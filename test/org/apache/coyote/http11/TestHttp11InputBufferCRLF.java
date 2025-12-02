@@ -48,23 +48,6 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 "GET\t/test\tHTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF },
                 Boolean.TRUE });
 
-        // Requests to simulate package boundaries
-        // HTTP/0.9 request
-        addRequestWithSplits("GET /test" + CRLF, Boolean.TRUE, parameterSets);
-
-        // HTTP/0.9 request with space
-        // Either malformed but acceptable HTTP/0.9 or invalid HTTP/1.1
-        // Tomcat opts for invalid HTTP/1.1
-        addRequestWithSplits("GET /test " + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
-
-        // HTTP/0.9 request (no optional CR)
-        addRequestWithSplits("GET /test" + LF, Boolean.TRUE, parameterSets);
-
-        // HTTP/0.9 request with space (no optional CR)
-        // Either malformed but acceptable HTTP/0.9 or invalid HTTP/1.1
-        // Tomcat opts for invalid HTTP/1.1
-        addRequestWithSplits("GET /test " + LF, Boolean.FALSE, Boolean.FALSE, parameterSets);
-
         // Standard HTTP/1.1 request
         addRequestWithSplits(
                 "GET /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,

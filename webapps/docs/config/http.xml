@@ -315,6 +315,15 @@
       The default value is <code>false</code>.</p>
     </attribute>
 
+    <attribute name="strictSni" required="false">
+      <p>Set this attribute to <code>true</code> to verify that the
+      <code>SSLHostConfig</code> configuration associated with the SNI host name
+      is the same as the <code>SSLHostConfig</code> configuration associated
+      with the HTTP protocol virtual host name in use. Non matching requests
+      will be rejected.
+      The default value is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
       after %xx decoding the URL. The default value is <code>UTF-8</code>.</p>
@@ -1144,9 +1153,12 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO connector use either the JSSE Java SSL implementation or
+  <p>The NIO connector uses either the JSSE Java SSL implementation or
   an OpenSSL implementation. As far as possible, common configuration attributes
-  are used for both JSSE and OpenSSL.</p>
+  are used for both JSSE and OpenSSL. You cannot mix JSSE specific configuration
+  attributes and OpenSSL specific configuration attributes on the same
+  connector. However, you may use either the JSSE or the OpenSSL configuration
+  style with either the JSSE and OpenSSL implementations.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the

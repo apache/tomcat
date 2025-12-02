@@ -198,7 +198,7 @@
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
   <!-- Tests To Run -->
-  <property name="test.name" value="**/Test*.java"/>
+  <!-- NOTE: test.name default is set in -test-profile-init target to allow profile override -->
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
   <property name="test.relaxTiming" value="false"/>
 
@@ -1950,14 +1950,104 @@
     <istrue value="${test.silent}"/>
   </condition>
 
+  <!-- ==================== Test Profile System ==================== -->
+  <!--
+    Property-based test profiles for convenient, selective test execution.
+
+    Usage: ant test -Dtest.profile=<profile-name>
+
+    Precedence: test.entry > test.profile > default
+    If test.entry is set, the profile is ignored to maintain backward compatibility.
+
+    Profile patterns are defined in test-profiles.properties test.profile properties
+    to keep this file readable.
+  -->
+
+  <!-- ================= Initialize Test Profile Property Values ================ -->
+
+  <!-- We read test profile definitions from "test-profiles.properties.default"   -->
+  <!-- and also from "test-profiles.properties" if it exists.                     -->
+  <!-- The values in "test-profiles.properties" have stronger preference.         -->
+  <!-- If you want to customize your build, you can either change the values      -->
+  <!-- directly in the default file, or create a new test-profiles.properties and -->
+  <!-- set the values there. This way you don't have to change a file which       -->
+  <!-- is part of the original project source code.                               -->
+  <!-- See "test-profiles.properties.default" in the top level directory for some -->
+  <!-- property values you may customize.                                         -->
+  <property file="${user.home}/test-profiles.properties"/>
+  <property file="test-profiles.properties"/>
+  <property file="test-profiles.properties.default"/>
+
+  <!-- Macro to set test pattern based on profile name -->
+  <macrodef name="set-profile-pattern">
+    <attribute name="profile"/>
+    <sequential>
+      <!-- Set test.name property based on the profile attribute -->
+      <condition property="test.name" value="${test.profile.smoke}">
+        <equals arg1="@{profile}" arg2="smoke"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.catalina}">
+        <equals arg1="@{profile}" arg2="catalina"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.coyote}">
+        <equals arg1="@{profile}" arg2="coyote"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.performance}">
+        <equals arg1="@{profile}" arg2="performance"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.tribes}">
+        <equals arg1="@{profile}" arg2="tribes"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.buildutil}">
+        <equals arg1="@{profile}" arg2="buildutil"/>
+      </condition>
+    </sequential>
+  </macrodef>
+
+  <!-- New internal target to initialize tests before moving to test target -->
+  <target name="-test-profile-init" if="test.profile" unless="test.entry">
+    <set-profile-pattern profile="${test.profile}"/>
+
+    <!-- Validate that the profile exists -->
+    <fail message="Unknown test profile '${test.profile}'. Check test-profiles.properties[.default] for available profiles.">
+      <condition>
+        <not><isset property="test.name"/></not>
+      </condition>
+    </fail>
+
+    <!-- Special handling for performance profile: disable default exclusion -->
+    <condition property="test.excludePerformance" value="false">
+      <equals arg1="${test.profile}" arg2="performance"/>
+    </condition>
+
+    <!-- Special handling for buildutil profile: include buildutil tests -->
+    <condition property="test.includeBuildutil" value="true">
+      <equals arg1="${test.profile}" arg2="buildutil"/>
+    </condition>
+
+    <!-- Special handling for tribes profile: include old slow/flaky tribes tests -->
+    <condition property="test.includeTribes" value="true">
+      <equals arg1="${test.profile}" arg2="tribes"/>
+    </condition>
+
+    <echo message="Test profile: ${test.profile}"/>
+  </target>
+
+  <!-- Set default test.name if no profile specified, using ant's immutability feature -->
+  <target name="-test-name-default" depends="-test-profile-init">
+    <property name="test.name" value="**/Test*.java"/>
+  </target>
+
+  <!-- ==================== End of Test Profile System ==================== -->
+
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,coverage-report,test-status" />
+          depends="-test-name-default,test-nio,coverage-report,test-status" />
 
   <target name="test-clean" description="Runs the JUnit test cases"
-          depends="clean-classes,test-nio,coverage-report,test-status" />
+          depends="clean-classes,-test-name-default,test-nio,coverage-report,test-status" />
 
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
-          depends="test-only-nio,test-status" />
+          depends="-test-name-default,test-only-nio,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -2100,14 +2190,14 @@
             <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
               <!-- Exclude helper classes -->
               <exclude name="**/Tester*.java" />
-              <!-- Exclude the tests known to fail -->
-              <exclude name="org/apache/catalina/tribes/test/**" />
+              <!-- Exclude old tribes tests (slow/flaky, excluded since 2011, unless explicitly requested via tribes profile) -->
+              <exclude name="org/apache/catalina/tribes/test/**" unless="test.includeTribes" />
               <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
               <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
               <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
-              <!-- Exclude tests that Gump can't compile -->
-              <exclude name="org/apache/tomcat/buildutil/**" />
+              <!-- Exclude tests that Gump can't compile (unless explicitly requested via buildutil profile) -->
+              <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>

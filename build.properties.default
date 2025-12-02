@@ -189,20 +189,20 @@ nsis.src.home=${base.path}/nsis-${nsis.version}-src
 nsis.src.loc=${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
 # ----- Commons Daemon, version 1.2.0 or later -----
-commons-daemon.version=1.4.1
+commons-daemon.version=1.5.0
 
-# checksum for commons-daemon-1.4.1-bin.tar.gz
+# checksum for commons-daemon-1.5.0-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=6e1e590d1b25b1c543b7e149748b25b7a200a20a70d490b1f2628ce808dd9da170d33c62b57421bdf7db0a9e0ac1df7f67de5e9ea4e70d500ec97ff7e6662e6a
+commons-daemon.bin.checksum.value=2b6365d3301b2bdf71851aa1be8b09f46b082ad93a564fbd1e64d69ad7f607807c45813fad182138150ea69fd231cd3b4812601ce011f42bd145979c005dca1b
 
-# checksums for commons-daemon-1.4.1-native-src.tar.gz, commons-daemon-1.4.1-bin-windows.zip
+# checksums for commons-daemon-1.5.0-native-src.tar.gz, commons-daemon-1.5.0-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=578002ddd6d1a63488b9920b848d839cab39fca58c1e208b929b5c327590ca63c5878cd5280d2a2006191a8e81d93e5ca07414f6f6f4a72669352df72a5977b1
+commons-daemon.native.src.checksum.value=8b3c22912b2fb87e5b8452f62e40d9ca328d33e5ea4db66e32139c341772e8147de300958d2e32b7a6289f0e2f3eb1e2114f10f6dc5c74232cd9f6fa2177a1f8
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=b8eeea01dbca495780e61db26776eab1561990d54499202bcb5d97c9f49e194ebc40002fabbaf74b5334481a2f42f80df5132efd0671632074df83759e04484a
+commons-daemon.native.win.checksum.value=e5d4d94e350d44ca2c9f34f65439bbc663b9d4df6edda10c83d3c8a76522bd3881cb4523152739369c89ec9bdc672c9b456d46ed72e12c366d6be8ba4619575d
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
@@ -254,10 +254,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.17.8
+bytebuddy.version=1.18.2
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=SHA-512
-bytebuddy.checksum.value=dd7f3f6aaf3dbf9df763e558706c82ad05add934d57e4872603da20fe8ba29647411b2456ec33c5cf07cf9d11e53f41aedbcb0ea4ca140c42ca632891cd826bf
+bytebuddy.checksum.value=fc5395040b177a382cff96fda197d624d3d914510e19d8ec68de9b472dc80ae48fcdb7283547774d4e4b3b74ff92107e8258c498d527c46846b5246fc9b09db9
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
@@ -272,10 +272,10 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=12.1.1
+checkstyle.version=12.2.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=ebdb306a9ffadbb319053e950020b2f251199fad11b74ae14ae6a162219f542f851885c73abfaf565bacaa9ff1322280d522cda4cd66e7052a263d453a7307df
+checkstyle.checksum.value=ddf947de9dbf6be0c69171d49415b1b0cc268f47d1a8fab04551b08086fb0100c87623cde9d99fca1cbfc92e33eb4afcea66d38a3c70155ec141c1f014453990
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar

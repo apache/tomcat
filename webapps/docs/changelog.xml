@@ -200,6 +200,18 @@
         <code>org.apache.catalina.Connector</code> no longer requires
         <code>org.apache.tomcat.jni.AprStatus</code> to be present. (markt)
       </fix>
+      <add>
+        Add the ability to use a custom function to generate the client
+        identifier in the <code>CrawlerSessionManagerValve</code>. This is only
+        available programmatically. Pull request <pr>902</pr> by Brian Matzon.
+        (markt)
+      </add>
+      <fix>
+        Change the SSO reauthentication behaviour for SPNEGO authentication so
+        that a normal SPNEGO  authentication is performed if the SSL Valve is
+        configured with reauthentication enabled. This is so that the delegated
+        credentials will be available to the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -228,12 +240,23 @@
         allowing to restrict which groups can be enabled on the SSL engine.
         (remm)
       </update>
+      <update>
+        Remove support for HTTP 0.9. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Don't log an incorrect certificate <code>KeyStore</code> location when
         creating a TLS connector if the <code>KeyStore</code> instance has been
         set directly on the connector. (markt)
       </fix>
+      <add>
+        Add <code>strictSNI</code> attribute on the <code>Connector</code> to
+        allow matching the <code>SSLHostConfig</code> configuration associated
+        with the SNI host name to the <code>SSLHostConfig</code> configuration
+        matched from the HTTP protocol host name. Non matching configurations
+        will cause the request to be rejected. The attribute default value is
+        <code>true</code>, enabling the matching. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -316,6 +339,10 @@
         Manager: Include web application state in the HTML and JSON complete
         server status output. (markt)
       </add>
+      <add>
+        Documentation: Expand the documentation to better explain when OCSP is
+        supported and when it is not. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
@@ -330,6 +357,12 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        Add test profile system for selective test execution. Profiles can be
+        specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
+        test subsets without using patterns directly. Profile patterns are
+        defined in <code>test-profiles.properties</code>. (csutherl)
+      </add>
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
@@ -342,6 +375,24 @@
         Update the packaged version of the Tomcat Migration Tool for Jakarta EE
         to 1.0.10. (markt)
       </update>
+      <update>
+        Update Commons Daemon to 1.5.0. (markt)
+      </update>
+      <update>
+        Update Byte Buddy to 1.18.2. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 12.2.0. (markt)
+      </update>
+      <add>
+        Improvements to Spanish translations provided by White Vogel. (markt)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
