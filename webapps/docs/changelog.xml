@@ -126,6 +126,12 @@
         available programmatically. Pull request <pr>902</pr> by Brian Matzon.
         (markt)
       </add>
+      <fix>
+        Change the SSO reauthentication behaviour for SPNEGO authentication so
+        that a normal SPNEGO  authentication is performed if the SSL Valve is
+        configured with reauthentication enabled. This is so that the delegated
+        credentials will be available to the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
