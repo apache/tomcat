@@ -105,9 +105,7 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.114 (remm)" rtext="in development">
-</section>
-<section name="Tomcat 9.0.113 (remm)" rtext="release in progress">
-  <subsection name="General">
+  <subsection name="Other">
     <changelog>
       <add>
         Add <code>test.silent</code> property to suppress JUnit console output
@@ -116,6 +114,8 @@
       </add>
     </changelog>
   </subsection>
+</section>
+<section name="Tomcat 9.0.113 (remm)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
