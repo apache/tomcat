@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.50 (schultz)" rtext="in development">
+  <subsection name="General">
+    <changelog>
+      <add>
+        Add <code>test.silent</code> property to suppress JUnit console output
+        during test execution. Useful for cleaner console output when running
+        tests with multiple threads. (csutherl)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
