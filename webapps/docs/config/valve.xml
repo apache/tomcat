@@ -1398,11 +1398,11 @@
         <p>If "true", this Valve uses cached security credentials (username and
         password) to reauthenticate to the <strong>Realm</strong> each request
         associated with an SSO session where the web application is configured
-        with BASIC, FORM or SPNEGO authentication. Web applications using DIGEST
+        with BASIC or FORM authentication. Web applications using DIGEST, SPNEGO
         or CLIENT-CERT authentication will reauthenticate using the standard
         authentication process for the authenticator. Therefore, it only makes
         sense to use the SSO Valve with this attribute set to "true" if there
-        are two or more web applications using BASIC, FORM or SPNEGO.</p>
+        are two or more web applications using BASIC or FORM.</p>
         <p>If "false", the Valve can itself authenticate requests based on the
         presence of a valid SSO cookie, without rechecking with the
         <strong>Realm</strong>.</p>

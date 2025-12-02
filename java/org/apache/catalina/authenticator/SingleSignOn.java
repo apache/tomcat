@@ -74,11 +74,10 @@ import org.apache.tomcat.util.res.StringManager;
  * from the user agent.</li>
  * <li>CLIENT-CERT - call the realm using the credentials present in the TLS connection. If not present in the TLS
  * connection, request them from the user agent.</li>
- * <li>SPNEGO - call the realm using the plain text user name and password cached by the SSO Valve if available. If not
- * cached, request authentication credentials from the user agent.</li>
+ * <li>SPNEGO - request authentication credentials from the user agent.</li>
  * </ul>
  * Note that this means that enabling reauthentication only makes sense if there are two or more web applications in the
- * Host that use BASIC, FORM or SPNEGO. If that is not the case, the SSO Valve will just add processing overhead.
+ * Host that use BASIC or FORM. If that is not the case, the SSO Valve will just add processing overhead.
  */
 public class SingleSignOn extends ValveBase {
 
