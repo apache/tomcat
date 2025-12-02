@@ -352,6 +352,12 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        Add test profile system for selective test execution. Profiles can be
+        specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
+        test subsets without using patterns directly. Profile patterns are
+        defined in <code>test-profiles.properties</code>. (csutherl)
+      </add>
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
