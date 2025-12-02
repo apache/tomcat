@@ -220,7 +220,7 @@ public abstract class SimpleHttpClient {
     }
 
     public void connect(int connectTimeout, int soTimeout) throws UnknownHostException, IOException {
-        connect(new Socket(), 10000, 10000, true);
+        connect(new Socket(), connectTimeout, soTimeout, true);
     }
 
     public void connect(Socket socket) throws UnknownHostException, IOException {
