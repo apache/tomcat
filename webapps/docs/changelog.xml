@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.50 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid possible NPEs when using a TLS enabled custom connector. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.50 (schultz)" rtext="Release in progress">
   <subsection name="General">
