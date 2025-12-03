@@ -127,8 +127,17 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols) {
         List<String> clientRequestedProtocols = clientRequestedProtocolsThreadLocal.get();
+        if (clientRequestedProtocols == null) {
+            clientRequestedProtocols = new ArrayList<String>();
+        }
         List<Group> clientSupportedGroups = clientSupportedGroupsThreadLocal.get();
+        if (clientSupportedGroups == null) {
+            clientSupportedGroups = new ArrayList<Group>();
+        }
         List<SignatureScheme> clientSignatureSchemes = clientSignatureSchemesThreadLocal.get();
+        if (clientSignatureSchemes == null) {
+            clientSignatureSchemes = new ArrayList<SignatureScheme>();
+        }
 
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
