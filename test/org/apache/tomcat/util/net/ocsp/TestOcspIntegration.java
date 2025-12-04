@@ -74,6 +74,8 @@ import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.TesterSupport;
+import org.apache.tomcat.util.net.openssl.OpenSSLConf;
+import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 import com.sun.net.httpserver.Headers;
@@ -368,6 +370,11 @@ public class TestOcspIntegration extends TomcatBaseTest {
 
         if (useOpenSSLTrust) {
             sslHostConfig.setCaCertificateFile(certificateChainFile.getAbsolutePath());
+            // Need to use OpenSSLConf settings
+            OpenSSLConf conf = new OpenSSLConf();
+            sslHostConfig.setOpenSslConf(conf);
+            // Verification
+            conf.addCmd(new OpenSSLConfCmd("OCSP_VERIFY_FLAGS", "16"));
         } else {
             sslHostConfig.setTruststoreType("PKCS12");
             sslHostConfig.setTruststoreFile(truststoreFile.getAbsolutePath());
