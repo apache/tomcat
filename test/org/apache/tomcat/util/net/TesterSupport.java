@@ -24,12 +24,24 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.cert.CertPathValidator;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.PKIXRevocationChecker;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.util.EnumSet;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -183,33 +195,61 @@ public final class TesterSupport {
     }
 
     protected static TrustManager[] getTrustManagers() throws Exception {
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(getKeyStore(CA_JKS));
+        return getTrustManagers(false);
+    }
+
+    protected static TrustManager[] getTrustManagers(boolean enableOcsp) throws Exception {
+        KeyStore trustStore = getKeyStore(CA_JKS);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        if (enableOcsp) {
+            Set<TrustAnchor> trustAnchors = getTrustAnchorsFromKeystore(trustStore);
+            PKIXBuilderParameters pkix = new PKIXBuilderParameters(trustAnchors, new X509CertSelector());
+            PKIXRevocationChecker revocationChecker =
+                    (PKIXRevocationChecker) CertPathValidator.getInstance("PKIX").getRevocationChecker();
+            revocationChecker.setOptions(EnumSet.of(PKIXRevocationChecker.Option.NO_FALLBACK));
+            pkix.addCertPathChecker(revocationChecker);
+            tmf.init(new CertPathTrustManagerParameters(pkix));
+        } else {
+            tmf.init(trustStore);
+        }
         return tmf.getTrustManagers();
     }
 
+    private static Set<TrustAnchor> getTrustAnchorsFromKeystore(KeyStore keyStore) throws KeyStoreException {
+        Set<TrustAnchor> trustAnchors = new HashSet<>();
+        Enumeration<String> aliases = keyStore.aliases();
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            Certificate certificate = keyStore.getCertificate(alias);
+            if (certificate instanceof X509Certificate) {
+                trustAnchors.add(new TrustAnchor((X509Certificate) certificate, null));
+            }
+        }
+        return trustAnchors;
+    }
+
     public static ClientSSLSocketFactory configureClientSsl() {
-        return configureClientSsl(false, null, CLIENT_JKS);
-    }
-
-    public static ClientSSLSocketFactory configureClientSsl(String keyStore) {
-        return configureClientSsl(false, null, keyStore);
-    }
-
-    public static ClientSSLSocketFactory configureClientSsl(String[] ciphers) {
-        return configureClientSsl(false, ciphers, CLIENT_JKS);
+        return configureClientSsl(false, null, false, CLIENT_JKS);
     }
 
     public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12) {
-        return configureClientSsl(forceTls12, null, CLIENT_JKS);
+        return configureClientSsl(forceTls12, null, false, CLIENT_JKS);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(String[] ciphers) {
+        return configureClientSsl(false, ciphers, false, CLIENT_JKS);
     }
 
     public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers) {
-        return configureClientSsl(forceTls12, ciphers, CLIENT_JKS);
+        return configureClientSsl(forceTls12, ciphers, false, CLIENT_JKS);
     }
 
-    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers, String keyStore) {
+    public static ClientSSLSocketFactory configureClientSsl(boolean enableOcsp, String keyStore) {
+        return configureClientSsl(false, null, enableOcsp, keyStore);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers, boolean enableOcsp,
+            String keyStore) {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
@@ -218,7 +258,7 @@ public final class TesterSupport {
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
-            sc.init(getUserKeyManagers(keyStore), getTrustManagers(), null);
+            sc.init(getUserKeyManagers(keyStore), getTrustManagers(enableOcsp), null);
             clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
             if (ciphers != null) {
                 clientSSLSocketFactory.setCipher(ciphers);
