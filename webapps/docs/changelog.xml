@@ -173,7 +173,8 @@
       <add>
         Add OCSP support to JSSE based TLS connectors and make the use of OCSP
         configurable per connector for both JSSE and OpenSSL based TLS
-        implementations. (markt)
+        implementations and align the checks performed by OpenSSL with those
+        performed by JSSE. (markt)
       </add>
     </changelog>
   </subsection>
