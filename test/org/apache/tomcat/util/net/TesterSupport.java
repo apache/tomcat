@@ -90,6 +90,8 @@ public final class TesterSupport {
     public static final String DB_INDEX = SSL_DIR + "index.db";
     public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "ocsp-responder-rsa-cert.pem";
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
+    public static final String LOCALHOST_CRL_RSA_JKS = SSL_DIR + "localhost-crl-rsa.jks";
+    public static final String CLIENT_CRL_JKS = SSL_DIR + "user2-crl.jks";
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
@@ -113,10 +115,16 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null, null, null);
+        // TLS material for tests uses default password
+        initSsl(tomcat, LOCALHOST_RSA_JKS, false);
     }
 
-    protected static void initSsl(Tomcat tomcat, String keystore,
+    public static void initSsl(Tomcat tomcat, String keystore, boolean opensslTrust) {
+        // TLS material for tests uses default password
+        initSsl(tomcat, keystore, opensslTrust, null, null, null, null);
+    }
+
+    protected static void initSsl(Tomcat tomcat, String keystore, boolean opensslTrust,
             String keystorePass, String keystorePassFile, String keyPass, String keyPassFile) {
 
         Connector connector = tomcat.getConnector();
@@ -138,7 +146,11 @@ public final class TesterSupport {
         }
         sslHostConfig.setSslProtocol("tls");
         certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
-        sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
+        if (opensslTrust) {
+            sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
+        } else {
+            sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
+        }
         if (keystorePassFile != null) {
             certificate.setCertificateKeystorePasswordFile(new File(keystorePassFile).getAbsolutePath());
         }
@@ -153,10 +165,10 @@ public final class TesterSupport {
         }
     }
 
-    protected static KeyManager[] getUser1KeyManagers() throws Exception {
+    protected static KeyManager[] getUserKeyManagers(String keyStore) throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(getKeyStore(CLIENT_JKS), JKS_PASS.toCharArray());
+        kmf.init(getKeyStore(keyStore), JKS_PASS.toCharArray());
         KeyManager[] managers = kmf.getKeyManagers();
         KeyManager manager;
         for (int i=0; i < managers.length; i++) {
@@ -178,18 +190,26 @@ public final class TesterSupport {
     }
 
     public static ClientSSLSocketFactory configureClientSsl() {
-        return configureClientSsl(false);
+        return configureClientSsl(false, null, CLIENT_JKS);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(String keyStore) {
+        return configureClientSsl(false, null, keyStore);
     }
 
     public static ClientSSLSocketFactory configureClientSsl(String[] ciphers) {
-        return configureClientSsl(false, ciphers);
+        return configureClientSsl(false, ciphers, CLIENT_JKS);
     }
 
     public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12) {
-        return configureClientSsl(forceTls12, null);
+        return configureClientSsl(forceTls12, null, CLIENT_JKS);
     }
 
     public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers) {
+        return configureClientSsl(forceTls12, ciphers, CLIENT_JKS);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers, String keyStore) {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
@@ -198,7 +218,7 @@ public final class TesterSupport {
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
-            sc.init(getUser1KeyManagers(), getTrustManagers(), null);
+            sc.init(getUserKeyManagers(keyStore), getTrustManagers(), null);
             clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
             if (ciphers != null) {
                 clientSSLSocketFactory.setCipher(ciphers);
