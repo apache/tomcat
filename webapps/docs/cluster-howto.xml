@@ -238,6 +238,19 @@ should be completed:</p>
   replication yields shorter request times, and synchronous replication guarantees the session
   to be replicated before the request returns.
 </p>
+<p>
+    In addition to <code>channelSendOptions</code>, the backup manager's
+    <code>mapSendOptions</code> attribute uses the same send-option flag
+    mechanism. This attribute controls how the replicated map within the
+    <code>BackupManager</code> sends its messages during session backup
+    operations.
+
+    Just like <code>channelSendOptions</code>, the value may be specified
+    either as an integer bitmask (e.g. <code>6</code>) or using the
+    human-readable option names (e.g. <code>"sync,use_ack"</code>), with
+    multiple names separated by commas. The same option names and flag
+    combinations apply to both attributes.
+</p>
 </section>
 
 <section name="Bind session after crash to failover node">
