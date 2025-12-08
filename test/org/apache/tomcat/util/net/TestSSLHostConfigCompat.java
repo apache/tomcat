@@ -254,6 +254,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
                 SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
                 sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
                 sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+                sslHostConfigCertificateRsa.setCertificateKeyPassword(TesterSupport.JKS_PASS);
                 sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
                 break;
             }
