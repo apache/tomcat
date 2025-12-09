@@ -101,6 +101,12 @@ public class OcspBaseTest extends TomcatBaseTest {
 
     protected void doTest(boolean clientCertValid, boolean serverCertValid, ClientCertificateVerification verifyClientCert,
             boolean verifyServerCert) throws Exception {
+        doTest(clientCertValid, serverCertValid, verifyClientCert, verifyServerCert, null);
+    }
+
+
+    protected void doTest(boolean clientCertValid, boolean serverCertValid, ClientCertificateVerification verifyClientCert,
+            boolean verifyServerCert, Boolean softFail) throws Exception {
 
         Assume.assumeFalse(!useOpenSSLTrust && verifyClientCert == ClientCertificateVerification.OPTIONAL_NO_CA);
 
@@ -138,6 +144,10 @@ public class OcspBaseTest extends TomcatBaseTest {
             TesterSupport.configureClientSsl(verifyServerCert, TesterSupport.CLIENT_JKS);
         } else {
             TesterSupport.configureClientSsl(verifyServerCert, TesterSupport.CLIENT_CRL_JKS);
+        }
+
+        if (softFail != null) {
+            sslHostConfig.setOcspSoftFail(softFail.booleanValue());
         }
 
         tomcat.start();

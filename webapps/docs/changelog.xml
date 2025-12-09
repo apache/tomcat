@@ -173,8 +173,12 @@
       <add>
         Add OCSP support to JSSE based TLS connectors and make the use of OCSP
         configurable per connector for both JSSE and OpenSSL based TLS
-        implementations and align the checks performed by OpenSSL with those
+        implementations. Align the checks performed by OpenSSL with those
         performed by JSSE. (markt)
+      </add>
+      <add>
+        Add support for soft failure of OCSP checks with soft failure support
+        disabled by default. (markt)
       </add>
     </changelog>
   </subsection>
