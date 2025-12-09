@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -177,12 +178,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param certificateVerificationDepth        Certificate verification depth
      * @param certificateVerificationOptionalNoCA Skip CA verification in optional mode
      * @param noOcspCheck                         Enable OCSP if true
+     * @param ocspSoftFail                        Allow OCSP checks to pass if the responder can't be contacted
      * @param ocspTimeout                         Timout in ms to use for OCSP requests
      * @param ocspVerifyFlags                     Verification flags for OCSP
      */
     OpenSSLEngine(Cleaner cleaner, MemorySegment sslCtx, String fallbackApplicationProtocol, boolean clientMode,
             OpenSSLSessionContext sessionContext, boolean alpn, boolean initialized, int certificateVerificationDepth,
-            boolean certificateVerificationOptionalNoCA, boolean noOcspCheck,  int ocspTimeout, int ocspVerifyFlags) {
+            boolean certificateVerificationOptionalNoCA, boolean noOcspCheck, boolean ocspSoftFail,
+            int ocspTimeout, int ocspVerifyFlags) {
         if (sslCtx == null) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
@@ -205,7 +208,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             var internalBIO = internalBIOPointer.get(ValueLayout.ADDRESS, 0);
             var networkBIO = networkBIOPointer.get(ValueLayout.ADDRESS, 0);
             SSL_set_bio(ssl, internalBIO, internalBIO);
-            state = new EngineState(ssl, networkBIO, certificateVerificationDepth, noOcspCheck, ocspTimeout, ocspVerifyFlags);
+            state = new EngineState(ssl, networkBIO, certificateVerificationDepth, noOcspCheck, ocspSoftFail,
+                    ocspTimeout, ocspVerifyFlags);
         }
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
@@ -1139,7 +1143,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN()) ||
                     (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY()) ||
                     (errnum == X509_V_ERR_CERT_UNTRUSTED()) || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
-            if (verifyErrorIsOptional && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
+            if ((verifyErrorIsOptional || errnum == X509_V_OK()) && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
                 ok = 1;
                 openssl_h_Compatibility.SSL_set_verify_result(state.ssl, X509_V_OK());
             }
@@ -1166,11 +1170,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                  * issuer may be missing/untrusted. Fail in that case.
                  */
                 if (verifyErrorIsOptional) {
-                    if (state.certificateVerifyMode != OpenSSLContext.OPTIONAL_NO_CA) {
-                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
-                        errnum = X509_V_ERR_APPLICATION_VERIFICATION();
-                        ok = 0;
-                    }
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+                    errnum = X509_V_ERR_APPLICATION_VERIFICATION();
+                    ok = 0;
                 } else {
                     int ocspResponse = processOCSP(state, x509ctx);
                     if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
@@ -1179,8 +1181,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_CERT_REVOKED());
                     } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
                         errnum = X509_STORE_CTX_get_error(x509ctx);
-                        if (errnum != X509_V_ERR_UNABLE_TO_GET_CRL() &&
-                                (errnum == X509_V_ERR_APPLICATION_VERIFICATION() || errnum != 0)) {
+                        if (errnum != 0 && !(state.ocspSoftFail && errnum == X509_V_ERR_UNABLE_TO_GET_CRL())) {
                             ok = 0;
                         }
                     }
@@ -1359,7 +1360,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             var nativeResponseData = localArena.allocateFrom(ValueLayout.JAVA_BYTE, responseData);
             var nativeResponseDataPointer = localArena.allocateFrom(ValueLayout.ADDRESS, nativeResponseData);
             ocspResponse = d2i_OCSP_RESPONSE(MemorySegment.NULL, nativeResponseDataPointer, responseData.length);
-            if (!MemorySegment.NULL.equals(ocspResponse)) {
+            if (MemorySegment.NULL.equals(ocspResponse)) {
+                // Failed to get a valid response
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+            } else {
                 if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
                     basicResponse = OCSP_response_get1_basic(ocspResponse);
                     if (OCSP_check_nonce(ocspRequest, basicResponse) == 0) {
@@ -1396,13 +1400,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     return status;
                 }
             }
+        } catch (IOException ioe) {
+            // Timeout or network error. Responder is not available.
+            log.warn(sm.getString("engine.ocspRequestError", url.toString()), ioe);
+            X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
         } catch (Exception e) {
             log.warn(sm.getString("engine.ocspRequestError", url.toString()), e);
+            X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
         } finally {
-            if (MemorySegment.NULL.equals(ocspResponse)) {
-                // Failed to get a valid response
-                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
-            }
             OCSP_CERTID_free(certId);
             OCSP_BASICRESP_free(basicResponse);
             OCSP_RESPONSE_free(ocspResponse);
@@ -1706,6 +1711,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         private final MemorySegment networkBIO;
         private final int certificateVerificationDepth;
         private final boolean noOcspCheck;
+        private final boolean ocspSoftFail;
         private final int ocspTimeout;
         private final int ocspVerifyFlags;
 
@@ -1714,10 +1720,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         private int handshakeCount = 0;
 
         private EngineState(MemorySegment ssl, MemorySegment networkBIO, int certificateVerificationDepth,
-                boolean noOcspCheck, int ocspTimeout, int ocspVerifyFlags) {
+                boolean noOcspCheck, boolean ocspSoftFail, int ocspTimeout, int ocspVerifyFlags) {
             states.put(Long.valueOf(ssl.address()), this);
             this.certificateVerificationDepth = certificateVerificationDepth;
             this.noOcspCheck = noOcspCheck;
+            this.ocspSoftFail = ocspSoftFail;
             this.ocspTimeout = ocspTimeout;
             this.ocspVerifyFlags = ocspVerifyFlags;
             // Use another arena to avoid keeping a reference through segments
