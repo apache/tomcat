@@ -117,6 +117,7 @@ public class SSLHostConfig implements Serializable {
     private boolean honorCipherOrder = false;
     private boolean ocspEnabled = false;
     private boolean ocspSoftFail = true;
+    private int ocspTimeout = 15000;
     private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
@@ -635,6 +636,16 @@ public class SSLHostConfig implements Serializable {
 
     public void setOcspSoftFail(boolean ocspSoftFail) {
         this.ocspSoftFail = ocspSoftFail;
+    }
+
+
+    public int getOcspTimeout() {
+        return ocspTimeout;
+    }
+
+
+    public void setOcspTimeout(int ocspTimeout) {
+        this.ocspTimeout = ocspTimeout;
     }
 
 

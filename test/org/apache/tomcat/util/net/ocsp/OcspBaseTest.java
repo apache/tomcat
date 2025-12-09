@@ -150,6 +150,16 @@ public class OcspBaseTest extends TomcatBaseTest {
             sslHostConfig.setOcspSoftFail(softFail.booleanValue());
         }
 
+        /*
+         * Use shorter timeout to speed up test.
+         *
+         * Note: JSSE timeout set earlier as it requires setting a system property that is read once in a static
+         * initializer.
+         */
+        if (useOpenSSLTrust) {
+            sslHostConfig.setOcspTimeout(1000);
+        }
+
         tomcat.start();
 
         int rc = getUrl("https://localhost:" + getPort() + "/simple", new ByteChunk(), false);
