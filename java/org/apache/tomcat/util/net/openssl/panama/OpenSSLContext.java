@@ -124,6 +124,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private boolean noOcspCheck = false;
     private boolean ocspSoftFail = true;
+    // 15s default - same as JSSE
     private int ocspTimeout = 15000;
     private int ocspVerifyFlags = 0;
     private X509TrustManager x509TrustManager;
@@ -360,7 +361,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     ok = true;
                 } else if (name.equals(OpenSSLConfCmd.OCSP_SOFT_FAIL)) {
                     ok = true;
-                } else if (name.equals("OCSP_TIMEOUT")) {
+                } else if (name.equals(OpenSSLConfCmd.OCSP_TIMEOUT)) {
                     ok = true;
                 } else if (name.equals("OCSP_VERIFY_FLAGS")) {
                     ok = true;
@@ -437,8 +438,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } else if (name.equals(OpenSSLConfCmd.OCSP_SOFT_FAIL)) {
                     // Ignore - Tomcat internal - set directly
                     rc = 1;
-                } else if (name.equals("OCSP_TIMEOUT")) {
-                    ocspTimeout = Integer.parseInt(value);
+                } else if (name.equals(OpenSSLConfCmd.OCSP_TIMEOUT)) {
+                    // Ignore - Tomcat internal - set directly
                     rc = 1;
                 } else if (name.equals("OCSP_VERIFY_FLAGS")) {
                     ocspVerifyFlags = Integer.parseInt(value);
@@ -571,6 +572,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 noOcspCheck = true;
             }
             ocspSoftFail = sslHostConfig.getOcspSoftFail();
+            ocspTimeout = sslHostConfig.getOcspTimeout();
 
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             SSL_CTX_set_verify(state.sslCtx, value,

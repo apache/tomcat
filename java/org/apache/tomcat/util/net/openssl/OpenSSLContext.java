@@ -369,6 +369,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         Boolean.toString(!sslHostConfig.getOcspEnabled())));
                 sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_SOFT_FAIL,
                         Boolean.toString(sslHostConfig.getOcspSoftFail())));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_TIMEOUT,
+                        Integer.toString(sslHostConfig.getOcspTimeout())));
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
