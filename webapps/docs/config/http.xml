@@ -1445,6 +1445,16 @@
       used.</p>
     </attribute>
 
+    <attribute name="ocspSoftFail" required="false">
+      <p>By default, if an OCSP check fails for any reason the associated TLS
+      handhskae will also fail and a TLS connection will not be established. If
+      this attribute is set to <code>true</code>, OCSP checks that fail but do
+      not return an explicit failure status to Tomcat (e.g. the OCSP check times
+      out) will not cause the TLS handshake to fail.</p>
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
+    </attribute>
+
     <attribute name="protocols" required="false">
       <p>The names of the protocols to support when communicating with clients.
       This should be a list of any combination of the following:

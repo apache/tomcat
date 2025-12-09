@@ -123,6 +123,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private boolean initialized = false;
 
     private boolean noOcspCheck = false;
+    private boolean ocspSoftFail = true;
     private int ocspTimeout = 15000;
     private int ocspVerifyFlags = 0;
     private X509TrustManager x509TrustManager;
@@ -357,6 +358,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             try (var localArena = Arena.ofConfined()) {
                 if (name.equals(OpenSSLConfCmd.NO_OCSP_CHECK)) {
                     ok = true;
+                } else if (name.equals(OpenSSLConfCmd.OCSP_SOFT_FAIL)) {
+                    ok = true;
                 } else if (name.equals("OCSP_TIMEOUT")) {
                     ok = true;
                 } else if (name.equals("OCSP_VERIFY_FLAGS")) {
@@ -429,7 +432,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             try (var localArena = Arena.ofConfined()) {
                 if (name.equals(OpenSSLConfCmd.NO_OCSP_CHECK)) {
-                    noOcspCheck = Boolean.parseBoolean(value);
+                    // Ignore - Tomcat internal - set directly
+                    rc = 1;
+                } else if (name.equals(OpenSSLConfCmd.OCSP_SOFT_FAIL)) {
+                    // Ignore - Tomcat internal - set directly
                     rc = 1;
                 } else if (name.equals("OCSP_TIMEOUT")) {
                     ocspTimeout = Integer.parseInt(value);
@@ -564,6 +570,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (value == OPTIONAL_NO_CA || !sslHostConfig.getOcspEnabled()) {
                 noOcspCheck = true;
             }
+            ocspSoftFail = sslHostConfig.getOcspSoftFail();
 
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             SSL_CTX_set_verify(state.sslCtx, value,
@@ -1362,7 +1369,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, false, sessionContext, alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA,
-                noOcspCheck, ocspTimeout, ocspVerifyFlags);
+                noOcspCheck, ocspSoftFail, ocspTimeout, ocspVerifyFlags);
     }
 
     @Override
