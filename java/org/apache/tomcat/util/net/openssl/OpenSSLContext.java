@@ -387,6 +387,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.NO_OCSP_CHECK,
                         Boolean.toString(!sslHostConfig.getOcspEnabled())));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_SOFT_FAIL,
+                        Boolean.toString(sslHostConfig.getOcspSoftFail())));
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {

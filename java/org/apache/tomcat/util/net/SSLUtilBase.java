@@ -540,7 +540,11 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         if (sslHostConfig.getOcspEnabled()) {
             PKIXRevocationChecker revocationChecker =(PKIXRevocationChecker) CertPathValidator.getInstance("PKIX").getRevocationChecker();
-            revocationChecker.setOptions(EnumSet.of(PKIXRevocationChecker.Option.SOFT_FAIL));
+            if (sslHostConfig.getOcspSoftFail()) {
+                revocationChecker.setOptions(EnumSet.of(PKIXRevocationChecker.Option.SOFT_FAIL));
+            } else {
+                revocationChecker.setOptions(Collections.emptySet());
+            }
             xparams.addCertPathChecker(revocationChecker);
             enableRevocation = true;
         }
