@@ -24,6 +24,7 @@ public class OpenSSLConfCmd implements Serializable {
     public static final String NO_OCSP_CHECK = "NO_OCSP_CHECK";
     public static final String OCSP_SOFT_FAIL = "OCSP_SOFT_FAIL";
     public static final String OCSP_TIMEOUT = "OCSP_TIMEOUT";
+    public static final String OCSP_VERIFY_FLAGS = "OCSP_VERIFY_FLAGS";
 
     private static final long serialVersionUID = 1L;
 

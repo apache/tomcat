@@ -118,6 +118,7 @@ public class SSLHostConfig implements Serializable {
     private boolean ocspEnabled = false;
     private boolean ocspSoftFail = true;
     private int ocspTimeout = 15000;
+    private int ocspVerifyFlags = 0;
     private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
@@ -589,6 +590,16 @@ public class SSLHostConfig implements Serializable {
 
     public void setOcspTimeout(int ocspTimeout) {
         this.ocspTimeout = ocspTimeout;
+    }
+
+
+    public int getOcspVerifyFlags() {
+        return ocspVerifyFlags;
+    }
+
+
+    public void setOcspVerifyFlags(int ocspVerifyFlags) {
+        this.ocspVerifyFlags = ocspVerifyFlags;
     }
 
 
