@@ -104,6 +104,7 @@ public final class TesterSupport {
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
     public static final String LOCALHOST_CRL_RSA_JKS = SSL_DIR + "localhost-crl-rsa.jks";
     public static final String CLIENT_CRL_JKS = SSL_DIR + "user2-crl.jks";
+    public static final String CLIENT_CRL_LONG_JKS = SSL_DIR + "user3-crl-long.jks";
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
