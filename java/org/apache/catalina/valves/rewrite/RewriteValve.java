@@ -155,7 +155,6 @@ public class RewriteValve extends ValveBase {
         InputStream is = null;
 
         // Process configuration file for this valve
-        // Process configuration file for this valve
         if (getContainer() instanceof Context) {
             context = true;
             String webInfResourcePath = "/WEB-INF/" + resourcePath;
