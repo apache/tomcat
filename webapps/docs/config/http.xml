@@ -1372,6 +1372,14 @@
       used.</p>
     </attribute>
 
+    <attribute name="ocspVerify" required="false">
+      <p>Configures the verification flags passed to
+      <code>OCSP_basic_verify</code> when using OCSP checks with an OpenSSL
+      based TLS implementation. This attribute has no effect if a JSSE based TLS
+      implementation is used.</p>
+      <p>If not specified, the default value of <code>0</code> will be used.</p>
+    </attribute>
+
     <attribute name="protocols" required="false">
       <p>The names of the protocols to support when communicating with clients.
       This should be a list of any combination of the following:

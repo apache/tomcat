@@ -289,6 +289,11 @@
         Add support for soft failure of OCSP checks with soft failure support
         disabled by default. (markt)
       </add>
+      <add>
+        Add support for configuring the verification flags passed to
+        <code>OCSP_basic_verify</code> when using an OpenSSL based TLS
+        implementation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
