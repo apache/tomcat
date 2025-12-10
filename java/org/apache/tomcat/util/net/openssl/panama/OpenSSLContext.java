@@ -363,7 +363,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     ok = true;
                 } else if (name.equals(OpenSSLConfCmd.OCSP_TIMEOUT)) {
                     ok = true;
-                } else if (name.equals("OCSP_VERIFY_FLAGS")) {
+                } else if (name.equals(OpenSSLConfCmd.OCSP_VERIFY_FLAGS)) {
                     ok = true;
                 } else {
                     int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateFrom(name));
@@ -441,8 +441,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } else if (name.equals(OpenSSLConfCmd.OCSP_TIMEOUT)) {
                     // Ignore - Tomcat internal - set directly
                     rc = 1;
-                } else if (name.equals("OCSP_VERIFY_FLAGS")) {
-                    ocspVerifyFlags = Integer.parseInt(value);
+                } else if (name.equals(OpenSSLConfCmd.OCSP_VERIFY_FLAGS)) {
+                    // Ignore - Tomcat internal - set directly
                     rc = 1;
                 } else {
                     rc = SSL_CONF_cmd(state.confCtx, localArena.allocateFrom(name), localArena.allocateFrom(value));
@@ -573,6 +573,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             ocspSoftFail = sslHostConfig.getOcspSoftFail();
             ocspTimeout = sslHostConfig.getOcspTimeout();
+            ocspVerifyFlags = sslHostConfig.getOcspVerifyFlags();
 
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             SSL_CTX_set_verify(state.sslCtx, value,
