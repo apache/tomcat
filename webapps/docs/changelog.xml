@@ -163,7 +163,7 @@
         HTTP/0.9 only allows GET as the HTTP method. (remm)
       </fix>
       <add>
-        Add <code>strictSNI</code> attribute on the <code>Connector</code> to
+        Add <code>strictSni</code> attribute on the <code>Connector</code> to
         allow matching the <code>SSLHostConfig</code> configuration associated
         with the SNI host name to the <code>SSLHostConfig</code> configuration
         matched from the HTTP protocol host name. Non matching configurations
