@@ -2089,7 +2089,6 @@
         <equals arg1="${failed.count}" arg2="0"/>
       </not>
     </condition>
-    
     <concat>
       <header>Testsuites with skipped tests: ${line.separator}</header>
       <string>${skipped.output}</string>
