@@ -634,7 +634,6 @@
     <!-- Remove optional valves -->
     <exclude name="org/apache/catalina/valves/Crawler*" />
     <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
-    <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/HealthCheckValve*" />
     <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
     <exclude name="org/apache/catalina/valves/PersistentValve*" />
