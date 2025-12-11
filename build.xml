@@ -2062,7 +2062,6 @@
       </not>
     </fileset>
 
-    <!-- Start Patch 1 -->
     <resourcecount property="skipped.count">
       <fileset refid="test.result.skippedtests"/>
     </resourcecount>
@@ -2090,7 +2089,6 @@
         <equals arg1="${failed.count}" arg2="0"/>
       </not>
     </condition>
-    <!-- End Patch 1 -->
     
     <concat>
       <header>Testsuites with skipped tests: ${line.separator}</header>
