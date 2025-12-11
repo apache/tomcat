@@ -2061,9 +2061,40 @@
         <contains text="Failures: 0, Errors: 0" />
       </not>
     </fileset>
+
+    <!-- Start Patch 1 -->
+    <resourcecount property="skipped.count">
+      <fileset refid="test.result.skippedtests"/>
+    </resourcecount>
+
+    <resourcecount property="failed.count">
+      <fileset refid="test.result.failedtests"/>
+    </resourcecount>
+
+    <pathconvert property="skipped.list" pathsep=";">
+      <fileset refid="test.result.skippedtests"/>
+    </pathconvert>
+
+    <pathconvert property="failed.list" pathsep=";">
+      <fileset refid="test.result.failedtests"/>
+    </pathconvert>
+
+    <condition property="skipped.output" value="${skipped.list}" else="None">
+      <not>
+        <equals arg1="${skipped.count}" arg2="0"/>
+      </not>
+    </condition>
+
+    <condition property="failed.output" value="${failed.list}" else="None">
+      <not>
+        <equals arg1="${failed.count}" arg2="0"/>
+      </not>
+    </condition>
+    <!-- End Patch 1 -->
+    
     <concat>
-      <header>Testsuites with skipped tests:${line.separator}</header>
-      <string>${toString:test.result.skippedtests}</string>
+      <header>Testsuites with skipped tests: ${line.separator}</header>
+      <string>${skipped.output}</string>
       <filterchain>
         <tokenfilter delimOutput="${line.separator}">
           <stringtokenizer delims=";"/>
@@ -2071,8 +2102,8 @@
       </filterchain>
     </concat>
     <concat>
-      <header>Testsuites with failed tests:${line.separator}</header>
-      <string>${toString:test.result.failedtests}</string>
+      <header>Testsuites with failed tests: ${line.separator}</header>
+      <string>${failed.output}</string>
       <filterchain>
         <tokenfilter delimOutput="${line.separator}">
           <stringtokenizer delims=";"/>
