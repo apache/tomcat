@@ -57,7 +57,9 @@ public class SSLHostConfig implements Serializable {
     // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
-    public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private static final String DEFAULT_TLS_12_BELOW_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private static final String DEFAULT_TLS_13_ABOVE_CIPHERS = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256";
+    public static final String DEFAULT_TLS_CIPHERS = DEFAULT_TLS_12_BELOW_CIPHERS + ":" + DEFAULT_TLS_13_ABOVE_CIPHERS;
 
     static {
         /*
