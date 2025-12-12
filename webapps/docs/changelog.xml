@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.14 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.15 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -191,27 +191,6 @@
         to <code>true</code>. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Add log warnings for additional Host <code>appBase</code> suspicious
-        values. (remm)
-      </fix>
-      <fix>
-        Remove hard dependency on tomcat-jni.jar for catalina.jar.
-        <code>org.apache.catalina.Connector</code> no longer requires
-        <code>org.apache.tomcat.jni.AprStatus</code> to be present. (markt)
-      </fix>
-      <add>
-        Add the ability to use a custom function to generate the client
-        identifier in the <code>CrawlerSessionManagerValve</code>. This is only
-        available programmatically. Pull request <pr>902</pr> by Brian Matzon.
-        (markt)
-      </add>
-      <fix>
-        Change the SSO reauthentication behaviour for SPNEGO authentication so
-        that a normal SPNEGO  authentication is performed if the SSL Valve is
-        configured with reauthentication enabled. This is so that the delegated
-        credentials will be available to the web application. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -244,19 +223,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Don't log an incorrect certificate <code>KeyStore</code> location when
-        creating a TLS connector if the <code>KeyStore</code> instance has been
-        set directly on the connector. (markt)
-      </fix>
-      <add>
-        Add <code>strictSNI</code> attribute on the <code>Connector</code> to
-        allow matching the <code>SSLHostConfig</code> configuration associated
-        with the SNI host name to the <code>SSLHostConfig</code> configuration
-        matched from the HTTP protocol host name. Non matching configurations
-        will cause the request to be rejected. The attribute default value is
-        <code>true</code>, enabling the matching. (remm)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -296,10 +262,6 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Correct a regression in 11.0.11 that broke some clustering
-        configurations. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -330,29 +292,11 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Manager: Fix abrupt truncation of the HTML and JSON complete server
-        status output if one or more of the web applications failed to start.
-        (schultz)
-      </fix>
-      <add>
-        Manager: Include web application state in the HTML and JSON complete
-        server status output. (markt)
-      </add>
-      <add>
-        Documentation: Expand the documentation to better explain when OCSP is
-        supported and when it is not. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>64083</bug>: If the underlying connection has been closed, don't
-        add it to the pool when it is returned. Pull request <pr>235</pr> by
-        Alex Panchenko. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -367,32 +311,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update file extension to media type mappings to align with the current
-        list used by the Apache Web Server (httpd). (markt)
-      </update>
-      <update>
-        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
-        to 1.0.10. (markt)
-      </update>
-      <update>
-        Update Commons Daemon to 1.5.0. (markt)
-      </update>
-      <update>
-        Update Byte Buddy to 1.18.2. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 12.2.0. (markt)
-      </update>
-      <add>
-        Improvements to Spanish translations provided by White Vogel. (markt)
-      </add>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
