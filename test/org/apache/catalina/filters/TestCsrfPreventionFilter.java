@@ -236,6 +236,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
                 "/foo/bar?csrf=&csrf&csrf&csrf&csrf=abc&csrf=",
                 "/foo/bar?xcsrf=&xcsrf&xcsrf&xcsrf&xcsrf=abc&xcsrf=",
                 "/foo/bar?xcsrf=&xcsrf&xcsrf&csrf=foo&xcsrf&xcsrf=abc&csrf=bar&xcsrf=&",
+                "/foo/bar?bar=fo?&csrf=abc",
+                "/foo/bar?bar=fo?&csrf=abc&baz=boh",
         };
 
         String csrfParameterName = "csrf";
@@ -264,7 +266,13 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         url = url.replaceAll(Pattern.quote("?") + csrfParameterName + "(=[^&]*)?(&|$)", "?");
 
         if (url.endsWith("?")) {
-            url = url.substring(0, url.length() - 1);
+            // Special case: it's possible to have multiple ? in a URL:
+            // the query-string is technically allowed to contain ? characters.
+            // Only trim the trailing ? if it is actually the quest-string
+            // separator.
+            if(url.lastIndexOf('?', url.length() - 2) < 0) {
+                url = url.substring(0, url.length() - 1);
+            }
         }
 
         return url;
