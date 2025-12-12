@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -67,11 +68,17 @@ final class EvictionTimer {
         @Override
         public void run() {
             synchronized (EvictionTimer.class) {
-                for (final Entry<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>> entry : TASK_MAP
-                        .entrySet()) {
+                /*
+                 * Need to use iterator over TASK_MAP so entries can be removed when iterating without triggering a
+                 * ConcurrentModificationException.
+                 */
+                final Iterator<Entry<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>>> iterator =
+                        TASK_MAP.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    final Entry<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>> entry = iterator.next();
                     if (entry.getKey().get() == null) {
                         executor.remove(entry.getValue());
-                        TASK_MAP.remove(entry.getKey());
+                        iterator.remove();
                     }
                 }
                 if (TASK_MAP.isEmpty() && executor != null) {
@@ -107,8 +114,10 @@ final class EvictionTimer {
             if (task != null) {
                 task.run();
             } else {
-                executor.remove(this);
-                TASK_MAP.remove(ref);
+                synchronized (EvictionTimer.class) {
+                    executor.remove(this);
+                    TASK_MAP.remove(ref);
+                }
             }
         }
     }
@@ -189,8 +198,8 @@ final class EvictionTimer {
      * server environments.
      *
      * @param task      Task to be scheduled.
-     * @param delay     Delay in milliseconds before task is executed.
-     * @param period    Time in milliseconds between executions.
+     * @param delay     Duration before task is executed.
+     * @param period    Duration between executions.
      */
     static synchronized void schedule(
             final BaseGenericObjectPool<?>.Evictor task, final Duration delay, final Duration period) {

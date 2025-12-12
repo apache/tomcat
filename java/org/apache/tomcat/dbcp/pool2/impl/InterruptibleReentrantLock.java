@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,18 +37,18 @@ final class InterruptibleReentrantLock extends ReentrantLock {
      * Constructs a new InterruptibleReentrantLock with the given fairness policy.
      *
      * @param fairness true means threads should acquire contended locks as if
-     * waiting in a FIFO queue
+     * waiting in a FIFO queue.
      */
     InterruptibleReentrantLock(final boolean fairness) {
         super(fairness);
     }
 
     /**
-     * Interrupts the threads that are waiting on a specific condition
+     * Interrupts the threads that are waiting on a specific condition.
      *
      * @param condition the condition on which the threads are waiting.
      */
-    public void interruptWaiters(final Condition condition) {
+    void interruptWaiters(final Condition condition) {
         getWaitingThreads(condition).forEach(Thread::interrupt);
     }
 }

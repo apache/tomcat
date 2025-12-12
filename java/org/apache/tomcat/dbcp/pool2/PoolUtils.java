@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -46,6 +47,9 @@ public final class PoolUtils {
      * frequently.
      */
     private static final class ErodingFactor {
+
+        private static final float MAX_INTERVAL = 15f;
+
         /** Determines frequency of "erosion" events */
         private final float factor;
 
@@ -53,7 +57,9 @@ public final class PoolUtils {
         private transient volatile long nextShrinkMillis;
 
         /** High water mark - largest numIdle encountered */
-        private transient volatile int idleHighWaterMark;
+        private transient volatile int idleHighWaterMark = 1;
+
+        private final ReentrantLock lock = new ReentrantLock();
 
         /**
          * Creates a new ErodingFactor with the given erosion factor.
@@ -61,10 +67,9 @@ public final class PoolUtils {
          * @param factor
          *            erosion factor
          */
-        ErodingFactor(final float factor) {
+        private ErodingFactor(final float factor) {
             this.factor = factor;
-            nextShrinkMillis = System.currentTimeMillis() + (long) (900000 * factor); // now + 15 min * factor
-            idleHighWaterMark = 1;
+            nextShrinkMillis = System.currentTimeMillis() + (long) (900_000 * factor); // now + 15 min * factor
         }
 
         /**
@@ -72,7 +77,7 @@ public final class PoolUtils {
          *
          * @return next shrink time
          */
-        public long getNextShrink() {
+        private long getNextShrink() {
             return nextShrinkMillis;
         }
 
@@ -81,7 +86,7 @@ public final class PoolUtils {
          */
         @Override
         public String toString() {
-            return "ErodingFactor{" + "factor=" + factor +
+            return "ErodingFactor{factor=" + factor +
                     ", idleHighWaterMark=" + idleHighWaterMark + '}';
         }
 
@@ -95,11 +100,14 @@ public final class PoolUtils {
          */
         public void update(final long nowMillis, final int numIdle) {
             final int idle = Math.max(0, numIdle);
-            idleHighWaterMark = Math.max(idle, idleHighWaterMark);
-            final float maxInterval = 15f;
-            final float minutes = maxInterval +
-                    (1f - maxInterval) / idleHighWaterMark * idle;
-            nextShrinkMillis = nowMillis + (long) (minutes * 60000f * factor);
+            lock.lock();
+            try {
+                idleHighWaterMark = Math.max(idle, idleHighWaterMark);
+                final float minutes = MAX_INTERVAL + (1f - MAX_INTERVAL) / idleHighWaterMark * idle;
+                nextShrinkMillis = nowMillis + (long) (minutes * 60000f * factor);
+            } finally {
+                lock.unlock();
+            }
         }
     }
     /**
@@ -129,7 +137,7 @@ public final class PoolUtils {
          *            events
          * @see #erodingFactor
          */
-        protected ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
+        private ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
                 final ErodingFactor erodingFactor) {
             if (keyedPool == null) {
                 throw new IllegalArgumentException(
@@ -150,7 +158,7 @@ public final class PoolUtils {
          *            events
          * @see #erodingFactor
          */
-        ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
+        private ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
                 final float factor) {
             this(keyedPool, new ErodingFactor(factor));
         }
@@ -315,7 +323,7 @@ public final class PoolUtils {
          */
         @Override
         public String toString() {
-            return "ErodingKeyedObjectPool{" + "factor=" +
+            return "ErodingKeyedObjectPool{factor=" +
                     erodingFactor + ", keyedPool=" + keyedPool + '}';
         }
     }
@@ -346,7 +354,7 @@ public final class PoolUtils {
          *            events
          * @see #factor
          */
-        ErodingObjectPool(final ObjectPool<T> pool, final float factor) {
+        private ErodingObjectPool(final ObjectPool<T> pool, final float factor) {
             this.pool = pool;
             this.factor = new ErodingFactor(factor);
         }
@@ -355,7 +363,7 @@ public final class PoolUtils {
          * {@inheritDoc}
          */
         @Override
-        public void addObject() throws Exception{
+        public void addObject() throws Exception {
             pool.addObject();
         }
 
@@ -457,7 +465,7 @@ public final class PoolUtils {
          */
         @Override
         public String toString() {
-            return "ErodingObjectPool{" + "factor=" + factor + ", pool=" +
+            return "ErodingObjectPool{factor=" + factor + ", pool=" +
                     pool + '}';
         }
     }
@@ -486,7 +494,7 @@ public final class PoolUtils {
          * @param factor
          *            erosion factor
          */
-        ErodingPerKeyKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool, final float factor) {
+        private ErodingPerKeyKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool, final float factor) {
             super(keyedPool, null);
             this.factor = factor;
         }
@@ -506,7 +514,7 @@ public final class PoolUtils {
          */
         @Override
         public String toString() {
-            return "ErodingPerKeyKeyedObjectPool{" + "factor=" + factor +
+            return "ErodingPerKeyKeyedObjectPool{factor=" + factor +
                     ", keyedPool=" + getKeyedPool() + '}';
         }
     }
