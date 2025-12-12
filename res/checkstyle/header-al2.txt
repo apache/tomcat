@@ -9,7 +9,7 @@
 ^(rem)?\W*\(the "License"\); you may not use this file except in compliance with$
 ^(rem)?\W*the License\.  You may obtain a copy of the License at$
 ^(rem)?\W*$
-^(rem)?\W*http://www.apache.org/licenses/LICENSE-2\.0$
+^(rem)?\W*http(s)?://www.apache.org/licenses/LICENSE-2\.0$
 ^(rem)?\W*$
 ^(rem)?\W*Unless required by applicable law or agreed to in writing, software$
 ^(rem)?\W*distributed under the License is distributed on an "AS IS" BASIS,$
