@@ -593,11 +593,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
          */
         public static String removeQueryParameters(String url, String parameterName) {
             if (null != parameterName) {
-//                System.out.println("Removing parameter " + parameterName + " from url " + url);
                 // Check for query string
                 int q = url.indexOf('?');
                 if (q > -1) {
-//                    System.out.println("Found query string at position " + q);
 
                     // Look for parameter end
                     int start = q + 1;
@@ -607,7 +605,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                     while (-1 < pos) {
                         // Process all parameters
-//                        System.out.println(":: url=" + url + ", pos=" + pos + ", start=" + start);
                         if (++iterations > 100000) {
                             // Just in case things get out of control
                             throw new IllegalStateException("Way too many loop iterations");
@@ -623,11 +620,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                             paramNameEnd = eq;
                         }
                         if (parameterName.equals(url.substring(start, paramNameEnd))) {
-//                            System.out.println("Removing parameter " + parameterName + " between index " + start + " and " + paramNameEnd);
                             // Remove the parameter
                             url = url.substring(0, start) + url.substring(pos + 1); // +1 to consume the &
                         } else {
-//                            System.out.println("Not removing parameter name " + url.substring(start, paramNameEnd));
                             start = pos + 1; // Go to next parameter
                         }
                         pos = url.indexOf('&', start);
@@ -635,7 +630,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                     // Check final parameter
                     String paramName;
-//                    System.out.println("Final parameter: " + url.substring(start));
                     pos = url.indexOf('=', start);
 
                     if (-1 < pos) {
@@ -647,7 +641,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                     if (paramName.equals(parameterName)) {
                         // Remove this parameter
 
-//                        System.out.println("Removing final parameter " + parameterName);
                         // Remove any trailing ? or & as well
                         char c = url.charAt(start - 1);
                         if ('?' == c || '&' == c) {
@@ -664,8 +657,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                     }
                 }
             }
-
-//            System.out.println("Returning " + url);
 
             return url;
         }
