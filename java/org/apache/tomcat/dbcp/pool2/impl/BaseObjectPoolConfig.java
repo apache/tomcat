@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -254,6 +254,19 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      */
     public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME = DefaultEvictionPolicy.class.getName();
 
+    /**
+     * The default value for the {@code collectDetailedStatistics} configuration
+     * attribute. When {@code true}, the pool will collect detailed timing statistics
+     * for monitoring purposes. When {@code false}, detailed statistics collection
+     * is disabled, improving performance under high load.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @since 2.13.0
+     */
+    public static final boolean DEFAULT_COLLECT_DETAILED_STATISTICS = true;
+
     private boolean lifo = DEFAULT_LIFO;
 
     private boolean fairness = DEFAULT_FAIRNESS;
@@ -291,6 +304,15 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
 
     private String jmxNameBase = DEFAULT_JMX_NAME_BASE;
 
+    private boolean collectDetailedStatistics = DEFAULT_COLLECT_DETAILED_STATISTICS;
+
+    /**
+     * Constructs a new instance.
+     */
+    public BaseObjectPoolConfig() {
+        // empty
+    }
+
     /**
      * Gets the value for the {@code blockWhenExhausted} configuration attribute for pools created with this configuration instance.
      *
@@ -300,6 +322,23 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      */
     public boolean getBlockWhenExhausted() {
         return blockWhenExhausted;
+    }
+
+    /**
+     * Gets the value for the {@code collectDetailedStatistics} configuration attribute
+     * for pools created with this configuration instance.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @return  {@code true} if detailed statistics collection is enabled,
+     *          {@code false} if disabled for improved performance.
+     * @see GenericObjectPool#getCollectDetailedStatistics()
+     * @see GenericKeyedObjectPool#getCollectDetailedStatistics()
+     * @since 2.13.0
+     */
+    public boolean getCollectDetailedStatistics() {
+        return collectDetailedStatistics;
     }
 
     /**
@@ -621,6 +660,25 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      */
     public void setBlockWhenExhausted(final boolean blockWhenExhausted) {
         this.blockWhenExhausted = blockWhenExhausted;
+    }
+
+    /**
+     * Sets the value for the {@code collectDetailedStatistics} configuration attribute
+     * for pools created with this configuration instance. When {@code false}, the pool
+     * will not collect detailed timing statistics, improving performance under high load
+     * at the cost of reduced monitoring capabilities.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @param collectDetailedStatistics The new setting of {@code collectDetailedStatistics}
+     *        for this configuration instance.
+     * @see GenericObjectPool#getCollectDetailedStatistics()
+     * @see GenericKeyedObjectPool#getCollectDetailedStatistics()
+     * @since 2.13.0
+     */
+    public void setCollectDetailedStatistics(final boolean collectDetailedStatistics) {
+        this.collectDetailedStatistics = collectDetailedStatistics;
     }
 
     /**
@@ -953,5 +1011,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
         builder.append(jmxNamePrefix);
         builder.append(", jmxNameBase=");
         builder.append(jmxNameBase);
+        builder.append(", collectDetailedStatistics=");
+        builder.append(collectDetailedStatistics);
     }
 }

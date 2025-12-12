@@ -119,6 +119,9 @@
         during test execution. Useful for cleaner console output when running
         tests with multiple threads. (csutherl)
       </add>
+      <update>
+        Update the internal fork of Commons Pool to 2.13.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
