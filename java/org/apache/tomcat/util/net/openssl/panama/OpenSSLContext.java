@@ -502,17 +502,30 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_TICKET());
             }
 
+            boolean ciphersSet = false;
+            String tls12Warning = null;
+            String tls13Warning = null;
             // List the ciphers that the client is permitted to negotiate
             if (minTlsVersion <= TLS1_2_VERSION()) {
                 if (SSL_CTX_set_cipher_list(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
-                    log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
+                    tls12Warning = sm.getString("engine.failedCipherList", sslHostConfig.getCiphers());
+                } else {
+                    ciphersSet = true;
                 }
             }
-            // Check if the ciphers have been changed from the defaults
-            if (maxTlsVersion >= TLS1_3_VERSION() &&
-                    (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
+            if (maxTlsVersion >= TLS1_3_VERSION()) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
-                    log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
+                    tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers());
+                } else {
+                    ciphersSet = true;
+                }
+            }
+            if (!ciphersSet) {
+                if (tls12Warning != null) {
+                    log.warn(tls12Warning);
+                }
+                if (tls13Warning != null) {
+                    log.warn(tls13Warning);
                 }
             }
 

@@ -110,6 +110,10 @@
       <fix>
         Avoid possible NPEs when using a TLS enabled custom connector. (remm)
       </fix>
+      <fix>
+        Improve warnings when setting ciphers lists in the FFM code, mirrorring
+        the tomcat-native changes. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
