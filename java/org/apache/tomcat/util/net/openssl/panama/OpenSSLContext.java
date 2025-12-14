@@ -1090,7 +1090,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                                     log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage,
                                             certificate.getCertificateFile()));
                                 }
-                                SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+                                SSL_CTX_set_dh_auto(state.sslCtx, 1);
                             }
                         }
                     }
@@ -1260,7 +1260,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage,
                                     x509KeyManager.toString()));
                         }
-                        SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+                        SSL_CTX_set_dh_auto(state.sslCtx, 1);
                     }
                 }
                 for (int i = 1; i < chain.length; i++) {
