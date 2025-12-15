@@ -82,7 +82,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
     // JMX specific attributes
     private static final String ONAME_BASE =
-        "org.apache.commons.pool2:type=GenericObjectPool,name=";
+            "org.apache.commons.pool2:type=GenericObjectPool,name=";
 
     private volatile String factoryType;
 

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,8 +72,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     private static final Log log = LogFactory.getLog(BasicDataSource.class);
 
     static {
-        // Attempt to prevent deadlocks - see DBCP - 272
-        DriverManager.getDrivers();
+        // Attempt to prevent deadlocks - see DBCP-272
+        DriverManager.getDrivers(); // NOPMD
         try {
             // Load classes now to prevent AccessControlExceptions later
             // A number of classes are loaded when getConnection() is called
@@ -153,7 +153,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * The property that controls if the pooled connections cache some state rather than query the database for current
      * state to improve performance.
      */
-    private boolean cacheState = true;
+    private volatile boolean cacheState = true;
 
     /**
      * The instance of the JDBC Driver to use.
@@ -219,7 +219,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     private boolean poolPreparedStatements;
 
-    private boolean clearStatementPoolOnReturn;
+    private volatile boolean clearStatementPoolOnReturn;
 
     /**
      * <p>
@@ -330,19 +330,19 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Controls access to the underlying connection.
      */
-    private boolean accessToUnderlyingConnectionAllowed;
+    private volatile boolean accessToUnderlyingConnectionAllowed;
 
     private Duration maxConnDuration = Duration.ofMillis(-1);
 
-    private boolean logExpiredConnections = true;
+    private volatile boolean logExpiredConnections = true;
 
     private String jmxName;
 
-    private boolean registerConnectionMBean = true;
+    private volatile boolean registerConnectionMBean = true;
 
-    private boolean autoCommitOnReturn = true;
+    private volatile boolean autoCommitOnReturn = true;
 
-    private boolean rollbackOnReturn = true;
+    private volatile boolean rollbackOnReturn = true;
 
     private volatile Set<String> disconnectionSqlCodes;
 
@@ -353,7 +353,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     private volatile Set<String> disconnectionIgnoreSqlCodes;
 
-    private boolean fastFailValidation;
+    private volatile boolean fastFailValidation;
 
     /**
      * The object pool that internally manages our connections.
@@ -387,6 +387,13 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Actual name under which this component has been registered.
      */
     private ObjectNameWrapper registeredJmxObjectName;
+
+    /**
+     * Constructs a new instance.
+     */
+    public BasicDataSource() {
+        // empty
+    }
 
     /**
      * Adds a custom connection property to the set that will be passed to our JDBC driver. This <strong>MUST</strong>
@@ -458,7 +465,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * with the specified {@link ClassLoader}.</li>
      * <li>If {code driverClassName} is specified and the previous attempt fails, the class is loaded using the
      * context class loader of the current thread.</li>
-     * <li>If a driver still isn't loaded one is loaded via the {@link DriverManager} using the specified {code connectionString}.
+     * <li>If a driver still isn't loaded one is loaded via the {@link DriverManager} using the specified {code connectionString}.</li>
      * </ol>
      * <p>
      * This method exists so subclasses can replace the implementation class.
@@ -2021,8 +2028,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * </p>
      *
      * @param disconnectionSqlCodes SQL State codes considered to signal fatal conditions
-     * @since 2.1
      * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionIgnoreSqlCodes}.
+     * @since 2.1
      */
     public void setDisconnectionSqlCodes(final Collection<String> disconnectionSqlCodes) {
         Utils.checkSqlCodes(disconnectionSqlCodes, this.disconnectionIgnoreSqlCodes);
@@ -2110,8 +2117,10 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * Sets whether connections created by this factory will fast fail validation.
+     *
+     * @param fastFailValidation true means connections created by this factory will fast fail validation.
      * @see #getFastFailValidation()
-     * @param fastFailValidation true means connections created by this factory will fast fail validation
      * @since 2.1
      */
     public void setFastFailValidation(final boolean fastFailValidation) {
@@ -2155,6 +2164,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * Sets whether to log abandoned resources.
+     *
      * @param logAbandoned new logAbandoned property value
      */
     public void setLogAbandoned(final boolean logAbandoned) {
@@ -2392,8 +2403,9 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * @param removeAbandonedOnBorrow true means abandoned connections may be removed when connections are borrowed from
-     *                                the pool.
+     * Sets abandoned connections may be removed when connections are borrowed from the pool.
+     *
+     * @param removeAbandonedOnBorrow true means abandoned connections may be removed when connections are borrowed from the pool.
      * @see #getRemoveAbandonedOnBorrow()
      */
     public void setRemoveAbandonedOnBorrow(final boolean removeAbandonedOnBorrow) {
@@ -2401,6 +2413,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * Sets whether abandoned connections may be removed on pool maintenance.
+     *
      * @param removeAbandonedOnMaintenance true means abandoned connections may be removed on pool maintenance.
      * @see #getRemoveAbandonedOnMaintenance()
      */

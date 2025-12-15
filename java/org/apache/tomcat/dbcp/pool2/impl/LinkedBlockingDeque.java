@@ -101,7 +101,7 @@ final class LinkedBlockingDeque<E> extends AbstractQueue<E>
         /**
          * The next node to return in next()
          */
-         Node<E> next;
+        Node<E> next;
 
         /**
          * nextItem holds on to item fields because once we claim that
@@ -560,7 +560,7 @@ final class LinkedBlockingDeque<E> extends AbstractQueue<E>
     int getTakeQueueLength() {
         lock.lock();
         try {
-           return lock.getWaitQueueLength(notEmpty);
+            return lock.getWaitQueueLength(notEmpty);
         } finally {
             lock.unlock();
         }
