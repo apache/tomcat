@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -103,7 +103,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                     connection.commit();
                 }
             } catch (final SQLException e) {
-                throw (XAException) new XAException().initCause(e);
+                throw newXAException("Commit failed.", e);
             } finally {
                 try {
                     connection.setAutoCommit(originalAutoCommit);
@@ -180,6 +180,10 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
             return this == xaResource;
         }
 
+        private XAException newXAException(final String message, final SQLException cause) {
+            return (XAException) new XAException(message).initCause(cause);
+        }
+
         /**
          * This method does nothing since the LocalXAConnection does not support two-phase-commit. This method will
          * return XAResource.XA_RDONLY if the connection isReadOnly(). This assumes that the physical connection is
@@ -242,7 +246,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
             try {
                 connection.rollback();
             } catch (final SQLException e) {
-                throw (XAException) new XAException().initCause(e);
+                throw newXAException("Rollback failed.", e);
             } finally {
                 try {
                     connection.setAutoCommit(originalAutoCommit);
@@ -282,12 +286,10 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         public synchronized void start(final Xid xid, final int flag) throws XAException {
             if (flag == TMNOFLAGS) {
                 // first time in this transaction
-
                 // make sure we aren't already in another tx
                 if (this.currentXid != null) {
                     throw new XAException("Already enlisted in another transaction with xid " + xid);
                 }
-
                 // save off the current auto commit flag, so it can be restored after the transaction completes
                 try {
                     originalAutoCommit = connection.getAutoCommit();
@@ -295,20 +297,16 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                     // no big deal, just assume it was off
                     originalAutoCommit = true;
                 }
-
                 // update the auto commit flag
                 try {
                     connection.setAutoCommit(false);
                 } catch (final SQLException e) {
-                    throw (XAException) new XAException("Count not turn off auto commit for a XA transaction")
-                            .initCause(e);
+                    throw newXAException("Count not turn off auto commit for a XA transaction", e);
                 }
-
                 this.currentXid = xid;
             } else if (flag == TMRESUME) {
                 if (!xid.equals(this.currentXid)) {
-                    throw new XAException("Attempting to resume in different transaction: expected " + this.currentXid
-                            + ", but was " + xid);
+                    throw new XAException("Attempting to resume in different transaction: expected " + this.currentXid + ", but was " + xid);
                 }
             } else {
                 throw new XAException("Unknown start flag " + flag);

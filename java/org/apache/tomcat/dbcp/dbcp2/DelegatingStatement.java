@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     /** The connection that created me. **/
     private DelegatingConnection<?> connection;
 
-    private boolean closed;
+    private volatile boolean closed;
 
     /**
      * Create a wrapper for the Statement which traces this Statement to the Connection which created it and the code
@@ -62,6 +62,8 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
+     * Activates this instance by delegating to the underlying statement.
+     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.
@@ -92,6 +94,11 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
+    /**
+     * Checks whether this instance is closed and throws an exception if it is.
+     *
+     * @throws SQLException Thrown if this instance is closed.
+     */
     protected void checkOpen() throws SQLException {
         if (isClosed()) {
             throw new SQLException(this.getClass().getName() + " with address: \"" + toString() + "\" is closed.");
@@ -390,6 +397,11 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         return getConnectionInternal(); // return the delegating connection that created this
     }
 
+    /**
+     * Gets the internal connection.
+     *
+     * @return the internal connection.
+     */
     protected DelegatingConnection<?> getConnectionInternal() {
         return connection;
     }
@@ -438,14 +450,14 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     * If my underlying {@link Statement} is not a {@code DelegatingStatement}, returns it, otherwise recursively
+     * If my underlying {@link Statement} is not a {@link DelegatingStatement}, returns it, otherwise recursively
      * invokes this method on my delegate.
      * <p>
-     * Hence this method will return the first delegate that is not a {@code DelegatingStatement} or {@code null} when
-     * no non-{@code DelegatingStatement} delegate can be found by traversing this chain.
+     * Hence this method will return the first delegate that is not a {@link DelegatingStatement} or {@code null} when
+     * no non-{@link DelegatingStatement} delegate can be found by traversing this chain.
      * </p>
      * <p>
-     * This method is useful when you may have nested {@code DelegatingStatement}s, and you want to make sure to obtain
+     * This method is useful when you may have nested {@link DelegatingStatement}s, and you want to make sure to obtain
      * a "genuine" {@link Statement}.
      * </p>
      *
@@ -612,6 +624,12 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
+    /**
+     * Delegates the exception to the internal connection if set, otherwise rethrows it.
+     *
+     * @param e The exception to handle.
+     * @throws SQLException The given exception if not handled.
+     */
     protected void handleException(final SQLException e) throws SQLException {
         if (connection == null) {
             throw e;
@@ -627,6 +645,11 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         return closed;
     }
 
+    /**
+     * Tests whether this instance is closed.
+     *
+     * @return whether this instance is closed.
+     */
     protected boolean isClosedInternal() {
         return closed;
     }
@@ -655,16 +678,15 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
 
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (iface.isAssignableFrom(getClass())) {
-            return true;
-        }
-        if (iface.isAssignableFrom(statement.getClass())) {
+        if (iface.isAssignableFrom(getClass()) || iface.isAssignableFrom(statement.getClass())) {
             return true;
         }
         return statement.isWrapperFor(iface);
     }
 
     /**
+     * Passivates this instance by delegating to the underlying statement.
+     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.
@@ -675,6 +697,11 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
+    /**
+     * Sets the closed internal state.
+     *
+     * @param closed whether the instance is now closed.
+     */
     protected void setClosedInternal(final boolean closed) {
         this.closed = closed;
     }

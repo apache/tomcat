@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,7 +37,7 @@ import org.apache.tomcat.dbcp.dbcp2.ListException;
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
 /**
- * A JNDI ObjectFactory which creates {@code SharedPoolDataSource}s or {@code PerUserPoolDataSource}s
+ * A JNDI ObjectFactory which creates {@link SharedPoolDataSource}s or {@link PerUserPoolDataSource}s
  *
  * @since 2.0
  */
@@ -116,7 +116,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         }
     }
 
-    private Boolean booleanValueOf(RefAddr refAddr) {
+    private Boolean booleanValueOf(final RefAddr refAddr) {
         return Boolean.valueOf(toString(refAddr));
     }
 
@@ -340,11 +340,11 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         }
     }
 
-    private Duration toDurationFromMillis(RefAddr refAddr) {
+    private Duration toDurationFromMillis(final RefAddr refAddr) {
         return Duration.ofMillis(parseLong(refAddr));
     }
 
-    private Duration toDurationFromSeconds(RefAddr refAddr) {
+    private Duration toDurationFromSeconds(final RefAddr refAddr) {
         return Duration.ofSeconds(parseInt(refAddr));
     }
 

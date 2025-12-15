@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ final class DriverFactory {
                 } else {
                     // Usage of DriverManager is not possible, as it does not
                     // respect the ContextClassLoader
-                    // N.B. This cast may cause ClassCastException which is
+                    // This cast may cause ClassCastException which is
                     // handled below
                     driverToUse = (Driver) driverFromCCL.getConstructor().newInstance();
                     if (!driverToUse.acceptsURL(url)) {

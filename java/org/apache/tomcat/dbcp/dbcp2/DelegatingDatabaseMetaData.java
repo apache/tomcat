@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -264,13 +264,13 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     /**
-     * If my underlying {@link ResultSet} is not a {@code DelegatingResultSet}, returns it, otherwise recursively invokes this method on my delegate.
+     * If my underlying {@link ResultSet} is not a {@link DelegatingResultSet}, returns it, otherwise recursively invokes this method on my delegate.
      * <p>
-     * Hence this method will return the first delegate that is not a {@code DelegatingResultSet}, or {@code null} when no non-{@code DelegatingResultSet}
+     * Hence this method will return the first delegate that is not a {@link DelegatingResultSet}, or {@code null} when no non-{@link DelegatingResultSet}
      * delegate can be found by traversing this chain.
      * </p>
      * <p>
-     * This method is useful when you may have nested {@code DelegatingResultSet}s, and you want to make sure to obtain a "genuine" {@link ResultSet}.
+     * This method is useful when you may have nested {@link DelegatingResultSet}s, and you want to make sure to obtain a "genuine" {@link ResultSet}.
      * </p>
      *
      * @return the innermost database meta data.
@@ -580,10 +580,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (iface.isAssignableFrom(getClass())) {
-            return true;
-        }
-        if (iface.isAssignableFrom(databaseMetaData.getClass())) {
+        if (iface.isAssignableFrom(getClass()) || iface.isAssignableFrom(databaseMetaData.getClass())) {
             return true;
         }
         return databaseMetaData.isWrapperFor(iface);

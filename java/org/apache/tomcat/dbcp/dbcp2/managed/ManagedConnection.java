@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,6 +51,14 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
      * @since 2.0
      */
     protected class CompletionListener implements TransactionContextListener {
+
+        /**
+         * Constructs a new instance.
+         */
+        public CompletionListener() {
+            // empty
+        }
+
         @Override
         public void afterCompletion(final TransactionContext completedContext, final boolean committed) {
             if (completedContext == transactionContext) {
@@ -207,27 +215,23 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
         lock.lock();
         try {
             transactionContext.completeTransaction();
+            // If we were using a shared connection, clear the reference now that
+            // the transaction has completed
+            if (isSharedConnection) {
+                setDelegate(null);
+                isSharedConnection = false;
+            }
         } finally {
             lock.unlock();
         }
-
-        // If we were using a shared connection, clear the reference now that
-        // the transaction has completed
-        if (isSharedConnection) {
-            setDelegate(null);
-            isSharedConnection = false;
-        }
-
         // autoCommit may have been changed directly on the underlying connection
         clearCachedState();
-
         // If this connection was closed during the transaction and there is
         // still a delegate present close it
         final Connection delegate = getDelegateInternal();
         if (isClosedInternal() && delegate != null) {
             try {
                 setDelegate(null);
-
                 if (!delegate.isClosed()) {
                     delegate.close();
                 }
@@ -253,15 +257,12 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
             // our listener is called. In that rare case, trigger the transaction complete call now
             transactionComplete();
         }
-
         // the existing transaction context ended (or we didn't have one), get the active transaction context
         transactionContext = transactionRegistry.getActiveTransactionContext();
-
         // if there is an active transaction context, and it already has a shared connection, use it
         if (transactionContext != null && transactionContext.getSharedConnection() != null) {
             // A connection for the connection factory has already been enrolled
             // in the transaction, replace our delegate with the enrolled connection
-
             // return current connection to the pool
             final C connection = getDelegateInternal();
             setDelegate(null);
@@ -277,17 +278,14 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
                     }
                 }
             }
-
             // add a listener to the transaction context
             transactionContext.addTransactionContextListener(new CompletionListener());
-
             // Set our delegate to the shared connection. Note that this will
             // always be of type C since it has been shared by another
             // connection from the same pool.
             @SuppressWarnings("unchecked")
             final C shared = (C) transactionContext.getSharedConnection();
             setDelegate(shared);
-
             // remember that we are using a shared connection, so it can be cleared after the
             // transaction completes
             isSharedConnection = true;
@@ -303,12 +301,10 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
                     throw new SQLException("Unable to acquire a new connection from the pool", e);
                 }
             }
-
             // if we have a transaction, out delegate becomes the shared delegate
             if (transactionContext != null) {
                 // add a listener to the transaction context
                 transactionContext.addTransactionContextListener(new CompletionListener());
-
                 // register our connection as the shared connection
                 try {
                     transactionContext.setSharedConnection(connection);

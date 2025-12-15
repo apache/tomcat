@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.dbcp2.cpdsadapter;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.tomcat.dbcp.dbcp2.DelegatingCallableStatement;
@@ -26,9 +27,9 @@ import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
 
 /**
- * This class is the {@code Connection} that will be returned from
- * {@code PooledConnectionImpl.getConnection()}. Most methods are wrappers around the JDBC 1.x
- * {@code Connection}. A few exceptions include preparedStatement and close. In accordance with the JDBC
+ * This class is the {@link Connection} that will be returned from
+ * {@link PooledConnectionImpl#getConnection()}. Most methods are wrappers around the JDBC 1.x
+ * {@link Connection}. A few exceptions include preparedStatement and close. In accordance with the JDBC
  * specification this Connection cannot be used after closed() is called. Any further usage will result in an
  * SQLException.
  * <p>
@@ -131,13 +132,13 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * If pooling of {@code CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
-     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
+     * If pooling of {@link CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
+     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link Connection}.
      *
      * @param sql
      *            an SQL statement that may contain one or more '?' parameter placeholders. Typically, this statement is
      *            specified using JDBC call escape syntax.
-     * @return a default {@code CallableStatement} object containing the pre-compiled SQL statement.
+     * @return a default {@link CallableStatement} object containing the pre-compiled SQL statement.
      * @throws SQLException
      *                Thrown if a database access error occurs or this method is called on a closed connection.
      * @since 2.4.0
@@ -154,23 +155,23 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * If pooling of {@code CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
-     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
+     * If pooling of {@link CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
+     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link Connection}.
      *
      * @param sql
-     *            a {@code String} object that is the SQL statement to be sent to the database; may contain on or
+     *            a {@link String} object that is the SQL statement to be sent to the database; may contain on or
      *            more '?' parameters.
      * @param resultSetType
-     *            a result set type; one of {@code ResultSet.TYPE_FORWARD_ONLY},
-     *            {@code ResultSet.TYPE_SCROLL_INSENSITIVE}, or {@code ResultSet.TYPE_SCROLL_SENSITIVE}.
+     *            a result set type; one of {@link ResultSet#TYPE_FORWARD_ONLY},
+     *            {@link ResultSet#TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet#TYPE_SCROLL_SENSITIVE}.
      * @param resultSetConcurrency
-     *            a concurrency type; one of {@code ResultSet.CONCUR_READ_ONLY} or
-     *            {@code ResultSet.CONCUR_UPDATABLE}.
-     * @return a {@code CallableStatement} object containing the pre-compiled SQL statement that will produce
-     *         {@code ResultSet} objects with the given type and concurrency.
+     *            a concurrency type; one of {@link ResultSet#CONCUR_READ_ONLY} or
+     *            {@link ResultSet#CONCUR_UPDATABLE}.
+     * @return a {@link CallableStatement} object containing the pre-compiled SQL statement that will produce
+     *         {@link ResultSet} objects with the given type and concurrency.
      * @throws SQLException
      *             Thrown if a database access error occurs, this method is called on a closed connection or the given
-     *             parameters are not {@code ResultSet} constants indicating type and concurrency.
+     *             parameters are not {@link ResultSet} constants indicating type and concurrency.
      * @since 2.4.0
      */
     @Override
@@ -187,26 +188,26 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * If pooling of {@code CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
-     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
+     * If pooling of {@link CallableStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
+     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link Connection}.
      *
      * @param sql
-     *            a {@code String} object that is the SQL statement to be sent to the database; may contain on or
+     *            a {@link String} object that is the SQL statement to be sent to the database; may contain on or
      *            more '?' parameters.
      * @param resultSetType
-     *            one of the following {@code ResultSet} constants: {@code ResultSet.TYPE_FORWARD_ONLY},
-     *            {@code ResultSet.TYPE_SCROLL_INSENSITIVE}, or {@code ResultSet.TYPE_SCROLL_SENSITIVE}.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#TYPE_FORWARD_ONLY},
+     *            {@link ResultSet#TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet#TYPE_SCROLL_SENSITIVE}.
      * @param resultSetConcurrency
-     *            one of the following {@code ResultSet} constants: {@code ResultSet.CONCUR_READ_ONLY} or
-     *            {@code ResultSet.CONCUR_UPDATABLE}.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#CONCUR_READ_ONLY} or
+     *            {@link ResultSet#CONCUR_UPDATABLE}.
      * @param resultSetHoldability
-     *            one of the following {@code ResultSet} constants: {@code ResultSet.HOLD_CURSORS_OVER_COMMIT}
-     *            or {@code ResultSet.CLOSE_CURSORS_AT_COMMIT}.
-     * @return a new {@code CallableStatement} object, containing the pre-compiled SQL statement, that will
-     *         generate {@code ResultSet} objects with the given type, concurrency, and holdability.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#HOLD_CURSORS_OVER_COMMIT}
+     *            or {@link ResultSet#CLOSE_CURSORS_AT_COMMIT}.
+     * @return a new {@link CallableStatement} object, containing the pre-compiled SQL statement, that will
+     *         generate {@link ResultSet} objects with the given type, concurrency, and holdability.
      * @throws SQLException
      *             Thrown if a database access error occurs, this method is called on a closed connection or the given
-     *             parameters are not {@code ResultSet} constants indicating type, concurrency, and holdability.
+     *             parameters are not {@link ResultSet} constants indicating type, concurrency, and holdability.
      * @since 2.4.0
      */
     @Override
@@ -223,8 +224,8 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * If pooling of {@code PreparedStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
-     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
+     * If pooling of {@link PreparedStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
+     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link Connection}.
      *
      * @param sql
      *            SQL statement to be prepared
@@ -259,8 +260,8 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     //
 
     /**
-     * If pooling of {@code PreparedStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
-     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
+     * If pooling of {@link PreparedStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
+     * be returned, otherwise delegate to the wrapped JDBC 1.x {@link Connection}.
      *
      * @throws SQLException
      *             if this connection is closed or an error occurs in the wrapped connection.

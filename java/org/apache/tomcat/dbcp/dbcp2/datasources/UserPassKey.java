@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,7 @@ import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
  * Holds a user name and password pair. Serves as a poolable object key for the {@link KeyedObjectPool} backing a
  * {@link SharedPoolDataSource}. Two instances with the same user name are considered equal. This ensures that there
  * will be only one keyed pool for each user in the pool. The password is used (along with the user name) by the
- * {@code KeyedCPDSConnectionFactory} when creating new connections.
+ * {@link KeyedCPDSConnectionFactory} when creating new connections.
  * </p>
  *
  * <p>
@@ -60,6 +60,17 @@ final class UserPassKey implements Serializable {
     }
 
     /**
+     * Clears the content of the name and password.
+     *
+     * @return {@code this} instance.
+     */
+    UserPassKey clear() {
+        name.clear();
+        password.clear();
+        return this;
+    }
+
+    /**
      * Only takes the user name into account.
      */
     @Override
@@ -67,10 +78,7 @@ final class UserPassKey implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         final UserPassKey other = (UserPassKey) obj;
