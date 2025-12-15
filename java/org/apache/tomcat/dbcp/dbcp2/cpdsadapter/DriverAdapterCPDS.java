@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,9 @@ package org.apache.tomcat.dbcp.dbcp2.cpdsadapter;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.time.Duration;
@@ -35,6 +37,7 @@ import javax.naming.Referenceable;
 import javax.naming.StringRefAddr;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
 import javax.sql.PooledConnection;
 
 import org.apache.tomcat.dbcp.dbcp2.Constants;
@@ -49,22 +52,22 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
 /**
  * <p>
  * An adapter for JDBC drivers that do not include an implementation of {@link javax.sql.ConnectionPoolDataSource}, but
- * still include a {@link java.sql.DriverManager} implementation. {@code ConnectionPoolDataSource}s are not used
- * within general applications. They are used by {@code DataSource} implementations that pool
- * {@code Connection}s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
- * will normally provide some method of initializing the {@code ConnectionPoolDataSource} whose attributes are
+ * still include a {@link java.sql.DriverManager} implementation. {@link ConnectionPoolDataSource}s are not used
+ * within general applications. They are used by {@link DataSource} implementations that pool
+ * {@link Connection}s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
+ * will normally provide some method of initializing the {@link ConnectionPoolDataSource} whose attributes are
  * presented as bean getters/setters and then deploying it via JNDI. It is then available as a source of physical
- * connections to the database, when the pooling {@code DataSource} needs to create a new physical connection.
+ * connections to the database, when the pooling {link DataSource} needs to create a new physical connection.
  * </p>
  * <p>
  * Although normally used within a JNDI environment, the DriverAdapterCPDS can be instantiated and initialized as any
- * bean and then attached directly to a pooling {@code DataSource}. {@code Jdbc2PoolDataSource} can use the
- * {@code ConnectionPoolDataSource} with or without the use of JNDI.
+ * bean and then attached directly to a pooling {link DataSource}. {@code Jdbc2PoolDataSource} can use the
+ * {link ConnectionPoolDataSource} with or without the use of JNDI.
  * </p>
  * <p>
- * The DriverAdapterCPDS also provides {@code PreparedStatement} pooling which is not generally available in jdbc2
- * {@code ConnectionPoolDataSource} implementation, but is addressed within the JDBC 3 specification. The
- * {@code PreparedStatement} pool in DriverAdapterCPDS has been in the DBCP package for some time, but it has not
+ * The DriverAdapterCPDS also provides {@link PreparedStatement} pooling which is not generally available in jdbc2
+ * {@link ConnectionPoolDataSource} implementation, but is addressed within the JDBC 3 specification. The
+ * {@link PreparedStatement} pool in DriverAdapterCPDS has been in the DBCP package for some time, but it has not
  * undergone extensive testing in the configuration used here. It should be considered experimental and can be toggled
  * with the poolPreparedStatements attribute.
  * </p>
@@ -110,7 +113,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
 
     static {
         // Attempt to prevent deadlocks - see DBCP-272
-        DriverManager.getDrivers();
+        DriverManager.getDrivers(); // NOPMD
     }
 
     /** Description */
@@ -129,19 +132,28 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     private String driver;
 
     /** Login TimeOut in seconds */
-    private int loginTimeout;
+    private volatile int loginTimeout;
 
     /** Log stream. NOT USED */
     private transient PrintWriter logWriter;
 
-    // PreparedStatement pool properties
-    private boolean poolPreparedStatements;
-    private int maxIdle = 10;
+    /** PreparedStatement pool property defaults to false. */
+    private volatile boolean poolPreparedStatements;
+
+    /** PreparedStatement pool property defaults to 10. */
+    private volatile int maxIdle = 10;
+
+    /** PreparedStatement pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_DURATION_BETWEEN_EVICTION_RUNS}. */
     private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
-    private int numTestsPerEvictionRun = -1;
+
+    /** PreparedStatement pool property defaults to -1. */
+    private volatile int numTestsPerEvictionRun = -1;
+
+    /** PreparedStatement pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_MIN_EVICTABLE_IDLE_DURATION}. */
     private Duration minEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION;
 
-    private int maxPreparedStatements = -1;
+    /** Maximum number of prepared statements, defaults to -1, meaning no limit. */
+    private volatile int maxPreparedStatements = -1;
 
     /** Whether or not getConnection has been called */
     private volatile boolean getConnectionCalled;
@@ -248,7 +260,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Gets the maximum number of prepared statements.
      *
-     * @return maxPrepartedStatements value
+     * @return maxPrepartedStatements, defaults to -1, meaning no limit.
      */
     public int getMaxPreparedStatements() {
         return maxPreparedStatements;
@@ -537,7 +549,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of {@code PreparedStatement}s
+     * Tests whether to toggle the pooling of {@link PreparedStatement}s
      *
      * @return value of poolPreparedStatements.
      */
@@ -656,7 +668,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the maximum number of prepared statements.
      *
-     * @param maxPreparedStatements the new maximum number of prepared statements
+     * @param maxPreparedStatements the new maximum number of prepared statements, &lt;= 0 means no limit.
      */
     public void setMaxPreparedStatements(final int maxPreparedStatements) {
         this.maxPreparedStatements = maxPreparedStatements;
@@ -736,7 +748,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of {@code PreparedStatement}s
+     * Sets whether to toggle the pooling of {@link PreparedStatement}s
      *
      * @param poolPreparedStatements true to pool statements.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called

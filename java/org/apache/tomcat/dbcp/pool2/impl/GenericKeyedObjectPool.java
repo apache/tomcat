@@ -215,8 +215,13 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      * My hash of sub-pools (ObjectQueue). The list of keys <strong>must</strong> be kept
      * in step with {@link #poolKeyList} using {@link #keyLock} to ensure any
      * changes to the list of current keys is made in a thread-safe manner.
+     *
+     * Correct operation of the pool requires that a Map implementation is used that
+     * supports concurrent read and write (e.g. ensureMinIdle() iterates over the key set
+     * while other threads may be adding or removing keys) therefore explicitly define
+     * this field as ConcurrentHashMap rather than Map.
      */
-    private final Map<K, ObjectDeque<T>> poolMap =
+    private final ConcurrentHashMap<K, ObjectDeque<T>> poolMap =
             new ConcurrentHashMap<>(); // @GuardedBy("keyLock") for write access (and some read access)
 
     /*

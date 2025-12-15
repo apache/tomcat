@@ -1734,7 +1734,7 @@ public final class PoolUtils {
      * @return a synchronized view of the specified KeyedPooledObjectFactory.
      */
     public static <K, V> KeyedPooledObjectFactory<K, V> synchronizedKeyedPooledFactory(
-        final KeyedPooledObjectFactory<K, V> keyedFactory) {
+            final KeyedPooledObjectFactory<K, V> keyedFactory) {
         return new SynchronizedKeyedPooledObjectFactory<>(keyedFactory);
     }
 

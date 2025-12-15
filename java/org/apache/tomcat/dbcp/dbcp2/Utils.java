@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,10 +39,10 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
 public final class Utils {
 
     private static final ResourceBundle messages = ResourceBundle
-        .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
+            .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
 
     /**
-     * Any SQL_STATE starting with this value is considered a fatal disconnect.
+     * Any SQL State starting with this value is considered a fatal disconnect.
      */
     public static final String DISCONNECTION_SQL_CODE_PREFIX = "08";
 

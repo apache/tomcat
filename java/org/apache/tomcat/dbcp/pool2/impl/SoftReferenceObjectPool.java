@@ -67,7 +67,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
 
     /** All references - checked out or waiting to be borrowed. */
     private final ArrayList<PooledSoftReference<T>> allReferences =
-        new ArrayList<>();
+            new ArrayList<>();
 
     /**
      * Constructs a {@code SoftReferenceObjectPool} with the specified factory.
@@ -329,7 +329,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         final PooledSoftReference<T> ref = findReference(obj);
         if (ref == null) {
             throw new IllegalStateException(
-                "Object to invalidate is not currently part of this pool");
+                    "Object to invalidate is not currently part of this pool");
         }
         if (factory != null) {
             destroy(ref);
@@ -392,7 +392,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         final PooledSoftReference<T> ref = findReference(obj);
         if (ref == null) {
             throw new IllegalStateException(
-                "Returned object not currently part of this pool");
+                    "Returned object not currently part of this pool");
         }
         if (factory != null) {
             if (!factory.validateObject(ref)) {
