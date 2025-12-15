@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -86,6 +86,8 @@ public class DataSourceConnectionFactory implements ConnectionFactory {
     }
 
     /**
+     * Gets the data source..
+     *
      * @return The data source.
      * @since 2.6.0
      */
@@ -94,7 +96,9 @@ public class DataSourceConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The user name.
+     * Gets the user name, may be null.
+     *
+     * @return The user name, may be null.
      * @since 2.6.0
      */
     public String getUserName() {
@@ -102,7 +106,9 @@ public class DataSourceConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The user password.
+     * Gets the user password, may be null.
+     *
+     * @return The user password, may be null.
      * @since 2.6.0
      */
     public char[] getUserPassword() {

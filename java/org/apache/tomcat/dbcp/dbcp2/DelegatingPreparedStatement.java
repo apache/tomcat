@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -167,10 +167,14 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
         }
     }
 
+    /**
+     * Prepares internal states before calling {@link #passivate()}.
+     *
+     * @throws SQLException Thrown closing a traced resource or calling {@link #passivate()}.
+     */
     protected void prepareToReturn() throws SQLException {
         setClosedInternal(true);
         removeThisTrace(getConnectionInternal());
-
         // The JDBC spec requires that a statement close any open
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
@@ -184,7 +188,6 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
                 throw new SQLExceptionList(thrownList);
             }
         }
-
         super.passivate();
     }
 

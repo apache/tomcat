@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,30 +41,30 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool;
 
 /**
  * <p>
- * The base class for {@code SharedPoolDataSource} and {@code PerUserPoolDataSource}. Many of the
+ * The base class for {@link SharedPoolDataSource} and {@link PerUserPoolDataSource}. Many of the
  * configuration properties are shared and defined here. This class is declared public in order to allow particular
  * usage with commons-beanutils; do not make direct use of it outside of <em>commons-dbcp2</em>.
  * </p>
  *
  * <p>
- * A J2EE container will normally provide some method of initializing the {@code DataSource} whose attributes are
+ * A J2EE container will normally provide some method of initializing the {@link DataSource} whose attributes are
  * presented as bean getters/setters and then deploying it via JNDI. It is then available to an application as a source
  * of pooled logical connections to the database. The pool needs a source of physical connections. This source is in the
- * form of a {@code ConnectionPoolDataSource} that can be specified via the {@link #setDataSourceName(String)} used
+ * form of a {@link ConnectionPoolDataSource} that can be specified via the {@link #setDataSourceName(String)} used
  * to lookup the source via JNDI.
  * </p>
  *
  * <p>
  * Although normally used within a JNDI environment, A DataSource can be instantiated and initialized as any bean. In
- * this case the {@code ConnectionPoolDataSource} will likely be instantiated in a similar manner. This class
+ * this case the {@link ConnectionPoolDataSource} will likely be instantiated in a similar manner. This class
  * allows the physical source of connections to be attached directly to this pool using the
  * {@link #setConnectionPoolDataSource(ConnectionPoolDataSource)} method.
  * </p>
  *
  * <p>
  * The dbcp package contains an adapter, {@link org.apache.tomcat.dbcp.dbcp2.cpdsadapter.DriverAdapterCPDS}, that can be
- * used to allow the use of {@code DataSource}'s based on this class with JDBC driver implementations that do not
- * supply a {@code ConnectionPoolDataSource}, but still provide a {@link java.sql.Driver} implementation.
+ * used to allow the use of {@link DataSource}'s based on this class with JDBC driver implementations that do not
+ * supply a {@link ConnectionPoolDataSource}, but still provide a {@link java.sql.Driver} implementation.
  * </p>
  *
  * <p>
@@ -111,32 +111,70 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /** Instance key */
     private String instanceKey;
 
-    // Pool properties
-    private boolean defaultBlockWhenExhausted = BaseObjectPoolConfig.DEFAULT_BLOCK_WHEN_EXHAUSTED;
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_BLOCK_WHEN_EXHAUSTED}. */
+    private volatile boolean defaultBlockWhenExhausted = BaseObjectPoolConfig.DEFAULT_BLOCK_WHEN_EXHAUSTED;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_EVICTION_POLICY_CLASS_NAME}. */
     private String defaultEvictionPolicyClassName = BaseObjectPoolConfig.DEFAULT_EVICTION_POLICY_CLASS_NAME;
-    private boolean defaultLifo = BaseObjectPoolConfig.DEFAULT_LIFO;
-    private int defaultMaxIdle = GenericKeyedObjectPoolConfig.DEFAULT_MAX_IDLE_PER_KEY;
-    private int defaultMaxTotal = GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_LIFO}. */
+    private volatile boolean defaultLifo = BaseObjectPoolConfig.DEFAULT_LIFO;
+
+    /** Pool property defaults to {@link GenericKeyedObjectPoolConfig#DEFAULT_MAX_IDLE_PER_KEY}. */
+    private volatile int defaultMaxIdle = GenericKeyedObjectPoolConfig.DEFAULT_MAX_IDLE_PER_KEY;
+
+    /** Pool property defaults to {@link GenericKeyedObjectPoolConfig#DEFAULT_MAX_TOTAL}. */
+    private volatile int defaultMaxTotal = GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_MAX_WAIT}. */
     private Duration defaultMaxWaitDuration = BaseObjectPoolConfig.DEFAULT_MAX_WAIT;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_MIN_EVICTABLE_IDLE_DURATION}. */
     private Duration defaultMinEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION;
-    private int defaultMinIdle = GenericKeyedObjectPoolConfig.DEFAULT_MIN_IDLE_PER_KEY;
-    private int defaultNumTestsPerEvictionRun = BaseObjectPoolConfig.DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+
+    /** Pool property defaults to {@link GenericKeyedObjectPoolConfig#DEFAULT_MIN_IDLE_PER_KEY}. */
+    private volatile int defaultMinIdle = GenericKeyedObjectPoolConfig.DEFAULT_MIN_IDLE_PER_KEY;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_NUM_TESTS_PER_EVICTION_RUN}. */
+    private volatile int defaultNumTestsPerEvictionRun = BaseObjectPoolConfig.DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_SOFT_MIN_EVICTABLE_IDLE_DURATION}. */
     private Duration defaultSoftMinEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_DURATION;
-    private boolean defaultTestOnCreate = BaseObjectPoolConfig.DEFAULT_TEST_ON_CREATE;
-    private boolean defaultTestOnBorrow = BaseObjectPoolConfig.DEFAULT_TEST_ON_BORROW;
-    private boolean defaultTestOnReturn = BaseObjectPoolConfig.DEFAULT_TEST_ON_RETURN;
-    private boolean defaultTestWhileIdle = BaseObjectPoolConfig.DEFAULT_TEST_WHILE_IDLE;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_TEST_ON_CREATE}. */
+    private volatile boolean defaultTestOnCreate = BaseObjectPoolConfig.DEFAULT_TEST_ON_CREATE;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_TEST_ON_BORROW}. */
+    private volatile boolean defaultTestOnBorrow = BaseObjectPoolConfig.DEFAULT_TEST_ON_BORROW;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_TEST_ON_RETURN}. */
+    private volatile boolean defaultTestOnReturn = BaseObjectPoolConfig.DEFAULT_TEST_ON_RETURN;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_TEST_WHILE_IDLE}. */
+    private volatile boolean defaultTestWhileIdle = BaseObjectPoolConfig.DEFAULT_TEST_WHILE_IDLE;
+
+    /** Pool property defaults to {@link BaseObjectPoolConfig#DEFAULT_DURATION_BETWEEN_EVICTION_RUNS}. */
     private Duration defaultDurationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
 
-    // Connection factory properties
+    /** Connection factory property defaults to null. */
     private String validationQuery;
+
+    /** Connection factory property defaults to -1 seconds. */
     private Duration validationQueryTimeoutDuration = Duration.ofSeconds(-1);
-    private boolean rollbackAfterValidation;
+
+    /** Connection factory property defaults to false. */
+    private volatile boolean rollbackAfterValidation;
+
+    /** Connection factory property defaults to -1 milliseconds. */
     private Duration maxConnDuration = Duration.ofMillis(-1);
 
-    // Connection properties
+    /** Connection property defaults to false. */
     private Boolean defaultAutoCommit;
-    private int defaultTransactionIsolation = UNKNOWN_TRANSACTIONISOLATION;
+
+    /** Connection property defaults to {@link #UNKNOWN_TRANSACTIONISOLATION}. */
+    private volatile int defaultTransactionIsolation = UNKNOWN_TRANSACTIONISOLATION;
+
+    /** Connection property defaults to false. */
     private Boolean defaultReadOnly;
 
     /**
@@ -198,7 +236,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     public Connection getConnection(final String userName, final String userPassword) throws SQLException {
         if (instanceKey == null) {
             throw new SQLException("Must set the ConnectionPoolDataSource "
-                    + "through setDataSourceName or setConnectionPoolDataSource" + " before calling getConnection.");
+                    + "through setDataSourceName or setConnectionPoolDataSource before calling getConnection.");
         }
         getConnectionCalled = true;
         PooledConnectionAndInfo info = null;
@@ -220,7 +258,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
                 // Password has not changed, so refuse client, but return connection to the pool
                 closeDueToException(info);
                 throw new SQLException(
-                        "Given password did not match password used" + " to create the PooledConnection.", ex);
+                        "Given password did not match password used to create the PooledConnection.", ex);
             } catch (final javax.naming.NamingException ne) {
                 throw new SQLException("NamingException encountered connecting to database", ne);
             }
@@ -233,7 +271,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             // Destroy and remove from pool
             manager.invalidate(info.getPooledConnection());
             // Reset the password on the factory if using CPDSConnectionFactory
-            manager.setPassword(upkey.getPassword());
+            manager.setPassword(upkey.getPasswordCharArray());
             info = null;
             for (int i = 0; i < 10; i++) { // Bound the number of retries - only needed if bad instances return
                 try {
@@ -269,6 +307,12 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         }
     }
 
+    /**
+     * Gets the pooled connection manager for the given key.
+     *
+     * @param upkey the key.
+     * @return the pooled connection manager for the given key.
+     */
     protected abstract PooledConnectionManager getConnectionManager(UserPassKey upkey);
 
     /**
@@ -416,11 +460,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
-     * GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
+     * Gets the default value for {@link
+     * GenericObjectPool#getSoftMinEvictableIdleDuration()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
-     *         GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
+     * @return The default value for {@link
+     *         GenericObjectPool#getSoftMinEvictableIdleDuration()} for each per user pool.
      * @since 2.10.0
      */
     public Duration getDefaultSoftMinEvictableIdleDuration() {
@@ -428,10 +472,10 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Gets the default value for {@link
      * GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * @return The default value for {@link
      *         GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
      * @deprecated Use {@link #getDefaultSoftMinEvictableIdleDuration()}.
      */
@@ -441,10 +485,10 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Gets the default value for {@link
      * GenericObjectPool#getTestOnBorrow()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * @return The default value for {@link
      *         GenericObjectPool#getTestOnBorrow()} for each per user pool.
      */
     public boolean getDefaultTestOnBorrow() {
@@ -452,10 +496,10 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Gets the default value for {@link
      * GenericObjectPool#getTestOnCreate()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * @return The default value for {@link
      *         GenericObjectPool#getTestOnCreate()} for each per user pool.
      */
     public boolean getDefaultTestOnCreate() {
@@ -463,10 +507,10 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Gets the default value for {@link
      * GenericObjectPool#getTestOnReturn()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * @return The default value for {@link
      *         GenericObjectPool#getTestOnReturn()} for each per user pool.
      */
     public boolean getDefaultTestOnReturn() {
@@ -474,10 +518,10 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Gets the default value for {@link
      * GenericObjectPool#getTestWhileIdle()} for each per user pool.
      *
-     * @return The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * @return The default value for {@link
      *         GenericObjectPool#getTestWhileIdle()} for each per user pool.
      */
     public boolean getDefaultTestWhileIdle() {
@@ -666,7 +710,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /**
      * Gets the value of defaultAutoCommit, which defines the state of connections handed out from this pool. The value
      * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is {@code null} which
-     * will use the default value for the drive.
+     * will use the default value for the driver.
      *
      * @return value of defaultAutoCommit.
      */
@@ -677,7 +721,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /**
      * Gets the value of defaultReadOnly, which defines the state of connections handed out from this pool. The value
      * can be changed on the Connection using Connection.setReadOnly(boolean). The default is {@code null} which
-     * will use the default value for the drive.
+     * will use the default value for the driver.
      *
      * @return value of defaultReadOnly.
      */
@@ -686,7 +730,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Whether a rollback will be issued after executing the SQL query that will be used to validate connections from
+     * Tests whether a rollback will be issued after executing the SQL query that will be used to validate connections from
      * this pool before returning them to the caller.
      *
      * @return true if a rollback will be issued after executing the validation query
@@ -733,7 +777,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
                     + "set using setConnectionPoolDataSource.");
         }
         if (this.dataSourceName != null) {
-            throw new IllegalStateException("The DataSourceName has already been set. " + "It cannot be altered.");
+            throw new IllegalStateException("The DataSourceName has already been set. It cannot be altered.");
         }
         this.dataSourceName = dataSourceName;
         instanceKey = InstanceKeyDataSourceFactory.registerNewInstance(this);
@@ -742,7 +786,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /**
      * Sets the value of defaultAutoCommit, which defines the state of connections handed out from this pool. The value
      * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is {@code null} which
-     * will use the default value for the drive.
+     * will use the default value for the driver.
      *
      * @param defaultAutoCommit
      *            Value to assign to defaultAutoCommit.
@@ -902,7 +946,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /**
      * Sets the value of defaultReadOnly, which defines the state of connections handed out from this pool. The value
      * can be changed on the Connection using Connection.setReadOnly(boolean). The default is {@code null} which
-     * will use the default value for the drive.
+     * will use the default value for the driver.
      *
      * @param defaultReadOnly
      *            Value to assign to defaultReadOnly.
@@ -913,12 +957,12 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
-     * GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
+     * Sets the default value for {@link
+     * GenericObjectPool#getSoftMinEvictableIdleDuration()} for each per user pool.
      *
      * @param defaultSoftMinEvictableIdleDuration
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
-     *            GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
+     *            The default value for {@link
+     *            GenericObjectPool#getSoftMinEvictableIdleDuration()} for each per user pool.
      * @since 2.10.0
      */
     public void setDefaultSoftMinEvictableIdle(final Duration defaultSoftMinEvictableIdleDuration) {
@@ -927,11 +971,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Sets the default value for {@link
      * GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
      *
      * @param softMinEvictableIdleTimeMillis
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     *            The default value for {@link
      *            GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
      * @deprecated Use {@link #setDefaultSoftMinEvictableIdle(Duration)}.
      */
@@ -942,11 +986,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Sets the default value for {@link
      * GenericObjectPool#getTestOnBorrow()} for each per user pool.
      *
      * @param testOnBorrow
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     *            The default value for {@link
      *            GenericObjectPool#getTestOnBorrow()} for each per user pool.
      */
     public void setDefaultTestOnBorrow(final boolean testOnBorrow) {
@@ -955,11 +999,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Sets the default value for {@link
      * GenericObjectPool#getTestOnCreate()} for each per user pool.
      *
      * @param testOnCreate
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     *            The default value for {@link
      *            GenericObjectPool#getTestOnCreate()} for each per user pool.
      */
     public void setDefaultTestOnCreate(final boolean testOnCreate) {
@@ -968,11 +1012,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Sets the default value for {@link
      * GenericObjectPool#getTestOnReturn()} for each per user pool.
      *
      * @param testOnReturn
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     *            The default value for {@link
      *            GenericObjectPool#getTestOnReturn()} for each per user pool.
      */
     public void setDefaultTestOnReturn(final boolean testOnReturn) {
@@ -981,11 +1025,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     * Sets the default value for {@link
      * GenericObjectPool#getTestWhileIdle()} for each per user pool.
      *
      * @param testWhileIdle
-     *            The default value for {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool
+     *            The default value for {@link
      *            GenericObjectPool#getTestWhileIdle()} for each per user pool.
      */
     public void setDefaultTestWhileIdle(final boolean testWhileIdle) {
@@ -1143,7 +1187,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Whether a rollback will be issued after executing the SQL query that will be used to validate connections from
+     * Sets whether a rollback will be issued after executing the SQL query that will be used to validate connections from
      * this pool before returning them to the caller. Default behavior is NOT to issue a rollback. The setting will only
      * have an effect if a validation query is set
      *
@@ -1155,6 +1199,13 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         this.rollbackAfterValidation = rollbackAfterValidation;
     }
 
+    /**
+     * Sets up the defaults for a given connection.
+     *
+     * @param connection The target connection.
+     * @param userName   The user name for the connection.
+     * @throws SQLException if a database access error occurs or this method is called on a closed connection
+     */
     protected abstract void setupDefaults(Connection connection, String userName) throws SQLException;
 
     /**
@@ -1193,9 +1244,18 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         this.validationQueryTimeoutDuration = Duration.ofSeconds(validationQueryTimeoutSeconds);
     }
 
+    /**
+     * Tests and returns whether a JNDI context can be created to lookup a ConnectionPoolDataSource to then access a PooledConnection connection.
+     *
+     * @param userName     An optional user name, may be null.
+     * @param userPassword An optional user user password, may be null.
+     * @return A ConnectionPoolDataSource from a JNDI context.
+     * @throws javax.naming.NamingException if a naming exception is encountered.
+     * @throws SQLException                 if a ConnectionPoolDataSource or PooledConnection is not available.
+     */
     protected ConnectionPoolDataSource testCPDS(final String userName, final String userPassword)
             throws javax.naming.NamingException, SQLException {
-        // The source of physical db connections
+        // The source of physical database connections
         ConnectionPoolDataSource cpds = this.dataSource;
         if (cpds == null) {
             Context ctx = null;
@@ -1206,12 +1266,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             }
             final Object ds = ctx.lookup(dataSourceName);
             if (!(ds instanceof ConnectionPoolDataSource)) {
-                throw new SQLException("Illegal configuration: " + "DataSource " + dataSourceName + " ("
-                        + ds.getClass().getName() + ")" + " doesn't implement javax.sql.ConnectionPoolDataSource");
+                throw new SQLException("Illegal configuration: DataSource " + dataSourceName + " ("
+                        + ds.getClass().getName() + ") doesn't implement javax.sql.ConnectionPoolDataSource");
             }
             cpds = (ConnectionPoolDataSource) ds;
         }
-
         // try to get a connection with the supplied userName/password
         PooledConnection conn = null;
         try {
@@ -1247,6 +1306,11 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         return builder.toString();
     }
 
+    /**
+     * Appends this instance's fields to a string builder.
+     *
+     * @param builder the target string builder.
+     */
     protected void toStringFields(final StringBuilder builder) {
         builder.append("getConnectionCalled=");
         builder.append(getConnectionCalled);

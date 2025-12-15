@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -158,15 +158,35 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
     @Override
     public Connection createConnection() throws SQLException {
         // create a new XAConnection
-        final XAConnection xaConnection;
-        if (userName == null) {
-            xaConnection = xaDataSource.getXAConnection();
-        } else {
-            xaConnection = xaDataSource.getXAConnection(userName, Utils.toString(userPassword));
+        XAConnection xaConnection = null;
+        Connection connection = null;
+        final XAResource xaResource;
+        try {
+            if (userName == null) {
+                xaConnection = xaDataSource.getXAConnection();
+            } else {
+                xaConnection = xaDataSource.getXAConnection(userName, Utils.toString(userPassword));
+            }
+            // get the real connection and XAResource from the connection
+            connection = xaConnection.getConnection();
+            xaResource = xaConnection.getXAResource();
+        } catch (final SQLException sqle) {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (final SQLException ignored) {
+                    // Ignore
+                }
+            }
+            if (xaConnection != null) {
+                try {
+                    xaConnection.close();
+                } catch (final SQLException ignored) {
+                    // Ignore
+                }
+            }
+            throw sqle;
         }
-        // get the real connection and XAResource from the connection
-        final Connection connection = xaConnection.getConnection();
-        final XAResource xaResource = xaConnection.getXAResource();
         // register the XA resource for the connection
         transactionRegistry.registerConnection(connection, xaResource);
         // The Connection we're returning is a handle on the XAConnection.

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,12 +29,12 @@ import java.util.Properties;
 public class DriverManagerConnectionFactory implements ConnectionFactory {
 
     static {
-        // Related to DBCP-212
+        // Related to DBCP-272
         // Driver manager does not sync loading of drivers that use the service
         // provider interface. This will cause issues is multi-threaded
         // environments. This hack makes sure the drivers are loaded before
         // DBCP tries to use them.
-        DriverManager.getDrivers();
+        DriverManager.getDrivers(); // NOPMD
     }
 
     private final String connectionUri;
@@ -123,6 +123,8 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
     }
 
     /**
+     * Gets the connection URI.
+     *
      * @return The connection URI.
      * @since 2.6.0
      */
@@ -131,7 +133,9 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The Properties.
+     * Gets the Properties, may be null.
+     *
+     * @return The Properties, may be null.
      * @since 2.6.0
      */
     public Properties getProperties() {
@@ -139,7 +143,9 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The user name.
+     * Gets the user name, may be null.
+     *
+     * @return The user name, may be null.
      * @since 2.6.0
      */
     public String getUserName() {

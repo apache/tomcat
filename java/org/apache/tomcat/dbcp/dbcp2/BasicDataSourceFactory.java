@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,12 +49,12 @@ import org.apache.tomcat.dbcp.pool2.impl.BaseObjectPoolConfig;
 import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPoolConfig;
 
 /**
- * JNDI object factory that creates an instance of {@code BasicDataSource} that has been configured based on the
- * {@code RefAddr} values of the specified {@code Reference}, which must match the names and data types of the
- * {@code BasicDataSource} bean properties with the following exceptions:
+ * JNDI object factory that creates an instance of {@link BasicDataSource} that has been configured based on the
+ * {@link RefAddr} values of the specified {@code Reference}, which must match the names and data types of the
+ * {@link BasicDataSource} bean properties with the following exceptions:
  * <ul>
  * <li>{@code connectionInitSqls} must be passed to this factory as a single String using semicolon to delimit the
- * statements whereas {@code BasicDataSource} requires a collection of Strings.</li>
+ * statements whereas {@link BasicDataSource} requires a collection of Strings.</li>
  * </ul>
  *
  * @since 2.0
@@ -131,7 +131,6 @@ public class BasicDataSourceFactory implements ObjectFactory {
      */
     private static final String PROP_DISCONNECTION_IGNORE_SQL_CODES = "disconnectionIgnoreSqlCodes";
 
-
     /*
      * Block with obsolete properties from DBCP 1.x. Warn users that these are ignored and they should use the 2.x
      * properties.
@@ -175,11 +174,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
                 "Property " + NUPROP_MAX_ACTIVE + " is not used in DBCP2, use " + PROP_MAX_TOTAL + " instead. "
                         + PROP_MAX_TOTAL + " default value is " + GenericObjectPoolConfig.DEFAULT_MAX_TOTAL + ".");
         NUPROP_WARNTEXT.put(NUPROP_REMOVE_ABANDONED,
-                "Property " + NUPROP_REMOVE_ABANDONED + " is not used in DBCP2," + " use one or both of "
+                "Property " + NUPROP_REMOVE_ABANDONED + " is not used in DBCP2, use one or both of "
                         + PROP_REMOVE_ABANDONED_ON_BORROW + " or " + PROP_REMOVE_ABANDONED_ON_MAINTENANCE + " instead. "
                         + "Both have default value set to false.");
         NUPROP_WARNTEXT.put(NUPROP_MAXWAIT,
-                "Property " + NUPROP_MAXWAIT + " is not used in DBCP2" + " , use " + PROP_MAX_WAIT_MILLIS + " instead. "
+                "Property " + NUPROP_MAXWAIT + " is not used in DBCP2 , use " + PROP_MAX_WAIT_MILLIS + " instead. "
                         + PROP_MAX_WAIT_MILLIS + " default value is " + BaseObjectPoolConfig.DEFAULT_MAX_WAIT
                         + ".");
     }
@@ -306,9 +305,10 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         final String value = properties.getProperty(PROP_CONNECTION_PROPERTIES);
         if (value != null) {
-            for (final Object key : getProperties(value).keySet()) {
-                final String propertyName = Objects.toString(key, null);
-                dataSource.addConnectionProperty(propertyName, getProperties(value).getProperty(propertyName));
+            final Properties connectionProperties = getProperties(value);
+            for (final Object key : connectionProperties.keySet()) {
+                final String propertyName = Objects.toString(key);
+                dataSource.addConnectionProperty(propertyName, connectionProperties.getProperty(propertyName));
             }
         }
 
@@ -376,7 +376,14 @@ public class BasicDataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * Creates and return a new {@code BasicDataSource} instance. If no instance can be created, return
+     * Constructs a new instance.
+     */
+    public BasicDataSourceFactory() {
+        // empty
+    }
+
+    /**
+     * Creates and return a new {@link BasicDataSource} instance. If no instance can be created, return
      * {@code null} instead.
      *
      * @param obj

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,19 +23,18 @@ import java.util.Arrays;
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
 /**
- * A {@code char} array wrapper that does not reveal its contents inadvertently through toString(). In contrast to, for
- * example, AtomicReference which toString()'s its contents.
- *
+ * A {@code char} array wrapper that does not reveal its contents inadvertently through toString(). In contrast to, for example, AtomicReference which
+ * toString()'s its contents.
+ * <p>
  * May contain null.
+ * </p>
  *
  * @since 2.9.0
  */
 final class CharArray implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     static final CharArray NULL = new CharArray((char[]) null);
-
+    private static final long serialVersionUID = 1L;
     private final char[] chars;
 
     CharArray(final char[] chars) {
@@ -53,6 +52,18 @@ final class CharArray implements Serializable {
      */
     String asString() {
         return Utils.toString(chars);
+    }
+
+    /**
+     * Clears the content of the char array.
+     *
+     * @return {@code this} instance.
+     */
+    CharArray clear() {
+        if (chars != null) {
+            Arrays.fill(chars, '\0');
+        }
+        return this;
     }
 
     @Override
@@ -80,5 +91,4 @@ final class CharArray implements Serializable {
     public int hashCode() {
         return Arrays.hashCode(chars);
     }
-
 }
