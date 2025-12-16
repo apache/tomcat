@@ -319,7 +319,7 @@
         Update the internal fork of Commons Pool to 2.13.0. (markt)
       </update>
       <update>
-        Update the internal fork of Commons DBCP to 2.14.0-RC1. (markt)
+        Update the internal fork of Commons DBCP to 2.14.0. (markt)
       </update>
       <update>
         Update Commons Daemon to 1.5.1. (markt)
