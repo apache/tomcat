@@ -104,7 +104,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.50 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.51 (schultz)" rtext="in development">
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -116,6 +116,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Commons Pool to 2.13.0. (markt)
+      </update>
+      <update>
+        Update the internal fork of Commons DBCP to 2.14.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.50 (schultz)" rtext="Release in progress">
   <subsection name="General">
@@ -125,12 +135,6 @@
         during test execution. Useful for cleaner console output when running
         tests with multiple threads. (csutherl)
       </add>
-      <update>
-        Update the internal fork of Commons Pool to 2.13.0. (markt)
-      </update>
-      <update>
-        Update the internal fork of Commons DBCP to 2.14.0. (markt)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Catalina">
