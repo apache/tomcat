@@ -69,7 +69,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     private static final Log log = LogFactory.getLog(BasicDataSource.class);
 
     static {
-        // Attempt to prevent deadlocks - see DBCP - 272
+        // Attempt to prevent deadlocks - see DBCP-272
         DriverManager.getDrivers(); // NOPMD
     }
 
@@ -438,7 +438,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * with the specified {@link ClassLoader}.</li>
      * <li>If {code driverClassName} is specified and the previous attempt fails, the class is loaded using the
      * context class loader of the current thread.</li>
-     * <li>If a driver still isn't loaded one is loaded via the {@link DriverManager} using the specified {code connectionString}.
+     * <li>If a driver still isn't loaded one is loaded via the {@link DriverManager} using the specified {code connectionString}.</li>
      * </ol>
      * <p>
      * This method exists so subclasses can replace the implementation class.

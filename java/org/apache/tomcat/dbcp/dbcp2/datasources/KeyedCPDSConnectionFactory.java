@@ -62,7 +62,7 @@ final class KeyedCPDSConnectionFactory extends AbstractConnectionFactory
     }
 
     @Override
-    public void activateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> pooledObject) throws SQLException {
+    public void activateObject(final UserPassKey ignored, final PooledObject<PooledConnectionAndInfo> pooledObject) throws SQLException {
         validateLifetime(pooledObject);
     }
 

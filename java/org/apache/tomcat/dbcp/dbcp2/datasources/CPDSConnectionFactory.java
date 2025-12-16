@@ -66,6 +66,7 @@ final class CPDSConnectionFactory extends AbstractConnectionFactory
             final Duration validationQueryTimeoutDuration, final boolean rollbackAfterValidation, final String userName,
             final char[] userPassword) {
         super(cpds, validationQuery, validationQueryTimeoutDuration, rollbackAfterValidation);
+        this.userPassKey = new UserPassKey(userName, userPassword);
     }
 
     @Override

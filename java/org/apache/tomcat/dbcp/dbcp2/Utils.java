@@ -42,7 +42,7 @@ public final class Utils {
             .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
 
     /**
-     * Any SQL_STATE starting with this value is considered a fatal disconnect.
+     * Any SQL State starting with this value is considered a fatal disconnect.
      */
     public static final String DISCONNECTION_SQL_CODE_PREFIX = "08";
 

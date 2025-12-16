@@ -232,7 +232,6 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
         if (isClosedInternal() && delegate != null) {
             try {
                 setDelegate(null);
-
                 if (!delegate.isClosed()) {
                     delegate.close();
                 }

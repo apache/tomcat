@@ -492,11 +492,11 @@ final class PooledConnectionImpl
      *            a {@link String} object that is the SQL statement to be sent to the database; may contain on or
      *            more '?' parameters.
      * @param resultSetType
-     *            a result set type; one of {@link ResultSet.TYPE_FORWARD_ONLY},
-     *            {@link ResultSet.TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet.TYPE_SCROLL_SENSITIVE}.
+     *            a result set type; one of {@link ResultSet#TYPE_FORWARD_ONLY},
+     *            {@link ResultSet#TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet#TYPE_SCROLL_SENSITIVE}.
      * @param resultSetConcurrency
-     *            a concurrency type; one of {@link ResultSet.CONCUR_READ_ONLY} or
-     *            {@link ResultSet.CONCUR_UPDATABLE}.
+     *            a concurrency type; one of {@link ResultSet#CONCUR_READ_ONLY} or
+     *            {@link ResultSet#CONCUR_UPDATABLE}.
      * @return a {@link CallableStatement} object containing the pre-compiled SQL statement that will produce
      *         {@link ResultSet} objects with the given type and concurrency.
      * @throws SQLException
@@ -526,14 +526,14 @@ final class PooledConnectionImpl
      *            a {@link String} object that is the SQL statement to be sent to the database; may contain on or
      *            more '?' parameters.
      * @param resultSetType
-     *            one of the following {@link ResultSet} constants: {@link ResultSet.TYPE_FORWARD_ONLY},
-     *            {@link ResultSet.TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet.TYPE_SCROLL_SENSITIVE}.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#TYPE_FORWARD_ONLY},
+     *            {@link ResultSet#TYPE_SCROLL_INSENSITIVE}, or {@link ResultSet#TYPE_SCROLL_SENSITIVE}.
      * @param resultSetConcurrency
-     *            one of the following {@link ResultSet} constants: {@link ResultSet.CONCUR_READ_ONLY} or
-     *            {@link ResultSet.CONCUR_UPDATABLE}.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#CONCUR_READ_ONLY} or
+     *            {@link ResultSet#CONCUR_UPDATABLE}.
      * @param resultSetHoldability
-     *            one of the following {@link ResultSet} constants: {@link ResultSet.HOLD_CURSORS_OVER_COMMIT}
-     *            or {@link ResultSet.CLOSE_CURSORS_AT_COMMIT}.
+     *            one of the following {@link ResultSet} constants: {@link ResultSet#HOLD_CURSORS_OVER_COMMIT}
+     *            or {@link ResultSet#CLOSE_CURSORS_AT_COMMIT}.
      * @return a new {@link CallableStatement} object, containing the pre-compiled SQL statement, that will
      *         generate {@link ResultSet} objects with the given type, concurrency, and holdability.
      * @throws SQLException
