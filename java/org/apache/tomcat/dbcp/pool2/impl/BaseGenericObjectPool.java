@@ -1014,7 +1014,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *         removal is configured for this pool; Integer.MAX_VALUE otherwise.
      *
      * @see AbandonedConfig#getRemoveAbandonedTimeoutDuration()
-     * @see AbandonedConfig#getRemoveAbandonedTimeoutDuration()
      * @deprecated Use {@link #getRemoveAbandonedTimeoutDuration()}.
      * @since 2.11.0
      */
