@@ -50,6 +50,11 @@ public class TestOcspEnabled extends OcspBaseTest {
         doTest(false, false, ClientCertificateVerification.DISABLED, false);
     }
 
+    @Test
+    public void testRevokedClientRevokedServerVerifyClientDefault() throws Exception {
+        doTest(false, false, ClientCertificateVerification.DEFAULT, false);
+    }
+
     @Test(expected = SSLHandshakeException.class)
     public void testRevokedClientRevokedServerVerifyServer() throws Exception {
         doTest(false, false, ClientCertificateVerification.DISABLED, true);
