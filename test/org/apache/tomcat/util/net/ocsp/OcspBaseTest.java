@@ -125,6 +125,9 @@ public class OcspBaseTest extends TomcatBaseTest {
         }
         SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
         switch (verifyClientCert) {
+            case DEFAULT:
+                sslHostConfig.setCertificateVerification("required");
+                break;
             case DISABLED:
                 sslHostConfig.setOcspEnabled(false);
                 sslHostConfig.setCertificateVerification("required");
@@ -170,6 +173,7 @@ public class OcspBaseTest extends TomcatBaseTest {
 
 
     protected enum ClientCertificateVerification {
+        DEFAULT,
         ENABLED,
         OPTIONAL_NO_CA,
         DISABLED
