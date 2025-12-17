@@ -44,63 +44,62 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         // Requests to exercise code that allows HT in place of SP
-        parameterSets.add(new Object[] { Boolean.FALSE, new String[] {
+        parameterSets.add(new Object[] { new String[] {
                 "GET\t/test\tHTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF },
                 Boolean.TRUE });
 
         // Standard HTTP/1.1 request
         addRequestWithSplits(
                 "GET /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
-                Boolean.FALSE, parameterSets);
+                parameterSets);
 
         // Standard HTTP/1.1 request with invalid HTTP protocol
         addRequestWithSplits("GET /test HTTP/" + CR + "1.1" + CRLF + "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
+                "Connection: close" + CRLF + CRLF, Boolean.FALSE, parameterSets);
 
         // Invalid (request target) HTTP/1.1 request
         addRequestWithSplits(
                 "GET /te<st HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
-                Boolean.FALSE, Boolean.FALSE, parameterSets);
+                Boolean.FALSE, parameterSets);
 
         // Invalid (use of CR) HTTP/1.1 request
         addRequestWithSplits("GET /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF +
-                "X-aaa: bbb" + CR + CRLF + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
+                "X-aaa: bbb" + CR + CRLF + CRLF, Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request with a query string
         addRequestWithSplits(
                 "GET /test?a=b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
-                Boolean.FALSE, parameterSets);
+                parameterSets);
 
         // Standard HTTP/1.1 request with a query string that includes ?
         addRequestWithSplits(
                 "GET /test?a=?b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
-                Boolean.FALSE, parameterSets);
+                parameterSets);
 
         // Standard HTTP/1.1 request with an invalid query string
         addRequestWithSplits(
                 "GET /test?a=<b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
-                Boolean.FALSE, Boolean.FALSE, parameterSets);
+                Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request using LF rather than CRLF
         addRequestWithSplits("GET /test HTTP/1.1" + LF + "Host: localhost:8080" + LF + "Connection: close" + LF + LF,
-                Boolean.FALSE, parameterSets);
+                parameterSets);
 
         // Invalid HTTP/1.1 request using CR rather than CRLF
         addRequestWithSplits("GET /test HTTP/1.1" + CR + "Host: localhost:8080" + CR + "Connection: close" + CR + CR,
-                Boolean.FALSE, Boolean.FALSE, parameterSets);
+                Boolean.FALSE, parameterSets);
 
         return parameterSets;
     }
 
 
-    private static void addRequestWithSplits(String request, Boolean isHttp09, List<Object[]> parameterSets) {
-        addRequestWithSplits(request, isHttp09, Boolean.TRUE, parameterSets);
+    private static void addRequestWithSplits(String request, List<Object[]> parameterSets) {
+        addRequestWithSplits(request, Boolean.TRUE, parameterSets);
     }
 
-    private static void addRequestWithSplits(String request, Boolean isHttp09, Boolean valid,
-            List<Object[]> parameterSets) {
+    private static void addRequestWithSplits(String request, Boolean valid, List<Object[]> parameterSets) {
         // Add as a single String
-        parameterSets.add(new Object[] { isHttp09, new String[] { request }, valid });
+        parameterSets.add(new Object[] { new String[] { request }, valid });
 
         // Add with all CRLF split between the CR and LF
         List<String> parts = new ArrayList<>();
@@ -112,30 +111,27 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
             pos = request.indexOf('\n', lastPos + 1);
         }
         parts.add(request.substring(lastPos));
-        parameterSets.add(new Object[] { isHttp09, parts.toArray(new String[0]), valid });
+        parameterSets.add(new Object[] { parts.toArray(new String[0]), valid });
 
         // Add with a split between each character
         List<String> chars = new ArrayList<>();
         for (char c : request.toCharArray()) {
             chars.add(Character.toString(c));
         }
-        parameterSets.add(new Object[] { isHttp09, chars.toArray(new String[0]), valid });
+        parameterSets.add(new Object[] { chars.toArray(new String[0]), valid });
     }
 
     @Parameter(0)
-    public boolean isHttp09;
-
-    @Parameter(1)
     public String[] request;
 
-    @Parameter(2)
+    @Parameter(1)
     public boolean valid;
 
 
     @Test
     public void testBug54947() {
 
-        Client client = new Client(request, isHttp09);
+        Client client = new Client(request);
 
         Exception e = client.doRequest();
 
@@ -153,9 +149,8 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
     private class Client extends SimpleHttpClient {
 
-        Client(String[] request, boolean isHttp09) {
+        Client(String[] request) {
             setRequest(request);
-            setUseHttp09(isHttp09);
         }
 
         private Exception doRequest() {

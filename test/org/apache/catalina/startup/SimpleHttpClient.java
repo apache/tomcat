@@ -101,7 +101,6 @@ public abstract class SimpleHttpClient {
     private String[] request;
     private boolean useContinue = false;
     private boolean useCookies = true;
-    private boolean useHttp09 = false;
     private int requestPause = 1000;
     private Charset requestBodyEncoding = StandardCharsets.ISO_8859_1;
 
@@ -141,10 +140,6 @@ public abstract class SimpleHttpClient {
 
     public boolean getUseCookies() {
         return useCookies;
-    }
-
-    public void setUseHttp09(boolean theUseHttp09Flag) {
-        useHttp09 = theUseHttp09Flag;
     }
 
     public void setRequestPause(int theRequestPause) {
@@ -274,26 +269,23 @@ public abstract class SimpleHttpClient {
             bodyUriElements.clear();
         }
 
-        // HTTP 0.9 has neither response line nor headers
-        if (!useHttp09) {
-            // Read the response status line
-            responseLine = readLine();
+        // Read the response status line
+        responseLine = readLine();
 
-            // Is a 100 continue response expected?
-            if (useContinue) {
-                if (isResponse100()) {
-                    // Skip the blank after the 100 Continue response
-                    readLine();
-                    // Now get the final response
-                    responseLine = readLine();
-                } else {
-                    throw new IOException("No 100 Continue response");
-                }
+        // Is a 100 continue response expected?
+        if (useContinue) {
+            if (isResponse100()) {
+                // Skip the blank after the 100 Continue response
+                readLine();
+                // Now get the final response
+                responseLine = readLine();
+            } else {
+                throw new IOException("No 100 Continue response");
             }
-
-            // Put the headers into a map, and process interesting ones
-            processHeaders();
         }
+
+        // Put the headers into a map, and process interesting ones
+        processHeaders();
 
         // Read the body, if requested and if one exists
         processBody(wantBody);
