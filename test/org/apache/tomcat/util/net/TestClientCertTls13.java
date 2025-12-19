@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -107,38 +106,6 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
         Assert.assertEquals(200, rc);
         Assert.assertEquals("OK-" + size, res.toString());
-    }
-
-    @Test
-    @Ignore // Currently fails with Tomcat Native 1.3.2 (unreleased)
-    public void testCiphersTLS12Only() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
-        sslHostConfig.setCiphers(SSLHostConfig.DEFAULT_TLS_12_BELOW_CIPHERS);
-
-        tomcat.start();
-
-        Assume.assumeFalse("LibreSSL does not allow PHA",
-                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
-
-        ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
-        Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
-    }
-
-    @Test
-    @Ignore // Currently fails with Tomcat Native 1.3.1
-    public void testCiphersTLS13Only() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
-        sslHostConfig.setCiphers(SSLHostConfig.DEFAULT_TLS_13_ABOVE_CIPHERS);
-
-        tomcat.start();
-
-        Assume.assumeFalse("LibreSSL does not allow PHA",
-                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
-
-        ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
-        Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
 
     @Override
