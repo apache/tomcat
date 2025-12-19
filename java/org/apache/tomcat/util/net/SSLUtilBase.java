@@ -128,7 +128,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             // OpenSSL profiles cannot be resolved without Java 22
             this.enabledCiphers = new String[0];
         } else {
-            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
+            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12);
             List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
             Set<String> implementedCiphers = getImplementedCiphers();
             List<String> enabledCiphers =
