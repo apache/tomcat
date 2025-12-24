@@ -38,6 +38,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.validator.StartupAbortException;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -727,6 +728,15 @@ public class Catalina {
             try {
                 getServer().init();
             } catch (LifecycleException e) {
+                Throwable t = e;
+                while (t.getCause() != null && t.getCause() != t) {
+                    t = t.getCause();
+                }
+
+                if (t instanceof StartupAbortException) {
+                    throw (StartupAbortException) t;
+                }
+
                 if (throwOnInitFailure) {
                     throw new Error(e);
                 } else {
@@ -752,6 +762,9 @@ public class Catalina {
                 load();
             }
         } catch (Exception e) {
+            if (e instanceof StartupAbortException) {
+                throw (StartupAbortException) e;
+            }
             e.printStackTrace(System.out);
         }
     }

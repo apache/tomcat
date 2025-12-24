@@ -118,7 +118,8 @@ public class StartupValidationListener implements LifecycleListener {
         if (abortOnError && result.getErrorCount() > 0) {
             String message = sm.getString("startupValidationListener.abortingOnErrors",
                     String.valueOf(result.getErrorCount()));
-            throw new IllegalArgumentException(message);
+            log.error(message);
+            throw new StartupAbortException(message);
         }
 
         if (log.isInfoEnabled()) {

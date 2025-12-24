@@ -527,12 +527,26 @@ public final class Bootstrap {
             if (throwable instanceof InvocationTargetException && throwable.getCause() != null) {
                 throwable = throwable.getCause();
             }
+
+            if (isStartupAbort(throwable)) {
+                System.exit(1);
+            }
+
             handleThrowable(throwable);
             log.error("Error running command", throwable);
             System.exit(1);
         }
     }
 
+    public static boolean isStartupAbort(Throwable t) {
+        while (t != null) {
+            if ("org.apache.catalina.startup.validator.StartupAbortException".equals(t.getClass().getName())) {
+                return true;
+            }
+            t = t.getCause();
+        }
+        return false;
+    }
 
     /**
      * Obtain the name of configured home (binary) directory. Note that home and base may be the same (and are by
