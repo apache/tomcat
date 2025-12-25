@@ -195,10 +195,22 @@ launches Java directly and does not use the script files.
 
       $CATALINA_HOME/bin/catalina.sh start
 
+NOTE: When using Windows PowerShell, scripts in the current directory
+must be executed with an explicit path. For example
+
+    .\startup.bat
+
+Running startup.bat without the leading ".\" may fail because
+PowerShell does not execute local scripts by default.
+
 (4.2) After startup, the default web applications included with Tomcat will be
       available by visiting:
 
       http://localhost:8080/
+
+NOTE: If no web application is deployed at the root context, accessing
+http://localhost:8080/ may return a 404 response. This indicates that
+Tomcat is running but no application is deployed.
 
 (4.3) Further information about configuring and running Tomcat can be found in
       the documentation included here, as well as on the Tomcat web site:
