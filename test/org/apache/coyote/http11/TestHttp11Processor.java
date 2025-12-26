@@ -31,11 +31,9 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.zip.Deflater;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
@@ -47,6 +45,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -2148,7 +2148,80 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
     }
 
+    @Test
+    public void testGzipLevel() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
 
+        Assert.assertEquals(-1, protocol.getGzipLevel());
+
+        protocol.setGzipLevel(Deflater.BEST_SPEED);
+        Assert.assertEquals(Deflater.BEST_SPEED, protocol.getGzipLevel());
+
+        protocol.setGzipLevel(Deflater.BEST_COMPRESSION);
+        Assert.assertEquals(Deflater.BEST_COMPRESSION, protocol.getGzipLevel());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipLevelLow() {
+        new Http11NioProtocol().setGzipLevel(-2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipLevelHigh() {
+        new Http11NioProtocol().setGzipLevel(10);
+    }
+
+    @Test
+    public void testGzipBufferSize() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        Assert.assertEquals(512, protocol.getGzipBufferSize());
+
+        protocol.setGzipBufferSize(1024);
+        Assert.assertEquals(1024, protocol.getGzipBufferSize());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipBufferSize() {
+        new Http11NioProtocol().setGzipBufferSize(0);
+    }
+
+    @Test
+    public void testOutputFilterFactory() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        // Test default factory is GzipOutputFilterFactory
+        Assert.assertNotNull(protocol.getOutputFilterFactory());
+        Assert.assertTrue(protocol.getOutputFilterFactory() instanceof GzipOutputFilterFactory);
+
+        protocol.setOutputFilterFactory(new MockOutputFilterFactory());
+        Assert.assertNotNull(protocol.getOutputFilterFactory());
+        Assert.assertTrue(protocol.getOutputFilterFactory() instanceof MockOutputFilterFactory);
+    }
+
+    @Test
+    public void testOutputFilterFactoryClassName() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        protocol.setOutputFilterFactory(MockOutputFilterFactory.class.getName());
+        Assert.assertNotNull(protocol.getOutputFilterFactory());
+        Assert.assertTrue(protocol.getOutputFilterFactory() instanceof MockOutputFilterFactory);
+    }
+
+    @Test
+    public void testNoCompressionEncodings() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+        String encodings = protocol.getNoCompressionEncodings();
+        Assert.assertTrue(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd")
+            .stream()
+            .anyMatch(encodings::contains));
+
+        protocol.setNoCompressionEncodings("br");
+
+        String newEncodings = protocol.getNoCompressionEncodings();
+        Assert.assertTrue(newEncodings.contains("br"));
+        Assert.assertFalse(newEncodings.contains("gzip"));
+    }
 
     private static class EarlyHintsServlet extends HttpServlet {
 
@@ -2183,6 +2256,17 @@ public class TestHttp11Processor extends TomcatBaseTest {
             resp.setContentType("text/plain");
 
             resp.getWriter().write("OK");
+        }
+    }
+
+    public static class MockOutputFilterFactory implements OutputFilterFactory {
+
+        public OutputFilter createFilter(AbstractHttp11Protocol<?> protocol) {
+            return null;
+        }
+
+        public String getEncodingName() {
+            return "";
         }
     }
 }
