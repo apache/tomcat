@@ -252,7 +252,8 @@
 
         <p>
           Examples:<br/>
-          <code>mapSendOptions="6"</code> / <code>mapSendOptions="sync,use_ack"</code><br/>
+          <code>mapSendOptions="6"</code> /
+          <code>mapSendOptions="sync,use_ack"</code><br/>
           <code>mapSendOptions="8"</code> / <code>mapSendOptions="async"</code><br/>
           <code>mapSendOptions="2"</code> / <code>mapSendOptions="use_ack"</code>
         </p>

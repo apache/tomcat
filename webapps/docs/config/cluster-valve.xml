@@ -136,8 +136,8 @@
 
         <p>
           The value may be specified either as an integer flag or using the
-          human-readable option names. These names are translated to their integer
-          values on startup.
+          human-readable option names. These names are translated to their
+          integer values on startup.
         </p>
 
         <p>Some of the values are:<br/>
@@ -150,17 +150,20 @@
 
         <p>
           Examples:<br/>
-          <code>mapSendOptions="6"</code> / <code>mapSendOptions="sync,use_ack"</code><br/>
-          <code>mapSendOptions="8"</code> / <code>mapSendOptions="async"</code><br/>
-          <code>mapSendOptions="2"</code> / <code>mapSendOptions="use_ack"</code>
+          <code>mapSendOptions="6"</code> /
+          <code>mapSendOptions="sync,use_ack"</code><br/>
+          <code>mapSendOptions="8"</code> /
+          <code>mapSendOptions="async"</code><br/>
+          <code>mapSendOptions="2"</code> /
+          <code>mapSendOptions="use_ack"</code>
         </p>
 
         <p>
-          The valid option names are the same as for <code>channelSendOptions</code>:
-          "asynchronous" (alias "async"), "byte_message" (alias "byte"),
-          "multicast", "secure", "synchronized_ack" (alias "sync"), "udp",
-          "use_ack". Multiple names may be comma-separated, e.g.
-          <code>"async,multicast"</code>.
+          The valid option names are the same as for
+          <code>channelSendOptions</code>: "asynchronous" (alias "async"),
+          "byte_message" (alias "byte"), "multicast", "secure",
+          "synchronized_ack" (alias "sync"), "udp", "use_ack". Multiple names
+          may be comma-separated, e.g. <code>"async,multicast"</code>.
         </p>
       </attribute>
       <attribute name="requireReauthentication" required="false">

@@ -244,7 +244,6 @@ should be completed:</p>
     mechanism. This attribute controls how the replicated map within the
     <code>BackupManager</code> sends its messages during session backup
     operations.
-
     Just like <code>channelSendOptions</code>, the value may be specified
     either as an integer bitmask (e.g. <code>6</code>) or using the
     human-readable option names (e.g. <code>"sync,use_ack"</code>), with
