@@ -540,7 +540,7 @@ public final class Bootstrap {
 
     public static boolean isStartupAbort(Throwable t) {
         while (t != null) {
-            if ("org.apache.catalina.startup.validator.StartupAbortException".equals(t.getClass().getName())) {
+            if ("org.apache.catalina.startup.StartupAbortException".equals(t.getClass().getName())) {
                 return true;
             }
             t = t.getCause();

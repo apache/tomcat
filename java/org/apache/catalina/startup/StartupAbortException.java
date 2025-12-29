@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.catalina.startup.validator;
+package org.apache.catalina.startup;
+
+import java.io.Serial;
 
 /**
  * Exception used to abort startup due to validation failures without producing a noisy stack trace.
  */
 public class StartupAbortException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public StartupAbortException(String message) {
