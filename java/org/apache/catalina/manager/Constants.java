@@ -36,7 +36,7 @@ public class Constants {
 
     static {
         //@formatter:off
-        COPYRIGHT_DATE_RANGE = "1999-2025";
+        COPYRIGHT_DATE_RANGE = "1999-2026";
 
         COPYRIGHT_NOTICE = "Copyright (c) " + COPYRIGHT_DATE_RANGE + ", Apache Software Foundation";
         HTML_COPYRIGHT_NOTICE = "Copyright &copy; " + COPYRIGHT_DATE_RANGE + ", Apache Software Foundation";
