@@ -789,7 +789,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             jmxUnregister();
 
             // Release any threads that were waiting for an object
-            poolMap.values().forEach(e -> e.getIdleObjects().interuptTakeWaiters());
+            poolMap.values().forEach(e -> e.getIdleObjects().interruptTakeWaiters());
             // This clear cleans up the keys now any waiting threads have been
             // interrupted
             clear();

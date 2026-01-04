@@ -121,7 +121,7 @@
         tests with multiple threads. (csutherl)
       </add>
       <update>
-        Update the internal fork of Commons Pool to 2.13.0. (markt)
+        Update the internal fork of Commons Pool to 2.13.1. (markt)
       </update>
       <update>
         Update the internal fork of Commons DBCP to 2.14.0. (markt)
