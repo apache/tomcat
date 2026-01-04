@@ -31,7 +31,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
  *     {@link GenericKeyedObjectPoolConfig#getMinIdlePerKey()} idle objects in
  *     the pool and the object has been idle for longer than
  *     {@link GenericObjectPool#getSoftMinEvictableIdleDuration()} /
- *     {@link GenericKeyedObjectPool#getSoftMinEvictableIdleDuration()}
+ *     {@link GenericKeyedObjectPool#getSoftMinEvictableIdleDuration()}</li>
  * </ul>
  * <p>
  * This class is immutable and thread-safe.

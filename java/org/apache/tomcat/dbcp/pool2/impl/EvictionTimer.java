@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * This class is currently implemented using {@link ScheduledThreadPoolExecutor}. This implementation may change in any
  * future release. This class keeps track of how many pools are using it. If no pools are using the timer, it is
- * cancelled. This prevents a thread being left running which, in application server environments, can lead to memory
+ * canceled. This prevents a thread being left running which, in application server environments, can lead to memory
  * leads and/or prevent applications from shutting down or reloading cleanly.
  * </p>
  * <p>
@@ -139,7 +139,7 @@ final class EvictionTimer {
     /**
      * Removes the specified eviction task from the timer.
      *
-     * @param evictor   Task to be cancelled.
+     * @param evictor   Task to be canceled.
      * @param timeout   If the associated executor is no longer required, how
      *                  long should this thread wait for the executor to
      *                  terminate?

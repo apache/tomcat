@@ -62,7 +62,7 @@ package org.apache.tomcat.dbcp.pool2;
  * While clients of a {@link KeyedObjectPool} borrow and return instances of
  * the underlying value type V, the factory methods act on instances of
  * {@link PooledObject PooledObject&lt;V&gt;}.  These are the object wrappers that
- * pools use to track and maintain state informations about the objects that
+ * pools use to track and maintain state information about the objects that
  * they manage.
  * </p>
  *
