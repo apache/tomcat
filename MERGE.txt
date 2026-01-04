@@ -67,7 +67,7 @@ Unused classes removed
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-pool-2.13.0 (2025-12-09)
+rel/commons-pool-2.13.1 (2025-12-30)
 
 DBCP2
 No unused code removed

@@ -585,7 +585,7 @@ final class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * Interrupts the threads currently waiting to take an object from the pool. See disclaimer on accuracy in
      * {@link java.util.concurrent.locks.ReentrantLock#getWaitingThreads(Condition)}.
      */
-    void interuptTakeWaiters() {
+    void interruptTakeWaiters() {
         lock.lock();
         try {
             lock.interruptWaiters(notEmpty);

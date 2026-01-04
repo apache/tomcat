@@ -212,10 +212,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         if (factory == null) {
             throw new IllegalStateException("Cannot add objects without a factory.");
         }
-
-        final int localMaxTotal = getMaxTotal();
         final int localMaxIdle = getMaxIdle();
-        if (getNumIdle() < localMaxIdle && (localMaxTotal < 0 || createCount.get() < localMaxTotal)) {
+        final int localMaxTotal = getMaxTotal();
+        if ((localMaxIdle < 0 || getNumIdle() < localMaxIdle) &&
+                (localMaxTotal < 0 || createCount.get() < localMaxTotal)) {
             addIdleObject(create(getMaxWaitDuration()));
         }
     }
@@ -479,7 +479,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             jmxUnregister();
 
             // Release any threads that were waiting for an object
-            idleObjects.interuptTakeWaiters();
+            idleObjects.interruptTakeWaiters();
         }
     }
 
