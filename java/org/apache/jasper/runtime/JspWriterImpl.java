@@ -52,7 +52,7 @@ public class JspWriterImpl extends JspWriter {
      * @param autoFlush <code>true</code> to automatically flush on buffer full, <code>false</code> to throw an overflow
      *                      exception in that case
      *
-     * @exception IllegalArgumentException If sz is &lt;= 0
+     * @exception IllegalArgumentException If sz is &lt; 0
      */
     public JspWriterImpl(ServletResponse response, int sz, boolean autoFlush) {
         super(sz, autoFlush);
