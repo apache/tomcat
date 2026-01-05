@@ -70,6 +70,7 @@ import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
@@ -101,6 +102,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
 
     private InstanceManager instanceManager;
+
+    private VirtualThreadExecutor virtualThreadExecutor;
 
     protected InstanceManager getInstanceManager(ClassLoader classLoader) {
         if (instanceManager != null) {
@@ -1010,6 +1013,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 }
             }
         }
+
+        if (useVirtualThreads()) {
+            virtualThreadExecutor.close();
+        }
     }
 
 
@@ -1026,6 +1033,18 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
         }
         return result;
+    }
+
+    public void setUseVirtualThreads(boolean useVirtualThreads) {
+        if (useVirtualThreads) {
+            virtualThreadExecutor = new VirtualThreadExecutor("WebSocketClient-IO-");
+        } else {
+            virtualThreadExecutor = null;
+        }
+    }
+
+    public boolean useVirtualThreads() {
+        return virtualThreadExecutor != null;
     }
 
 
