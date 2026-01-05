@@ -975,6 +975,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                     getSocket().close(true);
                 }
                 if (getEndpoint().running) {
+                    getSocket().reset(null, null);
                     if (nioChannels == null || !nioChannels.push(getSocket())) {
                         getSocket().free();
                     }
