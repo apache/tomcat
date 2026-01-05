@@ -86,9 +86,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
-        IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv2,
-                Constants.SSL_PROTO_SSLv3, Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1,
-                Constants.SSL_PROTO_TLSv1_2, Constants.SSL_PROTO_TLSv1_3);
+        if (OpenSSL_version_num() >= 0x1010100f) {
+            IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv2,
+                    Constants.SSL_PROTO_SSLv3, Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1,
+                    Constants.SSL_PROTO_TLSv1_2, Constants.SSL_PROTO_TLSv1_3);
+        } else {
+            IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv2,
+                    Constants.SSL_PROTO_SSLv3, Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1,
+                    Constants.SSL_PROTO_TLSv1_2);
+        }
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
