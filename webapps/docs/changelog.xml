@@ -114,6 +114,10 @@
         Improve warnings when setting ciphers lists in the FFM code, mirrorring
         the tomcat-native changes. (remm)
       </fix>
+      <fix>
+        <bug>69910</bug>: Dereference TLS objects right after closing a socket
+        to improve memory efficiency. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
