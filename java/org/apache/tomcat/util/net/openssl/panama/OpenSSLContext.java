@@ -520,7 +520,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     } else {
                         ciphersSet = true;
                     }
-                } catch (NoClassDefFoundError e) {
+                } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
                     // Ignore unavailable TLS 1.3 call, which might be compiled out sometimes on LibreSSL
                     tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers());
                 }
