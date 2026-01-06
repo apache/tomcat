@@ -224,7 +224,7 @@
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Improve warnings when setting ciphers lists in the FFM code, mirrorring
+        Improve warnings when setting ciphers lists in the FFM code, mirroring
         the tomcat-native changes. (remm)
       </fix>
       <fix>
