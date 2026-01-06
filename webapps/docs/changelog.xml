@@ -157,6 +157,19 @@
         certificates unless CA certificates were configured and the
         configuration failed. (markt)
       </fix>
+      <add>
+        For configuration consistency between OpenSSL and JSSE TLS
+        implementations, TLSv1.3 cipher suites included in the
+        <code>ciphers</code> attribute of an <code>SSLHostConfig</code> are now
+        always ignored (previously they would be ignored with OpenSSL
+        implementations and used with JSSE implementations) and a warning is
+        logged that the cipher suite has been ignored. (markt)
+      </add>
+      <add>
+        Add the <code>ciphersuite</code> attribute to
+        <code>SSLHostConfig</code> to configure the TLSv1.3 cipher suites.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

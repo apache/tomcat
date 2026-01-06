@@ -77,6 +77,76 @@ public class TestSSLHostConfig {
 
 
     @Test
+    public void testCipher05() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c = Cipher.TLS_AES_128_CCM_SHA256;
+
+        // Single TLSv1.3 name - should be filtered out
+        hc.setCiphers(c.getOpenSSLAlias());
+        Assert.assertEquals("", hc.getCiphers());
+    }
+
+
+    @Test
+    public void testCipher06() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
+
+        // TLSv1.3 then TLSv1.2 - TLSv1.3 name should be filtered out
+        hc.setCiphers(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias());
+        Assert.assertEquals(c2.getOpenSSLAlias(), hc.getCiphers());
+    }
+
+
+    @Test
+    public void testCipher07() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
+
+        // TLSv1.2 then TLSv1.3 - TLSv1.3 name should be filtered out
+        hc.setCiphers(c2.getOpenSSLAlias() + ":" + c1.getOpenSSLAlias());
+        Assert.assertEquals(c2.getOpenSSLAlias(), hc.getCiphers());
+    }
+
+
+    @Test
+    public void testCiphersuite01() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c = Cipher.TLS_AES_128_CCM_SHA256;
+
+        // Single TLSv1.3 cipher suite name
+        hc.setCipherSuites(c.getOpenSSLAlias());
+        Assert.assertEquals(c.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
+    public void testCiphersuite02() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
+
+        // TLSv1.3 then TLSv1.2 - TLSv1.2 name should be filtered out
+        hc.setCipherSuites(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias());
+        Assert.assertEquals(c1.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
+    public void testCiphersuite03() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
+
+        // TLSv1.2 then TLSv1.3 - TLSv1.2 name should be filtered out
+        hc.setCipherSuites(c2.getOpenSSLAlias() + ":" + c1.getOpenSSLAlias());
+        Assert.assertEquals(c1.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         // Dummy OpenSSL command name/value pair
         String name = "foo";

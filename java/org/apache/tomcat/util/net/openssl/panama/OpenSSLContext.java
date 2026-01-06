@@ -515,14 +515,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             if (maxTlsVersion >= TLS1_3_VERSION()) {
                 try {
-                    if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
-                        tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers());
+                    if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCipherSuites())) <= 0) {
+                        tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCipherSuites());
                     } else {
                         ciphersSet = true;
                     }
                 } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
                     // Ignore unavailable TLS 1.3 call, which might be compiled out sometimes on LibreSSL
-                    tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers());
+                    tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCipherSuites());
                 }
             }
             if (!ciphersSet) {
