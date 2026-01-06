@@ -305,7 +305,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 // proxy CONNECT, need to use TLS from this point on so wrap the
                 // original AsynchronousSocketChannel
                 SSLEngine sslEngine = createSSLEngine(clientEndpointConfiguration, host, port);
-                channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+                if (useVirtualThreads()) {
+                    channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine, virtualThreadExecutor);
+                } else {
+                    channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+                }
             } else if (channel == null) {
                 // Only need to wrap as this point if it wasn't wrapped to process a
                 // proxy CONNECT
