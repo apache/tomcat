@@ -142,6 +142,11 @@ public class JSSEUtil extends SSLUtilBase {
                     } else {
                         implementedCiphers = new HashSet<>(Arrays.asList(implementedCipherSuiteArray));
                     }
+
+                    if (sslHostConfig.getOpenSslConf() != null) {
+                        log.warn(sm.getString("jsseUtil.opensslconf.present"));
+                    }
+
                     initialized = true;
                 }
             }
