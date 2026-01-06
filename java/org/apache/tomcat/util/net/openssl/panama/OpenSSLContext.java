@@ -557,7 +557,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_verify(state.sslCtx, value,
                     SSL_CTX_set_verify$callback.allocate(new OpenSSLEngine.VerifyCallback(), contextArena));
 
-            // Trust and certificate verification
+            // Trust and certificate verification (optional - may not be configured)
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 x509TrustManager = chooseTrustManager(tms);
@@ -580,7 +580,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                     }
                 }
-            } else {
+            } else if (sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) {
                 // Client certificate verification based on trusted CA files and dirs
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null ?
                         localArena
@@ -590,9 +590,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         localArena
                                 .allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) :
                         MemorySegment.NULL;
-                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) &&
-                        SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative,
-                                caCertificatePathNative) <= 0) {
+                if (SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative, caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);

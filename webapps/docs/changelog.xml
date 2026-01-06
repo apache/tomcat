@@ -125,6 +125,11 @@
         Better warning message when <code>OpenSSLConf</code> configuration
         elements are used with a JSSE TLS implementation. (markt)
       </fix>
+      <fix>
+        When using OpenSSL via FFM, don't log a warning about missing CA
+        certificates unless CA certificates were configured and the
+        configuration failed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
