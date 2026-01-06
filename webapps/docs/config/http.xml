@@ -1250,6 +1250,10 @@
   <p>The implementation used (JSSE or OpenSSL) is independent of the
   configuration style used.</p>
 
+  <p>Any <code>OpenSSLConf</code> settings are only used with an OpenSSL
+  implementation and may override attributes set via <code>SSLHostConfig</code>
+  or <code>Certificate</code> elements.</p>
+
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
   <strong>SSLHostConfig</strong> elements must be unique and one of them must
