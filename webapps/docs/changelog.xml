@@ -237,6 +237,10 @@
         allows one configuration style to be used for the trust attributes and a
         different style for all the other attributes. (markt)
       </fix>
+      <fix>
+        Better warning message when <code>OpenSSLConf</code> configuration
+        elements are used with a JSSE TLS implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
