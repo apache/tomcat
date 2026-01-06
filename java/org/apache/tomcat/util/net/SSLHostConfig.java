@@ -78,6 +78,7 @@ public class SSLHostConfig implements Serializable {
     }
 
     private Type configType = null;
+    private Type trustConfigType = null;
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
@@ -186,7 +187,7 @@ public class SSLHostConfig implements Serializable {
      * @param name       the property name
      * @param configType the configuration type
      *
-     * @return true if the property belongs to the current configuration, and false otherwise
+     * @return true if the property belongs to the current configuration type, and false otherwise
      */
     boolean setProperty(String name, Type configType) {
         if (this.configType == null) {
@@ -194,6 +195,28 @@ public class SSLHostConfig implements Serializable {
         } else {
             if (configType != this.configType) {
                 log.warn(sm.getString("sslHostConfig.mismatch", name, getHostName(), configType, this.configType));
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Set property which belongs to the specified trust configuration type.
+     *
+     * @param name            the property name
+     * @param trustConfigType the trust configuration type
+     *
+     * @return true if the property belongs to the current trust configuration type, and false otherwise
+     */
+    boolean setTrustProperty(String name, Type trustConfigType) {
+        if (this.trustConfigType == null) {
+            this.trustConfigType = trustConfigType;
+        } else {
+            if (trustConfigType != this.trustConfigType) {
+                log.warn(sm.getString("sslHostConfig.mismatch.trust", name, getHostName(), trustConfigType,
+                        this.trustConfigType));
                 return false;
             }
         }
@@ -603,7 +626,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTrustManagerClassName(String trustManagerClassName) {
-        setProperty("trustManagerClassName", Type.JSSE);
+        setTrustProperty("trustManagerClassName", Type.JSSE);
         this.trustManagerClassName = trustManagerClassName;
     }
 
@@ -614,7 +637,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreAlgorithm(String truststoreAlgorithm) {
-        setProperty("truststoreAlgorithm", Type.JSSE);
+        setTrustProperty("truststoreAlgorithm", Type.JSSE);
         this.truststoreAlgorithm = truststoreAlgorithm;
     }
 
@@ -625,7 +648,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreFile(String truststoreFile) {
-        setProperty("truststoreFile", Type.JSSE);
+        setTrustProperty("truststoreFile", Type.JSSE);
         this.truststoreFile = truststoreFile;
     }
 
@@ -636,7 +659,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststorePassword(String truststorePassword) {
-        setProperty("truststorePassword", Type.JSSE);
+        setTrustProperty("truststorePassword", Type.JSSE);
         this.truststorePassword = truststorePassword;
     }
 
@@ -647,7 +670,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreProvider(String truststoreProvider) {
-        setProperty("truststoreProvider", Type.JSSE);
+        setTrustProperty("truststoreProvider", Type.JSSE);
         this.truststoreProvider = truststoreProvider;
     }
 
@@ -666,7 +689,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreType(String truststoreType) {
-        setProperty("truststoreType", Type.JSSE);
+        setTrustProperty("truststoreType", Type.JSSE);
         this.truststoreType = truststoreType;
     }
 
@@ -690,6 +713,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTrustStore(KeyStore truststore) {
+        setTrustProperty("trustStore", Type.JSSE);
         this.truststore = truststore;
     }
 
@@ -734,7 +758,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificateFile(String caCertificateFile) {
-        if (setProperty("caCertificateFile", Type.OPENSSL)) {
+        if (setTrustProperty("caCertificateFile", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
             if (truststoreFile != null) {
                 truststoreFile = null;
@@ -750,7 +774,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificatePath(String caCertificatePath) {
-        if (setProperty("caCertificatePath", Type.OPENSSL)) {
+        if (setTrustProperty("caCertificatePath", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
             if (truststoreFile != null) {
                 truststoreFile = null;
