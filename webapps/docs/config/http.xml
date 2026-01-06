@@ -1332,10 +1332,11 @@
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>The ciphers to enable using the OpenSSL syntax. (See the OpenSSL
-      documentation for the list of ciphers supported and the syntax).
-      Alternatively, a comma separated list of ciphers using the standard
-      OpenSSL cipher names or the standard JSSE cipher names may be used.</p>
+      <p>The TLSv1.2 and below ciphers to enable using the OpenSSL syntax. (See
+      the OpenSSL documentation for the list of ciphers supported and the
+      syntax). Alternatively, a comma separated list of TLS v1.2 and below
+      ciphers using the standard OpenSSL cipher names or the standard JSSE
+      cipher names may be used.</p>
       <p>Different versions of OpenSSL may interpret the same cipher string
       differently. For example, the <code>CCM8</code> ciphers were moved from
       <code>HIGH</code> to <code>MEDIUM</code> in OpenSSL 3.2. Regardless of
@@ -1343,17 +1344,40 @@
       value to a list of ciphers in a manner consistent with the latest OpenSSL
       development branch. This list of ciphers is then passed to the SSL
       implementation.</p>
-      <p>Only the ciphers that are supported by the SSL implementation will be
-      used. Any ciphers in the list derived from a non-default cipher string
-      that are not supported by the SSL implementation will be logged in a
+      <p>Only the TLSv1.2 and below ciphers that are supported by the SSL
+      implementation will be used. Any ciphers in the list derived from a
+      non-default cipher string that are not supported by the SSL implementation
+      or are TLSv1.3 cipher suites will be ignored and logged in a
       <code>WARNING</code> message when the Connector starts. The warning can be
-      avoided by providing an explicit list of ciphers that are supported by the
-      configured SSL implementation.</p>
+      avoided by providing an explicit list of TLSv1.2 and below ciphers that
+      are supported by the configured SSL implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
       will be used.</p>
       <p>Note that, by default, the order in which ciphers are defined is
-      treated as an order of preference. See <code>honorCipherOrder</code>.</p>
+      not treated as an order of preference. See
+      <code>honorCipherOrder</code>.</p>
+      <p>For JSSE (which - unlike OpenSSL - uses a single configuration setting
+      for both ciphers and cipher suites) the cipher suites attribute will be
+      prepended to the ciphers attribute before the combined value is used to
+      configure the JSSE implementation.</p>
+    </attribute>
+
+    <attribute name="cipherSuites" required="false">
+      <p>The TLSv1.3 cipher suites to enable using either the OpenSSL syntax
+      (colon separated list) or the JSSE syntax (comma separated list) using the
+      standard TLSv1.3 cipher suite names.</p>
+      <p>Only TLSv1.3 cipher suites will be used. Any other entries in the list
+      will be ignored and logged in a <code>WARNING</code> message when the
+      Connector starts. The warning can be avoided by providing an explicit list
+      of TLSv1.3 cipher suites.</p>
+      <p>If not specified, a default (using the OpenSSL notation) of
+      <code>TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
+      will be used.</p>
+      <p>For JSSE (which - unlike OpenSSL - uses a single configuration setting
+      for both ciphers and cipher suites) the cipher suites attribute will be
+      prepended to the ciphers attribute before the combined value is used to
+      configure the JSSE implementation.</p>
     </attribute>
 
     <attribute name="disableCompression" required="false">
