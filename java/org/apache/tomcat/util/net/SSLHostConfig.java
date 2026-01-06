@@ -308,7 +308,6 @@ public class SSLHostConfig implements Serializable {
         } else if (openSslConf != null) {
             throw new IllegalArgumentException(sm.getString("sslHostConfig.opensslconf.alreadySet"));
         }
-        setProperty("<OpenSSLConf>", Type.OPENSSL);
         openSslConf = conf;
     }
 
