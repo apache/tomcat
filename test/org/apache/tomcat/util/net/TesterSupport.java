@@ -212,7 +212,15 @@ public final class TesterSupport {
         return configureClientSsl(false);
     }
 
+    public static ClientSSLSocketFactory configureClientSsl(String[] ciphers) {
+        return configureClientSsl(false, ciphers);
+    }
+
     public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12) {
+        return configureClientSsl(forceTls12, null);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12, String[] ciphers) {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
@@ -223,6 +231,9 @@ public final class TesterSupport {
             }
             sc.init(getUser1KeyManagers(), getTrustManagers(), null);
             clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
+            if (ciphers != null) {
+                clientSSLSocketFactory.setCipher(ciphers);
+            }
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
         } catch (Exception e) {
             e.printStackTrace();
