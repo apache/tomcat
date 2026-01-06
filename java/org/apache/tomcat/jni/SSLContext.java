@@ -98,21 +98,33 @@ public final class SSLContext {
     public static native String[] getCiphers(long ctx);
 
     /**
-     * Cipher Suite available for negotiation in SSL handshake. <br>
+     * Set the TLSv1.2 and below ciphers available for negotiation the in TLS handshake.
+     * <p>
      * This complex directive uses a colon-separated cipher-spec string consisting of OpenSSL cipher specifications to
-     * configure the Cipher Suite the client is permitted to negotiate in the SSL handshake phase. Notice that this
-     * directive can be used both in per-server and per-directory context. In per-server context it applies to the
-     * standard SSL handshake when a connection is established. In per-directory context it forces an SSL renegotiation
-     * with the reconfigured Cipher Suite after the HTTP request was read but before the HTTP response is sent.
+     * configure the ciphers the client is permitted to negotiate in the TLS handshake phase.
      *
-     * @param ctx     Server or Client context to use.
-     * @param ciphers An OpenSSL cipher specification.
+     * @param ctx        Server or Client context to use.
+     * @param cipherList An OpenSSL cipher specification.
      *
      * @return <code>true</code> if the operation was successful
      *
      * @throws Exception An error occurred
      */
-    public static native boolean setCipherSuite(long ctx, String ciphers) throws Exception;
+    public static native boolean setCipherSuite(long ctx, String cipherList) throws Exception;
+
+    /**
+     * Set the TLSv1.3 cipher suites available for negotiation the in TLS handshake.
+     * <p>
+     * This uses a colon-separated list of TLSv1.3 cipher suite names in preference order.
+     *
+     * @param ctx          Server or Client context to use.
+     * @param cipherSuites An OpenSSL cipher suite list.
+     *
+     * @return <code>true</code> if the operation was successful
+     *
+     * @throws Exception An error occurred
+     */
+    public static native boolean setCipherSuitesEx(long ctx, String cipherSuites) throws Exception;
 
     /**
      * Set File of concatenated PEM-encoded CA CRLs or directory of PEM-encoded CA Certificates for Client Auth <br>
