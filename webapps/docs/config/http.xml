@@ -1153,17 +1153,17 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO connector uses either the JSSE Java SSL implementation or
-  an OpenSSL implementation. As far as possible, common configuration attributes
-  are used for both JSSE and OpenSSL. You must use a consistent configuration
-  style (JSSE specific attributes or OpenSSL specfic attributes) for each of the
-  following groups of configuration attributes but you may use a different
-  configuration style for each group:</p>
+  <p>The NIO connector may be configured to use either a JSSE Java SSL
+  implementation or an OpenSSL implementation. As far as possible, common
+  configuration attributes are used for both JSSE and OpenSSL. You must use a
+  consistent configuration style (JSSE specific attributes or OpenSSL specfic
+  attributes) for each of the following groups of configuration attributes but
+  you may use a different configuration style for each group:</p>
   <ul>
     <li>trust attributes</li>
     <li>all other attributes</li>
   </ul>
-  <p>The implementation used (JSSE or the OpenSSL) is independent of the
+  <p>The implementation used (JSSE or OpenSSL) is independent of the
   configuration style used.</p>
 
   <p>Each secure connector must define at least one
