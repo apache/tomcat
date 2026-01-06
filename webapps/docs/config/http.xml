@@ -1371,7 +1371,7 @@
     <li>trust attributes</li>
     <li>all other attributes</li>
   </ul>
-  <p>The implementation used (JSSE or the OpenSSL) is independent of the
+  <p>The implementation used (JSSE or OpenSSL) is independent of the
   configuration style used.</p>
 
   <p>Each secure connector must define at least one
