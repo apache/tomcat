@@ -115,6 +115,12 @@
         <bug>69910</bug>: Dereference TLS objects right after closing a socket
         to improve memory efficiency. (remm)
       </fix>
+      <fix>
+        Relax the JSSE vs OpenSSL configuration style checks on
+        <code>SSLHostConfig</code> to reflect the existing implementation that
+        allows one configuration style to be used for the trust attributes and a
+        different style for all the other attributes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
