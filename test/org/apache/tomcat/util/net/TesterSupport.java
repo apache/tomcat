@@ -157,6 +157,7 @@ public final class TesterSupport {
             certificate.setCertificateFile(new File(LOCALHOST_RSA_CERT_PEM).getAbsolutePath());
             certificate.setCertificateKeyFile(new File(LOCALHOST_RSA_KEY_PEM).getAbsolutePath());
             sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
+            sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
         }
     }
 
@@ -165,6 +166,7 @@ public final class TesterSupport {
         if (protocol.contains("Apr")) {
             // Only run for OpenSSL to avoid running the test multiple times
             Assume.assumeTrue(OpenSSLImplementation.class.getName().equals(sslImplementationName));
+            // If APR is being used, the listener will have been configured in TomcatBaseTest.setUp()
         } else {
             if (useOpenSSL) {
                 LifecycleListener listener = null;
