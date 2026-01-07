@@ -552,6 +552,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeRedirectURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeRedirectURL(url));
             } else {
@@ -567,6 +569,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeURL(url));
             } else {
@@ -586,6 +590,85 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
 
             return true;
+        }
+
+        /**
+         * Removes zero or more query parameters from a URL. All instances of the query parameter and any associated
+         * values will be removed.
+         *
+         * @param url           The URL whose query parameters should be removed.
+         * @param parameterName The name of the parameter to remove.
+         *
+         * @return The URL without any instances of the query parameter <code>parameterName</code> present.
+         */
+        public static String removeQueryParameters(String url, String parameterName) {
+            if (null != parameterName) {
+                // Check for query string
+                int q = url.indexOf('?');
+                if (q > -1) {
+
+                    // Look for parameter end
+                    int start = q + 1;
+                    int pos = url.indexOf('&', start);
+
+                    int iterations = 0;
+
+                    while (-1 < pos) {
+                        // Process all parameters
+                        if (++iterations > 100000) {
+                            // Just in case things get out of control
+                            throw new IllegalStateException("Way too many loop iterations");
+                        }
+
+                        int eq = url.indexOf('=', start);
+                        int paramNameEnd;
+                        if (-1 == eq || eq > pos) {
+                            paramNameEnd = pos;
+                            // Found no equal sign at all or past next & ; Parameter is all name.
+                        } else {
+                            // Found this param's equal sign
+                            paramNameEnd = eq;
+                        }
+                        if (parameterName.equals(url.substring(start, paramNameEnd))) {
+                            // Remove the parameter
+                            url = url.substring(0, start) + url.substring(pos + 1); // +1 to consume the &
+                        } else {
+                            start = pos + 1; // Go to next parameter
+                        }
+                        pos = url.indexOf('&', start);
+                    }
+
+                    // Check final parameter
+                    String paramName;
+                    pos = url.indexOf('=', start);
+
+                    if (-1 < pos) {
+                        paramName = url.substring(start, pos);
+                    } else {
+                        paramName = url.substring(start);
+                        // No value
+                    }
+                    if (paramName.equals(parameterName)) {
+                        // Remove this parameter
+
+                        // Remove any trailing ? or & as well
+                        char c = url.charAt(start - 1);
+                        if ('?' == c || '&' == c) {
+                            start--;
+                        }
+
+                        url = url.substring(0, start);
+                    } else {
+                        // Remove trailing ? if it's there. Is this worth it?
+                        int length = url.length();
+                        if (length == q + 1) {
+                            url = url.substring(0, length - 1);
+                        }
+                    }
+                }
+            }
+
+            return url;
         }
 
         /*

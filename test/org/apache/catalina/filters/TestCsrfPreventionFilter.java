@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -194,6 +196,106 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         Assert.assertEquals("/foo", response.encodeURL("/foo"));
         Assert.assertEquals("/foo/home.png", response.encodeURL("/foo/home.png"));
         Assert.assertEquals("/foo/images/home.jpg", response.encodeURL("/foo/images/home.jpg"));
+    }
+
+    @Test
+    public void testMultipleTokens() {
+        String nonce = "TESTNONCE";
+        String testURL = "/foo/bar?" + Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=sample";
+        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
+                Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
+
+        Assert.assertTrue("Original URL does not contain CSRF token",
+                testURL.contains(Constants.CSRF_NONCE_SESSION_ATTR_NAME));
+
+        String result = response.encodeURL(testURL);
+
+        int pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+        Assert.assertTrue("Result URL does not contain CSRF token",
+                pos >= 0);
+        pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME, pos + 1);
+        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result,
+                pos >= 0);
+    }
+
+    @Test
+    public void testURLCleansing() {
+        String[] urls = new String[] {
+                "/foo/bar",
+                "/foo/bar?",
+                "/foo/bar?csrf",
+                "/foo/bar?csrf&",
+                "/foo/bar?csrf=",
+                "/foo/bar?csrf=&",
+                "/foo/bar?csrf=abc",
+                "/foo/bar?csrf=abc&bar=foo",
+                "/foo/bar?bar=foo&csrf=abc",
+                "/foo/bar?bar=foo&csrf=abc&foo=bar",
+                "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar",
+                "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar&csrf=def",
+                "/foo/bar?csrf=&csrf&csrf&csrf&csrf=abc&csrf=",
+                "/foo/bar?xcsrf=&xcsrf&xcsrf&xcsrf&xcsrf=abc&xcsrf=",
+                "/foo/bar?xcsrf=&xcsrf&xcsrf&csrf=foo&xcsrf&xcsrf=abc&csrf=bar&xcsrf=&",
+                "/foo/bar?bar=fo?&csrf=abc",
+                "/foo/bar?bar=fo?&csrf=abc&baz=boh",
+        };
+
+        String csrfParameterName = "csrf";
+
+        for(String url : urls) {
+            String result = CsrfPreventionFilter.CsrfResponseWrapper.removeQueryParameters(url, csrfParameterName);
+
+            Assert.assertEquals("Failed to cleanse URL '" + url + "' properly", dumbButAccurateCleanse(url, csrfParameterName), result);
+        }
+
+    }
+
+    private static String dumbButAccurateCleanse(String url, String csrfParameterName) {
+        // Get rid of [&csrf=value] with optional =value
+        Pattern p = Pattern.compile(Pattern.quote("&") + Pattern.quote(csrfParameterName) + "(=[^&]*)?(&|$)");
+
+        // Do this iteratively to get everything
+        Matcher m = p.matcher(url);
+
+        while (m.find()) {
+            url = m.replaceFirst("$2");
+            m = p.matcher(url);
+        }
+
+        // Get rid of [?csrf=value] with optional =value
+        url = url.replaceAll(Pattern.quote("?") + csrfParameterName + "(=[^&]*)?(&|$)", "?");
+
+        if (url.endsWith("?")) {
+            // Special case: it's possible to have multiple ? in a URL:
+            // the query-string is technically allowed to contain ? characters.
+            // Only trim the trailing ? if it is actually the quest-string
+            // separator.
+            if(url.lastIndexOf('?', url.length() - 2) < 0) {
+                url = url.substring(0, url.length() - 1);
+            }
+        }
+
+        return url;
+    }
+
+    @Test
+    public void testDuplicateTokens() {
+        String nonce = "TESTNONCE";
+        String testURL = "/foo/bar?" + Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=" + nonce;
+        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
+                Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
+
+        Assert.assertTrue("Original URL does not contain CSRF token",
+                testURL.contains(Constants.CSRF_NONCE_SESSION_ATTR_NAME));
+
+        String result = response.encodeURL(testURL);
+
+        int pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+        Assert.assertTrue("Result URL does not contain CSRF token",
+                pos >= 0);
+        pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME, pos + 1);
+        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result,
+                pos >= 0);
     }
 
     private static class MimeTypeServletContext extends TesterServletContext {
