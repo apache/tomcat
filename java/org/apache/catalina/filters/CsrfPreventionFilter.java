@@ -579,17 +579,13 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
 
         /**
-         * Removes zero or more query parameters from a URL.
+         * Removes zero or more query parameters from a URL. All instances of the query parameter and any associated
+         * values will be removed.
          *
-         * All instances of the query parameter and any associated values will be
-         * removed.
-         *
-         * @param url The URL whose query parameters should be removed.
-         *
+         * @param url           The URL whose query parameters should be removed.
          * @param parameterName The name of the parameter to remove.
          *
-         * @return The URL without any instances of the query parameter
-         * <code>parameterName</code> present.
+         * @return The URL without any instances of the query parameter <code>parameterName</code> present.
          */
         public static String removeQueryParameters(String url, String parameterName) {
             if (null != parameterName) {
@@ -635,7 +631,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                     if (-1 < pos) {
                         paramName = url.substring(start, pos);
                     } else {
-                        paramName =  url.substring(start);
+                        paramName = url.substring(start);
                         // No value
                     }
                     if (paramName.equals(parameterName)) {
