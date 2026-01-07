@@ -191,6 +191,12 @@
         to <code>true</code>. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69623</bug>: Additional fix for the long standing regression that
+        meant that calls to <code>ClassLoader.getResource().getContent()</code>
+        failed when made from within a web application with resource caching
+        enabled if the target resource was packaged in a JAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
