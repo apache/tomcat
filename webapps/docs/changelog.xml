@@ -113,6 +113,10 @@
         failed when made from within a web application with resource caching
         enabled if the target resource was packaged in a JAR file. (markt)
       </fix>
+      <fix>
+        Pull request <pr>923</pr>: Avoid adding multiple CSRF tokens to a URL in
+        the <code>CsrfPreventionFilter</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
