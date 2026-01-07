@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -130,5 +131,39 @@ public class TestCachedResource extends TomcatBaseTest {
         try (InputStream is = d1.openStream()) {
             Assert.assertNotNull(is);
         }
+    }
+
+
+    @Test
+    public void testGetContentWebInfClasses() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webapp");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        tomcat.start();
+
+        URL url = ctx.getLoader().getClassLoader().getResource("bug69623-a.mdd");
+        Object o = url.getContent();
+        /*
+         * Could test the actual content but a non-null return without an exception is enough to demonstrate the bug has
+         * not occurred.
+         */
+        Assert.assertTrue(o instanceof ByteArrayInputStream);
+    }
+
+
+    @Test
+    public void testGetContentWebInfLib() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webapp");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        tomcat.start();
+
+        URL url = ctx.getLoader().getClassLoader().getResource("bug69623-b.mdd");
+        Object o = url.getContent();
+        /*
+         * Could test the actual content but a non-null return without an exception is enough to demonstrate the bug has
+         * not occurred.
+         */
+        Assert.assertTrue(o instanceof ByteArrayInputStream);
     }
 }
