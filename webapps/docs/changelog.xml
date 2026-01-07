@@ -291,6 +291,12 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        <bug>62814</bug>: Document that human-readable names maybe used for
+        <code>mapSendOptions</code> and align documentation with
+        <code>channelSendOptions</code>. Based on pull request <pr>929</pr> by
+        archan0621. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
