@@ -72,7 +72,7 @@
     The following is the default cluster configuration:
   </p>
   <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="8">
+                 channelSendOptions="async">
 
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
@@ -275,12 +275,12 @@ should be completed:</p>
 
 <section name="Configuration Example">
     <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="6">
+                 channelSendOptions="use_ack,sync">
 
           <Manager className="org.apache.catalina.ha.session.BackupManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"
-                   mapSendOptions="6"/>
+                   mapSendOptions="use_ack,sync"/>
           <!--
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
@@ -321,7 +321,7 @@ should be completed:</p>
       Break it down!!
     </p>
     <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="6">]]></source>
+                 channelSendOptions="use_ack,sync">]]></source>
     <p>
       The main element, inside this element all cluster details can be configured.
       The <code>channelSendOptions</code> is the flag that is attached to each message sent by the
@@ -335,7 +335,7 @@ should be completed:</p>
     <source><![CDATA[          <Manager className="org.apache.catalina.ha.session.BackupManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"
-                   mapSendOptions="6"/>
+                   mapSendOptions="use_ack,sync"/>
           <!--
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"

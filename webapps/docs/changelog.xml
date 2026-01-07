@@ -145,6 +145,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        <bug>62814</bug>: Document that human-readable names maybe used for
+        <code>mapSendOptions</code> and align documentation with
+        <code>channelSendOptions</code>. Based on pull request <pr>929</pr> by
+        archan0621. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
