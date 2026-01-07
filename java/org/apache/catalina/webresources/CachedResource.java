@@ -662,7 +662,7 @@ public class CachedResource implements WebResource {
         @Override
         public String getContentType() {
             // "content/unknown" is the value used by sun.net.www.URLConnection. It is used here for consistency.
-            return Objects.requireNonNullElse(getResource().getMimeType(), "content/unknown");
+            return (getResource().getMimeType() != null) ? getResource().getMimeType() : "content/unknown";
         }
     }
 }
