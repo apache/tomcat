@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.114 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>69623</bug>: Additional fix for the long standing regression that
+        meant that calls to <code>ClassLoader.getResource().getContent()</code>
+        failed when made from within a web application with resource caching
+        enabled if the target resource was packaged in a JAR file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
