@@ -275,9 +275,25 @@ public final class Bootstrap {
      * Load daemon.
      */
     private void load(String[] arguments) throws Exception {
+        invokeCatalinaMethod("load", arguments);
+    }
 
-        // Call the load() method
-        String methodName = "load";
+    /**
+     * Load configuration only without initializing server.
+     * Used for validation without binding to ports.
+     */
+    private void loadConfigOnly(String[] arguments) throws Exception {
+        invokeCatalinaMethod("loadConfigOnly", arguments);
+    }
+
+    /**
+     * Helper method to invoke a Catalina method via reflection with optional arguments.
+     *
+     * @param methodName the name of the method to invoke
+     * @param arguments optional arguments to pass to the method
+     * @throws Exception if the method invocation fails
+     */
+    private void invokeCatalinaMethod(String methodName, String[] arguments) throws Exception {
         Object[] param;
         Class<?>[] paramTypes;
         if (arguments == null || arguments.length == 0) {
@@ -296,7 +312,6 @@ public final class Bootstrap {
         method.invoke(catalinaDaemon, param);
     }
 
-
     /**
      * getServer() for configtest
      */
@@ -305,6 +320,18 @@ public final class Bootstrap {
         String methodName = "getServer";
         Method method = catalinaDaemon.getClass().getMethod(methodName);
         return method.invoke(catalinaDaemon);
+    }
+
+    /**
+     * Run configuration validation tests.
+     *
+     * @return exit code (0 = success, 1 = errors found)
+     * @throws Exception Fatal validation error
+     */
+    public int configtest() throws Exception {
+        Method method = catalinaDaemon.getClass().getMethod("configtest");
+        Integer exitCode = (Integer) method.invoke(catalinaDaemon);
+        return exitCode != null ? exitCode.intValue() : 1;
     }
 
 
@@ -482,6 +509,14 @@ public final class Bootstrap {
                     }
                     System.exit(0);
                     break;
+                case "config-validate":
+                    daemon.loadConfigOnly(args);
+                    if (null == daemon.getServer()) {
+                        System.exit(1);
+                    }
+                    int exitCode = daemon.configtest();
+                    System.exit(exitCode);
+                    break;
                 default:
                     log.warn("Bootstrap: command \"" + command + "\" does not exist.");
                     break;
@@ -492,12 +527,26 @@ public final class Bootstrap {
             if (throwable instanceof InvocationTargetException && throwable.getCause() != null) {
                 throwable = throwable.getCause();
             }
+
+            if (isStartupAbort(throwable)) {
+                System.exit(1);
+            }
+
             handleThrowable(throwable);
             log.error("Error running command", throwable);
             System.exit(1);
         }
     }
 
+    public static boolean isStartupAbort(Throwable t) {
+        while (t != null) {
+            if ("org.apache.catalina.startup.StartupAbortException".equals(t.getClass().getName())) {
+                return true;
+            }
+            t = t.getCause();
+        }
+        return false;
+    }
 
     /**
      * Obtain the name of configured home (binary) directory. Note that home and base may be the same (and are by
