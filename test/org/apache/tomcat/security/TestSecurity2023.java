@@ -24,6 +24,10 @@ import java.io.Serial;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
@@ -37,8 +41,14 @@ import org.junit.Test;
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.authenticator.FormAuthenticator;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 public class TestSecurity2023 extends TomcatBaseTest {
     /*
@@ -81,6 +91,90 @@ public class TestSecurity2023 extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, status);
     }
 
+    /*
+     * https://www.cve.org/CVERecord?id=CVE-2023-41080
+     *
+     * Fixed in
+     * 11.0.0-M11  https://github.com/apache/tomcat/commit/e3703c9abb8fe0d5602f6ba8a8f11d4b6940815a
+     * 10.1.13 https://github.com/apache/tomcat/commit/bb4624a9f3e69d495182ebfa68d7983076407a27
+     * 9.0.80 https://github.com/apache/tomcat/commit/77c0ce2d169efa248b64b992e547aad549ec906b
+     */
+    @Test
+    public void testCVE_2023_41080() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("", null);
+
+        LoginConfig loginConfig = new LoginConfig();
+        loginConfig.setAuthMethod("FORM");
+        loginConfig.setLoginPage("/login");
+        context.setLoginConfig(loginConfig);
+        context.getPipeline().addValve(new FormAuthenticator());
+
+        SecurityConstraint securityConstraint = new SecurityConstraint();
+        securityConstraint.addAuthRole("admin");
+        SecurityCollection securityCollection = new SecurityCollection();
+        securityCollection.addPattern("/secret.html");
+        securityCollection.addPattern("/example.com");
+        securityConstraint.addCollection(securityCollection);
+        context.addConstraint(securityConstraint);
+
+        tomcat.addUser("admin", "admin");
+        tomcat.addRole("admin", "admin");
+
+        Tomcat.addServlet(context, "login", new TestServlet());
+        context.addServletMappingDecoded("/login", "login");
+        Tomcat.addServlet(context, "secret", new TestServlet());
+        context.addServletMappingDecoded("/secret.html", "secret");
+        Tomcat.addServlet(context, "example", new TestServlet());
+        context.addServletMappingDecoded("/example.com", "example");
+
+        tomcat.start();
+
+        String location = doFormLoginAndGetRedirectLocation("http://localhost:" + getPort(), "/secret.html;@example.com");
+        Assert.assertNotNull(location);
+        Assert.assertFalse(location.startsWith("//"));
+        URI locationUri = new URI(location);
+        Assert.assertNull(locationUri.getHost());
+        Assert.assertTrue(locationUri.getPath().contains("secret.html"));
+
+        location = doFormLoginAndGetRedirectLocation("http://localhost:" + getPort(), "//example.com");
+        Assert.assertNotNull(location);
+        Assert.assertFalse(location.startsWith("//"));
+    }
+
+    private static String doFormLoginAndGetRedirectLocation(String basePath, String targetPath) throws Exception {
+        String url = basePath + targetPath;
+        Map<String, List<String>> resHead = new HashMap<>();
+        int rc = getUrl(url, new ByteChunk(), resHead);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String sessionCookie = null;
+        List<String> cookies = resHead.get("Set-Cookie");
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                if (cookie.startsWith("JSESSIONID=")) {
+                    sessionCookie = cookie.split(";")[0];
+                    break;
+                }
+            }
+        }
+        Assert.assertNotNull("JSESSIONID not found in response", sessionCookie);
+        String loginUrl = basePath + "/j_security_check";
+        HttpURLConnection conn = (HttpURLConnection) new URI(loginUrl).toURL().openConnection();
+        conn.setRequestMethod(Method.POST);
+        conn.setDoOutput(true);
+        conn.setInstanceFollowRedirects(false); // want to check the redirect location manually
+        conn.setRequestProperty("Cookie", sessionCookie);
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        String params = "j_username=admin&j_password=admin";
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(params.getBytes(StandardCharsets.UTF_8));
+        }
+        int loginRc = conn.getResponseCode();
+        Assert.assertEquals(HttpServletResponse.SC_SEE_OTHER, loginRc);
+        return conn.getHeaderField("Location");
+    }
+
     private static int postMultipart(String path, String queryStringParams, int parts) throws IOException, URISyntaxException {
         String urlStr = path + (queryStringParams == null || queryStringParams.isEmpty() ? "" : "?" + queryStringParams);
         String boundary = "--simpleboundary";
@@ -104,6 +198,7 @@ public class TestSecurity2023 extends TomcatBaseTest {
             inputStream = conn.getErrorStream();
         }
         if (inputStream != null) {
+            //noinspection StatementWithEmptyBody
             while (inputStream.read() != -1) {}
             inputStream.close();
         }
@@ -137,6 +232,10 @@ public class TestSecurity2023 extends TomcatBaseTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
             req.getParameterMap();
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         }
     }
 }
