@@ -886,6 +886,23 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     protected boolean checkForCachedAuthentication(Request request, HttpServletResponse response,
             boolean useSsoCachedUserAndPassword) {
 
+        /*
+         * There are two methods for authentication caching implemented by the SSO Valve. The first caches the
+         * authenticated Principal returned by the Realm. The second caches the user name and password passed to the
+         * Realm that were used for authentication.
+         *
+         * If cached authentication is not available or fails for any reason, the Authenticator will attempt the normal
+         * authentication process for the Authenticator.
+         *
+         * Which cached authentication methods are used depends on the configuration of the SSO Valve and/or the
+         * Authenticator.
+         *
+         * If the SSO Valve is configured to require re-authentication, any cached Principal will not be used.
+         *
+         * If the SSO Valve is configured to require re-authentication, whether the cached user name and password can be
+         * used will be determined by the calling Authenticator type.
+         */
+
         // Has the user already been authenticated?
         Principal principal = request.getUserPrincipal();
         String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
