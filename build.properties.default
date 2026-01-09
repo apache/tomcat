@@ -285,10 +285,10 @@ bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=7.0.3
+unboundid.version=7.0.4
 unboundid.checksum.enabled=true
-unboundid.checksum.algorithm=SHA-512
-unboundid.checksum.value=25fef7f28e06bedfa54672370e0e4cfb5ef8041f1bd5abf2826ad022e5131bf1d3791314888a939f3fe25edbc28d28afffdd7125cfae16876ead0bf50c68351a
+unboundid.checksum.algorithm=MD5|SHA-1
+unboundid.checksum.value=7006a217741934517b1cdd6aa12c6d9f|2fe2d5461a87a58aee97f836e3af63ef8ce7b29e
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
