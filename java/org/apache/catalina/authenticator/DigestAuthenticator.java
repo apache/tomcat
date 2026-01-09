@@ -272,8 +272,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * authentication. Reauthenticating with the cached user name and password should be sufficient for DIGEST in
          * that scenario. However, the original behaviour to reauthenticate has been retained in case of any (very
          * unlikely) backwards compatibility issues.
-         *
-         * TODO: Make the reauthentication behaviour configurable per authenticator.
          */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;

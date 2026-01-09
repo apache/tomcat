@@ -503,6 +503,15 @@ public class SingleSignOn extends ValveBase {
     }
 
 
+    protected void populateRequestFromSsoEntry(Request request, String ssoId) {
+        SingleSignOnEntry entry = cache.get(ssoId);
+        if (entry != null) {
+            request.setAuthType(entry.getAuthType());
+            request.setUserPrincipal(entry.getPrincipal());
+        }
+    }
+
+
     /**
      * Register the specified Principal as being associated with the specified value for the single sign on identifier.
      *
