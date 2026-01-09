@@ -362,6 +362,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.37. (markt)
       </update>
+      <update>
+        Update ByteBuddy to 1.18.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
