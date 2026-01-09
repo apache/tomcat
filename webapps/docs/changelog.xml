@@ -173,6 +173,9 @@
       <update>
         Update ByteBuddy to 1.18.3. (markt)
       </update>
+      <update>
+        Update UnboundID to 7.0.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
