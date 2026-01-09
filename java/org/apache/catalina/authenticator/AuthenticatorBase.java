@@ -219,6 +219,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     protected SingleSignOn sso = null;
 
+    private SsoReauthenticationMode ssoReauthenticationMode = SsoReauthenticationMode.DEFAULT;
+
     private AllowCorsPreflight allowCorsPreflight = AllowCorsPreflight.NEVER;
 
     private volatile String jaspicAppContextID = null;
@@ -227,6 +229,15 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     // ------------------------------------------------------------- Properties
+
+    public String getSsoReauthenticationMode() {
+        return ssoReauthenticationMode.name().toLowerCase(Locale.ENGLISH);
+    }
+
+    public void setSsoReauthenticationMode(String ssoReauthenticationMode) {
+        this.ssoReauthenticationMode =
+                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.trim().toUpperCase(Locale.ENGLISH));
+    }
 
     public String getAllowCorsPreflight() {
         return allowCorsPreflight.name().toLowerCase(Locale.ENGLISH);
@@ -898,38 +909,66 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
          * Which cached authentication methods are used depends on the configuration of the SSO Valve and/or the
          * Authenticator.
          *
-         * If the SSO Valve is configured to require re-authentication, any cached Principal will not be used.
+         * If the SSO Valve is configured to require re-authentication, any cached Principal will not be used unless the
+         * Authenticator is explicitly configured (via ssoReauthenticationMode) to use it.
          *
          * If the SSO Valve is configured to require re-authentication, whether the cached user name and password can be
-         * used will be determined by the calling Authenticator type.
+         * used will be determined by the calling Authenticator type unless the Authenticator's ssoReauthenticationMode
+         * is explicitly configured.
          */
 
-        // Has the user already been authenticated?
-        Principal principal = request.getUserPrincipal();
+        // Determine which - if any - checks for cached authentication will be made.
+        boolean checkPrincipal = false;
+        boolean checkPassword = false;
+
+        // Will be null if SSO is not configured or there is no current SSO session
         String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
-        if (principal != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("authenticator.check.found", principal.getName()));
-            }
-            // Associate the session with any existing SSO session. Even if
-            // useSSO is false, this will ensure coordinated session
-            // invalidation at log out.
+
+        if (sso == null) {
+            // There is no SSO - check in case some other component has set the Principal
+            checkPrincipal = true;
+        } else if (ssoReauthenticationMode == SsoReauthenticationMode.DEFAULT && !sso.getRequireReauthentication() ||
+                ssoReauthenticationMode == SsoReauthenticationMode.PRINCIPAL) {
+            checkPrincipal = true;
+            // If checkPrincipal is enabled then checkPassword is enabled if there is an SSO session
             if (ssoId != null) {
-                associate(ssoId, request.getSessionInternal(true));
+                checkPassword = true;
             }
-            return true;
+        } else if (ssoId != null && (ssoReauthenticationMode == SsoReauthenticationMode.PASSWORD ||
+                sso.getRequireReauthentication() && useSsoCachedUserAndPassword)) {
+            checkPassword = true;
         }
 
-        // Is there an SSO session against which we can try to reauthenticate?
-        if (useSsoCachedUserAndPassword && ssoId != null) {
+        // Check for a cached Principal. Most likely from SSO but could be another component.
+        if (checkPrincipal) {
+            if (ssoId != null && sso.getRequireReauthentication()) {
+                // There is a valid SSO session but SSO Valve won't have cached the Principal.
+                sso.populateRequestFromSsoEntry(request, ssoId);
+            }
+
+            // Has the user already been authenticated?
+            Principal principal = request.getUserPrincipal();
+            if (principal != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("authenticator.check.found", principal.getName()));
+                }
+                // Associate the session with any existing SSO session. Even if
+                // useSSO is false, this will ensure coordinated session
+                // invalidation at log out.
+                if (ssoId != null) {
+                    associate(ssoId, request.getSessionInternal(true));
+                }
+                return true;
+            }
+        }
+
+        // Check for a user and password cached by SSO
+        if (checkPassword) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.check.sso", ssoId));
             }
             /*
-             * Try to reauthenticate using data cached by SSO. If this fails, either the original SSO logon was of
-             * DIGEST or SSL (which we can't reauthenticate ourselves because there is no cached username and password),
-             * or the realm denied the user's reauthentication for some reason. In either case we have to prompt the
-             * user for a logon
+             * Try to reauthenticate using data cached by SSO. If this fails we have to prompt the user for credentials.
              */
             if (reauthenticateFromSSO(ssoId, request)) {
                 return true;
@@ -1311,5 +1350,13 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         NEVER,
         FILTER,
         ALWAYS
+    }
+
+
+    protected enum SsoReauthenticationMode {
+        DEFAULT,
+        PRINCIPAL,
+        PASSWORD,
+        FULL
     }
 }

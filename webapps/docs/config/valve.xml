@@ -1587,6 +1587,28 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -1769,6 +1791,28 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
+      </attribute>
+
       <attribute name="validateUri" required="false">
         <p>Should the URI be validated as required by RFC2617? If not specified,
         the default value of <code>true</code> will be used. This should
@@ -1926,6 +1970,28 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -2040,6 +2106,28 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
       </attribute>
 
     </attributes>
@@ -2218,6 +2306,28 @@
         <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
         This is useful, e.g., for access log consistency or other decisions to make.
         If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
       </attribute>
 
       <attribute name="storeDelegatedCredential" required="false">
