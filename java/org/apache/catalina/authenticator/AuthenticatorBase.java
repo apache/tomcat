@@ -209,7 +209,6 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * {@code remote-user} and {@code auth-type} to a reverse proxy. This is useful, e.g., for access log consistency or
      * other decisions to make.
      */
-
     protected boolean sendAuthInfoResponseHeaders = false;
 
     protected SessionIdGeneratorBase sessionIdGenerator = null;
