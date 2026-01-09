@@ -69,8 +69,6 @@ public class SSLAuthenticator extends AuthenticatorBase {
          * since it will not make any TLS information (client certificate etc) available that a web application may
          * depend on. Therefore, the reauthentication behaviour for CLIENT-CERT is to perform a normal CLIENT-CERT
          * authentication.
-         *
-         * TODO: Make the reauthentication behaviour configurable per authenticator.
          */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;

@@ -144,8 +144,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
          * Reauthenticating with the cached user name and password may not be sufficient for SPNEGO since it will not
          * make the delegated credentials available that a web application may depend on. Therefore, the
          * reauthentication behaviour for SPNEGO is to perform a normal SPNEGO authentication.
-         *
-         * TODO: Make the reauthentication behaviour configurable per authenticator.
          */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;
