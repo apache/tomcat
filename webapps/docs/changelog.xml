@@ -6648,6 +6648,9 @@
         Update the packaged version of the Tomcat Native Library to 1.2.30. Also
         update the minimum recommended version to 1.2.30. (markt)
       </update>
+      <update>
+        Update bnd to 7.2.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
