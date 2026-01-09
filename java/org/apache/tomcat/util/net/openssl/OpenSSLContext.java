@@ -328,7 +328,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_TICKET);
             }
 
-            // List the ciphers that the client is permitted to negotiate
+            // Configure the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
 
             // If there is no certificate file must be using a KeyStore so a KeyManager is required.
