@@ -51,7 +51,7 @@ import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
@@ -62,7 +62,34 @@ import org.apache.tomcat.util.http.Method;
 /**
  * Test case for {@link Request}.
  */
-public class TestRequest extends TomcatBaseTest {
+public class TestRequest extends Http2TestBase {
+
+    /**
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69918 POST parameters are not returned from a call
+     * to any of the {@link Request} getParameterXXX() methods if the request is HTTP/2 and the
+     * content-length header is not set.
+     */
+    @Test
+    public void testBug69918() throws Exception {
+        http2Connect();
+
+        sendParameterPostRequest(3, null, "a=1&b=2", -1, false);
+        output.setTraceBody(true);
+
+        boolean foundBody = false;
+        while (parser.readFrame()) {
+            String trace = output.getTrace();
+            if (trace.contains("3-Body-2")) {
+                foundBody = true;
+            } else if (trace.contains("3-Body-0")) {
+                Assert.fail("Parameter count was 0. Trace: " + trace);
+            }
+            if (trace.contains("3-EndOfStream")) {
+                break;
+            }
+        }
+        Assert.assertTrue("Parameter count should be 2, trace: " + output.getTrace(), foundBody);
+    }
 
     /**
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=37794 POST parameters are not returned from a call
