@@ -30,6 +30,7 @@ import org.apache.tomcat.dbcp.pool2.BaseObject;
  * @param <T> Type of element pooled.
  * @since 2.0
  */
+@SuppressWarnings("deprecation")
 public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Cloneable {
 
     /**
