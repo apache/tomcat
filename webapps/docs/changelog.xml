@@ -175,6 +175,9 @@
       <update>
         Update Commons Daemon to 1.5.1. (markt)
       </update>
+      <update>
+        Update ByteBuddy to 1.18.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
