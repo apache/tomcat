@@ -172,6 +172,9 @@
       <update>
         Update Commons Daemon to 1.5.1. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.37. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
