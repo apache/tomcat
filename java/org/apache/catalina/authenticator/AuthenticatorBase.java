@@ -877,13 +877,15 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Check to see if the user has already been authenticated earlier in the processing chain or if there is enough
      * information available to authenticate the user without requiring further user interaction.
      *
-     * @param request  The current request
-     * @param response The current response
-     * @param useSSO   Should information available from SSO be used to attempt to authenticate the current user?
+     * @param request                     The current request
+     * @param response                    The current response
+     * @param useSsoCachedUserAndPassword Should the user and password available from SSO be used to attempt to
+     *                                        authenticate the current user?
      *
      * @return <code>true</code> if the user was authenticated via the cache, otherwise <code>false</code>
      */
-    protected boolean checkForCachedAuthentication(Request request, HttpServletResponse response, boolean useSSO) {
+    protected boolean checkForCachedAuthentication(Request request, HttpServletResponse response,
+            boolean useSsoCachedUserAndPassword) {
 
         // Has the user already been authenticated?
         Principal principal = request.getUserPrincipal();
@@ -902,7 +904,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         // Is there an SSO session against which we can try to reauthenticate?
-        if (useSSO && ssoId != null) {
+        if (useSsoCachedUserAndPassword && ssoId != null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.check.sso", ssoId));
             }
