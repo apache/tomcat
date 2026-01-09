@@ -211,6 +211,11 @@
         recommended versions for Tomcat Native 1.x to 1.3.4. Update the minimum
         and recommended versions for Tomcat Native 2.x to 2.0.12. (markt)
       </update>
+      <add>
+        Add a new <code>ssoReauthenticationMode</code> to the Tomcat provided
+        Authenticators that provides a per Authenticator override of the SSO
+        Valve <code>requireReauthentication</code> attribute. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
