@@ -64,12 +64,17 @@ public class AprLifecycleListener implements LifecycleListener {
 
     // ---------------------------------------------- Constants
 
-    protected static final int TCN_REQUIRED_MAJOR = 1;
-    protected static final int TCN_REQUIRED_MINOR = 2;
-    protected static final int TCN_REQUIRED_PATCH = 34;
+    private static final int TCN_1_REQUIRED_MINOR = 3;
+    private static final int TCN_1_REQUIRED_PATCH = 4;
+    private static final int TCN_1_RECOMMENDED_MINOR = 3;
+    private static final int TCN_1_RECOMMENDED_PATCH = 4;
+
+    protected static final int TCN_REQUIRED_MAJOR = 2;
+    protected static final int TCN_REQUIRED_MINOR = 0;
+    protected static final int TCN_REQUIRED_PATCH = 12;
     protected static final int TCN_RECOMMENDED_MAJOR = 2;
     protected static final int TCN_RECOMMENDED_MINOR = 0;
-    protected static final int TCN_RECOMMENDED_PV = 5;
+    protected static final int TCN_RECOMMENDED_PV = 12;
 
 
     // ---------------------------------------------- Properties
@@ -209,9 +214,6 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     private static void init() {
-        int rqver = TCN_REQUIRED_MAJOR * 1000 + TCN_REQUIRED_MINOR * 100 + TCN_REQUIRED_PATCH;
-        int rcver = TCN_RECOMMENDED_MAJOR * 1000 + TCN_RECOMMENDED_MINOR * 100 + TCN_RECOMMENDED_PV;
-
         if (org.apache.tomcat.jni.AprStatus.isAprInitialized()) {
             return;
         }
@@ -249,9 +251,34 @@ public class AprLifecycleListener implements LifecycleListener {
             }
             return;
         }
+
+        /*
+         * With parallel development of 1.x and 2.x there are now minimum and recommended versions for both branches.
+         *
+         * The minimum required version is increased when the Tomcat Native API is changed (typically extended) to
+         * include functionality that Tomcat expects to always be present.
+         *
+         * The minimum recommended version is increased when there is a change in Tomcat Native that while not required
+         * is recommended (such as bug fixes).
+         */
+        int rqver;
+        int rcver;
+        if (tcnMajor == 1) {
+            rqver = 1000 + TCN_1_REQUIRED_MINOR * 100 + TCN_1_REQUIRED_PATCH;
+            rcver = 1000 + TCN_1_RECOMMENDED_MINOR * 100 + TCN_1_RECOMMENDED_PATCH;
+        } else {
+            rqver = TCN_REQUIRED_MAJOR * 1000 + TCN_REQUIRED_MINOR * 100 + TCN_REQUIRED_PATCH;
+            rcver = TCN_RECOMMENDED_MAJOR * 1000 + TCN_RECOMMENDED_MINOR * 100 + TCN_RECOMMENDED_PV;
+        }
+
         if (tcnVersion < rqver) {
-            log.error(sm.getString("aprListener.tcnInvalid", Library.versionString(),
-                    TCN_REQUIRED_MAJOR + "." + TCN_REQUIRED_MINOR + "." + TCN_REQUIRED_PATCH));
+            if (tcnMajor == 1) {
+                log.error(sm.getString("aprListener.tcnInvalid.1", Library.versionString(),
+                        "1." + TCN_1_REQUIRED_MINOR + "." + TCN_1_REQUIRED_PATCH));
+            } else {
+                log.error(sm.getString("aprListener.tcnInvalid", Library.versionString(),
+                        TCN_REQUIRED_MAJOR + "." + TCN_REQUIRED_MINOR + "." + TCN_REQUIRED_PATCH));
+            }
             try {
                 // Terminate the APR in case the version
                 // is below required.
@@ -263,8 +290,13 @@ public class AprLifecycleListener implements LifecycleListener {
             return;
         }
         if (tcnVersion < rcver) {
-            initInfoLogMessages.add(sm.getString("aprListener.tcnVersion", Library.versionString(),
-                    TCN_RECOMMENDED_MAJOR + "." + TCN_RECOMMENDED_MINOR + "." + TCN_RECOMMENDED_PV));
+            if (tcnMajor == 1) {
+                initInfoLogMessages.add(sm.getString("aprListener.tcnVersion.1", Library.versionString(),
+                        "1." + TCN_1_RECOMMENDED_MINOR + "." + TCN_1_RECOMMENDED_PATCH));
+            } else {
+                initInfoLogMessages.add(sm.getString("aprListener.tcnVersion", Library.versionString(),
+                        TCN_RECOMMENDED_MAJOR + "." + TCN_RECOMMENDED_MINOR + "." + TCN_RECOMMENDED_PV));
+            }
         }
 
         initInfoLogMessages
