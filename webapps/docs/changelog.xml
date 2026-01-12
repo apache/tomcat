@@ -388,6 +388,9 @@
         Improvements to Chinese translations provided by Yang. vincent.h and
         yong hu. (markt)
       </add>
+      <update>
+        Update Tomcat Native to 2.0.12. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
