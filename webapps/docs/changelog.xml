@@ -374,6 +374,9 @@
       <update>
         Update bnd to 7.2.0. (markt)
       </update>
+      <add>
+        Improvements to French translations. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
