@@ -2984,7 +2984,8 @@ public class Request implements HttpServletRequest {
                 return;
             }
             parameters.processParameters(formData, 0, len);
-        } else if ("chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
+        } else if (coyoteRequest.protocol().equals("HTTP/2.0")
+                || "chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
             byte[] formData = null;
             try {
                 formData = readChunkedPostBody();
