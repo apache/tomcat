@@ -198,6 +198,9 @@
         Improvements to Chinese translations provided by Yang. vincent.h and
         yong hu. (markt)
       </add>
+      <update>
+        Update Tomcat Native to 1.3.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
