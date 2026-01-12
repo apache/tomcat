@@ -64,11 +64,11 @@ public class AprLifecycleListener implements LifecycleListener {
     // ---------------------------------------------- Constants
 
     protected static final int TCN_REQUIRED_MAJOR = 1;
-    protected static final int TCN_REQUIRED_MINOR = 2;
-    protected static final int TCN_REQUIRED_PATCH = 14;
+    protected static final int TCN_REQUIRED_MINOR = 3;
+    protected static final int TCN_REQUIRED_PATCH = 4;
     protected static final int TCN_RECOMMENDED_MAJOR = 1;
     protected static final int TCN_RECOMMENDED_MINOR = 3;
-    protected static final int TCN_RECOMMENDED_PV = 0;
+    protected static final int TCN_RECOMMENDED_PV = 4;
 
 
     // ---------------------------------------------- Properties

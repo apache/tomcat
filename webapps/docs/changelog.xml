@@ -121,6 +121,10 @@
         <bug>69918</bug>: Ensure request parameters are correctly parsed for HTTP/2 requests
         when the content-length header is not set. (dsoumis)
       </fix>
+      <update>
+        Update the minimum and recommended versions for Tomcat Native to 1.3.4.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
