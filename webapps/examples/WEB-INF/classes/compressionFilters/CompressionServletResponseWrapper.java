@@ -30,9 +30,6 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 /**
  * Implementation of <b>HttpServletResponseWrapper</b> that works with
  * the CompressionServletResponseStream implementation..
- *
- * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionServletResponseWrapper
         extends HttpServletResponseWrapper {
@@ -188,7 +185,7 @@ public class CompressionServletResponseWrapper
                     stream.close();
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
     }

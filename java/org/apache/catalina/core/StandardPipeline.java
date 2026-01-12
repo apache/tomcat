@@ -43,8 +43,6 @@ import org.apache.tomcat.util.res.StringManager;
  * This implementation assumes that no calls to <code>addValve()</code> or <code>removeValve</code> are allowed while a
  * request is currently being processed. Otherwise, the mechanism by which per-thread state is maintained will need to
  * be modified.
- *
- * @author Craig R. McClanahan
  */
 public class StandardPipeline extends LifecycleBase implements Pipeline {
 
@@ -105,7 +103,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
         Valve valve = (first != null) ? first : basic;
         boolean supported = true;
         while (supported && valve != null) {
-            supported = supported & valve.isAsyncSupported();
+            supported = valve.isAsyncSupported();
             valve = valve.getNext();
         }
         return supported;

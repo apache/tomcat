@@ -85,7 +85,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
-        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.length() == 0) {
+        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.isEmpty()) {
             this.noKeepAliveUserAgents = null;
         } else {
             this.noKeepAliveUserAgents = Pattern.compile(noKeepAliveUserAgents);
@@ -134,7 +134,19 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
-        if (checkForCachedAuthentication(request, response, true)) {
+        /*
+         * Reauthentication using the cached user name and password (if any) is not enabled for SPNEGO authentication.
+         * This is because the delegated credentials will nto be available unless a normal SPNEGO authentication takes
+         * place.
+         *
+         * Reauthentication was introduced to handle the case where the Realm took additional actions on authentication.
+         * Reauthenticating with the cached user name and password may not be sufficient for SPNEGO since it will not
+         * make the delegated credentials available that a web application may depend on. Therefore, the
+         * reauthentication behaviour for SPNEGO is to perform a normal SPNEGO authentication.
+         *
+         * TODO: Make the reauthentication behaviour configurable per authenticator.
+         */
+        if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
 
@@ -183,8 +195,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         LoginContext lc = null;
         GSSContext gssContext = null;
-        byte[] outToken = null;
-        Principal principal = null;
+        byte[] outToken;
+        Principal principal;
         try {
             try {
                 lc = new LoginContext(getLoginConfigName());
@@ -207,15 +219,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
-            gssContext = manager.createContext(Subject.callAs(subject, () -> {
-                return manager.createCredential(null, credentialLifetime, new Oid("1.3.6.1.5.5.2"),
-                        GSSCredential.ACCEPT_ONLY);
-            }));
+            gssContext = manager.createContext(Subject.callAs(subject, () -> manager.createCredential(null,
+                    credentialLifetime, new Oid("1.3.6.1.5.5.2"), GSSCredential.ACCEPT_ONLY)));
 
             final GSSContext gssContextFinal = gssContext;
-            outToken = Subject.callAs(subject, () -> {
-                return gssContextFinal.acceptSecContext(decoded, 0, decoded.length);
-            });
+            outToken = Subject.callAs(subject, () -> gssContextFinal.acceptSecContext(decoded, 0, decoded.length));
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
@@ -227,9 +235,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            principal = Subject.callAs(subject, () -> {
-                return context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential);
-            });
+            principal = Subject.callAs(subject,
+                    () -> context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential));
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
@@ -298,10 +305,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     /**
      * This class implements a hack around an incompatibility between the SPNEGO implementation in Windows and the
      * SPNEGO implementation in Java 8 update 40 onwards. It was introduced by the change to fix this bug:
-     * https://bugs.openjdk.java.net/browse/JDK-8048194 (note: the change applied is not the one suggested in the bug
-     * report)
+     * <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a> (note: the change applied is not the
+     * one suggested in the bug report)
      * <p>
-     * It is not clear to me if Windows, Java or Tomcat is at fault here. I think it is Java but I could be wrong.
+     * It is not clear to me if Windows, Java or Tomcat is at fault here. I think it is Java, but I could be wrong.
      * <p>
      * This hack works by re-ordering the list of mechTypes in the NegTokenInit token.
      */

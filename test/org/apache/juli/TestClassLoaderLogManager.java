@@ -188,11 +188,6 @@ public class TestClassLoaderLogManager {
         }
 
         @Override
-        public boolean hasLoggingConfig() {
-            return true;
-        }
-
-        @Override
         public URL findResource(String name) {
             if ("logging.properties".equals(name)) {
                 try {

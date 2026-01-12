@@ -59,7 +59,7 @@ tomcat.pom.path=../../res/maven
 base.path=${user.home}/tomcat-build-libs
 
 # ----- Maven Ant Tasks -----
-maven-resolver-ant-tasks.version=1.3.0
+maven-resolver-ant-tasks.version=1.6.0
 maven-resolver-ant-tasks.home=${base.path}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}
 maven-resolver-ant-tasks.loc=https://repo1.maven.org/maven2/org/apache/maven/resolver/maven-resolver-ant-tasks/${maven-resolver-ant-tasks.version}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}-uber.jar
 maven-resolver-ant-tasks.jar=${maven-resolver-ant-tasks.home}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}-uber.jar

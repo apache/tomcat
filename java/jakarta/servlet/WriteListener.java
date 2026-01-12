@@ -26,9 +26,9 @@ import java.io.IOException;
 public interface WriteListener extends java.util.EventListener {
 
     /**
-     * Invoked when it it possible to write data without blocking. The container will invoke this method the first time
+     * Invoked when it is possible to write data without blocking. The container will invoke this method the first time
      * for a request as soon as data can be written. Subsequent invocations will only occur if a call to
-     * {@link ServletOutputStream#isReady()} has returned false and it has since become possible to write data.
+     * {@link ServletOutputStream#isReady()} has returned false, and it has since become possible to write data.
      *
      * @throws IOException if an I/O error occurs while processing this event
      */

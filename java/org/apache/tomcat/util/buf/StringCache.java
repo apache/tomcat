@@ -31,8 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
- *
- * @author Remy Maucherat
  */
 public class StringCache {
 
@@ -445,7 +443,7 @@ public class StringCache {
      *
      * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
-    protected static final int compare(ByteChunk name, byte[] compareTo) {
+    protected static int compare(ByteChunk name, byte[] compareTo) {
         int result = 0;
 
         byte[] b = name.getBuffer();
@@ -478,13 +476,13 @@ public class StringCache {
      * Find an entry given its name in the cache and return the associated String.
      *
      * @param name                      The name to find
-     * @param malformedInputAction      Action to take if an malformed input is encountered
+     * @param malformedInputAction      Action to take if a malformed input is encountered
      * @param unmappableCharacterAction Action to take if an unmappable character is encountered
      *
      * @return the corresponding value
      */
-    protected static final String find(ByteChunk name, CodingErrorAction malformedInputAction,
-        CodingErrorAction unmappableCharacterAction) {
+    protected static String find(ByteChunk name, CodingErrorAction malformedInputAction,
+            CodingErrorAction unmappableCharacterAction) {
         int pos = findClosest(name, bcCache, bcCache.length);
         if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset)) ||
                 !malformedInputAction.equals(bcCache[pos].malformedInputAction) ||
@@ -506,7 +504,7 @@ public class StringCache {
      *
      * @return the position of the best match
      */
-    protected static final int findClosest(ByteChunk name, ByteEntry[] array, int len) {
+    protected static int findClosest(ByteChunk name, ByteEntry[] array, int len) {
 
         int a = 0;
         int b = len - 1;
@@ -523,7 +521,7 @@ public class StringCache {
             return 0;
         }
 
-        int i = 0;
+        int i;
         while (true) {
             i = (b + a) >>> 1;
             int result = compare(name, array[i].name);
@@ -555,7 +553,7 @@ public class StringCache {
      *
      * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
-    protected static final int compare(CharChunk name, char[] compareTo) {
+    protected static int compare(CharChunk name, char[] compareTo) {
         int result = 0;
 
         char[] c = name.getBuffer();
@@ -591,7 +589,7 @@ public class StringCache {
      *
      * @return the corresponding value
      */
-    protected static final String find(CharChunk name) {
+    protected static String find(CharChunk name) {
         int pos = findClosest(name, ccCache, ccCache.length);
         if ((pos < 0) || (compare(name, ccCache[pos].name) != 0)) {
             return null;
@@ -611,7 +609,7 @@ public class StringCache {
      *
      * @return the position of the best match
      */
-    protected static final int findClosest(CharChunk name, CharEntry[] array, int len) {
+    protected static int findClosest(CharChunk name, CharEntry[] array, int len) {
 
         int a = 0;
         int b = len - 1;
@@ -628,7 +626,7 @@ public class StringCache {
             return 0;
         }
 
-        int i = 0;
+        int i;
         while (true) {
             i = (b + a) >>> 1;
             int result = compare(name, array[i].name);
@@ -654,7 +652,7 @@ public class StringCache {
 
     // -------------------------------------------------- ByteEntry Inner Class
 
-    private static class ByteEntry {
+    protected static class ByteEntry {
 
         private byte[] name = null;
         private Charset charset = null;
@@ -694,7 +692,7 @@ public class StringCache {
     // -------------------------------------------------- CharEntry Inner Class
 
 
-    private static class CharEntry {
+    protected static class CharEntry {
 
         private char[] name = null;
         private String value = null;

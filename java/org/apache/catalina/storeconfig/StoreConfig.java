@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Store Server/Service/Host/Context at file or PrintWriter. Default server.xml is at $catalina.base/conf/server.xml
  */
 public class StoreConfig implements IStoreConfig {
-    private static Log log = LogFactory.getLog(StoreConfig.class);
+    private static final Log log = LogFactory.getLog(StoreConfig.class);
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private String serverFilename = "conf/server.xml";
@@ -102,7 +102,7 @@ public class StoreConfig implements IStoreConfig {
      */
     public synchronized void storeServer(String aServerName, boolean backup, boolean externalAllowed)
             throws MalformedObjectNameException {
-        if (aServerName == null || aServerName.length() == 0) {
+        if (aServerName == null || aServerName.isEmpty()) {
             log.error(sm.getString("config.emptyObjectName"));
             return;
         }
@@ -111,8 +111,7 @@ public class StoreConfig implements IStoreConfig {
         if (mserver.isRegistered(objectName)) {
             try {
                 Server aServer = (Server) mserver.getAttribute(objectName, "managedResource");
-                StoreDescription desc = null;
-                desc = getRegistry().findDescription(StandardContext.class);
+                StoreDescription desc = getRegistry().findDescription(StandardContext.class);
                 if (desc != null) {
                     boolean oldSeparate = desc.isStoreSeparate();
                     boolean oldBackup = desc.isBackup();
@@ -150,7 +149,7 @@ public class StoreConfig implements IStoreConfig {
      */
     public synchronized void storeContext(String aContextName, boolean backup, boolean externalAllowed)
             throws MalformedObjectNameException {
-        if (aContextName == null || aContextName.length() == 0) {
+        if (aContextName == null || aContextName.isEmpty()) {
             log.error(sm.getString("config.emptyObjectName"));
             return;
         }
@@ -161,8 +160,7 @@ public class StoreConfig implements IStoreConfig {
                 Context aContext = (Context) mserver.getAttribute(objectName, "managedResource");
                 URL configFile = aContext.getConfigFile();
                 if (configFile != null) {
-                    StoreDescription desc = null;
-                    desc = getRegistry().findDescription(aContext.getClass());
+                    StoreDescription desc = getRegistry().findDescription(aContext.getClass());
                     if (desc != null) {
                         boolean oldSeparate = desc.isStoreSeparate();
                         boolean oldBackup = desc.isBackup();
@@ -209,8 +207,7 @@ public class StoreConfig implements IStoreConfig {
     @Override
     public synchronized boolean store(Context aContext) {
         try {
-            StoreDescription desc = null;
-            desc = getRegistry().findDescription(aContext.getClass());
+            StoreDescription desc = getRegistry().findDescription(aContext.getClass());
             if (desc != null) {
                 boolean old = desc.isStoreSeparate();
                 try {

@@ -34,7 +34,7 @@ import org.apache.tools.ant.BuildException;
  * <li>Bind Get result as Ant properties</li>
  * </ul>
  * <p>
- * Examples: Set an Mbean Manager attribute maxActiveSessions. Set this attribute with fresh jmx connection without save
+ * Examples: Set a Mbean Manager attribute maxActiveSessions. Set this attribute with fresh jmx connection without save
  * reference
  * </p>
  *
@@ -51,11 +51,9 @@ import org.apache.tools.ant.BuildException;
  *       /&gt;
  * </pre>
  * <p>
- * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
+ * First call to a remote MBean server save the JMXConnection a reference <em>jmx.server</em>
  * </p>
  * These tasks require Ant 1.6 or later interface.
- *
- * @author Peter Rossbach
  *
  * @since 5.5.10
  */
@@ -184,7 +182,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         ObjectName oname = new ObjectName(name);
         String mattrType = null;
         MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
-        MBeanAttributeInfo attrs[] = minfo.getAttributes();
+        MBeanAttributeInfo[] attrs = minfo.getAttributes();
         for (int i = 0; mattrType == null && i < attrs.length; i++) {
             if (attribute.equals(attrs[i].getName())) {
                 mattrType = attrs[i].getType();

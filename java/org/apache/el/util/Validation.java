@@ -18,8 +18,11 @@ package org.apache.el.util;
 
 public class Validation {
 
-    // Java keywords, boolean literals & the null literal in alphabetical order
-    private static final String invalidIdentifiers[] = { "abstract", "assert", "boolean", "break", "byte", "case",
+    /*
+     * Java keywords, boolean literals & the null literal in alphabetical order. As per the Java Language Specification,
+     * none of these are permitted to be used as an identifier.
+     */
+    private static final String[] invalidIdentifiers = { "_", "abstract", "assert", "boolean", "break", "byte", "case",
             "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends",
             "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int",
             "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return",
@@ -49,7 +52,7 @@ public class Validation {
         }
 
         // Should not be the case but check to be sure
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty()) {
             return false;
         }
 
@@ -69,18 +72,10 @@ public class Validation {
             }
         }
 
-        // Check the start character that has more restrictions
-        if (!Character.isJavaIdentifierStart(key.charAt(0))) {
-            return false;
-        }
-
-        // Check each remaining character used is permitted
-        for (int idx = 1; idx < key.length(); idx++) {
-            if (!Character.isJavaIdentifierPart(key.charAt(idx))) {
-                return false;
-            }
-        }
-
-        return true;
+        /*
+         * The parser checks Character.isJavaIdentifierStart() and Character.isJavaIdentifierPart() so no need to check
+         * them again here. However, we do need to check that '#' hasn't been used at the start of the identifier.
+         */
+        return key.charAt(0) != '#';
     }
 }

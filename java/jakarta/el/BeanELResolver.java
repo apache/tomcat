@@ -138,7 +138,7 @@ public class BeanELResolver extends ELResolver {
         Object[] parameters =
                 Util.buildParameters(context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
-        Object result = null;
+        Object result;
         try {
             result = matchingMethod.invoke(base, parameters);
         } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -222,7 +222,7 @@ public class BeanELResolver extends ELResolver {
                 this.write = Util.getMethod(this.owner, base, getWriteMethod());
                 if (this.write == null) {
                     throw new PropertyNotWritableException(
-                            Util.message(ctx, "propertyNotWritable", new Object[] { owner.getName(), getName() }));
+                            Util.message(ctx, "propertyNotWritable", owner.getName(), getName()));
                 }
             }
             return this.write;
@@ -233,7 +233,7 @@ public class BeanELResolver extends ELResolver {
                 this.read = Util.getMethod(this.owner, base, getReadMethod());
                 if (this.read == null) {
                     throw new PropertyNotFoundException(
-                            Util.message(ctx, "propertyNotReadable", new Object[] { owner.getName(), getName() }));
+                            Util.message(ctx, "propertyNotReadable", owner.getName(), getName()));
                 }
             }
             return this.read;

@@ -40,7 +40,7 @@ public interface Session extends Closeable {
      * {@link #addMessageHandler(Class, jakarta.websocket.MessageHandler.Partial)} or
      * {@link #addMessageHandler(Class, jakarta.websocket.MessageHandler.Whole)}.
      *
-     * @param handler The message handler for a incoming message
+     * @param handler The message handler for an incoming message
      *
      * @throws IllegalStateException If a message handler has already been registered for the associated message type
      */
@@ -160,7 +160,7 @@ public interface Session extends Closeable {
      *
      * @param <T>     The type of message that the given handler is intended for
      * @param clazz   The Class that implements T
-     * @param handler The message handler for a incoming message
+     * @param handler The message handler for an incoming message
      *
      * @throws IllegalStateException If a message handler has already been registered for the associated message type
      *
@@ -174,7 +174,7 @@ public interface Session extends Closeable {
      *
      * @param <T>     The type of message that the given handler is intended for
      * @param clazz   The Class that implements T
-     * @param handler The message handler for a incoming message
+     * @param handler The message handler for an incoming message
      *
      * @throws IllegalStateException If a message handler has already been registered for the associated message type
      *

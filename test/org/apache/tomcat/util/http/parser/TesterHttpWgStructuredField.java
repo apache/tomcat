@@ -106,20 +106,20 @@ public class TesterHttpWgStructuredField {
 
         try {
             switch (headerType) {
-            case "item": {
-                StructuredField.parseSfItem(input);
-                break;
-            }
-            case "list": {
-                StructuredField.parseSfList(input);
-                break;
-            }
-            case "dictionary": {
-                StructuredField.parseSfDictionary(input);
-                break;
-            }
-            default:
-                System.out.println("Type unsupported " + headerType);
+                case "item": {
+                    StructuredField.parseSfItem(input);
+                    break;
+                }
+                case "list": {
+                    StructuredField.parseSfList(input);
+                    break;
+                }
+                case "dictionary": {
+                    StructuredField.parseSfDictionary(input);
+                    break;
+                }
+                default:
+                    System.out.println("Type unsupported " + headerType);
             }
         } catch (Exception e) {
             Assert.assertTrue(name + ": raw [" + unescaped + "]", mustFail.booleanValue() || canFail.booleanValue());

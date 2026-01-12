@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,10 +97,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharsetHolder;
-import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.InvalidParameterException;
@@ -110,6 +109,7 @@ import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
@@ -123,9 +123,6 @@ import org.ietf.jgss.GSSException;
 
 /**
  * Wrapper object for the Coyote request.
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public class Request implements HttpServletRequest {
 
@@ -145,6 +142,11 @@ public class Request implements HttpServletRequest {
      */
     public Request(Connector connector, org.apache.coyote.Request coyoteRequest) {
         this.connector = connector;
+        if (connector != null) {
+            maxParameterCount = connector.getMaxParameterCount();
+            maxPartCount = connector.getMaxPartCount();
+            maxPartHeaderSize = connector.getMaxPartHeaderSize();
+        }
         this.coyoteRequest = coyoteRequest;
         inputBuffer = new InputBuffer(coyoteRequest);
     }
@@ -411,14 +413,22 @@ public class Request implements HttpServletRequest {
 
     private HttpServletRequest applicationRequest = null;
 
+    /**
+     * The maximum number of request parameters
+     */
+    private int maxParameterCount = -1;
+
+    private int maxPartCount = -1;
+
+    private int maxPartHeaderSize = -1;
 
     // --------------------------------------------------------- Public Methods
 
-    protected void addPathParameter(String name, String value) {
+    public void addPathParameter(String name, String value) {
         coyoteRequest.addPathParameter(name, value);
     }
 
-    protected String getPathParameter(String name) {
+    public String getPathParameter(String name) {
         return coyoteRequest.getPathParameter(name);
     }
 
@@ -441,6 +451,15 @@ public class Request implements HttpServletRequest {
         userPrincipal = null;
         subject = null;
         parametersParsed = false;
+        if (connector != null) {
+            maxParameterCount = connector.getMaxParameterCount();
+            maxPartCount = connector.getMaxPartCount();
+            maxPartHeaderSize = connector.getMaxPartHeaderSize();
+        } else {
+            maxParameterCount = -1;
+            maxPartCount = -1;
+            maxPartHeaderSize = -1;
+        }
         if (parts != null) {
             for (Part part : parts) {
                 try {
@@ -506,7 +525,7 @@ public class Request implements HttpServletRequest {
     }
 
 
-    protected void recycleSessionInfo() {
+    public void recycleSessionInfo() {
         if (session != null) {
             try {
                 session.endAccess();
@@ -568,7 +587,7 @@ public class Request implements HttpServletRequest {
      *             this request
      */
     public boolean getDiscardFacades() {
-        return (connector == null) ? true : connector.getDiscardFacades();
+        return connector == null || connector.getDiscardFacades();
     }
 
 
@@ -830,9 +849,38 @@ public class Request implements HttpServletRequest {
     }
 
 
+    /**
+     * Set the maximum number of request parameters (GET plus POST including multipart) for a single request.
+     *
+     * @param maxParameterCount The maximum number of request parameters
+     */
+    public void setMaxParameterCount(int maxParameterCount) {
+        this.maxParameterCount = maxParameterCount;
+    }
+
+
+    /**
+     * Set the maximum number of parts for a single multipart request.
+     *
+     * @param maxPartCount The maximum number of request parts
+     */
+    public void setMaxPartCount(int maxPartCount) {
+        this.maxPartCount = maxPartCount;
+    }
+
+
+    /**
+     * Set the maximum header size per part for a single multipart request.
+     *
+     * @param maxPartHeaderSize The maximum size of the headers for one part
+     */
+    public void setMaxPartHeaderSize(int maxPartHeaderSize) {
+        this.maxPartHeaderSize = maxPartHeaderSize;
+    }
+
+
     // ------------------------------------------------- ServletRequest Methods
 
-    @SuppressWarnings("deprecation")
     @Override
     public Object getAttribute(String name) {
         // Special attributes
@@ -860,7 +908,6 @@ public class Request implements HttpServletRequest {
             attr = coyoteRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR);
             if (attr != null) {
                 attributes.put(Globals.SECURE_PROTOCOL_ATTR, attr);
-                attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.CIPHER_SUITE_ATTR);
             if (attr != null) {
@@ -903,8 +950,8 @@ public class Request implements HttpServletRequest {
      * {@inheritDoc}
      * <p>
      * The attribute names returned will only be those for the attributes set via {@link #setAttribute(String, Object)}.
-     * Tomcat internal attributes will not be included although they are accessible via {@link #getAttribute(String)}.
-     * The Tomcat internal attributes include:
+     * Tomcat internal attributes will not be included even though they are accessible via
+     * {@link #getAttribute(String)}. The Tomcat internal attributes include:
      * <ul>
      * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
      * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
@@ -1014,8 +1061,8 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
-            return locales.get(0);
+        if (!locales.isEmpty()) {
+            return locales.getFirst();
         }
 
         return defaultLocale;
@@ -1029,7 +1076,7 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
+        if (!locales.isEmpty()) {
             return Collections.enumeration(locales);
         }
         ArrayList<Locale> results = new ArrayList<>();
@@ -1238,7 +1285,7 @@ public class Request implements HttpServletRequest {
 
         // Add the path info, if there is any
         String pathInfo = getPathInfo();
-        String requestPath = null;
+        String requestPath;
 
         if (pathInfo == null) {
             requestPath = servletPath;
@@ -1247,7 +1294,7 @@ public class Request implements HttpServletRequest {
         }
 
         int pos = requestPath.lastIndexOf('/');
-        String relative = null;
+        String relative;
         if (context.getDispatchersUseEncodedPaths()) {
             if (pos >= 0) {
                 relative = URLEncoder.DEFAULT.encode(requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
@@ -1355,12 +1402,12 @@ public class Request implements HttpServletRequest {
         if (context == null) {
             return;
         }
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
         boolean replaced = (oldValue != null);
-        ServletRequestAttributeEvent event = null;
+        ServletRequestAttributeEvent event;
         if (replaced) {
             event = new ServletRequestAttributeEvent(context.getServletContext(), getRequest(), name, oldValue);
         } else {
@@ -1368,10 +1415,9 @@ public class Request implements HttpServletRequest {
         }
 
         for (Object o : listeners) {
-            if (!(o instanceof ServletRequestAttributeListener)) {
+            if (!(o instanceof ServletRequestAttributeListener listener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1396,17 +1442,16 @@ public class Request implements HttpServletRequest {
      */
     private void notifyAttributeRemoved(String name, Object value) {
         Context context = getContext();
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletRequestAttributeEvent event =
                 new ServletRequestAttributeEvent(context.getServletContext(), getRequest(), name, value);
         for (Object o : listeners) {
-            if (!(o instanceof ServletRequestAttributeListener)) {
+            if (!(o instanceof ServletRequestAttributeListener listener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
@@ -1562,11 +1607,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public DispatcherType getDispatcherType() {
-        if (internalDispatcherType == null) {
-            return DispatcherType.REQUEST;
-        }
-
-        return this.internalDispatcherType;
+        return Objects.requireNonNullElse(internalDispatcherType, DispatcherType.REQUEST);
     }
 
 
@@ -1810,7 +1851,7 @@ public class Request implements HttpServletRequest {
             // is the protocol that must have been selected
             List<Upgrade> upgradeProtocols = Upgrade.parse(getHeaders(HTTP_UPGRADE_HEADER_NAME));
             if (upgradeProtocols != null && upgradeProtocols.size() == 1) {
-                result = upgradeProtocols.get(0).toString();
+                result = upgradeProtocols.getFirst().toString();
             }
         }
 
@@ -1828,118 +1869,14 @@ public class Request implements HttpServletRequest {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Tomcat returns the canonical context path for the web application.
+     */
     @Override
     public String getContextPath() {
-        int lastSlash = mappingData.contextSlashCount;
-        // Special case handling for the root context
-        if (lastSlash == 0) {
-            return "";
-        }
-
-        String canonicalContextPath = getServletContext().getContextPath();
-
-        String uri = getRequestURI();
-        int pos = 0;
-        if (!getContext().getAllowMultipleLeadingForwardSlashInPath()) {
-            // Ensure that the returned value only starts with a single '/'.
-            // This prevents the value being misinterpreted as a protocol-
-            // relative URI if used with sendRedirect().
-            do {
-                pos++;
-            } while (pos < uri.length() && uri.charAt(pos) == '/');
-            pos--;
-            uri = uri.substring(pos);
-        }
-
-        char[] uriChars = uri.toCharArray();
-        // Need at least the number of slashes in the context path
-        while (lastSlash > 0) {
-            pos = nextSlash(uriChars, pos + 1);
-            if (pos == -1) {
-                break;
-            }
-            lastSlash--;
-        }
-        // Now allow for path parameters, normalization and/or encoding.
-        // Essentially, keep extending the candidate path up to the next slash
-        // until the decoded and normalized candidate path (with the path
-        // parameters removed) is the same as the canonical path.
-        String candidate;
-        if (pos == -1) {
-            candidate = uri;
-        } else {
-            candidate = uri.substring(0, pos);
-        }
-        candidate = removePathParameters(candidate);
-        candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
-        candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
-        boolean match = canonicalContextPath.equals(candidate);
-        while (!match && pos != -1) {
-            pos = nextSlash(uriChars, pos + 1);
-            if (pos == -1) {
-                candidate = uri;
-            } else {
-                candidate = uri.substring(0, pos);
-            }
-            candidate = removePathParameters(candidate);
-            candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
-            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
-            match = canonicalContextPath.equals(candidate);
-        }
-        if (match) {
-            if (pos == -1) {
-                return uri;
-            } else {
-                return uri.substring(0, pos);
-            }
-        } else {
-            // Should never happen
-            throw new IllegalStateException(
-                    sm.getString("coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
-        }
-    }
-
-
-    private String removePathParameters(String input) {
-        int nextSemiColon = input.indexOf(';');
-        // Shortcut
-        if (nextSemiColon == -1) {
-            return input;
-        }
-        StringBuilder result = new StringBuilder(input.length());
-        result.append(input.substring(0, nextSemiColon));
-        while (true) {
-            int nextSlash = input.indexOf('/', nextSemiColon);
-            if (nextSlash == -1) {
-                break;
-            }
-            nextSemiColon = input.indexOf(';', nextSlash);
-            if (nextSemiColon == -1) {
-                result.append(input.substring(nextSlash));
-                break;
-            } else {
-                result.append(input.substring(nextSlash, nextSemiColon));
-            }
-        }
-
-        return result.toString();
-    }
-
-
-    private int nextSlash(char[] uri, int startPos) {
-        int len = uri.length;
-        int pos = startPos;
-        while (pos < len) {
-            if (uri[pos] == '/') {
-                return pos;
-            } else if (connector.getEncodedSolidusHandlingInternal() == EncodedSolidusHandling.DECODE &&
-                    uri[pos] == '%' && pos + 2 < len && uri[pos + 1] == '2' &&
-                    (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
-                return pos;
-            }
-            pos++;
-        }
-        return -1;
+        return getContext().getPath();
     }
 
 
@@ -2020,7 +1957,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public String getMethod() {
-        return coyoteRequest.method().toStringType();
+        return coyoteRequest.getMethod();
     }
 
 
@@ -2162,27 +2099,25 @@ public class Request implements HttpServletRequest {
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
-                // Can't find the session
+            } catch (IOException ignore) {
+                // Error looking up session. Treat it as not found.
             }
 
             if ((session == null) || !session.isValid()) {
                 // Check for parallel deployment contexts
-                if (getMappingData().contexts == null) {
-                    return false;
-                } else {
+                if (getMappingData().contexts != null) {
                     for (int i = (getMappingData().contexts.length); i > 0; i--) {
                         Context ctxt = getMappingData().contexts[i - 1];
                         try {
                             if (ctxt.getManager().findSession(requestedSessionId) != null) {
                                 return true;
                             }
-                        } catch (IOException e) {
-                            // Ignore
+                        } catch (IOException ignore) {
+                            // Error looking up session. Treat it as not found.
                         }
                     }
-                    return false;
                 }
+                return false;
             }
 
             return true;
@@ -2295,7 +2230,7 @@ public class Request implements HttpServletRequest {
     public void changeSessionId(String newSessionId) {
         // This should only ever be called if there was an old session ID but
         // double check to be sure
-        if (requestedSessionId != null && requestedSessionId.length() > 0) {
+        if (requestedSessionId != null && !requestedSessionId.isEmpty()) {
             requestedSessionId = newSessionId;
         }
 
@@ -2305,7 +2240,7 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        if (response != null) {
+        if (response != null && context != null) {
             Cookie newCookie = ApplicationSessionCookieConfig.createSessionCookie(context, newSessionId, isSecure());
             response.addSessionCookieInternal(newCookie);
         }
@@ -2393,15 +2328,20 @@ public class Request implements HttpServletRequest {
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException, ServletException {
 
-        parseParts();
+        parseParts(true);
 
         if (partsParseException != null) {
-            if (partsParseException instanceof IOException) {
-                throw (IOException) partsParseException;
-            } else if (partsParseException instanceof IllegalStateException) {
-                throw (IllegalStateException) partsParseException;
-            } else if (partsParseException instanceof ServletException) {
-                throw (ServletException) partsParseException;
+            Context context = getContext();
+            if (context != null && context.getLogger().isDebugEnabled()) {
+                context.getLogger()
+                        .debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
+            }
+            switch (partsParseException) {
+                case IOException ioException -> throw ioException;
+                case IllegalStateException illegalStateException -> throw illegalStateException;
+                case ServletException servletException -> throw servletException;
+                default -> {
+                }
             }
         }
 
@@ -2409,7 +2349,7 @@ public class Request implements HttpServletRequest {
     }
 
 
-    private void parseParts() {
+    private void parseParts(boolean explicit) {
 
         // Return immediately if the parts have already been parsed
         if (parts != null || partsParseException != null) {
@@ -2424,18 +2364,41 @@ public class Request implements HttpServletRequest {
                 mce = new MultipartConfigElement(null, connector.getMaxPostSize(), connector.getMaxPostSize(),
                         connector.getMaxPostSize());
             } else {
-                partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
+                if (explicit) {
+                    partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
+                } else {
+                    parts = Collections.emptyList();
+                }
                 return;
             }
         }
 
-        int maxParameterCount = getConnector().getMaxParameterCount();
+        /*
+         * When the request body is multipart/form-data, both the parts and the query string count towards
+         * maxParameterCount. If parseParts() is called before getParameterXXX() then the parts will be parsed before
+         * the query string. Otherwise, the query string will be parsed first.
+         *
+         * maxParameterCount must be respected regardless of which is parsed first.
+         *
+         * maxParameterCount is reset from the Connector at the start of every request.
+         *
+         * If parts are parsed first, non-file parts will be added to the parameter map and any files will reduce
+         * maxParameterCount by 1 so that when the query string is parsed the difference between the size of the
+         * parameter map and maxParameterCount will be the original maxParameterCount less the number of parts. i.e. the
+         * maxParameterCount applied to the query string will be the original maxParameterCount less the number of
+         * parts.
+         *
+         * If the query string is parsed first, all parameters will be added to the parameter map and, ignoring
+         * maxPartCount, the part limit will be set to the original maxParameterCount less the size of the parameter
+         * map. i.e. the maxParameterCount applied to the parts will be the original maxParameterCount less the number
+         * of query parameters.
+         */
         Parameters parameters = coyoteRequest.getParameters();
         parameters.setLimit(maxParameterCount);
 
         File location;
         String locationStr = mce.getLocation();
-        if (locationStr == null || locationStr.length() == 0) {
+        if (locationStr == null || locationStr.isEmpty()) {
             location = ((File) context.getServletContext().getAttribute(ServletContext.TEMPDIR));
         } else {
             // If relative, it is relative to TEMPDIR
@@ -2474,35 +2437,53 @@ public class Request implements HttpServletRequest {
         upload.setFileItemFactory(factory);
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
-        if (maxParameterCount > -1) {
-            // There is a limit. The limit for parts needs to be reduced by
-            // the number of parameters we have already parsed.
-            // Must be under the limit else parsing parameters would have
-            // triggered an exception.
-            upload.setFileCountMax(maxParameterCount - parameters.size());
+        upload.setPartHeaderSizeMax(maxPartHeaderSize);
+        /*
+         * There are two independent limits on the number of parts.
+         *
+         * 1. The limit based on parameters. This is maxParameterCount less the number of parameters already processed.
+         *
+         * 2. The limit based on parts. This is maxPartCount.
+         *
+         * The lower of these two limits will be applied to this request.
+         *
+         * Note: Either of both limits may be set to -1 (unlimited).
+         */
+        int partLimit = maxParameterCount;
+        if (partLimit > -1) {
+            partLimit = partLimit - parameters.size();
         }
+        int maxPartCount = this.maxPartCount;
+        if (maxPartCount > -1) {
+            if (partLimit < 0 || partLimit > maxPartCount) {
+                partLimit = maxPartCount;
+            }
+        }
+        upload.setFileCountMax(partLimit);
 
         parts = new ArrayList<>();
+        List<FileItem> items = null;
+        boolean success = false;
         try {
-            List<FileItem> items = upload.parseRequest(new ServletRequestContext(this));
+            items = upload.parseRequest(new ServletRequestContext(this));
             int maxPostSize = getConnector().getMaxPostSize();
-            int postSize = 0;
+            long postSize = 0;
             Charset charset = getCharset();
             for (FileItem item : items) {
                 ApplicationPart part = new ApplicationPart(item, location);
-                parts.add(part);
                 if (part.getSubmittedFileName() == null) {
                     String name = part.getName();
                     if (maxPostSize >= 0) {
                         // Have to calculate equivalent size. Not completely
                         // accurate but close enough.
-                        postSize += name.getBytes(charset).length;
+                        // Name
+                        postSize = Math.addExact(postSize, name.getBytes(charset).length);
                         // Equals sign
-                        postSize++;
+                        postSize = Math.addExact(postSize, 1);
                         // Value length
-                        postSize += part.getSize();
+                        postSize = Math.addExact(postSize, part.getSize());
                         // Value separator
-                        postSize++;
+                        postSize = Math.addExact(postSize, 1);
                         if (postSize > maxPostSize) {
                             throw new IllegalStateException(sm.getString("coyoteRequest.maxPostSizeExceeded"));
                         }
@@ -2514,22 +2495,41 @@ public class Request implements HttpServletRequest {
                         // Not possible
                     }
                     parameters.addParameter(name, value);
+                } else {
+                    // Adjust the limit to account for a file part which is not added to the parameter map.
+                    maxParameterCount--;
                 }
+                parts.add(part);
             }
+            success = true;
         } catch (InvalidContentTypeException e) {
             partsParseException = new ServletException(e);
-            return;
-        } catch (SizeException e) {
+        } catch (SizeException | FileCountLimitExceededException e) {
             checkSwallowInput();
             partsParseException = new InvalidParameterException(e, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-            return;
-        } catch (IOException e) {
-            partsParseException = e;
-            return;
+        } catch (IOException ioe) {
+            partsParseException = ioe;
         } catch (IllegalStateException e) {
             checkSwallowInput();
             partsParseException = e;
-            return;
+        } finally {
+            /*
+             * GC will delete any temporary copies of uploaded files left in the work directory but if we know that the
+             * upload has failed then explicitly clean up now.
+             */
+            if (!success) {
+                parts.clear();
+                if (items != null) {
+                    for (FileItem item : items) {
+                        try {
+                            item.delete();
+                        } catch (Throwable t) {
+                            ExceptionUtils.handleThrowable(t);
+                            log.warn(sm.getString("request.partCleanup.failed"), t);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -2571,11 +2571,11 @@ public class Request implements HttpServletRequest {
         if (requestedSessionId != null) {
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("request.session.failed", requestedSessionId, e.getMessage()), e);
+                    log.debug(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()), ioe);
                 } else {
-                    log.info(sm.getString("request.session.failed", requestedSessionId, e.getMessage()));
+                    log.info(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()));
                 }
                 session = null;
             }
@@ -2584,6 +2584,8 @@ public class Request implements HttpServletRequest {
             }
             if (session != null) {
                 session.access();
+                // The client has chosen to join the session
+                session.setNew(false);
                 return session;
             }
         }
@@ -2607,7 +2609,7 @@ public class Request implements HttpServletRequest {
         } else if (("/".equals(context.getSessionCookiePath()) && isRequestedSessionIdFromCookie())) {
             /*
              * This is the common(ish) use case: using the same session ID with multiple web applications on the same
-             * host. Typically this is used by Portlet implementations. It only works if sessions are tracked via
+             * host. Typically, this is used by Portlet implementations. It only works if sessions are tracked via
              * cookies. The cookie must have a path of "/" else it won't be provided for requests to all web
              * applications.
              *
@@ -2624,9 +2626,8 @@ public class Request implements HttpServletRequest {
                                 found = true;
                                 break;
                             }
-                        } catch (IOException e) {
-                            // Ignore. Problems with this manager will be
-                            // handled elsewhere.
+                        } catch (IOException ignore) {
+                            // Error looking up session. Treat it as not found.
                         }
                     }
                 }
@@ -2736,7 +2737,7 @@ public class Request implements HttpServletRequest {
                 scookie.getValue().getByteChunk().setCharset(getCookieProcessor().getCharset());
                 cookie.setValue(unescape(scookie.getValue().toString()));
                 cookies[idx++] = cookie;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignore) {
                 // Ignore bad cookie
             }
         }
@@ -2755,6 +2756,11 @@ public class Request implements HttpServletRequest {
         doParseParameters();
 
         if (parametersParseException != null) {
+            Context context = getContext();
+            if (context != null && context.getLogger().isDebugEnabled()) {
+                context.getLogger().debug(
+                        sm.getString("coyoteRequest.parametersParseException", parametersParseException.getMessage()));
+            }
             throw parametersParseException;
         }
     }
@@ -2766,13 +2772,27 @@ public class Request implements HttpServletRequest {
         }
         parametersParsed = true;
 
+        /*
+         * When the request body is multipart/form-data, both the parts and the query string count towards
+         * maxParameterCount. If parseParts() is called before getParameterXXX() then the parts will be parsed before
+         * the query string. Otherwise, the query string will be parsed first.
+         *
+         * maxParameterCount must be respected regardless of which is parsed first.
+         *
+         * maxParameterCount is reset from the Connector at the start of every request.
+         *
+         * If parts are parsed first, non-file parts will be added to the parameter map and any files will reduce
+         * maxParameterCount by 1 so that when the query string is parsed the difference between the size of the
+         * parameter map and maxParameterCount will be the original maxParameterCount less the number of parts. i.e. the
+         * maxParameterCount applied to the query string will be the original maxParameterCount less the number of
+         * parts.
+         *
+         * If the query string is parsed first, all parameters will be added to the parameter map and, ignoring
+         * maxPartCount, the part limit will be set to the original maxParameterCount less the size of the parameter
+         * map. i.e. the maxParameterCount applied to the parts will be the original maxParameterCount less the number
+         * of query parameters.
+         */
         Parameters parameters = coyoteRequest.getParameters();
-
-        // Set this every time in case limit has been changed via JMX
-        int maxParameterCount = getConnector().getMaxParameterCount();
-        if (parts != null && maxParameterCount > 0) {
-            maxParameterCount -= parts.size();
-        }
         parameters.setLimit(maxParameterCount);
 
         // getCharacterEncoding() may have been overridden to search for
@@ -2796,7 +2816,7 @@ public class Request implements HttpServletRequest {
         String mediaType = MediaType.parseMediaTypeOnly(getContentType());
 
         if ("multipart/form-data".equals(mediaType)) {
-            parseParts();
+            parseParts(false);
             if (partsParseException instanceof IllegalStateException) {
                 parametersParseException = (IllegalStateException) partsParseException;
             } else if (partsParseException != null) {
@@ -2828,7 +2848,7 @@ public class Request implements HttpServletRequest {
                         new InvalidParameterException(message, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
                 return;
             }
-            byte[] formData = null;
+            byte[] formData;
             if (len < CACHED_POST_LEN) {
                 if (postData == null) {
                     postData = new byte[CACHED_POST_LEN];
@@ -2839,19 +2859,19 @@ public class Request implements HttpServletRequest {
             }
             try {
                 readPostBodyFully(formData, len);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                 }
-                if (e instanceof ClientAbortException) {
+                if (ioe instanceof ClientAbortException) {
                     // Client has disconnected. Close immediately.
                     response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
                 }
-                if (e instanceof BadRequestException) {
-                    parametersParseException = new InvalidParameterException(e);
+                if (ioe instanceof BadRequestException) {
+                    parametersParseException = new InvalidParameterException(ioe);
                 } else {
-                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(ioe));
                 }
                 return;
             }
@@ -2862,22 +2882,20 @@ public class Request implements HttpServletRequest {
                 formData = readChunkedPostBody();
             } catch (IllegalStateException ise) {
                 parametersParseException = ise;
-                return;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                 }
-                if (e instanceof ClientAbortException) {
+                if (ioe instanceof ClientAbortException) {
                     // Client has disconnected. Close immediately.
                     response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
                 }
-                if (e instanceof BadRequestException) {
-                    parametersParseException = new InvalidParameterException(e);
+                if (ioe instanceof BadRequestException) {
+                    parametersParseException = new InvalidParameterException(ioe);
                 } else {
-                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(ioe));
                 }
-                return;
             }
             if (formData != null) {
                 parameters.processParameters(formData, 0, formData.length);
@@ -2986,7 +3004,7 @@ public class Request implements HttpServletRequest {
         List<AcceptLanguage> acceptLanguages;
         try {
             acceptLanguages = AcceptLanguage.parse(new StringReader(value));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
             // of an IOException.
             return;

@@ -41,8 +41,6 @@ import javax.naming.spi.ObjectFactory;
  * to which it is stored. [conf/tomcat-users.xml]</li>
  * </ul>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class MemoryUserDatabaseFactory implements ObjectFactory {
@@ -54,7 +52,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
     /**
      * <p>
      * Create and return a new <code>MemoryUserDatabase</code> instance that has been configured according to the
-     * properties of the specified <code>Reference</code>. If you instance can be created, return <code>null</code>
+     * properties of the specified <code>Reference</code>. If the instance cannot be created, return <code>null</code>
      * instead.
      * </p>
      *
@@ -71,10 +69,9 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"
-        if ((obj == null) || !(obj instanceof Reference)) {
+        if (!(obj instanceof Reference ref)) {
             return null;
         }
-        Reference ref = (Reference) obj;
         if (!"org.apache.catalina.UserDatabase".equals(ref.getClassName())) {
             return null;
         }
@@ -82,9 +79,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // Create and configure a MemoryUserDatabase instance based on the
         // RefAddr values associated with this Reference
         MemoryUserDatabase database = new MemoryUserDatabase(name.toString());
-        RefAddr ra = null;
-
-        ra = ref.get("pathname");
+        RefAddr ra = ref.get("pathname");
         if (ra != null) {
             database.setPathname(ra.getContent().toString());
         }

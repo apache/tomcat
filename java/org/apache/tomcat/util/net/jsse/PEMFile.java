@@ -107,15 +107,12 @@ public class PEMFile {
     }
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        StringBuilder result = new StringBuilder();
-        result.append(Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
-        result.append(System.lineSeparator());
-        result.append(Base64.getMimeEncoder().encodeToString(certificate.getEncoded()));
-        result.append(Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
-        return result.toString();
+        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + System.lineSeparator() +
+                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) + Part.END_BOUNDARY +
+                Part.CERTIFICATE + Part.FINISH_BOUNDARY;
     }
 
-    private List<X509Certificate> certificates = new ArrayList<>();
+    private final List<X509Certificate> certificates = new ArrayList<>();
     private PrivateKey privateKey;
 
     public List<X509Certificate> getCertificates() {
@@ -193,7 +190,7 @@ public class PEMFile {
             }
         }
 
-        String passwordToUse = null;
+        String passwordToUse;
         if (passwordFileStream != null) {
             try (BufferedReader reader =
                     new BufferedReader(new InputStreamReader(passwordFileStream, StandardCharsets.UTF_8))) {
@@ -408,13 +405,14 @@ public class PEMFile {
                     // PBKDF2 PRF
                     p.parseTagSequence();
                     p.parseLength();
-                    String prf = null;
-                    // This tag is optional. If present the nested sequence level will be 6 else if will be 4.
+                    String prf;
+                    // This tag is optional. If present the nested sequence level will be 6 else it will be 4.
                     if (p.getNestedSequenceLevel() == 6) {
                         byte[] oidPRF = p.parseOIDAsBytes();
                         prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
                         if (prf == null) {
-                            throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
+                            throw new NoSuchAlgorithmException(
+                                    sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
                         }
                         p.parseNull();
 
@@ -484,11 +482,12 @@ public class PEMFile {
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
             if (keyAlgorithm == null) {
-                for (String algorithm : new String[] { "RSA", "DSA", "EC" }) {
+                for (String algorithm : new String[] { "RSA", "DSA", "EC", "ML-DSA" }) {
                     try {
                         return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
                     } catch (InvalidKeySpecException e) {
-                        exception.addSuppressed(e);
+                        exception.addSuppressed(new InvalidKeySpecException(
+                                sm.getString("pemFile.parseError.algorithm", algorithm), e));
                     }
                 }
             } else {

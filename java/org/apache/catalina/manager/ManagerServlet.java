@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -145,12 +146,10 @@ import org.apache.tomcat.util.security.Escape;
  * <li><b>debug</b> - The debugging detail level that controls the amount of information that is logged by this servlet.
  * Default is zero.
  * </ul>
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -246,7 +245,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
     }
 
@@ -287,16 +286,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         String type = request.getParameter("type");
         String tag = request.getParameter("tag");
-        boolean update = false;
-        if (request.getParameter("update") != null && request.getParameter("update").equals("true")) {
-            update = true;
-        }
+        boolean update = request.getParameter("update") != null && request.getParameter("update").equals("true");
         String tlsHostName = request.getParameter("tlsHostName");
 
-        boolean statusLine = false;
-        if ("true".equals(request.getParameter("statusLine"))) {
-            statusLine = true;
-        }
+        boolean statusLine = "true".equals(request.getParameter("statusLine"));
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/plain; charset=" + Constants.CHARSET);
@@ -379,10 +372,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
         String config = request.getParameter("config");
         String tag = request.getParameter("tag");
-        boolean update = false;
-        if (request.getParameter("update") != null && request.getParameter("update").equals("true")) {
-            update = true;
-        }
+        boolean update = request.getParameter("update") != null && request.getParameter("update").equals("true");
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/plain;charset=" + Constants.CHARSET);
@@ -417,7 +407,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Set our properties from the initialization parameters
-        String value = null;
+        String value;
         try {
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
@@ -502,21 +492,20 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     protected void sslReload(PrintWriter writer, String tlsHostName, StringManager smClient) {
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         boolean found = false;
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 ProtocolHandler protocol = connector.getProtocolHandler();
-                if (protocol instanceof AbstractHttp11Protocol<?>) {
-                    AbstractHttp11Protocol<?> http11Protoocol = (AbstractHttp11Protocol<?>) protocol;
-                    if (tlsHostName == null || tlsHostName.length() == 0) {
+                if (protocol instanceof AbstractHttp11Protocol<?> http11Protoocol) {
+                    if (tlsHostName == null || tlsHostName.isEmpty()) {
                         found = true;
                         http11Protoocol.reloadSslHostConfigs();
                     } else {
                         SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
                         for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                            // tlsHostName is as provided by the user so use a case insensitive
-                            // comparison as host names are case insensitive.
+                            // tlsHostName is as provided by the user so use a case-insensitive
+                            // comparison as host names are case-insensitive.
                             if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
                                 found = true;
                                 http11Protoocol.reloadSslHostConfig(tlsHostName);
@@ -527,7 +516,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         }
         if (found) {
-            if (tlsHostName == null || tlsHostName.length() == 0) {
+            if (tlsHostName == null || tlsHostName.isEmpty()) {
                 writer.println(smClient.getString("managerServlet.sslReloadAll"));
             } else {
                 writer.println(smClient.getString("managerServlet.sslReload", tlsHostName));
@@ -625,7 +614,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
-        if (path == null || path.length() == 0 || !path.startsWith("/")) {
+        if (path == null || !path.startsWith("/")) {
             try {
                 mBeanServer.invoke(storeConfigOname, "storeConfig", null, null);
                 writer.println(smClient.getString("managerServlet.saved"));
@@ -673,7 +662,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void deploy(PrintWriter writer, String config, ContextName cn, String tag, boolean update,
             HttpServletRequest request, StringManager smClient) {
 
-        if (config != null && config.length() == 0) {
+        if (config != null && config.isEmpty()) {
             config = null;
         }
 
@@ -742,8 +731,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             writer.println(smClient.getString("managerServlet.mkdirFail", configBase));
                             return;
                         }
-                        if (ExpandWar.copy(new File(config), new File(configBase, baseName + ".xml")) == false) {
-                            throw new Exception(sm.getString("managerServlet.copyError", config));
+                        if (!ExpandWar.copy(new File(config), new File(configBase, baseName + ".xml"))) {
+                            writer.println(smClient.getString("managerServlet.copyFail", new File(config),
+                                    new File(configBase, baseName + ".xml")));
+                            return;
                         }
                     }
                     // Upload WAR
@@ -761,7 +752,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     }
                     if (tag != null) {
                         // Copy WAR to the host's appBase
-                        ExpandWar.copy(uploadedWar, deployedWar);
+                        if (!ExpandWar.copy(uploadedWar, deployedWar)) {
+                            writer.println(smClient.getString("managerServlet.copyFail", uploadedWar, deployedWar));
+                            return;
+                        }
                     }
                 } finally {
                     removeServiced(name);
@@ -815,7 +809,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         writer.println(smClient.getString("managerServlet.deleteFail", deployedWar));
                         return;
                     }
-                    ExpandWar.copy(localWar, deployedWar);
+                    if (!ExpandWar.copy(localWar, deployedWar)) {
+                        writer.println(smClient.getString("managerServlet.copyFail", localWar, deployedWar));
+                        return;
+                    }
                 } finally {
                     removeServiced(name);
                 }
@@ -847,10 +844,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void deploy(PrintWriter writer, String config, ContextName cn, String war, boolean update,
             StringManager smClient) {
 
-        if (config != null && config.length() == 0) {
+        if (config != null && config.isEmpty()) {
             config = null;
         }
-        if (war != null && war.length() == 0) {
+        if (war != null && war.isEmpty()) {
             war = null;
         }
 
@@ -909,7 +906,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 writer.println(smClient.getString("managerServlet.deleteFail", localConfigFile));
                                 return;
                             }
-                            ExpandWar.copy(configFile, localConfigFile);
+                            if (!ExpandWar.copy(configFile, localConfigFile)) {
+                                writer.println(
+                                        smClient.getString("managerServlet.copyFail", configFile, localConfigFile));
+                                return;
+                            }
                         }
                     }
                     if (war != null) {
@@ -929,7 +930,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 writer.println(smClient.getString("managerServlet.deleteFail", localWarFile));
                                 return;
                             }
-                            ExpandWar.copy(warFile, localWarFile);
+                            if (!ExpandWar.copy(warFile, localWarFile)) {
+                                writer.println(smClient.getString("managerServlet.copyFail", warFile, localWarFile));
+                                return;
+                            }
                         }
                     }
                 } finally {
@@ -981,10 +985,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) container;
             if (context != null) {
                 String displayPath = context.getPath();
-                if (displayPath.equals("")) {
+                if (displayPath.isEmpty()) {
                     displayPath = "/";
                 }
-                List<String> parts = null;
+                List<String> parts;
                 if (context.getState().isAvailable()) {
                     parts = Arrays.asList(displayPath, "running", "" + context.getManager().findSessions().length,
                             context.getDocBase());
@@ -1498,11 +1502,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         try (ServletInputStream istream = request.getInputStream(); OutputStream ostream = new FileOutputStream(war)) {
             IOTools.flow(istream, ostream);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (war.exists() && !war.delete()) {
                 writer.println(smClient.getString("managerServlet.deleteFail", war));
             }
-            throw e;
+            throw ioe;
         }
     }
 
@@ -1511,7 +1515,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // ContextName should be non-null with a path that is empty or starts
         // with /
-        if (cn != null && (cn.getPath().startsWith("/") || cn.getPath().equals(""))) {
+        if (cn != null && (cn.getPath().startsWith("/") || cn.getPath().isEmpty())) {
             return true;
         }
 
@@ -1526,7 +1530,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1549,7 +1553,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1564,12 +1568,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         if (alias == null) {
                             alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
                         }
-                        X509Certificate[] certs = sslContext.getCertificateChain(alias);
-                        if (certs == null) {
-                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                        if (sslContext == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                         } else {
-                            for (Certificate cert : certs) {
-                                certList.add(cert.toString());
+                            X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                            if (certs == null) {
+                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                            } else {
+                                for (Certificate cert : certs) {
+                                    certList.add(cert.toString());
+                                }
                             }
                         }
                         result.put(name, certList);
@@ -1589,7 +1597,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
-        Connector connectors[] = getConnectors();
+        Connector[] connectors = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1597,14 +1605,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
                     SSLContext sslContext = sslHostConfig.getCertificates().iterator().next().getSslContext();
-                    X509Certificate[] certs = sslContext.getAcceptedIssuers();
-                    if (certs == null) {
-                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                    } else if (certs.length == 0) {
-                        certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                    if (sslContext == null) {
+                        certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                     } else {
-                        for (Certificate cert : certs) {
-                            certList.add(cert.toString());
+                        X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                        if (certs == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                        } else if (certs.length == 0) {
+                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                        } else {
+                            for (Certificate cert : certs) {
+                                certList.add(cert.toString());
+                            }
                         }
                     }
                     result.put(name, certList);

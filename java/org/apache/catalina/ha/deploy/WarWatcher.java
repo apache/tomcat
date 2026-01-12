@@ -28,8 +28,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * The <b>WarWatcher </b> watches the deployDir for changes made to the directory (adding new WAR files-&gt;deploy or
  * remove WAR files-&gt;undeploy) and notifies a listener of the changes made.
- *
- * @author Peter Rossbach
  */
 public class WarWatcher {
 
@@ -149,7 +147,7 @@ public class WarWatcher {
     protected static class WarInfo {
         protected final File war;
 
-        protected long lastChecked = 0;
+        protected long lastChecked;
 
         protected long lastState = 0;
 
@@ -206,8 +204,7 @@ public class WarWatcher {
 
         @Override
         public boolean equals(Object other) {
-            if (other instanceof WarInfo) {
-                WarInfo wo = (WarInfo) other;
+            if (other instanceof WarInfo wo) {
                 return wo.getWar().equals(getWar());
             } else {
                 return false;

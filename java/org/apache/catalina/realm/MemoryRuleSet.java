@@ -25,8 +25,6 @@ import org.xml.sax.Attributes;
  * <p>
  * <strong>RuleSet</strong> for recognizing the users defined in the XML file processed by <code>MemoryRealm</code>.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class MemoryRuleSet implements RuleSet {
 

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +28,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,6 +48,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -258,7 +259,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -289,7 +290,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -321,8 +322,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("internalProxies", "192.168.0.10/31");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -331,7 +332,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, 200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
@@ -341,7 +342,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2",
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "200.0.0.1,200.0.0.2",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -358,16 +359,16 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         filterDef.setFilter(remoteIpFilter);
         MockHttpServletRequest request = new MockHttpServletRequest();
 
-        request.setRemoteAddr("proxy3");
+        request.setRemoteAddr("200.0.0.3");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, 200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
@@ -377,7 +378,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2,proxy3",
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "200.0.0.1,200.0.0.2,200.0.0.3",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -393,16 +394,16 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
         filterDef.setFilter(remoteIpFilter);
         MockHttpServletRequest request = new MockHttpServletRequest();
 
-        request.setRemoteAddr("proxy3");
+        request.setRemoteAddr("200.0.0.3");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, 200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
@@ -412,7 +413,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2,proxy3",
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "200.0.0.1,200.0.0.2,200.0.0.3",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -427,8 +428,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // PREPARE
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "127\\.0\\.0\\.1|192\\.168\\..*|another-internal-proxy");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("internalProxies", "127.0.0.1,192.168.0.0/16,10.0.0.1");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -436,8 +437,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
         request.addHeader("x-forwarded-for", "140.211.11.130");
-        request.addHeader("x-forwarded-for", "proxy1");
-        request.addHeader("x-forwarded-for", "proxy2");
+        request.addHeader("x-forwarded-for", "200.0.0.1");
+        request.addHeader("x-forwarded-for", "200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
@@ -447,7 +448,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2",
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "200.0.0.1,200.0.0.2",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -462,8 +463,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // PREPARE
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("internalProxies", "192.168.0.10/31");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -471,7 +472,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2, 192.168.0.10, 192.168.0.11");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, 200.0.0.2, 192.168.0.10, 192.168.0.11");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
@@ -481,7 +482,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2",
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "200.0.0.1,200.0.0.2",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -496,7 +497,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // PREPARE
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -504,14 +505,14 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         request.setRemoteAddr("not-allowed-internal-proxy");
         request.setRemoteHost("not-allowed-internal-proxy-host");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, 200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
 
         // VERIFY
         String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
-        Assert.assertEquals("x-forwarded-for must be unchanged", "140.211.11.130, proxy1, proxy2", actualXForwardedFor);
+        Assert.assertEquals("x-forwarded-for must be unchanged", "140.211.11.130, 200.0.0.1, 200.0.0.2", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
         Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
@@ -527,8 +528,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testInvokeUntrustedProxyInTheChain() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("internalProxies", "192.168.0.10/31");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
         filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
         filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
@@ -536,18 +537,18 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
-        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, untrusted-proxy, proxy2");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, untrusted-proxy, 200.0.0.2");
 
         // TEST
         HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
 
         // VERIFY
         String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
-        Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130,proxy1",
+        Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130,200.0.0.1",
                 actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "proxy2",
+        Assert.assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "200.0.0.2",
                 actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
@@ -738,7 +739,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testWithTomcatServer() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
-        Map<String, String> remoteIpFilterParameter = new HashMap<>();
+        Map<String,String> remoteIpFilterParameter = new HashMap<>();
         remoteIpFilterParameter.put("protocolHeader", "x-forwarded-proto");
 
         // SETUP
@@ -765,8 +766,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // TEST
-        HttpURLConnection httpURLConnection = (HttpURLConnection) URI.create(
-                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").toURL().openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) URI
+                .create("http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").toURL().openConnection();
         String expectedRemoteAddr = "my-remote-addr";
         httpURLConnection.addRequestProperty("x-forwarded-for", expectedRemoteAddr);
         httpURLConnection.addRequestProperty("x-forwarded-proto", "https");
@@ -788,7 +789,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testJSessionIdSecureAttributeMissing() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
-        Map<String, String> remoteIpFilterParameter = new HashMap<>();
+        Map<String,String> remoteIpFilterParameter = new HashMap<>();
         remoteIpFilterParameter.put("protocolHeader", "x-forwarded-proto");
 
         // SETUP
@@ -814,8 +815,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         getTomcatInstance().start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        Map<String, List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         String expectedRemoteAddr = "my-remote-addr";
         List<String> forwardedFor = new ArrayList<>(1);
         forwardedFor.add(expectedRemoteAddr);
@@ -842,29 +843,92 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
-    public void testInternalProxies() throws Exception {
-        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
-        Pattern internalProxiesPattern = remoteIpFilter.getInternalProxies();
+    public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeaderCidr() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192.168.0.0/24");
+        filterDef.addInitParameter("trustedProxies", "203.0.113.0/24");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
 
-        doTestPattern(internalProxiesPattern, "8.8.8.8", false);
-        doTestPattern(internalProxiesPattern, "100.62.0.0", false);
-        doTestPattern(internalProxiesPattern, "100.63.255.255", false);
-        doTestPattern(internalProxiesPattern, "100.64.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.65.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.68.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.72.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.88.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.95.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.102.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.110.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.126.0.0", true);
-        doTestPattern(internalProxiesPattern, "100.127.255.255", true);
-        doTestPattern(internalProxiesPattern, "100.128.0.0", false);
-        doTestPattern(internalProxiesPattern, "100.130.0.0", false);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        Assert.assertNull("x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
     }
 
-    private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
-        boolean match = pattern.matcher(input).matches();
-        Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
+    @Test
+    public void testInternalProxiesCidrWithNull() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        try {
+            // Multiple invalid CIDR formats
+            remoteIpFilter.setInternalProxies("192.168.0.0/33,2001:db8::/129");
+            Assert.fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passes - exception was thrown as expected
+            Assert.assertNotNull("Exception message should not be null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInternalProxiesCidr() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        NetMaskSet netMaskSet = NetMaskSet.parse(remoteIpFilter.getInternalProxies());
+
+        doTestNetMaskSet(netMaskSet, "8.8.8.8", false);
+        doTestNetMaskSet(netMaskSet, "100.62.0.0", false);
+        doTestNetMaskSet(netMaskSet, "100.63.255.255", false);
+        doTestNetMaskSet(netMaskSet, "100.64.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.65.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.68.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.72.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.88.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.95.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.102.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.110.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.126.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.127.255.255", true);
+        doTestNetMaskSet(netMaskSet, "100.128.0.0", false);
+        doTestNetMaskSet(netMaskSet, "100.130.0.0", false);
+        // Bug 69600 - IPv6 RFC 4193 Unique Local IPv6 Unicast Addresses
+        doTestNetMaskSet(netMaskSet, "fe79:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestNetMaskSet(netMaskSet, "fe80:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestNetMaskSet(netMaskSet, "fe80::", true);
+        doTestNetMaskSet(netMaskSet, "fe80:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestNetMaskSet(netMaskSet, "fe80::1", true);
+        doTestNetMaskSet(netMaskSet, "fe80:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestNetMaskSet(netMaskSet, "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestNetMaskSet(netMaskSet, "fec0:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestNetMaskSet(netMaskSet, "fec0::", false);
+        // Bug 69600 - IPv6 RFC 4291 Link Local IPv6 Unicast Addresses
+        doTestNetMaskSet(netMaskSet, "fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestNetMaskSet(netMaskSet, "fc00:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestNetMaskSet(netMaskSet, "fc00::", true);
+        doTestNetMaskSet(netMaskSet, "fc00:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestNetMaskSet(netMaskSet, "fc00::1", true);
+        doTestNetMaskSet(netMaskSet, "fc00:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestNetMaskSet(netMaskSet, "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestNetMaskSet(netMaskSet, "fe00:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestNetMaskSet(netMaskSet, "fe00::", false);
+    }
+
+    private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {
+        boolean match = netMaskSet.contains(remoteIp);
+        Assert.assertEquals(remoteIp, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

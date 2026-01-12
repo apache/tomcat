@@ -39,11 +39,11 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -151,7 +151,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         } else {
             Class<?> memorySegmentClass = Class.forName("java.lang.foreign.MemorySegment");
             Object ssxCtxSegment = memorySegmentClass.getMethod("ofAddress", Long.TYPE)
-                .invoke(null, sslHostConfig.getOpenSslContext());
+                    .invoke(null, sslHostConfig.getOpenSslContext());
             Method getCiphersMethod = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLContext")
                     .getDeclaredMethod("getCiphers", memorySegmentClass);
             getCiphersMethod.setAccessible(true);

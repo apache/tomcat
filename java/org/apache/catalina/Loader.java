@@ -35,8 +35,6 @@ import java.beans.PropertyChangeListener;
  * <li>Based on a policy chosen by the implementation, must call the <code>Context.reload()</code> method on the owning
  * <code>Context</code> when a change to one or more of the class files loaded by this class loader is detected.
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public interface Loader {
 

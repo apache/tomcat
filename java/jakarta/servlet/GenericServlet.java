@@ -17,6 +17,7 @@
 package jakarta.servlet;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 
 /**
@@ -36,6 +37,7 @@ import java.util.Enumeration;
  */
 public abstract class GenericServlet implements Servlet, ServletConfig, java.io.Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient ServletConfig config;
@@ -125,17 +127,10 @@ public abstract class GenericServlet implements Servlet, ServletConfig, java.io.
     }
 
     /**
-     * Called by the servlet container to indicate to a servlet that the servlet is being placed into service. See
-     * {@link Servlet#init}.
+     * {@inheritDoc}
      * <p>
      * This implementation stores the {@link ServletConfig} object it receives from the servlet container for later use.
      * When overriding this form of the method, call <code>super.init(config)</code>.
-     *
-     * @param config the <code>ServletConfig</code> object that contains configuration information for this servlet
-     *
-     * @exception ServletException if an exception occurs that interrupts the servlet's normal operation
-     *
-     * @see UnavailableException
      */
     @Override
     public void init(ServletConfig config) throws ServletException {

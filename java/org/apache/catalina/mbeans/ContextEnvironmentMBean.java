@@ -25,12 +25,8 @@ import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextEnvironment</code> component.
- * </p>
- *
- * @author Amy Roh
  */
 public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironment> {
 
@@ -42,7 +38,7 @@ public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironmen
 
         ContextEnvironment ce = doGetManagedResource();
 
-        // cannot use side-effects. It's removed and added back each time
+        // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = ce.getNamingResources();
         nr.removeEnvironment(ce.getName());

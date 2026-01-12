@@ -17,6 +17,7 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -47,9 +48,6 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST Authentication, as outlined in RFC 7616: "HTTP
  * Digest Authentication"
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class DigestAuthenticator extends AuthenticatorBase {
 
@@ -208,7 +206,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public String getAlgorithms() {
         StringBuilder result = new StringBuilder();
-        StringUtils.join(algorithms, ',', (x) -> x.getRfcName(), result);
+        StringUtils.join(algorithms, ',', AuthDigest::getRfcName, result);
         return result.toString();
     }
 
@@ -266,14 +264,18 @@ public class DigestAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
-        // NOTE: We don't try to reauthenticate using any existing SSO session,
-        // because that will only work if the original authentication was
-        // BASIC or FORM, which are less secure than the DIGEST auth-type
-        // specified for this webapp
-        //
-        // Change to true below to allow previous FORM or BASIC authentications
-        // to authenticate users for this webapp
-        // TODO make this a configurable attribute (in SingleSignOn??)
+        /*
+         * Reauthentication using the cached user name and password (if any) is not enabled for DIGEST authentication.
+         * This was an historical design decision made because DIGEST authentication is viewed as more secure than
+         * BASIC/FORM.
+         *
+         * However, reauthentication was introduced to handle the case where the Realm took additional actions on
+         * authentication. Reauthenticating with the cached user name and password should be sufficient for DIGEST in
+         * that scenario. However, the original behaviour to reauthenticate has been retained in case of any (very
+         * unlikely) backwards compatibility issues.
+         *
+         * TODO: Make the reauthentication behaviour configurable per authenticator.
+         */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
@@ -339,7 +341,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        // Note: The digest used to generate the nonce is independent of the the digest used for authentication.
+        // Note: The digest used to generate the nonce is independent of the digest used for authentication.
         byte[] buffer = ConcurrentMessageDigest.digest(NONCE_DIGEST, ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
         String nonce = currentTime + ":" + HexUtils.toHexString(buffer);
 
@@ -426,6 +428,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
          */
         nonces = new LinkedHashMap<>() {
 
+            @Serial
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;
 
@@ -462,7 +465,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private final long nonceValidity;
         private final String key;
         private final Map<String,NonceInfo> nonces;
-        private boolean validateUri = true;
+        private final boolean validateUri;
 
         private String userName = null;
         private String method = null;
@@ -503,7 +506,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             Map<String,String> directives;
             try {
                 directives = Authorization.parseAuthorizationDigest(new StringReader(authorization));
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return false;
             }
 
@@ -555,7 +558,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                         absolute.append("://");
                         absolute.append(host);
                         absolute.append(uriQuery);
-                        if (!uri.equals(absolute.toString())) {
+                        if (!uri.contentEquals(absolute)) {
                             return false;
                         }
                     } else {
@@ -595,7 +598,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            // Note: The digest used to generate the nonce is independent of the the digest used for authentication/
+            // Note: The digest used to generate the nonce is independent of the digest used for authentication/
             byte[] buffer =
                     ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String digestServerIpTimeKey = HexUtils.toHexString(buffer);
@@ -645,11 +648,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate algorithm is one of the algorithms configured for the authenticator
-            if (!algorithms.contains(algorithm)) {
-                return false;
-            }
-
-            return true;
+            return algorithms.contains(algorithm);
         }
 
         public boolean isNonceStale() {
@@ -671,7 +670,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public static class NonceInfo {
         private final long timestamp;
-        private final boolean seen[];
+        private final boolean[] seen;
         private final int offset;
         private int count = 0;
 

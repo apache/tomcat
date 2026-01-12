@@ -60,9 +60,6 @@ import org.apache.juli.logging.Log;
  * <li><b>Resources</b> - JNDI directory context enabling access to static resources, enabling custom linkages to
  * existing server components when Catalina is embedded in a larger server.
  * </ul>
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public interface Container extends Lifecycle {
 
@@ -331,7 +328,7 @@ public interface Container extends Lifecycle {
     /**
      * Add a new child Container to those associated with this Container, if supported. Prior to adding this Container
      * to the set of children, the child's <code>setParent()</code> method must be called, with this Container as an
-     * argument. This method may thrown an <code>IllegalArgumentException</code> if this Container chooses not to be
+     * argument. This method may throw an <code>IllegalArgumentException</code> if this Container chooses not to be
      * attached to the specified Container, in which case it is not added
      *
      * @param child New child Container to be added
@@ -429,7 +426,7 @@ public interface Container extends Lifecycle {
      *
      * @param request    Request (associated with the response) to log
      * @param response   Response (associated with the request) to log
-     * @param time       Time taken to process the request/response in milliseconds (use 0 if not known)
+     * @param time       Time taken to process the request/response in nanoseconds (use 0 if not known)
      * @param useDefault Flag that indicates that the request/response should be logged in the engine's default access
      *                       log
      */

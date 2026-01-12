@@ -52,8 +52,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>tempDir - a temporaryDirectory to store binary data when downloading a war from the cluster</li>
  * </ul>
  * Currently we only support deployment of WAR files since they are easier to send across the wire.
- *
- * @author Peter Rossbach
  */
 public class FarmWarDeployer extends ClusterListener implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/
@@ -142,13 +140,11 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
         // Check to correct engine and host setup
         Container econtainer = host.getParent();
-        if (!(econtainer instanceof Engine)) {
+        if (!(econtainer instanceof Engine engine)) {
             log.error(sm.getString("farmWarDeployer.hostParentEngine", host.getName()));
             return;
         }
-        Engine engine = (Engine) econtainer;
-        String hostname = null;
-        hostname = host.getName();
+        String hostname = host.getName();
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host=" + hostname);
         } catch (Exception e) {
@@ -165,7 +161,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         configBase = host.getConfigBaseFile();
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
         started = true;
         count = 0;
@@ -206,8 +202,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     @Override
     public void messageReceived(ClusterMessage msg) {
         try {
-            if (msg instanceof FileMessage) {
-                FileMessage fmsg = (FileMessage) msg;
+            if (msg instanceof FileMessage fmsg) {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("farmWarDeployer.msgRxDeploy", fmsg.getContextName(), fmsg.getFileName()));
                 }
@@ -240,8 +235,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         } else {
                             log.error(sm.getString("farmWarDeployer.servicingDeploy", contextName, name));
                         }
-                    } catch (Exception ex) {
-                        log.error(sm.getString("farmWarDeployer.fileMessageError"), ex);
+                    } catch (Exception e) {
+                        log.error(sm.getString("farmWarDeployer.fileMessageError"), e);
                     } finally {
                         removeFactory(fmsg);
                     }
@@ -265,12 +260,12 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     } else {
                         log.error(sm.getString("farmWarDeployer.servicingUndeploy", contextName));
                     }
-                } catch (Exception ex) {
-                    log.error(sm.getString("farmWarDeployer.undeployMessageError"), ex);
+                } catch (Exception e) {
+                    log.error(sm.getString("farmWarDeployer.undeployMessageError"), e);
                 }
             }
-        } catch (IOException x) {
-            log.error(sm.getString("farmWarDeployer.msgIoe"), x);
+        } catch (IOException ioe) {
+            log.error(sm.getString("farmWarDeployer.msgIoe"), ioe);
         }
     }
 
@@ -398,8 +393,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     log.error(sm.getString("farmWarDeployer.removeFailRemote", contextName));
                 }
 
-            } catch (Exception ex) {
-                log.error(sm.getString("farmWarDeployer.removeFailLocal", contextName), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("farmWarDeployer.removeFailLocal", contextName), e);
             }
         }
 
@@ -431,8 +426,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                 log.error(sm.getString("farmWarDeployer.servicingDeploy", cn.getName(), deployWar.getName()));
             }
             install(cn.getName(), deployWar);
-        } catch (Exception x) {
-            log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("farmWarDeployer.modInstallFail"), e);
         }
     }
 
@@ -444,8 +439,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                 log.info(sm.getString("farmWarDeployer.removeLocal", cn.getName()));
             }
             remove(cn.getName(), true);
-        } catch (Exception x) {
-            log.error(sm.getString("farmWarDeployer.removeLocalFail"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("farmWarDeployer.removeLocalFail"), e);
         }
     }
 
@@ -490,7 +485,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void undeployDir(File dir) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }
@@ -684,8 +679,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     return false;
                 }
             }
-        } catch (IOException e) {
-            log.error(sm.getString("farmWarDeployer.fileCopyFail", from, to), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("farmWarDeployer.fileCopyFail", from, to), ioe);
             return false;
         }
 
@@ -699,8 +694,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                 }
                 os.write(buf, 0, len);
             }
-        } catch (IOException e) {
-            log.error(sm.getString("farmWarDeployer.fileCopyFail", from, to), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("farmWarDeployer.fileCopyFail", from, to), ioe);
             return false;
         }
         return true;
@@ -723,7 +718,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         }
         try {
             dir = dir.getCanonicalFile();
-        } catch (IOException e) {// ignore
+        } catch (IOException ignore) {
+            // Ignore
         }
         return dir;
     }

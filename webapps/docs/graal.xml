@@ -61,7 +61,7 @@
   <p>
     Download the Tomcat Stuffed module from
     <code>https://github.com/apache/tomcat/tree/main/modules/stuffed</code>.
-    For convinience, an env property can be set:
+    For convenience, an env property can be set:
     <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
     The build process now requires both Apache Ant and Maven.
   </p>

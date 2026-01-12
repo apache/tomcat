@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * a web application in a directory with the specified name in their home directories. The context path of each deployed
  * application will be set to <code>~xxxxx</code>, where xxxxx is the username of the owning user for that web
  * application
- *
- * @author Craig R. McClanahan
  */
 public final class UserConfig implements LifecycleListener {
 
@@ -212,7 +210,7 @@ public final class UserConfig implements LifecycleListener {
      * @param allow The new allow expression
      */
     public void setAllow(String allow) {
-        if (allow == null || allow.length() == 0) {
+        if (allow == null || allow.isEmpty()) {
             this.allow = null;
         } else {
             this.allow = Pattern.compile(allow);
@@ -237,7 +235,7 @@ public final class UserConfig implements LifecycleListener {
      * @param deny The new deny expression
      */
     public void setDeny(String deny) {
-        if (deny == null || deny.length() == 0) {
+        if (deny == null || deny.isEmpty()) {
             this.deny = null;
         } else {
             this.deny = Pattern.compile(deny);
@@ -287,7 +285,7 @@ public final class UserConfig implements LifecycleListener {
         }
 
         // Load the user database object for this host
-        UserDatabase database = null;
+        UserDatabase database;
         try {
             Class<?> clazz = Class.forName(userClass);
             database = (UserDatabase) clazz.getConstructor().newInstance();
@@ -394,27 +392,12 @@ public final class UserConfig implements LifecycleListener {
             return false;
         }
         if (allow != null) {
-            if (allow.matcher(user).matches()) {
-                return true;
-            } else {
-                return false;
-            }
+            return allow.matcher(user).matches();
         }
         return true;
     }
 
-    private static class DeployUserDirectory implements Runnable {
-
-        private UserConfig config;
-        private String user;
-        private String home;
-
-        DeployUserDirectory(UserConfig config, String user, String home) {
-            this.config = config;
-            this.user = user;
-            this.home = home;
-        }
-
+    private record DeployUserDirectory(UserConfig config, String user, String home) implements Runnable {
         @Override
         public void run() {
             config.deploy(user, home);

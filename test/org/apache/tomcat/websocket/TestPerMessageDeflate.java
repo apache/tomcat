@@ -42,7 +42,7 @@ public class TestPerMessageDeflate {
         List<List<Parameter>> preferences = new ArrayList<>();
         preferences.add(parameters);
 
-        PerMessageDeflate perMessageDeflate = PerMessageDeflate.negotiate(preferences, true);
+        PerMessageDeflate perMessageDeflate = PerMessageDeflate.build(preferences, true);
         perMessageDeflate.setNext(new TesterTransformation());
 
         ByteBuffer bb1 = ByteBuffer.wrap("A".getBytes(StandardCharsets.UTF_8));
@@ -65,7 +65,7 @@ public class TestPerMessageDeflate {
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65317
      */
     @Test
-    public void testMessagePartThatFillsBufffer() throws IOException {
+    public void testMessagePartThatFillsBuffer() throws IOException {
 
         // Set up the extension using defaults
         List<Parameter> parameters = Collections.emptyList();
@@ -73,7 +73,7 @@ public class TestPerMessageDeflate {
         preferences.add(parameters);
 
         // Set up the compression and sending of the message.
-        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.negotiate(preferences, true);
+        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.build(preferences, true);
         perMessageDeflateTx.setNext(new TesterTransformation());
 
         byte[] data = new byte[8192];
@@ -88,7 +88,7 @@ public class TestPerMessageDeflate {
         MessagePart compressedPart = compressedParts.get(0);
 
         // Set up the decompression and process the received message
-        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, true);
         perMessageDeflateRx.setNext(new TesterTransformation(compressedPart.getPayload()));
 
         ByteBuffer received = ByteBuffer.allocate(8192);
@@ -112,7 +112,7 @@ public class TestPerMessageDeflate {
         preferences.add(parameters);
 
         // Set up the compression and sending of the message.
-        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.negotiate(preferences, true);
+        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.build(preferences, true);
         perMessageDeflateTx.setNext(new TesterTransformation());
 
         List<MessagePart> uncompressedParts = new ArrayList<>();
@@ -135,7 +135,7 @@ public class TestPerMessageDeflate {
         MessagePart compressedPart1 = compressedParts.get(0);
 
         // Set up the decompression and process the received message
-        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, true);
         perMessageDeflateRx.setNext(new TesterTransformation(compressedPart1.getPayload()));
 
         ByteBuffer received = ByteBuffer.allocate(8192);

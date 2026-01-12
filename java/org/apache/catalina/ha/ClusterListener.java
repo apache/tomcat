@@ -26,8 +26,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Receive SessionID cluster change from other backup node after primary session node is failed.
- *
- * @author Peter Rossbach
  */
 public abstract class ClusterListener implements ChannelListener {
 
@@ -71,10 +69,7 @@ public abstract class ClusterListener implements ChannelListener {
 
     @Override
     public final boolean accept(Serializable msg, Member member) {
-        if (msg instanceof ClusterMessage) {
-            return true;
-        }
-        return false;
+        return msg instanceof ClusterMessage;
     }
 
 

@@ -43,7 +43,7 @@ public class TestResponsePerformance extends LoggingBaseTest {
         doUri();
 
         // Note: With Java 11 the 'homebrew' approach is consistently 3-4 times faster on both MacOS (Intel) and Linux
-        //       With Java 22 EA the 'homebrew' approach is consistently a little over 2x faster on MacOS (M1)
+        // With Java 22 EA the 'homebrew' approach is consistently a little over 2x faster on MacOS (M1)
 
         // To allow for timing differences between runs, a "best of n" approach
         // is taken for this test
@@ -77,8 +77,7 @@ public class TestResponsePerformance extends LoggingBaseTest {
     private long doUri() {
         long start = System.currentTimeMillis();
         for (int i = 0; i < ITERATIONS; i++) {
-            URI base = URI.create(
-                    "http://localhost:8080/level1/level2/foo.html");
+            URI base = URI.create("http://localhost:8080/level1/level2/foo.html");
             base.resolve(URI.create("bar.html")).toASCIIString();
         }
         return System.currentTimeMillis() - start;

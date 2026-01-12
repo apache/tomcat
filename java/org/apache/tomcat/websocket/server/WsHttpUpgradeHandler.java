@@ -54,7 +54,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private final ClassLoader applicationClassLoader;
 
     private SocketWrapperBase<?> socketWrapper;
-    private UpgradeInfo upgradeInfo = new UpgradeInfo();
+    private final UpgradeInfo upgradeInfo = new UpgradeInfo();
 
     private Endpoint ep;
     private ServerEndpointConfig serverEndpointConfig;
@@ -63,7 +63,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private List<Extension> negotiatedExtensions;
     private String subProtocol;
     private Transformation transformation;
-    private Map<String, String> pathParameters;
+    private Map<String,String> pathParameters;
     private boolean secure;
     private WebConnection connection;
 
@@ -85,7 +85,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     public void preInit(ServerEndpointConfig serverEndpointConfig, WsServerContainer wsc,
             WsHandshakeRequest handshakeRequest, List<Extension> negotiatedExtensionsPhase2, String subProtocol,
-            Transformation transformation, Map<String, String> pathParameters, boolean secure) {
+            Transformation transformation, Map<String,String> pathParameters, boolean secure) {
         this.serverEndpointConfig = serverEndpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
@@ -117,8 +117,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            wsRemoteEndpointServer = new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer,
-                    connection);
+            wsRemoteEndpointServer =
+                    new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer, connection);
             wsSession = new WsSession(wsRemoteEndpointServer, webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(), handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId, negotiatedExtensions, subProtocol,
@@ -162,8 +162,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 wsRemoteEndpointServer.onWritePossible(false);
                 break;
             case STOP:
-                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY,
-                        sm.getString("wsHttpUpgradeHandler.serverStop"));
+                CloseReason cr =
+                        new CloseReason(CloseCodes.GOING_AWAY, sm.getString("wsHttpUpgradeHandler.serverStop"));
                 try {
                     wsSession.close(cr);
                 } catch (IOException ioe) {
@@ -189,7 +189,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
         /*
          * If a CLOSE frame has been received then wsFrame will be closed but need to keep the connection open until the
-         * CLOSE frame has been sent. Hence use the wsSession.isClosed() rather than wsFrame.isOpen() here.
+         * CLOSE frame has been sent. Hence, use the wsSession.isClosed() rather than wsFrame.isOpen() here.
          */
         if (wsSession.isClosed()) {
             return SocketState.CLOSED;
@@ -242,7 +242,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         /*
          * Any call to this method is a result of a problem reading from the client. At this point that state of the
          * connection is unknown. First attempt to clear the handler for any in-flight message write (that probably
-         * failed). If using NIO2 is is possible that the original error occurred on a write but this method was called
+         * failed). If using NIO2 it is possible that the original error occurred on a write but this method was called
          * during a read. The in-progress write will block the sending of the close frame unless the handler is cleared
          * (effectively signalling the write failed).
          */

@@ -147,7 +147,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         }
 
         StringBuilder stringBuilder = new StringBuilder(urlString);
-        if (urlString.indexOf("?") > -1) {
+        if (urlString.contains("?")) {
             stringBuilder.append('&');
         } else {
             stringBuilder.append('?');
@@ -193,7 +193,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             }
             try {
                 response.sendRedirect(urlString);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // Ignore
             }
         } else {

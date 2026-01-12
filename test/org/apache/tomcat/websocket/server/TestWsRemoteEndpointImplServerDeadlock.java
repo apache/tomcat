@@ -51,7 +51,7 @@ import org.apache.tomcat.websocket.WsSession;
 /*
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=66508
  *
- * If the client sends a close while the server waiting for the client before sending the rest of a message, the
+ * If the client sends a close while the server is waiting for the client before sending the rest of a message, the
  * processing of the close from the client can hang until the sending of the message times out.
  *
  * This is packaged in a separate class to allow test specific parameterisation.
@@ -126,7 +126,7 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
 
         // Set a short session close timeout (milliseconds)
         session.getUserProperties().put(
-            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
+                org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the session from the client
         session.close();
 

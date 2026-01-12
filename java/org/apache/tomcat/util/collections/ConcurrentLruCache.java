@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.collections;
 
+import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -76,7 +77,7 @@ public class ConcurrentLruCache<T> {
                 if (oldMap != null) {
                     map.putAll(oldMap);
                 }
-           } else {
+            } else {
                 map = null;
             }
         }
@@ -94,10 +95,11 @@ public class ConcurrentLruCache<T> {
     }
 
 
-    private static class LimitedLinkedHashMap<K,V> extends LinkedHashMap<K,V> {
+    private static class LimitedLinkedHashMap<K, V> extends LinkedHashMap<K,V> {
+        @Serial
         private static final long serialVersionUID = 1L;
 
-        private volatile int limit;
+        private final int limit;
 
         LimitedLinkedHashMap(int limit) {
             super(16, 0.75F, true);
@@ -106,10 +108,7 @@ public class ConcurrentLruCache<T> {
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
-            if (size() > limit) {
-                return true;
-            }
-            return false;
+            return size() > limit;
         }
 
         private int getLimit() {

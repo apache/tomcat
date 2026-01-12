@@ -28,7 +28,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class CredentialHandlerSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(CredentialHandlerSF.class);
+    private static final Log log = LogFactory.getLog(CredentialHandlerSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -62,9 +62,7 @@ public class CredentialHandlerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aCredentialHandler, StoreDescription parentDesc)
             throws Exception {
-        if (aCredentialHandler instanceof NestedCredentialHandler) {
-            NestedCredentialHandler nestedCredentialHandler = (NestedCredentialHandler) aCredentialHandler;
-
+        if (aCredentialHandler instanceof NestedCredentialHandler nestedCredentialHandler) {
             // Store nested <CredentialHandler> element
             CredentialHandler[] credentialHandlers = nestedCredentialHandler.getCredentialHandlers();
             storeElementArray(aWriter, indent, credentialHandlers);

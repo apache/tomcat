@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.Serial;
+
 /**
  * Message thrown by a sender when USE_SYNC_ACK receives a FAIL_ACK_COMMAND.
  * <p>
@@ -25,6 +27,7 @@ package org.apache.catalina.tribes;
  * @see ChannelException
  */
 public class RemoteProcessException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public RemoteProcessException() {

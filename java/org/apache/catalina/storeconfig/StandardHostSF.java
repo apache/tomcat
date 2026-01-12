@@ -41,14 +41,13 @@ public class StandardHostSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aHost, StoreDescription parentDesc)
             throws Exception {
-        if (aHost instanceof StandardHost) {
-            StandardHost host = (StandardHost) aHost;
+        if (aHost instanceof StandardHost host) {
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = host.findLifecycleListeners();
+            LifecycleListener[] listeners = host.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Alias> elements
-            String aliases[] = host.findAliases();
+            String[] aliases = host.findAliases();
             getStoreAppender().printTagArray(aWriter, "Alias", indent + 2, aliases);
 
             // Store nested <Realm> element
@@ -64,7 +63,7 @@ public class StandardHostSF extends StoreFactoryBase {
             }
 
             // Store nested <Valve> elements
-            Valve valves[] = host.getPipeline().getValves();
+            Valve[] valves = host.getPipeline().getValves();
             if (valves != null && valves.length > 0) {
                 List<Valve> hostValves = new ArrayList<>();
                 for (Valve valve : valves) {
@@ -88,7 +87,7 @@ public class StandardHostSF extends StoreFactoryBase {
             }
 
             // store all <Context> elements
-            Container children[] = host.findChildren();
+            Container[] children = host.findChildren();
             storeElementArray(aWriter, indent, children);
         }
     }

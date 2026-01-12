@@ -37,7 +37,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
      * @param methodName The HTTP method name
      */
     public HttpMethodConstraintElement(String methodName) {
-        if (methodName == null || methodName.length() == 0) {
+        if (methodName == null || methodName.isEmpty()) {
             throw new IllegalArgumentException(lStrings.getString("httpMethodConstraintElement.invalidMethod"));
         }
         this.methodName = methodName;
@@ -51,7 +51,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
      */
     public HttpMethodConstraintElement(String methodName, HttpConstraintElement constraint) {
         super(constraint.getEmptyRoleSemantic(), constraint.getTransportGuarantee(), constraint.getRolesAllowed());
-        if (methodName == null || methodName.length() == 0) {
+        if (methodName == null || methodName.isEmpty()) {
             throw new IllegalArgumentException(lStrings.getString("httpMethodConstraintElement.invalidMethod"));
         }
         this.methodName = methodName;

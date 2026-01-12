@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate method parameters on POJO endpoints the the {@link ServerEndpoint} has been defined with a
+ * Used to annotate method parameters on POJO endpoints that the {@link ServerEndpoint} has been defined with a
  * {@link ServerEndpoint#value()} that uses a URI template.
  */
 @Retention(RetentionPolicy.RUNTIME)

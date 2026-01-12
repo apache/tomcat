@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +61,58 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
             byte[] padding = new byte[8];
 
             sendSimplePostRequest(3, padding);
+            readSimplePostResponse(true);
+
+            // The window updates for padding could occur anywhere since they
+            // happen on a different thread to the response.
+            // The connection window update is always present if there is
+            // padding.
+            String trace = output.getTrace();
+            String paddingWindowUpdate = "0-WindowSize-[9]\n";
+            Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
+            trace = trace.replace(paddingWindowUpdate, "");
+
+            // The stream window update may or may not be present depending on
+            // timing. Remove it if present.
+            if (trace.contains("3-WindowSize-[9]\n")) {
+                trace = trace.replace("3-WindowSize-[9]\n", "");
+            }
+
+            Assert.assertEquals("0-WindowSize-[119]\n" + "3-WindowSize-[119]\n" + "3-HeadersStart\n" +
+                    "3-Header-[:status]-[200]\n" + "3-Header-[content-length]-[119]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-119\n" +
+                    "3-EndOfStream\n", trace);
+        } finally {
+            Logger.getLogger("org.apache.coyote").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+        }
+    }
+
+
+    @Test
+    public void testDataFrameWithPaddingAndContentLength() throws Exception {
+        Logger.getLogger("org.apache.coyote").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        try {
+            http2Connect();
+
+            // Disable overhead protection for window update as it breaks the
+            // test
+            http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+            byte[] padding = new byte[8];
+
+            byte[] headersFrameHeader = new byte[9];
+            ByteBuffer headersPayload = ByteBuffer.allocate(128);
+            byte[] dataFrameHeader = new byte[9];
+            ByteBuffer dataPayload = ByteBuffer.allocate(128);
+
+            // 128 byte payload, less 8 bytes padding, less 1 padding byte gives 119 bytes
+            buildPostRequest(headersFrameHeader, headersPayload, false, null, 119, "/simple", dataFrameHeader,
+                    dataPayload, padding, false, 3);
+            writeFrame(headersFrameHeader, headersPayload);
+            writeFrame(dataFrameHeader, dataPayload);
+
             readSimplePostResponse(true);
 
             // The window updates for padding could occur anywhere since they

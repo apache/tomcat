@@ -82,9 +82,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             if (cookieValue != null && !cookieValue.isNull()) {
                 if (cookieValue.getType() != MessageBytes.T_BYTES) {
                     if (log.isDebugEnabled()) {
-                        Exception e = new Exception();
                         // TODO: Review this in light of HTTP/2
-                        log.debug(sm.getString("rfc6265CookieProcessor.expectedBytes"), e);
+                        log.debug(sm.getString("rfc6265CookieProcessor.expectedBytes"), new Exception());
                     }
                     cookieValue.toBytes();
                 }
@@ -117,14 +116,14 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         header.append(cookie.getName());
         header.append('=');
         String value = cookie.getValue();
-        if (value != null && value.length() > 0) {
+        if (value != null && !value.isEmpty()) {
             validateCookieValue(value);
             header.append(value);
         }
 
         /*
-         *  RFC 6265 prefers Max-Age to Expires but some browsers including Microsoft IE and Microsoft Edge don't
-         *  understand Max-Age so send expires as well. Without this, persistent cookies fail with those browsers.
+         * RFC 6265 prefers Max-Age to Expires but some browsers including Microsoft IE and Microsoft Edge don't
+         * understand Max-Age so send expires as well. Without this, persistent cookies fail with those browsers.
          */
         int maxAge = cookie.getMaxAge();
 
@@ -135,8 +134,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 // To expire immediately we need to set the time in past
                 header.append(ANCIENT_DATE);
             } else {
-                COOKIE_DATE_FORMAT.get().format(
-                        new Date(System.currentTimeMillis() + maxAge * 1000L), header, new FieldPosition(0));
+                COOKIE_DATE_FORMAT.get().format(new Date(System.currentTimeMillis() + maxAge * 1000L), header,
+                        new FieldPosition(0));
 
                 header.append("; Max-Age=");
                 header.append(maxAge);
@@ -145,14 +144,14 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
         String domain = cookie.getDomain();
-        if (domain != null && domain.length() > 0) {
+        if (domain != null && !domain.isEmpty()) {
             validateDomain(domain);
             header.append("; Domain=");
             header.append(domain);
         }
 
         String path = cookie.getPath();
-        if (path != null && path.length() > 0) {
+        if (path != null && !path.isEmpty()) {
             validatePath(path);
             header.append("; Path=");
             header.append(path);
@@ -224,11 +223,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
     private void validateCookieValue(String value) {
         int start = 0;
         int end = value.length();
-        boolean quoted = false;
-
-        if (end > 1 && value.charAt(0) == '"' && value.charAt(end - 1) == '"') {
-            quoted = true;
-        }
+        boolean quoted = end > 1 && value.charAt(0) == '"' && value.charAt(end - 1) == '"';
 
         char[] chars = value.toCharArray();
         for (int i = start; i < end; i++) {
@@ -246,7 +241,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private void validateDomain(String domain) {
         int i = 0;
-        int prev = -1;
+        int prev;
         int cur = -1;
         char[] chars = domain.toCharArray();
         while (i < chars.length) {

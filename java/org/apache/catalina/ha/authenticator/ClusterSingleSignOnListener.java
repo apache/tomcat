@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.ha.authenticator;
 
+import java.io.Serial;
+
 import org.apache.catalina.authenticator.SingleSignOnListener;
 import org.apache.catalina.ha.session.ReplicatedSessionListener;
 
@@ -26,6 +28,7 @@ import org.apache.catalina.ha.session.ReplicatedSessionListener;
  */
 public class ClusterSingleSignOnListener extends SingleSignOnListener implements ReplicatedSessionListener {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ClusterSingleSignOnListener(String ssoId) {

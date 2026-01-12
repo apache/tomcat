@@ -17,6 +17,7 @@
 package org.apache.catalina.util;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Utility class to manage context names so there is one place where the conversions between baseName, path and version
@@ -106,11 +107,7 @@ public final class ContextName {
         }
 
         // Version should never be null
-        if (version == null) {
-            this.version = "";
-        } else {
-            this.version = version;
-        }
+        this.version = Objects.requireNonNullElse(version, "");
 
         // Name is path + version
         if (this.version.isEmpty()) {

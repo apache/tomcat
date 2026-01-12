@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -119,11 +119,14 @@ public final class PersistentProviderRegistrations {
         // Write out the providers to the temporary new file
         try (OutputStream fos = new FileOutputStream(configFileNew);
                 Writer writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-            writer.write("<?xml version='1.0' encoding='utf-8'?>\n" + "<jaspic-providers\n" +
-                    "    xmlns=\"http://tomcat.apache.org/xml\"\n" +
-                    "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                    "    xsi:schemaLocation=\"http://tomcat.apache.org/xml jaspic-providers.xsd\"\n" +
-                    "    version=\"1.0\">\n");
+            writer.write("""
+                    <?xml version='1.0' encoding='utf-8'?>
+                    <jaspic-providers
+                        xmlns="http://tomcat.apache.org/xml"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://tomcat.apache.org/xml jaspic-providers.xsd"
+                        version="1.0">
+                    """);
             for (Provider provider : providers.providers) {
                 writer.write("  <provider");
                 writeOptional("className", provider.getClassName(), writer);
@@ -141,12 +144,12 @@ public final class PersistentProviderRegistrations {
                 writer.write("  </provider>\n");
             }
             writer.write("</jaspic-providers>\n");
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (!configFileNew.delete()) {
                 Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
                 log.warn(sm.getString("persistentProviderRegistrations.deleteFail", configFileNew.getAbsolutePath()));
             }
-            throw new SecurityException(e);
+            throw new SecurityException(ioe);
         }
 
         // Move the current file out of the way
@@ -244,7 +247,7 @@ public final class PersistentProviderRegistrations {
         /**
          * Used by IntrospectionUtils via reflection.
          *
-         * @param name  - the name of of the property to set on this object
+         * @param name  - the name of the property to set on this object
          * @param value - the value to set
          *
          * @see #addProperty(String, String)

@@ -32,7 +32,7 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
  * Store server.xml elements Resources at context and GlobalNamingResources
  */
 public class NamingResourcesSF extends StoreFactoryBase {
-    private static Log log = LogFactory.getLog(NamingResourcesSF.class);
+    private static final Log log = LogFactory.getLog(NamingResourcesSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -56,8 +56,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
     public void storeChildren(PrintWriter aWriter, int indent, Object aElement, StoreDescription elementDesc)
             throws Exception {
 
-        if (aElement instanceof NamingResourcesImpl) {
-            NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
+        if (aElement instanceof NamingResourcesImpl resources) {
             // Store nested <Ejb> elements
             ContextEjb[] ejbs = resources.findEjbs();
             storeElementArray(aWriter, indent, ejbs);

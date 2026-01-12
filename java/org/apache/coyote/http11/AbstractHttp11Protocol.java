@@ -98,7 +98,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // be de-registered.
         ObjectName rgOname = getGlobalRequestProcessorMBeanName();
         if (rgOname != null) {
-            Registry registry = Registry.getRegistry(null, null);
+            Registry registry = Registry.getRegistry(null);
             ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
             Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
             for (ObjectInstance upgrade : upgrades) {
@@ -373,7 +373,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      *                                 "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents == null || restrictedUserAgents.length() == 0) {
+        if (restrictedUserAgents == null || restrictedUserAgents.isEmpty()) {
             this.restrictedUserAgents = null;
         } else {
             this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
@@ -475,7 +475,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The names of headers that are allowed to be sent via a trailer when using chunked encoding. They are stored in
      * lower case.
      */
-    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
+    private final Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
 
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
@@ -500,7 +500,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
     public boolean isTrailerHeaderAllowed(String headerName) {
-        return allowedTrailerHeaders.contains(headerName);
+        return allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH));
     }
 
     public String getAllowedTrailerHeaders() {
@@ -552,7 +552,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // HTTP Upgrade
         String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(getEndpoint().isSSLEnabled());
         boolean httpUpgradeConfigured = false;
-        if (httpUpgradeName != null && httpUpgradeName.length() > 0) {
+        if (httpUpgradeName != null && !httpUpgradeName.isEmpty()) {
             httpUpgradeProtocols.put(httpUpgradeName, upgradeProtocol);
             httpUpgradeConfigured = true;
             getLog().info(sm.getString("abstractHttp11Protocol.httpUpgradeConfigured", getName(), httpUpgradeName));
@@ -561,7 +561,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
         // ALPN
         String alpnName = upgradeProtocol.getAlpnName();
-        if (alpnName != null && alpnName.length() > 0) {
+        if (alpnName != null && !alpnName.isEmpty()) {
             // ALPN is only available with TLS
             if (getEndpoint().isSSLEnabled()) {
                 negotiatedProtocols.put(alpnName, upgradeProtocol);
@@ -616,7 +616,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
-                            Registry.getRegistry(null, null).registerComponent(result, oname, null);
+                            Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
                             result = null;
@@ -759,22 +759,25 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public boolean checkSni(String sniHostName, String protocolHostName) {
+        return getEndpoint().checkSni(sniHostName, protocolHostName);
+    }
+
     // ------------------------------------------------------------- Common code
 
     @Override
     protected Processor createProcessor() {
-        Http11Processor processor = new Http11Processor(this, adapter);
-        return processor;
+        return new Http11Processor(this, adapter);
     }
 
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket, UpgradeToken upgradeToken) {
-        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.httpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         } else {
-            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         }
     }
 }

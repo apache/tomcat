@@ -32,14 +32,13 @@ public class TesterServerAuthModuleA implements ServerAuthModule {
     private StringBuilder trace = new StringBuilder("init()-");
 
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException {
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
+            throws AuthException {
         return null;
     }
 
     @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
         return null;
     }
 
@@ -50,9 +49,8 @@ public class TesterServerAuthModuleA implements ServerAuthModule {
     }
 
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, @SuppressWarnings("rawtypes") Map options)
-                    throws AuthException {
+    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
+            @SuppressWarnings("rawtypes") Map options) throws AuthException {
         // NO-OP
     }
 

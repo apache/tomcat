@@ -72,56 +72,62 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
         if (chunked) {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
-                    "Host: localhost:" + getPort() + CRLF +
-                    "Connection: close" + CRLF +
-                    "Transfer-Encoding: chunked" + CRLF +
-                    "Content-Type: multipart/form-data; boundary=AaBbCc" + CRLF +
-                    CRLF +
-                    "3f" + CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var1\"" + CRLF +
-                    CRLF +
-                    "val1" + CRLF +
-                    CRLF +
-                    "3f" + CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var2\"" + CRLF +
-                    CRLF +
-                    "val2" + CRLF +
-                    CRLF +
-                    "3f" + CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var3\"" + CRLF +
-                    CRLF +
-                    "val3" + CRLF +
-                    CRLF +
-                    "0a" + CRLF +
-                    "--AaBbCc--" + CRLF +
-                    "0" + CRLF +
-                    CRLF});
+                        "Host: localhost:" + getPort() + CRLF +
+                        "Connection: close" + CRLF +
+                        "Transfer-Encoding: chunked" + CRLF +
+                        "Content-Type: multipart/form-data; boundary=AaBbCc" + CRLF +
+                        CRLF +
+                        "3f" + CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var1\"" + CRLF +
+                        CRLF +
+                        "val1" + CRLF +
+                        CRLF +
+                        "3f" + CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var2\"" + CRLF +
+                        CRLF +
+                        "val2" + CRLF +
+                        CRLF +
+                        "3f" + CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var3\"" + CRLF +
+                        CRLF +
+                        "val3" + CRLF +
+                        CRLF +
+                        "0a" + CRLF +
+                        "--AaBbCc--" + CRLF +
+                        "0" + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
         } else {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
-                    "Host: localhost:" + getPort() + CRLF +
-                    "Connection: close" + CRLF +
-                    "Content-Length: 199" + CRLF +
-                    "Content-Type: multipart/form-data; boundary=AaBbCc" + CRLF +
-                    CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var1\"" + CRLF +
-                    CRLF +
-                    "val1" + CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var2\"" + CRLF +
-                    CRLF +
-                    "val2" + CRLF +
-                    "--AaBbCc" + CRLF +
-                    "Content-Disposition: form-data; name=\"var3\"" + CRLF +
-                    CRLF +
-                    "val3" + CRLF +
-                    "--AaBbCc--"});
+                        "Host: localhost:" + getPort() + CRLF +
+                        "Connection: close" + CRLF +
+                        "Content-Length: 199" + CRLF +
+                        "Content-Type: multipart/form-data; boundary=AaBbCc" + CRLF +
+                        CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var1\"" + CRLF +
+                        CRLF +
+                        "val1" + CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var2\"" + CRLF +
+                        CRLF +
+                        "val2" + CRLF +
+                        "--AaBbCc" + CRLF +
+                        "Content-Disposition: form-data; name=\"var3\"" + CRLF +
+                        CRLF +
+                        "val3" + CRLF +
+                        "--AaBbCc--"
+                    });
+            // @formatter:on
         }
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();

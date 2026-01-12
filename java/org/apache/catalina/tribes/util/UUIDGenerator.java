@@ -64,7 +64,7 @@ public class UUIDGenerator {
         into[6 + offset] &= 0x0F;
         into[6 + offset] |= (UUID_VERSION << 4);
         into[8 + offset] &= 0x3F; // 0011 1111
-        into[8 + offset] |= 0x80; // 1000 0000
+        into[8 + offset] |= (byte) 0x80; // 1000 0000
         return into;
     }
 
@@ -77,11 +77,10 @@ public class UUIDGenerator {
      * @param r      Random
      */
     public static void nextBytes(byte[] into, int offset, int length, Random r) {
-        int numRequested = length;
         int numGot = 0, rnd = 0;
         while (true) {
             for (int i = 0; i < BYTES_PER_INT; i++) {
-                if (numGot == numRequested) {
+                if (numGot == length) {
                     return;
                 }
                 rnd = (i == 0 ? r.nextInt() : rnd >> BITS_PER_BYTE);

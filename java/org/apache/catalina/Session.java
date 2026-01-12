@@ -26,8 +26,6 @@ import jakarta.servlet.http.HttpSession;
 /**
  * A <b>Session</b> is the Catalina-internal facade for an <code>HttpSession</code> that is used to maintain state
  * information between requests for a particular user of a web application.
- *
- * @author Craig R. McClanahan
  */
 public interface Session {
 
@@ -58,6 +56,10 @@ public interface Session {
      */
     String SESSION_PASSIVATED_EVENT = "passivateSession";
 
+    /**
+     * The SessionEvent event type when a session changes its sessionId.
+     */
+    String SESSION_CHANGED_ID_EVENT = "changeSessionId";
 
     // ------------------------------------------------------------- Properties
 

@@ -23,10 +23,7 @@ import java.util.ResourceBundle;
 import org.apache.jasper.runtime.ExceptionUtils;
 
 /**
- * Class responsible for converting error codes to corresponding localized
- * error messages.
- *
- * @author Jan Luehe
+ * Class responsible for converting error codes to corresponding localized error messages.
  */
 public class Localizer {
 
@@ -41,11 +38,10 @@ public class Localizer {
     }
 
     /*
-     * Returns the localized error message corresponding to the given error
-     * code.
+     * Returns the localized error message corresponding to the given error code.
      *
-     * If the given error code is not defined in the resource bundle for
-     * localized error messages, it is used as the error message.
+     * If the given error code is not defined in the resource bundle for localized error messages, it is used as the
+     * error message.
      *
      * @param errCode Error code to localize
      *
@@ -58,18 +54,19 @@ public class Localizer {
                 errMsg = bundle.getString(errCode);
             }
         } catch (MissingResourceException e) {
+            // Ignore
         }
         return errMsg;
     }
 
     /*
-     * Returns the localized error message corresponding to the given error
-     * code.
+     * Returns the localized error message corresponding to the given error code.
      *
-     * If the given error code is not defined in the resource bundle for
-     * localized error messages, it is used as the error message.
+     * If the given error code is not defined in the resource bundle for localized error messages, it is used as the
+     * error message.
      *
      * @param errCode Error code to localize
+     *
      * @param args Arguments for parametric replacement
      *
      * @return Localized error message

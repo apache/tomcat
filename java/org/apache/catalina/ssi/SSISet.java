@@ -22,11 +22,7 @@ import java.io.PrintWriter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #set command
- *
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Implements the Server-side #set command.
  */
 public class SSISet implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSISet.class);

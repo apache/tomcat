@@ -24,9 +24,7 @@ import java.io.Writer;
 
 
 /**
- * Contains commonly needed I/O-related methods
- *
- * @author Dan Sandberg
+ * Contains commonly needed I/O-related methods.
  */
 public class IOTools {
     protected static final int DEFAULT_BUFFER_SIZE = 4 * 1024; // 4k

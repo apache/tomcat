@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.security.KeyStoreException;
 import java.util.List;
 import java.util.Set;
@@ -105,20 +106,20 @@ public class OpenSSLUtil extends SSLUtilBase {
             // No (or invalid?) certificate chain was provided for the cert
             String msg = sm.getString("openssl.nonJsseChain", certificate.getCertificateChainFile());
             if (log.isDebugEnabled()) {
-                log.info(msg, e);
+                log.debug(msg, e);
             } else {
                 log.info(msg);
             }
             return null;
-        } catch (KeyStoreException | IOException e) {
+        } catch (KeyStoreException | KeyException | IOException e) {
             // Depending on what is presented, JSSE may also throw
             // KeyStoreException or IOException if it doesn't understand the
             // provided file.
             if (certificate.getCertificateFile() != null) {
-                String msg = sm.getString("openssl.nonJsseCertificate",
-                        certificate.getCertificateFile(), certificate.getCertificateKeyFile());
+                String msg = sm.getString("openssl.nonJsseCertificate", certificate.getCertificateFile(),
+                        certificate.getCertificateKeyFile());
                 if (log.isDebugEnabled()) {
-                    log.info(msg, e);
+                    log.debug(msg, e);
                 } else {
                     log.info(msg);
                 }

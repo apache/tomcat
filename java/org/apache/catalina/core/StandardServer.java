@@ -61,8 +61,6 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 /**
  * Standard implementation of the <b>Server</b> interface, available for use (but not required) when deploying and
  * starting Catalina.
- *
- * @author Craig R. McClanahan
  */
 public final class StandardServer extends LifecycleMBeanBase implements Server {
 
@@ -104,7 +102,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * Global naming resources.
      */
-    private NamingResourcesImpl globalNamingResources = null;
+    private NamingResourcesImpl globalNamingResources;
 
 
     /**
@@ -461,7 +459,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         servicesWriteLock.lock();
         try {
-            Service results[] = new Service[services.length + 1];
+            Service[] results = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
             services = results;
@@ -490,14 +488,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 awaitSocket = null;
                 try {
                     s.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignored
                 }
             }
             t.interrupt();
             try {
                 t.join(1000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignore) {
                 // Ignored
             }
         }
@@ -530,9 +528,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Set up a server socket to wait on
         try {
             awaitSocket = new ServerSocket(getPortWithOffset(), 1, InetAddress.getByName(address));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             log.error(sm.getString("standardServer.awaitSocket.fail", address, String.valueOf(getPortWithOffset()),
-                    String.valueOf(getPort()), String.valueOf(getPortOffset())), e);
+                    String.valueOf(getPort()), String.valueOf(getPortOffset())), ioe);
             return;
         }
 
@@ -562,12 +560,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         log.warn(sm.getString("standardServer.accept.timeout",
                                 Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
                         continue;
-                    } catch (IOException e) {
+                    } catch (IOException ioe) {
                         if (stopAwait) {
                             // Wait was aborted with socket.close()
                             break;
                         }
-                        log.error(sm.getString("standardServer.accept.error"), e);
+                        log.error(sm.getString("standardServer.accept.error"), ioe);
                         break;
                     }
 
@@ -580,11 +578,11 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         expected += random.nextInt() % 1024;
                     }
                     while (expected > 0) {
-                        int ch = -1;
+                        int ch;
                         try {
                             ch = stream.read();
-                        } catch (IOException e) {
-                            log.warn(sm.getString("standardServer.accept.readError"), e);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString("standardServer.accept.readError"), ioe);
                             ch = -1;
                         }
                         // Control character or EOF (-1) terminates loop
@@ -600,7 +598,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         if (socket != null) {
                             socket.close();
                         }
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // Ignore
                     }
                 }
@@ -623,7 +621,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             if (serverSocket != null) {
                 try {
                     serverSocket.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -793,7 +791,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            MBeanServer server = Registry.getRegistry(null).getMBeanServer();
             if (server.isRegistered(sname)) {
                 server.invoke(sname, "storeConfig", null, null);
             } else {
@@ -820,7 +818,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            MBeanServer server = Registry.getRegistry(null).getMBeanServer();
             if (server.isRegistered(sname)) {
                 server.invoke(sname, "store", new Object[] { context }, new String[] { "java.lang.String" });
             } else {

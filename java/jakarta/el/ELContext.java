@@ -365,22 +365,16 @@ public abstract class ELContext {
         if ("equals".equals(method.getName())) {
             if (method.getReturnType().equals(boolean.class)) {
                 if (method.getParameterCount() == 1) {
-                    if (method.getParameterTypes()[0].equals(Object.class)) {
-                        return true;
-                    }
+                    return method.getParameterTypes()[0].equals(Object.class);
                 }
             }
         } else if ("hashCode".equals(method.getName())) {
             if (method.getReturnType().equals(int.class)) {
-                if (method.getParameterCount() == 0) {
-                    return true;
-                }
+                return method.getParameterCount() == 0;
             }
         } else if ("toString".equals(method.getName())) {
             if (method.getReturnType().equals(String.class)) {
-                if (method.getParameterCount() == 0) {
-                    return true;
-                }
+                return method.getParameterCount() == 0;
             }
         }
 

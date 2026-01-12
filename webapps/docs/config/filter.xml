@@ -968,13 +968,21 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     from that IP are dropped with a &quot;429 Too many requests&quot; response
     until the bucket time ends and a new bucket starts.</p>
 
-    <p>The filter is optimized for efficiency and low overhead, so it converts
-    some configured values to more efficient values. For example, a configuration
-    of a 60 seconds time bucket is converted to 65.536 seconds. That allows
-    for very fast bucket calculation using bit shift arithmetic. In order to remain
-    true to the user intent, the configured number of requests is then multiplied
-    by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
-    real values of 109 Requests per 65 seconds.</p>
+    <p>The RateLimiter implementation can be set via the <code>rateLimitClassName</code>
+    init param. The default implementation,
+    <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for
+    efficiency and low overhead so it converts some configured values to more
+    efficient values. For example, a configuration of a 60 seconds time bucket
+    is converted to 65.536 seconds. That allows for very fast bucket calculation
+    using bit shift arithmetic. In order to remain true to the user intent, the
+    configured number of requests is then multiplied by the same ratio, so a
+    configuration of 100 Requests per 60 seconds, has the real values of 109
+    Requests per 65 seconds. An alternative implementation,
+    <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to
+    provide a less efficient but more accurate control, whose effective duration
+    in seconds and number of requests allowed are consist with the configured
+    values. You can specify a different class as long as it implements the
+    <code>org.apache.catalina.util.RateLimiter</code> interface.</p>
 
     <p>It is common to set up different restrictions for different URIs.
     For example, a login page or authentication script is typically expected
@@ -1046,8 +1054,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="rateLimitClassName" required="false">
-        <p>The full class name of an implementation of the RateLimiter interface.
-        Default is &quot;org.apache.catalina.util.FastRateLimiter&quot;.</p>
+        <p>The full class name of an implementation of the RateLimiter
+        interface. Default is
+        &quot;org.apache.catalina.util.FastRateLimiter&quot;, which is optimized
+        for efficiency. If you need exact rate limiting and can accept a small
+        decrease in efficiency, you can use
+        &quot;org.apache.catalina.util.ExactRateLimiter&quot; instead.</p>
       </attribute>
 
       <attribute name="statusCode" required="false">
@@ -1094,93 +1106,6 @@ FINE: Request "/docs/config/manager.html" with response status "200"
   </subsection>
 
 </section>
-
-
-<section name="Remote Address Filter">
-
-  <subsection name="Introduction">
-
-    <p>The <strong>Remote Address Filter</strong> allows you to compare the
-    IP address of the client that submitted this request against one or more
-    <em>regular expressions</em>, and either allow the request to continue
-    or refuse to process the request from this client. </p>
-
-    <p>The syntax for <em>regular expressions</em> is different than that for
-    'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
-    package. Please consult the Java documentation for details of the
-    expressions supported.</p>
-
-    <p><strong>Note:</strong> There is a caveat when using this filter with
-    IPv6 addresses. Format of the IP address that this valve is processing
-    depends on the API that was used to obtain it. If the address was obtained
-    from Java socket using Inet6Address class, its format will be
-    <code>x:x:x:x:x:x:x:x</code>. That is, the IP address for localhost
-    will be <code>0:0:0:0:0:0:0:1</code> instead of the more widely used
-    <code>::1</code>. Consult your access logs for the actual value.</p>
-
-    <p>See also: <a href="#Remote_Host_Filter">Remote Host Filter</a>.</p>
-  </subsection>
-
-  <subsection name="Filter Class Name">
-
-    <p>The filter class name for the Remote Address Filter is
-    <strong><code>org.apache.catalina.filters.RemoteAddrFilter</code>
-    </strong>.</p>
-
-  </subsection>
-
-  <subsection name="Initialisation parameters">
-
-    <p>The <strong>Remote Address Filter</strong> supports the following
-    initialisation parameters:</p>
-
-    <attributes>
-
-      <attribute name="allow" required="false">
-        <p>A regular expression (using <code>java.util.regex</code>) that the
-        remote client&apos;s IP address is compared to.  If this attribute
-        is specified, the remote address MUST match for this request to be
-        accepted.  If this attribute is not specified, all requests will be
-        accepted UNLESS the remote address matches a <code>deny</code>
-        pattern.</p>
-      </attribute>
-
-      <attribute name="deny" required="false">
-        <p>A regular expression (using <code>java.util.regex</code>) that the
-        remote client's IP address is compared to.  If this attribute
-        is specified, the remote address MUST NOT match for this request to be
-        accepted.  If this attribute is not specified, request acceptance is
-        governed solely by the <code>accept</code> attribute.</p>
-      </attribute>
-
-      <attribute name="denyStatus" required="false">
-        <p>HTTP response status code that is used when rejecting denied
-        request. The default value is <code>403</code>. For example,
-        it can be set to the value <code>404</code>.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-  <subsection name="Example">
-    <p>To allow access only for the clients connecting from localhost:</p>
-<source><![CDATA[    <filter>
-      <filter-name>Remote Address Filter</filter-name>
-      <filter-class>org.apache.catalina.filters.RemoteAddrFilter</filter-class>
-      <init-param>
-        <param-name>allow</param-name>
-        <param-value>127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1</param-value>
-      </init-param>
-    </filter>
-    <filter-mapping>
-      <filter-name>Remote Address Filter</filter-name>
-      <url-pattern>/*</url-pattern>
-    </filter-mapping>]]></source>
-  </subsection>
-
-</section>
-
 
 <section name="Remote Host Filter">
 
@@ -1448,7 +1373,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
          <param-name>internalProxies</param-name>
-         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+         <param-value>192.168.0.10/31</param-value>
        </init-param>
        <init-param>
          <param-name>remoteIpHeader</param-name>
@@ -1529,7 +1454,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
          <param-name>internalProxies</param-name>
-         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+         <param-value>192.168.0.10/31</param-value>
        </init-param>
        <init-param>
          <param-name>remoteIpHeader</param-name>
@@ -1541,7 +1466,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1564,18 +1489,18 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, proxy1, proxy2 </td>
+        <td> 140.211.11.130, 200.0.0.1, 200.0.0.2 </td>
         <td> null </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1, proxy2 </td>
+        <td> 200.0.0.1, 200.0.0.2 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    Note : <code>200.0.0.1</code> and <code>200.0.0.2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
     <code>x-forwarded-by</code> header. <code>x-forwarded-for</code> is <code>null</code>
     because all the proxies are trusted or internal.
@@ -1589,7 +1514,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
          <param-name>internalProxies</param-name>
-         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+         <param-value>192.168.0.10/31</param-value>
        </init-param>
        <init-param>
          <param-name>remoteIpHeader</param-name>
@@ -1601,7 +1526,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1624,18 +1549,18 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
+        <td> 140.211.11.130, 200.0.0.1, 200.0.0.2, 192.168.0.10 </td>
         <td> null </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1, proxy2 </td>
+        <td> 200.0.0.1, 200.0.0.2 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    Note : <code>200.0.0.1</code> and <code>200.0.0.2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
     <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal
     proxy, it does not appear in <code>x-forwarded-by</code>.
@@ -1652,7 +1577,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
          <param-name>internalProxies</param-name>
-         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+         <param-value>192.168.0.10/31</param-value>
        </init-param>
        <init-param>
          <param-name>remoteIpHeader</param-name>
@@ -1664,7 +1589,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1683,27 +1608,27 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
-        <td> untrusted-proxy </td>
+        <td> 200.99.99.99 </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
+        <td> 140.211.11.130, 200.99.99.99, 200.0.0.1 </td>
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1 </td>
+        <td> 200.0.0.1 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>.
+    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>200.0.0.1</code>.
     <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because
-    <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
-    <code>untrusted-proxy</code> is the actual remote ip.
-    <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP
-    verified by <code>proxy1</code>.
+    <code>200.99.99.99</code> is not trusted and thus, we cannot trust that
+    <code>200.99.99.99</code> is the actual remote ip.
+    <code>request.remoteAddr</code> is <code>200.99.99.99</code> that is an IP
+    verified by <code>200.0.0.1</code>.
     </p>
   </subsection>
 
@@ -1727,12 +1652,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="internalProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an internal proxy.
-        Internal proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will not appear in the <strong>proxiesHeader</strong>
-        value. If not specified the default value of <code>
-        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|100\.6[4-9]{1}\.\d{1,3}\.\d{1,3}|100\.[7-9]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.1[0-1]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]{1}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
+        <p>A comma separated list of CIDR blocks that a proxy&apos;s IP address
+        must match to be considered an internal proxy. Internal proxies that
+        appear in the <strong>remoteIpHeader</strong> will be trusted and will
+        not appear in the <strong>proxiesHeader</strong> value. If not specified
+        the default value of <code>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
+        169.254.0.0/16, 100.64.0.0/10, 127.0.0.0/8, ::1/128, fe80::/10, fc00::/7
         </code> will be used.</p>
       </attribute>
 
@@ -1753,11 +1678,11 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="trustedProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an trusted proxy.
-        Trusted proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will appear in the <strong>proxiesHeader</strong> value.
-        If not specified, no proxies will be trusted.</p>
+        <p>A comma separated list of CIDR blocks that a proxy&apos;s IP address
+        must match to be considered a trusted proxy. Trusted proxies that appear
+        in the <strong>remoteIpHeader</strong> will be trusted and will appear
+        in the <strong>proxiesHeader</strong> value. If not specified, no
+        proxies will be trusted.</p>
       </attribute>
 
       <attribute name="protocolHeader" required="false">

@@ -61,7 +61,7 @@ public class EntityTag {
                     strong = true;
                     break;
                 case FOUND:
-                    strong = false;
+                    // Already set as strong = false;
                     break;
             }
 

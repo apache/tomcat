@@ -38,7 +38,9 @@ import org.xml.sax.InputSource;
 public class TestStatusTransformer extends TomcatBaseTest {
 
     enum Mode {
-        HTML, XML, JSON
+        HTML,
+        XML,
+        JSON
     }
 
     @Test
@@ -63,8 +65,7 @@ public class TestStatusTransformer extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
         ctxt.setPrivileged(true);
-        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
-                "org.apache.catalina.servlets.DefaultServlet");
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
         ctxt.addServletMappingDecoded("/", "default");
         Tomcat.addServlet(ctxt, "status", "org.apache.catalina.manager.StatusManagerServlet");
@@ -82,10 +83,14 @@ public class TestStatusTransformer extends TomcatBaseTest {
             }
         };
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
 
@@ -95,10 +100,14 @@ public class TestStatusTransformer extends TomcatBaseTest {
             case JSON -> requestline = "GET /status/all?JSON=true HTTP/1.1";
             default -> requestline = "GET /status/all HTTP/1.1";
         }
+        // @formatter:off
         client.setRequest(new String[] {
                 requestline + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         String body = client.getResponseBody();
@@ -108,8 +117,10 @@ public class TestStatusTransformer extends TomcatBaseTest {
             Assert.assertTrue(result.contains("name=localhost/"));
         } else if (mode.equals(Mode.XML)) {
             try (StringReader reader = new StringReader(body)) {
-                Document xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
-                String serialized = ((DOMImplementationLS) xmlDocument.getImplementation()).createLSSerializer().writeToString(xmlDocument);
+                Document xmlDocument =
+                        DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
+                String serialized = ((DOMImplementationLS) xmlDocument.getImplementation()).createLSSerializer()
+                        .writeToString(xmlDocument);
                 // Verify that a request is being processed
                 Assert.assertTrue(serialized.contains("stage=\"S\""));
             }

@@ -30,23 +30,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Concurrent hash map that holds its keys via weak references. Unlike
- * <code>WeakHashMap</code> this class does not handle dead keys during common
- * access operations, but expects you to call its {@link #maintain()} method
+ * Concurrent hash map that holds its keys via weak references. Unlike <code>WeakHashMap</code> this class does not
+ * handle dead keys during common access operations, but expects you to call its {@link #maintain()} method
  * periodically. Both keys and values are expected to be not-<code>null</code>.
  *
  * @param <K> The type of keys used with the Map instance
  * @param <V> The type of values used with the Map instance
  */
-public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implements
-        ConcurrentMap<K, V> {
+public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K,V> implements ConcurrentMap<K,V> {
 
-    private final ConcurrentMap<Key, V> map = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Key,V> map = new ConcurrentHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     /**
-     * Method, that has to be invoked periodically to clean dead keys from the
-     * map.
+     * Method, that has to be invoked periodically to clean dead keys from the map.
      */
     public void maintain() {
         Key key;
@@ -108,16 +105,14 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
     }
 
     /**
-     * Creates Key instance to be used to store values in the map. It is
-     * registered with the ReferenceQueue.
+     * Creates Key instance to be used to store values in the map. It is registered with the ReferenceQueue.
      */
     private Key createStoreKey(Object key) {
         return new Key(key, queue);
     }
 
     /**
-     * Creates Key instance to be used only to lookup values in the map. It is
-     * not registered with the ReferenceQueue.
+     * Creates Key instance to be used only to lookup values in the map. It is not registered with the ReferenceQueue.
      */
     private Key createLookupKey(Object key) {
         return new Key(key, null);
@@ -213,7 +208,7 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
     }
 
     @Override
-    public Set<Map.Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K,V>> entrySet() {
         return new AbstractSet<>() {
             @Override
             public boolean isEmpty() {
@@ -226,10 +221,9 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
             }
 
             @Override
-            public Iterator<Map.Entry<K, V>> iterator() {
+            public Iterator<Map.Entry<K,V>> iterator() {
                 return new Iterator<>() {
-                    private final Iterator<Map.Entry<Key, V>> it = map
-                            .entrySet().iterator();
+                    private final Iterator<Map.Entry<Key,V>> it = map.entrySet().iterator();
 
                     @Override
                     public boolean hasNext() {
@@ -237,9 +231,9 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
                     }
 
                     @Override
-                    public Map.Entry<K, V> next() {
+                    public Map.Entry<K,V> next() {
                         return new Map.Entry<>() {
-                            private final Map.Entry<Key, V> en = it.next();
+                            private final Map.Entry<Key,V> en = it.next();
 
                             @SuppressWarnings("unchecked")
                             @Override

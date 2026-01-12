@@ -36,8 +36,6 @@ import jakarta.servlet.UnavailableException;
  * <p>
  * Child Containers are not allowed on Wrapper implementations, so the <code>addChild()</code> method should throw an
  * <code>IllegalArgumentException</code>.
- *
- * @author Craig R. McClanahan
  */
 public interface Wrapper extends Container {
 
@@ -226,7 +224,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the set of security role reference names associated with this servlet, if any; otherwise return a
+     * @return the array of security role reference names associated with this servlet, if any; otherwise return a
      *             zero-length array.
      */
     String[] findSecurityReferences();
@@ -293,14 +291,14 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the multi-part configuration for the associated Servlet. If no multi-part configuration has been defined,
+     * @return the multipart configuration for the associated Servlet. If no multipart configuration has been defined,
      *             then <code>null</code> will be returned.
      */
     MultipartConfigElement getMultipartConfigElement();
 
 
     /**
-     * Set the multi-part configuration for the associated Servlet. To clear the multi-part configuration specify
+     * Set the multipart configuration for the associated Servlet. To clear the multipart configuration specify
      * <code>null</code> as the new value.
      *
      * @param multipartConfig The configuration associated with the Servlet

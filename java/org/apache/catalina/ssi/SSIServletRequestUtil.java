@@ -37,7 +37,7 @@ public class SSIServletRequestUtil {
             if (result == null) {
                 result = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
             }
-            if ((result == null) || (result.equals(""))) {
+            if ((result == null) || (result.isEmpty())) {
                 result = "/";
             }
             return result;
@@ -47,7 +47,7 @@ public class SSIServletRequestUtil {
         if (result == null) {
             result = request.getServletPath();
         }
-        if ((result == null) || (result.equals(""))) {
+        if ((result == null) || (result.isEmpty())) {
             result = "/";
         }
         return RequestUtil.normalize(result);

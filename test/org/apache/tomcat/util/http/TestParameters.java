@@ -27,15 +27,15 @@ import org.junit.Test;
 public class TestParameters {
 
     private static final Parameter SIMPLE =
-        new Parameter("foo1", "bar1");
+            new Parameter("foo1", "bar1");
     private static final Parameter SIMPLE_MULTIPLE =
-        new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
+            new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
     private static final Parameter NO_VALUE =
-        new Parameter("foo3");
+            new Parameter("foo3");
     private static final Parameter EMPTY_VALUE =
-        new Parameter("foo4", "");
+            new Parameter("foo4", "");
     private static final Parameter EMPTY =
-        new Parameter("");
+            new Parameter("");
     private static final Parameter UTF8 =
             new Parameter("\ufb6b\ufb6a\ufb72", "\uffee\uffeb\uffe2");
 

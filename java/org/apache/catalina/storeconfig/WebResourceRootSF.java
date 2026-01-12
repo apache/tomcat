@@ -34,8 +34,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aResourceRoot, StoreDescription parentDesc)
             throws Exception {
-        if (aResourceRoot instanceof WebResourceRoot) {
-            WebResourceRoot resourceRoot = (WebResourceRoot) aResourceRoot;
+        if (aResourceRoot instanceof WebResourceRoot resourceRoot) {
 
             // Store nested <PreResources> elements
             WebResourceSet[] preResourcesArray = resourceRoot.getPreResources();

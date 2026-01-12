@@ -77,8 +77,6 @@ import org.apache.tools.ant.BuildException;
  * <b>NOTE</b>: For numeric expressions the type must be set and use xml entities as operations.<br>
  * As type we currently support <em>long</em> and <em>double</em>.
  *
- * @author Peter Rossbach
- *
  * @since 5.5.10
  */
 public class JMXAccessorCondition extends JMXAccessorConditionBase {
@@ -171,7 +169,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
      * @return true if there is no unless condition, or there is a named property but it doesn't exist
      */
     protected boolean testUnlessCondition() {
-        if (unlessCondition == null || "".equals(unlessCondition)) {
+        if (unlessCondition == null || unlessCondition.isEmpty()) {
             return true;
         }
         return getProject().getProperty(unlessCondition) == null;

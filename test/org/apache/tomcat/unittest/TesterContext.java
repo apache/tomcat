@@ -1216,18 +1216,8 @@ public class TesterContext implements Context {
     public void setThreadBindingListener(ThreadBindingListener threadBindingListener) { /* NO-OP */ }
 
     @Override
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        return null;
-    }
-
-    @Override
     public ClassLoader bind(ClassLoader originalClassLoader) {
         return null;
-    }
-
-    @Override
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        // NO-OP
     }
 
     @Override

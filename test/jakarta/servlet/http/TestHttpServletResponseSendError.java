@@ -38,14 +38,14 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 
 /**
- * These tests evolved out of a discussion in the Jakarta Servlet project
- * regarding the intended behaviour in various error scenarios. Async requests
- * and/or async error pages added additional complexity.
+ * These tests evolved out of a discussion in the Jakarta Servlet project regarding the intended behaviour in various
+ * error scenarios. Async requests and/or async error pages added additional complexity.
  */
 @RunWith(Parameterized.class)
 public class TestHttpServletResponseSendError extends TomcatBaseTest {
 
-    /*
+    /* @formatter:off
+     *
      * Implementation notes:
      * Original Request
      *   - async
@@ -57,24 +57,23 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
      *   - async
      *     - complete
      *     - dispatch
+     *
+     * @formatter:on
      */
 
     private enum AsyncErrorPoint {
         /*
-         * Thread A is the container thread the processes the original request.
-         * Thread B is the async thread (may or may not be a container thread)
-         *   that is started by the async processing.
+         * Thread A is the container thread the processes the original request. Thread B is the async thread (may or may
+         * not be a container thread) that is started by the async processing.
          */
         THREAD_A_BEFORE_START_ASYNC,
         THREAD_A_AFTER_START_ASYNC,
         THREAD_A_AFTER_START_RUNNABLE,
         THREAD_B_BEFORE_COMPLETE
         /*
-         * If the error is triggered after Thread B completes async processing
-         * there is essentially a race condition between thread B making the
-         * change and the container checking to see if the error flag has been
-         * set. We can't easily control the execution order here so we don't
-         * test it.
+         * If the error is triggered after Thread B completes async processing there is essentially a race condition
+         * between thread B making the change and the container checking to see if the error flag has been set. We can't
+         * easily control the execution order here so we don't test it.
          */
     }
 
@@ -95,15 +94,15 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
                                     // managed threads are not visible to the container.
                                     continue;
                                 }
-                                parameterSets.add(new Object[] { async, throwException, useDispatch,
-                                        errorPoint, useStart} );
+                                parameterSets
+                                        .add(new Object[] { async, throwException, useDispatch, errorPoint, useStart });
                             }
                         }
                     }
                 } else {
                     // Ignore the async specific parameters
                     parameterSets.add(new Object[] { async, throwException, Boolean.FALSE,
-                            AsyncErrorPoint.THREAD_A_AFTER_START_ASYNC, Boolean.FALSE} );
+                            AsyncErrorPoint.THREAD_A_AFTER_START_ASYNC, Boolean.FALSE });
                 }
             }
         }
@@ -189,8 +188,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
 
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             if (throwException) {
                 throw new SendErrorException();
             } else {
@@ -207,9 +205,9 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         private final boolean throwException;
-        private final  boolean useDispatch;
+        private final boolean useDispatch;
         private final AsyncErrorPoint errorPoint;
-        private final  boolean useStart;
+        private final boolean useStart;
 
         public TesterAsyncServlet(boolean throwException, boolean useDispatch, AsyncErrorPoint errorPoint,
                 boolean useStart) {
@@ -221,8 +219,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
 
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             if (errorPoint == AsyncErrorPoint.THREAD_A_BEFORE_START_ASYNC) {
                 doError(resp);
@@ -267,8 +264,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         private final boolean useDispatch;
         private final AsyncErrorPoint errorPoint;
 
-        public AsyncRunnable(AsyncContext ac, boolean throwException, boolean useDispatch,
-                AsyncErrorPoint errorPoint) {
+        public AsyncRunnable(AsyncContext ac, boolean throwException, boolean useDispatch, AsyncErrorPoint errorPoint) {
             this.ac = ac;
             this.throwException = throwException;
             this.useDispatch = useDispatch;
@@ -290,8 +286,8 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
                 // reported
                 try {
                     ((HttpServletResponse) ac.getResponse()).sendError(599);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
 
@@ -311,8 +307,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write("DISPATCH");
@@ -332,8 +327,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write("FAIL-599");
@@ -346,8 +340,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write("FAIL-Exception");

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +35,7 @@ public class ImportHandler {
     private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
     static {
-        // Servlet 6.0
+        // Servlet 6.2
         Set<String> servletClassNames = new HashSet<>();
         // Interfaces
         servletClassNames.add("AsyncContext");
@@ -87,7 +88,7 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 6.1
+        // Servlet 6.2
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
@@ -117,7 +118,7 @@ public class ImportHandler {
         servletHttpClassNames.add("MappingMatch");
         standardPackages.put("jakarta.servlet.http", servletHttpClassNames);
 
-        // JSP 3.0
+        // JSP 4.1
         Set<String> servletJspClassNames = new HashSet<>();
         // Interfaces
         servletJspClassNames.add("HttpJspPage");
@@ -137,7 +138,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 21 EA29
+        // Based on Java 26 EA26
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -145,6 +146,7 @@ public class ImportHandler {
         javaLangClassNames.add("Cloneable");
         javaLangClassNames.add("Comparable");
         javaLangClassNames.add("Iterable");
+        javaLangClassNames.add("LazyConstant");
         javaLangClassNames.add("ProcessHandle");
         javaLangClassNames.add("ProcessHandle.Info");
         javaLangClassNames.add("Readable");
@@ -169,6 +171,7 @@ public class ImportHandler {
         javaLangClassNames.add("Enum");
         javaLangClassNames.add("Enum.EnumDesc");
         javaLangClassNames.add("Float");
+        javaLangClassNames.add("IO");
         javaLangClassNames.add("InheritableThreadLocal");
         javaLangClassNames.add("Integer");
         javaLangClassNames.add("Long");
@@ -191,6 +194,7 @@ public class ImportHandler {
         javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");
+        javaLangClassNames.add("StableValue");
         javaLangClassNames.add("StackTraceElement");
         javaLangClassNames.add("StackWalker");
         javaLangClassNames.add("StrictMath");
@@ -279,10 +283,10 @@ public class ImportHandler {
 
     }
 
-    private Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
-    private Map<String,String> classNames = new ConcurrentHashMap<>();
-    private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
-    private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
+    private final Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
+    private final Map<String,String> classNames = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 
 
     public ImportHandler() {
@@ -369,11 +373,7 @@ public class ImportHandler {
         // b) java.lang.Package.getPackage(name) is not reliable (BZ 57574),
         // c) such check is not required by specification.
         Set<String> preloaded = standardPackages.get(name);
-        if (preloaded == null) {
-            packageNames.put(name, Collections.emptySet());
-        } else {
-            packageNames.put(name, preloaded);
-        }
+        packageNames.put(name, Objects.requireNonNullElse(preloaded, Collections.emptySet()));
     }
 
 
@@ -401,6 +401,18 @@ public class ImportHandler {
                 clazzes.put(name, clazz);
                 return clazz;
             }
+            // Might be an inner class
+            StringBuilder sb = new StringBuilder(className);
+            int replacementPosition = sb.lastIndexOf(".");
+            while (replacementPosition > -1) {
+                sb.setCharAt(replacementPosition, '$');
+                clazz = findClass(sb.toString(), true);
+                if (clazz != null) {
+                    clazzes.put(name, clazz);
+                    return clazz;
+                }
+                replacementPosition = sb.lastIndexOf(".", replacementPosition);
+            }
         }
 
         // Search the package imports - note there may be multiple matches
@@ -425,13 +437,9 @@ public class ImportHandler {
                 result = clazz;
             }
         }
-        if (result == null) {
-            // Cache NotFound results to save repeated calls to findClass()
-            // which is relatively slow
-            clazzes.put(name, NotFound.class);
-        } else {
-            clazzes.put(name, result);
-        }
+        // Cache NotFound results to save repeated calls to findClass()
+        // which is relatively slow
+        clazzes.put(name, Objects.requireNonNullElse(result, NotFound.class));
 
         return result;
     }

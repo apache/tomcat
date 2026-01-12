@@ -47,21 +47,21 @@ public class TestServletRequestParametersQueryString extends ServletRequestParam
         List<Object[]> parameterSets = new ArrayList<>();
 
         // Empty parameter
-        parameterSets.add(new Object[] { "before=aaa&&after=zzz", SC_OK, TWO} );
+        parameterSets.add(new Object[] { "before=aaa&&after=zzz", SC_OK, TWO });
 
         // Invalid parameter
-        parameterSets.add(new Object[] { "before=aaa&=value&after=zzz", SC_BAD_REQUEST, ZERO} );
+        parameterSets.add(new Object[] { "before=aaa&=value&after=zzz", SC_BAD_REQUEST, ZERO });
 
         // Invalid %nn encoding
-        parameterSets.add(new Object[] { "before=aaa&test=val%GGue&after=zzz", SC_BAD_REQUEST, ZERO} );
+        parameterSets.add(new Object[] { "before=aaa&test=val%GGue&after=zzz", SC_BAD_REQUEST, ZERO });
 
         // Invalid UTF-8 byte
-        parameterSets.add(new Object[] { "before=aaa&test=val%FFue&after=zzz", SC_BAD_REQUEST, ZERO} );
+        parameterSets.add(new Object[] { "before=aaa&test=val%FFue&after=zzz", SC_BAD_REQUEST, ZERO });
 
         // There are no unmappable UTF-8 code points
 
         // Too many parameters
-        parameterSets.add(new Object[] { "before=aaa&test=value&after=zzz&extra=yyy", SC_BAD_REQUEST, ZERO} );
+        parameterSets.add(new Object[] { "before=aaa&test=value&after=zzz&extra=yyy", SC_BAD_REQUEST, ZERO });
 
         return parameterSets;
     }
@@ -94,11 +94,14 @@ public class TestServletRequestParametersQueryString extends ServletRequestParam
 
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /?" + queryString +" HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: close" + CRLF +
-                CRLF });
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();
         client.processRequest();

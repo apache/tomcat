@@ -37,8 +37,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StoreConfigLifecycleListener implements LifecycleListener {
 
-    private static Log log = LogFactory.getLog(StoreConfigLifecycleListener.class);
-    private static StringManager sm = StringManager.getManager(StoreConfigLifecycleListener.class);
+    private static final Log log = LogFactory.getLog(StoreConfigLifecycleListener.class);
+    private static final StringManager sm = StringManager.getManager(StoreConfigLifecycleListener.class);
 
     /**
      * The configuration information registry for our managed beans.
@@ -97,8 +97,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             // Note: Hard-coded domain used since this object is per Server/JVM
             oname = new ObjectName("Catalina:type=StoreConfig");
             registry.registerComponent(storeConfig, oname, "StoreConfig");
-        } catch (Exception ex) {
-            log.error(sm.getString("storeConfigListener.registerError"), ex);
+        } catch (Exception e) {
+            log.error(sm.getString("storeConfigListener.registerError"), e);
         }
     }
 

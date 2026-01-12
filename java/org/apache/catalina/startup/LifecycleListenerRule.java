@@ -97,7 +97,7 @@ public class LifecycleListenerRule extends Rule {
         // Check the container's parent for the specified attribute
         if (p != null && className == null) {
             String configClass = (String) IntrospectionUtils.getProperty(p, attributeName);
-            if (configClass != null && configClass.length() > 0) {
+            if (configClass != null && !configClass.isEmpty()) {
                 className = configClass;
             }
         }

@@ -61,7 +61,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     /**
      * Keeps count of the number of stuck threads that have been interrupted
      */
-    private AtomicLong interruptedThreadsCount = new AtomicLong();
+    private final AtomicLong interruptedThreadsCount = new AtomicLong();
 
     /**
      * In seconds. Default 600 (10 minutes).
@@ -325,7 +325,9 @@ public class StuckThreadDetectionValve extends ValveBase {
                     // going out from here, maybe already serving a new request
                     this.interruptionSemaphore.acquire();
                 } catch (InterruptedException e) {
-                    log.debug(sm.getString("stuckThreadDetectionValve.interrupted"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stuckThreadDetectionValve.interrupted"), e);
+                    }
                 }
                 // no need to release the semaphore, it will be GCed
             }

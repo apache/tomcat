@@ -143,6 +143,25 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
     /**
      * {@inheritDoc}
      * <p>
+     * Calls to this method will be ignored as this implementation does not allow linking.
+     */
+    @Override
+    public void setAllowLinking(boolean allowLinking) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calls to this method always return {@code false} as this implementation does not allow linking.
+     */
+    @Override
+    public boolean getAllowLinking() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
      * This implementation always returns true.
      */
     @Override

@@ -52,7 +52,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     private volatile boolean running = false;
 
-    private AtomicReference<Selector> selector = new AtomicReference<>();
+    private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
@@ -72,12 +72,12 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         super.start();
         try {
             setPool(new RxTaskPool(getMaxThreads(), getMinThreads(), this));
-        } catch (Exception x) {
-            log.fatal(sm.getString("nioReceiver.threadpool.fail"), x);
-            if (x instanceof IOException) {
-                throw (IOException) x;
+        } catch (Exception e) {
+            log.fatal(sm.getString("nioReceiver.threadpool.fail"), e);
+            if (e instanceof IOException) {
+                throw (IOException) e;
             } else {
-                throw new IOException(x.getMessage());
+                throw new IOException(e.getMessage());
             }
         }
         try {
@@ -90,12 +90,12 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             Thread t = new Thread(this, "NioReceiver" + channelName);
             t.setDaemon(true);
             t.start();
-        } catch (Exception x) {
-            log.fatal(sm.getString("nioReceiver.start.fail"), x);
-            if (x instanceof IOException) {
-                throw (IOException) x;
+        } catch (Exception e) {
+            log.fatal(sm.getString("nioReceiver.start.fail"), e);
+            if (e instanceof IOException) {
+                throw (IOException) e;
             } else {
-                throw new IOException(x.getMessage());
+                throw new IOException(e.getMessage());
             }
         }
     }
@@ -128,13 +128,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         // set up the datagram channel
         if (this.getUdpPort() > 0) {
             datagramChannel = DatagramChannel.open();
-            configureDatagraChannel();
+            configureDatagramChannel();
             // bind to the address to avoid security checks
             bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
         }
     }
 
-    private void configureDatagraChannel() throws IOException {
+    private void configureDatagramChannel() throws IOException {
         datagramChannel.configureBlocking(false);
         datagramChannel.socket().setSendBufferSize(getUdpTxBufSize());
         datagramChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
@@ -160,15 +160,15 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (events.isEmpty()) {
             return;
         }
-        Runnable r = null;
+        Runnable r;
         while ((r = events.pollFirst()) != null) {
             try {
                 if (log.isTraceEnabled()) {
                     log.trace("Processing event in selector:" + r);
                 }
                 r.run();
-            } catch (Exception x) {
-                log.error(sm.getString("nioReceiver.eventsError"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("nioReceiver.eventsError"), e);
             }
         }
     }
@@ -184,9 +184,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (key.channel() instanceof SocketChannel) {
             try {
                 ((SocketChannel) key.channel()).socket().close();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), e);
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
                 }
             }
         }
@@ -201,9 +201,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
         try {
             key.channel().close();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("nioReceiver.closeError"), e);
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
             }
         }
 
@@ -303,7 +303,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 // get an iterator over the set of selected keys
                 Iterator<SelectionKey> it = selector.selectedKeys().iterator();
                 // look at each key in the selected set
-                while (it != null && it.hasNext()) {
+                while (it.hasNext()) {
                     SelectionKey key = it.next();
                     // Is a new connection coming in?
                     if (key.isAcceptable()) {
@@ -344,9 +344,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (datagramChannel != null) {
             try {
                 datagramChannel.close();
-            } catch (Exception iox) {
+            } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), iox);
+                    log.debug(sm.getString("nioReceiver.closeError"), e);
                 }
             }
             datagramChannel = null;
@@ -377,8 +377,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     log.warn(sm.getString("nioReceiver.stop.threadRunning"));
                 }
                 closeSelector();
-            } catch (Exception x) {
-                log.error(sm.getString("nioReceiver.stop.fail"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("nioReceiver.stop.fail"), e);
             } finally {
                 this.selector.set(null);
             }
@@ -397,9 +397,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 key.attach(null);
                 key.cancel();
             }
-        } catch (IOException ignore) {
+        } catch (IOException ioe) {
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("nioReceiver.cleanup.fail"), ignore);
+                log.warn(sm.getString("nioReceiver.cleanup.fail"), ioe);
             }
         } catch (ClosedSelectorException ignore) {
             // Ignore
@@ -444,8 +444,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         running = true;
         try {
             listen();
-        } catch (Exception x) {
-            log.error(sm.getString("nioReceiver.run.fail"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("nioReceiver.run.fail"), e);
         } finally {
             running = false;
         }

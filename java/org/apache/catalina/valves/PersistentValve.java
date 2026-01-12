@@ -76,7 +76,7 @@ public class PersistentValve extends ValveBase {
 
     protected Pattern filter = null;
 
-    private ConcurrentMap<String,UsageCountingSemaphore> sessionToSemaphoreMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String,UsageCountingSemaphore> sessionToSemaphoreMap = new ConcurrentHashMap<>();
 
     private boolean semaphoreFairness = true;
 
@@ -93,11 +93,7 @@ public class PersistentValve extends ValveBase {
     @Override
     public void setContainer(Container container) {
         super.setContainer(container);
-        if (container instanceof Engine || container instanceof Host) {
-            clBindRequired = true;
-        } else {
-            clBindRequired = false;
-        }
+        clBindRequired = container instanceof Engine || container instanceof Host;
     }
 
 
@@ -202,7 +198,7 @@ public class PersistentValve extends ValveBase {
                 Session hsess;
                 try {
                     hsess = request.getSessionInternal(false);
-                } catch (Exception ex) {
+                } catch (Exception e) {
                     hsess = null;
                 }
                 String newsessionId = null;
@@ -289,9 +285,7 @@ public class PersistentValve extends ValveBase {
             int maxInactiveInterval = session.getMaxInactiveInterval();
             if (maxInactiveInterval > 0) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
-                if (timeIdle >= maxInactiveInterval) {
-                    return true;
-                }
+                return timeIdle >= maxInactiveInterval;
             }
         }
 
@@ -325,7 +319,7 @@ public class PersistentValve extends ValveBase {
     }
 
     public void setFilter(String filter) {
-        if (filter == null || filter.length() == 0) {
+        if (filter == null || filter.isEmpty()) {
             this.filter = null;
         } else {
             try {

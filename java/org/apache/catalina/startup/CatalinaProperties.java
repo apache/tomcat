@@ -30,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
- *
- * @author Remy Maucherat
  */
 public class CatalinaProperties {
 
@@ -102,7 +100,7 @@ public class CatalinaProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                log.warn(t);
+                log.warn(t.getMessage(), t);
             } finally {
                 try {
                     is.close();

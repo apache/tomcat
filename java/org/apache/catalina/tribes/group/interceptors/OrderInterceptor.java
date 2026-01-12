@@ -70,7 +70,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         ChannelException cx = null;
         for (Member member : destination) {
             try {
-                int nr = 0;
+                int nr;
                 outLock.writeLock().lock();
                 try {
                     nr = incCounter(member);
@@ -157,7 +157,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         MessageOrder prev = null;
         tmp = order;
         // flag to empty out the queue when it larger than maxQueue
-        boolean empty = order != null ? order.getCount() >= maxQueue : false;
+        boolean empty = order != null && order.getCount() >= maxQueue;
         while (tmp != null) {
             // process expired messages or empty out the queue
             if (tmp.isExpired(expire) || empty) {
@@ -249,7 +249,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         private final long received = System.currentTimeMillis();
         private MessageOrder next;
         private final int msgNr;
-        private ChannelMessage msg = null;
+        private ChannelMessage msg;
 
         public MessageOrder(int msgNr, ChannelMessage msg) {
             this.msgNr = msgNr;
@@ -317,7 +317,6 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 // add before
                 prev.next = add; // prev cannot be null here, warning suppressed
                 add.next = iter;
-
             } else {
                 throw new ArithmeticException(sm.getString("orderInterceptor.messageAdded.sameCounter"));
             }

@@ -281,7 +281,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     public void sendAck() throws IOException {
         // It possible that the protocol configuration is changed between the
-        // request being received and the first read of the body. That could led
+        // request being received and the first read of the body. That could lead
         // to multiple calls to this method so ensure the ACK is only sent once.
         if (!response.isCommitted() && !ackSent) {
             ackSent = true;

@@ -22,9 +22,6 @@ import jakarta.el.FunctionMapper;
 
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public class FunctionMapperFactory extends FunctionMapper {
 
     protected FunctionMapperImpl memento = null;

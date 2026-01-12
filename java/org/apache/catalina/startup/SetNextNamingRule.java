@@ -78,7 +78,7 @@ public class SetNextNamingRule extends Rule {
         Object parent = digester.peek(1);
         boolean context = false;
 
-        NamingResourcesImpl namingResources = null;
+        NamingResourcesImpl namingResources;
         if (parent instanceof Context) {
             namingResources = ((Context) parent).getNamingResources();
             context = true;
@@ -105,13 +105,7 @@ public class SetNextNamingRule extends Rule {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("SetNextRule[");
-        sb.append("methodName=");
-        sb.append(methodName);
-        sb.append(", paramType=");
-        sb.append(paramType);
-        sb.append(']');
-        return sb.toString();
+        return "SetNextRule[" + "methodName=" + methodName + ", paramType=" + paramType + ']';
     }
 
 

@@ -38,6 +38,7 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.ServerEndpointConfig;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.websocket.Constants;
@@ -50,8 +51,8 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 public class UpgradeUtil {
 
     private static final StringManager sm = StringManager.getManager(UpgradeUtil.class.getPackage().getName());
-    private static final byte[] WS_ACCEPT = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-            .getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] WS_ACCEPT =
+            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(StandardCharsets.ISO_8859_1);
 
     private UpgradeUtil() {
         // Utility class. Hide default constructor.
@@ -71,20 +72,20 @@ public class UpgradeUtil {
      */
     public static boolean isWebSocketUpgradeRequest(ServletRequest request, ServletResponse response) {
 
-        return ((request instanceof HttpServletRequest) &&
-                (response instanceof HttpServletResponse) && headerContainsToken((HttpServletRequest) request,
-                        Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE) &&
-                "GET".equals(((HttpServletRequest) request).getMethod()));
+        return ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
+                headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
+                        Constants.UPGRADE_HEADER_VALUE) &&
+                Method.GET.equals(((HttpServletRequest) request).getMethod()));
     }
 
 
     public static void doUpgrade(WsServerContainer sc, HttpServletRequest req, HttpServletResponse resp,
-            ServerEndpointConfig sec, Map<String, String> pathParams) throws ServletException, IOException {
+            ServerEndpointConfig sec, Map<String,String> pathParams) throws ServletException, IOException {
 
         // Validate the rest of the headers and reject the request if that
         // validation fails
         String key;
-        String subProtocol = null;
+        String subProtocol;
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -119,19 +120,19 @@ public class UpgradeUtil {
         while (extHeaders.hasMoreElements()) {
             Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
         }
-        // Negotiation phase 1. By default this simply filters out the
+        // Negotiation phase 1. By default, this simply filters out the
         // extensions that the server does not support but applications could
         // use a custom configurator to do more than this.
-        List<Extension> installedExtensions = null;
-        if (sec.getExtensions().size() == 0) {
+        List<Extension> installedExtensions;
+        if (sec.getExtensions().isEmpty()) {
             installedExtensions = Constants.INSTALLED_EXTENSIONS;
         } else {
             installedExtensions = new ArrayList<>();
             installedExtensions.addAll(sec.getExtensions());
             installedExtensions.addAll(Constants.INSTALLED_EXTENSIONS);
         }
-        List<Extension> negotiatedExtensionsPhase1 = sec.getConfigurator().getNegotiatedExtensions(installedExtensions,
-                extensionsRequested);
+        List<Extension> negotiatedExtensionsPhase1 =
+                sec.getConfigurator().getNegotiatedExtensions(installedExtensions, extensionsRequested);
 
         // Negotiation phase 2. Create the Transformations that will be applied
         // to this connection. Note than an extension may be dropped at this
@@ -176,7 +177,7 @@ public class UpgradeUtil {
         resp.setHeader(Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE);
         resp.setHeader(Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE);
         resp.setHeader(HandshakeResponse.SEC_WEBSOCKET_ACCEPT, getWebSocketAccept(key));
-        if (subProtocol != null && subProtocol.length() > 0) {
+        if (subProtocol != null && !subProtocol.isEmpty()) {
             // RFC6455 4.2.2 explicitly states "" is not valid here
             resp.setHeader(Constants.WS_PROTOCOL_HEADER_NAME, subProtocol);
         }
@@ -211,7 +212,7 @@ public class UpgradeUtil {
         wsRequest.finished();
 
         // Add any additional headers
-        for (Entry<String, List<String>> entry : wsResponse.getHeaders().entrySet()) {
+        for (Entry<String,List<String>> entry : wsResponse.getHeaders().entrySet()) {
             for (String headerValue : entry.getValue()) {
                 resp.addHeader(entry.getKey(), headerValue);
             }
@@ -253,7 +254,7 @@ public class UpgradeUtil {
 
         TransformationFactory factory = TransformationFactory.getInstance();
 
-        LinkedHashMap<String, List<List<Extension.Parameter>>> extensionPreferences = new LinkedHashMap<>();
+        LinkedHashMap<String,List<List<Extension.Parameter>>> extensionPreferences = new LinkedHashMap<>();
 
         // Result will likely be smaller than this
         List<Transformation> result = new ArrayList<>(negotiatedExtensions.size());
@@ -263,7 +264,7 @@ public class UpgradeUtil {
                     .add(extension.getParameters());
         }
 
-        for (Map.Entry<String, List<List<Extension.Parameter>>> entry : extensionPreferences.entrySet()) {
+        for (Map.Entry<String,List<List<Extension.Parameter>>> entry : extensionPreferences.entrySet()) {
             Transformation transformation = factory.create(entry.getKey(), entry.getValue(), true);
             if (transformation != null) {
                 result.add(transformation);
@@ -274,7 +275,7 @@ public class UpgradeUtil {
 
 
     private static void append(StringBuilder sb, Extension extension) {
-        if (extension == null || extension.getName() == null || extension.getName().length() == 0) {
+        if (extension == null || extension.getName() == null || extension.getName().isEmpty()) {
             return;
         }
 

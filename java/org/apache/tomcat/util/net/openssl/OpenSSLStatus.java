@@ -25,7 +25,11 @@ public class OpenSSLStatus {
      * OpenSSL library variant that has been identified
      */
     public enum Name {
-        OPENSSL, OPENSSL3, LIBRESSL, BORINGSSL, UNKNOWN
+        OPENSSL,
+        OPENSSL3,
+        LIBRESSL,
+        BORINGSSL,
+        UNKNOWN
     }
 
     private static volatile boolean libraryInitialized = false;

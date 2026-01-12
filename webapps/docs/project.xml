@@ -80,14 +80,14 @@
         <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
         <item name="Configuration"         href="config/index.html"/>
         <item name="Tomcat Javadocs"       href="api/index.html"/>
-        <item name="Servlet 6.1 Javadocs"  href="servletapi/index.html"/>
-        <item name="JSP 4.0 Javadocs"      href="jspapi/index.html"/>
-        <item name="EL 6.0 Javadocs"       href="elapi/index.html"/>
-        <item name="WebSocket 2.2 Javadocs"
+        <item name="Servlet 6.2 Javadocs"  href="servletapi/index.html"/>
+        <item name="JSP 4.1 Javadocs"      href="jspapi/index.html"/>
+        <item name="EL 6.1 Javadocs"       href="elapi/index.html"/>
+        <item name="WebSocket 2.3 Javadocs"
               href="websocketapi/index.html"/>
-        <item name="Authentication 3.1 Javadocs"
+        <item name="Authentication 3.2 Javadocs"
               href="jaspicapi/index.html"/>
-        <item name="Annotations 3.0 Javadocs"
+        <item name="Annotations 3.1 Javadocs"
               href="annotationapi/index.html"/>
         <item name="JK 1.2 Documentation"
               href="https://tomcat.apache.org/connectors-doc/"/>

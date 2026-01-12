@@ -39,7 +39,7 @@ public class TestFilterDef {
         FilterDef filterDef = new FilterDef();
         filterDef.setFilterName("test");
         Assert.assertEquals("'test' is expected as filter name",
-            "test", filterDef.getFilterName());
+                "test", filterDef.getFilterName());
     }
 
 }

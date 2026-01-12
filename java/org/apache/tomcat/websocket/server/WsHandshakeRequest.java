@@ -19,11 +19,13 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -41,16 +43,16 @@ public class WsHandshakeRequest implements HandshakeRequest {
     private static final StringManager sm = StringManager.getManager(WsHandshakeRequest.class);
 
     private final URI requestUri;
-    private final Map<String, List<String>> parameterMap;
+    private final Map<String,List<String>> parameterMap;
     private final String queryString;
     private final Principal userPrincipal;
-    private final Map<String, List<String>> headers;
+    private final Map<String,List<String>> headers;
     private final Object httpSession;
 
     private volatile HttpServletRequest request;
 
 
-    public WsHandshakeRequest(HttpServletRequest request, Map<String, String> pathParams) {
+    public WsHandshakeRequest(HttpServletRequest request, Map<String,String> pathParams) {
 
         this.request = request;
 
@@ -60,18 +62,18 @@ public class WsHandshakeRequest implements HandshakeRequest {
         requestUri = buildRequestUri(request);
 
         // ParameterMap
-        Map<String, String[]> originalParameters = request.getParameterMap();
-        Map<String, List<String>> newParameters = new HashMap<>(originalParameters.size());
-        for (Entry<String, String[]> entry : originalParameters.entrySet()) {
+        Map<String,String[]> originalParameters = request.getParameterMap();
+        Map<String,List<String>> newParameters = new HashMap<>(originalParameters.size());
+        for (Entry<String,String[]> entry : originalParameters.entrySet()) {
             newParameters.put(entry.getKey(), Collections.unmodifiableList(Arrays.asList(entry.getValue())));
         }
-        for (Entry<String, String> entry : pathParams.entrySet()) {
+        for (Entry<String,String> entry : pathParams.entrySet()) {
             newParameters.put(entry.getKey(), Collections.singletonList(entry.getValue()));
         }
         parameterMap = Collections.unmodifiableMap(newParameters);
 
         // Headers
-        Map<String, List<String>> newHeaders = new CaseInsensitiveKeyMap<>();
+        Map<String,List<String>> newHeaders = new CaseInsensitiveKeyMap<>();
 
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -89,7 +91,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
     }
 
     @Override
-    public Map<String, List<String>> getParameterMap() {
+    public Map<String,List<String>> getParameterMap() {
         return parameterMap;
     }
 
@@ -104,7 +106,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
     }
 
     @Override
-    public Map<String, List<String>> getHeaders() {
+    public Map<String,List<String>> getHeaders() {
         return headers;
     }
 
@@ -145,15 +147,13 @@ public class WsHandshakeRequest implements HandshakeRequest {
             port = 80;
         }
 
-        if ("http".equals(scheme)) {
-            uri.append("ws");
-        } else if ("https".equals(scheme)) {
-            uri.append("wss");
-        } else if ("wss".equals(scheme) || "ws".equals(scheme)) {
-            uri.append(scheme);
-        } else {
-            // Should never happen
-            throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.unknownScheme", scheme));
+        switch (scheme) {
+            case "http" -> uri.append("ws");
+            case "https" -> uri.append("wss");
+            case "wss", "ws" -> uri.append(scheme);
+            case null, default ->
+                // Should never happen
+                throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.unknownScheme", scheme));
         }
 
         uri.append("://");
@@ -178,5 +178,45 @@ public class WsHandshakeRequest implements HandshakeRequest {
             // Should never happen
             throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.invalidUri", uri.toString()), e);
         }
+    }
+
+    @Override
+    public X509Certificate[] getUserX509CertificateChain() {
+        return (X509Certificate[]) request.getAttribute(Constants.CERTIFICATE_SERVLET_REQUEST_ATTRIBUTE);
+    }
+
+    @Override
+    public String getLocalAddress() {
+        return request.getLocalAddr();
+    }
+
+    @Override
+    public String getLocalHostName() {
+        return request.getLocalName();
+    }
+
+    @Override
+    public int getLocalPort() {
+        return request.getLocalPort();
+    }
+
+    @Override
+    public String getRemoteAddress() {
+        return request.getRemoteAddr();
+    }
+
+    @Override
+    public String getRemoteHostName() {
+        return request.getRemoteHost();
+    }
+
+    @Override
+    public int getRemotePort() {
+        return request.getRemotePort();
+    }
+
+    @Override
+    public Locale getPreferredLocale() {
+        return request.getLocale();
     }
 }

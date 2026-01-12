@@ -72,16 +72,14 @@ public class TestSendFile extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
-        Map<String, List<String>> respHeaders = new HashMap<>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
         for (int i = 0; i < ITERATIONS; i++) {
             long start = System.currentTimeMillis();
-            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
-                    respHeaders);
+            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, respHeaders);
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-            System.out.println("Client received " + bc.getLength() + " bytes in "
-                    + (System.currentTimeMillis() - start) + " ms.");
-            Assert.assertEquals("Expected [" + EXPECTED_CONTENT_LENGTH * (i + 1L) +
-                    "], was [" + bc.getLength() + "]",
+            System.out.println(
+                    "Client received " + bc.getLength() + " bytes in " + (System.currentTimeMillis() - start) + " ms.");
+            Assert.assertEquals("Expected [" + EXPECTED_CONTENT_LENGTH * (i + 1L) + "], was [" + bc.getLength() + "]",
                     EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
 
             bc.recycle();
@@ -102,8 +100,7 @@ public class TestSendFile extends TomcatBaseTest {
             }
             w.flush();
         }
-        System.out.println(
-                "Created file:" + f.getAbsolutePath() + " with " + f.length() + " bytes.");
+        System.out.println("Created file:" + f.getAbsolutePath() + " with " + f.length() + " bytes.");
         return f;
 
     }
@@ -120,8 +117,7 @@ public class TestSendFile extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("'application/octet-stream");
             resp.setCharacterEncoding("ISO-8859-1");
@@ -143,8 +139,8 @@ public class TestSendFile extends TomcatBaseTest {
                             written += len;
                         }
                     } while (len > 0);
-                    System.out.println("Server Wrote " + written + " bytes in "
-                            + (System.currentTimeMillis() - start) + " ms.");
+                    System.out.println(
+                            "Server Wrote " + written + " bytes in " + (System.currentTimeMillis() - start) + " ms.");
                 }
             }
         }
@@ -164,21 +160,16 @@ public class TestSendFile extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         try {
-            getUrl("http://localhost:" + getPort() + "/test/?" + Globals.SENDFILE_SUPPORTED_ATTR
-                    + "=true", bc, null);
-        } catch (IOException e) {
+            getUrl("http://localhost:" + getPort() + "/test/?" + Globals.SENDFILE_SUPPORTED_ATTR + "=true", bc, null);
+        } catch (IOException ioe) {
             // Ignore possible IOE due to file delete on the server
-            System.out.println("Ignored: " + e.getMessage());
+            System.out.println("Ignored: " + ioe.getMessage());
         }
 
         CountDownLatch latch = new CountDownLatch(2);
         List<Throwable> throwables = new CopyOnWriteArrayList<>();
-        new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
-                        .start();
-        new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
-                        .start();
+        new Thread(new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables)).start();
+        new Thread(new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables)).start();
 
         latch.await(3000, TimeUnit.MILLISECONDS);
 
@@ -196,8 +187,7 @@ public class TestSendFile extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             if (Boolean.valueOf(req.getParameter(Globals.SENDFILE_SUPPORTED_ATTR)).booleanValue()) {
                 resp.setContentType("'application/octet-stream");
                 resp.setCharacterEncoding("ISO-8859-1");

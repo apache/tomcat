@@ -33,9 +33,10 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
 
 
 /**
- * <p>High level API for processing file uploads.</p>
+ * High level API for processing file uploads.
  *
- * <p>This class handles multiple files per single HTML widget, sent using
+ * <p>
+ * This class handles multiple files per single HTML widget, sent using
  * {@code multipart/mixed} encoding type, as specified by
  * <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.  Use {@link
  * #parseRequest(RequestContext)} to acquire a list of {@link
@@ -48,7 +49,15 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  */
 public abstract class FileUploadBase {
 
-    // ----------------------------------------------------- Manifest constants
+    /**
+     * Line feed.
+     */
+    private static final char LF = '\n';
+
+    /**
+     * Carriage return.
+     */
+    private static final char CR = '\r';
 
     /**
      * HTTP content type header name.
@@ -90,7 +99,12 @@ public abstract class FileUploadBase {
      */
     public static final String MULTIPART_MIXED = "multipart/mixed";
 
-    // ----------------------------------------------------------- Data members
+    /**
+     * Default per part header size limit in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public static final int DEFAULT_PART_HEADER_SIZE_MAX = 512;
 
     /**
      * The maximum size permitted for the complete request, as opposed to
@@ -111,6 +125,11 @@ public abstract class FileUploadBase {
     private long fileCountMax = -1;
 
     /**
+     * The maximum permitted size of the headers provided with a single part in bytes.
+     */
+    private int partHeaderSizeMax = DEFAULT_PART_HEADER_SIZE_MAX;
+
+    /**
      * The content encoding to use when reading part headers.
      */
     private String headerEncoding;
@@ -120,7 +139,75 @@ public abstract class FileUploadBase {
      */
     private ProgressListener listener;
 
-    // ----------------------------------------------------- Property accessors
+    /**
+     * Constructs a new instance.
+     */
+    public FileUploadBase() {
+        // empty
+    }
+
+    /**
+     * Gets the boundary from the {@code Content-type} header.
+     *
+     * @param contentType The value of the content type header from which to
+     *                    extract the boundary value.
+     *
+     * @return The boundary, as a byte array.
+     */
+    public byte[] getBoundary(final String contentType) {
+        final ParameterParser parser = new ParameterParser();
+        parser.setLowerCaseNames(true);
+        // Parameter parser can handle null input
+        final Map<String, String> params = parser.parse(contentType, new char[] {';', ','});
+        final String boundaryStr = params.get("boundary");
+
+        if (boundaryStr == null) {
+            return null;
+        }
+        return boundaryStr.getBytes(StandardCharsets.ISO_8859_1);
+    }
+
+    /**
+     * Gets the field name from the {@code Content-disposition}
+     * header.
+     *
+     * @param headers A {@code Map} containing the HTTP request headers.
+     *
+     * @return The field name for the current {@code encapsulation}.
+     */
+    public String getFieldName(final FileItemHeaders headers) {
+        return getFieldName(headers.getHeader(CONTENT_DISPOSITION));
+    }
+
+    /**
+     * Returns the field name, which is given by the content-disposition
+     * header.
+     * @param contentDisposition The content-dispositions header value.
+     * @return The field name.
+     */
+    private String getFieldName(final String contentDisposition) {
+        String fieldName = null;
+        if (contentDisposition != null && contentDisposition.toLowerCase(Locale.ROOT).startsWith(FORM_DATA)) {
+            final ParameterParser parser = new ParameterParser();
+            parser.setLowerCaseNames(true);
+            // Parameter parser can handle null input
+            final Map<String, String> params = parser.parse(contentDisposition, ';');
+            fieldName = params.get("name");
+            if (fieldName != null) {
+                fieldName = fieldName.trim();
+            }
+        }
+        return fieldName;
+    }
+
+    /**
+     * Returns the maximum number of files allowed in a single request.
+     *
+     * @return The maximum number of files allowed in a single request.
+     */
+    public long getFileCountMax() {
+        return fileCountMax;
+    }
 
     /**
      * Returns the factory class used when creating file items.
@@ -130,38 +217,45 @@ public abstract class FileUploadBase {
     public abstract FileItemFactory getFileItemFactory();
 
     /**
-     * Sets the factory class to use when creating file items.
+     * Gets the file name from the {@code Content-disposition}
+     * header.
      *
-     * @param factory The factory class for new file items.
+     * @param headers The HTTP headers object.
+     *
+     * @return The file name for the current {@code encapsulation}.
      */
-    public abstract void setFileItemFactory(FileItemFactory factory);
-
-    /**
-     * Returns the maximum allowed size of a complete request, as opposed
-     * to {@link #getFileSizeMax()}.
-     *
-     * @return The maximum allowed size, in bytes. The default value of
-     *   -1 indicates, that there is no limit.
-     *
-     * @see #setSizeMax(long)
-     *
-     */
-    public long getSizeMax() {
-        return sizeMax;
+    public String getFileName(final FileItemHeaders headers) {
+        return getFileName(headers.getHeader(CONTENT_DISPOSITION));
     }
 
     /**
-     * Sets the maximum allowed size of a complete request, as opposed
-     * to {@link #setFileSizeMax(long)}.
-     *
-     * @param sizeMax The maximum allowed size, in bytes. The default value of
-     *   -1 indicates, that there is no limit.
-     *
-     * @see #getSizeMax()
-     *
+     * Returns the given content-disposition headers file name.
+     * @param contentDisposition The content-disposition headers value.
+     * @return The file name
      */
-    public void setSizeMax(final long sizeMax) {
-        this.sizeMax = sizeMax;
+    private String getFileName(final String contentDisposition) {
+        String fileName = null;
+        if (contentDisposition != null) {
+            final String cdl = contentDisposition.toLowerCase(Locale.ROOT);
+            if (cdl.startsWith(FORM_DATA) || cdl.startsWith(ATTACHMENT)) {
+                final ParameterParser parser = new ParameterParser();
+                parser.setLowerCaseNames(true);
+                // Parameter parser can handle null input
+                final Map<String, String> params = parser.parse(contentDisposition, ';');
+                if (params.containsKey("filename")) {
+                    fileName = params.get("filename");
+                    if (fileName != null) {
+                        fileName = fileName.trim();
+                    } else {
+                        // Even if there is no value, the parameter is present,
+                        // so we return an empty file name rather than no file
+                        // name.
+                        fileName = "";
+                    }
+                }
+            }
+        }
+        return fileName;
     }
 
     /**
@@ -176,36 +270,7 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Sets the maximum allowed size of a single uploaded file,
-     * as opposed to {@link #getSizeMax()}.
-     *
-     * @see #getFileSizeMax()
-     * @param fileSizeMax Maximum size of a single uploaded file.
-     */
-    public void setFileSizeMax(final long fileSizeMax) {
-        this.fileSizeMax = fileSizeMax;
-    }
-
-    /**
-     * Returns the maximum number of files allowed in a single request.
-     *
-     * @return The maximum number of files allowed in a single request.
-     */
-    public long getFileCountMax() {
-        return fileCountMax;
-    }
-
-    /**
-     * Sets the maximum number of files allowed per request.
-     *
-     * @param fileCountMax The new limit. {@code -1} means no limit.
-     */
-    public void setFileCountMax(final long fileCountMax) {
-        this.fileCountMax = fileCountMax;
-    }
-
-    /**
-     * Retrieves the character encoding used when reading the headers of an
+     * Gets the character encoding used when reading the headers of an
      * individual part. When not specified, or {@code null}, the request
      * encoding is used. If that is also not specified, or {@code null},
      * the platform default encoding is used.
@@ -215,20 +280,6 @@ public abstract class FileUploadBase {
     public String getHeaderEncoding() {
         return headerEncoding;
     }
-
-    /**
-     * Specifies the character encoding to be used when reading the headers of
-     * individual part. When not specified, or {@code null}, the request
-     * encoding is used. If that is also not specified, or {@code null},
-     * the platform default encoding is used.
-     *
-     * @param encoding The encoding used to read part headers.
-     */
-    public void setHeaderEncoding(final String encoding) {
-        headerEncoding = encoding;
-    }
-
-    // --------------------------------------------------------- Public methods
 
     /**
      * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
@@ -247,176 +298,13 @@ public abstract class FileUploadBase {
      *   storing the uploaded content.
      */
     public FileItemIterator getItemIterator(final RequestContext ctx)
-    throws FileUploadException, IOException {
+        throws FileUploadException, IOException {
         try {
             return new FileItemIteratorImpl(this, ctx);
         } catch (final FileUploadIOException e) {
             // unwrap encapsulated SizeException
             throw (FileUploadException) e.getCause();
         }
-    }
-
-    /**
-     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant {@code multipart/form-data} stream.
-     *
-     * @param ctx The context for the request to be parsed.
-     *
-     * @return A list of {@code FileItem} instances parsed from the
-     *         request, in the order that they were transmitted.
-     *
-     * @throws FileUploadException if there are problems reading/parsing
-     *                             the request or storing files.
-     */
-    public List<FileItem> parseRequest(final RequestContext ctx)
-            throws FileUploadException {
-        final List<FileItem> items = new ArrayList<>();
-        boolean successful = false;
-        try {
-            final FileItemIterator iter = getItemIterator(ctx);
-            final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(),
-                    "No FileItemFactory has been set.");
-            final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
-            while (iter.hasNext()) {
-                if (items.size() == fileCountMax) {
-                    // The next item will exceed the limit.
-                    throw new FileCountLimitExceededException(ATTACHMENT, getFileCountMax());
-                }
-                final FileItemStream item = iter.next();
-                // Don't use getName() here to prevent an InvalidFileNameException.
-                final String fileName = item.getName();
-                final FileItem fileItem = fileItemFactory.createItem(item.getFieldName(), item.getContentType(),
-                                                   item.isFormField(), fileName);
-                items.add(fileItem);
-                try {
-                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true, buffer);
-                } catch (final FileUploadIOException e) {
-                    throw (FileUploadException) e.getCause();
-                } catch (final IOException e) {
-                    throw new IOFileUploadException(String.format("Processing of %s request failed. %s",
-                                                           MULTIPART_FORM_DATA, e.getMessage()), e);
-                }
-                final FileItemHeaders fih = item.getHeaders();
-                fileItem.setHeaders(fih);
-            }
-            successful = true;
-            return items;
-        } catch (final FileUploadException e) {
-            throw e;
-        } catch (final IOException e) {
-            throw new FileUploadException(e.getMessage(), e);
-        } finally {
-            if (!successful) {
-                for (final FileItem fileItem : items) {
-                    try {
-                        fileItem.delete();
-                    } catch (final Exception ignored) {
-                        // ignored TODO perhaps add to tracker delete failure list somehow?
-                    }
-                }
-            }
-        }
-    }
-
-    // ------------------------------------------------------ Protected methods
-
-    /**
-     * Retrieves the boundary from the {@code Content-type} header.
-     *
-     * @param contentType The value of the content type header from which to
-     *                    extract the boundary value.
-     *
-     * @return The boundary, as a byte array.
-     */
-    public byte[] getBoundary(final String contentType) {
-        final ParameterParser parser = new ParameterParser();
-        parser.setLowerCaseNames(true);
-        // Parameter parser can handle null input
-        final Map<String, String> params = parser.parse(contentType, new char[] {';', ','});
-        final String boundaryStr = params.get("boundary");
-
-        if (boundaryStr == null) {
-            return null;
-        }
-        final byte[] boundary;
-        boundary = boundaryStr.getBytes(StandardCharsets.ISO_8859_1);
-        return boundary;
-    }
-
-    /**
-     * Retrieves the file name from the {@code Content-disposition}
-     * header.
-     *
-     * @param headers The HTTP headers object.
-     *
-     * @return The file name for the current {@code encapsulation}.
-     */
-    public String getFileName(final FileItemHeaders headers) {
-        return getFileName(headers.getHeader(CONTENT_DISPOSITION));
-    }
-
-    /**
-     * Returns the given content-disposition headers file name.
-     * @param pContentDisposition The content-disposition headers value.
-     * @return The file name
-     */
-    private String getFileName(final String pContentDisposition) {
-        String fileName = null;
-        if (pContentDisposition != null) {
-            final String cdl = pContentDisposition.toLowerCase(Locale.ENGLISH);
-            if (cdl.startsWith(FORM_DATA) || cdl.startsWith(ATTACHMENT)) {
-                final ParameterParser parser = new ParameterParser();
-                parser.setLowerCaseNames(true);
-                // Parameter parser can handle null input
-                final Map<String, String> params = parser.parse(pContentDisposition, ';');
-                if (params.containsKey("filename")) {
-                    fileName = params.get("filename");
-                    if (fileName != null) {
-                        fileName = fileName.trim();
-                    } else {
-                        // Even if there is no value, the parameter is present,
-                        // so we return an empty file name rather than no file
-                        // name.
-                        fileName = "";
-                    }
-                }
-            }
-        }
-        return fileName;
-    }
-
-    /**
-     * Retrieves the field name from the {@code Content-disposition}
-     * header.
-     *
-     * @param headers A {@code Map} containing the HTTP request headers.
-     *
-     * @return The field name for the current {@code encapsulation}.
-     */
-    public String getFieldName(final FileItemHeaders headers) {
-        return getFieldName(headers.getHeader(CONTENT_DISPOSITION));
-    }
-
-    /**
-     * Returns the field name, which is given by the content-disposition
-     * header.
-     * @param pContentDisposition The content-dispositions header value.
-     * @return The field jake
-     */
-    private String getFieldName(final String pContentDisposition) {
-        String fieldName = null;
-        if (pContentDisposition != null
-                && pContentDisposition.toLowerCase(Locale.ENGLISH).startsWith(FORM_DATA)) {
-            final ParameterParser parser = new ParameterParser();
-            parser.setLowerCaseNames(true);
-            // Parameter parser can handle null input
-            final Map<String, String> params = parser.parse(pContentDisposition, ';');
-            fieldName = params.get("name");
-            if (fieldName != null) {
-                fieldName = fieldName.trim();
-            }
-        }
-        return fieldName;
     }
 
     /**
@@ -465,6 +353,40 @@ public abstract class FileUploadBase {
     }
 
     /**
+     * Obtain the per part size limit for headers.
+     *
+     * @return The maximum size of the headers for a single part in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public int getPartHeaderSizeMax() {
+        return partHeaderSizeMax;
+    }
+
+    /**
+     * Returns the progress listener.
+     *
+     * @return The progress listener, if any, or null.
+     */
+    public ProgressListener getProgressListener() {
+        return listener;
+    }
+
+    /**
+     * Returns the maximum allowed size of a complete request, as opposed
+     * to {@link #getFileSizeMax()}.
+     *
+     * @return The maximum allowed size, in bytes. The default value of
+     *   -1 indicates, that there is no limit.
+     *
+     * @see #setSizeMax(long)
+     *
+     */
+    public long getSizeMax() {
+        return sizeMax;
+    }
+
+    /**
      * Creates a new instance of {@link FileItemHeaders}.
      * @return The new instance.
      */
@@ -483,12 +405,12 @@ public abstract class FileUploadBase {
     private int parseEndOfLine(final String headerPart, final int end) {
         int index = end;
         for (;;) {
-            final int offset = headerPart.indexOf('\r', index);
+            final int offset = headerPart.indexOf(CR, index);
             if (offset == -1  ||  offset + 1 >= headerPart.length()) {
                 throw new IllegalStateException(
-                    "Expected headers to be terminated by an empty line.");
+                            "Expected headers to be terminated by an empty line.");
             }
-            if (headerPart.charAt(offset + 1) == '\n') {
+            if (headerPart.charAt(offset + 1) == LF) {
                 return offset;
             }
             index = offset + 1;
@@ -512,21 +434,137 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Returns the progress listener.
+     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
+     * compliant {@code multipart/form-data} stream.
      *
-     * @return The progress listener, if any, or null.
+     * @param ctx The context for the request to be parsed.
+     *
+     * @return A list of {@code FileItem} instances parsed from the
+     *         request, in the order that they were transmitted.
+     *
+     * @throws FileUploadException if there are problems reading/parsing
+     *                             the request or storing files.
      */
-    public ProgressListener getProgressListener() {
-        return listener;
+    public List<FileItem> parseRequest(final RequestContext ctx) throws FileUploadException {
+        final List<FileItem> items = new ArrayList<>();
+        boolean successful = false;
+        try {
+            final FileItemIterator iter = getItemIterator(ctx);
+            final FileItemFactory fileItemFactory = getFileItemFactory();
+            Objects.requireNonNull(fileItemFactory, "getFileItemFactory()");
+            final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
+            while (iter.hasNext()) {
+                if (items.size() == fileCountMax) {
+                    // The next item will exceed the limit.
+                    throw new FileCountLimitExceededException(ATTACHMENT, getFileCountMax());
+                }
+                final FileItemStream item = iter.next();
+                // Don't use getName() here to prevent an InvalidFileNameException.
+                final String fileName = item.getName();
+                final FileItem fileItem = fileItemFactory.createItem(item.getFieldName(), item.getContentType(),
+                                                   item.isFormField(), fileName);
+                items.add(fileItem);
+                try {
+                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true, buffer);
+                } catch (final FileUploadIOException e) {
+                    throw (FileUploadException) e.getCause();
+                } catch (final IOException e) {
+                    throw new IOFileUploadException(String.format("Processing of %s request failed. %s",
+                                                           MULTIPART_FORM_DATA, e.getMessage()), e);
+                }
+                final FileItemHeaders fih = item.getHeaders();
+                fileItem.setHeaders(fih);
+            }
+            successful = true;
+            return items;
+        } catch (final FileUploadException e) {
+            throw e;
+        } catch (final IOException e) {
+            throw new FileUploadException(e.getMessage(), e);
+        } finally {
+            if (!successful) {
+                for (final FileItem fileItem : items) {
+                    try {
+                        fileItem.delete();
+                    } catch (final Exception ignored) {
+                        // ignored TODO perhaps add to tracker delete failure list somehow?
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the maximum number of files allowed per request.
+     *
+     * @param fileCountMax The new limit. {@code -1} means no limit.
+     */
+    public void setFileCountMax(final long fileCountMax) {
+        this.fileCountMax = fileCountMax;
+    }
+
+    /**
+     * Sets the factory class to use when creating file items.
+     *
+     * @param factory The factory class for new file items.
+     */
+    public abstract void setFileItemFactory(FileItemFactory factory);
+
+    /**
+     * Sets the maximum allowed size of a single uploaded file,
+     * as opposed to {@link #getSizeMax()}.
+     *
+     * @see #getFileSizeMax()
+     * @param fileSizeMax Maximum size of a single uploaded file.
+     */
+    public void setFileSizeMax(final long fileSizeMax) {
+        this.fileSizeMax = fileSizeMax;
+    }
+
+    /**
+     * Specifies the character encoding to be used when reading the headers of
+     * individual part. When not specified, or {@code null}, the request
+     * encoding is used. If that is also not specified, or {@code null},
+     * the platform default encoding is used.
+     *
+     * @param encoding The encoding used to read part headers.
+     */
+    public void setHeaderEncoding(final String encoding) {
+        headerEncoding = encoding;
+    }
+
+    /**
+     * Sets the per part size limit for headers.
+     *
+     * @param partHeaderSizeMax The maximum size of the headers in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public void setPartHeaderSizeMax(final int partHeaderSizeMax) {
+        this.partHeaderSizeMax = partHeaderSizeMax;
     }
 
     /**
      * Sets the progress listener.
      *
-     * @param pListener The progress listener, if any. Defaults to null.
+     * @param listener The progress listener, if any. Defaults to null.
      */
-    public void setProgressListener(final ProgressListener pListener) {
-        listener = pListener;
+    public void setProgressListener(final ProgressListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * Sets the maximum allowed size of a complete request, as opposed
+     * to {@link #setFileSizeMax(long)}.
+     *
+     * @param sizeMax The maximum allowed size, in bytes. The default value of
+     *   -1 indicates, that there is no limit.
+     *
+     * @see #getSizeMax()
+     *
+     */
+    public void setSizeMax(final long sizeMax) {
+        this.sizeMax = sizeMax;
     }
 
 }

@@ -17,8 +17,10 @@
 package org.apache.catalina.servlets;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -56,11 +58,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.WebdavIfHeader;
 import org.w3c.dom.Document;
@@ -72,15 +76,32 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Servlet which adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
+ * This servlet adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
  * <a href="https://tools.ietf.org/html/rfc4918#section-18">level 3</a>. All the basic HTTP requests are handled by the
- * DefaultServlet. The WebdavServlet must not be used as the default servlet (ie mapped to '/') as it will not work in
- * this configuration.
+ * DefaultServlet.
  * <p>
- * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect of re-mounting the entire web
- * application under that sub-path, with WebDAV access to all the resources. To restore the DefaultServlet behavior set
- * <code>serveSubpathOnly</code> to <code>true</code>. The <code>WEB-INF</code> and <code>META-INF</code> directories
- * are protected in this re-mounted resource tree.
+ * The WebDAV servlet is only designed for use with path mapping. The WebdavServlet must not be used as the default
+ * servlet (i.e. mapped to '/') or with any other mapping types as it will not work in those configurations.
+ * <p>
+ * By default, the entire web application is exposed via the WebDAV servlet. Mapping the WebDAV servlet to
+ * <code>/*</code> provides WebDAV access to all the resources within the web application. To aid separation of normal
+ * users and WebDAV users, the WebDAV servlet may be mounted at a sub-path (e.g. <code>/webdav/*</code>) which creates
+ * an additional mapping for the entire web application under that sub-path, with WebDAV access to all the resources.
+ * <p>
+ * By default, the <code>WEB-INF</code> and <code>META-INF</code> directories are not accessible via WebDAV. This may be
+ * changed by setting the <code>allowSpecialPaths</code> initialisation parameter to <code>true</code>.
+ * <p>
+ * It is also possible to enable WebDAV access to a sub-set of the standard web application URL space rather than
+ * creating an additional, WebDAV specific mapping. To do this, map the WebDAV servlet to the desired sub-path and set
+ * the <code>serveSubpathOnly</code> initialisation parameter to <code>true</code>.
+ * <p>
+ * Security constraints using the same URL pattern as the mapping (e.g. <code>/webdav/*</code>) can be used to limit the
+ * users with access to WebDAV functionality. Care is required if using security constraints to further limit WebDAV
+ * functionality. In particular, administrators should be aware that security constraints apply only to the request URL.
+ * Security constraints do not apply to any destination URL associated with the WebDAV operation (such as COPY or MOVE).
+ * <p>
+ * If WebDAV functionality is included in a web application where legitimate users may access it via a browser, it is
+ * recommended that the application include CORS protection.
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
  *
@@ -94,7 +115,7 @@ import org.xml.sax.SAXException;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *      &lt;param-name&gt;listings&lt;/param-name&gt;
- *      &lt;param-value&gt;false&lt;/param-value&gt;
+ *      &lt;param-value&gt;true&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *  &lt;/servlet&gt;
  *  &lt;servlet-mapping&gt;
@@ -103,7 +124,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * This will enable read only access. To enable read-write access add:
+ * This will enable read only access with folder listings enabled. To enable read-write access add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -121,7 +142,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * By default access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, use add:
+ * By default, access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -136,12 +157,12 @@ import org.xml.sax.SAXException;
  * http://host:port/context/webdavedit/content
  * <p>
  * The Servlet provides support for arbitrary dead properties on all resources (dead properties are properties whose
- * values are not protected by the server, such as the content length of a resource). By default the Servlet will use
+ * values are not protected by the server, such as the content length of a resource). By default, the Servlet will use
  * non persistent memory storage for them. Persistence can be achieved by implementing the <code>PropertyStore</code>
  * interface and configuring the Servlet to use that store. The <code>propertyStore</code> init-param allows configuring
- * the classname of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
+ * the class name of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
  * store object as bean properties. For example, this would configure a store with class
- * <code>com.MyPropertyStore</code>, and set its field <code>myName</code> to value <code>myValue</code>:
+ * <code>com.MyPropertyStore</code>, and set its property <code>myName</code> to value <code>myValue</code>:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -159,18 +180,8 @@ import org.xml.sax.SAXException;
  */
 public class WebdavServlet extends DefaultServlet implements PeriodicEventListener {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-
-
-    // -------------------------------------------------------------- Constants
-
-    private static final String METHOD_PROPFIND = "PROPFIND";
-    private static final String METHOD_PROPPATCH = "PROPPATCH";
-    private static final String METHOD_MKCOL = "MKCOL";
-    private static final String METHOD_COPY = "COPY";
-    private static final String METHOD_MOVE = "MOVE";
-    private static final String METHOD_LOCK = "LOCK";
-    private static final String METHOD_UNLOCK = "UNLOCK";
 
 
     /**
@@ -344,11 +355,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     resourceLocks.remove(currentLock.path);
                 }
             } else {
-                for (String token : currentLock.sharedTokens) {
-                    if (sharedLocks.get(token) == null) {
-                        currentLock.sharedTokens.remove(token);
-                    }
-                }
+                currentLock.sharedTokens.removeIf(token -> sharedLocks.get(token) == null);
                 if (currentLock.sharedTokens.isEmpty()) {
                     resourceLocks.remove(currentLock.path);
                 }
@@ -464,7 +471,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         /**
-         * @return the statusCode the statusCode to set as a result of the operation
+         * @return the statusCode to set as a result of the operation
          */
         public int getStatusCode() {
             return this.statusCode;
@@ -488,7 +495,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Type of PROPFIND request.
      */
-    enum PropfindType {
+    public enum PropfindType {
         FIND_BY_PROPERTY,
         FIND_ALL_PROP,
         FIND_PROPERTY_NAMES
@@ -498,7 +505,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Type of property update in a PROPPATCH.
      */
-    enum PropertyUpdateType {
+    public enum PropertyUpdateType {
         SET,
         REMOVE
     }
@@ -516,10 +523,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *                              exception)
      */
     protected DocumentBuilder getDocumentBuilder() throws ServletException {
-        DocumentBuilder documentBuilder = null;
-        DocumentBuilderFactory documentBuilderFactory = null;
+        DocumentBuilder documentBuilder;
         try {
-            documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -560,23 +566,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             log("[" + method + "] " + path);
         }
 
-        if (method.equals(METHOD_PROPFIND)) {
-            doPropfind(req, resp);
-        } else if (method.equals(METHOD_PROPPATCH)) {
-            doProppatch(req, resp);
-        } else if (method.equals(METHOD_MKCOL)) {
-            doMkcol(req, resp);
-        } else if (method.equals(METHOD_COPY)) {
-            doCopy(req, resp);
-        } else if (method.equals(METHOD_MOVE)) {
-            doMove(req, resp);
-        } else if (method.equals(METHOD_LOCK)) {
-            doLock(req, resp);
-        } else if (method.equals(METHOD_UNLOCK)) {
-            doUnlock(req, resp);
-        } else {
+        switch (method) {
+            case Method.PROPFIND -> doPropfind(req, resp);
+            case Method.PROPPATCH -> doProppatch(req, resp);
+            case Method.MKCOL -> doMkcol(req, resp);
+            case Method.COPY -> doCopy(req, resp);
+            case Method.MOVE -> doMove(req, resp);
+            case Method.LOCK -> doLock(req, resp);
+            case Method.UNLOCK -> doUnlock(req, resp);
             // DefaultServlet processing
-            super.service(req, resp);
+            default -> super.service(req, resp);
         }
     }
 
@@ -602,12 +601,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             // Get all hrefs from the if header
             Iterator<String> hrefs = ifHeader.getResources();
 
-            String currentPath = null;
-            String currentHref = null;
-            WebResource currentWebResource = null;
+            String currentPath;
+            String currentHref;
+            WebResource currentWebResource;
             if (hrefs.hasNext()) {
                 currentHref = hrefs.next();
                 currentPath = getPathFromHref(currentHref, request);
+                if (currentPath == null) {
+                    // The path was invalid
+                    return false;
+                }
                 currentWebResource = resources.getResource(currentPath);
             } else {
                 currentPath = path;
@@ -633,23 +636,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             if (parentLock.hasExpired()) {
                                 resourceLocks.remove(parentPath);
                             } else {
-                                if ((parentPath != currentPath && parentLock.depth > 0) || parentPath == currentPath) {
+                                // parentPath == currentPath is a check for the first loop
+                                if (parentPath == currentPath || parentLock.depth > 0) {
                                     if (parentLock.isExclusive()) {
                                         lockTokens.add(LOCK_SCHEME + parentLock.token);
                                     } else {
-                                        for (String token : parentLock.sharedTokens) {
-                                            if (sharedLocks.get(token) == null) {
-                                                parentLock.sharedTokens.remove(token);
-                                            }
-                                        }
+                                        parentLock.sharedTokens.removeIf(token -> sharedLocks.get(token) == null);
                                         if (parentLock.sharedTokens.isEmpty()) {
                                             resourceLocks.remove(parentLock.path);
                                         }
                                         for (String token : parentLock.sharedTokens) {
                                             LockInfo sharedLock = sharedLocks.get(token);
                                             if (sharedLock != null) {
-                                                if ((parentPath != currentPath && sharedLock.depth > 0) ||
-                                                        parentPath == currentPath) {
+                                                if (parentPath == currentPath || sharedLock.depth > 0) {
                                                     lockTokens.add(LOCK_SCHEME + token);
                                                 }
                                             }
@@ -674,6 +673,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (hrefs.hasNext()) {
                     currentHref = hrefs.next();
                     currentPath = getPathFromHref(currentHref, request);
+                    if (currentPath == null) {
+                        // The path was invalid
+                        return false;
+                    }
                     currentWebResource = resources.getResource(currentPath);
                 } else {
                     break;
@@ -716,7 +719,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (pathInfo != null) {
             result.append(pathInfo);
         }
-        if (result.length() == 0) {
+        if (result.isEmpty()) {
             result.append('/');
         }
         String resultString = result.toString();
@@ -751,7 +754,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // if the resource does not exist.
         StringBuilder methodsAllowed = new StringBuilder("OPTIONS, GET, POST, HEAD");
 
-        if (!readOnly) {
+        if (!isReadOnly()) {
             methodsAllowed.append(", DELETE");
             if (!resource.isDirectory()) {
                 methodsAllowed.append(", PUT");
@@ -765,7 +768,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         methodsAllowed.append(", LOCK, UNLOCK, PROPPATCH, COPY, MOVE");
 
-        if (listings) {
+        if (isListings()) {
             methodsAllowed.append(", PROPFIND");
         }
 
@@ -796,23 +799,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doPropfind(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (!listings) {
+        if (!isListings()) {
             sendNotAllowed(req, resp);
             return;
         }
 
         String path = getRelativePath(req);
 
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
-
         // Properties which are to be displayed.
         List<Node> properties = new ArrayList<>();
         // Propfind depth
-        int depth = maxDepth;
+        int depth;
         // Propfind type
         PropfindType type = null;
 
@@ -821,23 +818,30 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (depthStr == null) {
             depth = maxDepth;
         } else {
-            if (depthStr.equals("0")) {
-                depth = 0;
-            } else if (depthStr.equals("1")) {
-                depth = 1;
-            } else if (depthStr.equals("infinity")) {
-                depth = maxDepth;
-            } else {
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-                return;
+            switch (depthStr) {
+                case "0" -> depth = 0;
+                case "1" -> depth = 1;
+                case "infinity" -> depth = maxDepth;
+                default -> {
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
+                }
             }
         }
 
-        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
+        byte[] body;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException ioe) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
-                Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+                Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
@@ -1013,7 +1017,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1026,8 +1030,20 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         DocumentBuilder documentBuilder = getDocumentBuilder();
         ArrayList<ProppatchOperation> operations = new ArrayList<>();
 
+        byte[] body;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException ioe) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length == 0) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
         try {
-            Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+            Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
@@ -1053,18 +1069,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         break;
                                     case Node.ELEMENT_NODE:
                                         if ("prop".equals(getDAVNode(currentNode2))) {
-                                            NodeList propChildList = currentNode2.getChildNodes();
-                                            Node property = null;
-                                            for (int k = 0; k < propChildList.getLength(); k++) {
-                                                Node currentNode3 = propChildList.item(k);
-                                                switch (currentNode3.getNodeType()) {
-                                                    case Node.TEXT_NODE:
-                                                        break;
-                                                    case Node.ELEMENT_NODE:
-                                                        property = currentNode3;
-                                                        break;
-                                                }
-                                            }
+                                            Node property = getNode(currentNode2);
                                             if (property != null) {
                                                 operations
                                                         .add(new ProppatchOperation(PropertyUpdateType.SET, property));
@@ -1086,18 +1091,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         break;
                                     case Node.ELEMENT_NODE:
                                         if ("prop".equals(getDAVNode(currentNode2))) {
-                                            NodeList propChildList = currentNode2.getChildNodes();
-                                            Node property = null;
-                                            for (int k = 0; k < propChildList.getLength(); k++) {
-                                                Node currentNode3 = propChildList.item(k);
-                                                switch (currentNode3.getNodeType()) {
-                                                    case Node.TEXT_NODE:
-                                                        break;
-                                                    case Node.ELEMENT_NODE:
-                                                        property = currentNode3;
-                                                        break;
-                                                }
-                                            }
+                                            Node property = getNode(currentNode2);
                                             if (property != null) {
                                                 operations.add(
                                                         new ProppatchOperation(PropertyUpdateType.REMOVE, property));
@@ -1161,6 +1155,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     }
 
+    private static Node getNode(Node currentNode2) {
+        NodeList propChildList = currentNode2.getChildNodes();
+        Node property = null;
+        for (int k = 0; k < propChildList.getLength(); k++) {
+            Node currentNode3 = propChildList.item(k);
+            switch (currentNode3.getNodeType()) {
+                case Node.TEXT_NODE:
+                    break;
+                case Node.ELEMENT_NODE:
+                    property = currentNode3;
+                    break;
+            }
+        }
+        return property;
+    }
+
 
     /**
      * MKCOL Method.
@@ -1175,12 +1185,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String path = getRelativePath(req);
 
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
-
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
             resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
@@ -1194,7 +1198,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1204,7 +1208,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (req.getContentLengthLong() > 0) {
+        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
             // No support for MKCOL bodies, which are non standard
             resp.sendError(WebdavStatus.SC_UNSUPPORTED_MEDIA_TYPE);
             return;
@@ -1221,14 +1225,18 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             sendNotAllowed(req, resp);
             return;
         }
 
         String path = getRelativePath(req);
 
-        deleteResource(path, req, resp);
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+        deleteResource(path, req, resp, true);
     }
 
 
@@ -1268,7 +1276,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doCopy(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1289,7 +1297,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doMove(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1318,7 +1326,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doLock(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1374,17 +1382,25 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 lockDuration = MAX_TIMEOUT;
             }
         }
-        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000);
+        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000L);
 
         boolean lockCreation = false;
 
         Node lockInfoNode = null;
 
-        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
+        byte[] body;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException ioe) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
-                Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+                Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
@@ -1405,8 +1421,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             // Reading lock information
 
             NodeList childList = lockInfoNode.getChildNodes();
-            StringWriter strWriter = null;
-            DOMWriter domWriter = null;
+            StringWriter strWriter;
+            DOMWriter domWriter;
 
             Node lockScopeNode = null;
             Node lockTypeNode = null;
@@ -1657,7 +1673,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (parentLock.hasExpired()) {
                         resourceLocks.remove(parentPath);
                     } else {
-                        if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                        // parentPath == currentPath is a check for the first loop
+                        if (parentPath == path || parentLock.depth > 0) {
                             if (parentLock.isExclusive()) {
                                 if (ifHeader.contains(":" + parentLock.token + ">") && (parentLock.principal == null ||
                                         parentLock.principal.equals(req.getRemoteUser()))) {
@@ -1670,7 +1687,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         LockInfo sharedLock = sharedLocks.get(token);
                                         if (sharedLock != null && (sharedLock.principal == null ||
                                                 sharedLock.principal.equals(req.getRemoteUser()))) {
-                                            if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                            if (parentPath == path || sharedLock.depth > 0) {
                                                 toRenew = sharedLock;
                                                 break;
                                             }
@@ -1731,7 +1748,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doUnlock(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1758,19 +1775,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             if (lockTokenHeader.contains(":" + parentLock.token + ">") &&
                                     (parentLock.principal == null ||
                                             parentLock.principal.equals(req.getRemoteUser()))) {
                                 resourceLocks.remove(parentPath);
                                 unlocked = true;
-                                break;
                             } else {
                                 // No parent exclusive lock will be found
                                 unlocked = false;
-                                break;
                             }
+                            break;
                         } else {
                             for (String token : parentLock.sharedTokens) {
                                 if (lockTokenHeader.contains(":" + token + ">")) {
@@ -1779,7 +1796,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         parentLock.sharedTokens.remove(token);
                                     } else if (lock.principal == null || lock.principal.equals(req.getRemoteUser())) {
                                         // The shared lock might not have the same depth
-                                        if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                        if (parentPath == path || lock.depth > 0) {
                                             parentLock.sharedTokens.remove(token);
                                             sharedLocks.remove(token);
                                             unlocked = true;
@@ -1822,8 +1839,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @return <code>true</code> if the resource specified is under a special path
      */
     private boolean isSpecialPath(final String path) {
-        return !allowSpecialPaths && (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
+        if (!allowSpecialPaths) {
+            String upperCasePath = path.toUpperCase(Locale.ENGLISH);
+            return upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/") ||
+                    upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF");
+        }
+        return false;
     }
 
 
@@ -1945,19 +1966,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
-                            if (ifHeader.contains(":" + parentLock.token + ">") &&
-                                    (parentLock.principal == null || parentLock.principal.equals(principal))) {
-                                return false;
-                            }
-                            return true;
+                            return !ifHeader.contains(":" + parentLock.token + ">") ||
+                                    (parentLock.principal != null && !parentLock.principal.equals(principal));
                         } else {
                             for (String token : parentLock.sharedTokens) {
                                 LockInfo lock = sharedLocks.get(token);
                                 if (lock != null) {
                                     // The shared lock might not have the same depth
-                                    if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                    if (parentPath == path || lock.depth > 0) {
                                         if (ifHeader.contains(":" + token + ">") &&
                                                 (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
@@ -2058,7 +2077,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // Cross-context operations aren't supported
         String reqContextPath = getPathPrefix(req);
-        if (!destinationPath.startsWith(reqContextPath + "/")) {
+        String expectedTargetPath = reqContextPath;
+        // Also ensure copy (and move) operations do not escape the configured sub-path when limited to the sub-path
+        if (serveSubpathOnly && req.getServletPath() != null) {
+            expectedTargetPath = expectedTargetPath + req.getServletPath();
+        }
+        if (!destinationPath.startsWith(expectedTargetPath + "/")) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
@@ -2097,11 +2121,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         boolean overwrite = true;
         String overwriteHeader = req.getHeader("Overwrite");
         if (overwriteHeader != null) {
-            if (overwriteHeader.equalsIgnoreCase("T")) {
-                overwrite = true;
-            } else {
-                overwrite = false;
-            }
+            overwrite = overwriteHeader.equalsIgnoreCase("T");
         }
 
         // Overwriting the destination
@@ -2235,35 +2255,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     store.copy(source, dest);
                 }
-            } catch (IOException e) {
-                log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
+            } catch (IOException ioe) {
+                log(sm.getString("webdavservlet.inputstreamclosefail", source), ioe);
             }
         } else {
             errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             return false;
         }
         return true;
-    }
-
-
-    /**
-     * Delete a resource.
-     *
-     * @param path Path of the resource which is to be deleted
-     * @param req  Servlet request
-     * @param resp Servlet response
-     *
-     * @return <code>true</code> if the delete is successful
-     *
-     * @throws IOException If an IO error occurs
-     */
-    private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        WebResource resource = resources.getResource(path);
-        if (!checkIfHeaders(req, resp, resource)) {
-            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return false;
-        }
-        return deleteResource(path, req, resp, true);
     }
 
 
@@ -2468,7 +2467,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "error", XMLWriter.OPENING);
 
-        if (errorPath != null && errorPath.length() > 0) {
+        if (errorPath != null && !errorPath.isEmpty()) {
             generatedXML.writeElement("D", error, XMLWriter.OPENING);
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
             generatedXML.writeText(getEncodedPath(errorPath, null, req));
@@ -2497,12 +2496,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         generatedXML.writeElement("D", "href", XMLWriter.OPENING);
         generatedXML.writeText(rewrittenUrl);
         generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-        String resourceName = path;
-        int lastSlash = path.lastIndexOf('/');
-        if (lastSlash != -1) {
-            resourceName = resourceName.substring(lastSlash + 1);
-        }
 
         switch (propFindType) {
 
@@ -2681,7 +2674,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             parentLock.toXML(generatedXML);
                         } else {
@@ -2691,7 +2685,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                     if (sharedLock.hasExpired()) {
                                         sharedLocks.remove(lockToken);
                                     } else {
-                                        if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                        if (parentPath == path || sharedLock.depth > 0) {
                                             sharedLock.toXML(generatedXML);
                                         }
                                     }
@@ -2731,12 +2725,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     private static boolean propertyEquals(Node node1, Node node2) {
-        if (node1.getLocalName().equals(node2.getLocalName()) &&
+        return node1.getLocalName().equals(node2.getLocalName()) &&
                 ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
-                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())))) {
-            return true;
-        }
-        return false;
+                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())));
     }
 
 
@@ -2747,6 +2738,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     private static class LockInfo implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         LockInfo(int maxDepth) {
@@ -2774,21 +2766,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         @Override
         public String toString() {
-
-            StringBuilder result = new StringBuilder("Type:");
-            result.append(type);
-            result.append("\nScope:");
-            result.append(scope);
-            result.append("\nDepth:");
-            result.append(depth);
-            result.append("\nOwner:");
-            result.append(owner);
-            result.append("\nExpiration:");
-            result.append(FastHttpDateFormat.formatDate(expiresAt));
-            result.append("\nToken:");
-            result.append(token);
-            result.append("\n");
-            return result.toString();
+            return "Type:" + type + "\nScope:" + scope + "\nDepth:" + String.valueOf(depth) + "\nOwner:" + owner +
+                    "\nExpiration:" + FastHttpDateFormat.formatDate(expiresAt) + "\nToken:" + token + "\n";
         }
 
 
@@ -2796,7 +2775,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
          * @return true if the lock has expired.
          */
         public boolean hasExpired() {
-            return sharedTokens.size() == 0 && System.currentTimeMillis() > expiresAt;
+            return sharedTokens.isEmpty() && System.currentTimeMillis() > expiresAt;
         }
 
 
@@ -2868,7 +2847,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * references are filtered out for security reasons. See CVE-2007-5461.
      */
     private static class WebdavResolver implements EntityResolver {
-        private ServletContext context;
+        private final ServletContext context;
 
         WebdavResolver(ServletContext theContext) {
             context = theContext;
@@ -2997,11 +2976,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     }
                 }
             } else {
-                ArrayList<Node> properties = deadProperties.get(resource);
-                if (properties == null) {
-                    properties = new ArrayList<>();
-                    deadProperties.put(resource, properties);
-                }
+                ArrayList<Node> properties = deadProperties.computeIfAbsent(resource, k -> new ArrayList<>());
                 synchronized (properties) {
                     for (ProppatchOperation operation : operations) {
                         if (operation.getUpdateType() == PropertyUpdateType.SET) {
@@ -3045,8 +3020,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 /**
  * Wraps the HttpServletResponse class to abstract the specific protocol used. To support other protocols we would only
  * need to modify this class and the WebDavRetCode classes.
- *
- * @author Marc Eaddy
  */
 class WebdavStatus {
 

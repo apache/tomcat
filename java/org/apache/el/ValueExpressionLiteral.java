@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
@@ -31,6 +32,7 @@ import org.apache.el.util.ReflectionUtil;
 
 public final class ValueExpressionLiteral extends ValueExpression implements Externalizable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Object value;

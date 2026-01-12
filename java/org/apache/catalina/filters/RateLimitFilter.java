@@ -47,12 +47,15 @@ import org.apache.tomcat.util.res.StringManager;
  * so it converts some configured values to more efficient values. For example, a configuration of a 60 seconds time
  * bucket is converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In
  * order to remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
- * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify a
- * different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
+ * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. An alternative
+ * implementation, <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to provide a less efficient but
+ * more accurate control, whose effective duration in seconds and number of requests configuration are consist with the
+ * user declared. You can specify a different class as long as it implements the
+ * <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
- * is typically expected to get far less requests than the rest of the application, so you can add a filter definition
+ * is typically expected to get far fewer requests than the rest of the application, so you can add a filter definition
  * that would allow only 5 requests per 15 seconds and map those URIs to it.
  * </p>
  * <p>
@@ -71,7 +74,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
  * filter mapping for the Rate Limit Filter must come <em>after</em> the mapping of the Remote IP Filter to ensure that
  * each request has its IP address resolved before the Rate Limit Filter is applied. Failure to do so will count
- * requests from different IPs in the same bucket and will result in a self inflicted DoS attack.
+ * requests from different IPs in the same bucket and will result in a self-inflicted DoS attack.
  * </p>
  */
 public class RateLimitFilter extends FilterBase {
@@ -145,7 +148,7 @@ public class RateLimitFilter extends FilterBase {
 
     private String policyName = null;
 
-    private transient Log log = LogFactory.getLog(RateLimitFilter.class);
+    private final transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
     private static final StringManager sm = StringManager.getManager(RateLimitFilter.class);
 

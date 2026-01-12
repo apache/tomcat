@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -68,6 +69,7 @@ public class AbsoluteOrder {
 
     public static class AbsoluteComparator implements Comparator<Member>, Serializable {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -113,15 +115,7 @@ public class AbsoluteOrder {
         }
 
         protected int compareInts(int b1, int b2) {
-            int result = 0;
-            if (b1 == b2) {
-
-            } else if (b1 < b2) {
-                result = -1;
-            } else {
-                result = 1;
-            }
-            return result;
+            return Integer.compare(b1, b2);
         }
     }
 

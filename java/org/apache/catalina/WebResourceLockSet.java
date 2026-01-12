@@ -16,8 +16,7 @@
  */
 package org.apache.catalina;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Interface implemented by {@link WebResourceSet} implementations that wish to provide locking functionality.
@@ -25,49 +24,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public interface WebResourceLockSet {
 
     /**
-     * Lock the resource at the provided path for reading. The resource is not required to exist. Read locks are not
-     * exclusive.
+     * Obtain a reentrant read/write lock for the resource at the provided path. The resource is not required to exist.
+     * Multiple calls to this method with the same path will return the same lock provided that at least one instance of
+     * the lock remains in use between the calls.
      *
-     * @param path The path to the resource to be locked for reading
+     * @param path The path for which the lock should be obtained
      *
-     * @return The {@link ResourceLock} that must be passed to {@link #unlockForRead(ResourceLock)} to release the lock
+     * @return A reentrant read/write lock for the given resource.
      */
-    ResourceLock lockForRead(String path);
-
-    /**
-     * Release a read lock from the resource associated with the given {@link ResourceLock}.
-     *
-     * @param resourceLock The {@link ResourceLock} associated with the resource for which a read lock should be
-     *                         released
-     */
-    void unlockForRead(ResourceLock resourceLock);
-
-    /**
-     * Lock the resource at the provided path for writing. The resource is not required to exist. Write locks are
-     * exclusive.
-     *
-     * @param path The path to the resource to be locked for writing
-     *
-     * @return The {@link ResourceLock} that must be passed to {@link #unlockForWrite(ResourceLock)} to release the lock
-     */
-    ResourceLock lockForWrite(String path);
-
-    /**
-     * Release the write lock from the resource associated with the given {@link ResourceLock}.
-     *
-     * @param resourceLock The {@link ResourceLock} associated with the resource for which the write lock should be
-     *                         released
-     */
-    void unlockForWrite(ResourceLock resourceLock);
-
-
-    class ResourceLock {
-        public final AtomicInteger count = new AtomicInteger(0);
-        public final ReentrantReadWriteLock reentrantLock = new ReentrantReadWriteLock();
-        public final String key;
-
-        public ResourceLock(String key) {
-            this.key = key;
-        }
-    }
+    ReadWriteLock getLock(String path);
 }

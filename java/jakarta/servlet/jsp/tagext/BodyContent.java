@@ -44,7 +44,7 @@ import jakarta.servlet.jsp.JspWriter;
 public abstract class BodyContent extends JspWriter {
 
     /**
-     * Protected constructor. Unbounded buffer, no autoflushing.
+     * Protected constructor. Unbounded buffer, no auto flushing.
      *
      * @param e the enclosing JspWriter
      */
@@ -71,7 +71,7 @@ public abstract class BodyContent extends JspWriter {
     public void clearBody() {
         try {
             this.clear();
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             // TODO -- clean this one up.
             throw new Error("internal error!;");
         }

@@ -82,7 +82,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Protected constructor.
      *
      * @param bufferSize the size of the buffer to be used by the JspWriter
-     * @param autoFlush  whether the JspWriter should be autoflushing
+     * @param autoFlush  whether the JspWriter should be auto flushing
      */
     protected JspWriter(int bufferSize, boolean autoFlush) {
         this.bufferSize = bufferSize;
@@ -179,7 +179,7 @@ public abstract class JspWriter extends java.io.Writer {
      * @throws NullPointerException If <code>s</code> is <code>null</code>
      * @throws IOException          If an error occurred while writing
      */
-    public abstract void print(char s[]) throws IOException;
+    public abstract void print(char[] s) throws IOException;
 
     /**
      * Print a string. If the argument is <code>null</code> then the string <code>"null"</code> is printed. Otherwise,
@@ -285,7 +285,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @throws IOException If an error occurred while writing
      */
-    public abstract void println(char x[]) throws IOException;
+    public abstract void println(char[] x) throws IOException;
 
     /**
      * Print a String and then terminate the line. This method behaves as though it invokes
@@ -327,7 +327,7 @@ public abstract class JspWriter extends java.io.Writer {
     /**
      * Flush the stream. If the stream has saved any characters from the various write() methods in a buffer, write them
      * immediately to their intended destination. Then, if that destination is another character or byte stream, flush
-     * it. Thus one flush() invocation will flush all the buffers in a chain of Writers and OutputStreams.
+     * it. Thus, one flush() invocation will flush all the buffers in a chain of Writers and OutputStreams.
      * <p>
      * The method may be invoked indirectly if the buffer size is exceeded.
      * <p>
@@ -386,7 +386,7 @@ public abstract class JspWriter extends java.io.Writer {
     protected int bufferSize;
 
     /**
-     * Whether the JspWriter is autoflushing.
+     * Whether the JspWriter is auto flushing.
      */
     protected boolean autoFlush;
 }

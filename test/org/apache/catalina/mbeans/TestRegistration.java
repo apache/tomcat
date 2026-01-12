@@ -41,9 +41,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
- * General tests around the process of registration and de-registration that
- * don't necessarily apply to one specific Tomcat class.
- *
+ * General tests around the process of registration and de-registration that don't necessarily apply to one specific
+ * Tomcat class.
  */
 public class TestRegistration extends TomcatBaseTest {
 
@@ -63,91 +62,61 @@ public class TestRegistration extends TomcatBaseTest {
 
 
     private static String[] basicMBeanNames() {
-        return new String[] {
-            "Tomcat:type=Engine",
-            "Tomcat:type=Realm,realmPath=/realm0",
-            "Tomcat:type=Mapper",
-            "Tomcat:type=MBeanFactory",
-            "Tomcat:type=NamingResources",
-            "Tomcat:type=Server",
-            "Tomcat:type=Service",
-            "Tomcat:type=StringCache",
-            "Tomcat:type=UtilityExecutor",
-            "Tomcat:type=Valve,name=StandardEngineValve",
-        };
+        return new String[] { "Tomcat:type=Engine", "Tomcat:type=Realm,realmPath=/realm0", "Tomcat:type=Mapper",
+                "Tomcat:type=MBeanFactory", "Tomcat:type=NamingResources", "Tomcat:type=Server", "Tomcat:type=Service",
+                "Tomcat:type=StringCache", "Tomcat:type=UtilityExecutor",
+                "Tomcat:type=Valve,name=StandardEngineValve", };
     }
 
     private static String[] hostMBeanNames(String host) {
-        return new String[] {
-            "Tomcat:type=Host,host=" + host,
-            "Tomcat:type=Valve,host=" + host + ",name=ErrorReportValve",
-            "Tomcat:type=Valve,host=" + host + ",name=StandardHostValve",
-        };
+        return new String[] { "Tomcat:type=Host,host=" + host,
+                "Tomcat:type=Valve,host=" + host + ",name=ErrorReportValve",
+                "Tomcat:type=Valve,host=" + host + ",name=StandardHostValve", };
     }
 
     private String[] optionalMBeanNames(String host) {
         if (isAccessLogEnabled()) {
-            return new String[] {
-                "Tomcat:type=Valve,host=" + host + ",name=AccessLogValve",
-            };
+            return new String[] { "Tomcat:type=Valve,host=" + host + ",name=AccessLogValve", };
         } else {
-            return new String[] { };
+            return new String[] {};
         }
     }
 
     private static String[] requestMBeanNames(String port, String type) {
-        return new String[] {
-            "Tomcat:type=RequestProcessor,worker=" +
-                    ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port) +
-                    ",name=HttpRequest1",
-        };
+        return new String[] { "Tomcat:type=RequestProcessor,worker=" +
+                ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port) + ",name=HttpRequest1", };
     }
 
     private static String[] contextMBeanNames(String host, String context) {
         return new String[] {
-            "Tomcat:j2eeType=WebModule,name=//" + host + context +
-                ",J2EEApplication=none,J2EEServer=none",
-            "Tomcat:type=Loader,host=" + host + ",context=" + context,
-            "Tomcat:type=Manager,host=" + host + ",context=" + context,
-            "Tomcat:type=NamingResources,host=" + host + ",context=" + context,
-            "Tomcat:type=Valve,host=" + host + ",context=" + context +
-                    ",name=NonLoginAuthenticator",
-            "Tomcat:type=Valve,host=" + host + ",context=" + context +
-                    ",name=StandardContextValve",
-            "Tomcat:type=ParallelWebappClassLoader,host=" + host + ",context=" + context,
-            "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context,
-            "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context +
-                    ",name=Cache",
-            "Tomcat:type=Realm,realmPath=/realm0,host=" + host +
-            ",context=" + context,
-            "Tomcat:type=Realm,realmPath=/realm0/realm0,host=" + host +
-            ",context=" + context
-        };
+                "Tomcat:j2eeType=WebModule,name=//" + host + context + ",J2EEApplication=none,J2EEServer=none",
+                "Tomcat:type=Loader,host=" + host + ",context=" + context,
+                "Tomcat:type=Manager,host=" + host + ",context=" + context,
+                "Tomcat:type=NamingResources,host=" + host + ",context=" + context,
+                "Tomcat:type=Valve,host=" + host + ",context=" + context + ",name=NonLoginAuthenticator",
+                "Tomcat:type=Valve,host=" + host + ",context=" + context + ",name=StandardContextValve",
+                "Tomcat:type=ParallelWebappClassLoader,host=" + host + ",context=" + context,
+                "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context,
+                "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context + ",name=Cache",
+                "Tomcat:type=Realm,realmPath=/realm0,host=" + host + ",context=" + context,
+                "Tomcat:type=Realm,realmPath=/realm0/realm0,host=" + host + ",context=" + context };
     }
 
     private static String[] connectorMBeanNames(String port, String type) {
-        return new String[] {
-        "Tomcat:type=Connector,port=" + port + ",address="
-                + ObjectName.quote(ADDRESS),
-        "Tomcat:type=GlobalRequestProcessor,name="
-                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        "Tomcat:type=ProtocolHandler,port=" + port + ",address="
-                + ObjectName.quote(ADDRESS),
-        "Tomcat:type=ThreadPool,name="
-                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        "Tomcat:type=SocketProperties,name="
-                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        };
+        return new String[] { "Tomcat:type=Connector,port=" + port + ",address=" + ObjectName.quote(ADDRESS),
+                "Tomcat:type=GlobalRequestProcessor,name=" +
+                        ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
+                "Tomcat:type=ProtocolHandler,port=" + port + ",address=" + ObjectName.quote(ADDRESS),
+                "Tomcat:type=ThreadPool,name=" + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
+                "Tomcat:type=SocketProperties,name=" + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port), };
     }
 
     /*
-     * Test verifying that Tomcat correctly de-registers the MBeans it has
-     * registered.
-     * @author Marc Guillemot
+     * Test verifying that Tomcat correctly de-registers the MBeans it has registered.
      */
     @Test
     public void testMBeanDeregistration() throws Exception {
-        final MBeanServer mbeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        final MBeanServer mbeanServer = Registry.getRegistry(null).getMBeanServer();
         // Verify there are no Catalina or Tomcat MBeans
         Set<ObjectName> onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
@@ -181,7 +150,7 @@ public class TestRegistration extends TomcatBaseTest {
         // Verify there are the correct Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         ArrayList<String> found = new ArrayList<>(onames.size());
-        for (ObjectName on: onames) {
+        for (ObjectName on : onames) {
             found.add(on.toString());
         }
 
@@ -198,8 +167,7 @@ public class TestRegistration extends TomcatBaseTest {
         expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
         expected.addAll(Arrays.asList(connectorMBeanNames("auto-" + index, protocol)));
         expected.addAll(Arrays.asList(optionalMBeanNames("localhost")));
-        expected.addAll(Arrays.asList(requestMBeanNames(
-                "auto-" + index + "-" + getPort(), protocol)));
+        expected.addAll(Arrays.asList(requestMBeanNames("auto-" + index + "-" + getPort(), protocol)));
 
         // Did we find all expected MBeans?
         ArrayList<String> missing = new ArrayList<>(expected);
@@ -248,8 +216,7 @@ public class TestRegistration extends TomcatBaseTest {
     }
 
     /*
-     * Confirm that, as far as ObjectName is concerned, the order of the key
-     * properties is not significant.
+     * Confirm that, as far as ObjectName is concerned, the order of the key properties is not significant.
      */
     @Test
     public void testNames() throws MalformedObjectNameException {

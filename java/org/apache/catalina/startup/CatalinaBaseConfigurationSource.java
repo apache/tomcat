@@ -47,7 +47,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
     @Override
     public Resource getServerXml() throws IOException {
-        IOException ioe = null;
+        IOException ioException = null;
         Resource result = null;
         try {
             if (serverXmlPath == null || serverXmlPath.equals(Catalina.SERVER_XML)) {
@@ -55,8 +55,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             } else {
                 result = getResource(serverXmlPath);
             }
-        } catch (IOException e) {
-            ioe = e;
+        } catch (IOException ioe) {
+            ioException = ioe;
         }
         if (result == null) {
             // Compatibility with legacy server-embed.xml location
@@ -71,8 +71,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             }
         }
 
-        if (result == null && ioe != null) {
-            throw ioe;
+        if (result == null && ioException != null) {
+            throw ioException;
         } else {
             return result;
         }
@@ -108,7 +108,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         }
 
         // Then try URI.
-        URI uri = null;
+        URI uri;
         try {
             uri = getURIInternal(name);
         } catch (IllegalArgumentException e) {

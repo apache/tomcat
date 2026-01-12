@@ -57,8 +57,8 @@ public class SimplePOJOAsyncExample {
             Future<Connection> future = datasource.getConnectionAsync();
             while (!future.isDone()) {
                 System.out.println("Connection is not yet available. Do some background work");
-            try {
-                Thread.sleep(100); //simulate work
+                try {
+                    Thread.sleep(100); //simulate work
                 } catch (InterruptedException x) {
                     Thread.interrupted();
                 }

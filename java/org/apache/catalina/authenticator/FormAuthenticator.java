@@ -40,14 +40,12 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of FORM BASED Authentication, as described in the Servlet API
  * Specification.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class FormAuthenticator extends AuthenticatorBase {
 
@@ -79,7 +77,7 @@ public class FormAuthenticator extends AuthenticatorBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the character encoding to use to read the user name and password.
+     * Return the character encoding to use to read the username and password.
      *
      * @return The name of the character encoding
      */
@@ -89,7 +87,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Set the character encoding to be used to read the user name and password.
+     * Set the character encoding to be used to read the username and password.
      *
      * @param encoding The name of the encoding to use
      */
@@ -134,7 +132,7 @@ public class FormAuthenticator extends AuthenticatorBase {
      * Configures the maximum session timeout to be used during authentication if the authentication process creates a
      * session.
      *
-     * @param authenticationSessionTimeout The maximum session timeout to use duriing authentication if the
+     * @param authenticationSessionTimeout The maximum session timeout to use during authentication if the
      *                                         authentication process creates a session
      */
     public void setAuthenticationSessionTimeout(int authenticationSessionTimeout) {
@@ -159,7 +157,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // References to objects we will need later
         Session session = null;
-        Principal principal = null;
+        Principal principal;
 
         // Have we authenticated this user before but have caching disabled?
         if (!cache) {
@@ -225,9 +223,9 @@ public class FormAuthenticator extends AuthenticatorBase {
         // No -- Save this request and redirect to the form login page
         if (!loginAction) {
             // If this request was to the root of the context without a trailing
-            // '/', need to redirect to add it else the submit of the login form
+            // '/', need to redirect to add it else the submission of the login form
             // may not go to the correct web application
-            if (request.getServletPath().length() == 0 && request.getPathInfo() == null) {
+            if (request.getServletPath().isEmpty() && request.getPathInfo() == null) {
                 StringBuilder location = new StringBuilder(requestURI);
                 location.append('/');
                 if (request.getQueryString() != null) {
@@ -245,7 +243,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             try {
                 saveRequest(request, session);
             } catch (IOException ioe) {
-                log.debug(sm.getString("authenticator.requestBodyTooBig"));
+                log.debug(sm.getString("authenticator.requestBodyTooBig"), ioe);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, sm.getString("authenticator.requestBodyTooBig"));
                 return false;
             }
@@ -301,7 +299,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 // the landing page
                 String uri = request.getContextPath() + landingPage;
                 SavedRequest saved = new SavedRequest();
-                saved.setMethod("GET");
+                saved.setMethod(Method.GET);
                 saved.setRequestURI(uri);
                 saved.setDecodedRequestURI(uri);
                 request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
@@ -326,7 +324,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 // the landing page
                 String uri = request.getContextPath() + landingPage;
                 SavedRequest saved = new SavedRequest();
-                saved.setMethod("GET");
+                saved.setMethod(Method.GET);
                 saved.setRequestURI(uri);
                 saved.setDecodedRequestURI(uri);
                 session.setNote(Constants.FORM_REQUEST_NOTE, saved);
@@ -364,9 +362,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         Session session = request.getSessionInternal(false);
         if (session != null) {
             SavedRequest savedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            if (savedRequest != null && decodedRequestURI.equals(savedRequest.getDecodedRequestURI())) {
-                return true;
-            }
+            return savedRequest != null && decodedRequestURI.equals(savedRequest.getDecodedRequestURI());
         }
 
         return false;
@@ -424,7 +420,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         }
 
         String loginPage = config.getLoginPage();
-        if (loginPage == null || loginPage.length() == 0) {
+        if (loginPage == null || loginPage.isEmpty()) {
             String msg = sm.getString("formAuthenticator.noLoginPage", context.getName());
             log.warn(msg);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
@@ -445,7 +441,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Always use GET for the login page, regardless of the method used
         String oldMethod = request.getMethod();
-        request.getCoyoteRequest().method().setString("GET");
+        request.getCoyoteRequest().setMethod(Method.GET);
 
         RequestDispatcher disp = context.getServletContext().getRequestDispatcher(loginPage);
         try {
@@ -461,7 +457,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
         } finally {
             // Restore original method so that it is written into access log
-            request.getCoyoteRequest().method().setString(oldMethod);
+            request.getCoyoteRequest().setMethod(oldMethod);
         }
     }
 
@@ -480,7 +476,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             throws IOException {
 
         String errorPage = config.getErrorPage();
-        if (errorPage == null || errorPage.length() == 0) {
+        if (errorPage == null || errorPage.isEmpty()) {
             String msg = sm.getString("formAuthenticator.noErrorPage", context.getName());
             log.warn(msg);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
@@ -505,7 +501,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
     /**
      * Does this request match the saved one (so that it must be the redirect we signaled after successful
-     * authentication?
+     * authentication?)
      *
      * @param request The request to be verified
      *
@@ -587,7 +583,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         String method = saved.getMethod();
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
-        boolean cacheable = "GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method);
+        boolean cacheable = Method.GET.equals(method) || Method.HEAD.equals(method);
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();
@@ -621,7 +617,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
             // If no content type specified, use default for POST
             String savedContentType = saved.getContentType();
-            if (savedContentType == null && "POST".equalsIgnoreCase(method)) {
+            if (savedContentType == null && Method.POST.equals(method)) {
                 savedContentType = Globals.CONTENT_TYPE_FORM_URL_ENCODING;
             }
 
@@ -629,7 +625,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             request.getCoyoteRequest().setContentType(contentType);
         }
 
-        request.getCoyoteRequest().method().setString(method);
+        request.getCoyoteRequest().setMethod(method);
         // The method, URI, queryString and protocol are normally stored as
         // bytes in the HttpInputBuffer and converted lazily to String. At this
         // point, the method has already been set as String in the line above
@@ -637,14 +633,14 @@ public class FormAuthenticator extends AuthenticatorBase {
         // HttpInputBuffer. Processing the saved request body will overwrite
         // these bytes. Configuring the HttpInputBuffer to retain these bytes as
         // it would in a normal request would require some invasive API changes.
-        // Therefore force the conversion to String now so the correct values
+        // Therefore, force the conversion to String now so the correct values
         // are presented if the application requests them.
         request.getCoyoteRequest().requestURI().toStringType();
         request.getCoyoteRequest().queryString().toStringType();
         request.getCoyoteRequest().protocol().toStringType();
 
-        if (saved.getOriginalMaxInactiveInterval() > 0) {
-            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveInterval());
+        if (saved.getOriginalMaxInactiveIntervalOptional() != null) {
+            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveIntervalOptional().intValue());
         }
 
         return true;
@@ -663,7 +659,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Create and populate a SavedRequest object for this request
         SavedRequest saved = new SavedRequest();
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 saved.addCookie(cookie);
@@ -715,17 +711,19 @@ public class FormAuthenticator extends AuthenticatorBase {
         SavedRequest previousSavedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
         if (session.isNew()) {
             int originalMaxInactiveInterval = session.getMaxInactiveInterval();
-            if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
+            if (originalMaxInactiveInterval > getAuthenticationSessionTimeout() || originalMaxInactiveInterval <= 0) {
                 saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
                 session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
             }
-        } else if (previousSavedRequest != null && previousSavedRequest.getOriginalMaxInactiveInterval() > 0) {
+        } else if (previousSavedRequest != null &&
+                previousSavedRequest.getOriginalMaxInactiveIntervalOptional() != null) {
             /*
              * The user may have refreshed the browser page during authentication. Transfer the original max inactive
              * interval from previous saved request to current one else, once authentication is completed, the session
-             * will retain the the shorter authentication session timeout
+             * will retain the shorter authentication session timeout
              */
-            saved.setOriginalMaxInactiveInterval(previousSavedRequest.getOriginalMaxInactiveInterval());
+            saved.setOriginalMaxInactiveInterval(
+                    previousSavedRequest.getOriginalMaxInactiveIntervalOptional().intValue());
         }
 
         // Stash the SavedRequest in our session for later use

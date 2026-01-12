@@ -27,8 +27,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class handles reading bytes.
- *
- * @author Remy Maucherat
  */
 public class CoyoteInputStream extends ServletInputStream {
 

@@ -29,14 +29,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ManagerSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(ManagerSF.class);
+    private static final Log log = LogFactory.getLog(ManagerSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
         StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
-            if (aElement instanceof StandardManager) {
-                StandardManager manager = (StandardManager) aElement;
+            if (aElement instanceof StandardManager manager) {
                 if (!isDefaultManager(manager)) {
                     if (log.isTraceEnabled()) {
                         log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
@@ -62,18 +61,14 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        if (!"SESSIONS.ser".equals(smanager.getPathname()) || (smanager.getMaxActiveSessions() != -1)) {
-            return false;
-        }
-        return true;
+        return "SESSIONS.ser".equals(smanager.getPathname()) && (smanager.getMaxActiveSessions() == -1);
 
     }
 
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aManager, StoreDescription parentDesc)
             throws Exception {
-        if (aManager instanceof Manager) {
-            Manager manager = (Manager) aManager;
+        if (aManager instanceof Manager manager) {
             // Store nested <SessionIdGenerator> element;
             SessionIdGenerator sessionIdGenerator = manager.getSessionIdGenerator();
             if (sessionIdGenerator != null) {

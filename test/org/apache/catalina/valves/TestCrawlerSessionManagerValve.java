@@ -165,7 +165,7 @@ public class TestCrawlerSessionManagerValve {
     private HttpSession createSessionExpectations(CrawlerSessionManagerValve valve, boolean isBot) {
         HttpSession session = EasyMock.createMock(HttpSession.class);
         if (isBot) {
-            EasyMock.expect(session.getId()).andReturn("id").times(2);
+            EasyMock.expect(session.getId()).andReturn("id").times(1);
             session.setAttribute(EasyMock.eq(valve.getClass().getName()),
                     EasyMock.anyObject(HttpSessionBindingListener.class));
             EasyMock.expectLastCall();
@@ -184,6 +184,8 @@ public class TestCrawlerSessionManagerValve {
             String contextPath, String userAgent) {
         Request request = EasyMock.createMock(Request.class);
         EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
+        EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
+        EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
         EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
         EasyMock.expect(request.getContext()).andReturn(simpleContextWithName(contextPath));
         IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false)).andReturn(null);

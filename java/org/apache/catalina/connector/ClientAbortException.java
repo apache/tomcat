@@ -16,15 +16,16 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.Serial;
+
 import org.apache.coyote.BadRequestException;
 
 /**
  * Extend IOException to identify it as being caused by an abort of a request by a remote client.
- *
- * @author Glenn L. Nielsen
  */
 public final class ClientAbortException extends BadRequestException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

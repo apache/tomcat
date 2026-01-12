@@ -24,11 +24,8 @@ import javax.naming.NamingException;
 
 /**
  * Naming enumeration implementation.
- *
- * @author Remy Maucherat
  */
-public class NamingContextEnumeration
-    implements NamingEnumeration<NameClassPair> {
+public class NamingContextEnumeration implements NamingEnumeration<NameClassPair> {
 
 
     // ----------------------------------------------------------- Constructors
@@ -52,22 +49,19 @@ public class NamingContextEnumeration
 
 
     @Override
-    public NameClassPair next()
-        throws NamingException {
+    public NameClassPair next() throws NamingException {
         return nextElement();
     }
 
 
     @Override
-    public boolean hasMore()
-        throws NamingException {
+    public boolean hasMore() throws NamingException {
         return iterator.hasNext();
     }
 
 
     @Override
-    public void close()
-        throws NamingException {
+    public void close() throws NamingException {
     }
 
 

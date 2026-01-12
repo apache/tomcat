@@ -18,9 +18,6 @@ package org.apache.tomcat.util.buf;
 
 /**
  * This class implements some basic ASCII character handling functions.
- *
- * @author dac@eng.sun.com
- * @author James Todd [gonzo@eng.sun.com]
  */
 public final class Ascii {
     /*
@@ -75,7 +72,7 @@ public final class Ascii {
     }
 
     /**
-     * Parses an unsigned long from the specified subarray of bytes.
+     * Parses an unsigned long from the specified sub array of bytes.
      *
      * @param b   the bytes to parse
      * @param off the start offset of the bytes

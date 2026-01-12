@@ -31,10 +31,20 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -48,8 +58,13 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Server;
@@ -65,6 +80,8 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.http.Method;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -137,8 +154,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
         return ctx;
     }
-
-
+    public Context getProgrammaticRootContextWithManager() {
+        Context ctx = getProgrammaticRootContext();
+        if (ctx.getManager() == null) {
+            ctx.setManager(new StandardManager());
+        }
+        return ctx;
+    }
     /*
      * Sub-classes need to know port so they can connect
      */
@@ -244,7 +266,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         private static final long serialVersionUID = 1L;
 
         public static final String RESPONSE_TEXT =
-            "<html><body><p>Hello World</p></body></html>";
+                "<html><body><p>Hello World</p></body></html>";
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -468,13 +490,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             out.println("CONTEXT-MINOR-VERSION: " + ctx.getMinorVersion());
             out.println("CONTEXT-SERVER-INFO: " + ctx.getServerInfo());
             for (Enumeration<String> e = ctx.getInitParameterNames();
-                 e.hasMoreElements();) {
+                    e.hasMoreElements();) {
                 name = e.nextElement();
                 out.println("CONTEXT-INIT-PARAM:" + name + ": " +
                             ctx.getInitParameter(name));
             }
             for (Enumeration<String> e = ctx.getAttributeNames();
-                 e.hasMoreElements();) {
+                    e.hasMoreElements();) {
                 name = e.nextElement();
                 out.println("CONTEXT-ATTRIBUTE:" + name + ": " +
                             ctx.getAttribute(name));
@@ -511,11 +533,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             out.println("REQUEST-LOCALE: " + request.getLocale());
 
             for (Enumeration<String> e = request.getHeaderNames();
-                 e.hasMoreElements();) {
+                    e.hasMoreElements();) {
                 name = e.nextElement();
                 value = new StringBuilder();
                 for (Enumeration<String> h = request.getHeaders(name);
-                     h.hasMoreElements();) {
+                        h.hasMoreElements();) {
                     value.append(h.nextElement());
                     if (h.hasMoreElements()) {
                         value.append(';');
@@ -525,7 +547,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
 
             for (Enumeration<String> e = request.getAttributeNames();
-                 e.hasMoreElements();) {
+                    e.hasMoreElements();) {
                 name = e.nextElement();
                 attribute = request.getAttribute(name);
                 out.println("ATTRIBUTE:" + name + ": " +
@@ -533,7 +555,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
 
             for (Enumeration<String> e = request.getParameterNames();
-                 e.hasMoreElements();) {
+                    e.hasMoreElements();) {
                 name = e.nextElement();
                 value = new StringBuilder();
                 String values[] = request.getParameterValues(name);
@@ -544,7 +566,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         value.append(';');
                     }
                 }
-                out.println("PARAM/" + name + ": " + value);
+                out.println("PARAM:" + name + ": " + value);
             }
 
             out.println("SESSION-REQUESTED-ID: " +
@@ -566,7 +588,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         session.getMaxInactiveInterval());
                 out.println("SESSION-IS-NEW: " + session.isNew());
                 for (Enumeration<String> e = session.getAttributeNames();
-                     e.hasMoreElements();) {
+                        e.hasMoreElements();) {
                     name = e.nextElement();
                     attribute = session.getAttribute(name);
                     out.println("SESSION-ATTRIBUTE:" + name + ": " +
@@ -575,7 +597,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
 
             int bodySize = 0;
-            if ("PUT".equalsIgnoreCase(request.getMethod())) {
+            if (Method.PUT.equals(request.getMethod())) {
                 InputStream is = request.getInputStream();
                 int read = 0;
                 byte[] buffer = new byte[8192];
@@ -633,12 +655,12 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int getUrl(String path, ByteChunk out, boolean followRedirects)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, "GET", followRedirects);
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, Method.GET, followRedirects);
     }
 
     public static int headUrl(String path, ByteChunk out, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "HEAD");
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, Method.HEAD);
     }
 
     public static int getUrl(String path, ByteChunk out, Map<String, List<String>> reqHead,
@@ -649,7 +671,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     public static int getUrl(String path, ByteChunk out, int readTimeout,
             Map<String, List<String>> reqHead, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, readTimeout, reqHead, resHead, "GET");
+        return methodUrl(path, out, readTimeout, reqHead, resHead, Method.GET);
     }
 
     public static int methodUrl(String path, ByteChunk out, int readTimeout,
@@ -725,29 +747,26 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     public static int postUrl(final byte[] body, String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
-            BytesStreamer s = new BytesStreamer() {
-            boolean done = false;
-            @Override
-            public byte[] next() {
-                done = true;
-                return body;
-
-            }
-
-            @Override
-            public int getLength() {
-                return body!=null?body.length:0;
-            }
-
-            @Override
-            public int available() {
-                if (done) {
-                  return 0;
-                } else {
-                  return getLength();
+        BytesStreamer s = new BytesStreamer() {
+                boolean done = false;
+                @Override
+                public byte[] next() {
+                    done = true;
+                    return body;
                 }
-            }
-        };
+                @Override
+                public int getLength() {
+                    return body!=null?body.length:0;
+                }
+                @Override
+                public int available() {
+                    if (done) {
+                        return 0;
+                    } else {
+                        return getLength();
+                    }
+                }
+            };
         return postUrl(false,s,path,out,reqHead,resHead);
     }
 
@@ -758,7 +777,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         URL url = URI.create(path).toURL();
         HttpURLConnection connection =
-            (HttpURLConnection) url.openConnection();
+                (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setReadTimeout(1000000);
         if (reqHead != null) {
@@ -923,6 +942,215 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         Session[] sessions = context.getManager().findSessions();
         for (Session session : sessions) {
             session.setMaxInactiveInterval(newIntervalSecs);
+        }
+    }
+
+    /**
+     * Captures logs for the given logger names in the current ClassLoader.
+     */
+    public static class LogCapture implements AutoCloseable {
+        protected final Level level;
+        protected final String[] loggerNames;
+        protected final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
+        protected final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
+        private volatile boolean installed = false;
+        protected final Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                logRecords.add(record);
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() throws SecurityException {
+                logRecords.clear();
+            }
+        };
+        public LogCapture(Level level, String... loggerNames) {
+            this.level = level;
+            this.loggerNames = loggerNames;
+        }
+
+        public void attach() {
+            if (!installed) {
+                for (String name : loggerNames) {
+                    Logger logger = Logger.getLogger(name);
+                    logger.addHandler(handler);
+                    if (level != null) {
+                        previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                        logger.setLevel(level);
+                    }
+                }
+                installed = true;
+            }
+        }
+
+        public boolean containsText(CharSequence s) {
+            for (LogRecord record : logRecords) {
+                if (record.getMessage().contains(s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public boolean hasException(Class<? extends Throwable> type) {
+            for (LogRecord record : logRecords) {
+                Throwable t = record.getThrown();
+                while (t != null) {
+                    if (type.isInstance(t)) {return true;}
+                    t = t.getCause();
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void close() throws Exception {
+            for (Logger l : previousLevelsOfLoggersMap.keySet()) {
+                try {
+                    l.removeHandler(handler);
+                } catch (Throwable ignore) {
+                }
+                try {
+                    l.setLevel(previousLevelsOfLoggersMap.get(l));
+                } catch (Throwable ignore) {
+                }
+            }
+            previousLevelsOfLoggersMap.clear();
+        }
+    }
+
+    public static LogCapture attachLogCapture(Level level, String... loggerNames) {
+        LogCapture logCapture = new LogCapture(level, loggerNames);
+        logCapture.attach();
+        return logCapture;
+    }
+
+    /**
+     * Captures webapp-scoped logs (e.g. ContextConfig/Digester) during the
+     * CONFIGURE_START phase of a {@link Context}.
+     */
+    public static class WebappLogCapture extends LogCapture implements LifecycleListener {
+        private String lifecycleEvent = Lifecycle.CONFIGURE_START_EVENT;
+        public WebappLogCapture(String lifecycleEvent, Level level, String... loggerNames) {
+            this(level, loggerNames);
+            this.lifecycleEvent = lifecycleEvent;
+        }
+        public WebappLogCapture(Level level, String... loggerNames) {
+            super(level, loggerNames);
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (this.lifecycleEvent.equals(event.getType())) {
+                this.attach();
+            }
+        }
+    }
+
+    /**
+     * Installs a {@link WebappLogCapture} on the given {@link Context} so it runs
+     * before {@link ContextConfig} during CONFIGURE_START.
+     * @param ctx         the webapp context
+     * @param level       level for loggers (e.g. {@code Level.ALL})
+     * @param loggerNames fully-qualified logger names
+     * @return the active capture
+     */
+    public static WebappLogCapture attachWebappLogCapture(Context ctx, Level level, String... loggerNames) {
+        List<LifecycleListener> lifecycleListenersToReAdd = new ArrayList<>();
+        for (LifecycleListener l : ctx.findLifecycleListeners()) {
+            if (l instanceof ContextConfig) {
+                lifecycleListenersToReAdd.add(l);
+            }
+        }
+        for (LifecycleListener l : lifecycleListenersToReAdd) {
+            ctx.removeLifecycleListener(l);
+        }
+        WebappLogCapture webappLogCapture = new WebappLogCapture(level, loggerNames);
+        ctx.addLifecycleListener(webappLogCapture);
+        for (LifecycleListener l : lifecycleListenersToReAdd) {
+            ctx.addLifecycleListener(l);
+        }
+        return webappLogCapture;
+    }
+
+    /**
+     * Returns the localized key in a LocalStrings.properties file.
+     *
+     * @param packagePath The package that contains LocalStrings.properties, e.g. 'org.apache.catalina.startup'
+     * @param key           The key to find, e.g. 'versionLoggerListener.serverInfo.server.built'
+     * @param locale        The locale to use, e.g. Locale.ENGLISH
+     * @return The prefix before the first argument placeholder and if no placeholder, returns the whole formatted string.
+     */
+    public static String getKeyFromPropertiesFile(String packagePath, String key, Locale locale) {
+        StringManager sm;
+        if (locale != null) {
+            sm = StringManager.getManager(packagePath, locale);
+        } else {
+            sm = StringManager.getManager(packagePath);
+        }
+
+        String formatted = sm.getString(key, "XXX");
+        int insertIndex = formatted.indexOf("XXX");
+        return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
+    }
+    public static String getKeyFromPropertiesFile(String packagePath, String key) {
+        return getKeyFromPropertiesFile(packagePath, key, Locale.getDefault());
+    }
+    public static String getKeyFromPropertiesFile(StringManager sm, String key) {
+        String formatted = sm.getString(key, "XXX");
+        int insertIndex = formatted.indexOf("XXX");
+        return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
+    }
+
+    /**
+     * Injects a {@link LifecycleListener} to a {@link Context} of a {@link Container} that sends {@code ADD_CHILD_EVENT}.
+     * Useful when deploying with the Manager / HostConfig.
+     */
+    public static class ContainerInjector implements ContainerListener, AutoCloseable {
+
+        private final Container container;
+        private final Predicate<Context> filter;
+        private final Consumer<Context> action;
+        private volatile boolean installed = false;
+        private String containerEvent = Container.ADD_CHILD_EVENT;
+
+        private ContainerInjector(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
+            this.container = container;
+            this.filter = filter;
+            this.action = action;
+            if (containerEvent != null) {
+                this.containerEvent = containerEvent;
+            }
+            container.addContainerListener(this);
+        }
+
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action) {
+            return new ContainerInjector(container, filter, action, null);
+        }
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
+            return new ContainerInjector(container, filter, action, containerEvent);
+        }
+
+        @Override
+        public void containerEvent(ContainerEvent event) {
+            if (this.containerEvent.equals(event.getType()) && !installed) {
+                Object data = event.getData();
+                if (data instanceof Context ctx) {
+                    if (filter != null && filter.test(ctx)) {
+                        action.accept(ctx);
+                        installed = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void close() {
+            container.removeContainerListener(this);
         }
     }
 }

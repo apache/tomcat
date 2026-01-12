@@ -28,7 +28,7 @@ public class RewriteCond {
 
     public static class PatternCondition extends Condition {
         public Pattern pattern;
-        private ThreadLocal<Matcher> matcher = new ThreadLocal<>();
+        private final ThreadLocal<Matcher> matcher = new ThreadLocal<>();
 
         @Override
         public boolean evaluate(String value, Resolver resolver) {
@@ -60,16 +60,12 @@ public class RewriteCond {
         @Override
         public boolean evaluate(String value, Resolver resolver) {
             int result = value.compareTo(condition);
-            switch (type) {
-                case -1:
-                    return (result < 0);
-                case 0:
-                    return (result == 0);
-                case 1:
-                    return (result > 0);
-                default:
-                    return false;
-            }
+            return switch (type) {
+                case -1 -> (result < 0);
+                case 0 -> (result == 0);
+                case 1 -> (result > 0);
+                default -> false;
+            };
 
         }
     }

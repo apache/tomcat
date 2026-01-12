@@ -40,8 +40,6 @@ import javax.sql.DataSource;
  * <li><strong>dataSourceName</strong> - JNDI name of the DataSource, which must be located in the same Context
  * environment as the UserDatabase</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
@@ -52,7 +50,7 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
     /**
      * <p>
      * Create and return a new <code>DataSourceUserDatabase</code> instance that has been configured according to the
-     * properties of the specified <code>Reference</code>. If you instance can be created, return <code>null</code>
+     * properties of the specified <code>Reference</code>. If the instance cannot be created, return <code>null</code>
      * instead.
      * </p>
      *
@@ -69,19 +67,16 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"
-        if ((obj == null) || !(obj instanceof Reference)) {
+        if (!(obj instanceof Reference ref)) {
             return null;
         }
-        Reference ref = (Reference) obj;
         if (!"org.apache.catalina.UserDatabase".equals(ref.getClassName())) {
             return null;
         }
 
         DataSource dataSource = null;
         String dataSourceName = null;
-        RefAddr ra = null;
-
-        ra = ref.get("dataSourceName");
+        RefAddr ra = ref.get("dataSourceName");
         if (ra != null) {
             dataSourceName = ra.getContent().toString();
             dataSource = (DataSource) nameCtx.lookup(dataSourceName);

@@ -16,6 +16,7 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
 import java.util.Enumeration;
 
 import javax.naming.Context;
@@ -24,6 +25,7 @@ import javax.naming.Reference;
 
 public abstract class AbstractRef extends Reference {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

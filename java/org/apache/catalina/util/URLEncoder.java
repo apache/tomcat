@@ -26,9 +26,6 @@ import java.util.BitSet;
  * This class is very similar to the java.net.URLEncoder class. Unfortunately, with java.net.URLEncoder there is no way
  * to specify to the java.net.URLEncoder which characters should NOT be encoded. This code was moved from
  * DefaultServlet.java
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public final class URLEncoder implements Cloneable {
 
@@ -162,7 +159,7 @@ public final class URLEncoder implements Cloneable {
                 try {
                     writer.write((char) c);
                     writer.flush();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     buf.reset();
                     continue;
                 }

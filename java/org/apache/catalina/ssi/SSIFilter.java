@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Serial;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,11 +40,10 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Filter to process SSI requests within a webpage. Mapped to a content types from within web.xml.
  *
- * @author David Becker
- *
  * @see org.apache.catalina.ssi.SSIServlet
  */
 public class SSIFilter extends GenericFilter {
+    @Serial
     private static final long serialVersionUID = 1L;
     /** Debug level for this servlet. */
     protected int debug = 0;

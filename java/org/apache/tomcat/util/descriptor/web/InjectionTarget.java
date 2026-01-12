@@ -16,10 +16,12 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class InjectionTarget implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String targetClass;

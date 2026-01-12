@@ -24,6 +24,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,7 +45,12 @@ import org.apache.tomcat.util.json.JSONParser;
  */
 
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
+
     private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
+
+    private Path saTokenPath;
+    private FileTime saTokenLastModifiedTime;
+
 
     @Override
     public void start(int level) throws Exception {
@@ -80,10 +87,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
             }
             try {
-                byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(saTokenFile));
+                saTokenPath = FileSystems.getDefault().getPath(saTokenFile);
+                byte[] bytes = Files.readAllBytes(saTokenPath);
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
-            } catch (IOException e) {
-                log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+                saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
+            } catch (IOException ioe) {
+                log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
             }
         } else {
             if (protocol == null) {
@@ -110,17 +119,18 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         String labels = getEnv(CUSTOM_ENV_PREFIX + "LABELS", "KUBERNETES_LABELS");
 
-        namespace = URLEncoder.encode(namespace, "UTF-8");
-        labels = labels == null ? null : URLEncoder.encode(labels, "UTF-8");
+        namespace = URLEncoder.encode(namespace, StandardCharsets.UTF_8);
+        labels = labels == null ? null : URLEncoder.encode(labels, StandardCharsets.UTF_8);
 
         url = String.format("%s://%s:%s/api/%s/namespaces/%s/pods", protocol, masterHost, masterPort, ver, namespace);
-        if (labels != null && labels.length() > 0) {
+        if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
 
         // Fetch initial members
         heartbeat();
     }
+
 
     @Override
     public boolean stop(int level) throws Exception {
@@ -131,23 +141,51 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
     }
 
+
     @Override
     protected Member[] fetchMembers() {
         if (streamProvider == null) {
             return new Member[0];
         }
 
+        reloadSaTokenIfChanged();
+
         List<MemberImpl> members = new ArrayList<>();
 
         try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
-                InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             parsePods(reader, members);
-        } catch (IOException e) {
-            log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
         }
 
         return members.toArray(new Member[0]);
     }
+
+
+    private void reloadSaTokenIfChanged() {
+        if (saTokenPath == null) {
+            // Service account token not being used.
+            return;
+        }
+        if (!Files.exists(saTokenPath)) {
+            // If the service account token is being used, this path should exist
+            log.warn(sm.getString("kubernetesMembershipProvider.serviceAccountTokenMissing", saTokenPath));
+            return;
+        }
+        try {
+            FileTime oldSaTokenLastModifiedTime = saTokenLastModifiedTime;
+            saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
+            // Use != to protect against clock issues
+            if (!saTokenLastModifiedTime.equals(oldSaTokenLastModifiedTime)) {
+                byte[] bytes = Files.readAllBytes(saTokenPath);
+                ((TokenStreamProvider) streamProvider).setToken(new String(bytes, StandardCharsets.US_ASCII));
+            }
+        } catch (IOException ioe) {
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+        }
+    }
+
 
     @SuppressWarnings("unchecked")
     protected void parsePods(Reader reader, List<MemberImpl> members) {
@@ -222,13 +260,13 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 long aliveTime =
                         Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
 
-                MemberImpl member = null;
+                MemberImpl member;
                 try {
                     member = new MemberImpl(podIP, port, aliveTime);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Shouldn't happen:
                     // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
                     continue;
                 }
                 byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
@@ -239,5 +277,4 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
         }
     }
-
 }

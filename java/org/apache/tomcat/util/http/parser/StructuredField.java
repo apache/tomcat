@@ -201,7 +201,7 @@ public class StructuredField {
             item = parseSfBoolean(input);
         } else {
             throw new IllegalArgumentException(
-                    sm.getString("sf.bareitem.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.bareitem.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
 
         return item;
@@ -209,10 +209,7 @@ public class StructuredField {
 
 
     static void parseSfParameters(Reader input, SfListMember listMember) throws IOException {
-        while (true) {
-            if (peek(input) != ';') {
-                break;
-            }
+        while (peek(input) == ';') {
             requireChar(input, ';');
             skipSP(input);
             String key = parseSfKey(input);
@@ -237,7 +234,7 @@ public class StructuredField {
         int c = input.read();
         if (!isKeyFirst(c)) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.key.invalidFirstCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.key.invalidFirstCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
 
         while (c != -1 && isKey(c)) {
@@ -267,7 +264,7 @@ public class StructuredField {
 
         if (!HttpParser.isNumeric(c)) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.numeric.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.numeric.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
         result.append((char) c);
         input.mark(1);
@@ -324,7 +321,7 @@ public class StructuredField {
                 c = input.read();
                 if (c != '\\' && c != '\"') {
                     throw new IllegalArgumentException(
-                            sm.getString("sf.string.invalidEscape", String.format("\\u%40X", Integer.valueOf(c))));
+                            sm.getString("sf.string.invalidEscape", String.format("\\u%04X", Integer.valueOf(c))));
                 }
             } else {
                 if (c == '\"') {
@@ -333,7 +330,7 @@ public class StructuredField {
                 // This test also covers unexpected EOF
                 if (c < 32 || c > 126) {
                     throw new IllegalArgumentException(
-                            sm.getString("sf.string.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                            sm.getString("sf.string.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
                 }
             }
             result.append((char) c);
@@ -375,7 +372,7 @@ public class StructuredField {
                 base64.append((char) c);
             } else {
                 throw new IllegalArgumentException(
-                        sm.getString("sf.base64.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                        sm.getString("sf.base64.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
             }
         }
 
@@ -393,7 +390,7 @@ public class StructuredField {
             return new SfBoolean(false);
         } else {
             throw new IllegalArgumentException(
-                    sm.getString("sf.boolean.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.boolean.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
     }
 
@@ -428,7 +425,7 @@ public class StructuredField {
             }
         }
         throw new IllegalArgumentException(
-                sm.getString("sf.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                sm.getString("sf.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
     }
 
 
@@ -437,7 +434,7 @@ public class StructuredField {
         int c = input.read();
         if (c == required) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
         input.reset();
     }
@@ -502,7 +499,7 @@ public class StructuredField {
 
 
     static class SfDictionary {
-        private Map<String,SfListMember> dictionary = new LinkedHashMap<>();
+        private final Map<String,SfListMember> dictionary = new LinkedHashMap<>();
 
         void addDictionaryMember(String key, SfListMember value) {
             dictionary.put(key, value);
@@ -514,7 +511,7 @@ public class StructuredField {
     }
 
     static class SfList {
-        private List<SfListMember> listMembers = new ArrayList<>();
+        private final List<SfListMember> listMembers = new ArrayList<>();
 
         void addListMember(SfListMember listMember) {
             listMembers.add(listMember);

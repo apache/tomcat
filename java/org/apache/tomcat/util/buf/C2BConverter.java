@@ -66,8 +66,12 @@ public final class C2BConverter {
         leftovers.position(0);
     }
 
-    public boolean isUndeflow() {
+    public boolean isUnderflow() {
         return (leftovers.position() > 0);
+    }
+
+    public boolean isUndeflow() {
+        return isUnderflow();
     }
 
     /**
@@ -95,11 +99,11 @@ public final class C2BConverter {
             cb.limit(cc.getEnd());
             cb.position(cc.getStart());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = bb.position();
-            // Loop until one char is encoded or there is a encoder error
+            // Loop until one char is encoded or there is an encoder error
             do {
                 leftovers.put((char) cc.subtract());
                 leftovers.flip();
@@ -160,11 +164,11 @@ public final class C2BConverter {
             cb.limit(cc.limit());
             cb.position(cc.position());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = bb.position();
-            // Loop until one char is encoded or there is a encoder error
+            // Loop until one char is encoded or there is an encoder error
             do {
                 leftovers.put(cc.get());
                 leftovers.flip();

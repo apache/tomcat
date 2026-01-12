@@ -49,7 +49,7 @@ public class ServerCookies {
 
         if (cookieCount >= serverCookies.length) {
             int newSize = limit > -1 ? Math.min(2 * cookieCount, limit) : 2 * cookieCount;
-            ServerCookie scookiesTmp[] = new ServerCookie[newSize];
+            ServerCookie[] scookiesTmp = new ServerCookie[newSize];
             System.arraycopy(serverCookies, 0, scookiesTmp, 0, cookieCount);
             serverCookies = scookiesTmp;
         }
@@ -78,7 +78,7 @@ public class ServerCookies {
         this.limit = limit;
         if (limit > -1 && serverCookies.length > limit && cookieCount <= limit) {
             // shrink cookie list array
-            ServerCookie scookiesTmp[] = new ServerCookie[limit];
+            ServerCookie[] scookiesTmp = new ServerCookie[limit];
             System.arraycopy(serverCookies, 0, scookiesTmp, 0, cookieCount);
             serverCookies = scookiesTmp;
         }

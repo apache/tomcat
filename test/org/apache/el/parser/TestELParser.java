@@ -66,7 +66,7 @@ public class TestELParser extends ELBaseTest {
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
         ValueExpression var =
-            factory.createValueExpression(beanA, TesterBeanA.class);
+                factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", var);
 
         // Should fail
@@ -88,7 +88,7 @@ public class TestELParser extends ELBaseTest {
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
         ValueExpression var =
-            factory.createValueExpression(beanA, TesterBeanA.class);
+                factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("this", var);
 
         // Should fail
@@ -177,7 +177,7 @@ public class TestELParser extends ELBaseTest {
         ELContext context = new ELContextImpl();
 
         ValueExpression var =
-            factory.createValueExpression(Boolean.TRUE, Boolean.class);
+                factory.createValueExpression(Boolean.TRUE, Boolean.class);
         context.getVariableMapper().setVariable("test", var);
 
         StringBuilder expr = new StringBuilder();
@@ -204,13 +204,13 @@ public class TestELParser extends ELBaseTest {
 
         TesterBeanC beanC = new TesterBeanC();
         ValueExpression var =
-            factory.createValueExpression(beanC, TesterBeanC.class);
+                factory.createValueExpression(beanC, TesterBeanC.class);
         context.getVariableMapper().setVariable("myBean", var);
 
         ValueExpression ve = factory.createValueExpression(context,
-            "${(myBean.int1 > 1 and myBean.myBool) or "+
-            "((myBean.myBool or myBean.myBool1) and myBean.int1 > 1)}",
-            Boolean.class);
+                "${(myBean.int1 > 1 and myBean.myBool) or "+
+                "((myBean.myBool or myBean.myBool1) and myBean.int1 > 1)}",
+                Boolean.class);
         Assert.assertEquals(Boolean.FALSE, ve.getValue(context));
         beanC.setInt1(2);
         beanC.setMyBool1(true);

@@ -33,7 +33,7 @@ public class StringUtil {
      * @return An array of String values.
      */
     public static String[] splitCommaSeparated(String s) {
-        return (s == null || s.length() == 0) ? new String[0] : commaSeparatedValuesPattern.split(s);
+        return (s == null || s.isEmpty()) ? new String[0] : commaSeparatedValuesPattern.split(s);
 
     }
 }

@@ -112,7 +112,7 @@ public class FileMessageFactory {
     /**
      * The time this instance was last modified.
      */
-    protected long lastModified = 0;
+    protected long lastModified;
 
     /**
      * The maximum time (in seconds) this instance will be allowed to exist from lastModifiedTime.
@@ -121,7 +121,7 @@ public class FileMessageFactory {
 
     /**
      * Private constructor, either instantiates a factory to read or write. <BR>
-     * When openForWrite==true, then a the file, f, will be created and an output stream is opened to write to it. <BR>
+     * When openForWrite==true, then the file f will be created and an output stream is opened to write to it. <BR>
      * When openForWrite==false, an input stream is opened, the file has to exist.
      *
      * @param f            File - the file to be read/written
@@ -234,7 +234,7 @@ public class FileMessageFactory {
         // Have received a new message. Update the last modified time (even if the message is being buffered for now).
         lastModified = System.currentTimeMillis();
 
-        FileMessage next = null;
+        FileMessage next;
         synchronized (this) {
             if (!isWriting) {
                 next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
@@ -276,12 +276,14 @@ public class FileMessageFactory {
             try {
                 in.close();
             } catch (IOException ignore) {
+                // Ignore
             }
         }
         if (out != null) {
             try {
                 out.close();
             } catch (IOException ignore) {
+                // Ignore
             }
         }
         in = null;

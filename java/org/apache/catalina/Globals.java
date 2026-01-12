@@ -18,8 +18,6 @@ package org.apache.catalina;
 
 /**
  * Global constants that are applicable to multiple packages within Catalina.
- *
- * @author Craig R. McClanahan
  */
 public final class Globals {
 
@@ -143,14 +141,6 @@ public final class Globals {
      * The request attribute key for the session manager. This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SSL_SESSION_MGR_ATTR = "jakarta.servlet.request.ssl_session_mgr";
-
-
-    // ------------------------------------------------- Session attribute names
-
-    /**
-     * The subject under which the AccessControlContext is running.
-     */
-    public static final String SUBJECT_ATTR = "javax.security.auth.subject";
 
 
     // ------------------------------------------ ServletContext attribute names

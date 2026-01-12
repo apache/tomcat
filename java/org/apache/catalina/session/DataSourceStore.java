@@ -45,8 +45,6 @@ import org.apache.juli.logging.Log;
 /**
  * Implementation of the {@link org.apache.catalina.Store Store} interface that stores serialized session objects in a
  * database. Sessions that are saved are still subject to being expired based on inactivity.
- *
- * @author Bip Thelin
  */
 public class DataSourceStore extends StoreBase {
 
@@ -327,11 +325,9 @@ public class DataSourceStore extends StoreBase {
      * @param expiredOnly flag, whether only keys of expired sessions should be returned
      *
      * @return array containing the list of session IDs
-     *
-     * @exception IOException if an input/output error occurred
      */
-    private String[] keys(boolean expiredOnly) throws IOException {
-        String keys[] = null;
+    private String[] keys(boolean expiredOnly) {
+        String[] keys = null;
         int numberOfTries = 2;
         while (numberOfTries > 0) {
 
@@ -364,7 +360,7 @@ public class DataSourceStore extends StoreBase {
                     }
                 }
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException", e));
+                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
                 keys = new String[0];
                 // Close the connection so that it gets reopened next time
             } finally {
@@ -398,7 +394,7 @@ public class DataSourceStore extends StoreBase {
                     numberOfTries = 0;
                 }
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException", e));
+                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -445,7 +441,7 @@ public class DataSourceStore extends StoreBase {
                     numberOfTries = 0;
                 }
             } catch (SQLException e) {
-                contextLog.error(sm.getString("dataSourceStore.SQLException", e));
+                contextLog.error(sm.getString("dataSourceStore.SQLException"), e);
             } finally {
                 context.unbind(oldThreadContextCL);
                 release(_conn);
@@ -471,7 +467,7 @@ public class DataSourceStore extends StoreBase {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException", e));
+                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -519,7 +515,7 @@ public class DataSourceStore extends StoreBase {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException", e));
+                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -529,7 +525,6 @@ public class DataSourceStore extends StoreBase {
 
     @Override
     public void save(Session session) throws IOException {
-        ByteArrayOutputStream bos = null;
         String saveSql = "INSERT INTO " + sessionTable + " (" + sessionIdCol + ", " + sessionAppCol + ", " +
                 sessionDataCol + ", " + sessionValidCol + ", " + sessionMaxInactiveCol + ", " + sessionLastAccessedCol +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
@@ -546,7 +541,7 @@ public class DataSourceStore extends StoreBase {
                     // Remove session if it exists and insert again.
                     remove(session.getIdInternal(), _conn);
 
-                    bos = new ByteArrayOutputStream();
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
                         ((StandardSession) session).writeObjectData(oos);
                     }
@@ -566,8 +561,8 @@ public class DataSourceStore extends StoreBase {
                         numberOfTries = 0;
                     }
                 } catch (SQLException e) {
-                    manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException", e));
-                } catch (IOException e) {
+                    manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
+                } catch (IOException ioe) {
                     // Ignore
                 } finally {
                     release(_conn);
@@ -603,7 +598,7 @@ public class DataSourceStore extends StoreBase {
                 }
             }
         } catch (SQLException ex) {
-            manager.getContext().getLogger().error(sm.getString("dataSourceStore.checkConnectionSQLException", ex));
+            manager.getContext().getLogger().error(sm.getString("dataSourceStore.checkConnectionSQLException"), ex);
         }
 
         return conn;
@@ -648,7 +643,8 @@ public class DataSourceStore extends StoreBase {
                         Context envCtx = (Context) (new InitialContext()).lookup("java:comp/env");
                         this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
                     } catch (NamingException e) {
-                        context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName), e);
+                        context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName),
+                                e);
                     }
                 }
             }
@@ -687,7 +683,7 @@ public class DataSourceStore extends StoreBase {
         try {
             dbConnection.close();
         } catch (SQLException e) {
-            manager.getContext().getLogger().error(sm.getString("dataSourceStore.close", e));
+            manager.getContext().getLogger().error(sm.getString("dataSourceStore.close"), e);
         }
     }
 

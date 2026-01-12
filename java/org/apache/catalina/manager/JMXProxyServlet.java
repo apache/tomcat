@@ -18,6 +18,7 @@ package org.apache.catalina.manager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -43,11 +44,10 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This servlet will dump JMX attributes in a simple format and implement proxy services for modeler.
- *
- * @author Costin Manolache
  */
 public class JMXProxyServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // Constant for "no parameters" when invoking a JMX operation
@@ -69,8 +69,8 @@ public class JMXProxyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         // Retrieve the MBean server
-        registry = Registry.getRegistry(null, null);
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        registry = Registry.getRegistry(null);
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
     }
 
 
@@ -148,9 +148,9 @@ public class JMXProxyServlet extends HttpServlet {
             writer.print(" = ");
 
             writer.println(MBeanDumper.escape(valueStr));
-        } catch (Exception ex) {
-            writer.println("Error - " + ex.toString());
-            ex.printStackTrace(writer);
+        } catch (Exception e) {
+            writer.println("Error - " + e.toString());
+            e.printStackTrace(writer);
         }
     }
 
@@ -159,23 +159,23 @@ public class JMXProxyServlet extends HttpServlet {
         try {
             setAttributeInternal(onameStr, att, val);
             writer.println("OK - Attribute set");
-        } catch (Exception ex) {
-            writer.println("Error - " + ex.toString());
-            ex.printStackTrace(writer);
+        } catch (Exception e) {
+            writer.println("Error - " + e.toString());
+            e.printStackTrace(writer);
         }
     }
 
 
     public void listBeans(PrintWriter writer, String qry) {
 
-        Set<ObjectName> names = null;
+        Set<ObjectName> names;
         try {
             names = mBeanServer.queryNames(new ObjectName(qry), null);
             writer.println("OK - Number of results: " + names.size());
             writer.println();
-        } catch (Exception ex) {
-            writer.println("Error - " + ex.toString());
-            ex.printStackTrace(writer);
+        } catch (Exception e) {
+            writer.println("Error - " + e.toString());
+            e.printStackTrace(writer);
             return;
         }
 
@@ -205,9 +205,9 @@ public class JMXProxyServlet extends HttpServlet {
             } else {
                 writer.println("OK - Operation " + op + " without return value");
             }
-        } catch (Exception ex) {
-            writer.println("Error - " + ex.toString());
-            ex.printStackTrace(writer);
+        } catch (Exception e) {
+            writer.println("Error - " + e.toString());
+            e.printStackTrace(writer);
         }
     }
 
@@ -259,7 +259,7 @@ public class JMXProxyServlet extends HttpServlet {
         MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, paramCount);
         if (null == methodInfo) {
             // getMethodInfo returns null for both "object not found" and "operation not found"
-            MBeanInfo info = null;
+            MBeanInfo info;
             try {
                 info = registry.getMBeanServer().getMBeanInfo(oname);
             } catch (InstanceNotFoundException infe) {

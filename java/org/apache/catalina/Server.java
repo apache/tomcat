@@ -34,8 +34,6 @@ import org.apache.catalina.startup.Catalina;
  * In between, the implementation must open a server socket on the port number specified by the <code>port</code>
  * property. When a connection is accepted, the first line is read and compared with the specified shutdown command. If
  * the command matches, shutdown of the server is initiated.
- *
- * @author Craig R. McClanahan
  */
 public interface Server extends Lifecycle {
 
@@ -231,7 +229,7 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the set of Services defined within this Server.
+     * @return the array of Services defined within this Server.
      */
     Service[] findServices();
 

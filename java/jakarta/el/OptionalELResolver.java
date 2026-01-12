@@ -175,11 +175,9 @@ public class OptionalELResolver extends ELResolver {
             }
 
             try {
-                Object convertedValue = context.convertToType(value, type);
+                T convertedValue = context.convertToType(value, type);
                 context.setPropertyResolved(true);
-                @SuppressWarnings("unchecked")
-                T result = (T) convertedValue;
-                return result;
+                return convertedValue;
             } catch (ELException e) {
                 /*
                  * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the

@@ -11,49 +11,50 @@ public interface ELParserTreeConstants {
     int JJTASSIGN = 6;
     int JJTLAMBDAEXPRESSION = 7;
     int JJTLAMBDAPARAMETERS = 8;
-    int JJTELVIS = 9;
-    int JJTCHOICE = 10;
-    int JJTOR = 11;
-    int JJTAND = 12;
-    int JJTEQUAL = 13;
-    int JJTNOTEQUAL = 14;
-    int JJTLESSTHAN = 15;
-    int JJTGREATERTHAN = 16;
-    int JJTLESSTHANEQUAL = 17;
-    int JJTGREATERTHANEQUAL = 18;
-    int JJTCONCATENATION = 19;
-    int JJTPLUS = 20;
-    int JJTMINUS = 21;
-    int JJTMULT = 22;
-    int JJTDIV = 23;
-    int JJTMOD = 24;
-    int JJTNEGATIVE = 25;
-    int JJTNOTEMPTY = 26;
-    int JJTNOT = 27;
-    int JJTEMPTY = 28;
-    int JJTVALUE = 29;
-    int JJTDOTSUFFIX = 30;
-    int JJTBRACKETSUFFIX = 31;
-    int JJTMETHODPARAMETERS = 32;
-    int JJTSETDATA = 33;
-    int JJTLISTDATA = 34;
-    int JJTMAPDATA = 35;
-    int JJTMAPENTRY = 36;
-    int JJTIDENTIFIER = 37;
-    int JJTFUNCTION = 38;
-    int JJTTRUE = 39;
-    int JJTFALSE = 40;
-    int JJTFLOATINGPOINT = 41;
-    int JJTINTEGER = 42;
-    int JJTSTRING = 43;
-    int JJTNULL = 44;
+    int JJTNULLCOALESCING = 9;
+    int JJTELVIS = 10;
+    int JJTCHOICE = 11;
+    int JJTOR = 12;
+    int JJTAND = 13;
+    int JJTEQUAL = 14;
+    int JJTNOTEQUAL = 15;
+    int JJTLESSTHAN = 16;
+    int JJTGREATERTHAN = 17;
+    int JJTLESSTHANEQUAL = 18;
+    int JJTGREATERTHANEQUAL = 19;
+    int JJTCONCATENATION = 20;
+    int JJTPLUS = 21;
+    int JJTMINUS = 22;
+    int JJTMULT = 23;
+    int JJTDIV = 24;
+    int JJTMOD = 25;
+    int JJTNEGATIVE = 26;
+    int JJTNOTEMPTY = 27;
+    int JJTNOT = 28;
+    int JJTEMPTY = 29;
+    int JJTVALUE = 30;
+    int JJTDOTSUFFIX = 31;
+    int JJTBRACKETSUFFIX = 32;
+    int JJTMETHODPARAMETERS = 33;
+    int JJTSETDATA = 34;
+    int JJTLISTDATA = 35;
+    int JJTMAPDATA = 36;
+    int JJTMAPENTRY = 37;
+    int JJTIDENTIFIER = 38;
+    int JJTFUNCTION = 39;
+    int JJTTRUE = 40;
+    int JJTFALSE = 41;
+    int JJTFLOATINGPOINT = 42;
+    int JJTINTEGER = 43;
+    int JJTSTRING = 44;
+    int JJTNULL = 45;
 
 
     String[] jjtNodeName = { "CompositeExpression", "LiteralExpression", "DeferredExpression", "DynamicExpression",
-            "void", "Semicolon", "Assign", "LambdaExpression", "LambdaParameters", "Elvis", "Choice", "Or", "And",
-            "Equal", "NotEqual", "LessThan", "GreaterThan", "LessThanEqual", "GreaterThanEqual", "Concatenation",
-            "Plus", "Minus", "Mult", "Div", "Mod", "Negative", "NotEmpty", "Not", "Empty", "Value", "DotSuffix",
-            "BracketSuffix", "MethodParameters", "SetData", "ListData", "MapData", "MapEntry", "Identifier", "Function",
-            "True", "False", "FloatingPoint", "Integer", "String", "Null", };
+            "void", "Semicolon", "Assign", "LambdaExpression", "LambdaParameters", "NullCoalescing", "Elvis", "Choice",
+            "Or", "And", "Equal", "NotEqual", "LessThan", "GreaterThan", "LessThanEqual", "GreaterThanEqual",
+            "Concatenation", "Plus", "Minus", "Mult", "Div", "Mod", "Negative", "NotEmpty", "Not", "Empty", "Value",
+            "DotSuffix", "BracketSuffix", "MethodParameters", "SetData", "ListData", "MapData", "MapEntry",
+            "Identifier", "Function", "True", "False", "FloatingPoint", "Integer", "String", "Null", };
 }
-/* JavaCC - OriginalChecksum=bf490de1f9b26486497de3154abf559e (do not edit this line) */
+/* JavaCC - OriginalChecksum=d80a2fa5420bfdbed47a91cdb3343069 (do not edit this line) */

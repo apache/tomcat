@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,6 +47,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class XByteBuffer implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(XByteBuffer.class);
@@ -64,7 +66,7 @@ public class XByteBuffer implements Serializable {
     /**
      * Variable to hold the data
      */
-    protected byte[] buf = null;
+    protected byte[] buf;
 
     /**
      * Current length of data in the buffer
@@ -75,7 +77,7 @@ public class XByteBuffer implements Serializable {
      * Flag for discarding invalid packages If this flag is set to true, and append(byte[],...) is called, the data
      * added will be inspected, and if it doesn't start with <code>START_DATA</code> it will be thrown away.
      */
-    protected boolean discard = true;
+    protected boolean discard;
 
     /**
      * Constructs a new XByteBuffer.<br>
@@ -241,7 +243,7 @@ public class XByteBuffer implements Serializable {
 
     public void expand(int newcount) {
         // don't change the allocation strategy
-        byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
+        byte[] newbuf = new byte[Math.max(buf.length << 1, newcount)];
         System.arraycopy(buf, 0, newbuf, 0, bufSize);
         buf = newbuf;
     }
@@ -337,8 +339,7 @@ public class XByteBuffer implements Serializable {
 
     public ChannelData extractPackage(boolean clearFromBuffer) {
         XByteBuffer xbuf = extractDataPackage(clearFromBuffer);
-        ChannelData cdata = ChannelData.getDataFromPackage(xbuf);
-        return cdata;
+        return ChannelData.getDataFromPackage(xbuf);
     }
 
     /**
@@ -379,12 +380,10 @@ public class XByteBuffer implements Serializable {
 
 
     public static int getDataPackageLength(int datalength) {
-        int length = START_DATA.length + // header length
+        return START_DATA.length + // header length
                 4 + // data length indicator
                 datalength + // actual data length
                 END_DATA.length; // footer length
-        return length;
-
     }
 
     public static byte[] createDataPackage(byte[] data) {
@@ -404,7 +403,7 @@ public class XByteBuffer implements Serializable {
      */
     public static int toInt(byte[] b, int off) {
         return ((b[off + 3]) & 0xFF) + (((b[off + 2]) & 0xFF) << 8) + (((b[off + 1]) & 0xFF) << 16) +
-                (((b[off + 0]) & 0xFF) << 24);
+                (((b[off]) & 0xFF) << 24);
     }
 
     /**
@@ -419,7 +418,7 @@ public class XByteBuffer implements Serializable {
         return (((long) b[off + 7]) & 0xFF) + ((((long) b[off + 6]) & 0xFF) << 8) +
                 ((((long) b[off + 5]) & 0xFF) << 16) + ((((long) b[off + 4]) & 0xFF) << 24) +
                 ((((long) b[off + 3]) & 0xFF) << 32) + ((((long) b[off + 2]) & 0xFF) << 40) +
-                ((((long) b[off + 1]) & 0xFF) << 48) + ((((long) b[off + 0]) & 0xFF) << 56);
+                ((((long) b[off + 1]) & 0xFF) << 48) + ((((long) b[off]) & 0xFF) << 56);
     }
 
 
@@ -466,7 +465,7 @@ public class XByteBuffer implements Serializable {
         n >>>= 8;
         b[offset + 1] = (byte) (n);
         n >>>= 8;
-        b[offset + 0] = (byte) (n);
+        b[offset] = (byte) (n);
         return b;
     }
 
@@ -494,7 +493,7 @@ public class XByteBuffer implements Serializable {
         n >>>= 8;
         b[offset + 1] = (byte) (n);
         n >>>= 8;
-        b[offset + 0] = (byte) (n);
+        b[offset] = (byte) (n);
         return b;
     }
 
@@ -512,7 +511,7 @@ public class XByteBuffer implements Serializable {
         if (find.length > src.length) {
             return result;
         }
-        if (find.length == 0 || src.length == 0) {
+        if (find.length == 0) {
             return result;
         }
         if (srcOff >= src.length) {
@@ -577,7 +576,7 @@ public class XByteBuffer implements Serializable {
         }
         if (data != null && length > 0) {
             InputStream instream = new ByteArrayInputStream(data, offset, length);
-            ObjectInputStream stream = null;
+            ObjectInputStream stream;
             stream = (cls.length > 0) ? new ReplicationStream(instream, cls) : new ObjectInputStream(instream);
             message = stream.readObject();
             instream.close();
@@ -606,8 +605,7 @@ public class XByteBuffer implements Serializable {
         ObjectOutputStream out = new ObjectOutputStream(outs);
         out.writeObject(msg);
         out.flush();
-        byte[] data = outs.toByteArray();
-        return data;
+        return outs.toByteArray();
     }
 
     public void setDiscard(boolean discard) {

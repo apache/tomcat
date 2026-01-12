@@ -23,8 +23,6 @@ import java.util.Iterator;
  * along with definitions of corresponding {@link Role}s, and referenced by a {@link Realm} for authentication and
  * access control.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public interface UserDatabase {
@@ -116,7 +114,7 @@ public interface UserDatabase {
 
 
     /**
-     * @return the {@link User} with the specified user name, if any; otherwise return <code>null</code>.
+     * @return the {@link User} with the specified username, if any; otherwise return <code>null</code>.
      *
      * @param username Name of the user to return
      */

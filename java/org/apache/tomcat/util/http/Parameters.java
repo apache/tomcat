@@ -129,10 +129,10 @@ public final class Parameters {
         handleQueryParameters();
         ArrayList<String> values = paramHashValues.get(name);
         if (values != null) {
-            if (values.size() == 0) {
+            if (values.isEmpty()) {
                 return "";
             }
-            return values.get(0);
+            return values.getFirst();
         } else {
             return null;
         }
@@ -159,9 +159,9 @@ public final class Parameters {
 
         try {
             decodedQuery.duplicate(queryMB);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Can't happen, as decodedQuery can't overflow
-            log.error(sm.getString("parameters.copyFail"), e);
+            log.error(sm.getString("parameters.copyFail"), ioe);
         }
         processParameters(decodedQuery, queryStringCharset);
     }
@@ -197,11 +197,11 @@ public final class Parameters {
     private static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
 
 
-    public void processParameters(byte bytes[], int start, int len) {
+    public void processParameters(byte[] bytes, int start, int len) {
         processParameters(bytes, start, len, charset);
     }
 
-    private void processParameters(byte bytes[], int start, int len, Charset charset) {
+    private void processParameters(byte[] bytes, int start, int len, Charset charset) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("parameters.bytes", new String(bytes, start, len, DEFAULT_BODY_CHARSET)));
@@ -340,14 +340,14 @@ public final class Parameters {
                 }
 
                 addParameter(name, value);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 String message;
                 if (log.isDebugEnabled()) {
                     message = sm.getString("parameters.decodeFail.debug", origName.toString(), origValue.toString());
                 } else {
                     message = sm.getString("parameters.decodeFail.info", tmpName.toString(), tmpValue.toString());
                 }
-                throw new InvalidParameterException(message, e);
+                throw new InvalidParameterException(message, ioe);
             } finally {
                 tmpName.recycle();
                 tmpValue.recycle();

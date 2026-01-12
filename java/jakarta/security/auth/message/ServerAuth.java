@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -29,8 +29,8 @@ public interface ServerAuth {
      *
      * @return An AuthStatus instance that represents the result of the validation
      *
-     * @throws AuthException If the a failure occurred in a manner that prevented the failure from being communicated
-     *                           via messageInfo
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated via
+     *                           messageInfo
      */
     AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
             throws AuthException;
@@ -43,8 +43,8 @@ public interface ServerAuth {
      *
      * @return An AuthStatus instance that represents the result of the authentication
      *
-     * @throws AuthException If the a failure occurred in a manner that prevented the failure from being communicated
-     *                           via messageInfo
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated via
+     *                           messageInfo
      */
     default AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
         return AuthStatus.SUCCESS;
@@ -57,7 +57,7 @@ public interface ServerAuth {
      * @param messageInfo The associated request and response
      * @param subject     The subject to clean
      *
-     * @throws AuthException If the a failure occurred
+     * @throws AuthException If a failure occurred
      */
     default void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
         // NO-OP

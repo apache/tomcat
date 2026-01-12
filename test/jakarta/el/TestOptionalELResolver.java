@@ -141,7 +141,8 @@ public class TestOptionalELResolver {
         ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", varBeanA);
 
-        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", Optional.class);
+        ValueExpression ve =
+                factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", Optional.class);
         Object result = ve.getValue(context);
 
         Assert.assertNotNull(result);
@@ -162,7 +163,8 @@ public class TestOptionalELResolver {
         ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", varBeanA);
 
-        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", Optional.class);
+        ValueExpression ve =
+                factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", Optional.class);
         Object result = ve.getValue(context);
 
         Assert.assertNotNull(result);

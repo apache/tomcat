@@ -23,8 +23,6 @@
     &project;
 
     <properties>
-        <author email="ccain@apache.org">Christopher Cain</author>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>SSL/TLS Configuration How-To</title>
     </properties>
 
@@ -102,7 +100,7 @@ client are taking place over a secure connection (because your application
 needs to be able to ask about this), but it does not participate in the
 encryption or decryption itself.</p>
 
-<p>Tomcat is able to use any of the the cryptographic protocols that are
+<p>Tomcat is able to use any of the cryptographic protocols that are
 provided by the underlying environment. Java itself provides cryptographic
 capabilities through <a href="https://docs.oracle.com/javase/9/security/java-cryptography-architecture-jca-reference-guide.htm">JCE/JCA</a>
 and encrypted communications capabilities through <a href="https://docs.oracle.com/javase/9/security/java-secure-socket-extension-jsse-reference-guide.htm">JSSE</a>.
@@ -276,11 +274,6 @@ loaded or not, use one of the following:</p>
            sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>
 
-<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
-<Connector protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-           sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
-           port="8443" .../>]]></source>
-
 <p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
 If the Tomcat Native library or Java 22 is installed, using the
 <code>sslImplementationName</code>
@@ -444,7 +437,7 @@ require slightly different information and/or provide the certificate and
 associated certificate chain in different formats. Additionally, the rules that
 the Certificate Authorities use for issuing certificates change over time. As a
 result you may find that the commands given above may need to be modified. If
-you require assitance then help is available via the
+you require assistance then help is available via the
 <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat users
 mailing list</a>.</p>
 
@@ -452,19 +445,34 @@ mailing list</a>.</p>
 </section>
 
 <section name="Using OCSP Certificates">
-    <p>
-        Support of the Online Certificate Status Protocol (OCSP) in Apache Tomcat
-        uses OpenSSL. This can be used either through
-        <a href="https://tomcat.apache.org/download-native.cgi">Tomcat Native</a>
-        or the FFM API on Java 22 and newer.
-    </p>
+<p>Tomcat supports the Online Certificate Status Protocol (OCSP) to verify the
+status of client provided certificates for a sub-set of connector
+configurations.</p>
+
 <p>To use OCSP, you require the following:</p>
 
 <ul>
   <li>OCSP-enabled certificates</li>
-  <li>Tomcat with an OpenSSL enabled connector</li>
+  <li>Tomcat with an OCSP enabled connector</li>
   <li>Configured OCSP responder</li>
 </ul>
+
+<p>OCSP is currently implemented for the following connector configurations:</p>
+
+<ul>
+  <li>NIO HTTP connector with the
+      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>,
+      a Tomcat Native build where OCSP is enabled and using the OpenSSL style
+      configuration.</li>
+  <li>NIO HTTP connector with the
+      <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>,
+      and using the OpenSSL style configuration. This uses FFM so Java 22 or
+      later is also required.</li>
+</ul>
+
+<p>OCSP is not supported if the
+<code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code> is used or if
+the JSSE configuraton style is used.</p>
 
 <subsection name="Generating OCSP-Enabled Certificates">
 <p>Apache Tomcat requires the OCSP-enabled certificate to have the OCSP
@@ -523,10 +531,7 @@ nsComment="Testing OCSP Certificate"
 <p>Additional information may be obtained about TLS handshake failures by
 configuring the dedicated TLS handshake logger to log debug level messages by
 adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:
-<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>
-or
-<source>org.apache.tomcat.util.net.Nio2Endpoint.handshake.level=FINE</source>
-depending on the <strong>Connector</strong> being used.
+<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>.
 </p>
 
 <p>Here is a list of common problems that you may encounter when setting up

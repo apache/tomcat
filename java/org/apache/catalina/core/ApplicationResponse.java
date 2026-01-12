@@ -31,8 +31,6 @@ import jakarta.servlet.ServletResponseWrapper;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
  */
 class ApplicationResponse extends ServletResponseWrapper {
 
@@ -66,7 +64,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Disallow <code>reset()</code> calls on a included response.
+     * Disallow <code>reset()</code> calls on an included response.
      *
      * @exception IllegalStateException if the response has already been committed
      */

@@ -27,7 +27,7 @@ import org.apache.tomcat.util.res.StringManager;
  * StoreFactory saves special elements. Output was generate with StoreAppenders.
  */
 public class StoreFactoryBase implements IStoreFactory {
-    private static Log log = LogFactory.getLog(StoreFactoryBase.class);
+    private static final Log log = LogFactory.getLog(StoreFactoryBase.class);
 
     private StoreRegistry registry;
 
@@ -160,9 +160,9 @@ public class StoreFactoryBase implements IStoreFactory {
             for (Object element : elements) {
                 try {
                     storeElement(aWriter, indent, element);
-                } catch (IOException ioe) {
-                    // ignore children report error them self!
-                    // see StandardContext.storeWithBackup()
+                } catch (IOException ignore) {
+                    // Ignore. Children report error themselves.
+                    // See StandardContext.storeWithBackup()
                 }
             }
         }

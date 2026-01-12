@@ -3,22 +3,18 @@
 ## Building
 
 The OpenSSL API support classes can be built using jextract from Java 22+.
-
-jextract is now available in its own standalone repository. Clone
-`https://github.com/openjdk/jextract` in some location and
-checkout the branch that supports Java 22. Please refer to the
-instructions from the repository for building. It should be the
-`panama` branch.
+jextract can be downloaded from `https://jdk.java.net/jextract/`. Extract the
+download and set the path as the `JEXTRACT_HOME` environment variable for
+ease of use.
 
 This step is only useful to be able to use additional native APIs from OpenSSL
 or stdlib.
 
 Find include paths using `gcc -xc -E -v -`, on Fedora it is
-`/usr/lib/gcc/x86_64-redhat-linux/12/include`. Edit `openssl-tomcat.conf`
+`/usr/lib/gcc/x86_64-redhat-linux/14/include`. Edit `openssl-tomcat.conf`
 accordingly to set the appropriate path.
 
 ```
-export JEXTRACT_HOME=<pathto>/jextract/build/jextract
 $JEXTRACT_HOME/bin/jextract @openssl-tomcat.conf openssl.h
 ```
 Note: The build path for the JDK will be different on other platforms.
@@ -29,7 +25,7 @@ API compatible, the generated code will still work.
 The `openssl-tomcat.conf` will generate a trimmed down OpenSSL API. When
 developing new features, the full API can be generated instead using:
 ```
-$JEXTRACT_HOME/bin/jextract --source -t org.apache.tomcat.util.openssl -lssl -I /usr/lib/gcc/x86_64-redhat-linux/12/include openssl.h --output src/main/java
+$JEXTRACT_HOME/bin/jextract --source -t org.apache.tomcat.util.openssl -lssl -I /usr/lib/gcc/x86_64-redhat-linux/14/include openssl.h --output src/main/java
 ```
 
 The `openssl.conf` file lists all the API calls and constants that can be

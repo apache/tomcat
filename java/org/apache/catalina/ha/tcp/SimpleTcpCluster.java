@@ -59,9 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for setting up a cluster and provides callers
  * with a valid multicast receiver/sender.
- *
- * @author Remy Maucherat
- * @author Peter Rossbach
  */
 public class SimpleTcpCluster extends LifecycleMBeanBase
         implements CatalinaCluster, MembershipListener, ChannelListener {
@@ -345,8 +342,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         try {
             manager = managerTemplate.cloneFromTemplate();
             manager.setName(name);
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), e);
             manager = new DeltaManager();
         } finally {
             if (manager != null) {
@@ -359,11 +356,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void registerManager(Manager manager) {
 
-        if (!(manager instanceof ClusterManager)) {
+        if (!(manager instanceof ClusterManager cmanager)) {
             log.warn(sm.getString("simpleTcpCluster.clustermanager.notImplement", manager));
             return;
         }
-        ClusterManager cmanager = (ClusterManager) manager;
         // Notify our interested LifecycleListeners
         fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
         String clusterName = getManagerName(cmanager.getName(), manager);
@@ -377,8 +373,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     @Override
     public void removeManager(Manager manager) {
-        if (manager instanceof ClusterManager) {
-            ClusterManager cmgr = (ClusterManager) manager;
+        if (manager instanceof ClusterManager cmgr) {
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT, manager);
             managers.remove(getManagerName(cmgr.getName(), manager));
@@ -470,19 +465,19 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 clusterDeployer.start();
             }
             registerMember(channel.getLocalMember(false));
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.startUnable"), x);
-            throw new LifecycleException(x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.startUnable"), e);
+            throw new LifecycleException(e);
         }
 
         setState(LifecycleState.STARTING);
     }
 
     protected void checkDefaults() {
-        if (clusterListeners.size() == 0 && managerTemplate instanceof DeltaManager) {
+        if (clusterListeners.isEmpty() && managerTemplate instanceof DeltaManager) {
             addClusterListener(new ClusterSessionListener());
         }
-        if (valves.size() == 0) {
+        if (valves.isEmpty()) {
             addValve(new JvmRouteBinderValve());
             addValve(new ReplicationValve());
         }
@@ -560,8 +555,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             channel.removeChannelListener(this);
             channel.removeMembershipListener(this);
             this.unregisterClusterValve();
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.stopUnable"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
         }
 
         channel.setUtilityExecutor(null);
@@ -612,8 +607,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                     log.debug(sm.getString("simpleTcpCluster.noMembers", msg));
                 }
             }
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.sendFailed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.sendFailed"), e);
         }
     }
 
@@ -631,8 +626,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERREGISTER_EVENT, member);
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.member.addFailed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.member.addFailed"), e);
         }
 
     }
@@ -651,8 +646,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERUNREGISTER_EVENT, member);
-        } catch (Exception x) {
-            log.error(sm.getString("simpleTcpCluster.member.removeFailed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.member.removeFailed"), e);
         }
     }
 

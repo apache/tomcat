@@ -38,8 +38,6 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
  * <strong>IMPLEMENTATION NOTE</strong>: It is assumed that the in-memory collection representing our defined users (and
  * their roles) is initialized at application startup and never modified again. Therefore, no thread synchronization is
  * performed around accesses to the principals collection.
- *
- * @author Craig R. McClanahan
  */
 public class MemoryRealm extends RealmBase {
 
@@ -63,13 +61,13 @@ public class MemoryRealm extends RealmBase {
 
 
     /**
-     * The set of valid Principals for this Realm, keyed by user name.
+     * The set of valid Principals for this Realm, keyed by username.
      */
     private final Map<String,GenericPrincipal> principals = new HashMap<>();
 
 
     /**
-     * The set of credentials for this Realm, keyed by user name.
+     * The set of credentials for this Realm, keyed by username.
      */
     private final Map<String,String> credentials = new HashMap<>();
 

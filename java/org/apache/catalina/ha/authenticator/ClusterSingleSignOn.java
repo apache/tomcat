@@ -34,7 +34,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A <strong>Valve</strong> that supports a "single sign on" user experience on each nodes of a cluster, where the
+ * A <strong>Valve</strong> that supports a "single sign on" user experience on each node of a cluster, where the
  * security identity of a user who successfully authenticates to one web application is propagated to other web
  * applications and to other nodes cluster in the same security domain. For successful use, the following requirements
  * must be met:
@@ -46,8 +46,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>The web applications themselves must use one of the standard Authenticators found in the
  * <code>org.apache.catalina.authenticator</code> package.</li>
  * </ul>
- *
- * @author Fabien Carrion
  */
 public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, MapOwner {
 

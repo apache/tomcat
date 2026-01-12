@@ -29,10 +29,18 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class TesterPageContext extends PageContext {
+    private final ELContext elContext;
+
+    public TesterPageContext() {
+        this.elContext = null;
+    }
+
+    public TesterPageContext(ELContext elContext) {
+        this.elContext = elContext;
+    }
 
     @Override
-    public void initialize(Servlet servlet, ServletRequest request,
-            ServletResponse response, String errorPageURL,
+    public void initialize(Servlet servlet, ServletRequest request, ServletResponse response, String errorPageURL,
             boolean needsSession, int bufferSize, boolean autoFlush)
             throws IOException, IllegalStateException, IllegalArgumentException {
         // NO-OP
@@ -86,33 +94,28 @@ public class TesterPageContext extends PageContext {
     }
 
     @Override
-    public void forward(String relativeUrlPath) throws ServletException,
-            IOException {
+    public void forward(String relativeUrlPath) throws ServletException, IOException {
         // NO-OP
 
     }
 
     @Override
-    public void include(String relativeUrlPath) throws ServletException,
-            IOException {
+    public void include(String relativeUrlPath) throws ServletException, IOException {
         // NO-OP
     }
 
     @Override
-    public void include(String relativeUrlPath, boolean flush)
-            throws ServletException, IOException {
+    public void include(String relativeUrlPath, boolean flush) throws ServletException, IOException {
         // NO-OP
     }
 
     @Override
-    public void handlePageException(Exception e) throws ServletException,
-            IOException {
+    public void handlePageException(Exception e) throws ServletException, IOException {
         // NO-OP
     }
 
     @Override
-    public void handlePageException(Throwable t) throws ServletException,
-            IOException {
+    public void handlePageException(Throwable t) throws ServletException, IOException {
         // NO-OP
     }
 
@@ -174,7 +177,6 @@ public class TesterPageContext extends PageContext {
 
     @Override
     public ELContext getELContext() {
-        // NO-OP
-        return null;
+        return elContext;
     }
 }

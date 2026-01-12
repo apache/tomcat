@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +41,13 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
@@ -150,21 +151,20 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public void dispatch() {
         check();
         String path;
-        String cpath;
+        String pathInfo;
         ServletRequest servletRequest = getRequest();
-        if (servletRequest instanceof HttpServletRequest) {
-            HttpServletRequest sr = (HttpServletRequest) servletRequest;
-            path = sr.getRequestURI();
-            cpath = sr.getContextPath();
+        if (servletRequest instanceof HttpServletRequest sr) {
+            path = sr.getServletPath();
+            pathInfo = sr.getPathInfo();
         } else {
-            path = request.getRequestURI();
-            cpath = request.getContextPath();
+            path = request.getServletPath();
+            pathInfo = request.getPathInfo();
         }
-        if (cpath.length() > 1) {
-            path = path.substring(cpath.length());
+        if (pathInfo != null && !pathInfo.isEmpty()) {
+            path = path + pathInfo;
         }
-        if (!context.getDispatchersUseEncodedPaths()) {
-            path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
+        if (context.getDispatchersUseEncodedPaths()) {
+            path = URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
         }
         dispatch(path);
     }
@@ -193,10 +193,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
             }
             final RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
-            if (!(requestDispatcher instanceof AsyncDispatcher)) {
+            if (!(requestDispatcher instanceof AsyncDispatcher applicationDispatcher)) {
                 throw new UnsupportedOperationException(sm.getString("asyncContextImpl.noAsyncDispatcher"));
             }
-            final AsyncDispatcher applicationDispatcher = (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
             this.dispatch = new AsyncRunnable(request, applicationDispatcher, servletRequest, servletResponse);
@@ -255,16 +254,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException {
         check();
-        T listener = null;
+        T listener;
         try {
             listener = (T) context.getInstanceManager().newInstance(clazz.getName(), clazz.getClassLoader());
         } catch (ReflectiveOperationException | NamingException e) {
-            ServletException se = new ServletException(e);
-            throw se;
+            throw new ServletException(e);
         } catch (Exception e) {
             ExceptionUtils.handleThrowable(e.getCause());
-            ServletException se = new ServletException(e);
-            throw se;
+            throw new ServletException(e);
         }
         return listener;
     }
@@ -538,6 +535,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     private static class DebugException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 
@@ -577,20 +575,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
-    private static class AsyncRunnable implements Runnable {
-
-        private final AsyncDispatcher applicationDispatcher;
-        private final Request request;
-        private final ServletRequest servletRequest;
-        private final ServletResponse servletResponse;
-
-        AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
-                ServletResponse servletResponse) {
-            this.request = request;
-            this.applicationDispatcher = applicationDispatcher;
-            this.servletRequest = servletRequest;
-            this.servletResponse = servletResponse;
-        }
+    private record AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
+            ServletResponse servletResponse) implements Runnable {
 
         @Override
         public void run() {

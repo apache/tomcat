@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <title>Manager App How-To</title>
     </properties>
 
@@ -77,8 +76,8 @@ example:</p>
          docBase="${catalina.home}/webapps/manager">
   <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
                    sameSiteCookies="strict" />
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
   <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
 </Context>]]></source>
 
@@ -205,13 +204,13 @@ the role <strong>manager-script</strong>.</p>
 
 <p>In addition to the password restrictions, access to the Manager web
 application can be restricted by the <strong>remote IP address</strong> or host
-by adding a <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
+by adding a <code>RemoteCIDRValve</code> or <code>RemoteHostValve</code>.
 See <a href="config/valve.html#Remote_Address_Filter">valves documentation</a>
 for details. Here is
 an example of restricting access to the localhost by IP address:</p>
 <source><![CDATA[<Context privileged="true">
-         <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                allow="127\.0\.0\.1"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
 </Context>]]></source>
 
 </section>

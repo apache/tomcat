@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,10 +30,11 @@ import org.apache.tomcat.dbcp.pool2.BaseObject;
  * @param <T> Type of element pooled.
  * @since 2.0
  */
+@SuppressWarnings("deprecation")
 public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Cloneable {
 
     /**
-     * The default value for the {@code lifo} configuration attribute.
+     * The default value for the {@code lifo} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getLifo()
      * @see GenericKeyedObjectPool#getLifo()
@@ -41,7 +42,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_LIFO = true;
 
     /**
-     * The default value for the {@code fairness} configuration attribute.
+     * The default value for the {@code fairness} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getFairness()
      * @see GenericKeyedObjectPool#getFairness()
@@ -49,7 +50,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_FAIRNESS = false;
 
     /**
-     * The default value for the {@code maxWait} configuration attribute.
+     * The default value for the {@code maxWait} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getMaxWaitDuration()
      * @see GenericKeyedObjectPool#getMaxWaitDuration()
@@ -68,7 +69,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final Duration DEFAULT_MAX_WAIT = Duration.ofMillis(DEFAULT_MAX_WAIT_MILLIS);
 
     /**
-     * The default value for the {@code minEvictableIdleDuration} configuration attribute.
+     * The default value for the {@code minEvictableIdleDuration} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getMinEvictableIdleDuration()
      * @see GenericKeyedObjectPool#getMinEvictableIdleDuration()
@@ -98,7 +99,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final Duration DEFAULT_MIN_EVICTABLE_IDLE_TIME = Duration.ofMillis(DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS);
 
     /**
-     * The default value for the {@code softMinEvictableIdleTime} configuration attribute.
+     * The default value for the {@code softMinEvictableIdleTime} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getSoftMinEvictableIdleDuration()
      * @see GenericKeyedObjectPool#getSoftMinEvictableIdleDuration()
@@ -128,7 +129,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final Duration DEFAULT_SOFT_MIN_EVICTABLE_IDLE_DURATION = Duration.ofMillis(DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS);
 
     /**
-     * The default value for {@code evictorShutdownTimeout} configuration attribute.
+     * The default value for {@code evictorShutdownTimeout} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getEvictorShutdownTimeoutDuration()
      * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutDuration()
@@ -147,7 +148,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final Duration DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT = Duration.ofMillis(DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS);
 
     /**
-     * The default value for the {@code numTestsPerEvictionRun} configuration attribute.
+     * The default value for the {@code numTestsPerEvictionRun} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getNumTestsPerEvictionRun()
      * @see GenericKeyedObjectPool#getNumTestsPerEvictionRun()
@@ -155,17 +156,16 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final int DEFAULT_NUM_TESTS_PER_EVICTION_RUN = 3;
 
     /**
-     * The default value for the {@code testOnCreate} configuration attribute.
+     * The default value for the {@code testOnCreate} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getTestOnCreate()
      * @see GenericKeyedObjectPool#getTestOnCreate()
-     *
      * @since 2.2
      */
     public static final boolean DEFAULT_TEST_ON_CREATE = false;
 
     /**
-     * The default value for the {@code testOnBorrow} configuration attribute.
+     * The default value for the {@code testOnBorrow} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getTestOnBorrow()
      * @see GenericKeyedObjectPool#getTestOnBorrow()
@@ -173,7 +173,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_TEST_ON_BORROW = false;
 
     /**
-     * The default value for the {@code testOnReturn} configuration attribute.
+     * The default value for the {@code testOnReturn} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getTestOnReturn()
      * @see GenericKeyedObjectPool#getTestOnReturn()
@@ -181,7 +181,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_TEST_ON_RETURN = false;
 
     /**
-     * The default value for the {@code testWhileIdle} configuration attribute.
+     * The default value for the {@code testWhileIdle} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getTestWhileIdle()
      * @see GenericKeyedObjectPool#getTestWhileIdle()
@@ -189,7 +189,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_TEST_WHILE_IDLE = false;
 
     /**
-     * The default value for the {@code timeBetweenEvictionRuns} configuration attribute.
+     * The default value for the {@code timeBetweenEvictionRuns} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getDurationBetweenEvictionRuns()
      * @see GenericKeyedObjectPool#getDurationBetweenEvictionRuns()
@@ -218,7 +218,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final Duration DEFAULT_TIME_BETWEEN_EVICTION_RUNS = Duration.ofMillis(DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
 
     /**
-     * The default value for the {@code blockWhenExhausted} configuration attribute.
+     * The default value for the {@code blockWhenExhausted} configuration attribute: {@value}.
      *
      * @see GenericObjectPool#getBlockWhenExhausted()
      * @see GenericKeyedObjectPool#getBlockWhenExhausted()
@@ -226,12 +226,12 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     public static final boolean DEFAULT_BLOCK_WHEN_EXHAUSTED = true;
 
     /**
-     * The default value for enabling JMX for pools created with a configuration instance.
+     * The default value for enabling JMX for pools created with a configuration instance: {@value}.
      */
     public static final boolean DEFAULT_JMX_ENABLE = true;
 
     /**
-     * The default value for the prefix used to name JMX enabled pools created with a configuration instance.
+     * The default value for the prefix used to name JMX enabled pools created with a configuration instance: {@value}.
      *
      * @see GenericObjectPool#getJmxName()
      * @see GenericKeyedObjectPool#getJmxName()
@@ -254,6 +254,19 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      * @see GenericKeyedObjectPool#getEvictionPolicyClassName()
      */
     public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME = DefaultEvictionPolicy.class.getName();
+
+    /**
+     * The default value for the {@code collectDetailedStatistics} configuration
+     * attribute. When {@code true}, the pool will collect detailed timing statistics
+     * for monitoring purposes. When {@code false}, detailed statistics collection
+     * is disabled, improving performance under high load.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @since 2.13.0
+     */
+    public static final boolean DEFAULT_COLLECT_DETAILED_STATISTICS = true;
 
     private boolean lifo = DEFAULT_LIFO;
 
@@ -292,6 +305,15 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
 
     private String jmxNameBase = DEFAULT_JMX_NAME_BASE;
 
+    private boolean collectDetailedStatistics = DEFAULT_COLLECT_DETAILED_STATISTICS;
+
+    /**
+     * Constructs a new instance.
+     */
+    public BaseObjectPoolConfig() {
+        // empty
+    }
+
     /**
      * Gets the value for the {@code blockWhenExhausted} configuration attribute for pools created with this configuration instance.
      *
@@ -301,6 +323,23 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      */
     public boolean getBlockWhenExhausted() {
         return blockWhenExhausted;
+    }
+
+    /**
+     * Gets the value for the {@code collectDetailedStatistics} configuration attribute
+     * for pools created with this configuration instance.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @return  {@code true} if detailed statistics collection is enabled,
+     *          {@code false} if disabled for improved performance.
+     * @see GenericObjectPool#getCollectDetailedStatistics()
+     * @see GenericKeyedObjectPool#getCollectDetailedStatistics()
+     * @since 2.13.0
+     */
+    public boolean getCollectDetailedStatistics() {
+        return collectDetailedStatistics;
     }
 
     /**
@@ -420,7 +459,6 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      * Gets the value for the {@code lifo} configuration attribute for pools created with this configuration instance.
      *
      * @return The current setting of {@code lifo} for this configuration instance
-     *
      * @see GenericObjectPool#getLifo()
      * @see GenericKeyedObjectPool#getLifo()
      */
@@ -623,6 +661,25 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
      */
     public void setBlockWhenExhausted(final boolean blockWhenExhausted) {
         this.blockWhenExhausted = blockWhenExhausted;
+    }
+
+    /**
+     * Sets the value for the {@code collectDetailedStatistics} configuration attribute
+     * for pools created with this configuration instance. When {@code false}, the pool
+     * will not collect detailed timing statistics, improving performance under high load
+     * at the cost of reduced monitoring capabilities.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @param collectDetailedStatistics The new setting of {@code collectDetailedStatistics}
+     *        for this configuration instance.
+     * @see GenericObjectPool#getCollectDetailedStatistics()
+     * @see GenericKeyedObjectPool#getCollectDetailedStatistics()
+     * @since 2.13.0
+     */
+    public void setCollectDetailedStatistics(final boolean collectDetailedStatistics) {
+        this.collectDetailedStatistics = collectDetailedStatistics;
     }
 
     /**
@@ -955,5 +1012,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
         builder.append(jmxNamePrefix);
         builder.append(", jmxNameBase=");
         builder.append(jmxNameBase);
+        builder.append(", collectDetailedStatistics=");
+        builder.append(collectDetailedStatistics);
     }
 }

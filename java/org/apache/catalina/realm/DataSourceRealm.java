@@ -34,11 +34,6 @@ import org.apache.naming.ContextBindings;
 /**
  * Implementation of <b>Realm</b> that works with any JDBC JNDI DataSource. See the Realm How-To for more details on how
  * to set up the database and for configuration options.
- *
- * @author Glenn L. Nielsen
- * @author Craig R. McClanahan
- * @author Carson McDonald
- * @author Ignacio Ortega
  */
 public class DataSourceRealm extends RealmBase {
 
@@ -206,7 +201,7 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the table that holds user data..
+     * @return the table that holds user data
      */
     public String getUserTable() {
         return userTable;
@@ -240,10 +235,8 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             // If the db connection open fails, return "not authenticated"
             return null;
@@ -362,7 +355,7 @@ public class DataSourceRealm extends RealmBase {
     protected Connection open() {
 
         try {
-            Context context = null;
+            Context context;
             if (localDataSource) {
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
@@ -390,10 +383,8 @@ public class DataSourceRealm extends RealmBase {
     @Override
     protected String getPassword(String username) {
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             return null;
         }
@@ -407,7 +398,7 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * Return the password associated with the given principal's user name.
+     * Return the password associated with the given principal's username.
      *
      * @param dbConnection The database connection to be used
      * @param username     Username for which password should be retrieved
@@ -451,18 +442,16 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * Return the roles associated with the given user name.
+     * Return the roles associated with the given username.
      *
-     * @param username User name for which roles should be retrieved
+     * @param username Username for which roles should be retrieved
      *
      * @return an array list of the role names
      */
     protected ArrayList<String> getRoles(String username) {
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             return null;
         }
@@ -476,10 +465,10 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * Return the roles associated with the given user name.
+     * Return the roles associated with the given username.
      *
      * @param dbConnection The database connection to be used
-     * @param username     User name for which roles should be retrieved
+     * @param username     Username for which roles should be retrieved
      *
      * @return an array list of the role names
      */
@@ -491,14 +480,11 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        ArrayList<String> list = null;
-
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
             stmt.setString(1, username);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                list = new ArrayList<>();
-
+                ArrayList<String> list = new ArrayList<>();
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {

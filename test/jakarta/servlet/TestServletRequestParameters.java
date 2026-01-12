@@ -49,10 +49,18 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
 
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
-        client.setRequest(new String[] { "POST / HTTP/1.1" + CRLF + "Host: localhost:" + getPort() + CRLF +
-                "Connection: close" + CRLF + "Transfer-Encoding: chunked" + CRLF +
-                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + CRLF + "0a" + CRLF +
-                "var1=val1&" + CRLF });
+        // @formatter:off
+        client.setRequest(new String[] {
+                "POST / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    "Transfer-Encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    CRLF +
+                    "0a" + CRLF +
+                    "var1=val1&" + CRLF
+                });
+        // @formatter:on
 
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();
@@ -66,7 +74,7 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         }
 
         // Connection should be closed by the server.
-        //readLine() will receive an EOF reading the status line resuting in a null
+        // readLine() will receive an EOF reading the status line resulting in a null
         Assert.assertNull(client.getResponseLine());
     }
 }

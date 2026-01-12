@@ -27,8 +27,6 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 
 /**
  * A dinky coordinator, just uses a sorted version of the member array.
- *
- * @author rnewson
  */
 public class SimpleCoordinator extends ChannelInterceptorBase {
 
@@ -110,7 +108,7 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
     }
 
     public boolean isCoordinator() {
-        return view == null ? false : getLocalMember(false).equals(getCoordinator());
+        return view != null && getLocalMember(false).equals(getCoordinator());
     }
 
 }

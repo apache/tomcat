@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.catalina.Context;
@@ -28,6 +29,7 @@ import org.apache.catalina.Session;
  */
 public class SingleSignOnSessionKey implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String sessionId;
@@ -36,6 +38,13 @@ public class SingleSignOnSessionKey implements Serializable {
 
     public SingleSignOnSessionKey(Session session) {
         this.sessionId = session.getId();
+        Context context = session.getManager().getContext();
+        this.contextName = context.getName();
+        this.hostName = context.getParent().getName();
+    }
+
+    public SingleSignOnSessionKey(Session session, String sessionId) {
+        this.sessionId = sessionId;
         Context context = session.getManager().getContext();
         this.contextName = context.getName();
         this.hostName = context.getParent().getName();
@@ -90,13 +99,10 @@ public class SingleSignOnSessionKey implements Serializable {
             return false;
         }
         if (hostName == null) {
-            if (other.hostName != null) {
-                return false;
-            }
-        } else if (!hostName.equals(other.hostName)) {
-            return false;
+            return other.hostName == null;
+        } else {
+            return hostName.equals(other.hostName);
         }
-        return true;
     }
 
     @Override
@@ -104,14 +110,6 @@ public class SingleSignOnSessionKey implements Serializable {
         // Session ID is 32. Standard text is 36. Host could easily be 20+.
         // Context could be anything from 0 upwards. 128 seems like a reasonable
         // size to accommodate most cases without being too big.
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("Host: [");
-        sb.append(hostName);
-        sb.append("], Context: [");
-        sb.append(contextName);
-        sb.append("], SessionID: [");
-        sb.append(sessionId);
-        sb.append(']');
-        return sb.toString();
+        return "Host: [" + hostName + "], Context: [" + contextName + "], SessionID: [" + sessionId + ']';
     }
 }

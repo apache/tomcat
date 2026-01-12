@@ -16,12 +16,15 @@
  */
 package jakarta.servlet.jsp;
 
+import java.io.Serial;
+
 /**
- * A generic exception known to the JSP engine; uncaught JspExceptions will result in an invocation of the errorpage
+ * A generic exception known to the JSP engine; uncaught JspExceptions will result in an invocation of the error page
  * machinery.
  */
 public class JspException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

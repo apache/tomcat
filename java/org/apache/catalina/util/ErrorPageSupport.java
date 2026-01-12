@@ -29,10 +29,10 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 public class ErrorPageSupport {
 
     // Fully qualified class name to error page
-    private Map<String,ErrorPage> exceptionPages = new ConcurrentHashMap<>();
+    private final Map<String,ErrorPage> exceptionPages = new ConcurrentHashMap<>();
 
     // HTTP status code to error page
-    private Map<Integer,ErrorPage> statusPages = new ConcurrentHashMap<>();
+    private final Map<Integer,ErrorPage> statusPages = new ConcurrentHashMap<>();
 
 
     public void add(ErrorPage errorPage) {

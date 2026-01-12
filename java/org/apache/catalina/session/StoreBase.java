@@ -35,8 +35,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Abstract implementation of the {@link Store} interface to support most of the functionality required by a
  * {@link Store}.
- *
- * @author Bip Thelin
  */
 public abstract class StoreBase extends LifecycleBase implements Store {
 
@@ -101,7 +99,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Get only those keys of sessions, that are saved in the Store and are to be expired.
      *
-     * @return list of session keys, that are to be expired
+     * @return array of session keys, that are to be expired
      *
      * @throws IOException if an input-/output error occurred
      */
@@ -114,7 +112,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      * so expire the Session and remove it from the Store.
      */
     public void processExpires() {
-        String[] keys = null;
+        String[] keys;
 
         if (!getState().isAvailable()) {
             return;
@@ -122,8 +120,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
         try {
             keys = expiredKeys();
-        } catch (IOException e) {
-            manager.getContext().getLogger().error(sm.getString("store.keysFail"), e);
+        } catch (IOException ioe) {
+            manager.getContext().getLogger().error(sm.getString("store.keysFail"), ioe);
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
@@ -171,8 +169,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 manager.getContext().getLogger().error(sm.getString("store.expireFail", key), e);
                 try {
                     remove(key);
-                } catch (IOException e2) {
-                    manager.getContext().getLogger().error(sm.getString("store.removeFail", key), e2);
+                } catch (IOException ioe) {
+                    manager.getContext().getLogger().error(sm.getString("store.removeFail", key), ioe);
                 }
             }
         }
@@ -182,10 +180,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // --------------------------------------------------------- Protected Methods
 
     /**
-     * Create the object input stream to use to read a session from the store. Sub-classes <b>must</b> have set the
+     * Create the object input stream to use to read a session from the store. Subclasses <b>must</b> have set the
      * thread context class loader before calling this method.
      *
-     * @param is The input stream provided by the sub-class that will provide the data for a session
+     * @param is The input stream provided by the subclass that will provide the data for a session
      *
      * @return An appropriately configured ObjectInputStream from which the session can be read.
      *
@@ -197,8 +195,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         CustomObjectInputStream ois;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        if (manager instanceof ManagerBase) {
-            ManagerBase managerBase = (ManagerBase) manager;
+        if (manager instanceof ManagerBase managerBase) {
             ois = new CustomObjectInputStream(bis, classLoader, manager.getContext().getLogger(),
                     managerBase.getSessionAttributeValueClassNamePattern(),
                     managerBase.getWarnOnSessionAttributeFilterFailure());

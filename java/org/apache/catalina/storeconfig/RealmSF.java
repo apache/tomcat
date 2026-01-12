@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RealmSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(RealmSF.class);
+    private static final Log log = LogFactory.getLog(RealmSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -61,8 +61,7 @@ public class RealmSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aRealm, StoreDescription parentDesc)
             throws Exception {
-        if (aRealm instanceof CombinedRealm) {
-            CombinedRealm combinedRealm = (CombinedRealm) aRealm;
+        if (aRealm instanceof CombinedRealm combinedRealm) {
 
             // Store nested <Realm> element
             Realm[] realms = combinedRealm.getNestedRealms();

@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Cluster object</title>
   </properties>
 
@@ -122,64 +121,45 @@ network, particularly DoS attacks.</p>
       </p>
     </attribute>
     <attribute name="channelSendOptions" required="true">
-      <p>The Tribes channel send options, default is <code>8</code>.<br/>
-         This option is used to set the flag that all messages sent through the
-         SimpleTcpCluster uses. The flag decides how the messages are sent, and is a simple logical OR.</p>
-
-      <source>int options = Channel.SEND_OPTIONS_ASYNCHRONOUS |
-              Channel.SEND_OPTIONS_SYNCHRONIZED_ACK |
-              Channel.SEND_OPTIONS_USE_ACK;</source>
-      <p>Some of the values are:<br/>
-      <code>Channel.SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004</code><br/>
-      <code>Channel.SEND_OPTIONS_ASYNCHRONOUS = 0x0008</code><br/>
-      <code>Channel.SEND_OPTIONS_USE_ACK = 0x0002</code><br/>
-      So to use ACK and ASYNC messaging, the flag would be <code>10</code> (8+2)
-      <br/>
-      Note that if you use ASYNC messaging it is possible for update messages
-      for a session to be processed by the receiving nodes in a different order
-      to the order in which they were sent.
-      </p>
-      <p>
-        The various <code>channelSendOptions</code> values offer a tradeoff
-        between throughput on the sending node and the reliability of
-        replication should the sending or receiving node(s) fail. Here are
-        some common options. "Message" could be any message sent between nodes,
-        but only session-change messages are considered, here.
-      </p>
-      <p>
-        <code>channelSendOptions="8"</code> / <code>channelSendOptions="async"</code>
-        As far as the sender is concerned, the message is "sent"
-        as soon as it has been placed in the queue on the sender for
-        transmission to the other nodes. The message may not reach any or all
-        of the recipient nodes and may not be successfully processed on any
-        nodes that it does reach. This option offers the highest throughput on
-        the sender but the least reliability, as the triggering request will
-        complete without any knowledge of the success/failure of the session
-        replication.
-      </p>
-      <p>
-        <code>channelSendOptions="2"</code> / <code>channelSendOptions="use_ack"</code>
-        The sender will block the completion of the current request until all
-        of the receiving nodes have acknowledged that they have received the
-        message, but have not necessarily processed that message. This option
-        will result in lower throughput on the sending node, because the message
-        must be transmitted and the acknowledgement received, but the
-        reliability is greater than the asynchronous model.
-      </p>
-      <p>
-        <code>channelSendOptions="6"</code> / <code>channelSendOptions="sync,use_ack"</code>
-        The sender will block the completion of the current request until
-        all of the receiving nodes have acknowledged that they have received
-        <u>and</u> processed the message. This option will have the lowest
-        throughput (of these three) but the greatest reliability.
-      </p>
-      <p>
-      You may also set these options as a comma separated string, e.g. "async, multicast", which
-      will be translated into <code>Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST</code>
-      <br/>
-      The valid option names are "asynchronous" (alias "async"), "byte_message" (alias "byte")
-      , "multicast", "secure", "synchronized_ack" (alias "sync"), "udp", "use_ack"
-      </p>
+        <p>The Tribes channel send options. This option is used for all messages
+        sent through the SimpleTcpCluster.</p>
+        <p>The value may be specified either as an integer (add values to use
+        multiple flags) or using a comma-separate list of the human-readable
+        option names. Human-readable names are translated to their integer
+        values on startup.</p>
+        <p>The different values offer a tradeoff between throughput on the
+        sending node and the reliability of replication should the sending or
+        receiving node(s) fail.</p>
+        <p>The supported values are:</p>
+        <dl>
+          <dt><code>byte_message</code>, <code>byte</code> or
+              <code>1</code></dt>
+          <dd>The message is a pure byte message and no marshaling or
+              unmarshalling will be performed</dd>
+          <dt><code>use_ack</code> or <code>2</code></dt>
+          <dd>The message is sent and an ACK is received when the message has
+              been received by the recipient. If no ack is received, the message
+              is not considered successful.</dd>
+          <dt><code>synchronized_ack</code>, <code>sync</code> or
+              <code>4</code></dt>
+          <dd>Has no effect unless <code>use_ack</code> is set. The message is
+              sent and an ACK is received when the message has been received and
+              processed by the recipient. If no ack is received, the message is
+              not considered successful.</dd>
+          <dt><code>asynchronous</code>, <code>async</code> or
+              <code>8</code></dt>
+          <dd>The message will be placed on a queue and sent by a separate
+              thread. It is possible for update messages for a session to be
+              processed by the receiving node in a different order to the order
+              in which they were sent.</dd>
+          <dt><code>secure</code> or <code>16</code></dt>
+          <dd>Not implemented. Has no effect if used.</dd>
+          <dt><code>udp</code> or <code>32</code></dt>
+          <dd>The message will be sent using UDP instead of TCP.</dd>
+          <dt><code>multicast</code> or <code>64</code></dt>
+          <dd>Not implemented. Messages will not be sent if used.</dd>
+        </dl>
+        <p>The default value is <code>8</code> (<code>async</code>).</p>
     </attribute>
     <attribute name="channelStartOptions" required="false">
       <p>Sets the start and stop flags for the &lt;Channel&gt; object used by the cluster.

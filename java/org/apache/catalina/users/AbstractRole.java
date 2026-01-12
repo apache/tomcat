@@ -25,8 +25,6 @@ import org.apache.catalina.Role;
  * Convenience base class for {@link Role} implementations.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public abstract class AbstractRole implements Role {

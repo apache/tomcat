@@ -89,6 +89,7 @@
     </menu>
 
     <menu name="Other">
+        <item name="Runtime attributes"    href="runtime-attributes.html"/>
         <item name="System properties"     href="systemprops.html"/>
         <item name="Jakarta Authentication"
               href="jaspic.html"/>

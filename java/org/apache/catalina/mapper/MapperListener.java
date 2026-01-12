@@ -40,9 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Mapper listener.
- *
- * @author Remy Maucherat
- * @author Costin Manolache
  */
 public class MapperListener extends LifecycleMBeanBase implements ContainerListener, LifecycleListener {
 
@@ -258,7 +255,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
 
         boolean found = false;
 
-        if (defaultHost != null && defaultHost.length() > 0) {
+        if (defaultHost != null && !defaultHost.isEmpty()) {
             Container[] containers = engine.findChildren();
 
             for (Container container : containers) {
@@ -453,15 +450,13 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
     public void lifecycleEvent(LifecycleEvent event) {
         if (event.getType().equals(AFTER_START_EVENT)) {
             Object obj = event.getSource();
-            if (obj instanceof Wrapper) {
-                Wrapper w = (Wrapper) obj;
+            if (obj instanceof Wrapper w) {
                 // Only if the Context has started. If it has not, then it will
                 // have its own "after_start" event later.
                 if (w.getParent().getState().isAvailable()) {
                     registerWrapper(w);
                 }
-            } else if (obj instanceof Context) {
-                Context c = (Context) obj;
+            } else if (obj instanceof Context c) {
                 // Only if the Host has started. If it has not, then it will
                 // have its own "after_start" event later.
                 if (c.getParent().getState().isAvailable()) {

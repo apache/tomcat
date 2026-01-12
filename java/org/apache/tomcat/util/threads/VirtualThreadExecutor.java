@@ -32,9 +32,9 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
 
     private static final StringManager sm = StringManager.getManager(VirtualThreadExecutor.class);
 
-    private CountDownLatch shutdown = new CountDownLatch(1);
+    private final CountDownLatch shutdown = new CountDownLatch(1);
 
-    private Thread.Builder threadBuilder;
+    private final Thread.Builder threadBuilder;
 
     public VirtualThreadExecutor(String namePrefix) {
         threadBuilder = Thread.ofVirtual().name(namePrefix, 0);

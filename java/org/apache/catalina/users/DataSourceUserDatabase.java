@@ -322,7 +322,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     }
 
     /**
-     * @return the table that holds user data..
+     * @return the table that holds user data
      */
     public String getUserTable() {
         return userTable;
@@ -871,8 +871,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
         }
 
-        User user = new GenericUser<>(this, userName, dbCredentials, fullName, groups, roles);
-        return user;
+        return new GenericUser<>(this, userName, dbCredentials, fullName, groups, roles);
     }
 
     @Override
@@ -1124,7 +1123,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     protected void saveInternal(Connection dbConnection) {
 
         StringBuilder temp = null;
-        StringBuilder tempRelation = null;
+        StringBuilder tempRelation;
         StringBuilder tempRelationDelete = null;
 
         if (isRoleStoreDefined()) {

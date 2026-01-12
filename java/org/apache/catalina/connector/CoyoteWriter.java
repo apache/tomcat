@@ -21,8 +21,6 @@ import java.io.PrintWriter;
 
 /**
  * Coyote implementation of the servlet writer.
- *
- * @author Remy Maucherat
  */
 public class CoyoteWriter extends PrintWriter {
 
@@ -91,8 +89,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.flush();
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
@@ -105,7 +103,7 @@ public class CoyoteWriter extends PrintWriter {
         // so the stream can be reused. We close ob.
         try {
             ob.close();
-        } catch (IOException ex) {
+        } catch (IOException ignore) {
             // Ignore
         }
         error = false;
@@ -129,15 +127,15 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(c);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
 
 
     @Override
-    public void write(char buf[], int off, int len) {
+    public void write(char[] buf, int off, int len) {
 
         if (error) {
             return;
@@ -145,15 +143,15 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(buf, off, len);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
 
 
     @Override
-    public void write(char buf[]) {
+    public void write(char[] buf) {
         write(buf, 0, buf.length);
     }
 
@@ -167,8 +165,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(s, off, len);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
@@ -224,7 +222,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void print(char s[]) {
+    public void print(char[] s) {
         write(s);
     }
 
@@ -293,7 +291,7 @@ public class CoyoteWriter extends PrintWriter {
 
 
     @Override
-    public void println(char c[]) {
+    public void println(char[] c) {
         print(c);
         println();
     }

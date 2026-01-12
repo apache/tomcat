@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
  */
 public class SSLHostConfigSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(SSLHostConfigSF.class);
+    private static final Log log = LogFactory.getLog(SSLHostConfigSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -48,7 +48,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
                 SSLHostConfig bean2 = (SSLHostConfig) getStoreAppender().defaultInstance(aElement);
                 SSLHostConfig sslHostConfig = (SSLHostConfig) aElement;
                 if (!bean2.getProtocols().equals(sslHostConfig.getProtocols())) {
-                    StringBuffer protocolsValue = new StringBuffer();
+                    StringBuilder protocolsValue = new StringBuilder();
                     for (String protocol : sslHostConfig.getProtocols()) {
                         protocolsValue.append('+').append(protocol);
                     }
@@ -75,8 +75,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aSSLHostConfig, StoreDescription parentDesc)
             throws Exception {
-        if (aSSLHostConfig instanceof SSLHostConfig) {
-            SSLHostConfig sslHostConfig = (SSLHostConfig) aSSLHostConfig;
+        if (aSSLHostConfig instanceof SSLHostConfig sslHostConfig) {
             // Store nested <SSLHostConfigCertificate> elements
             SSLHostConfigCertificate[] hostConfigsCertificates =
                     sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);

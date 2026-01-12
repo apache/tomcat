@@ -60,7 +60,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase implements D
         if (membership == null) {
             setupMembership();
         }
-        boolean notify = false;
+        boolean notify;
         synchronized (membership) {
             notify = Arrays.equals(domain, member.getDomain());
             if (notify) {
@@ -81,7 +81,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase implements D
         if (membership == null) {
             setupMembership();
         }
-        boolean notify = false;
+        boolean notify;
         synchronized (membership) {
             notify = Arrays.equals(domain, member.getDomain());
             if (notify) {

@@ -33,8 +33,6 @@ import org.apache.catalina.UserDatabase;
  * </p>
  *
  * @param <UD> The specific type of UserDase with which this group is associated
- *
- * @author Craig R. McClanahan
  */
 public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 
@@ -143,8 +141,7 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof GenericGroup) {
-            GenericGroup<?> group = (GenericGroup<?>) obj;
+        if (obj instanceof GenericGroup<?> group) {
             return group.database == database && groupname.equals(group.getGroupname());
         }
         return super.equals(obj);

@@ -110,7 +110,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
         if (saltLength == 0) {
             salt = new byte[0];
         } else if (saltLength > 0) {
-            // Double checked locking. OK since random is volatile.
+            // Double-checked locking. OK since random is volatile.
             if (random == null) {
                 synchronized (randomLock) {
                     if (random == null) {
@@ -137,14 +137,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             // Output the simple/old format for backwards compatibility
             return serverCredential;
         } else {
-            StringBuilder result = new StringBuilder((saltLength << 1) + 10 + serverCredential.length() + 2);
-            result.append(HexUtils.toHexString(salt));
-            result.append('$');
-            result.append(iterations);
-            result.append('$');
-            result.append(serverCredential);
-
-            return result.toString();
+            return HexUtils.toHexString(salt) + '$' + iterations + '$' + serverCredential;
         }
     }
 
@@ -236,7 +229,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
     /**
      * Generates the equivalent stored credentials for the given input credentials, salt, iterations and key length. The
-     * default implementation calls ignores the key length and calls {@link #mutate(String, byte[], int)}. Sub-classes
+     * default implementation calls ignores the key length and calls {@link #mutate(String, byte[], int)}. Subclasses
      * that use the key length should override this method.
      *
      * @param inputCredentials User provided credentials

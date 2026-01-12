@@ -22,8 +22,6 @@ package org.apache.coyote;
  *
  * @see ProtocolHandler
  * @see ActionHook
- *
- * @author Remy Maucherat
  */
 public enum ActionCode {
 
@@ -138,7 +136,7 @@ public enum ActionCode {
     ASYNC_DISPATCH,
 
     /**
-     * Callback to indicate the the actual dispatch has started and that the async state needs change.
+     * Callback to indicate the actual dispatch has started and that the async state needs change.
      */
     ASYNC_DISPATCHED,
 

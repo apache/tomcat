@@ -72,30 +72,36 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
         if (chunked) {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
-                    "Host: localhost:" + getPort() + CRLF +
-                    "Connection: close" + CRLF +
-                    "Transfer-Encoding: chunked" + CRLF +
-                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                    CRLF +
-                    "0a" + CRLF +
-                    "var1=val1&" + CRLF +
-                    "0a" + CRLF +
-                    "var2=val2&" + CRLF +
-                    "0a" + CRLF +
-                    "var3=val3&" + CRLF +
-                    "0" + CRLF +
-                    CRLF});
+                        "Host: localhost:" + getPort() + CRLF +
+                        "Connection: close" + CRLF +
+                        "Transfer-Encoding: chunked" + CRLF +
+                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                        CRLF +
+                        "0a" + CRLF +
+                        "var1=val1&" + CRLF +
+                        "0a" + CRLF +
+                        "var2=val2&" + CRLF +
+                        "0a" + CRLF +
+                        "var3=val3&" + CRLF +
+                        "0" + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
         } else {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
-                    "Host: localhost:" + getPort() + CRLF +
-                    "Connection: close" + CRLF +
-                    "Content-Length: 50" + CRLF +
-                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                    CRLF +
-                    "01234567890123456789012345678901234567890123456789" });
+                        "Host: localhost:" + getPort() + CRLF +
+                        "Connection: close" + CRLF +
+                        "Content-Length: 50" + CRLF +
+                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                        CRLF +
+                        "01234567890123456789012345678901234567890123456789"
+                    });
+            // @formatter:on
         }
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();

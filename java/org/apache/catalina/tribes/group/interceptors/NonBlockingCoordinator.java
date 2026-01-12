@@ -100,8 +100,8 @@ import org.apache.juli.logging.LogFactory;
  * the view.
  * </p>
  * <p>
- * Lets assume that C1 arrives, C1 has lower priority than C, but higher priority than D.<br>
- * Lets also assume that C1 sees the following view {B,D,E}<br>
+ * Let's assume that C1 arrives, C1 has lower priority than C, but higher priority than D.<br>
+ * Let's also assume that C1 sees the following view {B,D,E}<br>
  * C1 waits for a token to arrive. When the token arrives, the same scenario as above will happen.<br>
  * In the scenario where C1 sees {D,E} and A,B,C cannot see C1, no token will ever arrive.<br>
  * In this case, C1 sends a Z{C1-ldr, C1-src, mbrs-C1,D,E} to D<br>
@@ -238,14 +238,24 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                         new CoordinationEvent(CoordinationEvent.EVT_PROCESS_ELECT, this, "Election, sending request"));
                 sendElectionMsg(local, others[0], msg);
             } else {
-                try {
-                    coordMsgReceived.set(false);
-                    fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG, this,
-                            "Election, waiting for request"));
-                    electionMutex.wait(waitForCoordMsgTimeout);
-                } catch (InterruptedException x) {
-                    Thread.currentThread().interrupt();
-                }
+                coordMsgReceived.set(false);
+                fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG, this,
+                        "Election, waiting for request"));
+                long timeout = waitForCoordMsgTimeout;
+                long timeoutEndNanos = System.nanoTime() + timeout * 1_000_000;
+                do {
+                    try {
+                        electionMutex.wait(timeout);
+                    } catch (InterruptedException x) {
+                        Thread.currentThread().interrupt();
+                    }
+                    timeout = (timeoutEndNanos - System.nanoTime()) / 1_000_000;
+                    /*
+                     * Spurious wake-ups are possible. Keep waiting if a) the condition we were waiting for hasn't
+                     * happened (i.e. notify() was not called) AND b) the timeout has not expired AND c) the thread was
+                     * not interrupted.
+                     */
+                } while (suggestedviewId == null && !coordMsgReceived.get() && timeout > 0 && !Thread.interrupted());
                 String msg;
                 if (suggestedviewId == null && !coordMsgReceived.get()) {
                     if (Thread.interrupted()) {
@@ -266,9 +276,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(m, others);
         Member[] mbrs = m.getMembers();
         m.reset();
-        CoordinationMessage msg = new CoordinationMessage(leader, local, mbrs,
-                new UniqueId(UUIDGenerator.randomUUID(true)), COORD_REQUEST);
-        return msg;
+        return new CoordinationMessage(leader, local, mbrs, new UniqueId(UUIDGenerator.randomUUID(true)),
+                COORD_REQUEST);
     }
 
     protected void sendElectionMsg(Member local, Member next, CoordinationMessage msg) throws ChannelException {
@@ -287,6 +296,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 sendElectionMsg(local, msg.getMembers()[current], msg);
                 sent = true;
             } catch (ChannelException x) {
+                // Exception is logged further up stack
                 log.warn(sm.getString("nonBlockingCoordinator.electionMessage.sendfailed", msg.getMembers()[current]));
                 current = Arrays.nextIndex(msg.getMembers()[current], msg.getMembers());
                 if (current == next) {
@@ -323,8 +333,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             return true;
         } catch (SocketTimeoutException | ConnectException x) {
             // do nothing, we couldn't connect
-        } catch (Exception x) {
-            log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"), e);
         }
         return false;
     }
@@ -468,7 +478,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Block in/out messages while a election is going on
+     * Block in/out messages while an election is going on
      */
     protected void halt() {
 
@@ -544,7 +554,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     @Override
     public void messageReceived(ChannelMessage msg) {
         if (Arrays.contains(msg.getMessage().getBytesDirect(), 0, COORD_ALIVE, 0, COORD_ALIVE.length)) {
-            // ignore message, its an alive message
+            // ignore message, it's an alive message
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MSG_ARRIVE, this, "Alive Message"));
 
         } else if (Arrays.contains(msg.getMessage().getBytesDirect(), 0, COORD_HEADER, 0, COORD_HEADER.length)) {
@@ -626,8 +636,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                     startElection(true);
                 }
             }
-        } catch (Exception x) {
-            log.error(sm.getString("nonBlockingCoordinator.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("nonBlockingCoordinator.heartbeat.failed"), e);
         } finally {
             super.heartbeat();
         }
@@ -786,12 +796,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             byte[] ldr = leader.getData(false, false);
             buf.append(ldr.length);
             buf.append(ldr, 0, ldr.length);
-            ldr = null;
             // source
             byte[] src = source.getData(false, false);
             buf.append(src.length);
             buf.append(src, 0, src.length);
-            src = null;
             // view
             buf.append(view.length);
             for (Member member : view) {
@@ -858,36 +866,22 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
         @Override
         public String getEventTypeDesc() {
-            switch (type) {
-                case EVT_START:
-                    return "EVT_START:" + info;
-                case EVT_MBR_ADD:
-                    return "EVT_MBR_ADD:" + info;
-                case EVT_MBR_DEL:
-                    return "EVT_MBR_DEL:" + info;
-                case EVT_START_ELECT:
-                    return "EVT_START_ELECT:" + info;
-                case EVT_PROCESS_ELECT:
-                    return "EVT_PROCESS_ELECT:" + info;
-                case EVT_MSG_ARRIVE:
-                    return "EVT_MSG_ARRIVE:" + info;
-                case EVT_PRE_MERGE:
-                    return "EVT_PRE_MERGE:" + info;
-                case EVT_POST_MERGE:
-                    return "EVT_POST_MERGE:" + info;
-                case EVT_WAIT_FOR_MSG:
-                    return "EVT_WAIT_FOR_MSG:" + info;
-                case EVT_SEND_MSG:
-                    return "EVT_SEND_MSG:" + info;
-                case EVT_STOP:
-                    return "EVT_STOP:" + info;
-                case EVT_CONF_RX:
-                    return "EVT_CONF_RX:" + info;
-                case EVT_ELECT_ABANDONED:
-                    return "EVT_ELECT_ABANDONED:" + info;
-                default:
-                    return "Unknown";
-            }
+            return switch (type) {
+                case EVT_START -> "EVT_START:" + info;
+                case EVT_MBR_ADD -> "EVT_MBR_ADD:" + info;
+                case EVT_MBR_DEL -> "EVT_MBR_DEL:" + info;
+                case EVT_START_ELECT -> "EVT_START_ELECT:" + info;
+                case EVT_PROCESS_ELECT -> "EVT_PROCESS_ELECT:" + info;
+                case EVT_MSG_ARRIVE -> "EVT_MSG_ARRIVE:" + info;
+                case EVT_PRE_MERGE -> "EVT_PRE_MERGE:" + info;
+                case EVT_POST_MERGE -> "EVT_POST_MERGE:" + info;
+                case EVT_WAIT_FOR_MSG -> "EVT_WAIT_FOR_MSG:" + info;
+                case EVT_SEND_MSG -> "EVT_SEND_MSG:" + info;
+                case EVT_STOP -> "EVT_STOP:" + info;
+                case EVT_CONF_RX -> "EVT_CONF_RX:" + info;
+                case EVT_ELECT_ABANDONED -> "EVT_ELECT_ABANDONED:" + info;
+                default -> "Unknown";
+            };
         }
 
         @Override

@@ -35,10 +35,6 @@ import org.apache.el.stream.Optional;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstValue extends SimpleNode {
 
     private static final Object[] EMPTY_ARRAY = new Object[0];
@@ -94,7 +90,8 @@ public final class AstValue extends SimpleNode {
                 i += 2;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             } else if (i + 1 < propCount) {
                 // Object with property not at end of expression
@@ -110,11 +107,13 @@ public final class AstValue extends SimpleNode {
                 i++;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             }
             if (base == null) {
-                throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                throw new PropertyNotFoundException(
+                        MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
             }
         }
 
@@ -133,8 +132,7 @@ public final class AstValue extends SimpleNode {
         ELResolver resolver = ctx.getELResolver();
         while (base != null && i < propCount) {
             suffix = this.children[i].getValue(ctx);
-            if (i + 1 < propCount && (this.children[i + 1] instanceof AstMethodParameters)) {
-                AstMethodParameters mps = (AstMethodParameters) this.children[i + 1];
+            if (i + 1 < propCount && (this.children[i + 1] instanceof AstMethodParameters mps)) {
                 if (base instanceof Optional && "orElseGet".equals(suffix) && mps.jjtGetNumChildren() == 1) {
                     Node paramFoOptional = mps.jjtGetChild(0);
                     if (!(paramFoOptional instanceof AstLambdaExpression ||
@@ -193,7 +191,7 @@ public final class AstValue extends SimpleNode {
     public MethodInfo getMethodInfo(EvaluationContext ctx, @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
-        Class<?>[] types = null;
+        Class<?>[] types;
         if (isParametersProvided()) {
             Object[] values = ((AstMethodParameters) this.jjtGetChild(this.jjtGetNumChildren() - 1)).getParameters(ctx);
             types = getTypesFromValues(values);
@@ -210,9 +208,9 @@ public final class AstValue extends SimpleNode {
             throws ELException {
 
         Target t = getTarget(ctx);
-        Method m = null;
-        Object[] values = null;
-        Class<?>[] types = null;
+        Method m;
+        Object[] values;
+        Class<?>[] types;
         if (isParametersProvided()) {
             values = ((AstMethodParameters) this.jjtGetChild(this.jjtGetNumChildren() - 1)).getParameters(ctx);
             types = getTypesFromValues(values);
@@ -225,7 +223,7 @@ public final class AstValue extends SimpleNode {
         // Handle varArgs and any coercion required
         values = convertArgs(ctx, values, m);
 
-        Object result = null;
+        Object result;
         try {
             result = m.invoke(t.base, values);
         } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -243,7 +241,7 @@ public final class AstValue extends SimpleNode {
     @Override
     public MethodReference getMethodReference(EvaluationContext ctx) {
         Target t = getTarget(ctx);
-        Method m = null;
+        Method m;
         Object[] values = null;
         Class<?>[] types = null;
         if (isParametersProvided()) {
@@ -268,7 +266,7 @@ public final class AstValue extends SimpleNode {
         int paramCount = types.length;
 
         if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
-                !m.isVarArgs() && (paramCount > 0 && src == null || src != null && src.length != paramCount)) {
+                !m.isVarArgs() && (src == null || src.length != paramCount)) {
             String srcCount = null;
             if (src != null) {
                 srcCount = Integer.toString(src.length);
@@ -316,7 +314,7 @@ public final class AstValue extends SimpleNode {
             return null;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;
@@ -352,9 +350,7 @@ public final class AstValue extends SimpleNode {
         // child
         int len = children.length;
         if (len > 2) {
-            if (this.jjtGetChild(len - 1) instanceof AstMethodParameters) {
-                return true;
-            }
+            return this.jjtGetChild(len - 1) instanceof AstMethodParameters;
         }
         return false;
     }

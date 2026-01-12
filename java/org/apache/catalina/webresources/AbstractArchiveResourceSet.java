@@ -31,17 +31,21 @@ import java.util.zip.ZipFile;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
+    private static final Log log = LogFactory.getLog(AbstractArchiveResourceSet.class);
+
     private URL baseUrl;
     private String baseUrlString;
-    private JarFile archive = null;
+    protected JarFile archive = null;
     protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
-    private long archiveUseCount = 0;
-    private JarContents jarContents;
-    private boolean retainBloomFilterForArchives = false;
+    protected long archiveUseCount = 0;
+    protected JarContents jarContents;
+    protected boolean retainBloomFilterForArchives = false;
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
@@ -68,10 +72,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         String webAppMount = getWebAppMount();
 
         ArrayList<String> result = new ArrayList<>();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
+            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
             for (String name : getArchiveEntries(false).keySet()) {
@@ -81,13 +85,13 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                     } else {
                         name = name.substring(pathInJar.length());
                     }
-                    if (name.length() == 0) {
+                    if (name.isEmpty()) {
                         continue;
                     }
                     if (name.charAt(0) == '/') {
                         name = name.substring(1);
                     }
-                    if (name.length() > 0 && name.lastIndexOf('/') == -1) {
+                    if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
                         result.add(name);
                     }
                 }
@@ -108,17 +112,18 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         return result.toArray(new String[0]);
     }
 
+
     @Override
     public final Set<String> listWebAppPaths(String path) {
         checkPath(path);
         String webAppMount = getWebAppMount();
 
         ResourceSet<String> result = new ResourceSet<>();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path and make
             // sure it ends in '/'
-            if (pathInJar.length() > 0) {
+            if (!pathInJar.isEmpty()) {
                 if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
                     pathInJar = pathInJar.substring(1) + '/';
                 }
@@ -225,13 +230,13 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         // If the JAR has been mounted below the web application root, return
         // an empty resource for requests outside of the mount point.
 
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
+            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            if (pathInJar.equals("")) {
+            if (pathInJar.isEmpty()) {
                 // Special case
                 // This is a directory resource so the path must end with /
                 if (!path.endsWith("/")) {
@@ -293,6 +298,33 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         throw new IllegalArgumentException(sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calls to this method will be ignored as archives do not allow linking.
+     */
+    @Override
+    public void setAllowLinking(boolean allowLinking) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calls to this method always return {@code false} as archives do not allow linking.
+     */
+    @Override
+    public boolean getAllowLinking() {
+        return false;
+    }
+
+    /**
+     * Create a JarFile for accessing the elements of the resource set. Depending on the
+     * {@link WebResourceRoot#getArchiveIndexStrategy()}, it may also index the elements for faster lookups.
+     *
+     * @return A JarFile to use to access the elements of the resource set
+     *
+     * @throws IOException If an error occurs creating the JarFile
+     */
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {
@@ -320,8 +352,8 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (archive != null && archiveUseCount == 0) {
                 try {
                     archive.close();
-                } catch (IOException e) {
-                    // Log at least WARN
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("abstractArchiveResourceSet.archiveCloseFailed"), ioe);
                 }
                 archive = null;
                 archiveEntries = null;

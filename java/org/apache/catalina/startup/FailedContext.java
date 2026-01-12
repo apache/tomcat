@@ -21,6 +21,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.servlet.ServletContainerInitializer;
@@ -184,7 +185,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
             } else if (c == null) {
                 // May happen in unit testing and/or some embedding scenarios
                 keyProperties.append(",container");
-                keyProperties.append(containerCount++);
+                keyProperties.append(containerCount);
                 keyProperties.append("=null");
                 break;
             } else {
@@ -206,11 +207,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
         StringBuilder keyProperties = new StringBuilder("j2eeType=WebModule,name=//");
 
         String hostname = getParent().getName();
-        if (hostname == null) {
-            keyProperties.append("DEFAULT");
-        } else {
-            keyProperties.append(hostname);
-        }
+        keyProperties.append(Objects.requireNonNullElse(hostname, "DEFAULT"));
 
         String contextName = getName();
         if (!contextName.startsWith("/")) {
@@ -1267,18 +1264,8 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        return null;
-    }
-
-    @Override
     public ClassLoader bind(ClassLoader originalClassLoader) {
         return null;
-    }
-
-    @Override
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        // NO-OP
     }
 
     @Override
@@ -1445,4 +1432,15 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
     }
 
+    public long getStartTime() {
+        return -1;
+    }
+
+    public long getStartupTime() {
+        return -1;
+    }
+
+    public long getTldScanTime() {
+        return -1;
+    }
 }

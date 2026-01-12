@@ -219,7 +219,7 @@ public class TestCookieParsing extends TomcatBaseTest {
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
             Cookie cookies[] = req.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
@@ -238,7 +238,7 @@ public class TestCookieParsing extends TomcatBaseTest {
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
             req.getCookies();
             // Never do this in production code. It triggers an XSS.
             Enumeration<String> cookieHeaders = req.getHeaders("Cookie");

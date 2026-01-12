@@ -23,13 +23,14 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.EjbRef;
+import org.apache.naming.StringManager;
 
 /**
  * Object factory for EJBs.
- *
- * @author Remy Maucherat
  */
 public class EjbFactory extends FactoryBase {
+
+    private static final StringManager sm = StringManager.getManager(EjbFactory.class);
 
     @Override
     protected boolean isReferenceTypeSupported(Object obj) {
@@ -40,20 +41,14 @@ public class EjbFactory extends FactoryBase {
     protected ObjectFactory getDefaultFactory(Reference ref) throws NamingException {
 
         ObjectFactory factory;
-        String javaxEjbFactoryClassName = System.getProperty(
-                "jakarta.ejb.Factory", Constants.OPENEJB_EJB_FACTORY);
+        String javaxEjbFactoryClassName = System.getProperty("jakarta.ejb.Factory", Constants.OPENEJB_EJB_FACTORY);
         try {
-            factory = (ObjectFactory)
-                Class.forName(javaxEjbFactoryClassName).getConstructor().newInstance();
-        } catch(Throwable t) {
-            if (t instanceof NamingException) {
-                throw (NamingException) t;
-            }
+            factory = (ObjectFactory) Class.forName(javaxEjbFactoryClassName).getConstructor().newInstance();
+        } catch (Throwable t) {
             if (t instanceof VirtualMachineError) {
                 throw (VirtualMachineError) t;
             }
-            NamingException ex = new NamingException
-                ("Could not create resource factory instance");
+            NamingException ex = new NamingException(sm.getString("factoryBase.factoryCreationError"));
             ex.initCause(t);
             throw ex;
         }
@@ -67,8 +62,7 @@ public class EjbFactory extends FactoryBase {
         if (linkRefAddr != null) {
             // Retrieving the EJB link
             String ejbLink = linkRefAddr.getContent().toString();
-            Object beanObj = (new InitialContext()).lookup(ejbLink);
-            return beanObj;
+            return (new InitialContext()).lookup(ejbLink);
         }
         return null;
     }

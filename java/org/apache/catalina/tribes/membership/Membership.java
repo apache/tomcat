@@ -27,8 +27,6 @@ import org.apache.catalina.tribes.Member;
  * A <b>membership</b> implementation using simple multicast. This is the representation of a multicast membership. This
  * class is responsible for maintaining a list of active cluster nodes in the cluster. If a node fails to send out a
  * heartbeat, the node will be dismissed.
- *
- * @author Peter Rossbach
  */
 public class Membership implements Cloneable {
 
@@ -175,7 +173,7 @@ public class Membership implements Cloneable {
         synchronized (membersLock) {
             if (!map.containsKey(member)) {
                 map.put(member, entry);
-                Member results[] = new Member[members.length + 1];
+                Member[] results = new Member[members.length + 1];
                 System.arraycopy(members, 0, results, 0, members.length);
                 results[members.length] = member;
                 Arrays.sort(results, memberComparator);
@@ -203,7 +201,7 @@ public class Membership implements Cloneable {
             if (n < 0) {
                 return;
             }
-            Member results[] = new Member[members.length - 1];
+            Member[] results = new Member[members.length - 1];
             int j = 0;
             for (int i = 0; i < members.length; i++) {
                 if (i != n) {
@@ -220,7 +218,7 @@ public class Membership implements Cloneable {
      *
      * @param maxtime - the max time a member can remain unannounced before it is considered dead.
      *
-     * @return the list of expired members
+     * @return the array of expired members
      */
     public Member[] expire(long maxtime) {
         synchronized (membersLock) {
@@ -263,11 +261,9 @@ public class Membership implements Cloneable {
 
     public Member getMember(Member mbr) {
         Member[] members = this.members;
-        if (members.length > 0) {
-            for (Member member : members) {
-                if (member.equals(mbr)) {
-                    return member;
-                }
+        for (Member member : members) {
+            if (member.equals(mbr)) {
+                return member;
             }
         }
         return null;
@@ -292,7 +288,7 @@ public class Membership implements Cloneable {
     /**
      * Inner class that represents a member entry
      */
-    protected static class MbrEntry {
+    public static class MbrEntry {
 
         protected final Member mbr;
         protected long lastHeardFrom;

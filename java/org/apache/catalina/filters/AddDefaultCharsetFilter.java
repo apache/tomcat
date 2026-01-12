@@ -63,7 +63,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
-        if (encoding == null || encoding.length() == 0 || encoding.equalsIgnoreCase("default")) {
+        if (encoding == null || encoding.isEmpty() || encoding.equalsIgnoreCase("default")) {
             encoding = DEFAULT_ENCODING;
         } else if (encoding.equalsIgnoreCase("system")) {
             encoding = Charset.defaultCharset().name();

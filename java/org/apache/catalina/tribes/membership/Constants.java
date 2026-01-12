@@ -20,8 +20,6 @@ import org.apache.catalina.tribes.util.Arrays;
 
 /**
  * Manifest constants for the <code>org.apache.catalina.tribes.membership</code> package.
- *
- * @author Peter Rossbach
  */
 public class Constants {
 

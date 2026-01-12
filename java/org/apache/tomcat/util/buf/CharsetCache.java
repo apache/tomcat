@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -157,12 +158,12 @@ public class CharsetCache {
             // Added from OpenJDK 21 ea18
             "gb18030-2022"
             // If you add and entry to this list, ensure you run
-            // TestCharsetUtil#testIsAcsiiSupersetAll()
+            // TestCharsetUtil#testIsAsciiSupersetAll()
     };
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy", null);
 
-    private ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
 
     public CharsetCache() {
         // Pre-populate the cache
@@ -192,15 +193,15 @@ public class CharsetCache {
 
         if (result == DUMMY_CHARSET) {
             // Name is known but the Charset is not in the cache
-            Charset charset = Charset.forName(lcCharsetName);
-            if (charset == null) {
-                // Charset not available in this JVM - remove cache entry
-                cache.remove(lcCharsetName);
-                result = null;
-            } else {
+            try {
+                Charset charset = Charset.forName(lcCharsetName);
                 // Charset is available - populate cache entry
                 addToCache(lcCharsetName, charset);
                 result = charset;
+            } catch (UnsupportedCharsetException e) {
+                // Charset not available in this JVM - remove cache entry
+                cache.remove(lcCharsetName);
+                result = null;
             }
         }
 

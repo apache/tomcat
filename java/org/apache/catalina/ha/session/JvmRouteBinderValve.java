@@ -58,8 +58,6 @@ import org.apache.tomcat.util.res.StringManager;
  * You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes! Set enable true on all
  * JvmRouteBinderValve backups, disable worker at mod_jk and then drop node and restart it! Then enable mod_jk worker
  * and disable JvmRouteBinderValves again. This use case means that only requested sessions are migrated.
- *
- * @author Peter Rossbach
  */
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 
@@ -138,7 +136,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * Detect possible the JVMRoute change at cluster backup node..
+     * Detect possible the JVMRoute change at cluster backup node.
      *
      * @param request  tomcat request being processed
      * @param response tomcat response being processed
@@ -258,8 +256,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             Session catalinaSession = null;
             try {
                 catalinaSession = getManager(request).findSession(sessionId);
-            } catch (IOException e) {
-                // Hups!
+            } catch (IOException ignore) {
+                // Error looking for session using old session ID. Treat it as not found.
             }
             String id = sessionId.substring(0, index);
             String newSessionID = id + "." + localJvmRoute;
@@ -270,11 +268,11 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             } else {
                 try {
                     catalinaSession = getManager(request).findSession(newSessionID);
-                } catch (IOException e) {
-                    // Hups!
+                } catch (IOException ignore) {
+                    // Error looking for session using new session ID. Treat it as not found.
                 }
                 if (catalinaSession != null) {
-                    // session is rewrite at other request, rewrite this also
+                    // Session was rewritten in other, concurrent request. Rewrite this request also.
                     changeRequestSessionID(request, sessionId, newSessionID);
                 } else {
                     if (log.isDebugEnabled()) {

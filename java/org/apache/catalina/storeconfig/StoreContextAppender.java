@@ -92,7 +92,7 @@ public class StoreContextAppender extends StoreAppender {
         }
         try {
             appBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             appBase = file;
         }
         return appBase;
@@ -111,7 +111,7 @@ public class StoreContextAppender extends StoreAppender {
         }
         try {
             docBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             docBase = file;
         }
         return docBase;
@@ -127,7 +127,7 @@ public class StoreContextAppender extends StoreAppender {
     protected String getDefaultWorkDir(StandardContext context) {
         String defaultWorkDir = null;
         String contextWorkDir = context.getName();
-        if (contextWorkDir.length() == 0) {
+        if (contextWorkDir.isEmpty()) {
             contextWorkDir = "_";
         }
         if (contextWorkDir.startsWith("/")) {
@@ -163,7 +163,6 @@ public class StoreContextAppender extends StoreAppender {
     @Override
     public Object defaultInstance(Object bean) throws ReflectiveOperationException {
         if (bean instanceof StandardContext) {
-            StandardContext defaultContext = new StandardContext();
             // @formatter:off
             /*
              * if (!((StandardContext) bean).getOverride()) {
@@ -176,7 +175,7 @@ public class StoreContextAppender extends StoreAppender {
              * }
              */
             // @formatter:on
-            return defaultContext;
+            return new StandardContext();
         } else {
             return super.defaultInstance(bean);
         }

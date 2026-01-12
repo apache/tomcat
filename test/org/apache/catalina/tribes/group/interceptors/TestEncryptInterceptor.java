@@ -325,7 +325,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
                     msg.setMessage(xbb);
 
                     for(int i=0; i<messagesPerThread; ++i) {
-                      src.sendMessage(null, msg, null);
+                        src.sendMessage(null, msg, null);
                     }
                 } catch (ChannelException e) {
                     Assert.fail("Encountered exception sending messages: " + e.getMessage());
@@ -340,11 +340,11 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         }
 
         for(int i=0; i<numThreads; ++i) {
-          threads[i].start();
+            threads[i].start();
         }
 
         for(int i=0; i<numThreads; ++i) {
-          threads[i].join();
+            threads[i].join();
         }
 
         // Check all received messages to make sure they are not corrupted
@@ -354,7 +354,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
                 numThreads * messagesPerThread, messages.size());
 
         for(byte[] message : messages) {
-          Assert.assertArrayEquals("Message is corrupted", message, bytes);
+            Assert.assertArrayEquals("Message is corrupted", message, bytes);
         }
     }
 

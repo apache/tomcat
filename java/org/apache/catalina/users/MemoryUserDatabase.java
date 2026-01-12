@@ -57,8 +57,6 @@ import org.xml.sax.Attributes;
  * This class does not enforce what, in an RDBMS, would be called referential integrity. Concurrent modifications may
  * result in inconsistent data such as a User retaining a reference to a Role that has been removed from the database.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 /*
@@ -139,7 +137,7 @@ public class MemoryUserDatabase implements UserDatabase {
     protected final Map<String,Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * The set of {@link User}s defined in this database, keyed by user name.
+     * The set of {@link User}s defined in this database, keyed by username.
      */
     protected final Map<String,User> users = new ConcurrentHashMap<>();
 
@@ -259,7 +257,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public Group createGroup(String groupname, String description) {
-        if (groupname == null || groupname.length() == 0) {
+        if (groupname == null || groupname.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullGroup");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -278,7 +276,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public Role createRole(String rolename, String description) {
-        if (rolename == null || rolename.length() == 0) {
+        if (rolename == null || rolename.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullRole");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -298,7 +296,7 @@ public class MemoryUserDatabase implements UserDatabase {
     @Override
     public User createUser(String username, String password, String fullName) {
 
-        if (username == null || username.length() == 0) {
+        if (username == null || username.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullUser");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -481,15 +479,12 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Print the file prolog
                 writer.println("<?xml version='1.0' encoding='utf-8'?>");
                 writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
-                writer.print("              ");
-                writer.println("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-                writer.print("              ");
-                writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
+                writer.println("              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+                writer.println("              xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
                 writer.println("              version=\"1.0\">");
 
                 // Print entries for each defined role, group, and user
-                Iterator<?> values = null;
-                values = getRoles();
+                Iterator<?> values = getRoles();
                 while (values.hasNext()) {
                     Role role = (Role) values.next();
                     writer.print("  <role rolename=\"");
@@ -563,11 +558,11 @@ public class MemoryUserDatabase implements UserDatabase {
                 if (writer.checkError()) {
                     throw new IOException(sm.getString("memoryUserDatabase.writeException", fileNew.getAbsolutePath()));
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (fileNew.exists() && !fileNew.delete()) {
                     log.warn(sm.getString("memoryUserDatabase.fileDelete", fileNew));
                 }
-                throw e;
+                throw ioe;
             }
             this.lastModified = fileNew.lastModified();
         } finally {
@@ -633,8 +628,8 @@ public class MemoryUserDatabase implements UserDatabase {
                     writeLock.unlock();
                 }
             }
-        } catch (Exception ioe) {
-            log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), ioe);
+        } catch (Exception e) {
+            log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), e);
         } finally {
             if (uConn != null) {
                 try {
@@ -655,18 +650,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");
-        sb.append(this.id);
-        sb.append(",pathname=");
-        sb.append(pathname);
-        sb.append(",groupCount=");
-        sb.append(this.groups.size());
-        sb.append(",roleCount=");
-        sb.append(this.roles.size());
-        sb.append(",userCount=");
-        sb.append(this.users.size());
-        sb.append(']');
-        return sb.toString();
+        return "MemoryUserDatabase[id=" + this.id + ",pathname=" + pathname + ",groupCount=" + this.groups.size() +
+                ",roleCount=" + this.roles.size() + ",userCount=" + this.users.size() + ']';
     }
 }
 
@@ -698,8 +683,8 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
             }
         }
         if (roles != null) {
-            while (roles.length() > 0) {
-                String rolename = null;
+            while (!roles.isEmpty()) {
+                String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
                     rolename = roles.substring(0, comma).trim();
@@ -708,7 +693,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                     rolename = roles.trim();
                     roles = "";
                 }
-                if (rolename.length() > 0) {
+                if (!rolename.isEmpty()) {
                     Role role = database.findRole(rolename);
                     if (role == null) {
                         role = database.createRole(rolename, null);
@@ -780,8 +765,8 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
         String roles = attributes.getValue("roles");
         User user = database.createUser(username, password, fullName);
         if (groups != null) {
-            while (groups.length() > 0) {
-                String groupname = null;
+            while (!groups.isEmpty()) {
+                String groupname;
                 int comma = groups.indexOf(',');
                 if (comma >= 0) {
                     groupname = groups.substring(0, comma).trim();
@@ -790,7 +775,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                     groupname = groups.trim();
                     groups = "";
                 }
-                if (groupname.length() > 0) {
+                if (!groupname.isEmpty()) {
                     Group group = database.findGroup(groupname);
                     if (group == null) {
                         group = database.createGroup(groupname, null);
@@ -800,8 +785,8 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
             }
         }
         if (roles != null) {
-            while (roles.length() > 0) {
-                String rolename = null;
+            while (!roles.isEmpty()) {
+                String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
                     rolename = roles.substring(0, comma).trim();
@@ -810,7 +795,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                     rolename = roles.trim();
                     roles = "";
                 }
-                if (rolename.length() > 0) {
+                if (!rolename.isEmpty()) {
                     Role role = database.findRole(rolename);
                     if (role == null) {
                         role = database.createRole(rolename, null);

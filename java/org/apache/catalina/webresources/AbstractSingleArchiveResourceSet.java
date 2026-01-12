@@ -142,8 +142,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 }

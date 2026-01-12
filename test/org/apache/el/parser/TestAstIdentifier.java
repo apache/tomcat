@@ -16,10 +16,18 @@
  */
 package org.apache.el.parser;
 
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.jasper.el.ELContextImpl;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestAstIdentifier {
 
@@ -42,5 +50,76 @@ public class TestAstIdentifier {
                 processor.getValue("MAX_VALUE",
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), result);
+    }
+
+
+    @Test
+    public void testIdentifierStart() {
+        /*
+         * This test only works on Java 21 to Java 23.
+         *
+         * Java 21 is the minimum Java version for Tomcat 12.
+         *
+         * In Java 24, the definition of Java Letter and/or Java Digit has changed.
+         */
+        Assume.assumeFalse(JreCompat.isJre24Available());
+        for (int i = 0; i < 0xFFFF; i++) {
+            if (Character.isJavaIdentifierStart(i)) {
+                testIdentifier((char) i, 'b');
+            } else {
+                try {
+                    testIdentifier((char) i, 'b');
+                } catch (ELException e) {
+                    continue;
+                }
+                Assert.fail("Expected EL exception for [" + i + "], [" + (char) i + "]");
+            }
+        }
+    }
+
+
+    @Test
+    public void testIdentifierPart() {
+        /*
+         * This test only works on Java 21 to Java 23.
+         *
+         * Java 21 is the minimum Java version for Tomcat 12.
+         *
+         * In Java 24, the definition of Java Letter and/or Java Digit has changed.
+         */
+        Assume.assumeFalse(JreCompat.isJre24Available());
+        for (int i = 0; i < 0xFFFF; i++) {
+            if (Character.isJavaIdentifierPart(i)) {
+                testIdentifier('b', (char) i);
+            } else {
+                try {
+                    testIdentifier((char) i, 'b');
+                } catch (ELException e) {
+                    continue;
+                }
+                Assert.fail("Expected EL exception for [" + i + "], [" + (char) i + "]");
+            }
+        }
+    }
+
+
+    private void testIdentifier(char one, char two) {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        String s = "OK";
+        ValueExpression var = factory.createValueExpression(s, String.class);
+
+        String identifier = new String(new char[] { one , two });
+        context.getVariableMapper().setVariable(identifier, var);
+
+        ValueExpression ve = null;
+        try {
+            ve = factory.createValueExpression(context, "${" + identifier + "}", String.class);
+        } catch (Exception e) {
+            throw e;
+        }
+
+        Assert.assertEquals(s, ve.getValue(context));
     }
 }

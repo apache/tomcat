@@ -113,7 +113,7 @@ public interface JspPropertyGroupDescriptor {
 
     /**
      * Should an error be raised at translation time for a page in this group if the page contains a reference (e.g. a
-     * tag) to a undeclared namespace.
+     * tag) to an undeclared namespace.
      *
      * @return {@code true} if an error should be raised, otherwise {@code false}
      */

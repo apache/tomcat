@@ -21,8 +21,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Tables useful when converting byte arrays to and from strings of hexadecimal digits. Code from Ajp11, from Apache's
  * JServ.
- *
- * @author Craig R. McClanahan
  */
 public final class HexUtils {
 
@@ -33,9 +31,9 @@ public final class HexUtils {
     /**
      * Table for HEX to DEC byte translation.
      */
-    private static final int[] DEC = { 00, 01, 02, 03, 04, 05, 06, 07, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13,
-            14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, 10, 11, 12, 13, 14, 15, };
+    private static final int[] DEC = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 10,
+            11, 12, 13, 14, 15, };
 
 
     /**
@@ -114,7 +112,7 @@ public final class HexUtils {
             int upperNibble = getDec(inputChars[2 * i]);
             int lowerNibble = getDec(inputChars[2 * i + 1]);
             if (upperNibble < 0 || lowerNibble < 0) {
-                // Non hex character
+                // Non-hex character
                 throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.nonHex"));
             }
             result[i] = (byte) ((upperNibble << 4) + lowerNibble);

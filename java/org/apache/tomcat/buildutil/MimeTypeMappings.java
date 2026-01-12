@@ -49,7 +49,7 @@ public class MimeTypeMappings {
         digester.parse(globalWebXml);
 
         Map<String,String> webXmlMimeMappings = webXmlDefaultFragment.getMimeMappings();
-        SortedMap<String, String> sortedWebXmlMimeMappings = new TreeMap<>(webXmlMimeMappings);
+        SortedMap<String,String> sortedWebXmlMimeMappings = new TreeMap<>(webXmlMimeMappings);
 
         File f = new File("java/org/apache/catalina/startup/MimeTypeMappings.properties");
         try (FileOutputStream fos = new FileOutputStream(f);
@@ -59,7 +59,7 @@ public class MimeTypeMappings {
 
             w.write(System.lineSeparator());
 
-            for (Map.Entry<String, String> mapping : sortedWebXmlMimeMappings.entrySet()) {
+            for (Map.Entry<String,String> mapping : sortedWebXmlMimeMappings.entrySet()) {
                 w.write(mapping.getKey());
                 w.write("=");
                 w.write(mapping.getValue());

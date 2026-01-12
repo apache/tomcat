@@ -28,14 +28,13 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 /**
  * Abstract base class for Ant tasks that interact with the <em>Manager</em> web application for dynamically deploying
  * and undeploying applications. These tasks require Ant 1.4 or later.
- *
- * @author Craig R. McClanahan
  *
  * @since 4.1
  */
@@ -169,7 +168,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     public void execute(String command, InputStream istream, String contentType, long contentLength)
             throws BuildException {
 
-        URLConnection conn = null;
         InputStreamReader reader = null;
         try {
             // Set up authorization with our credentials
@@ -177,8 +175,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Create a connection for this command
             URI uri = new URI(url + command);
-            uri.parseServerAuthority();
-            conn = uri.toURL().openConnection();
+            URLConnection conn = uri.parseServerAuthority().toURL().openConnection();
             HttpURLConnection hconn = (HttpURLConnection) conn;
 
             // Set up standard connection characteristics
@@ -189,7 +186,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 preAuthenticate();
 
                 hconn.setDoOutput(true);
-                hconn.setRequestMethod("PUT");
+                hconn.setRequestMethod(Method.PUT);
                 if (contentType != null) {
                     hconn.setRequestProperty("Content-Type", contentType);
                 }
@@ -200,7 +197,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 }
             } else {
                 hconn.setDoOutput(false);
-                hconn.setRequestMethod("GET");
+                hconn.setRequestMethod(Method.GET);
             }
             hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
@@ -209,13 +206,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Send the request data (if any)
             if (istream != null) {
-                try (OutputStream ostream = hconn.getOutputStream()) {
+                try (istream; OutputStream ostream = hconn.getOutputStream()) {
                     IOTools.flow(istream, ostream);
-                } finally {
-                    try {
-                        istream.close();
-                    } catch (Exception e) {
-                    }
                 }
             }
 
@@ -233,7 +225,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     // in Win \r\n would cause handleOutput() to be called
                     // twice, the second time with an empty string,
                     // producing blank lines
-                    if (buff.length() > 0) {
+                    if (!buff.isEmpty()) {
                         String line = buff.toString();
                         buff.setLength(0);
                         if (!ignoreResponseConstraint && first) {
@@ -249,7 +241,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     buff.append((char) ch);
                 }
             }
-            if (buff.length() > 0) {
+            if (!buff.isEmpty()) {
                 handleOutput(buff.toString(), msgPriority);
             }
             if (error != null && isFailOnError()) {
@@ -271,7 +263,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 } catch (IOException ioe) {
                     // Ignore
                 }
-                reader = null;
             }
             if (istream != null) {
                 try {
@@ -294,12 +285,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * appropriate Authorization when the next request is made (that includes a request body).
      */
     private void preAuthenticate() throws IOException, URISyntaxException {
-        URLConnection conn = null;
 
         // Create a connection for this command
         URI uri = new URI(url);
-        uri.parseServerAuthority();
-        conn = uri.toURL().openConnection();
+        URLConnection conn = uri.parseServerAuthority().toURL().openConnection();
         HttpURLConnection hconn = (HttpURLConnection) conn;
 
         // Set up standard connection characteristics
@@ -307,7 +296,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
         hconn.setDoOutput(false);
-        hconn.setRequestMethod("OPTIONS");
+        hconn.setRequestMethod(Method.OPTIONS);
         hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
         // Establish the connection with the server

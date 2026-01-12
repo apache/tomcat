@@ -171,7 +171,7 @@ class Http2Parser {
                     Integer.toString(dataLength), padding));
         }
 
-        ByteBuffer dest = output.startRequestBodyFrame(streamId, payloadSize, endOfStream);
+        ByteBuffer dest = output.startRequestBodyFrame(streamId, dataLength, endOfStream);
         if (dest == null) {
             swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
             // Process padding before sending any notifications in case padding
@@ -184,7 +184,7 @@ class Http2Parser {
             }
         } else {
             synchronized (dest) {
-                if (dest.remaining() < payloadSize) {
+                if (dest.remaining() < dataLength) {
                     // Client has sent more data than permitted by Window size
                     swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
                     if (Flags.hasPadding(flags)) {
@@ -281,7 +281,7 @@ class Http2Parser {
         // RFC 7450 priority frames are ignored. Still need to treat as overhead.
         try {
             swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
-        } catch (ConnectionException e) {
+        } catch (ConnectionException ignore) {
             // Will never happen because swallowPayload() is called with isPadding set
             // to false
         }
@@ -460,15 +460,24 @@ class Http2Parser {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(payload, 4, payloadSize - 4);
         Reader r = new BufferedReader(new InputStreamReader(bais, StandardCharsets.US_ASCII));
-        Priority p = Priority.parsePriority(r);
 
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("http2Parser.processFramePriorityUpdate.debug", connectionId,
-                    Integer.toString(prioritizedStreamID), Integer.toString(p.getUrgency()),
-                    Boolean.valueOf(p.getIncremental())));
+        try {
+            Priority p = Priority.parsePriority(r);
+
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("http2Parser.processFramePriorityUpdate.debug", connectionId,
+                        Integer.toString(prioritizedStreamID), Integer.toString(p.getUrgency()),
+                        Boolean.valueOf(p.getIncremental())));
+            }
+
+            output.priorityUpdate(prioritizedStreamID, p);
+        } catch (IllegalArgumentException iae) {
+            // Priority frames with invalid priority field values should be ignored
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("http2Parser.processFramePriorityUpdate.invalid", connectionId,
+                        Integer.toString(prioritizedStreamID)), iae);
+            }
         }
-
-        output.priorityUpdate(prioritizedStreamID, p);
     }
 
 
@@ -626,6 +635,12 @@ class Http2Parser {
                     Http2Error.COMPRESSION_ERROR);
         }
 
+        /*
+         * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
+         * HPack decoder does not retain a reference to this stream. This aids GC.
+         */
+        hpackDecoder.clearHeaderEmitter();
+
         synchronized (output) {
             output.headersEnd(streamId, headersEndStream);
 
@@ -753,7 +768,7 @@ class Http2Parser {
         HpackDecoder getHpackDecoder();
 
         // Data frames
-        ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception;
+        ByteBuffer startRequestBodyFrame(int streamId, int dataLength, boolean endOfStream) throws Http2Exception;
 
         void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception, IOException;
 

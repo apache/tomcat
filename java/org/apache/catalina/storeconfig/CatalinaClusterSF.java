@@ -42,10 +42,8 @@ public class CatalinaClusterSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aCluster, StoreDescription parentDesc)
             throws Exception {
-        if (aCluster instanceof CatalinaCluster) {
-            CatalinaCluster cluster = (CatalinaCluster) aCluster;
-            if (cluster instanceof SimpleTcpCluster) {
-                SimpleTcpCluster tcpCluster = (SimpleTcpCluster) cluster;
+        if (aCluster instanceof CatalinaCluster cluster) {
+            if (cluster instanceof SimpleTcpCluster tcpCluster) {
                 // Store nested <Manager> element
                 ClusterManager manager = tcpCluster.getManagerTemplate();
                 if (manager != null) {
@@ -64,15 +62,15 @@ public class CatalinaClusterSF extends StoreFactoryBase {
             }
             // Store nested <Valve> element
             // ClusterValve are not store at Hosts element, see
-            Valve valves[] = cluster.getValves();
+            Valve[] valves = cluster.getValves();
             storeElementArray(aWriter, indent, valves);
 
             if (aCluster instanceof SimpleTcpCluster) {
                 // Store nested <Listener> elements
-                LifecycleListener listeners[] = ((SimpleTcpCluster) cluster).findLifecycleListeners();
+                LifecycleListener[] listeners = ((SimpleTcpCluster) cluster).findLifecycleListeners();
                 storeElementArray(aWriter, indent, listeners);
                 // Store nested <ClusterListener> elements
-                ClusterListener mlisteners[] = ((SimpleTcpCluster) cluster).findClusterListeners();
+                ClusterListener[] mlisteners = ((SimpleTcpCluster) cluster).findClusterListeners();
                 List<ClusterListener> clusterListeners = new ArrayList<>();
                 for (ClusterListener clusterListener : mlisteners) {
                     if (clusterListener != deployer) {

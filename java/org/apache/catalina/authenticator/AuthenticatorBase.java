@@ -70,6 +70,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -85,8 +86,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <b>USAGE CONSTRAINT</b>: This Valve is only useful when processing HTTP requests. Requests of any other type will
  * simply be passed through.
- *
- * @author Craig R. McClanahan
  */
 public abstract class AuthenticatorBase extends ValveBase implements Authenticator, RegistrationListener {
 
@@ -143,7 +142,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Should a session always be used once a user is authenticated? This may offer some performance benefits since the
      * session can then be used to cache the authenticated Principal, hence removing the need to authenticate the user
      * via the Realm on every request. This may be of help for combinations such as BASIC authentication used with the
-     * JNDIRealm or DataSourceRealms. However there will also be the performance cost of creating and GC'ing the
+     * JNDIRealm or DataSourceRealms. However, there will also be the performance cost of creating and GC'ing the
      * session. By default, a session will not be created.
      */
     protected boolean alwaysUseSession = false;
@@ -211,7 +210,6 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * {@code remote-user} and {@code auth-type} to a reverse proxy. This is useful, e.g., for access log consistency or
      * other decisions to make.
      */
-
     protected boolean sendAuthInfoResponseHeaders = false;
 
     protected SessionIdGeneratorBase sessionIdGenerator = null;
@@ -420,7 +418,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
     /**
-     * Sets the flag whether authentication information will be send to a reverse proxy on a forwarded request.
+     * Sets the flag whether authentication information will be sent to a reverse proxy on a forwarded request.
      *
      * @param sendAuthInfoResponseHeaders {@code true} if response headers shall be sent, {@code false} otherwise
      */
@@ -486,7 +484,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !"POST".equalsIgnoreCase(request.getMethod())) {
+        if (constraints != null && disableProxyCaching && !Method.POST.equals(request.getMethod())) {
             if (securePagesWithPragma) {
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
@@ -609,7 +607,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (allowCorsPreflight != AllowCorsPreflight.NEVER) {
             // First check to see if this is a CORS Preflight request
             // This is a subset of the tests in CorsFilter.checkRequestType
-            if ("OPTIONS".equals(request.getMethod())) {
+            if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
                 if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
                         !RequestUtil.isSameOrigin(request, originHeader)) {
@@ -721,17 +719,18 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     private CallbackHandler createCallbackHandler() {
-        CallbackHandler callbackHandler = null;
+        CallbackHandler callbackHandler;
 
         Class<?> clazz = null;
         try {
             clazz = Class.forName(jaspicCallbackHandlerClass, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException e) {
-            // Proceed with the retry below
+        } catch (ClassNotFoundException ignore) {
+            // Not found in the context class loader (web application class loader). Re-try below.
         }
 
         try {
             if (clazz == null) {
+                // Look in the same class loader that loaded this class - usually Tomcat's common loader.
                 clazz = Class.forName(jaspicCallbackHandlerClass);
             }
             callbackHandler = (CallbackHandler) clazz.getConstructor().newInstance();
@@ -751,12 +750,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     // ------------------------------------------------------ Protected Methods
 
     /**
-     * Provided for sub-classes to implement their specific authentication mechanism.
+     * Provided for subclasses to implement their specific authentication mechanism.
      *
      * @param request  The request that triggered the authentication
      * @param response The response associated with the request
      *
-     * @return {@code true} if the the user was authenticated, otherwise {@code
+     * @return {@code true} if the user was authenticated, otherwise {@code
      *         false}, in which case an authentication challenge will have been written to the response
      *
      * @throws IOException If an I/O problem occurred during the authentication process
@@ -822,7 +821,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (requirePrincipal) {
                     return false;
                 }
-            } else if (cachedAuth == false || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
+            } else if (!cachedAuth || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
                 // cached and the Principal did not change.
 
@@ -878,13 +877,32 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Check to see if the user has already been authenticated earlier in the processing chain or if there is enough
      * information available to authenticate the user without requiring further user interaction.
      *
-     * @param request  The current request
-     * @param response The current response
-     * @param useSSO   Should information available from SSO be used to attempt to authenticate the current user?
+     * @param request                     The current request
+     * @param response                    The current response
+     * @param useSsoCachedUserAndPassword Should the user and password available from SSO be used to attempt to
+     *                                        authenticate the current user?
      *
      * @return <code>true</code> if the user was authenticated via the cache, otherwise <code>false</code>
      */
-    protected boolean checkForCachedAuthentication(Request request, HttpServletResponse response, boolean useSSO) {
+    protected boolean checkForCachedAuthentication(Request request, HttpServletResponse response,
+            boolean useSsoCachedUserAndPassword) {
+
+        /*
+         * There are two methods for authentication caching implemented by the SSO Valve. The first caches the
+         * authenticated Principal returned by the Realm. The second caches the user name and password passed to the
+         * Realm that were used for authentication.
+         *
+         * If cached authentication is not available or fails for any reason, the Authenticator will attempt the normal
+         * authentication process for the Authenticator.
+         *
+         * Which cached authentication methods are used depends on the configuration of the SSO Valve and/or the
+         * Authenticator.
+         *
+         * If the SSO Valve is configured to require re-authentication, any cached Principal will not be used.
+         *
+         * If the SSO Valve is configured to require re-authentication, whether the cached user name and password can be
+         * used will be determined by the calling Authenticator type.
+         */
 
         // Has the user already been authenticated?
         Principal principal = request.getUserPrincipal();
@@ -903,7 +921,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         // Is there an SSO session against which we can try to reauthenticate?
-        if (useSSO && ssoId != null) {
+        if (useSsoCachedUserAndPassword && ssoId != null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.check.sso", ssoId));
             }
@@ -929,14 +947,14 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 Principal authorized = context.getRealm().authenticate(username);
                 if (authorized == null) {
                     // Realm doesn't recognise user. Create a user with no roles
-                    // from the authenticated user name
+                    // from the authenticated username
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("authenticator.check.authorizeFail", username));
                     }
                     authorized = new GenericPrincipal(username);
                 }
                 String authType = request.getAuthType();
-                if (authType == null || authType.length() == 0) {
+                if (authType == null || authType.isEmpty()) {
                     authType = getAuthMethod();
                 }
                 register(request, response, authorized, authType, username, null);
@@ -1208,7 +1226,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // path, if there is one
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
-            Valve valves[] = parent.getPipeline().getValves();
+            Valve[] valves = parent.getPipeline().getValves();
             for (Valve valve : valves) {
                 if (valve instanceof SingleSignOn) {
                     sso = (SingleSignOn) valve;

@@ -26,12 +26,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.tomcat.util.buf.ByteBufferHolder;
 
 /**
- * Provides an expandable set of buffers for writes. Non-blocking writes can be
- * of any size and may not be able to be written immediately or wholly contained
- * in the buffer used to perform the writes to the next layer. This class
- * provides a buffering capability to allow such writes to return immediately
- * and also allows for the user provided buffers to be re-used / recycled as
- * required.
+ * Provides an expandable set of buffers for writes. Non-blocking writes can be of any size and may not be able to be
+ * written immediately or wholly contained in the buffer used to perform the writes to the next layer. This class
+ * provides a buffering capability to allow such writes to return immediately and also allows for the user provided
+ * buffers to be re-used / recycled as required.
  */
 public class WriteBuffer {
 
@@ -76,14 +74,11 @@ public class WriteBuffer {
 
 
     /**
-     * Create an array of ByteBuffers from the current WriteBuffer, prefixing
-     * that array with the provided ByteBuffers.
+     * Create an array of ByteBuffers from the current WriteBuffer, prefixing that array with the provided ByteBuffers.
      *
-     * @param prefixes The additional ByteBuffers to add to the start of the
-     *                 array
+     * @param prefixes The additional ByteBuffers to add to the start of the array
      *
-     * @return an array of ByteBuffers from the current WriteBuffer prefixed by
-     *         the provided ByteBuffers
+     * @return an array of ByteBuffers from the current WriteBuffer prefixed by the provided ByteBuffers
      */
     ByteBuffer[] toArray(ByteBuffer... prefixes) {
         List<ByteBuffer> result = new ArrayList<>();
@@ -138,8 +133,7 @@ public class WriteBuffer {
 
 
     /**
-     * Interface implemented by clients of the WriteBuffer to enable data to be
-     * written back out from the buffer.
+     * Interface implemented by clients of the WriteBuffer to enable data to be written back out from the buffer.
      */
     public interface Sink {
         boolean writeFromBuffer(ByteBuffer buffer, boolean block) throws IOException;

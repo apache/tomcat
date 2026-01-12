@@ -44,13 +44,10 @@ class HpackEncoder {
         public boolean shouldUseIndexing(String headerName, String value) {
             // content length and date change all the time
             // no need to index them, or they will churn the table
-            switch (headerName) {
-                case "content-length":
-                case "date":
-                    return false;
-                default:
-                    return true;
-            }
+            return switch (headerName) {
+                case "content-length", "date" -> false;
+                default -> true;
+            };
         }
 
         @Override

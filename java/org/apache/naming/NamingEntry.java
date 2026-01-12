@@ -19,8 +19,6 @@ package org.apache.naming;
 
 /**
  * Represents a binding in a NamingContext.
- *
- * @author Remy Maucherat
  */
 public class NamingEntry {
 
@@ -38,8 +36,7 @@ public class NamingEntry {
 
 
     /**
-     * The type instance variable is used to avoid using RTTI when doing
-     * lookups.
+     * The type instance variable is used to avoid using RTTI when doing lookups.
      */
     public int type;
     public final String name;

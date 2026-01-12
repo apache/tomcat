@@ -117,11 +117,11 @@ Var ServiceInstallLog
   Page custom CheckUserType
   !insertmacro MUI_PAGE_FINISH
 
-  !ifdef UNINSTALLONLY
-    ;Uninstall Page order
-    !insertmacro MUI_UNPAGE_CONFIRM
-    !insertmacro MUI_UNPAGE_INSTFILES
-  !endif
+!ifdef UNINSTALLONLY
+  ;Uninstall Page order
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+!endif
 
   ;Language
   !insertmacro MUI_LANGUAGE English
@@ -162,8 +162,12 @@ Var ServiceInstallLog
   InstType Minimum
   InstType Full
 
-  ReserveFile System.dll
-  ReserveFile nsDialogs.dll
+!ifdef UNINSTALLONLY
+  !uninstfinalize '@OS.CMD.COPY@ %1 Uninstall.exe'
+!endif
+
+  ReserveFile /plugin System.dll
+  ReserveFile /plugin nsDialogs.dll
   ReserveFile tomcat-users_1.xml
   ReserveFile tomcat-users_2.xml
 
@@ -364,7 +368,7 @@ Section -post
   ; S-1-5-11     Authenticated users
   ;
   ; Grant admins, LocalService and Local System full control full control
-  nsExec::ExecToStack 'icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetGroupPermissionsOk
@@ -377,7 +381,7 @@ Section -post
   ClearErrors
 
   ; Make the icon readable to all authenticated users so it appears correctly in the uninstall UI
-  nsExec::ExecToStack 'icacls "$INSTDIR\tomcat.ico" /inheritance:e /grant *S-1-5-11:(R)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR\tomcat.ico" /inheritance:e /grant *S-1-5-11:(R)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetIconPermissionsOk
@@ -390,7 +394,7 @@ Section -post
   ClearErrors
 
   ; Make the uninstaller readable and executable to all authenticated users so the user that installed Tomcat can also uninstall it
-  nsExec::ExecToStack 'icacls "$INSTDIR\Uninstall.exe" /inheritance:e /grant *S-1-5-11:(RX)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR\Uninstall.exe" /inheritance:e /grant *S-1-5-11:(RX)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetUninstallerPermissionsOk
@@ -1141,6 +1145,7 @@ FunctionEnd
 ;Uninstaller Section
 
 !ifdef UNINSTALLONLY
+
   Section Uninstall
 
     ${If} $TomcatServiceName == ""
@@ -1271,5 +1276,4 @@ FunctionEnd
   FunctionEnd
 
 !endif
-
 ;eof

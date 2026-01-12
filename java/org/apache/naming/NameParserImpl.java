@@ -23,19 +23,15 @@ import javax.naming.NamingException;
 
 /**
  * Parses names.
- *
- * @author Remy Maucherat
  */
-public class NameParserImpl
-    implements NameParser {
+public class NameParserImpl implements NameParser {
 
 
     // ----------------------------------------------------- NameParser Methods
 
 
     @Override
-    public Name parse(String name)
-        throws NamingException {
+    public Name parse(String name) throws NamingException {
         return new CompositeName(name);
     }
 

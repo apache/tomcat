@@ -36,8 +36,6 @@ import jakarta.servlet.ServletRequestWrapper;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
  */
 class ApplicationRequest extends ServletRequestWrapper {
 
@@ -49,8 +47,7 @@ class ApplicationRequest extends ServletRequestWrapper {
                     RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
                     RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING));
 
-    private static final int shortestSpecialNameLength =
-            specialsSet.stream().mapToInt(s -> s.length()).min().getAsInt();
+    private static final int shortestSpecialNameLength = specialsSet.stream().mapToInt(String::length).min().getAsInt();
 
 
     /**

@@ -19,6 +19,7 @@ package org.apache.el.parser;
 
 import jakarta.el.ELClass;
 import jakarta.el.ELException;
+import jakarta.el.ELResolver;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
@@ -32,10 +33,6 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.Validation;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstIdentifier extends SimpleNode {
     public AstIdentifier(int id) {
         super(id);
@@ -78,15 +75,13 @@ public final class AstIdentifier extends SimpleNode {
         ctx.setPropertyResolved(false);
         Object result;
         /*
-         * Putting the Boolean into the ELContext is part of a performance optimisation for ScopedAttributeELResolver.
-         * When looking up "foo", the resolver can't differentiate between ${ foo } and ${ foo.bar }. This is important
+         * Putting the Boolean into the ELContext is part of a performance optimisation for ImportELResolver. When
+         * looking up "foo", the resolver can't differentiate between ${ foo } and ${ foo.bar }. This is important
          * because the expensive class lookup only needs to be performed in the later case. This flag tells the resolver
          * if the lookup can be skipped.
          */
-        if (parent instanceof AstValue) {
-            ctx.putContext(this.getClass(), Boolean.FALSE);
-        } else {
-            ctx.putContext(this.getClass(), Boolean.TRUE);
+        if (!(parent instanceof AstValue)) {
+            ctx.putContext(ELResolver.StandaloneIdentifierMarker.class, Boolean.TRUE);
         }
         try {
             result = ctx.getELResolver().getValue(ctx, null, this.image);

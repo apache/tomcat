@@ -33,6 +33,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
+
 public class TestValidation extends DefaultTestCase {
 
     public static final Boolean WITHAUTOCOMMIT = Boolean.TRUE;
@@ -139,6 +141,27 @@ public class TestValidation extends DefaultTestCase {
         datasource.getPoolProperties().setValidationQuery("SELECT 1");
         PooledConnection cxn = getPooledConnection();
         Assert.assertFalse("No transaction must be running after connection is obtained", getMock(cxn).isRunningTransaction());
+    }
+
+    @Test
+    public void returnClosedConnection() throws SQLException {
+        ConnectionPool pool = datasource.createPool();
+        pool.resetStats();
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnBorrow());
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnReturn());
+        Assert.assertFalse(datasource.getPoolProperties().isTestWhileIdle());
+        try (Connection connection = datasource.getConnection()) {
+            Assert.assertEquals("size", 1, pool.getSize());
+            Connection realConnection = ((PooledConnection) connection).getConnection();
+            Assert.assertNotSame(connection, realConnection);
+            realConnection.close();
+            Assert.assertTrue(realConnection.isClosed());
+            Assert.assertFalse(connection.isClosed());
+        }
+        Assert.assertEquals("borrowed", 1, pool.getBorrowedCount());
+        Assert.assertEquals("returned", 1, pool.getReturnedCount());
+        Assert.assertEquals("released", 1, pool.getReleasedCount());
+        Assert.assertEquals("size", 0, pool.getSize());
     }
 
     @Test
@@ -617,10 +640,10 @@ public class TestValidation extends DefaultTestCase {
         public boolean isValid(int timeout) throws SQLException {
             statementExecuted();
             switch (validationOutcome) {
-            case SUCCESS: { return true; }
-            case FAILURE: { return false; }
-            case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
-            default: { return true; }
+                case SUCCESS: { return true; }
+                case FAILURE: { return false; }
+                case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
+                default: { return true; }
             }
         }
     }

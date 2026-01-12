@@ -57,7 +57,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         if (base == null && property != null) {
             Scope scope = Scope.lookupMap.get(property.toString());
             if (scope != null) {
-                return scope.getScopeValue(context, base, property);
+                return scope.getScopeValue(context, null, property);
             }
         }
         return null;
@@ -69,7 +69,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         if (base == null && property != null) {
             if (Scope.lookupMap.containsKey(property.toString())) {
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
             }
         }
         return null;
@@ -81,7 +81,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         if (base == null && property != null) {
             if (Scope.lookupMap.containsKey(property.toString())) {
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
                 throw new PropertyNotWritableException();
             }
         }
@@ -93,7 +93,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         if (base == null && property != null) {
             if (Scope.lookupMap.containsKey(property.toString())) {
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
                 return true;
             }
         }

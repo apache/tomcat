@@ -23,9 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-    <author email="remm@apache.org">Remy Maucherat</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>The Host Container</title>
   </properties>
 
@@ -191,10 +188,10 @@
         the pathname of a directory that may contain Java EE web applications to
         be converted to Jakarta EE before deployment. Java EE applications
         packaged as WAR files or directories placed in this directory will be
-        converted to Jakarta EE using the Apache Tomcart Migration Tool for
+        converted to Jakarta EE using the Apache Tomcat Migration Tool for
         Jakarta EE. The conversion will be performed using default settings. The
         resulting WAR or directory will be placed in the <code>appBase</code>
-        confiugured for this virtual host.</p>
+        configured for this virtual host.</p>
         <p>If the default settings are not appropriate for the migration of an
         application, the full range of migration options may be accessed by
         performing the migration manually. The <code>migrate.[sh|bat]</code>
@@ -278,7 +275,7 @@
         a descriptor is located at <code>/META-INF/context.xml</code> and no
         descriptor is present in <strong>xmlBase</strong> then the context will
         fail to start in case the descriptor contains necessary configuration
-        for secure deployment (such as a RemoteAddrValve) which should not be
+        for secure deployment (such as a RemoteCIDRValve) which should not be
         ignored. The default is <code>true</code>.</p>
       </attribute>
 
@@ -303,7 +300,7 @@
         <a href="#Automatic_Application_Deployment">Automatic Application
         Deployment</a> for more information.</p>
         <p>Note: If Tomcat expands the WAR file then it will add a file
-        (<code>/META-INF/war-tracking</code>) to the unpacked directory
+        (<code>/META-INF/war-tracker</code>) to the unpacked directory
         structure which it uses to detect changes in the WAR file while Tomcat
         is not running. Any such change will trigger the deletion of the
         expanded directory and the deployment of the updated WAR file when
@@ -552,8 +549,8 @@
   ...
   <Valve className="org.apache.catalina.valves.RemoteHostValve"
          allow=".*\.mycompany\.com|www\.yourcompany\.com"/>
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192\.168\.1\.\d+"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         deny="192.168.1.0/24"/>
   ...
 </Host>]]></source>
 

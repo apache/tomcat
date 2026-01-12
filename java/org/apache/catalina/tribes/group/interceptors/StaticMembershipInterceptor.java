@@ -61,9 +61,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     public void removeStaticMember(Member member) {
         synchronized (members) {
-            if (members.contains(member)) {
-                members.remove(member);
-            }
+            members.remove(member);
         }
     }
 
@@ -100,20 +98,18 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     @Override
     public boolean hasMembers() {
-        return super.hasMembers() || (members.size() > 0);
+        return super.hasMembers() || (!members.isEmpty());
     }
 
     @Override
     public Member[] getMembers() {
-        if (members.size() == 0) {
+        if (members.isEmpty()) {
             return super.getMembers();
         } else {
             synchronized (members) {
                 Member[] others = super.getMembers();
                 Member[] result = new Member[members.size() + others.length];
-                for (int i = 0; i < others.length; i++) {
-                    result[i] = others[i];
-                }
+                System.arraycopy(others, 0, result, 0, others.length);
                 for (int i = 0; i < members.size(); i++) {
                     result[i + others.length] = members.get(i);
                 }
@@ -218,7 +214,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
     }
 
     protected ChannelInterceptor getfirstInterceptor() {
-        ChannelInterceptor result = null;
+        ChannelInterceptor result;
         ChannelInterceptor now = this;
         do {
             result = now;

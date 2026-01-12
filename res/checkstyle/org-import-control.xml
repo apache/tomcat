@@ -106,6 +106,7 @@
     <allow pkg="org.apache.el"/>
   </subpackage>
   <subpackage name="jasper">
+    <allow pkg="javax.tools"/>
     <allow pkg="jakarta.el"/>
     <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.el"/>

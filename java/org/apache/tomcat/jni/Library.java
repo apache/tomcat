@@ -21,7 +21,7 @@ import java.io.File;
 public final class Library {
 
     /* Default library names - use 2.x in preference to 1.x if both are available */
-    private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
+    private static final String[] NAMES = { "tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1" };
     /* System property used to define CATALINA_HOME */
     private static final String CATALINA_HOME_PROP = "catalina.home";
     /*
@@ -56,7 +56,7 @@ public final class Library {
         }
         if (!loaded) {
             String path = System.getProperty("java.library.path");
-            String [] paths = path.split(File.pathSeparator);
+            String[] paths = path.split(File.pathSeparator);
             for (String value : NAMES) {
                 try {
                     System.loadLibrary(value);
@@ -72,7 +72,7 @@ public final class Library {
                             throw t;
                         }
                     }
-                    if (err.length() > 0) {
+                    if (!err.isEmpty()) {
                         err.append(", ");
                     }
                     err.append(t.getMessage());
@@ -88,12 +88,11 @@ public final class Library {
                 names.append(name);
                 names.append(", ");
             }
-            throw new LibraryNotFoundError(names.substring(0, names.length() -2), err.toString());
+            throw new LibraryNotFoundError(names.substring(0, names.length() - 2), err.toString());
         }
     }
 
-    private Library(String libraryName)
-    {
+    private Library(String libraryName) {
         System.loadLibrary(libraryName);
     }
 
@@ -101,43 +100,45 @@ public final class Library {
      * Create Tomcat Native's global APR pool. This has to be the first call to TCN library.
      */
     private static native boolean initialize();
+
     /**
      * Destroys Tomcat Native's global APR pool. This has to be the last call to TCN library. This will destroy any APR
      * root pools that have not been explicitly destroyed.
      */
     public static native void terminate();
+
     /* Internal function for loading APR Features */
     private static native int version(int what);
 
     /* TCN_MAJOR_VERSION */
-    public static int TCN_MAJOR_VERSION  = 0;
+    public static int TCN_MAJOR_VERSION = 0;
     /* TCN_MINOR_VERSION */
-    public static int TCN_MINOR_VERSION  = 0;
+    public static int TCN_MINOR_VERSION = 0;
     /* TCN_PATCH_VERSION */
-    public static int TCN_PATCH_VERSION  = 0;
+    public static int TCN_PATCH_VERSION = 0;
     /* TCN_IS_DEV_VERSION */
     public static int TCN_IS_DEV_VERSION = 0;
     /* APR_MAJOR_VERSION */
-    public static int APR_MAJOR_VERSION  = 0;
+    public static int APR_MAJOR_VERSION = 0;
     /* APR_MINOR_VERSION */
-    public static int APR_MINOR_VERSION  = 0;
+    public static int APR_MINOR_VERSION = 0;
     /* APR_PATCH_VERSION */
-    public static int APR_PATCH_VERSION  = 0;
+    public static int APR_PATCH_VERSION = 0;
     /* APR_IS_DEV_VERSION */
     public static int APR_IS_DEV_VERSION = 0;
 
     /* TCN_VERSION_STRING */
     public static native String versionString();
+
     /* APR_VERSION_STRING */
     public static native String aprVersionString();
 
     /**
-     * Setup any APR internal data structures.  This MUST be the first function
-     * called for any APR library.
+     * Setup any APR internal data structures. This MUST be the first function called for any APR library.
+     *
      * @param libraryName the name of the library to load
      *
-     * @return {@code true} if the native code was initialized successfully
-     *         otherwise {@code false}
+     * @return {@code true} if the native code was initialized successfully otherwise {@code false}
      *
      * @throws Exception if a problem occurred during initialization
      */
@@ -148,18 +149,17 @@ public final class Library {
             } else {
                 _instance = new Library(libraryName);
             }
-            TCN_MAJOR_VERSION  = version(0x01);
-            TCN_MINOR_VERSION  = version(0x02);
-            TCN_PATCH_VERSION  = version(0x03);
+            TCN_MAJOR_VERSION = version(0x01);
+            TCN_MINOR_VERSION = version(0x02);
+            TCN_PATCH_VERSION = version(0x03);
             TCN_IS_DEV_VERSION = version(0x04);
-            APR_MAJOR_VERSION  = version(0x11);
-            APR_MINOR_VERSION  = version(0x12);
-            APR_PATCH_VERSION  = version(0x13);
+            APR_MAJOR_VERSION = version(0x11);
+            APR_MINOR_VERSION = version(0x12);
+            APR_PATCH_VERSION = version(0x13);
             APR_IS_DEV_VERSION = version(0x14);
 
             if (APR_MAJOR_VERSION < 1) {
-                throw new UnsatisfiedLinkError("Unsupported APR Version (" +
-                                               aprVersionString() + ")");
+                throw new UnsatisfiedLinkError("Unsupported APR Version (" + aprVersionString() + ")");
             }
         }
         return initialize();

@@ -17,7 +17,7 @@
 package org.apache.el.util;
 
 /**
- * Utilities for handling Throwables and Exceptions.
+ * Utilities for handling Throwable and Exceptions.
  */
 /*
  * Copied from o.a.t.u.ExceptionUtils
@@ -42,8 +42,8 @@ public class ExceptionUtils {
 
 
     /**
-     * NO-OP method provided to enable simple pre-loading of this class. Since the class is used extensively in error
-     * handling, it is prudent to pre-load it to avoid any failure to load this class masking the true problem during
+     * NO-OP method provided to enable simple preloading of this class. Since the class is used extensively in error
+     * handling, it is prudent to preload it to avoid any failure to load this class masking the true problem during
      * error handling.
      */
     public static void preload() {

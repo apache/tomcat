@@ -37,7 +37,9 @@ public class Jre22Compat extends JreCompat {
             c1 = Class.forName("java.text.ListFormat");
         } catch (ClassNotFoundException e) {
             // Must be pre-Java 22
-            log.debug(sm.getString("jre22Compat.javaPre22"), e);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("jre22Compat.javaPre22"), e);
+            }
         }
         supported = (c1 != null);
     }

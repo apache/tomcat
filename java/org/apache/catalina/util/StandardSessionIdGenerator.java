@@ -21,7 +21,7 @@ public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
     @Override
     public String generateSessionId(String route) {
 
-        byte random[] = new byte[16];
+        byte[] random = new byte[16];
         int sessionIdLength = getSessionIdLength();
 
         // Render the result as a String of hexadecimal digits
@@ -49,11 +49,11 @@ public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
             }
         }
 
-        if (route != null && route.length() > 0) {
+        if (route != null && !route.isEmpty()) {
             buffer.append('.').append(route);
         } else {
             String jvmRoute = getJvmRoute();
-            if (jvmRoute != null && jvmRoute.length() > 0) {
+            if (jvmRoute != null && !jvmRoute.isEmpty()) {
                 buffer.append('.').append(jvmRoute);
             }
         }

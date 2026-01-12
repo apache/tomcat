@@ -16,15 +16,15 @@
  */
 package org.apache.catalina;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
  * General event for notifying listeners of significant changes on a Container.
- *
- * @author Craig R. McClanahan
  */
 public final class ContainerEvent extends EventObject {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

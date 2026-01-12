@@ -65,9 +65,6 @@ import org.xml.sax.InputSource;
  * <li><b>start</b> - Start an instance of Catalina.</li>
  * <li><b>stop</b> - Stop the currently running instance of Catalina.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class Catalina {
 
@@ -312,7 +309,7 @@ public class Catalina {
      *
      * @return <code>true</code> if we should continue processing
      */
-    protected boolean arguments(String args[]) {
+    protected boolean arguments(String[] args) {
 
         boolean isConfig = false;
         boolean isGenerateCode = false;
@@ -495,8 +492,8 @@ public class Catalina {
      * Cluster support is optional. The JARs may have been removed.
      */
     private void addClusterRuleSet(Digester digester, String prefix) {
-        Class<?> clazz = null;
-        Constructor<?> constructor = null;
+        Class<?> clazz;
+        Constructor<?> constructor;
         try {
             clazz = Class.forName("org.apache.catalina.ha.ClusterRuleSet");
             constructor = clazz.getConstructor(String.class);
@@ -547,7 +544,7 @@ public class Catalina {
                 Digester.setGeneratedCodeLoader(loader);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("catalina.noLoader", loaderClassName), e);
+                    log.debug(sm.getString("catalina.noLoader", loaderClassName), e);
                 } else {
                     log.info(sm.getString("catalina.noLoader", loaderClassName));
                 }
@@ -665,8 +662,8 @@ public class Catalina {
                         String.valueOf(s.getPortOffset())));
                 log.error(sm.getString("catalina.stopError"), ce);
                 System.exit(1);
-            } catch (IOException e) {
-                log.error(sm.getString("catalina.stopError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("catalina.stopError"), ioe);
                 System.exit(1);
             }
         } else {
@@ -726,7 +723,7 @@ public class Catalina {
     /*
      * Load using arguments
      */
-    public void load(String args[]) {
+    public void load(String[] args) {
 
         try {
             if (arguments(args)) {
@@ -913,9 +910,9 @@ public class Catalina {
         File loaderLocation = new File(generatedCodeLocation, generatedCodePackage);
         try (FileWriter writer = new FileWriter(new File(loaderLocation, loaderClassName + ".java"))) {
             writer.write(code.toString());
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Should not happen
-            log.debug(sm.getString("catalina.loaderWriteFail"), e);
+            log.debug(sm.getString("catalina.loaderWriteFail"), ioe);
         }
     }
 
@@ -949,7 +946,7 @@ public class Catalina {
 
     // --------------------------------------- CatalinaShutdownHook Inner Class
 
-    // XXX Should be moved to embedded !
+
     /**
      * Shutdown hook which will perform a clean shutdown of Catalina if needed.
      */
@@ -991,7 +988,7 @@ public class Catalina {
 
         }
 
-        ClassLoader parentClassLoader = null;
+        ClassLoader parentClassLoader;
 
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {

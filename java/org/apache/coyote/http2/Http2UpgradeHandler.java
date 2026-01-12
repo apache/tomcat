@@ -48,6 +48,7 @@ import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.log.UserDataHelper;
@@ -64,7 +65,7 @@ import org.apache.tomcat.util.res.StringManager;
  * For reading, this implementation is blocking within frames and non-blocking between frames. <br>
  * Note:
  * <ul>
- * <li>You will need to nest an &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
+ * <li>You will need to nest a &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
  * inside a TLS enabled Connector element in server.xml to enable HTTP/2 support.</li>
  * </ul>
  */
@@ -89,6 +90,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected static final HeaderSink HEADER_SINK = new HeaderSink();
 
+    protected static final UserDataHelper userDataHelper = new UserDataHelper(log);
+
     protected final String connectionId;
 
     protected final Http2Protocol protocol;
@@ -99,7 +102,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile Http2Parser parser;
 
     // Simple state machine (sequence of states)
-    private AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
+    private final AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
     /**
@@ -136,8 +139,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
 
-    protected final UserDataHelper userDataHelper = new UserDataHelper(log);
-
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest,
             SocketWrapperBase<?> socketWrapper) {
@@ -152,7 +153,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Over time the count should be a slowly decreasing negative number.
         // Therefore, the longer a connection is 'well-behaved', the greater
         // tolerance it will have for a period of 'bad' behaviour.
-        overheadCount = new AtomicLong(-10 * protocol.getOverheadCountFactor());
+        overheadCount = new AtomicLong(-10L * protocol.getOverheadCountFactor());
 
         lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
         lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
@@ -162,8 +163,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
 
-        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams());
-        localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize());
+        /*
+         * Force set these initial limits. A well-behaved client should ACK the settings and adhere to them before it
+         * reaches the limits anyway.
+         */
+        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams(), true);
+        localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize(), true);
 
         pingManager.initiateDisabled = protocol.getInitiatePingDisabled();
 
@@ -441,6 +446,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
             }
             close();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.throwable", connectionId), t);
+            }
+            // Unexpected errors close the connection.
+            close();
         }
 
         if (log.isTraceEnabled()) {
@@ -513,7 +525,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
             try {
                 writeGoAwayFrame((1 << 31) - 1, Http2Error.NO_ERROR.getCode(), null);
-            } catch (IOException ioe) {
+            } catch (IOException ignore) {
                 // This is fatal for the connection. Ignore it here. There will be
                 // further attempts at I/O in upgradeDispatch() and it can better
                 // handle the IO errors.
@@ -572,6 +584,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     se.getError(), se.getMessage()));
         }
 
+        // Treat a sent reset like a received reset and increment the overhead count
+        increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
+
         // Write a RST frame
         byte[] rstFrame = new byte[13];
         // Length
@@ -620,7 +635,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         try {
             writeGoAwayFrame(maxProcessedStreamId, code, msg);
-        } catch (IOException ioe) {
+        } catch (IOException ignore) {
             // Ignore. GOAWAY is sent on a best efforts basis and the original
             // error has already been logged.
         }
@@ -644,6 +659,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             socketWrapper.flush(true);
         } catch (IOException ioe) {
+            // Exception is logged further up stack
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
             if (log.isDebugEnabled()) {
                 log.debug(msg);
@@ -936,8 +952,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 } else if (windowSize < 1) {
                     /*
                      * The connection window has no capacity. If the stream has not been granted an allocation, and the
-                     * stream was not already added to the backlog due to an partial reservation (see next else if
-                     * block) add it to the backlog so it can obtain an allocation when capacity is available.
+                     * stream was not already added to the backlog due to a partial reservation (see next else if block)
+                     * add it to the backlog so it can obtain an allocation when capacity is available.
                      */
                     if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {
                         stream.setConnectionAllocationRequested(reservation);
@@ -1183,12 +1199,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             int leftToAllocate = allocation;
 
             if (stream.getConnectionAllocationRequested() > 0) {
-                int allocatedThisTime;
-                if (allocation >= stream.getConnectionAllocationRequested()) {
-                    allocatedThisTime = stream.getConnectionAllocationRequested();
-                } else {
-                    allocatedThisTime = allocation;
-                }
+                int allocatedThisTime = Math.min(allocation, stream.getConnectionAllocationRequested());
                 stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
                 stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
                 leftToAllocate = leftToAllocate - allocatedThisTime;
@@ -1346,39 +1357,59 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void reduceOverheadCount(FrameType frameType) {
-        // A non-overhead frame reduces the overhead count by
-        // Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR. A simple browser
-        // request is likely to have one non-overhead frame (HEADERS) and one
-        // overhead frame (REPRIORITISE). With the default settings the overhead
-        // count will reduce by 10 for each simple request.
-        // Requests and responses with bodies will create additional
-        // non-overhead frames, further reducing the overhead count.
+        /*
+         * A non-overhead frame reduces the overhead count by {@code Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR}.
+         *
+         * A simple browser request is likely to have one non-overhead frame (HEADERS) that results in a response with
+         * one further non-overhead frame (DATA). With the default settings, the overhead count will reduce by 40 for
+         * each simple request.
+         *
+         * Requests and responses with bodies will create additional non-overhead frames, further reducing the overhead
+         * count.
+         */
         updateOverheadCount(frameType, Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR);
     }
 
 
     @Override
     public void increaseOverheadCount(FrameType frameType) {
-        // An overhead frame increases the overhead count by
-        // overheadCountFactor. By default, this means an overhead frame
-        // increases the overhead count by 10. A simple browser request is
-        // likely to have one non-overhead frame (HEADERS) and one overhead
-        // frame (REPRIORITISE). With the default settings the overhead count
-        // will reduce by 10 for each simple request.
+        /*
+         * An overhead frame (SETTINGS, PRIORITY, PING) increases the overhead count by overheadCountFactor. By default,
+         * this means an overhead frame increases the overhead count by 10.
+         *
+         * If the client ignores maxConcurrentStreams then any HEADERS frame received will also increase the overhead
+         * count by overheadCountFactor.
+         *
+         * A simple browser request should not trigger any overhead frames.
+         */
         updateOverheadCount(frameType, getProtocol().getOverheadCountFactor());
     }
 
 
-    private void increaseOverheadCount(FrameType frameType, int increment) {
-        // Overhead frames that indicate inefficient (and potentially malicious)
-        // use of small frames trigger an increase that is inversely
-        // proportional to size. The default threshold for all three potential
-        // areas for abuse (HEADERS, DATA, WINDOW_UPDATE) is 1024 bytes. Frames
-        // with sizes smaller than this will trigger an increase of
-        // threshold/size.
-        // DATA and WINDOW_UPDATE take an average over the last two non-final
-        // frames to allow for client buffering schemes that can result in some
-        // small DATA payloads.
+    /**
+     * Used to increase the overhead for frames that don't use the {@code overheadCountFactor} ({@code CONTINUATION},
+     * {@code DATA}, {@code WINDOW_UPDATE} and {@code RESET}).
+     *
+     * @param frameType The frame type triggering the overhead increase
+     * @param increment The amount by which the overhead is increased
+     */
+    protected void increaseOverheadCount(FrameType frameType, int increment) {
+        /*
+         * Three types of frame are susceptible to inefficient (and potentially malicious) use of small frames. These
+         * trigger an increase in overhead that is inversely proportional to size. The default threshold for all three
+         * potential areas for abuse (CONTINUATION, DATA, WINDOW_UPDATE) is 1024 bytes. Frames with sizes smaller than
+         * this will trigger an increase of threshold/size.
+         *
+         * The check for DATA and WINDOW_UPDATE frames takes an average over the last two frames to allow for client
+         * buffering schemes that can result in some small DATA payloads.
+         *
+         * The CONTINUATION and DATA frames checks are skipped for end of headers (CONTINUATION) and end of stream
+         * (DATA) as those frames may be small for legitimate reasons.
+         *
+         * RESET frames (received or sent) trigger an increase of overheadResetFactor.
+         *
+         * In all cases, the calling method determines the extent to which the overhead count is increased.
+         */
         updateOverheadCount(frameType, increment);
     }
 
@@ -1404,7 +1435,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         int len = length;
         int pos = offset;
         boolean nextReadBlock = block;
-        int thisRead = 0;
+        int thisRead;
 
         while (len > 0) {
             // Blocking reads use the protocol level read timeout. Non-blocking
@@ -1459,7 +1490,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception {
+    public ByteBuffer startRequestBodyFrame(int streamId, int dataLength, boolean endOfStream) throws Http2Exception {
         // DATA frames reduce the overhead count ...
         reduceOverheadCount(FrameType.DATA);
 
@@ -1473,8 +1504,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // average over two frames to avoid false positives.
         if (!endOfStream) {
             int overheadThreshold = protocol.getOverheadDataThreshold();
-            int average = (lastNonFinalDataPayload >> 1) + (payloadSize >> 1);
-            lastNonFinalDataPayload = payloadSize;
+            int average = (lastNonFinalDataPayload >> 1) + (dataLength >> 1);
+            lastNonFinalDataPayload = dataLength;
             // Avoid division by zero
             if (average == 0) {
                 average = 1;
@@ -1486,7 +1517,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.DATA);
-        abstractNonZeroStream.receivedData(payloadSize);
+        abstractNonZeroStream.receivedData(dataLength);
         ByteBuffer result = abstractNonZeroStream.getInputByteBuffer(true);
 
         if (log.isTraceEnabled()) {
@@ -1569,9 +1600,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (payloadSize < overheadThreshold) {
                 if (payloadSize == 0) {
                     // Avoid division by zero
-                    increaseOverheadCount(FrameType.HEADERS, overheadThreshold);
+                    increaseOverheadCount(FrameType.CONTINUATION, overheadThreshold);
                 } else {
-                    increaseOverheadCount(FrameType.HEADERS, overheadThreshold / payloadSize);
+                    increaseOverheadCount(FrameType.CONTINUATION, overheadThreshold / payloadSize);
                 }
             }
         }
@@ -1582,10 +1613,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void headersEnd(int streamId, boolean endOfStream) throws Http2Exception {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
-        if (abstractNonZeroStream instanceof Stream) {
+        if (abstractNonZeroStream instanceof Stream stream) {
             boolean processStream = false;
             setMaxProcessedStream(streamId);
-            Stream stream = (Stream) abstractNonZeroStream;
             if (stream.isActive()) {
                 if (stream.receivedEndOfHeaders()) {
                     if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.get()) {
@@ -1623,8 +1653,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void receivedEndOfStream(int streamId) throws ConnectionException {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             receivedEndOfStream(stream);
         }
     }
@@ -1654,8 +1683,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.RST);
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             boolean active = stream.isActive();
             stream.receiveReset(errorCode);
             if (active) {
@@ -1787,8 +1815,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
         increaseOverheadCount(FrameType.PRIORITY_UPDATE);
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(prioritizedStreamID, true);
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             stream.setUrgency(p.getUrgency());
             stream.setIncremental(p.getIncremental());
         }
@@ -1832,6 +1859,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
+    String getSniHostName() {
+        return socketWrapper.getSniHostName();
+    }
+
     protected class PingManager {
 
         protected boolean initiateDisabled = false;
@@ -1839,7 +1870,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // 10 seconds
         protected final long pingIntervalNano = 10000000000L;
 
-        protected int sequence = 0;
+        protected volatile int sequence = 0;
         protected long lastPingNanoTime = Long.MIN_VALUE;
 
         protected Queue<PingRecord> inflightPings = new ConcurrentLinkedQueue<>();
@@ -1860,18 +1891,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (force || now - lastPingNanoTime > pingIntervalNano) {
                 lastPingNanoTime = now;
                 byte[] payload = new byte[8];
-                socketWrapper.getLock().lock();
-                try {
-                    int sentSequence = ++sequence;
-                    PingRecord pingRecord = new PingRecord(sentSequence, now);
-                    inflightPings.add(pingRecord);
-                    ByteUtil.set31Bits(payload, 4, sentSequence);
-                    socketWrapper.write(true, PING, 0, PING.length);
-                    socketWrapper.write(true, payload, 0, payload.length);
-                    socketWrapper.flush(true);
-                } finally {
-                    socketWrapper.getLock().unlock();
-                }
+                int sentSequence = ++sequence;
+                PingRecord pingRecord = new PingRecord(sentSequence, now);
+                inflightPings.add(pingRecord);
+                ByteUtil.set31Bits(payload, 4, sentSequence);
+                socketWrapper.write(true, PING, 0, PING.length);
+                socketWrapper.write(true, payload, 0, payload.length);
+                socketWrapper.flush(true);
             }
         }
 
@@ -1880,13 +1906,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Extract the sequence from the payload
                 int receivedSequence = ByteUtil.get31Bits(payload, 4);
                 PingRecord pingRecord = inflightPings.poll();
-                while (pingRecord != null && pingRecord.getSequence() < receivedSequence) {
+                while (pingRecord != null && pingRecord.sequence() < receivedSequence) {
                     pingRecord = inflightPings.poll();
                 }
                 if (pingRecord == null) {
                     // Unexpected ACK. Log it.
                 } else {
-                    long roundTripTime = System.nanoTime() - pingRecord.getSentNanoTime();
+                    long roundTripTime = System.nanoTime() - pingRecord.sentNanoTime();
                     roundTripTimes.add(Long.valueOf(roundTripTime));
                     while (roundTripTimes.size() > 3) {
                         // Ignore the returned value as we just want to reduce
@@ -1917,16 +1943,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    protected static class PingRecord {
-
-        private final int sequence;
-        private final long sentNanoTime;
-
-        public PingRecord(int sequence, long sentNanoTime) {
-            this.sequence = sequence;
-            this.sentNanoTime = sentNanoTime;
-        }
-
+    protected record PingRecord(int sequence, long sentNanoTime) {
         public int getSequence() {
             return sequence;
         }

@@ -22,10 +22,6 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstCompositeExpression extends SimpleNode {
 
     public AstCompositeExpression(int id) {
@@ -40,8 +36,8 @@ public final class AstCompositeExpression extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         StringBuilder sb = new StringBuilder(16);
-        Object obj = null;
         if (this.children != null) {
+            Object obj;
             for (Node child : this.children) {
                 obj = child.getValue(ctx);
                 if (obj != null) {

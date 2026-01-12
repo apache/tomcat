@@ -45,8 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * This listener must only be nested within {@link Server} elements.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class GlobalResourcesLifecycleListener implements LifecycleListener {
@@ -93,7 +91,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
      */
     protected void createMBeans() {
         // Look up our global naming context
-        Context context = null;
+        Context context;
         try {
             context = (Context) (new InitialContext()).lookup("java:/");
         } catch (NamingException e) {

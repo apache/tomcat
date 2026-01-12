@@ -56,7 +56,7 @@ import org.apache.tomcat.util.http.CookieProcessor;
  */
 public class StandardContextSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(StandardContextSF.class);
+    private static final Log log = LogFactory.getLog(StandardContextSF.class);
 
     /**
      * Store a Context as Separate file as configFile value from context exists. filename can be relative to
@@ -196,10 +196,9 @@ public class StandardContextSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aContext, StoreDescription parentDesc)
             throws Exception {
-        if (aContext instanceof StandardContext) {
-            StandardContext context = (StandardContext) aContext;
+        if (aContext instanceof StandardContext context) {
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = context.findLifecycleListeners();
+            LifecycleListener[] listeners = context.findLifecycleListeners();
             List<LifecycleListener> listenersArray = new ArrayList<>();
             for (LifecycleListener listener : listeners) {
                 if (!(listener instanceof ThreadLocalLeakPreventionListener)) {
@@ -209,7 +208,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElementArray(aWriter, indent, listenersArray.toArray());
 
             // Store nested <Valve> elements
-            Valve valves[] = context.getPipeline().getValves();
+            Valve[] valves = context.getPipeline().getValves();
             storeElementArray(aWriter, indent, valves);
 
             // Store nested <Loader> elements
@@ -239,10 +238,10 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, resources);
 
             // Store nested <WrapperListener> elements
-            String wLifecycles[] = context.findWrapperLifecycles();
+            String[] wLifecycles = context.findWrapperLifecycles();
             getStoreAppender().printTagArray(aWriter, "WrapperListener", indent + 2, wLifecycles);
             // Store nested <WrapperLifecycle> elements
-            String wListeners[] = context.findWrapperListeners();
+            String[] wListeners = context.findWrapperListeners();
             getStoreAppender().printTagArray(aWriter, "WrapperLifecycle", indent + 2, wListeners);
 
             // Store nested <Parameter> elements
@@ -288,8 +287,8 @@ public class StandardContextSF extends StoreFactoryBase {
             file = new File(file, host.getName());
             try {
                 file = file.getCanonicalFile();
-            } catch (IOException e) {
-                log.error(sm.getString("standardContextSF.canonicalPathError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("standardContextSF.canonicalPathError"), ioe);
             }
         }
         return file;

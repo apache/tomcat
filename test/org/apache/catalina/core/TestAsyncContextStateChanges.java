@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.TestCoyoteAdapter;
@@ -110,9 +111,12 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         Client client = new Client();
         client.setPort(getPort());
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + CRLF +
+                    CRLF});
+        // @formatter:on
         client.connect();
         client.sendRequest();
 
@@ -150,8 +154,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             servletStartLatch.countDown();
 
             if (dispatch) {
@@ -206,12 +209,10 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
             if (endTiming == EndTiming.THREAD_COMPLETES_AFTER_SERVLET_EXIT) {
                 try {
                     /*
-                     * As much as I dislike it, I don't see any easy way around
-                     * this hack. The thread is started as the Servlet exits but
-                     * we need to wait for the post processing to complete for
-                     * the test to work as intended. In real-world applications
-                     * this does mean that there is a real chance of an ISE. We
-                     * may need to increase this delay for some CI systems.
+                     * As much as I dislike it, I don't see any easy way around this hack. The thread is started as the
+                     * Servlet exits but we need to wait for the post processing to complete for the test to work as
+                     * intended. In real-world applications this does mean that there is a real chance of an ISE. We may
+                     * need to increase this delay for some CI systems.
                      */
                     sleep(1000);
                 } catch (InterruptedException e) {
@@ -237,8 +238,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     for (int i = 0; i < 64; i++) {
                         os.write(TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8));
                     }
-                } catch (IOException e) {
-                    // Expected
+                } catch (IOException ignore) {
+                    // Ignore - The test intends to trigger the IOE
                 }
             }
 
@@ -344,12 +345,12 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
     public enum AsyncEnd {
 
-        NONE          ( true, false),
-        COMPLETE      (false, false),
-        DISPATCH      (false, false),
-        ERROR_NONE    ( true,  true),
-        ERROR_COMPLETE(false,  true),
-        ERROR_DISPATCH(false,  true);
+        NONE(true, false),
+        COMPLETE(false, false),
+        DISPATCH(false, false),
+        ERROR_NONE(true, true),
+        ERROR_COMPLETE(false, true),
+        ERROR_DISPATCH(false, true);
 
         final boolean none;
         final boolean error;

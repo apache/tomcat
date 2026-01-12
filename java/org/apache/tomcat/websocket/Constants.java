@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -42,8 +40,8 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE = Integer
-            .getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024).intValue();
+    static final int DEFAULT_BUFFER_SIZE =
+            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024).intValue();
 
     // Client connection
     /**
@@ -87,8 +85,8 @@ public class Constants {
     public static final int PROXY_AUTHENTICATION_REQUIRED = 407;
 
     // Configuration for Origin header in client
-    static final String DEFAULT_ORIGIN_HEADER_VALUE = System
-            .getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
+    static final String DEFAULT_ORIGIN_HEADER_VALUE =
+            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
     // Configuration for blocking sends
     public static final String BLOCKING_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
@@ -101,7 +99,8 @@ public class Constants {
     public static final long DEFAULT_SESSION_CLOSE_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
 
     // Configuration for session close timeout
-    public static final String ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT";
+    public static final String ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT_PROPERTY =
+            "org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT";
     // Default is 50 milliseconds - setting is in milliseconds
     public static final long DEFAULT_ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT = 50;
 
@@ -112,24 +111,21 @@ public class Constants {
     public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
 
     // Configuration for background processing checks intervals
-    static final int DEFAULT_PROCESS_PERIOD = Integer
-            .getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10).intValue();
+    static final int DEFAULT_PROCESS_PERIOD =
+            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10).intValue();
 
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
     public static final String WS_AUTHENTICATION_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM";
 
-    public static final String WS_AUTHENTICATION_PROXY_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
-    public static final String WS_AUTHENTICATION_PROXY_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
-    public static final String WS_AUTHENTICATION_PROXY_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
+    public static final String WS_AUTHENTICATION_PROXY_USER_NAME =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
+    public static final String WS_AUTHENTICATION_PROXY_PASSWORD =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
+    public static final String WS_AUTHENTICATION_PROXY_REALM =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
 
-    public static final List<Extension> INSTALLED_EXTENSIONS;
-
-    static {
-        List<Extension> installed = new ArrayList<>(1);
-        installed.add(new WsExtension("permessage-deflate"));
-        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
-    }
+    public static final List<Extension> INSTALLED_EXTENSIONS = List.of(new WsExtension("permessage-deflate"));
 
     private Constants() {
         // Hide default constructor

@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.DispatcherType;
@@ -43,9 +44,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Valve that implements the default basic behavior for the <code>StandardHost</code> container implementation.
  * <p>
  * <b>USAGE CONSTRAINT</b>: This implementation is likely to be useful only when processing HTTP requests.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 final class StandardHostValve extends ValveBase {
 
@@ -211,8 +209,8 @@ final class StandardHostValve extends ValveBase {
                     response.finishResponse();
                 } catch (ClientAbortException e) {
                     // Ignore
-                } catch (IOException e) {
-                    container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
+                } catch (IOException ioe) {
+                    container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), ioe);
                 }
             }
         }
@@ -264,8 +262,8 @@ final class StandardHostValve extends ValveBase {
                 if (custom(request, response, errorPage)) {
                     try {
                         response.finishResponse();
-                    } catch (IOException e) {
-                        container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
+                    } catch (IOException ioe) {
+                        container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), ioe);
                     }
                 }
             }
@@ -305,11 +303,7 @@ final class StandardHostValve extends ValveBase {
          * Need to ensure message attribute is set even if there is no message (e.g. if error was triggered by an
          * exception with a null message).
          */
-        if (message == null) {
-            request.setAttribute(RequestDispatcher.ERROR_MESSAGE, "");
-        } else {
-            request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
-        }
+        request.setAttribute(RequestDispatcher.ERROR_MESSAGE, Objects.requireNonNullElse(message, ""));
 
         if (exception != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);

@@ -28,7 +28,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
-import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
@@ -37,12 +36,14 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
@@ -51,9 +52,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a Coyote connector.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class Connector extends LifecycleMBeanBase {
 
@@ -62,6 +60,22 @@ public class Connector extends LifecycleMBeanBase {
 
     public static final String INTERNAL_EXECUTOR_NAME = "Internal";
 
+    private static final boolean aprStatusPresent;
+
+    static {
+        /*
+         * The AprStatus class has to be in the org.apache.tomcat.jni package so it can be referenced by the OpenSSL
+         * clean-up code to avoid a race condition on shutdown between the AprLifecycleListener shutting down the Tomcat
+         * Native library along with any remaining open connections and the OpenSSL clean-up code shutting down an
+         * individual connection that can trigger a JVM crash.
+         *
+         * In some deployment scenarios AprStatus is not present - e.g. because tomcat-jni.jar is not present. To avoid
+         * a CNFE in this class on Connector initialisation when AprStatus is not present - and ugly work-arounds that
+         * try loading the class and catching the exception - use getResource() to see if AprStatus is present.
+         */
+        aprStatusPresent =
+                (Connector.class.getClassLoader().getResource("org/apache/tomcat/jni/AprStatus.class") != null);
+    }
 
     // ------------------------------------------------------------ Constructor
 
@@ -210,6 +224,10 @@ public class Connector extends LifecycleMBeanBase {
      */
     protected int maxParameterCount = 1000;
 
+    private int maxPartCount = 50;
+
+    private int maxPartHeaderSize = 512;
+
     /**
      * Maximum size of a POST which will be automatically parsed by the container. 2 MiB by default.
      */
@@ -225,7 +243,7 @@ public class Connector extends LifecycleMBeanBase {
      * Comma-separated list of HTTP methods that will be parsed according to POST-style rules for
      * application/x-www-form-urlencoded request bodies.
      */
-    protected String parseBodyMethods = "POST";
+    protected String parseBodyMethods = Method.POST;
 
     /**
      * A Set of methods determined by {@link #parseBodyMethods}.
@@ -270,7 +288,13 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * The behavior when an encoded solidus (slash) is submitted.
+     * The behavior when an encoded reverse solidus (backslash - \) is submitted.
+     */
+    private EncodedSolidusHandling encodedReverseSolidusHandling = EncodedSolidusHandling.DECODE;
+
+
+    /**
+     * The behavior when an encoded solidus (slash - /) is submitted.
      */
     private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
 
@@ -473,6 +497,26 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    public int getMaxPartCount() {
+        return maxPartCount;
+    }
+
+
+    public void setMaxPartCount(int maxPartCount) {
+        this.maxPartCount = maxPartCount;
+    }
+
+
+    public int getMaxPartHeaderSize() {
+        return maxPartHeaderSize;
+    }
+
+
+    public void setMaxPartHeaderSize(int maxPartHeaderSize) {
+        this.maxPartHeaderSize = maxPartHeaderSize;
+    }
+
+
     /**
      * @return the maximum size of a POST which will be automatically parsed by the container.
      */
@@ -532,7 +576,7 @@ public class Connector extends LifecycleMBeanBase {
             methodSet.addAll(Arrays.asList(StringUtils.splitCommaSeparated(methods)));
         }
 
-        if (methodSet.contains("TRACE")) {
+        if (methodSet.contains(Method.TRACE)) {
             throw new IllegalArgumentException(sm.getString("coyoteConnector.parseBodyMethodNoTrace"));
         }
 
@@ -655,7 +699,7 @@ public class Connector extends LifecycleMBeanBase {
      */
     public void setProxyName(String proxyName) {
 
-        if (proxyName != null && proxyName.length() > 0) {
+        if (proxyName != null && !proxyName.isEmpty()) {
             this.proxyName = proxyName;
         } else {
             this.proxyName = null;
@@ -866,6 +910,21 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    public String getEncodedReverseSolidusHandling() {
+        return encodedReverseSolidusHandling.getValue();
+    }
+
+
+    public void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
+        this.encodedReverseSolidusHandling = EncodedSolidusHandling.fromString(encodedReverseSolidusHandling);
+    }
+
+
+    public EncodedSolidusHandling getEncodedReverseSolidusHandlingInternal() {
+        return encodedReverseSolidusHandling;
+    }
+
+
     public String getEncodedSolidusHandling() {
         return encodedSolidusHandling.getValue();
     }
@@ -954,7 +1013,7 @@ public class Connector extends LifecycleMBeanBase {
             } else if (addressObj != null) {
                 address = addressObj.toString();
             }
-            if (address.length() > 0) {
+            if (!address.isEmpty()) {
                 sb.append(",address=");
                 sb.append(ObjectName.quote(address));
             }
@@ -1009,25 +1068,19 @@ public class Connector extends LifecycleMBeanBase {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
-            // Use FFM and OpenSSL if available
-            AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
-            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
-                // OpenSSL is compatible with the JSSE configuration, so use it if it is available
+        if (protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler &&
+                jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
+            // If SSL is enabled and a specific implementation isn't specified, select the correct default.
+            if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()) {
+                // Use FFM and OpenSSL if available
                 jsseProtocolHandler
                         .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
-            }
-        } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
-            // Use tomcat-native and OpenSSL otherwise, if available
-            AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
-            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
-                // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
+            } else if (aprStatusPresent && AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL()) {
+                // Use tomcat-native and OpenSSL otherwise, if available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
             }
+            // Otherwise the default JSSE will be used
         }
-        // Otherwise the default JSSE will be used
 
         try {
             protocolHandler.init();

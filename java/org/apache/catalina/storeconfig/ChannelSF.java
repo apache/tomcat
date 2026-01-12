@@ -39,10 +39,8 @@ public class ChannelSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aChannel, StoreDescription parentDesc)
             throws Exception {
-        if (aChannel instanceof Channel) {
-            Channel channel = (Channel) aChannel;
-            if (channel instanceof ManagedChannel) {
-                ManagedChannel managedChannel = (ManagedChannel) channel;
+        if (aChannel instanceof Channel channel) {
+            if (channel instanceof ManagedChannel managedChannel) {
                 // Store nested <Membership> element
                 MembershipService service = managedChannel.getMembershipService();
                 if (service != null) {

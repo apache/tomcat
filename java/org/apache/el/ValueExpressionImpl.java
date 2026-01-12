@@ -70,8 +70,6 @@ import org.apache.el.util.ReflectionUtil;
  * @see jakarta.el.Expression
  * @see jakarta.el.ExpressionFactory
  * @see jakarta.el.ValueExpression
- *
- * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class ValueExpressionImpl extends ValueExpression implements Externalizable {
 

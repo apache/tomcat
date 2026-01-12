@@ -65,47 +65,51 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
+        set(setting, value, false);
+    }
+
+
+    final void set(Setting setting, long value, boolean force) throws T {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
                     Long.toString(value)));
         }
 
         switch (setting) {
-            case HEADER_TABLE_SIZE:
-                validateHeaderTableSize(value);
-                break;
-            case ENABLE_PUSH:
-                validateEnablePush(value);
-                break;
-            case MAX_CONCURRENT_STREAMS:
+            case HEADER_TABLE_SIZE -> validateHeaderTableSize(value);
+            case ENABLE_PUSH -> validateEnablePush(value);
+            case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> {
                 // No further validation required
-                break;
-            case INITIAL_WINDOW_SIZE:
-                validateInitialWindowSize(value);
-                break;
-            case MAX_FRAME_SIZE:
-                validateMaxFrameSize(value);
-                break;
-            case MAX_HEADER_LIST_SIZE:
-                // No further validation required
-                break;
-            case NO_RFC7540_PRIORITIES:
-                validateNoRfc7540Priorities(value);
-                break;
-            case ENABLE_CONNECT_PROTOCOL:
-            case TLS_RENEG_PERMITTED:
+            }
+            case INITIAL_WINDOW_SIZE -> validateInitialWindowSize(value);
+            case MAX_FRAME_SIZE -> validateMaxFrameSize(value);
+            case NO_RFC7540_PRIORITIES -> validateNoRfc7540Priorities(value);
+            case ENABLE_CONNECT_PROTOCOL, TLS_RENEG_PERMITTED -> {
                 // Not supported. Ignore it.
                 return;
-            case UNKNOWN:
+                // Not supported. Ignore it.
+            }
+            case UNKNOWN -> {
                 // Unrecognised. Ignore it.
                 return;
+            }
         }
 
-        set(setting, Long.valueOf(value));
+        set(setting, Long.valueOf(value), force);
     }
 
 
-    synchronized void set(Setting setting, Long value) {
+    /**
+     * Specify a new value for setting with the option to force the change to take effect immediately rather than
+     * waiting until an {@code ACK} is received.
+     *
+     * @param setting The setting to update
+     * @param value   The new value for the setting
+     * @param force   {@code false} if an {@code ACK} must be received before the setting takes effect or {@code true}
+     *                    if the setting to take effect immediately. Even if the setting takes effect immediately, it
+     *                    will still be included in the next {@code SETTINGS} frame and an {@code ACK} will be expected.
+     */
+    synchronized void set(Setting setting, Long value, boolean force) {
         current.put(setting, value);
     }
 

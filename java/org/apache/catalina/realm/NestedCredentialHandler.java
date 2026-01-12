@@ -47,7 +47,7 @@ public class NestedCredentialHandler implements CredentialHandler {
             return null;
         }
 
-        return credentialHandlers.get(0).mutate(inputCredentials);
+        return credentialHandlers.getFirst().mutate(inputCredentials);
     }
 
 

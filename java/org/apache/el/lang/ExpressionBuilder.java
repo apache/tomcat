@@ -42,9 +42,6 @@ import org.apache.el.util.ConcurrentCache;
 import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class ExpressionBuilder implements NodeVisitor {
 
     private static final SynchronizedStack<ELParser> parserCache = new SynchronizedStack<>();
@@ -80,8 +77,7 @@ public final class ExpressionBuilder implements NodeVisitor {
     }
 
     public static Node createNode(String expr) throws ELException {
-        Node n = createNodeInternal(expr);
-        return n;
+        return createNodeInternal(expr);
     }
 
     private static Node createNodeInternal(String expr) throws ELException {
@@ -106,7 +102,7 @@ public final class ExpressionBuilder implements NodeVisitor {
                     n = n.jjtGetChild(0);
                 } else {
                     Class<?> type = null;
-                    Node child = null;
+                    Node child;
                     for (int i = 0; i < numChildren; i++) {
                         child = n.jjtGetChild(i);
                         if (child instanceof AstLiteralExpression) {
@@ -167,9 +163,7 @@ public final class ExpressionBuilder implements NodeVisitor {
 
     @Override
     public void visit(Node node) throws ELException {
-        if (node instanceof AstFunction) {
-
-            AstFunction funcNode = (AstFunction) node;
+        if (node instanceof AstFunction funcNode) {
 
             Method m = null;
 
@@ -180,7 +174,7 @@ public final class ExpressionBuilder implements NodeVisitor {
             // References to variables that refer to lambda expressions will be
             // parsed as functions. This is handled at runtime but at this point
             // need to treat it as a variable rather than a function.
-            if (m == null && this.varMapper != null && funcNode.getPrefix().length() == 0) {
+            if (m == null && this.varMapper != null && funcNode.getPrefix().isEmpty()) {
                 this.varMapper.resolveVariable(funcNode.getLocalName());
                 return;
             }

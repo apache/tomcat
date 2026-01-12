@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Used to define the order in which classes or parameters should be used. The annotated class or parameter defines how
- * the prority value is used.
+ * the priority value is used.
  *
  * @since Common Annotations 1.2
  */

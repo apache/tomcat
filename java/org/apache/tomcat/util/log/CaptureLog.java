@@ -21,8 +21,6 @@ import java.io.PrintStream;
 
 /**
  * Per Thread System.err and System.out log capture data.
- *
- * @author Glenn L. Nielsen
  */
 
 class CaptureLog {

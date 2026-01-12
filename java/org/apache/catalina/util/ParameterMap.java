@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,11 +33,10 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @param <K> The type of Key
  * @param <V> The type of Value
- *
- * @author Craig R. McClanahan
  */
 public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
     private final Map<K,V> delegatedMap;
@@ -82,7 +82,12 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
      * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(Map<K,V> map) {
-        delegatedMap = new LinkedHashMap<>(map);
+        // Unroll loop for performance - https://bz.apache.org/bugzilla/show_bug.cgi?id=69820
+        int mapSize = map.size();
+        delegatedMap = new LinkedHashMap<>((int) (mapSize * 1.5));
+        for (Map.Entry<K,V> entry : map.entrySet()) {
+            delegatedMap.put(entry.getKey(), entry.getValue());
+        }
         unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
@@ -95,7 +100,12 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
      * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(ParameterMap<K,V> map) {
-        delegatedMap = new LinkedHashMap<>(map.delegatedMap);
+        // Unroll loop for performance - https://bz.apache.org/bugzilla/show_bug.cgi?id=69820
+        int mapSize = map.size();
+        delegatedMap = new LinkedHashMap<>((int) (mapSize * 1.5));
+        for (Map.Entry<K,V> entry : map.entrySet()) {
+            delegatedMap.put(entry.getKey(), entry.getValue());
+        }
         unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 

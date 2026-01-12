@@ -26,8 +26,6 @@ import org.apache.catalina.UserDatabase;
  * </p>
  *
  * @param <UD> The specific type of UserDase with which this role is associated
- *
- * @author Craig R. McClanahan
  */
 public class GenericRole<UD extends UserDatabase> extends AbstractRole {
 
@@ -86,8 +84,7 @@ public class GenericRole<UD extends UserDatabase> extends AbstractRole {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof GenericRole) {
-            GenericRole<?> role = (GenericRole<?>) obj;
+        if (obj instanceof GenericRole<?> role) {
             return role.database == database && rolename.equals(role.getRolename());
         }
         return super.equals(obj);

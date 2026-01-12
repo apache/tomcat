@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author>Allistair Crossley</author>
         <title>Tomcat Web Application Deployment</title>
     </properties>
 

@@ -23,6 +23,9 @@ public class Constants {
 
     public static final String REL_EXTERNAL = "rel=\"noopener noreferrer\"";
 
+    public static final String COPYRIGHT_DATE_RANGE;
+    public static final String COPYRIGHT_NOTICE;
+    public static final String HTML_COPYRIGHT_NOTICE;
     public static final String HTML_HEADER_SECTION;
     public static final String BODY_HEADER_SECTION;
     public static final String MESSAGE_SECTION;
@@ -33,9 +36,15 @@ public class Constants {
 
     static {
         //@formatter:off
+        COPYRIGHT_DATE_RANGE = "1999-2026";
+
+        COPYRIGHT_NOTICE = "Copyright (c) " + COPYRIGHT_DATE_RANGE + ", Apache Software Foundation";
+        HTML_COPYRIGHT_NOTICE = "Copyright &copy; " + COPYRIGHT_DATE_RANGE + ", Apache Software Foundation";
+
         HTML_HEADER_SECTION =
                 "<html>\n" +
                 "<head>\n" +
+                "<link href=\"{0}/images/favicon.ico\" rel=\"icon\" type=\"image/x-icon\" />\n" +
                 "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
 
         BODY_HEADER_SECTION =
@@ -130,7 +139,7 @@ public class Constants {
         HTML_TAIL_SECTION =
                 "<hr size=\"1\" noshade=\"noshade\">\n" +
                 "<center><font size=\"-1\" color=\"#525D76\">\n" +
-                " <em>Copyright &copy; 1999-2024, Apache Software Foundation</em>" +
+                " <em>" + HTML_COPYRIGHT_NOTICE + "</em>" +
                 "</font></center>\n" +
                 "\n" +
                 "</body>\n" +

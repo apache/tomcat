@@ -24,8 +24,14 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -38,9 +44,7 @@ import org.apache.el.util.MessageFactory;
 
 
 /**
- * A helper class that implements the EL Specification
- *
- * @author Jacob Hookom [jacob@hookom.net]
+ * A helper class that implements the EL Specification.
  */
 public class ELSupport {
 
@@ -55,21 +59,19 @@ public class ELSupport {
      * If the objects are identical, or they are equal according to {@link #equals(ELContext, Object, Object)} then
      * return 0.
      * <p>
+     * If either object is null, error
+     * <p>
      * If either object is a BigDecimal, then coerce both to BigDecimal first. Similarly for Double(Float), BigInteger,
      * and Long(Integer, Char, Short, Byte).
      * <p>
-     * Otherwise, check that the first object is an instance of Comparable, and compare against the second object. If
-     * that is null, return 1, otherwise return the result of comparing against the second object.
+     * If either object is TemporalAccessor, Clock, java.util.Date or java.sql.Timestamp, coerce both to Instant and
+     * then compare.
      * <p>
-     * Similarly, if the second object is Comparable, if the first is null, return -1, else return the result of
-     * comparing against the first object.
+     * If the first object is an instance of Comparable, return the result of comparing against the second object.
      * <p>
-     * A null object is considered as:
-     * <ul>
-     * <li>ZERO when compared with Numbers</li>
-     * <li>the empty string for String compares</li>
-     * <li>Otherwise null is considered to be lower than anything else.</li>
-     * </ul>
+     * If the second object is an instance of Comparable, return -1 * the result of comparing against the first object.
+     * <p>
+     * Otherwise, error.
      *
      * @param ctx  the context in which this comparison is taking place
      * @param obj0 first object
@@ -80,10 +82,13 @@ public class ELSupport {
      * @throws ELException        if neither object is Comparable
      * @throws ClassCastException if the objects are not mutually comparable
      */
-    public static final int compare(final ELContext ctx, final Object obj0, final Object obj1) throws ELException {
+    public static int compare(final ELContext ctx, final Object obj0, final Object obj1) throws ELException {
         if (obj0 == obj1 || equals(ctx, obj0, obj1)) {
             return 0;
         }
+        Objects.requireNonNull(obj0, MessageFactory.get("error.compare.null"));
+        Objects.requireNonNull(obj1, MessageFactory.get("error.compare.null"));
+
         if (isBigDecimalOp(obj0, obj1)) {
             BigDecimal bd0 = (BigDecimal) coerceToNumber(ctx, obj0, BigDecimal.class);
             BigDecimal bd1 = (BigDecimal) coerceToNumber(ctx, obj1, BigDecimal.class);
@@ -104,18 +109,23 @@ public class ELSupport {
             Long l1 = (Long) coerceToNumber(ctx, obj1, Long.class);
             return l0.compareTo(l1);
         }
+        if (isDateOp(obj0, obj1)) {
+            Instant i0 = coerceToInstant(ctx, obj0);
+            Instant i1 = coerceToInstant(ctx, obj1);
+            return i0.compareTo(i1);
+        }
         if (obj0 instanceof String || obj1 instanceof String) {
             return coerceToString(ctx, obj0).compareTo(coerceToString(ctx, obj1));
         }
         if (obj0 instanceof Comparable<?>) {
             @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj0;
-            return (obj1 != null) ? comparable.compareTo(obj1) : 1;
+            return comparable.compareTo(obj1);
         }
         if (obj1 instanceof Comparable<?>) {
             @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj1;
-            return (obj0 != null) ? -comparable.compareTo(obj0) : -1;
+            return -comparable.compareTo(obj0);
         }
         throw new ELException(MessageFactory.get("error.compare", obj0, obj1));
     }
@@ -141,7 +151,7 @@ public class ELSupport {
      *
      * @throws ELException if one of the coercion fails
      */
-    public static final boolean equals(final ELContext ctx, final Object obj0, final Object obj1) throws ELException {
+    public static boolean equals(final ELContext ctx, final Object obj0, final Object obj1) throws ELException {
         if (obj0 == obj1) {
             return true;
         } else if (obj0 == null || obj1 == null) {
@@ -168,20 +178,24 @@ public class ELSupport {
             return obj0.equals(coerceToEnum(ctx, obj1, obj0.getClass()));
         } else if (obj1.getClass().isEnum()) {
             return obj1.equals(coerceToEnum(ctx, obj0, obj1.getClass()));
+        } else if (isDateOp(obj0, obj1)) {
+            Instant i0 = coerceToInstant(ctx, obj0);
+            Instant i1 = coerceToInstant(ctx, obj1);
+            return i0.equals(i1);
         } else if (obj0 instanceof String || obj1 instanceof String) {
             int lexCompare = coerceToString(ctx, obj0).compareTo(coerceToString(ctx, obj1));
-            return (lexCompare == 0) ? true : false;
+            return lexCompare == 0;
         } else {
             return obj0.equals(obj1);
         }
     }
 
     /*
-     * Going to have to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
-     * be a neater / better solution but I couldn't find it.
+     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might be a
+     * neater / better solution, but I couldn't find it.
      */
     @SuppressWarnings("unchecked")
-    public static final Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
+    public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
             @SuppressWarnings("rawtypes") Class type) {
 
         if (ctx != null) {
@@ -227,15 +241,14 @@ public class ELSupport {
      *
      * @throws ELException if object is not Boolean or String
      */
-    public static final Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive)
-            throws ELException {
+    public static Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
             try {
-                Object result = ctx.getELResolver().convertToType(ctx, obj, Boolean.class);
+                Boolean result = ctx.getELResolver().convertToType(ctx, obj, Boolean.class);
                 if (ctx.isPropertyResolved()) {
-                    return (Boolean) result;
+                    return result;
                 }
             } finally {
                 ctx.setPropertyResolved(originalIsPropertyResolved);
@@ -266,9 +279,9 @@ public class ELSupport {
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
             try {
-                Object result = ctx.getELResolver().convertToType(ctx, obj, Character.class);
+                Character result = ctx.getELResolver().convertToType(ctx, obj, Character.class);
                 if (ctx.isPropertyResolved()) {
-                    return (Character) result;
+                    return result;
                 }
             } finally {
                 ctx.setPropertyResolved(originalIsPropertyResolved);
@@ -292,7 +305,7 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", obj, objType, Character.class));
     }
 
-    protected static final Number coerceToNumber(final Number number, final Class<?> type) throws ELException {
+    protected static Number coerceToNumber(final Number number, final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             return Long.valueOf(number.longValue());
         }
@@ -336,8 +349,7 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", number, number.getClass(), type));
     }
 
-    public static final Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type)
-            throws ELException {
+    public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -374,7 +386,7 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), type));
     }
 
-    protected static final Number coerceToNumber(final String val, final Class<?> type) throws ELException {
+    protected static Number coerceToNumber(final String val, final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             try {
                 return Long.valueOf(val);
@@ -443,41 +455,66 @@ public class ELSupport {
      *
      * @return the String value of the object
      */
-    public static final String coerceToString(final ELContext ctx, final Object obj) {
+    public static String coerceToString(final ELContext ctx, final Object obj) {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
             try {
-                Object result = ctx.getELResolver().convertToType(ctx, obj, String.class);
+                String result = ctx.getELResolver().convertToType(ctx, obj, String.class);
                 if (ctx.isPropertyResolved()) {
-                    return (String) result;
+                    return result;
                 }
             } finally {
                 ctx.setPropertyResolved(originalIsPropertyResolved);
             }
         }
 
-        if (obj == null) {
-            return "";
-        } else if (obj instanceof String) {
-            return (String) obj;
-        } else if (obj instanceof Enum<?>) {
-            return ((Enum<?>) obj).name();
-        } else {
-            try {
-                return obj.toString();
-            } catch (ELException e) {
-                // Unlikely but you never know
-                throw e;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                throw new ELException(t);
+        return switch (obj) {
+            case null -> "";
+            case String s -> s;
+            case Enum<?> anEnum -> anEnum.name();
+            default -> {
+                try {
+                    yield obj.toString();
+                } catch (ELException e) {
+                    // Unlikely but you never know
+                    throw e;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    throw new ELException(t);
+                }
             }
-        }
+        };
     }
 
-    public static final <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type)
-            throws ELException {
+
+    private static Instant coerceToInstant(final ELContext ctx, final Object obj) {
+        if (ctx != null) {
+            boolean originalIsPropertyResolved = ctx.isPropertyResolved();
+            try {
+                Instant result = ctx.getELResolver().convertToType(ctx, obj, Instant.class);
+                if (ctx.isPropertyResolved()) {
+                    return result;
+                }
+            } finally {
+                ctx.setPropertyResolved(originalIsPropertyResolved);
+            }
+        }
+
+        return switch (obj) {
+            case null -> null;
+            case TemporalAccessor t -> Instant.from(t);
+            case Clock c -> c.instant();
+            case Date d -> d.toInstant();
+            case String s -> Instant.parse(s);
+            default -> {
+                throw new ELException(
+                        MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));
+            }
+        };
+    }
+
+    public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -533,8 +570,19 @@ public class ELSupport {
         if (obj == null) {
             return null;
         }
-        if (obj instanceof String) {
-            String str = (String) obj;
+
+        if (Instant.class.equals(type)) {
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToInstant(ctx, obj);
+            return result;
+        }
+        if (Date.class.equals(type)) {
+            @SuppressWarnings("unchecked")
+            T result = (T) Date.from(coerceToInstant(ctx, obj));
+            return result;
+        }
+
+        if (obj instanceof String str) {
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
                 if (str.isEmpty()) {
@@ -572,8 +620,7 @@ public class ELSupport {
         }
 
         if (obj instanceof LambdaExpression && isFunctionalInterface(type)) {
-            T result = coerceToFunctionalInterface(ctx, (LambdaExpression) obj, type);
-            return result;
+            return coerceToFunctionalInterface(ctx, (LambdaExpression) obj, type);
         }
 
         throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), type));
@@ -623,25 +670,31 @@ public class ELSupport {
     }
 
 
-    public static final boolean isBigDecimalOp(final Object obj0, final Object obj1) {
-        return (obj0 instanceof BigDecimal || obj1 instanceof BigDecimal);
+    public static boolean isBigDecimalOp(final Object obj0, final Object obj1) {
+        return obj0 instanceof BigDecimal || obj1 instanceof BigDecimal;
     }
 
-    public static final boolean isBigIntegerOp(final Object obj0, final Object obj1) {
-        return (obj0 instanceof BigInteger || obj1 instanceof BigInteger);
+    public static boolean isBigIntegerOp(final Object obj0, final Object obj1) {
+        return obj0 instanceof BigInteger || obj1 instanceof BigInteger;
     }
 
-    public static final boolean isDoubleOp(final Object obj0, final Object obj1) {
-        return (obj0 instanceof Double || obj1 instanceof Double || obj0 instanceof Float || obj1 instanceof Float);
+    public static boolean isDoubleOp(final Object obj0, final Object obj1) {
+        return obj0 instanceof Double || obj1 instanceof Double || obj0 instanceof Float || obj1 instanceof Float;
     }
 
-    public static final boolean isLongOp(final Object obj0, final Object obj1) {
-        return (obj0 instanceof Long || obj1 instanceof Long || obj0 instanceof Integer || obj1 instanceof Integer ||
+    public static boolean isLongOp(final Object obj0, final Object obj1) {
+        return obj0 instanceof Long || obj1 instanceof Long || obj0 instanceof Integer || obj1 instanceof Integer ||
                 obj0 instanceof Character || obj1 instanceof Character || obj0 instanceof Short ||
-                obj1 instanceof Short || obj0 instanceof Byte || obj1 instanceof Byte);
+                obj1 instanceof Short || obj0 instanceof Byte || obj1 instanceof Byte;
     }
 
-    public static final boolean isStringFloat(final String str) {
+    public static boolean isDateOp(final Object obj0, Object obj1) {
+        return obj0 instanceof TemporalAccessor || obj1 instanceof TemporalAccessor || obj0 instanceof Clock ||
+                obj1 instanceof Clock || obj0 instanceof Date || obj1 instanceof Date || obj0 instanceof Timestamp ||
+                obj1 instanceof Timestamp;
+    }
+
+    public static boolean isStringFloat(final String str) {
         int len = str.length();
         if (len > 1) {
             for (int i = 0; i < len; i++) {
@@ -694,24 +747,22 @@ public class ELSupport {
      */
     private static boolean overridesObjectMethod(Method method) {
         // There are three methods that can be overridden
-        if ("equals".equals(method.getName())) {
-            if (method.getReturnType().equals(boolean.class)) {
-                if (method.getParameterCount() == 1) {
-                    if (method.getParameterTypes()[0].equals(Object.class)) {
-                        return true;
+        switch (method.getName()) {
+            case "equals" -> {
+                if (method.getReturnType().equals(boolean.class)) {
+                    if (method.getParameterCount() == 1) {
+                        return method.getParameterTypes()[0].equals(Object.class);
                     }
                 }
             }
-        } else if ("hashCode".equals(method.getName())) {
-            if (method.getReturnType().equals(int.class)) {
-                if (method.getParameterCount() == 0) {
-                    return true;
+            case "hashCode" -> {
+                if (method.getReturnType().equals(int.class)) {
+                    return method.getParameterCount() == 0;
                 }
             }
-        } else if ("toString".equals(method.getName())) {
-            if (method.getReturnType().equals(String.class)) {
-                if (method.getParameterCount() == 0) {
-                    return true;
+            case "toString" -> {
+                if (method.getReturnType().equals(String.class)) {
+                    return method.getParameterCount() == 0;
                 }
             }
         }
@@ -721,6 +772,6 @@ public class ELSupport {
 
 
     private ELSupport() {
-        // Uility class - hide default constructor;
+        // Utility class - hide default constructor;
     }
 }

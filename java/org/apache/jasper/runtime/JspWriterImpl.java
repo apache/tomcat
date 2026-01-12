@@ -27,43 +27,34 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Write text to a character-output stream, buffering characters so as
- * to provide for the efficient writing of single characters, arrays,
- * and strings.
- *
- * Provide support for discarding for the output that has been
- * buffered.
- *
- * This needs revisiting when the buffering problems in the JSP spec
- * are fixed -akv
- *
- * @author Anil K. Vijendran
+ * Write text to a character-output stream, buffering characters to provide efficient writing of single characters,
+ * arrays, and strings. Provide support for discarding the output that has been buffered. This needs revisiting when the
+ * buffering problems in the JSP spec are fixed -akv.
  */
 public class JspWriterImpl extends JspWriter {
 
     private Writer out;
     private ServletResponse response;
-    private char cb[];
+    private char[] cb;
     private int nextChar;
     private boolean flushed = false;
     private boolean closed = false;
 
     public JspWriterImpl() {
-        super( Constants.DEFAULT_BUFFER_SIZE, true );
+        super(Constants.DEFAULT_BUFFER_SIZE, true);
     }
 
     /**
-     * Create a new buffered character-output stream that uses an output
-     * buffer of the given size.
+     * Create a new buffered character-output stream that uses an output buffer of the given size.
      *
-     * @param  response A Servlet Response
-     * @param  sz       Output-buffer size, a positive integer
-     * @param autoFlush <code>true</code> to automatically flush on buffer
-     *  full, <code>false</code> to throw an overflow exception in that case
-     * @exception  IllegalArgumentException  If sz is &lt;= 0
+     * @param response  A Servlet Response
+     * @param sz        Output-buffer size, a positive integer
+     * @param autoFlush <code>true</code> to automatically flush on buffer full, <code>false</code> to throw an overflow
+     *                      exception in that case
+     *
+     * @exception IllegalArgumentException If sz is &lt; 0
      */
-    public JspWriterImpl(ServletResponse response, int sz,
-            boolean autoFlush) {
+    public JspWriterImpl(ServletResponse response, int sz, boolean autoFlush) {
         super(sz, autoFlush);
         if (sz < 0) {
             throw new IllegalArgumentException(Localizer.getMessage("jsp.error.negativeBufferSize"));
@@ -73,14 +64,14 @@ public class JspWriterImpl extends JspWriter {
         nextChar = 0;
     }
 
-    void init( ServletResponse response, int sz, boolean autoFlush ) {
-        this.response= response;
-        if( sz > 0 && ( cb == null || sz > cb.length ) ) {
-            cb=new char[sz];
+    void init(ServletResponse response, int sz, boolean autoFlush) {
+        this.response = response;
+        if (sz > 0 && (cb == null || sz > cb.length)) {
+            cb = new char[sz];
         }
         nextChar = 0;
-        this.autoFlush=autoFlush;
-        this.bufferSize=sz;
+        this.autoFlush = autoFlush;
+        this.bufferSize = sz;
     }
 
     /**
@@ -95,9 +86,9 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Flush the output buffer to the underlying character stream, without
-     * flushing the stream itself.  This method is non-private only so that it
-     * may be invoked by PrintStream.
+     * Flush the output buffer to the underlying character stream, without flushing the stream itself. This method is
+     * non-private only so that it may be invoked by PrintStream.
+     *
      * @throws IOException Error writing buffered data
      */
     protected final void flushBuffer() throws IOException {
@@ -133,12 +124,10 @@ public class JspWriterImpl extends JspWriter {
     public final void clear() throws IOException {
         if ((bufferSize == 0) && (out != null)) {
             // clear() is illegal after any unbuffered output (JSP.5.5)
-            throw new IllegalStateException(
-                    Localizer.getMessage("jsp.error.ise_on_clear"));
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.ise_on_clear"));
         }
         if (flushed) {
-            throw new IOException(
-                    Localizer.getMessage("jsp.error.attempt_to_clear_flushed_buffer"));
+            throw new IOException(Localizer.getMessage("jsp.error.attempt_to_clear_flushed_buffer"));
         }
         ensureOpen();
         nextChar = 0;
@@ -147,8 +136,7 @@ public class JspWriterImpl extends JspWriter {
     @Override
     public void clearBuffer() throws IOException {
         if (bufferSize == 0) {
-            throw new IllegalStateException(
-                    Localizer.getMessage("jsp.error.ise_on_clear"));
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.ise_on_clear"));
         }
         ensureOpen();
         nextChar = 0;
@@ -159,7 +147,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void flush()  throws IOException {
+    public void flush() throws IOException {
         flushBuffer();
         if (out != null) {
             out.flush();
@@ -212,18 +200,15 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Our own little min method, to avoid loading java.lang.Math if we've run
-     * out of file descriptors and we're trying to print a stack trace.
+     * Our own little min method, to avoid loading java.lang.Math if we've run out of file descriptors, and we're trying
+     * to print a stack trace.
      */
     private static int min(int a, int b) {
-        if (a < b) {
-            return a;
-        }
-        return b;
+        return Math.min(a, b);
     }
 
     @Override
-    public void write(char cbuf[], int off, int len) throws IOException {
+    public void write(char[] cbuf, int off, int len) throws IOException {
         ensureOpen();
 
         if (bufferSize == 0) {
@@ -232,17 +217,17 @@ public class JspWriterImpl extends JspWriter {
             return;
         }
 
-        if ((off < 0) || (off > cbuf.length) || (len < 0) ||
-                ((off + len) > cbuf.length) || ((off + len) < 0)) {
+        if ((off < 0) || (off > cbuf.length) || (len < 0) || ((off + len) > cbuf.length) || ((off + len) < 0)) {
             throw new IndexOutOfBoundsException();
         } else if (len == 0) {
             return;
         }
 
         if (len >= bufferSize) {
-            /* If the request length exceeds the size of the output buffer,
-             flush the buffer and then write the data directly.  In this
-             way buffered streams will cascade harmlessly. */
+            /*
+             * If the request length exceeds the size of the output buffer, flush the buffer and then write the data
+             * directly. In this way buffered streams will cascade harmlessly.
+             */
             if (autoFlush) {
                 flushBuffer();
             } else {
@@ -271,7 +256,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void write(char buf[]) throws IOException {
+    public void write(char[] buf) throws IOException {
         write(buf, 0, buf.length);
     }
 
@@ -339,7 +324,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void print(char s[]) throws IOException {
+    public void print(char[] s) throws IOException {
         write(s);
     }
 
@@ -400,7 +385,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void println(char x[]) throws IOException {
+    public void println(char[] x) throws IOException {
         print(x);
         println();
     }

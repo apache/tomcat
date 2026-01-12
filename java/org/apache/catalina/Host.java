@@ -37,8 +37,6 @@ import java.util.regex.Pattern;
  * <p>
  * The child containers attached to a Host are generally implementations of Context (representing an individual servlet
  * context).
- *
- * @author Craig R. McClanahan
  */
 public interface Host extends Container {
 
@@ -88,7 +86,7 @@ public interface Host extends Container {
 
     /**
      * @return an absolute {@link File} for the appBase of this Host. The file will be canonical if possible. There is
-     *             no guarantee that that the appBase exists.
+     *             no guarantee that the appBase exists.
      */
     File getAppBaseFile();
 
@@ -110,7 +108,7 @@ public interface Host extends Container {
 
     /**
      * @return an absolute {@link File} for the legacy (Java EE) appBase of this Host. The file will be canonical if
-     *             possible. There is no guarantee that that the appBase exists.
+     *             possible. There is no guarantee that the appBase exists.
      */
     File getLegacyAppBaseFile();
 
@@ -193,7 +191,7 @@ public interface Host extends Container {
 
     /**
      * @return the executor that is used for starting and stopping contexts. This is primarily for use by components
-     *             deploying contexts that want to do this in a multi-threaded manner.
+     *             deploying contexts that want to do this in a multithreaded manner.
      */
     ExecutorService getStartStopExecutor();
 
@@ -243,7 +241,7 @@ public interface Host extends Container {
 
 
     /**
-     * @return the set of alias names for this Host. If none are defined, a zero length array is returned.
+     * @return the array of alias names for this Host. If none are defined, a zero length array is returned.
      */
     String[] findAliases();
 

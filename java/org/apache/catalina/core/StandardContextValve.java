@@ -32,8 +32,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
  * Valve that implements the default basic behavior for the <code>StandardContext</code> container implementation.
  * <p>
  * <b>USAGE CONSTRAINT</b>: This implementation is likely to be useful only when processing HTTP requests.
- *
- * @author Craig R. McClanahan
  */
 final class StandardContextValve extends ValveBase {
 

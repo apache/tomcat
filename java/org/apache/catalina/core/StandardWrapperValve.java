@@ -44,8 +44,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Valve that implements the default basic behavior for the <code>StandardWrapper</code> container implementation.
- *
- * @author Craig R. McClanahan
  */
 final class StandardWrapperValve extends ValveBase {
 
@@ -122,12 +120,12 @@ final class StandardWrapperValve extends ValveBase {
                     StandardWrapper.getRootCause(e));
             throwable = e;
             exception(request, response, e);
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
-            throwable = e;
-            exception(request, response, e);
-            servlet = null;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), t);
+            throwable = t;
+            exception(request, response, t);
+            // servlet = null; is set here
         }
 
         MessageBytes requestPathMB = request.getRequestPathMB();
@@ -156,7 +154,7 @@ final class StandardWrapperValve extends ValveBase {
                         }
                     } finally {
                         String log = SystemLogHandler.stopCapture();
-                        if (log != null && log.length() > 0) {
+                        if (log != null && !log.isEmpty()) {
                             context.getLogger().info(log);
                         }
                     }
@@ -183,11 +181,11 @@ final class StandardWrapperValve extends ValveBase {
             }
             throwable = e;
             exception(request, response, e);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             container.getLogger()
-                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
-            throwable = e;
-            exception(request, response, e);
+                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), ioe);
+            throwable = ioe;
+            exception(request, response, ioe);
         } catch (UnavailableException e) {
             container.getLogger()
                     .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
@@ -210,12 +208,12 @@ final class StandardWrapperValve extends ValveBase {
             }
             throwable = e;
             exception(request, response, e, e.getErrorCode());
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             container.getLogger()
-                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
-            throwable = e;
-            exception(request, response, e);
+                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), t);
+            throwable = t;
+            exception(request, response, t);
         } finally {
             // Release the filter chain (if any) for this request
             if (filterChain != null) {
@@ -227,12 +225,12 @@ final class StandardWrapperValve extends ValveBase {
                 if (servlet != null) {
                     wrapper.deallocate(servlet);
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                container.getLogger().error(sm.getString("standardWrapper.deallocateException", wrapper.getName()), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                container.getLogger().error(sm.getString("standardWrapper.deallocateException", wrapper.getName()), t);
                 if (throwable == null) {
-                    throwable = e;
-                    exception(request, response, e);
+                    throwable = t;
+                    exception(request, response, t);
                 }
             }
 
@@ -242,11 +240,11 @@ final class StandardWrapperValve extends ValveBase {
                 if ((servlet != null) && (wrapper.getAvailable() == Long.MAX_VALUE)) {
                     wrapper.unload();
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                container.getLogger().error(sm.getString("standardWrapper.unloadException", wrapper.getName()), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                container.getLogger().error(sm.getString("standardWrapper.unloadException", wrapper.getName()), t);
                 if (throwable == null) {
-                    exception(request, response, e);
+                    exception(request, response, t);
                 }
             }
             long t2 = System.currentTimeMillis();

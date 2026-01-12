@@ -46,7 +46,7 @@ Branch: 1.x
 Sub-tree:
 src/main/java/org/apache/commons/fileupload
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-7a8c3241cfa8d036452cd4fc3f92d57cff189bca (2023-09-16)
+rel/commons-fileupload-1.6.0 (2025-06-05)
 
 Note: Tomcat's copy of fileupload also includes classes copied manually from
       Commons IO.
@@ -58,7 +58,7 @@ Unused classes removed
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-pool-2.12.0 (2023-09-30)
+rel/commons-pool-2.13.1 (2025-12-30)
 
 DBCP2
 No unused code removed
@@ -66,4 +66,4 @@ Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-dbcp-2.13.0 (2024-12-02)
+rel/commons-dbcp-2.14.0 (2025-12-16)

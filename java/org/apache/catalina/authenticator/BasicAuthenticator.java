@@ -34,8 +34,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
  * 'Basic' HTTP Authentication Scheme"
- *
- * @author Craig R. McClanahan
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 
@@ -51,7 +49,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     public void setCharset(String charsetString) {
-        // Only acceptable options are null, "" or "UTF-8" (case insensitive)
+        // Only acceptable options are null, "" or "UTF-8" (case-insensitive)
         if (charsetString == null || charsetString.isEmpty()) {
             charset = StandardCharsets.ISO_8859_1;
         } else if ("UTF-8".equalsIgnoreCase(charsetString)) {
@@ -76,7 +74,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         if (authorization != null) {
             authorization.toBytes();
             ByteChunk authorizationBC = authorization.getByteChunk();
-            BasicCredentials credentials = null;
+            BasicCredentials credentials;
             try {
                 credentials = new BasicCredentials(authorizationBC, charset);
                 String username = credentials.getUsername();
@@ -89,7 +87,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
             } catch (IllegalArgumentException iae) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("basicAuthenticator.invalidAuthorization", iae.getMessage()));
+                    log.debug(sm.getString("basicAuthenticator.invalidAuthorization"), iae);
                 }
             }
         }

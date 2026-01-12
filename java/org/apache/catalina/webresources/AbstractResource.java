@@ -90,7 +90,7 @@ public abstract class AbstractResource implements WebResource {
                         if (contentLength <= 16 * 1024) {
                             byte[] buf = getContent();
                             if (buf != null) {
-                                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                                buf = ConcurrentMessageDigest.digestSHA256(buf);
                                 strongETag = "\"" + HexUtils.toHexString(buf) + "\"";
                             } else {
                                 strongETag = getETag();
@@ -98,7 +98,7 @@ public abstract class AbstractResource implements WebResource {
                         } else {
                             byte[] buf = new byte[4096];
                             try (InputStream is = getInputStream()) {
-                                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                                MessageDigest digest = MessageDigest.getInstance("SHA-256");
                                 while (true) {
                                     int n = is.read(buf);
                                     if (n <= 0) {
@@ -128,6 +128,14 @@ public abstract class AbstractResource implements WebResource {
 
     @Override
     public final String getMimeType() {
+        if (mimeType == null) {
+            String name = getName();
+            int extensionStart = name.lastIndexOf('.');
+            if (extensionStart > -1) {
+                String extension = name.substring(extensionStart + 1);
+                mimeType = root.getContext().findMimeMapping(extension);
+            }
+        }
         return mimeType;
     }
 

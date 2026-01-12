@@ -50,6 +50,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
@@ -83,8 +84,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /anything HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /anything HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -106,7 +111,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // There should not be an end chunk
         Assert.assertFalse(client.getResponseBody().endsWith("0"));
         // The last portion of text should be there
-        Assert.assertTrue(client.getResponseBody().endsWith("line03" + SimpleHttpClient.CRLF));
+        Assert.assertTrue(client.getResponseBody().endsWith("line03" + CRLF));
     }
 
     private static class ResponseWithErrorServlet extends HttpServlet {
@@ -148,8 +153,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testWithUnknownExpectation() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Expect: unknown" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Expect: unknown" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -164,10 +174,16 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testWithTEVoid() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Transfer-encoding: void" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                SimpleHttpClient.CRLF + "test=data";
+        // @formatter:off
+        String request =
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: void" + CRLF +
+                "Content-Length: 9" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                CRLF +
+                "test=data";
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -182,10 +198,16 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testWithTEBuffered() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Transfer-encoding: buffered" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                SimpleHttpClient.CRLF + "test=data";
+        // @formatter:off
+        String request =
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: buffered" + CRLF +
+                "Content-Length: 9" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                CRLF +
+                "test=data";
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -213,12 +235,20 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /test/echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + (withCL ? "Content-length: 1" + SimpleHttpClient.CRLF : "") +
-                "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + "Connection: close" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "9" + SimpleHttpClient.CRLF + "test=data" +
-                SimpleHttpClient.CRLF + "0" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "POST /test/echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                (withCL ? "Content-length: 1" + CRLF : "") +
+                "Transfer-encoding: chunked" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                "Connection: close" + CRLF +
+                CRLF +
+                "9" + CRLF +
+                "test=data" + CRLF +
+                "0" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -234,10 +264,16 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testWithTESavedRequest() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Transfer-encoding: savedrequest" + SimpleHttpClient.CRLF +
-                "Content-Length: 9" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + SimpleHttpClient.CRLF + "test=data";
+        // @formatter:off
+        String request =
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: savedrequest" + CRLF +
+                "Content-Length: 9" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                CRLF +
+                "test=data";
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -252,10 +288,16 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testWithTEUnsupported() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Transfer-encoding: unsupported" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                SimpleHttpClient.CRLF + "test=data";
+        // @formatter:off
+        String request =
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: unsupported" + CRLF +
+                "Content-Length: 9" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                CRLF +
+                "test=data";
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -279,8 +321,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String requestPart1 = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF;
-        String requestPart2 = "Host: any" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        String requestPart1 = "GET /foo HTTP/1.1" + CRLF;
+        String requestPart2 = "Host: any" + CRLF + CRLF;
 
         final Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { requestPart1, requestPart2 });
@@ -335,9 +377,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF + "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                CRLF +
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                CRLF;
+        // @formatter:on
 
         final Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -534,12 +582,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "POST /echo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost:" + getPort() +
-                SimpleHttpClient.CRLF + "Content-Length: 10" + SimpleHttpClient.CRLF;
-        if (useExpectation) {
-            request += "Expect: 100-continue" + SimpleHttpClient.CRLF;
-        }
-        request += SimpleHttpClient.CRLF + "HelloWorld";
+        // @formatter:off
+        String request =
+                "POST /echo HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: 10" + CRLF +
+                (useExpectation ? "Expect: 100-continue" + CRLF : "") +
+                CRLF +
+                "HelloWorld";
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -749,7 +800,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                     resp.setCharacterEncoding("UTF-8");
                     try {
                         resp.getWriter().print("OK");
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // Should never happen. Test will fail if it does.
                     }
                     ac.complete();
@@ -985,8 +1036,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: a" + SimpleHttpClient.CRLF + "Host: b" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: a" + CRLF +
+                "Host: b" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1018,8 +1074,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: a" + SimpleHttpClient.CRLF + "Host: a" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: a" + CRLF +
+                "Host: a" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1048,7 +1109,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        String request = "GET /foo HTTP/1.1" + CRLF + CRLF;
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1077,8 +1138,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: b" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a/foo HTTP/1.1" + CRLF +
+                "Host: b" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1107,8 +1172,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a:8080/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: b:8080" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a:8080/foo HTTP/1.1" + CRLF +
+                "Host: b:8080" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1137,8 +1206,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://user:pwd@a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: b" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://user:pwd@a/foo HTTP/1.1" + CRLF +
+                "Host: b" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1170,8 +1243,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: " + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a/foo HTTP/1.1" + CRLF +
+                "Host: " + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1203,8 +1280,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a:8080/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: " + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a:8080/foo HTTP/1.1" + CRLF +
+                "Host: " + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1236,8 +1317,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://user:pwd@a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: " +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://user:pwd@a/foo HTTP/1.1" + CRLF +
+                "Host: " + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1270,8 +1355,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: a" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a/foo HTTP/1.1" + CRLF +
+                "Host: a" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1305,8 +1394,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a:8080/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: a:8080" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a:8080/foo HTTP/1.1" + CRLF +
+                "Host: a:8080" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1341,8 +1434,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://user:pwd@a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: a" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://user:pwd@a/foo HTTP/1.1" + CRLF +
+                "Host: a" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1376,8 +1473,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: A" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET http://a/foo HTTP/1.1" + CRLF +
+                "Host: A" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1412,8 +1513,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: " + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: " + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1448,8 +1553,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host:      " + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host:      " + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1540,14 +1649,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost:" + getPort() +
-                SimpleHttpClient.CRLF;
-
-        if (sendKeepAlive) {
-            request += "Connection: keep-alive" + SimpleHttpClient.CRLF;
-        }
-
-        request += SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                (sendKeepAlive ? "Connection: keep-alive" + CRLF : "") +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1657,8 +1765,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "POST /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost:" + getPort() +
-                SimpleHttpClient.CRLF + "Content-Length: 10" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "POST /foo HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: 10" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request, "XXXXXXXXXX" });
@@ -1812,9 +1925,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost:" + getPort() +
-                SimpleHttpClient.CRLF + "Transfer-Encoding: " + headerValue + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Transfer-Encoding: " + headerValue + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1835,11 +1952,19 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "POST /test/echo-params.jsp HTTP/1.0" + SimpleHttpClient.CRLF + "Host: any" +
-                SimpleHttpClient.CRLF + "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + "Connection: close" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "9" + SimpleHttpClient.CRLF + "test=data" +
-                SimpleHttpClient.CRLF + "0" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "POST /test/echo-params.jsp HTTP/1.0" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: chunked" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                "Connection: close" + CRLF +
+                CRLF +
+                "9" + CRLF +
+                "test=data" + CRLF +
+                "0" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -1867,9 +1992,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "POST /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost:" + getPort() +
-                SimpleHttpClient.CRLF + "Expect: 100-continue" + SimpleHttpClient.CRLF + "Content-Length: 10" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "0123456789";
+        // @formatter:off
+        String request =
+                "POST /foo HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Expect: 100-continue" + CRLF +
+                "Content-Length: 10" + CRLF +
+                CRLF +
+                "0123456789";
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1886,7 +2017,6 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.processRequest(false);
 
         Assert.assertTrue(client.isResponse200());
-
     }
 
 
@@ -1894,8 +2024,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
     public void testConnect() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        String request = "CONNECT example.local HTTP/1.1" + SimpleHttpClient.CRLF + "Host: example.local" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "CONNECT example.local HTTP/1.1" + CRLF +
+                "Host: example.local" + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -1930,9 +2064,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /ehs HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /ehs HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1959,9 +2096,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /ehs HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /ehs HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
@@ -1989,9 +2129,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /ehs HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /ehs HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });

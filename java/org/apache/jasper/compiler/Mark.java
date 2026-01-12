@@ -23,10 +23,8 @@ import org.apache.jasper.JspCompilationContext;
 
 /**
  * Mark represents a point in the JSP input.
- *
- * @author Anil K. Vijendran
  */
-final class Mark {
+public final class Mark {
 
     // position within current stream
     int cursor, line, col;
@@ -42,9 +40,9 @@ final class Mark {
     /**
      * Constructor
      *
-     * @param reader JspReader this mark belongs to
+     * @param reader   JspReader this mark belongs to
      * @param inStream current stream for this mark
-     * @param name JSP file name
+     * @param name     JSP file name
      */
     Mark(JspReader reader, char[] inStream, String name) {
         this.ctxt = reader.getJspCompilationContext();
@@ -60,7 +58,7 @@ final class Mark {
      * Constructor
      */
     Mark(Mark other) {
-       init(other, false);
+        init(other, false);
     }
 
     void update(int cursor, int line, int col) {
@@ -105,7 +103,7 @@ final class Mark {
 
     @Override
     public String toString() {
-        return getFile()+"("+line+","+col+")";
+        return getFile() + "(" + line + "," + col + ")";
     }
 
     public String getFile() {
@@ -125,8 +123,7 @@ final class Mark {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Mark) {
-            Mark m = (Mark) other;
+        if (other instanceof Mark m) {
             return this.cursor == m.cursor && this.line == m.line && this.col == m.col;
         }
         return false;

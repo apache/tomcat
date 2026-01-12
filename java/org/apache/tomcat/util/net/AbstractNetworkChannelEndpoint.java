@@ -23,9 +23,10 @@ import java.nio.channels.Channel;
 import java.nio.channels.NetworkChannel;
 
 public abstract class AbstractNetworkChannelEndpoint<S extends Channel, U extends NetworkChannel>
-        extends AbstractEndpoint<S, U> {
+        extends AbstractEndpoint<S,U> {
 
     protected abstract NetworkChannel getServerSocket();
+
     protected abstract S createChannel(SocketBufferHandler buffer);
 
 

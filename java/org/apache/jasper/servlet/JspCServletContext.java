@@ -65,12 +65,8 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
 
 
 /**
- * Simple <code>ServletContext</code> implementation without
- * HTTP-specific methods.
- *
- * @author Peter Rossbach (pr@webapp.de)
+ * Simple <code>ServletContext</code> implementation without HTTP-specific methods.
  */
-
 public class JspCServletContext implements ServletContext {
 
 
@@ -104,13 +100,13 @@ public class JspCServletContext implements ServletContext {
     /**
      * Merged web.xml for the application.
      */
-    private WebXml webXml;
+    private final WebXml webXml;
 
 
     private List<URL> resourceJARs;
 
 
-    private JspConfigDescriptor jspConfigDescriptor;
+    private final JspConfigDescriptor jspConfigDescriptor;
 
 
     /**
@@ -124,21 +120,19 @@ public class JspCServletContext implements ServletContext {
     /**
      * Create a new instance of this ServletContext implementation.
      *
-     * @param aLogWriter PrintWriter which is used for <code>log()</code> calls
+     * @param aLogWriter       PrintWriter which is used for <code>log()</code> calls
      * @param aResourceBaseURL Resource base URL
-     * @param classLoader   Class loader for this {@link ServletContext}
-     * @param validate      Should a validating parser be used to parse web.xml?
-     * @param blockExternal Should external entities be blocked when parsing
-     *                      web.xml?
+     * @param classLoader      Class loader for this {@link ServletContext}
+     * @param validate         Should a validating parser be used to parse web.xml?
+     * @param blockExternal    Should external entities be blocked when parsing web.xml?
+     *
      * @throws JasperException An error occurred building the merged web.xml
      */
-    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL,
-            ClassLoader classLoader, boolean validate, boolean blockExternal)
-            throws JasperException {
+    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL, ClassLoader classLoader, boolean validate,
+            boolean blockExternal) throws JasperException {
 
         myAttributes = new HashMap<>();
-        myParameters.put(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
-                String.valueOf(blockExternal));
+        myParameters.put(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM, String.valueOf(blockExternal));
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
         this.loader = classLoader;
@@ -146,21 +140,19 @@ public class JspCServletContext implements ServletContext {
         jspConfigDescriptor = webXml.getJspConfigDescriptor();
     }
 
-    private WebXml buildMergedWebXml(boolean validate, boolean blockExternal)
-            throws JasperException {
+    private WebXml buildMergedWebXml(boolean validate, boolean blockExternal) throws JasperException {
         WebXml webXml = new WebXml();
         WebXmlParser webXmlParser = new WebXmlParser(validate, validate, blockExternal);
         // Use this class's classloader as Ant will have set the TCCL to its own
         webXmlParser.setClassLoader(getClass().getClassLoader());
 
         try {
-            URL url = getResource(
-                    org.apache.tomcat.util.descriptor.web.Constants.WEB_XML_LOCATION);
+            URL url = getResource(org.apache.tomcat.util.descriptor.web.Constants.WEB_XML_LOCATION);
             if (!webXmlParser.parseWebXml(url, webXml, false)) {
                 throw new JasperException(Localizer.getMessage("jspc.error.invalidWebXml"));
             }
-        } catch (IOException e) {
-            throw new JasperException(e);
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
         }
 
         // if the application is metadata-complete then we can skip fragment processing
@@ -175,7 +167,7 @@ public class JspCServletContext implements ServletContext {
             return webXml;
         }
 
-        Map<String, WebXml> fragments = scanForFragments(webXmlParser);
+        Map<String,WebXml> fragments = scanForFragments(webXmlParser);
         Set<WebXml> orderedFragments = WebXml.orderWebFragments(webXml, fragments, this);
 
         // Find resource JARs
@@ -192,11 +184,7 @@ public class JspCServletContext implements ServletContext {
         List<URL> resourceJars = new ArrayList<>();
         // Build list of potential resource JARs. Use same ordering as ContextConfig
         Set<WebXml> resourceFragments = new LinkedHashSet<>(orderedFragments);
-        for (WebXml fragment : fragments) {
-            if (!resourceFragments.contains(fragment)) {
-                resourceFragments.add(fragment);
-            }
-        }
+        resourceFragments.addAll(fragments);
 
         for (WebXml resourceFragment : resourceFragments) {
             try (Jar jar = JarFactory.newInstance(resourceFragment.getURL())) {
@@ -213,15 +201,14 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    private Map<String, WebXml> scanForFragments(WebXmlParser webXmlParser) throws JasperException {
+    private Map<String,WebXml> scanForFragments(WebXmlParser webXmlParser) throws JasperException {
         StandardJarScanner scanner = new StandardJarScanner();
         // TODO - enabling this means initializing the classloader first in JspC
         scanner.setScanClassPath(false);
         // TODO - configure filter rules from Ant rather then system properties
         scanner.setJarScanFilter(new StandardJarScanFilter());
 
-        FragmentJarScannerCallback callback =
-                new FragmentJarScannerCallback(webXmlParser, false, true);
+        FragmentJarScannerCallback callback = new FragmentJarScannerCallback(webXmlParser, false, true);
         scanner.scan(JarScanType.PLUGGABILITY, this, callback);
         if (!callback.isOk()) {
             throw new JasperException(Localizer.getMessage("jspc.error.invalidFragment"));
@@ -330,7 +317,7 @@ public class JspCServletContext implements ServletContext {
         // Strip leading '/'
         path = path.substring(1);
 
-        URL url = null;
+        URL url;
         try {
             URI uri = new URI(myResourceBaseURL.toExternalForm() + path);
             url = uri.toURL();
@@ -386,7 +373,7 @@ public class JspCServletContext implements ServletContext {
         if (basePath != null) {
             File theBaseDir = new File(basePath);
             if (theBaseDir.isDirectory()) {
-                String theFiles[] = theBaseDir.list();
+                String[] theFiles = theBaseDir.list();
                 if (theFiles != null) {
                     for (String theFile : theFiles) {
                         File testFile = new File(basePath + File.separator + theFile);
@@ -407,11 +394,9 @@ public class JspCServletContext implements ServletContext {
             for (URL jarUrl : resourceJARs) {
                 try (Jar jar = JarFactory.newInstance(jarUrl)) {
                     jar.nextEntry();
-                    for (String entryName = jar.getEntryName();
-                            entryName != null;
-                            jar.nextEntry(), entryName = jar.getEntryName()) {
-                        if (entryName.startsWith(jarPath) &&
-                                entryName.length() > jarPath.length()) {
+                    for (String entryName = jar.getEntryName(); entryName != null; jar.nextEntry(), entryName =
+                            jar.getEntryName()) {
+                        if (entryName.startsWith(jarPath) && entryName.length() > jarPath.length()) {
                             // Let the Set implementation handle duplicates
                             int sep = entryName.indexOf('/', jarPath.length());
                             if (sep < 0) {
@@ -423,8 +408,8 @@ public class JspCServletContext implements ServletContext {
                             }
                         }
                     }
-                } catch (IOException e) {
-                    log(e.getMessage(), e);
+                } catch (IOException ioe) {
+                    log(ioe.getMessage(), ioe);
                 }
             }
         }
@@ -471,15 +456,13 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            String className) {
+    public FilterRegistration.Dynamic addFilter(String filterName, String className) {
         return null;
     }
 
 
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            String className) {
+    public ServletRegistration.Dynamic addServlet(String servletName, String className) {
         return null;
     }
 
@@ -503,8 +486,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public void setSessionTrackingModes(
-            Set<SessionTrackingMode> sessionTrackingModes) {
+    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
         // Do nothing
     }
 
@@ -516,22 +498,19 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public Dynamic addFilter(String filterName,
-            Class<? extends Filter> filterClass) {
+    public Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
         return null;
     }
 
 
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            Servlet servlet) {
+    public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
         return null;
     }
 
 
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            Class<? extends Servlet> servletClass) {
+    public ServletRegistration.Dynamic addServlet(String servletName, Class<? extends Servlet> servletClass) {
         return null;
     }
 
@@ -543,15 +522,13 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public <T extends Filter> T createFilter(Class<T> c)
-            throws ServletException {
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
         return null;
     }
 
 
     @Override
-    public <T extends Servlet> T createServlet(Class<T> c)
-            throws ServletException {
+    public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
         return null;
     }
 
@@ -593,8 +570,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public <T extends EventListener> T createListener(Class<T> c)
-            throws ServletException {
+    public <T extends EventListener> T createListener(Class<T> c) throws ServletException {
         return null;
     }
 
@@ -624,7 +600,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
         return null;
     }
 
@@ -636,7 +612,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
         return null;
     }
 

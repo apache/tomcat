@@ -27,8 +27,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Receive replicated SessionMessage form other cluster node.
- *
- * @author Peter Rossbach
  */
 public class ClusterSessionListener extends ClusterListener {
 
@@ -45,8 +43,7 @@ public class ClusterSessionListener extends ClusterListener {
 
     @Override
     public void messageReceived(ClusterMessage myobj) {
-        if (myobj instanceof SessionMessage) {
-            SessionMessage msg = (SessionMessage) myobj;
+        if (myobj instanceof SessionMessage msg) {
             String ctxname = msg.getContextName();
             // check if the message is an EVT_GET_ALL_SESSIONS,
             // if so, wait until we are fully started up

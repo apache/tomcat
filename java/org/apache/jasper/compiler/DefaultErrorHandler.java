@@ -20,8 +20,6 @@ import org.apache.jasper.JasperException;
 
 /**
  * Default implementation of ErrorHandler interface.
- *
- * @author Jan Luehe
  */
 class DefaultErrorHandler implements ErrorHandler {
 
@@ -44,7 +42,7 @@ class DefaultErrorHandler implements ErrorHandler {
             return;
         }
 
-        Object[] args = null;
+        Object[] args;
         StringBuilder buf = new StringBuilder();
 
         for (JavacErrorDetail detail : details) {

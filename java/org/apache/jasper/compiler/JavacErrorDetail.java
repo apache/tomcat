@@ -29,9 +29,6 @@ import org.apache.tomcat.Jar;
 
 /**
  * Class providing details about a javac compilation error.
- *
- * @author Jan Luehe
- * @author Kin-man Chung
  */
 public class JavacErrorDetail {
 

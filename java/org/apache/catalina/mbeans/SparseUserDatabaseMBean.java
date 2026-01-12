@@ -37,11 +37,9 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.SparseUserDatabase</code>
  * component. The main difference is that the MBeans are created on demand (for example, the findUser method would
- * register the corresponding user and make it available for management. All the MBeans created for users, groups and
+ * register the corresponding user and make it available for management). All the MBeans created for users, groups and
  * roles are then discarded when save is invoked.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class SparseUserDatabaseMBean extends BaseModelMBean {
 
@@ -177,7 +175,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new User and return the corresponding MBean Name.
      *
-     * @param username User name of the new user
+     * @param username Username of the new user
      * @param password Password for the new user
      * @param fullName Full name for the new user
      *
@@ -247,9 +245,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified user name (if any); otherwise return <code>null</code>.
+     * Return the MBean Name for the specified username (if any); otherwise return <code>null</code>.
      *
-     * @param username User name to look up
+     * @param username Username to look up
      *
      * @return the user object name
      */
@@ -314,7 +312,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Remove an existing user and destroy the corresponding MBean.
      *
-     * @param username User name to remove
+     * @param username Username to remove
      */
     public void removeUser(String username) {
         UserDatabase database = (UserDatabase) this.resource;
@@ -338,8 +336,8 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         try {
             UserDatabase database = (UserDatabase) this.resource;
             if (database.isSparse()) {
-                ObjectName query = null;
-                Set<ObjectName> results = null;
+                ObjectName query;
+                Set<ObjectName> results;
 
                 // Groups
                 query = new ObjectName("Users:type=Group,database=" + database.getId() + ",*");

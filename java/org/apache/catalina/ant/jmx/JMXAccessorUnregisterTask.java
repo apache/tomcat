@@ -45,8 +45,6 @@ import org.apache.tools.ant.BuildException;
  * </p>
  * These tasks require Ant 1.6 or later interface.
  *
- * @author Peter Rossbach
- *
  * @since 5.5.12
  */
 public class JMXAccessorUnregisterTask extends JMXAccessorTask {
@@ -74,12 +72,11 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
      * @throws Exception An error occurred
      */
     protected String jmxUuregister(MBeanServerConnection jmxServerConnection, String name) throws Exception {
-        String error = null;
         if (isEcho()) {
             handleOutput("Unregister MBean " + name);
         }
         jmxServerConnection.unregisterMBean(new ObjectName(name));
-        return error;
+        return null;
     }
 
 }

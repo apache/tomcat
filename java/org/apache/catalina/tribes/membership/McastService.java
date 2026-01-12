@@ -147,8 +147,8 @@ public class McastService extends MembershipServiceBase implements MessageListen
             localMember.setSecurePort(securePort);
             localMember.setUdpPort(udpPort);
             localMember.getData(true, true);
-        } catch (IOException x) {
-            throw new IllegalArgumentException(x);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 
@@ -320,15 +320,15 @@ public class McastService extends MembershipServiceBase implements MessageListen
         if (properties.getProperty("mcastTTL") != null) {
             try {
                 ttl = Integer.parseInt(properties.getProperty("mcastTTL"));
-            } catch (Exception x) {
-                log.error(sm.getString("McastService.parseTTL", properties.getProperty("mcastTTL")), x);
+            } catch (Exception e) {
+                log.error(sm.getString("McastService.parseTTL", properties.getProperty("mcastTTL")), e);
             }
         }
         if (properties.getProperty("mcastSoTimeout") != null) {
             try {
                 soTimeout = Integer.parseInt(properties.getProperty("mcastSoTimeout"));
-            } catch (Exception x) {
-                log.error(sm.getString("McastService.parseSoTimeout", properties.getProperty("mcastSoTimeout")), x);
+            } catch (Exception e) {
+                log.error(sm.getString("McastService.parseSoTimeout", properties.getProperty("mcastSoTimeout")), e);
             }
         }
 
@@ -372,8 +372,8 @@ public class McastService extends MembershipServiceBase implements MessageListen
                 impl = null;
                 channel = null;
             }
-        } catch (Exception x) {
-            log.error(sm.getString("McastService.stopFail", Integer.valueOf(svc)), x);
+        } catch (Exception e) {
+            log.error(sm.getString("McastService.stopFail", Integer.valueOf(svc)), e);
         }
     }
 
@@ -411,8 +411,8 @@ public class McastService extends MembershipServiceBase implements MessageListen
         DatagramPacket packet = new DatagramPacket(data, 0, data.length);
         try {
             impl.send(false, packet);
-        } catch (Exception x) {
-            throw new ChannelException(x);
+        } catch (Exception e) {
+            throw new ChannelException(e);
         }
     }
 
@@ -454,8 +454,8 @@ public class McastService extends MembershipServiceBase implements MessageListen
                 if (impl != null) {
                     impl.send(false);
                 }
-            } catch (Exception x) {
-                log.error(sm.getString("McastService.payload"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("McastService.payload"), e);
             }
         }
     }
@@ -469,8 +469,8 @@ public class McastService extends MembershipServiceBase implements MessageListen
                 if (impl != null) {
                     impl.send(false);
                 }
-            } catch (Exception x) {
-                log.error(sm.getString("McastService.domain"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("McastService.domain"), e);
             }
         }
     }
@@ -526,7 +526,7 @@ public class McastService extends MembershipServiceBase implements MessageListen
      *
      * @throws Exception If an error occurs
      */
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         McastService service = new McastService();
         Properties p = new Properties();
         p.setProperty("mcastPort", "5555");

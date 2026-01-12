@@ -46,7 +46,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set_max_proto_version";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -79,7 +80,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set_min_proto_version";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -144,7 +146,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_sess_set_cache_size";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -209,7 +212,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set_session_cache_mode";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -242,7 +246,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_add0_chain_cert";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -276,7 +281,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set_tlsext_ticket_keys";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
+                        openssl_h.C_POINTER, openssl_h.C_LONG);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -345,7 +351,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set_tmp_ecdh";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -359,6 +366,24 @@ public class openssl_h_Macros {
             }
         } else {
             return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, ecdh);
+        }
+    }
+
+
+    /**
+     * Set automatic dh.
+     * {@snippet lang = c : # define SSL_CTX_set_dh_auto(ctx, onoff) \
+     *    SSL_CTX_ctrl(ctx,SSL_CTRL_SET_DH_AUTO,onoff,NULL)
+     * }
+     * @param sslCtx  the SSL context
+     * @param onoff 1 to enable
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set_dh_auto(MemorySegment sslCtx, int onoff) {
+        if (openssl_h_Compatibility.BORINGSSL) {
+            return 1;
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
         }
     }
 
@@ -406,7 +431,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set1_groups";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
+                        openssl_h.C_POINTER, openssl_h.C_INT);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;
@@ -420,6 +446,41 @@ public class openssl_h_Macros {
             }
         } else {
             return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS(), listLength, groupsList);
+        }
+    }
+
+
+    /**
+     * Set list of groups in preference order.
+     * {@snippet lang = c :
+     * # define SSL_set1_groups_list(s, str) \
+     *          SSL_ctrl(s,SSL_CTRL_SET_GROUPS_LIST,0,(char *)(str))
+     * }
+     *
+     * @param sslCtx     the SSL context
+     * @param groupsList the groups list as a String
+     *
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set1_groups_list(MemorySegment sslCtx, MemorySegment groupsList) {
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set1_groups_list";
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, groupsList);
+                }
+                return (long) mh$.invokeExact(sslCtx, groupsList);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS_LIST(), 0, groupsList);
         }
     }
 
@@ -460,6 +521,7 @@ public class openssl_h_Macros {
 
     /**
      * Return the d2i_ECPKParameters symbol.
+     *
      * @return the symbol
      */
     public static MemorySegment d2i_ECPKParameters$SYMBOL() {

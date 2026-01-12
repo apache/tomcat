@@ -68,9 +68,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Startup event listener for a <b>Host</b> that configures the properties of that Host, and the associated defined
  * contexts.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class HostConfig implements LifecycleListener {
 
@@ -135,7 +132,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Set of applications which are being serviced, and shouldn't be deployed/undeployed/redeployed at the moment.
      */
-    private Set<String> servicedSet = ConcurrentHashMap.newKeySet();
+    private final Set<String> servicedSet = ConcurrentHashMap.newKeySet();
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
@@ -259,14 +256,11 @@ public class HostConfig implements LifecycleListener {
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.PERIODIC_EVENT)) {
-            check();
-        } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
-            beforeStart();
-        } else if (event.getType().equals(Lifecycle.START_EVENT)) {
-            start();
-        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
-            stop();
+        switch (event.getType()) {
+            case Lifecycle.PERIODIC_EVENT -> check();
+            case Lifecycle.BEFORE_START_EVENT -> beforeStart();
+            case Lifecycle.START_EVENT -> start();
+            case Lifecycle.STOP_EVENT -> stop();
         }
     }
 
@@ -279,10 +273,7 @@ public class HostConfig implements LifecycleListener {
      * @return {@code true} if the application was not already in the list
      */
     public boolean tryAddServiced(String name) {
-        if (servicedSet.add(name)) {
-            return true;
-        }
-        return false;
+        return servicedSet.add(name);
     }
 
 
@@ -356,7 +347,7 @@ public class HostConfig implements LifecycleListener {
         }
         try {
             return file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             return file;
         }
     }
@@ -534,7 +525,7 @@ public class HostConfig implements LifecycleListener {
         Context context = null;
         boolean isExternalWar = false;
         boolean isExternal = false;
-        File expandedDocBase = null;
+        File expandedDocBase;
 
         try {
             synchronized (digesterLock) {
@@ -605,7 +596,8 @@ public class HostConfig implements LifecycleListener {
 
             // default to appBase dir + name
             expandedDocBase = new File(host.getAppBaseFile(), cn.getBaseName());
-            if (context.getDocBase() != null && !context.getDocBase().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+            if (context != null && context.getDocBase() != null &&
+                    !context.getDocBase().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -757,7 +749,7 @@ public class HostConfig implements LifecycleListener {
         // not end with File.separator for a directory
 
         StringBuilder docBase;
-        String canonicalDocBase = null;
+        String canonicalDocBase;
 
         try {
             String canonicalAppBase = appBase.getCanonicalPath();
@@ -783,7 +775,7 @@ public class HostConfig implements LifecycleListener {
 
         // Compare the two. If they are not the same, the contextPath must
         // have /../ like sequences in it
-        return canonicalDocBase.equals(docBase.toString());
+        return canonicalDocBase.contentEquals(docBase);
     }
 
     /**
@@ -806,19 +798,17 @@ public class HostConfig implements LifecycleListener {
             if (entry != null) {
                 xmlInWar = true;
             }
-        } catch (IOException e) {
-            /* Ignore */
+        } catch (IOException ignore) {
+            // Ignore
         }
 
         // If there is an expanded directory then any xml in that directory
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
-        boolean useXml = false;
-        // If the xml file exists then expandedDir must exists so no need to
+        boolean useXml =
+                xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
+        // If the xml file exists then expandedDir must exist so no need to
         // test that here
-        if (xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified())) {
-            useXml = true;
-        }
 
         Context context = null;
         boolean deployThisXML = this.deployXML;
@@ -893,8 +883,8 @@ public class HostConfig implements LifecycleListener {
                             OutputStream ostream = new FileOutputStream(xml)) {
                         IOTools.flow(istream, ostream);
                     }
-                } catch (IOException e) {
-                    /* Ignore */
+                } catch (IOException ignore) {
+                    // Ignore
                 }
             }
         }
@@ -1063,7 +1053,7 @@ public class HostConfig implements LifecycleListener {
                     }
                 }
 
-                if (copyThisXml == false && context instanceof StandardContext) {
+                if (!copyThisXml && context instanceof StandardContext) {
                     // Host is using default value. Context may override it.
                     copyThisXml = ((StandardContext) context).getCopyXML();
                 }
@@ -1188,7 +1178,7 @@ public class HostConfig implements LifecycleListener {
 
     protected void migrateLegacyApp(File source, File destination) {
         File tempNew = null;
-        File tempOld = null;
+        File tempOld;
         try {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
@@ -1359,8 +1349,8 @@ public class HostConfig implements LifecycleListener {
                     }
                 }
             } else {
-                // There is a chance the the resource was only missing
-                // temporarily eg renamed during a text editor save
+                // There is a chance the resource was only missing
+                // temporarily e.g. renamed during a text editor save
                 if (resource.exists() || !resource.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     try {
                         Thread.sleep(500);
@@ -1518,16 +1508,16 @@ public class HostConfig implements LifecycleListener {
         String canonicalLocation;
         try {
             canonicalLocation = resource.getParentFile().getCanonicalPath();
-        } catch (IOException e) {
-            log.warn(sm.getString("hostConfig.canonicalizing", resource.getParentFile(), app.name), e);
+        } catch (IOException ioe) {
+            log.warn(sm.getString("hostConfig.canonicalizing", resource.getParentFile(), app.name), ioe);
             return false;
         }
 
         String canonicalAppBase;
         try {
             canonicalAppBase = host.getAppBaseFile().getCanonicalPath();
-        } catch (IOException e) {
-            log.warn(sm.getString("hostConfig.canonicalizing", host.getAppBaseFile(), app.name), e);
+        } catch (IOException ioe) {
+            log.warn(sm.getString("hostConfig.canonicalizing", host.getAppBaseFile(), app.name), ioe);
             return false;
         }
 
@@ -1539,18 +1529,14 @@ public class HostConfig implements LifecycleListener {
         String canonicalConfigBase;
         try {
             canonicalConfigBase = host.getConfigBaseFile().getCanonicalPath();
-        } catch (IOException e) {
-            log.warn(sm.getString("hostConfig.canonicalizing", host.getConfigBaseFile(), app.name), e);
+        } catch (IOException ioe) {
+            log.warn(sm.getString("hostConfig.canonicalizing", host.getConfigBaseFile(), app.name), ioe);
             return false;
         }
 
-        if (canonicalLocation.equals(canonicalConfigBase) && resource.getName().endsWith(".xml")) {
-            // Resource is an xml file in the configBase so it may be deleted
-            return true;
-        }
-
+        // Resource is a xml file in the configBase so it may be deleted
+        return canonicalLocation.equals(canonicalConfigBase) && resource.getName().endsWith(".xml");
         // All other resources should not be deleted
-        return false;
     }
 
 
@@ -1578,7 +1564,7 @@ public class HostConfig implements LifecycleListener {
         try {
             ObjectName hostON = host.getObjectName();
             oname = new ObjectName(hostON.getDomain() + ":type=Deployer,host=" + host.getName());
-            Registry.getRegistry(null, null).registerComponent(this, oname, this.getClass().getName());
+            Registry.getRegistry(null).registerComponent(this, oname, this.getClass().getName());
         } catch (Exception e) {
             log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
@@ -1606,7 +1592,7 @@ public class HostConfig implements LifecycleListener {
 
         if (oname != null) {
             try {
-                Registry.getRegistry(null, null).unregisterComponent(oname);
+                Registry.getRegistry(null).unregisterComponent(oname);
             } catch (Exception e) {
                 log.warn(sm.getString("hostConfig.jmx.unregister", oname), e);
             }
@@ -1835,18 +1821,7 @@ public class HostConfig implements LifecycleListener {
         public boolean loggedDirWarning = false;
     }
 
-    private static class DeployDescriptor implements Runnable {
-
-        private HostConfig config;
-        private ContextName cn;
-        private File descriptor;
-
-        DeployDescriptor(HostConfig config, ContextName cn, File descriptor) {
-            this.config = config;
-            this.cn = cn;
-            this.descriptor = descriptor;
-        }
-
+    private record DeployDescriptor(HostConfig config, ContextName cn, File descriptor) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1857,18 +1832,7 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
-    private static class DeployWar implements Runnable {
-
-        private HostConfig config;
-        private ContextName cn;
-        private File war;
-
-        DeployWar(HostConfig config, ContextName cn, File war) {
-            this.config = config;
-            this.cn = cn;
-            this.war = war;
-        }
-
+    private record DeployWar(HostConfig config, ContextName cn, File war) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1879,18 +1843,7 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
-    private static class DeployDirectory implements Runnable {
-
-        private HostConfig config;
-        private ContextName cn;
-        private File dir;
-
-        DeployDirectory(HostConfig config, ContextName cn, File dir) {
-            this.config = config;
-            this.cn = cn;
-            this.dir = dir;
-        }
-
+    private record DeployDirectory(HostConfig config, ContextName cn, File dir) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1902,20 +1855,7 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private static class MigrateApp implements Runnable {
-
-        private HostConfig config;
-        private ContextName cn;
-        private File source;
-        private File destination;
-
-        MigrateApp(HostConfig config, ContextName cn, File source, File destination) {
-            this.config = config;
-            this.cn = cn;
-            this.source = source;
-            this.destination = destination;
-        }
-
+    private record MigrateApp(HostConfig config, ContextName cn, File source, File destination) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1936,22 +1876,7 @@ public class HostConfig implements LifecycleListener {
      * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
      * removed in future without changing the Context API.
      */
-    private static class ExpandedDirectoryRemovalListener implements LifecycleListener {
-
-        private final File toDelete;
-        private final String newDocBase;
-
-        /**
-         * Create a listener that will ensure that any expanded WAR is removed and the docBase set to the specified WAR.
-         *
-         * @param toDelete   The file (a directory representing an expanded WAR) to be deleted
-         * @param newDocBase The new docBase for the Context
-         */
-        ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
-            this.toDelete = toDelete;
-            this.newDocBase = newDocBase;
-        }
-
+    private record ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {

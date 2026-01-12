@@ -33,7 +33,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public abstract class AbstractProcessorLight implements Processor {
 
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
+    private final Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
 
     @Override
@@ -75,7 +75,7 @@ public abstract class AbstractProcessorLight implements Processor {
             }
 
             /*
-             * If state is already CLOSED don't call asyncPostProcess() as that will likely change the the state to some
+             * If state is already CLOSED don't call asyncPostProcess() as that will likely change the state to some
              * other value causing processing to continue when it should cease. The AsyncStateMachine will be recycled
              * as part of the Processor clean-up on CLOSED so it doesn't matter what state it is left in at this point.
              */
@@ -173,7 +173,7 @@ public abstract class AbstractProcessorLight implements Processor {
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException;
 
     /**
-     * Process an in-progress request that is not longer in standard HTTP mode. Uses currently include Servlet 3.0 Async
+     * Process an in-progress request that is no longer in standard HTTP mode. Uses currently include Servlet 3.0 Async
      * and HTTP upgrade connections. Further uses may be added in the future. These will typically start as HTTP
      * requests.
      *

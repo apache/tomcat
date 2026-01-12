@@ -25,8 +25,6 @@ import jakarta.el.VariableMapper;
 
 /**
  * Simple ELContextWrapper for runtime evaluation of EL w/ dynamic FunctionMappers
- *
- * @author jhook
  */
 public final class ELContextWrapper extends ELContext {
 

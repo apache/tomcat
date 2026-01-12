@@ -16,11 +16,14 @@
  */
 package org.apache.coyote;
 
+import java.io.Serial;
+
 /**
  * Used when we need to indicate failure but the (Servlet) API doesn't declare any appropriate exceptions.
  */
 public class ProtocolException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ProtocolException() {

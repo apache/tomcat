@@ -30,8 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Gzip output filter.
- *
- * @author Remy Maucherat
  */
 public class GzipOutputFilter implements OutputFilter {
 
@@ -98,9 +96,9 @@ public class GzipOutputFilter implements OutputFilter {
                     log.trace("Flushing the compression stream!");
                 }
                 compressionStream.flush();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("gzipOutputFilter.flushFail"), e);
+                    log.debug(sm.getString("gzipOutputFilter.flushFail"), ioe);
                 }
             }
         }

@@ -86,21 +86,17 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
         public transient volatile ThreadPoolExecutor tpe;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-            resp.getWriter().println(
-                    "The current thread served " + this + " servlet");
-            tpe = new ThreadPoolExecutor(tpSize, tpSize, 50000L,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+            resp.getWriter().println("The current thread served " + this + " servlet");
+            tpe = new ThreadPoolExecutor(tpSize, tpSize, 50000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
             Task[] tasks = new Task[nTasks];
             for (int i = 0; i < nTasks; i++) {
                 tasks[i] = new Task("Task " + i);
                 tpe.execute(tasks[i]);
             }
-            resp.getWriter().println("Started " + nTasks +
-                    " never ending tasks using the ThreadPoolExecutor");
+            resp.getWriter().println("Started " + nTasks + " never ending tasks using the ThreadPoolExecutor");
             resp.getWriter().flush();
         }
 

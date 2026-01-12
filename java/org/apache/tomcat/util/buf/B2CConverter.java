@@ -135,7 +135,7 @@ public class B2CConverter {
             cb.limit(cc.getBuffer().length);
             cb.position(cc.getEnd());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = cb.position();
@@ -204,7 +204,7 @@ public class B2CConverter {
             cb.limit(cc.capacity());
             cb.position(cc.limit());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = cb.position();

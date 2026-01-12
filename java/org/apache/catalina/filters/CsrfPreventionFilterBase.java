@@ -79,9 +79,7 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
             Class<?> clazz = Class.forName(randomClass);
             randomSource = (Random) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            ServletException se =
-                    new ServletException(sm.getString("csrfPrevention.invalidRandomClass", randomClass), e);
-            throw se;
+            throw new ServletException(sm.getString("csrfPrevention.invalidRandomClass", randomClass), e);
         }
     }
 
@@ -95,12 +93,12 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
      * Generate a once time token (nonce) for authenticating subsequent requests. The nonce generation is a simplified
      * version of ManagerBase.generateSessionId().
      *
-     * @param request The request. Unused in this method but present for the the benefit of sub-classes.
+     * @param request The request. Unused in this method but present for the benefit of subclasses.
      *
      * @return the generated nonce
      */
     protected String generateNonce(HttpServletRequest request) {
-        byte random[] = new byte[16];
+        byte[] random = new byte[16];
 
         // Render the result as a String of hexadecimal digits
         StringBuilder buffer = new StringBuilder();

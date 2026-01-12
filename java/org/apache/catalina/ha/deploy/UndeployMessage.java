@@ -16,15 +16,18 @@
  */
 package org.apache.catalina.ha.deploy;
 
+import java.io.Serial;
+
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 
 public class UndeployMessage implements ClusterMessage {
+    @Serial
     private static final long serialVersionUID = 2L;
 
     private Member address;
     private long timestamp;
-    private String uniqueId;
+    private final String uniqueId;
     private final String contextName;
 
     public UndeployMessage(Member address, long timestamp, String uniqueId, String contextName) {

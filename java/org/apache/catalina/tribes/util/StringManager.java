@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.util;
 
+import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,15 +40,11 @@ import java.util.ResourceBundle;
  * <p>
  * Please see the documentation for java.util.ResourceBundle for more information.
  *
- * @author James Duncan Davidson [duncan@eng.sun.com]
- * @author James Todd [gonzo@eng.sun.com]
- * @author Mel Martinez [mmartinez@g1440.com]
- *
  * @see java.util.ResourceBundle
  */
 public class StringManager {
 
-    private static int LOCALE_CACHE_SIZE = 10;
+    private static final int LOCALE_CACHE_SIZE = 10;
 
     /**
      * The ResourceBundle for this StringManager.
@@ -68,14 +65,15 @@ public class StringManager {
         try {
             bnd = ResourceBundle.getBundle(bundleName, locale);
         } catch (MissingResourceException ex) {
-            // Try from the current loader (that's the case for trusted apps)
-            // Should only be required if using a TC5 style classloader structure
-            // where common != shared != server
+            /*
+             * Try from the current loader (that's the case for trusted apps). Should only be required if using a class
+             * loader structure where common != shared != server
+             */
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (cl != null) {
                 try {
                     bnd = ResourceBundle.getBundle(bundleName, locale, cl);
-                } catch (MissingResourceException ex2) {
+                } catch (MissingResourceException ignore) {
                     // Ignore
                 }
             }
@@ -106,8 +104,7 @@ public class StringManager {
      */
     public String getString(String key) {
         if (key == null) {
-            String msg = "key may not have a null value";
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException("key may not have a null value");
         }
 
         String str = null;
@@ -117,7 +114,7 @@ public class StringManager {
             if (bundle != null) {
                 str = bundle.getString(key);
             }
-        } catch (MissingResourceException mre) {
+        } catch (MissingResourceException ignore) {
             // bad: shouldn't mask an exception the following way:
             // str = "[cannot find message associated with key '" + key +
             // "' due to " + mre + "]";
@@ -129,7 +126,6 @@ public class StringManager {
             // better: consistent with container pattern to
             // simply return null. Calling code can then do
             // a null check.
-            str = null;
         }
 
         return str;
@@ -181,7 +177,7 @@ public class StringManager {
      *
      * @return The StringManager for the given class.
      */
-    public static final StringManager getManager(Class<?> clazz) {
+    public static StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
     }
 
@@ -194,7 +190,7 @@ public class StringManager {
      *
      * @return The StringManager for the given package.
      */
-    public static final StringManager getManager(String packageName) {
+    public static StringManager getManager(String packageName) {
         return getManager(packageName, Locale.getDefault());
     }
 
@@ -208,7 +204,7 @@ public class StringManager {
      *
      * @return The StringManager for a particular package and Locale
      */
-    public static final synchronized StringManager getManager(String packageName, Locale locale) {
+    public static synchronized StringManager getManager(String packageName, Locale locale) {
 
         Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
@@ -218,14 +214,12 @@ public class StringManager {
              * for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
              */
             map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 0.75f, true) {
+                @Serial
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<Locale,StringManager> eldest) {
-                    if (size() > (LOCALE_CACHE_SIZE - 1)) {
-                        return true;
-                    }
-                    return false;
+                    return size() > (LOCALE_CACHE_SIZE - 1);
                 }
             };
             managers.put(packageName, map);

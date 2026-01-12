@@ -179,7 +179,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     }
 
 
-    protected void getRandomBytes(byte bytes[]) {
+    protected void getRandomBytes(byte[] bytes) {
 
         SecureRandom random = randoms.poll();
         if (random == null) {
@@ -212,9 +212,9 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
         if (result == null) {
             // No secureRandomClass or creation failed. Use SecureRandom.
             try {
-                if (secureRandomProvider != null && secureRandomProvider.length() > 0) {
+                if (secureRandomProvider != null && !secureRandomProvider.isEmpty()) {
                     result = SecureRandom.getInstance(secureRandomAlgorithm, secureRandomProvider);
-                } else if (secureRandomAlgorithm != null && secureRandomAlgorithm.length() > 0) {
+                } else if (secureRandomAlgorithm != null && !secureRandomAlgorithm.isEmpty()) {
                     result = SecureRandom.getInstance(secureRandomAlgorithm);
                 }
             } catch (NoSuchAlgorithmException e) {

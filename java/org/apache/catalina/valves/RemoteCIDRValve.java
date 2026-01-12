@@ -203,12 +203,8 @@ public final class RemoteCIDRValve extends RequestFilterValve {
         }
 
         // Allow if deny is specified but allow isn't
-        if (!deny.isEmpty() && allow.isEmpty()) {
-            return true;
-        }
-
-        // Deny this request
-        return false;
+        // Otherwise deny this request
+        return !deny.isEmpty() && allow.isEmpty();
     }
 
 

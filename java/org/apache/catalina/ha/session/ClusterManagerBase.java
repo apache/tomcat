@@ -60,7 +60,7 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      */
     private boolean recordAllActions = false;
 
-    private SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<>();
+    private final SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<>();
 
 
     protected SynchronizedStack<DeltaRequest> getDeltaRequestPool() {

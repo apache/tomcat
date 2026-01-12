@@ -29,7 +29,7 @@ import org.apache.tools.ant.BuildException;
 /**
  * Access <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
- * <li>open more then one JSR 160 rmi connection</li>
+ * <li>open more than one JSR 160 rmi connection</li>
  * <li>Get/Set Mbeans attributes</li>
  * <li>Call Mbean Operation with arguments</li>
  * <li>Argument values can be converted from string to int,long,float,double,boolean,ObjectName or InetAddress</li>
@@ -53,32 +53,34 @@ import org.apache.tools.ant.BuildException;
  * </pre>
  *
  * </li>
- * <li>Create new AccessLogger at localhost <code>
+ * <li>Create new AccessLogger at localhost
+ *
+ * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
  *           operation="createAccessLoggerValve"
- *           resultproperty="accessLoggerObjectName"
- *       &gt;
+ *           resultproperty="accessLoggerObjectName"&gt;
  *         &lt;arg value="Catalina:type=Host,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
+ * </pre>
  *
- * </code></li>
- * <li>Remove existing AccessLogger at localhost <code>
+ * </li>
+ * <li>Remove existing AccessLogger at localhost
+ *
+ * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
- *           operation="removeValve"
- *       &gt;
+ *           operation="removeValve"&gt;
  *         &lt;arg value="Catalina:type=Valve,name=AccessLogValve,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
+ * </pre>
  *
- * </code></li>
+ * </li>
  * </ul>
  * <p>
  * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
  * </p>
  * These tasks require Ant 1.6 or later interface.
- *
- * @author Peter Rossbach
  *
  * @since 5.5.10
  */
@@ -153,8 +155,8 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
         if (args == null) {
             result = jmxServerConnection.invoke(new ObjectName(name), operation, null, null);
         } else {
-            Object argsA[] = new Object[args.size()];
-            String sigA[] = new String[args.size()];
+            Object[] argsA = new Object[args.size()];
+            String[] sigA = new String[args.size()];
             for (int i = 0; i < args.size(); i++) {
                 Arg arg = args.get(i);
                 if (arg.getType() == null) {

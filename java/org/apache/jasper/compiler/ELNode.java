@@ -27,11 +27,8 @@ import org.apache.jasper.JasperException;
 /**
  * This class defines internal representation for an EL Expression. It currently only defines functions. It can be
  * expanded to define all the components of an EL expression, if need to.
- *
- * @author Kin-man Chung
  */
-
-abstract class ELNode {
+public abstract class ELNode {
 
     public abstract void accept(Visitor v) throws JasperException;
 
@@ -211,7 +208,7 @@ abstract class ELNode {
         }
 
         public boolean isEmpty() {
-            return list.size() == 0;
+            return list.isEmpty();
         }
 
         /**

@@ -16,6 +16,8 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
+
 /**
  * Represents any of the exception conditions that can arise during expression evaluation.
  *
@@ -23,6 +25,7 @@ package jakarta.el;
  */
 public class ELException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -6228042809457459161L;
 
     /**

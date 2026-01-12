@@ -23,12 +23,7 @@ import java.io.PrintWriter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #include command
- *
- * @author Bip Thelin
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Implements the Server-side #include command.
  */
 public final class SSIInclude implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIInclude.class);
@@ -52,8 +47,8 @@ public final class SSIInclude implements SSICommand {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiInclude.includeFailed", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiInclude.includeFailed", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }

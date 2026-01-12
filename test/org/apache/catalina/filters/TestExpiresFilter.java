@@ -87,66 +87,66 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             // VERIFY DEFAULT CONFIGURATION
             ExpiresConfiguration expiresConfigurationDefault = expiresFilter.getDefaultExpiresConfiguration();
-            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationDefault.getStartingPoint());
-            Assert.assertEquals(1, expiresConfigurationDefault.getDurations().size());
-            Assert.assertEquals(DurationUnit.MONTH, expiresConfigurationDefault.getDurations().get(0).getUnit());
-            Assert.assertEquals(1, expiresConfigurationDefault.getDurations().get(0).getAmount());
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationDefault.startingPoint());
+            Assert.assertEquals(1, expiresConfigurationDefault.durations().size());
+            Assert.assertEquals(DurationUnit.MONTH, expiresConfigurationDefault.durations().get(0).unit());
+            Assert.assertEquals(1, expiresConfigurationDefault.durations().get(0).amount());
 
             // VERIFY TEXT/HTML
             ExpiresConfiguration expiresConfigurationTextHtml =
                     expiresFilter.getExpiresConfigurationByContentType().get("text/html");
-            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationTextHtml.getStartingPoint());
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationTextHtml.startingPoint());
 
-            Assert.assertEquals(3, expiresConfigurationTextHtml.getDurations().size());
+            Assert.assertEquals(3, expiresConfigurationTextHtml.durations().size());
 
-            Duration oneMonth = expiresConfigurationTextHtml.getDurations().get(0);
-            Assert.assertEquals(DurationUnit.MONTH, oneMonth.getUnit());
-            Assert.assertEquals(1, oneMonth.getAmount());
+            Duration oneMonth = expiresConfigurationTextHtml.durations().get(0);
+            Assert.assertEquals(DurationUnit.MONTH, oneMonth.unit());
+            Assert.assertEquals(1, oneMonth.amount());
 
-            Duration fifteenDays = expiresConfigurationTextHtml.getDurations().get(1);
-            Assert.assertEquals(DurationUnit.DAY, fifteenDays.getUnit());
-            Assert.assertEquals(15, fifteenDays.getAmount());
+            Duration fifteenDays = expiresConfigurationTextHtml.durations().get(1);
+            Assert.assertEquals(DurationUnit.DAY, fifteenDays.unit());
+            Assert.assertEquals(15, fifteenDays.amount());
 
-            Duration twoHours = expiresConfigurationTextHtml.getDurations().get(2);
-            Assert.assertEquals(DurationUnit.HOUR, twoHours.getUnit());
-            Assert.assertEquals(2, twoHours.getAmount());
+            Duration twoHours = expiresConfigurationTextHtml.durations().get(2);
+            Assert.assertEquals(DurationUnit.HOUR, twoHours.unit());
+            Assert.assertEquals(2, twoHours.amount());
 
             // VERIFY IMAGE/GIF
             ExpiresConfiguration expiresConfigurationImageGif =
                     expiresFilter.getExpiresConfigurationByContentType().get("image/gif");
-            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfigurationImageGif.getStartingPoint());
+            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfigurationImageGif.startingPoint());
 
-            Assert.assertEquals(2, expiresConfigurationImageGif.getDurations().size());
+            Assert.assertEquals(2, expiresConfigurationImageGif.durations().size());
 
-            Duration fiveHours = expiresConfigurationImageGif.getDurations().get(0);
-            Assert.assertEquals(DurationUnit.HOUR, fiveHours.getUnit());
-            Assert.assertEquals(5, fiveHours.getAmount());
+            Duration fiveHours = expiresConfigurationImageGif.durations().get(0);
+            Assert.assertEquals(DurationUnit.HOUR, fiveHours.unit());
+            Assert.assertEquals(5, fiveHours.amount());
 
-            Duration threeMinutes = expiresConfigurationImageGif.getDurations().get(1);
-            Assert.assertEquals(DurationUnit.MINUTE, threeMinutes.getUnit());
-            Assert.assertEquals(3, threeMinutes.getAmount());
+            Duration threeMinutes = expiresConfigurationImageGif.durations().get(1);
+            Assert.assertEquals(DurationUnit.MINUTE, threeMinutes.unit());
+            Assert.assertEquals(3, threeMinutes.amount());
 
             // VERIFY IMAGE/JPG
             ExpiresConfiguration expiresConfigurationImageJpg =
                     expiresFilter.getExpiresConfigurationByContentType().get("image/jpg");
-            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationImageJpg.getStartingPoint());
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationImageJpg.startingPoint());
 
-            Assert.assertEquals(1, expiresConfigurationImageJpg.getDurations().size());
+            Assert.assertEquals(1, expiresConfigurationImageJpg.durations().size());
 
-            Duration tenThousandSeconds = expiresConfigurationImageJpg.getDurations().get(0);
-            Assert.assertEquals(DurationUnit.SECOND, tenThousandSeconds.getUnit());
-            Assert.assertEquals(10000, tenThousandSeconds.getAmount());
+            Duration tenThousandSeconds = expiresConfigurationImageJpg.durations().get(0);
+            Assert.assertEquals(DurationUnit.SECOND, tenThousandSeconds.unit());
+            Assert.assertEquals(10000, tenThousandSeconds.amount());
 
             // VERIFY VIDEO/MPEG
             ExpiresConfiguration expiresConfiguration =
                     expiresFilter.getExpiresConfigurationByContentType().get("video/mpeg");
-            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfiguration.getStartingPoint());
+            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfiguration.startingPoint());
 
-            Assert.assertEquals(1, expiresConfiguration.getDurations().size());
+            Assert.assertEquals(1, expiresConfiguration.durations().size());
 
-            Duration twentyThousandSeconds = expiresConfiguration.getDurations().get(0);
-            Assert.assertEquals(DurationUnit.SECOND, twentyThousandSeconds.getUnit());
-            Assert.assertEquals(20000, twentyThousandSeconds.getAmount());
+            Duration twentyThousandSeconds = expiresConfiguration.durations().get(0);
+            Assert.assertEquals(DurationUnit.SECOND, twentyThousandSeconds.unit());
+            Assert.assertEquals(20000, twentyThousandSeconds.amount());
         } finally {
             tomcat.stop();
         }
@@ -177,9 +177,9 @@ public class TestExpiresFilter extends TomcatBaseTest {
         ExpiresConfiguration actualConfiguration =
                 expiresFilter.parseExpiresConfiguration("access plus 1 month 15 days 2 hours");
 
-        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.getStartingPoint());
+        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.startingPoint());
 
-        Assert.assertEquals(3, actualConfiguration.getDurations().size());
+        Assert.assertEquals(3, actualConfiguration.durations().size());
 
     }
 
@@ -188,11 +188,11 @@ public class TestExpiresFilter extends TomcatBaseTest {
         ExpiresFilter expiresFilter = new ExpiresFilter();
         ExpiresConfiguration actualConfiguration = expiresFilter.parseExpiresConfiguration("access plus 2 hours");
 
-        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.getStartingPoint());
+        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.startingPoint());
 
-        Assert.assertEquals(1, actualConfiguration.getDurations().size());
-        Assert.assertEquals(2, actualConfiguration.getDurations().get(0).getAmount());
-        Assert.assertEquals(DurationUnit.HOUR, actualConfiguration.getDurations().get(0).getUnit());
+        Assert.assertEquals(1, actualConfiguration.durations().size());
+        Assert.assertEquals(2, actualConfiguration.durations().get(0).amount());
+        Assert.assertEquals(DurationUnit.HOUR, actualConfiguration.durations().get(0).unit());
 
     }
 

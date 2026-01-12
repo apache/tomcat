@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,13 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
     private volatile boolean closed;
 
     /**
+     * Constructs a new instance.
+     */
+    public BaseObjectPool() {
+        // empty
+    }
+
+    /**
      * Not supported in this base implementation. Subclasses should override
      * this behavior.
      *
@@ -49,7 +56,6 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      * closed.
      *
      * @throws IllegalStateException when this pool has been closed.
-     *
      * @see #isClosed()
      */
     protected final void assertOpen() throws IllegalStateException {

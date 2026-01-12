@@ -53,7 +53,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     public DataSourceProxy(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
-          throw new NullPointerException("PoolConfiguration cannot be null.");
+            throw new NullPointerException("PoolConfiguration cannot be null.");
         }
         this.poolProperties = poolProperties;
     }
@@ -83,7 +83,7 @@ public class DataSourceProxy implements PoolConfiguration {
     public Connection getConnection(String username, String password) throws SQLException {
         if (this.getPoolProperties().isAlternateUsernameAllowed()) {
             if (pool == null) {
-              return createPool().getConnection(username,password);
+                return createPool().getConnection(username,password);
             }
             return pool.getConnection(username,password);
         } else {
@@ -128,7 +128,7 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public Connection getConnection() throws SQLException {
         if (pool == null) {
-          return createPool().getConnection();
+            return createPool().getConnection();
         }
         return pool.getConnection();
     }
@@ -140,7 +140,7 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
         if (pool == null) {
-          return createPool().getConnectionAsync();
+            return createPool().getConnectionAsync();
         }
         return pool.getConnectionAsync();
     }
@@ -241,9 +241,9 @@ public class DataSourceProxy implements PoolConfiguration {
     public int getPoolSize() {
         final ConnectionPool p = pool;
         if (p == null) {
-          return 0;
+            return 0;
         } else {
-          return p.getSize();
+            return p.getSize();
         }
     }
 

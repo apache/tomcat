@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,9 +49,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 /**
  * Standard implementation of the <b>Host</b> interface. Each child container must be a Context implementation to
  * process the requests directed to a particular web application.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class StandardHost extends ContainerBase implements Host {
 
@@ -231,6 +229,12 @@ public class StandardHost extends ContainerBase implements Host {
             // Ignore
         }
 
+        Path appBasePath = file.toPath();
+        Path basePath = getCatalinaBase().toPath();
+        if (basePath.startsWith(appBasePath)) {
+            log.warn(sm.getString("standardHost.problematicAppBaseParent", getName()));
+        }
+
         this.appBaseFile = file;
         return file;
     }
@@ -238,7 +242,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     public void setAppBase(String appBase) {
-        if (appBase.trim().equals("")) {
+        if (appBase.trim().isEmpty()) {
             log.warn(sm.getString("standardHost.problematicAppBase", getName()));
         }
         String oldAppBase = this.appBase;
@@ -274,6 +278,12 @@ public class StandardHost extends ContainerBase implements Host {
             // Ignore
         }
 
+        Path appBasePath = file.toPath();
+        Path basePath = getCatalinaBase().toPath();
+        if (basePath.startsWith(appBasePath)) {
+            log.warn(sm.getString("standardHost.problematicLegacyAppBaseParent", getName()));
+        }
+
         this.legacyAppBaseFile = file;
         return file;
     }
@@ -281,7 +291,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     public void setLegacyAppBase(String legacyAppBase) {
-        if (legacyAppBase.trim().equals("")) {
+        if (legacyAppBase.trim().isEmpty()) {
             log.warn(sm.getString("standardHost.problematicLegacyAppBase", getName()));
         }
         String oldLegacyAppBase = this.legacyAppBase;
@@ -310,7 +320,7 @@ public class StandardHost extends ContainerBase implements Host {
         if (hostConfigBase != null) {
             return hostConfigBase;
         }
-        String path = null;
+        String path;
         if (getXmlBase() != null) {
             path = getXmlBase();
         } else {
@@ -330,7 +340,8 @@ public class StandardHost extends ContainerBase implements Host {
         }
         try {
             file = file.getCanonicalFile();
-        } catch (IOException e) {// ignore
+        } catch (IOException ignore) {
+            // Ignore
         }
         this.hostConfigBase = file;
         return file;
@@ -618,7 +629,7 @@ public class StandardHost extends ContainerBase implements Host {
                 }
             }
             // Add this alias to the list
-            String newAliases[] = Arrays.copyOf(aliases, aliases.length + 1);
+            String[] newAliases = Arrays.copyOf(aliases, aliases.length + 1);
             newAliases[aliases.length] = alias;
             aliases = newAliases;
         }
@@ -636,7 +647,7 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void addChild(Container child) {
 
-        if (!(child instanceof Context)) {
+        if (!(child instanceof Context context)) {
             throw new IllegalArgumentException(sm.getString("standardHost.notContext"));
         }
 
@@ -644,7 +655,6 @@ public class StandardHost extends ContainerBase implements Host {
 
         // Avoid NPE for case where Context is defined in server.xml with only a
         // docBase
-        Context context = (Context) child;
         if (context.getPath() == null) {
             ContextName cn = new ContextName(context.getDocBase(), true);
             context.setPath(cn.getPath());
@@ -656,15 +666,14 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Used to ensure the regardless of {@link Context} implementation, a record is kept of the class loader used every
+     * Used to ensure that regardless of {@link Context} implementation, a record is kept of the class loader used every
      * time a context starts.
      */
     private class MemoryLeakTrackingListener implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (event.getType().equals(AFTER_START_EVENT)) {
-                if (event.getSource() instanceof Context) {
-                    Context context = ((Context) event.getSource());
+                if (event.getSource() instanceof Context context) {
                     childClassLoaders.put(context.getLoader().getClassLoader(),
                             context.getServletContext().getContextPath());
                 }
@@ -678,7 +687,7 @@ public class StandardHost extends ContainerBase implements Host {
      * reload. Note: This method attempts to force a full garbage collection. This should be used with extreme caution
      * on a production system.
      *
-     * @return a list of possibly leaking contexts
+     * @return an array of possibly leaking contexts
      */
     public String[] findReloadedContextMemoryLeaks() {
 
@@ -727,7 +736,7 @@ public class StandardHost extends ContainerBase implements Host {
 
             // Remove the specified alias
             int j = 0;
-            String results[] = new String[aliases.length - 1];
+            String[] results = new String[aliases.length - 1];
             for (int i = 0; i < aliases.length; i++) {
                 if (i != n) {
                     results[j++] = aliases[i];
@@ -748,7 +757,7 @@ public class StandardHost extends ContainerBase implements Host {
 
         // Set error report valve
         String errorValve = getErrorReportValveClass();
-        if ((errorValve != null) && (!errorValve.equals(""))) {
+        if ((errorValve != null) && (!errorValve.isEmpty())) {
             try {
                 boolean found = false;
                 Valve[] valves = getPipeline().getValves();
@@ -801,11 +810,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     protected String getObjectNameKeyProperties() {
-
-        StringBuilder keyProperties = new StringBuilder("type=Host");
-        keyProperties.append(getMBeanKeyProperties());
-
-        return keyProperties.toString();
+        return "type=Host" + getMBeanKeyProperties();
     }
 
 }

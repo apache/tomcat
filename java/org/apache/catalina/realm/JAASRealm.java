@@ -108,16 +108,13 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <blockquote><code>CATALINA_OPTS="-Djava.security.auth.login.config=$CATALINA_HOME/conf/jaas.config"</code></blockquote>
  * </li>
  * <li>As part of the login process, JAASRealm registers its own <code>CallbackHandler</code>, called (unsurprisingly)
- * <code>JAASCallbackHandler</code>. This handler supplies the HTTP requests's username and credentials to the
+ * <code>JAASCallbackHandler</code>. This handler supplies the HTTP requests' username and credentials to the
  * user-supplied <code>LoginModule</code></li>
  * <li>As with other <code>Realm</code> implementations, digested passwords are supported if the
  * <code>&lt;Realm&gt;</code> element in <code>server.xml</code> contains a <code>digest</code> attribute;
  * <code>JAASCallbackHandler</code> will digest the password prior to passing it back to the
  * <code>LoginModule</code></li>
  * </ul>
- *
- * @author Craig R. McClanahan
- * @author Yoav Shapira
  */
 public class JAASRealm extends RealmBase {
 
@@ -161,7 +158,7 @@ public class JAASRealm extends RealmBase {
     protected volatile boolean jaasConfigurationLoaded = false;
 
     /**
-     * Keeps track if JAAS invocation of login modules was successful or not. By default it is true unless we detect
+     * Keeps track if JAAS invocation of login modules was successful or not. By default, it is true unless we detect
      * JAAS login module can't perform the login. This will be used for realm's {@link #isAvailable()} status so that
      * {@link LockOutRealm} will not lock the user out if JAAS login modules are unavailable to perform the actual
      * login.
@@ -271,7 +268,7 @@ public class JAASRealm extends RealmBase {
 
         String[] classNames = classNamesString.split("[ ]*,[ ]*");
         for (String className : classNames) {
-            if (className.length() == 0) {
+            if (className.isEmpty()) {
                 continue;
             }
             try {
@@ -329,7 +326,7 @@ public class JAASRealm extends RealmBase {
     /**
      * Perform the actual JAAS authentication.
      *
-     * @param username        The user name
+     * @param username        The username
      * @param callbackHandler The callback handler
      *
      * @return the associated principal, or <code>null</code> if there is none.
@@ -338,7 +335,6 @@ public class JAASRealm extends RealmBase {
 
         // Establish a LoginContext to use for authentication
         try {
-            LoginContext loginContext = null;
             if (appName == null) {
                 appName = "Tomcat";
             }
@@ -357,12 +353,13 @@ public class JAASRealm extends RealmBase {
                 currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
 
+            LoginContext loginContext;
             try {
                 Configuration config = getConfig();
                 loginContext = new LoginContext(appName, null, callbackHandler, config);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("jaasRealm.unexpectedError"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("jaasRealm.unexpectedError"), t);
                 // There is configuration issue with JAAS so mark the realm as
                 // unavailable
                 invocationSuccess = false;
@@ -378,7 +375,7 @@ public class JAASRealm extends RealmBase {
             }
 
             // Negotiate a login via this LoginContext
-            Subject subject = null;
+            Subject subject;
             try {
                 loginContext.login();
                 subject = loginContext.getSubject();
@@ -395,7 +392,7 @@ public class JAASRealm extends RealmBase {
                 }
             } catch (AccountExpiredException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.accountExpired", username));
+                    log.debug(sm.getString("jaasRealm.accountExpired", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
@@ -403,7 +400,7 @@ public class JAASRealm extends RealmBase {
                 return null;
             } catch (CredentialExpiredException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.credentialExpired", username));
+                    log.debug(sm.getString("jaasRealm.credentialExpired", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
@@ -411,7 +408,7 @@ public class JAASRealm extends RealmBase {
                 return null;
             } catch (FailedLoginException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.failedLogin", username));
+                    log.debug(sm.getString("jaasRealm.failedLogin", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
@@ -423,10 +420,10 @@ public class JAASRealm extends RealmBase {
                 // invocations so mark JAAS realm as available
                 invocationSuccess = true;
                 return null;
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("jaasRealm.unexpectedError"), e);
-                // JAAS throws exception different than LoginException so mark the
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("jaasRealm.unexpectedError"), t);
+                // JAAS throws exception different from LoginException so mark the
                 // realm as unavailable
                 invocationSuccess = false;
                 return null;
@@ -451,7 +448,7 @@ public class JAASRealm extends RealmBase {
             return principal;
         } catch (Throwable t) {
             log.error(sm.getString("jaasRealm.unexpectedError"), t);
-            // JAAS throws exception different than LoginException so mark the realm as unavailable
+            // JAAS throws exception different from LoginException so mark the realm as unavailable
             invocationSuccess = false;
             return null;
         }
@@ -459,7 +456,7 @@ public class JAASRealm extends RealmBase {
 
 
     /**
-     * @return the password associated with the given principal's user name. This always returns null as the JAASRealm
+     * @return the password associated with the given principal's username. This always returns null as the JAASRealm
      *             has no way of obtaining this information.
      */
     @Override
@@ -485,7 +482,7 @@ public class JAASRealm extends RealmBase {
      * the LoginModules are mapped to roles, but only if their respective classes match one of the "role class" classes.
      * If a user Principal cannot be constructed, return <code>null</code>.
      *
-     * @param username     The associated user name
+     * @param username     The associated username
      * @param subject      The <code>Subject</code> representing the logged-in user
      * @param loginContext Associated with the Principal so {@link LoginContext#logout()} can be called later
      *
@@ -528,7 +525,7 @@ public class JAASRealm extends RealmBase {
             }
             return null;
         } else {
-            if (roles.size() == 0) {
+            if (roles.isEmpty()) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.rolePrincipalFailure"));
                 }
@@ -601,7 +598,7 @@ public class JAASRealm extends RealmBase {
                         (Class<Configuration>) Class.forName("com.sun.security.auth.login.ConfigFile");
                 Constructor<Configuration> constructor = sunConfigFile.getConstructor(URI.class);
                 URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
-                Configuration config = null;
+                Configuration config;
                 if (resource == null) {
                     try (ConfigurationSource.Resource configFileResource =
                             ConfigFileLoader.getSource().getResource(configFile)) {

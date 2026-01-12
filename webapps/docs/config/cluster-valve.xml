@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Cluster Valve object</title>
   </properties>
 
@@ -128,11 +127,47 @@
         <p>Sets the host domain to be used for sso cookies.</p>
       </attribute>
       <attribute name="mapSendOptions" required="false">
-        <p>The Valve uses a replicated map. You can setup the flag for how this
-        map sends messages. The default value is <code>6</code> (synchronous).
-        Note that if you use asynchronous messaging it is possible for update
-        messages to be processed by the receiving node in a different order to
-        the order in which they were sent.</p>
+        <p>The valve uses a replicated map. This map sends and receives messages
+        internally. You can configure the flag that controls how this map sends
+        messages.</p>
+        <p>The value may be specified either as an integer (add values to use
+        multiple flags) or using a comma-separate list of the human-readable
+        option names. Human-readable names are translated to their integer
+        values on startup.</p>
+        <p>The different values offer a tradeoff between throughput on the
+        sending node and the reliability of replication should the sending or
+        receiving node(s) fail.</p>
+        <p>The supported values are:</p>
+        <dl>
+          <dt><code>byte_message</code>, <code>byte</code> or
+              <code>1</code></dt>
+          <dd>The message is a pure byte message and no marshaling or
+              unmarshalling will be performed</dd>
+          <dt><code>use_ack</code> or <code>2</code></dt>
+          <dd>The message is sent and an ACK is received when the message has
+              been received by the recipient. If no ack is received, the message
+              is not considered successful.</dd>
+          <dt><code>synchronized_ack</code>, <code>sync</code> or
+              <code>4</code></dt>
+          <dd>Has no effect unless <code>use_ack</code> is set. The message is
+              sent and an ACK is received when the message has been received and
+              processed by the recipient. If no ack is received, the message is
+              not considered successful.</dd>
+          <dt><code>asynchronous</code>, <code>async</code> or
+              <code>8</code></dt>
+          <dd>The message will be placed on a queue and sent by a separate
+              thread. It is possible for update messages for a session to be
+              processed by the receiving node in a different order to the order
+              in which they were sent.</dd>
+          <dt><code>secure</code> or <code>16</code></dt>
+          <dd>Not implemented. Has no effect if used.</dd>
+          <dt><code>udp</code> or <code>32</code></dt>
+          <dd>The message will be sent using UDP instead of TCP.</dd>
+          <dt><code>multicast</code> or <code>64</code></dt>
+          <dd>Not implemented. Messages will not be sent if used.</dd>
+        </dl>
+        <p>The default value is <code>6</code> (<code>use_ack</code> with
+        <code>sync</code>).</p>
       </attribute>
       <attribute name="requireReauthentication" required="false">
         <p>Default false. Flag to determine whether each request needs to be

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,7 +62,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * The default implementation of a Channel.<br>
  * The GroupChannel manages the replication channel. It coordinates message being sent and received with membership
- * announcements. The channel has an chain of interceptors that can modify the message or perform other logic.<br>
+ * announcements. The channel has a chain of interceptors that can modify the message or perform other logic.<br>
  * It manages a complete group, both membership and replication.
  */
 public class GroupChannel extends ChannelInterceptorBase implements ManagedChannel, JmxChannel, GroupChannelMBean {
@@ -216,7 +217,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             ChannelData data = new ChannelData(true);// generates a unique Id
             data.setAddress(getLocalMember(false));
             data.setTimestamp(System.currentTimeMillis());
-            byte[] b = null;
+            byte[] b;
             if (msg instanceof ByteMessage) {
                 b = ((ByteMessage) msg).getMessage();
                 options = options | SEND_OPTIONS_BYTE_MESSAGE;
@@ -255,7 +256,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * Callback from the interceptor stack. <br>
      * When a message is received from a remote node, this method will be invoked by the previous interceptor.<br>
-     * This method can also be used to send a message to other components within the same application, but its an
+     * This method can also be used to send a message to other components within the same application, but it's an
      * extreme case, and you're probably better off doing that logic between the applications itself.
      *
      * @param msg ChannelMessage
@@ -271,14 +272,14 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                         new java.sql.Timestamp(System.currentTimeMillis()) + " from " + msg.getAddress().getName());
             }
 
-            Serializable fwd = null;
+            Serializable fwd;
             if ((msg.getOptions() & SEND_OPTIONS_BYTE_MESSAGE) == SEND_OPTIONS_BYTE_MESSAGE) {
                 fwd = new ByteMessage(msg.getMessage().getBytes());
             } else {
                 try {
                     fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0, msg.getMessage().getLength());
-                } catch (Exception sx) {
-                    log.error(sm.getString("groupChannel.unable.deserialize", msg), sx);
+                } catch (Exception e) {
+                    log.error(sm.getString("groupChannel.unable.deserialize", msg), e);
                     return;
                 }
             }
@@ -310,13 +311,13 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 Logs.MESSAGES.trace("GroupChannel delivered[" + delivered + "] id:" + new UniqueId(msg.getUniqueId()));
             }
 
-        } catch (Exception x) {
+        } catch (Exception e) {
             // this could be the channel listener throwing an exception, we should log it
             // as a warning.
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("groupChannel.receiving.error"), x);
+                log.warn(sm.getString("groupChannel.receiving.error"), e);
             }
-            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"), x);
+            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"), e);
         }
     }
 
@@ -336,8 +337,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
             RpcMessage.NoRpcChannelReply reply = new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
             send(new Member[] { destination }, reply, SEND_OPTIONS_ASYNCHRONOUS);
-        } catch (Exception x) {
-            log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"), e);
         }
     }
 
@@ -421,7 +422,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             } // end if
             first = first.getNext();
         } // while
-        if (conflicts.length() > 0) {
+        if (!conflicts.isEmpty()) {
             throw new ChannelException(sm.getString("groupChannel.optionFlag.conflict", conflicts.toString()));
         }
 
@@ -450,7 +451,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     protected void startHeartbeat() {
-        if (heartbeat && (heartbeatFuture == null || (heartbeatFuture != null && heartbeatFuture.isDone()))) {
+        if (heartbeat && (heartbeatFuture == null || heartbeatFuture.isDone())) {
             if (heartbeatFuture != null && heartbeatFuture.isDone()) {
                 // There was an error executing the scheduled task, get it and log it
                 try {
@@ -492,11 +493,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @return ChannelInterceptor
      */
     public ChannelInterceptor getFirstInterceptor() {
-        if (interceptors != null) {
-            return interceptors;
-        } else {
-            return coordinator;
-        }
+        return Objects.requireNonNullElse(interceptors, coordinator);
     }
 
     @Override

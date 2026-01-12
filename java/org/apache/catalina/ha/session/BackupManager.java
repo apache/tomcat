@@ -100,8 +100,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
     // =========================================================================
     @Override
     public void objectMadePrimary(Object key, Object value) {
-        if (value instanceof DeltaSession) {
-            DeltaSession session = (DeltaSession) value;
+        if (value instanceof DeltaSession session) {
             synchronized (session) {
                 session.access();
                 session.setPrimarySession(true);
@@ -123,13 +122,10 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
 
     /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}. Starts the cluster communication channel, this
-     * will connect with the other nodes in the cluster, and request the current session state to be transferred to this
-     * node.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
+     * {@inheritDoc}
+     * <p>
+     * Starts the cluster communication channel, this will connect with the other nodes in the cluster, and request the
+     * current session state to be transferred to this node.
      */
     @Override
     protected void startInternal() throws LifecycleException {
@@ -145,9 +141,9 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
             map.setChannelSendOptions(mapSendOptions);
             map.setAccessTimeout(accessTimeout);
             this.sessions = map;
-        } catch (Exception x) {
-            log.error(sm.getString("backupManager.startUnable", getName()), x);
-            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()), x);
+        } catch (Exception e) {
+            log.error(sm.getString("backupManager.startUnable", getName()), e);
+            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()), e);
         }
         setState(LifecycleState.STARTING);
     }
@@ -162,12 +158,9 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
 
     /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}. This will disconnect the cluster communication
-     * channel and stop the listener thread.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
+     * {@inheritDoc}
+     * <p>
+     * This will disconnect the cluster communication channel and stop the listener thread.
      */
     @Override
     protected void stopInternal() throws LifecycleException {
@@ -178,8 +171,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
         setState(LifecycleState.STOPPING);
 
-        if (sessions instanceof LazyReplicatedMap) {
-            LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
+        if (sessions instanceof LazyReplicatedMap<String,Session> map) {
             map.breakdown();
         }
 
@@ -265,8 +257,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
     @Override
     public Set<String> getSessionIdsFull() {
         LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
-        Set<String> sessionIds = new HashSet<>(map.keySetFull());
-        return sessionIds;
+        return new HashSet<>(map.keySetFull());
     }
 
 }

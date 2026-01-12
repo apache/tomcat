@@ -98,8 +98,8 @@ public class PojoMethodMapping {
                 if (method.isSynthetic()) {
                     // Skip all synthetic methods.
                     // They may have copies of annotations from methods we are
-                    // interested in and they will use the wrong parameter type
-                    // (they always use Object) so we can't used them here.
+                    // interested in, and they will use the wrong parameter type
+                    // (they always use Object) so we can't use them here.
                     continue;
                 }
                 if (method.getAnnotation(OnOpen.class) != null) {
@@ -159,7 +159,7 @@ public class PojoMethodMapping {
             }
             currentClazz = currentClazz.getSuperclass();
         }
-        // If the methods are not on clazzPojo and they are overridden
+        // If the methods are not on clazzPojo, and they are overridden
         // by a non annotated method in clazzPojo, they should be ignored
         if (open != null && open.getDeclaringClass() != clazzPojo) {
             if (isOverridenWithoutAnnotation(clazzPojoMethods, open, OnOpen.class)) {
@@ -229,7 +229,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnOpenArgs(Map<String, String> pathParameters, Session session, EndpointConfig config)
+    public Object[] getOnOpenArgs(Map<String,String> pathParameters, Session session, EndpointConfig config)
             throws DecodeException {
         return buildArgs(onOpenParams, pathParameters, session, config, null, null);
     }
@@ -240,7 +240,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnCloseArgs(Map<String, String> pathParameters, Session session, CloseReason closeReason)
+    public Object[] getOnCloseArgs(Map<String,String> pathParameters, Session session, CloseReason closeReason)
             throws DecodeException {
         return buildArgs(onCloseParams, pathParameters, session, null, null, closeReason);
     }
@@ -251,7 +251,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnErrorArgs(Map<String, String> pathParameters, Session session, Throwable throwable)
+    public Object[] getOnErrorArgs(Map<String,String> pathParameters, Session session, Throwable throwable)
             throws DecodeException {
         return buildArgs(onErrorParams, pathParameters, session, null, throwable, null);
     }
@@ -262,7 +262,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String, String> pathParameters, Session session,
+    public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String,String> pathParameters, Session session,
             EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageHandlerInfo messageMethod : onMessage) {
@@ -314,7 +314,7 @@ public class PojoMethodMapping {
     }
 
 
-    private static Object[] buildArgs(PojoPathParam[] pathParams, Map<String, String> pathParameters, Session session,
+    private static Object[] buildArgs(PojoPathParam[] pathParams, Map<String,String> pathParameters, Session session,
             EndpointConfig config, Throwable throwable, CloseReason closeReason) throws DecodeException {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
@@ -354,10 +354,10 @@ public class PojoMethodMapping {
         private int indexInputStream = -1;
         private int indexReader = -1;
         private int indexPrimitive = -1;
-        private Map<Integer, PojoPathParam> indexPathParams = new HashMap<>();
+        private final Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
         private DecoderMatch decoderMatch = null;
-        private long maxMessageSize = -1;
+        private final long maxMessageSize;
 
         MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries) throws DeploymentException {
 
@@ -564,24 +564,24 @@ public class PojoMethodMapping {
 
         private boolean isText() {
             return indexString >= 0 || indexPrimitive >= 0 || indexReader >= 0 ||
-                    (decoderMatch != null && decoderMatch.getTextDecoders().size() > 0);
+                    (decoderMatch != null && !decoderMatch.getTextDecoders().isEmpty());
         }
 
 
         private boolean isBinary() {
             return indexByteArray >= 0 || indexByteBuffer >= 0 || indexInputStream >= 0 ||
-                    (decoderMatch != null && decoderMatch.getBinaryDecoders().size() > 0);
+                    (decoderMatch != null && !decoderMatch.getBinaryDecoders().isEmpty());
         }
 
 
-        public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String, String> pathParameters, Session session,
+        public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String,String> pathParameters, Session session,
                 EndpointConfig config) {
             Object[] params = new Object[m.getParameterTypes().length];
 
-            for (Map.Entry<Integer, PojoPathParam> entry : indexPathParams.entrySet()) {
+            for (Map.Entry<Integer,PojoPathParam> entry : indexPathParams.entrySet()) {
                 PojoPathParam pathParam = entry.getValue();
                 String valueString = pathParameters.get(pathParam.getName());
-                Object value = null;
+                Object value;
                 try {
                     value = Util.coerceToType(pathParam.getType(), valueString);
                 } catch (Exception e) {
@@ -617,21 +617,21 @@ public class PojoMethodMapping {
                             indexInputStream, true, indexSession, true, maxMessageSize);
                     results.add(mh);
                 } else if (decoderMatch != null && decoderMatch.hasMatches()) {
-                    if (decoderMatch.getBinaryDecoders().size() > 0) {
+                    if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                         MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo, m, session, config,
                                 decoderMatch.getBinaryDecoders(), params, indexPayload, true, indexSession, true,
                                 maxMessageSize);
                         results.add(mh);
                     }
-                    if (decoderMatch.getTextDecoders().size() > 0) {
+                    if (!decoderMatch.getTextDecoders().isEmpty()) {
                         MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m, session, config,
                                 decoderMatch.getTextDecoders(), params, indexPayload, true, indexSession,
                                 maxMessageSize);
                         results.add(mh);
                     }
                 } else {
-                    MessageHandler mh = new PojoMessageHandlerWholePong(pojo, m, session, params, indexPong, false,
-                            indexSession);
+                    MessageHandler mh =
+                            new PojoMessageHandlerWholePong(pojo, m, session, params, indexPong, false, indexSession);
                     results.add(mh);
                 }
             } else {

@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.io.Serial;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -263,7 +264,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     // Copied from org.apache.tomcat.util.buf.HexUtils
     // @formatter:off
     private static final int[] DEC = {
-        00, 01, 02, 03, 04, 05, 06, 07,  8,  9, -1, -1, -1, -1, -1, -1,
+        0, 1, 2, 3, 4, 5, 6, 7,  8,  9, -1, -1, -1, -1, -1, -1,
         -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, 10, 11, 12, 13, 14, 15,
@@ -390,7 +391,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
 
         public void shutdown() {
-            // Individual Cipher and SecureRandom objects need no explicit teardown
+            // Individual Cipher and SecureRandom objects need no explicit tear down
             cipherPool.clear();
             randomPool.clear();
         }
@@ -581,6 +582,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     }
 
     static class ChannelConfigException extends ChannelException {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         ChannelConfigException(String message) {

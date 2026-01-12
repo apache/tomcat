@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
  * DefaultEvictionPolicy} for a pool, users must provide an implementation of
  * this interface that provides the required eviction policy.
  *
- * @param <T> the type of objects in the pool
+ * @param <T> the type of objects in the pool.
  * @since 2.0
  */
 public interface EvictionPolicy<T> {

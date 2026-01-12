@@ -89,9 +89,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (response instanceof HttpServletResponse) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+        if (response instanceof HttpServletResponse httpResponse) {
             if (response.isCommitted()) {
                 throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
             }
@@ -147,11 +145,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     public void setHstsMaxAgeSeconds(int hstsMaxAgeSeconds) {
-        if (hstsMaxAgeSeconds < 0) {
-            this.hstsMaxAgeSeconds = 0;
-        } else {
-            this.hstsMaxAgeSeconds = hstsMaxAgeSeconds;
-        }
+        this.hstsMaxAgeSeconds = Math.max(hstsMaxAgeSeconds, 0);
     }
 
 

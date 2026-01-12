@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.LinkedHashMap;
@@ -80,6 +81,7 @@ public class LockOutRealm extends CombinedRealm {
          * retained.
          */
         failedUsers = new LinkedHashMap<>(cacheSize, 0.75f, true) {
+            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -134,8 +136,8 @@ public class LockOutRealm extends CombinedRealm {
     @Override
     public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
         if (gssContext.isEstablished()) {
-            String username = null;
-            GSSName name = null;
+            String username;
+            GSSName name;
             try {
                 name = gssContext.getSrcName();
             } catch (GSSException e) {
@@ -202,10 +204,10 @@ public class LockOutRealm extends CombinedRealm {
 
     /*
      * Checks to see if the current user is locked. If this is associated with a login attempt, then the last access
-     * time will be recorded and any attempt to authenticated a locked user will log a warning.
+     * time will be recorded and any attempt to authenticate a locked user will log a warning.
      */
     public boolean isLocked(String username) {
-        LockRecord lockRecord = null;
+        LockRecord lockRecord;
         synchronized (this) {
             lockRecord = failedUsers.get(username);
         }
@@ -216,13 +218,10 @@ public class LockOutRealm extends CombinedRealm {
         }
 
         // Check to see if user is locked
-        if (lockRecord.getFailures() >= failureCount &&
-                (System.currentTimeMillis() - lockRecord.getLastFailureTime()) / 1000 < lockOutTime) {
-            return true;
-        }
+        // Otherwise, user has not, yet, exceeded lock thresholds
+        return lockRecord.getFailures() >= failureCount &&
+                (System.currentTimeMillis() - lockRecord.getLastFailureTime()) / 1000 < lockOutTime;
 
-        // User has not, yet, exceeded lock thresholds
-        return false;
     }
 
 
@@ -239,7 +238,7 @@ public class LockOutRealm extends CombinedRealm {
      * After a failed authentication, add the record of the failed authentication.
      */
     private void registerAuthFailure(String username) {
-        LockRecord lockRecord = null;
+        LockRecord lockRecord;
         synchronized (this) {
             if (!failedUsers.containsKey(username)) {
                 lockRecord = new LockRecord();

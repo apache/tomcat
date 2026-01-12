@@ -84,8 +84,7 @@ public class TextOptimizer {
         @Override
         public void visit(Node.TemplateText n) throws JasperException {
             if (n.isAllSpace()) {
-                if ((options.getTrimSpaces() == TrimSpacesOption.TRUE ||
-                        pageInfo.isTrimDirectiveWhitespaces())) {
+                if ((options.getTrimSpaces() == TrimSpacesOption.TRUE || pageInfo.isTrimDirectiveWhitespaces())) {
                     n.setText(EMPTY_TEXT);
                     return;
                 } else if (options.getTrimSpaces() == TrimSpacesOption.SINGLE) {
@@ -105,8 +104,8 @@ public class TextOptimizer {
         }
 
         /**
-         * This method breaks concatenation mode.  As a side effect it copies
-         * the concatenated string to the first text node
+         * This method breaks concatenation mode. As a side effect it copies the concatenated string to the first text
+         * node
          */
         private void collectText() {
 
@@ -119,8 +118,7 @@ public class TextOptimizer {
 
     }
 
-    public static void concatenate(Compiler compiler, Node.Nodes page)
-            throws JasperException {
+    public static void concatenate(Compiler compiler, Node.Nodes page) throws JasperException {
 
         TextCatVisitor v = new TextCatVisitor(compiler);
         page.visit(v);

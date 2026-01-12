@@ -64,7 +64,7 @@ public class McastServiceImpl extends MembershipProviderBase {
      */
     protected MulticastSocket socket;
     /**
-     * The local member that we intend to broad cast over and over again
+     * The local member that we intend to broadcast over and over again
      */
     protected final MemberImpl member;
     /**
@@ -116,7 +116,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     /**
      * Read timeout on the mcast socket
      */
-    protected int mcastSoTimeout = -1;
+    protected int mcastSoTimeout;
     /**
      * bind address
      */
@@ -202,13 +202,17 @@ public class McastServiceImpl extends MembershipProviderBase {
                  * On some platforms (e.g. Linux) it is not possible to bind to the multicast address. In this case only
                  * bind to the port.
                  */
-                log.info(sm.getString("mcastServiceImpl.bind.failed"));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.bind.failed"), e);
+                } else {
+                    log.info(sm.getString("mcastServiceImpl.bind.failed"));
+                }
                 socket = new MulticastSocket(port);
             }
         } else {
             socket = new MulticastSocket(port);
         }
-        // Hint if we want disable loop back(local machine) messages
+        // Hint if we want to disable loop back(local machine) messages
         socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(!localLoopbackDisabled));
         if (mcastBindAddress != null) {
             if (log.isInfoEnabled()) {
@@ -289,6 +293,7 @@ public class McastServiceImpl extends MembershipProviderBase {
         try {
             Thread.sleep(memberwait);
         } catch (InterruptedException ignore) {
+            // Ignore
         }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.waitForMembers.done", Integer.toString(level)));
@@ -328,13 +333,19 @@ public class McastServiceImpl extends MembershipProviderBase {
             // leave mcast group
             try {
                 socket.leaveGroup(new InetSocketAddress(address, 0), null);
-            } catch (Exception ignore) {
-                // NO-OP
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
             }
             try {
                 socket.close();
-            } catch (Exception ignore) {
-                // NO-OP
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
             }
             member.setServiceStartTime(-1);
         }
@@ -347,9 +358,7 @@ public class McastServiceImpl extends MembershipProviderBase {
      * @throws IOException Received failed
      */
     public void receive() throws IOException {
-        boolean checkexpired = true;
         try {
-
             socket.receive(receivePacket);
             if (receivePacket.getLength() > MAX_PACKET_SIZE) {
                 log.error(sm.getString("mcastServiceImpl.packet.tooLong", Integer.toString(receivePacket.getLength())));
@@ -361,16 +370,14 @@ public class McastServiceImpl extends MembershipProviderBase {
                 } else {
                     memberBroadcastsReceived(data);
                 }
-
             }
-        } catch (SocketTimeoutException x) {
-            // do nothing, this is normal, we don't want to block forever
-            // since the receive thread is the same thread
-            // that does membership expiration
+        } catch (SocketTimeoutException ignore) {
+            /*
+             * Do nothing. This is normal. We don't want to block forever since the receive thread is the same thread
+             * that does membership expiration.
+             */
         }
-        if (checkexpired) {
-            checkExpired();
-        }
+        checkExpired();
     }
 
     private void memberDataReceived(byte[] data) {
@@ -474,8 +481,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                         }
                     };
                     executor.execute(t);
-                } catch (Exception x) {
-                    log.error(sm.getString("mcastServiceImpl.memberDisappeared.failed"), x);
+                } catch (Exception e) {
+                    log.error(sm.getString("mcastServiceImpl.memberDisappeared.failed"), e);
                 }
             }
         }
@@ -520,7 +527,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     }
 
     public long getServiceStartTime() {
-        return (member != null) ? member.getServiceStartTime() : -1l;
+        return (member != null) ? member.getServiceStartTime() : -1L;
     }
 
     public int getRecoveryCounter() {
@@ -567,14 +574,14 @@ public class McastServiceImpl extends MembershipProviderBase {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("mcastServiceImpl.invalidMemberPackage"), ax);
                     }
-                } catch (Exception x) {
+                } catch (Exception e) {
                     if (errorCounter == 0 && doRunReceiver) {
-                        log.warn(sm.getString("mcastServiceImpl.error.receiving"), x);
+                        log.warn(sm.getString("mcastServiceImpl.error.receiving"), e);
                     } else if (log.isDebugEnabled()) {
                         if (doRunReceiver) {
-                            log.debug(sm.getString("mcastServiceImpl.error.receiving"), x);
+                            log.debug(sm.getString("mcastServiceImpl.error.receiving"), e);
                         } else {
-                            log.warn(sm.getString("mcastServiceImpl.error.receivingNoSleep"), x);
+                            log.debug(sm.getString("mcastServiceImpl.error.receivingNoSleep"), e);
                         }
                     }
                     if (doRunReceiver) {
@@ -613,11 +620,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                 try {
                     send(true);
                     errorCounter = 0;
-                } catch (Exception x) {
+                } catch (Exception e) {
                     if (errorCounter == 0) {
-                        log.warn(sm.getString("mcastServiceImpl.send.failed"), x);
+                        log.warn(sm.getString("mcastServiceImpl.send.failed"), e);
                     } else {
-                        log.debug(sm.getString("mcastServiceImpl.send.failed"), x);
+                        log.debug(sm.getString("mcastServiceImpl.send.failed"), e);
                     }
                     if ((++errorCounter) >= recoveryCounter) {
                         errorCounter = 0;
@@ -668,8 +675,8 @@ public class McastServiceImpl extends MembershipProviderBase {
             try {
                 parent.stop(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
                 return true;
-            } catch (Exception x) {
-                log.warn(sm.getString("mcastServiceImpl.recovery.stopFailed"), x);
+            } catch (Exception e) {
+                log.warn(sm.getString("mcastServiceImpl.recovery.stopFailed"), e);
                 return false;
             }
         }
@@ -679,8 +686,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                 parent.init();
                 parent.start(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
                 return true;
-            } catch (Exception x) {
-                log.warn(sm.getString("mcastServiceImpl.recovery.startFailed"), x);
+            } catch (Exception e) {
+                log.warn(sm.getString("mcastServiceImpl.recovery.startFailed"), e);
                 return false;
             }
         }

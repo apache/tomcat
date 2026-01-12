@@ -64,8 +64,8 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
             ParallelNioSender sender = new ParallelNioSender();
             transferProperties(this, sender);
             return sender;
-        } catch (IOException x) {
-            throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"), x);
+        } catch (IOException ioe) {
+            throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"), ioe);
         }
     }
 }

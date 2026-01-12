@@ -27,8 +27,6 @@ import org.xml.sax.Attributes;
 /**
  * Rule that copies the <code>parentClassLoader</code> property from the next-to-top item on the stack (which must be a
  * <code>Container</code>) to the top item on the stack (which must also be a <code>Container</code>).
- *
- * @author Craig R. McClanahan
  */
 public class CopyParentClassLoaderRule extends Rule {
 
@@ -54,7 +52,7 @@ public class CopyParentClassLoaderRule extends Rule {
         }
         Container child = (Container) digester.peek(0);
         Object parent = digester.peek(1);
-        Method method = parent.getClass().getMethod("getParentClassLoader", new Class[0]);
+        Method method = parent.getClass().getMethod("getParentClassLoader");
         ClassLoader classLoader = (ClassLoader) method.invoke(parent, new Object[0]);
         child.setParentClassLoader(classLoader);
 

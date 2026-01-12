@@ -34,8 +34,6 @@ import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * Chunked output filter.
- *
- * @author Remy Maucherat
  */
 public class ChunkedOutputFilter implements OutputFilter {
 

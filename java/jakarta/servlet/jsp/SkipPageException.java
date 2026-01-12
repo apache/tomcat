@@ -16,6 +16,8 @@
  */
 package jakarta.servlet.jsp;
 
+import java.io.Serial;
+
 /**
  * Exception to indicate the calling page must cease evaluation. Thrown by a simple tag handler to indicate that the
  * remainder of the page must not be evaluated. The result is propagated back to the page in the case where one tag
@@ -32,6 +34,7 @@ package jakarta.servlet.jsp;
  */
 public class SkipPageException extends JspException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

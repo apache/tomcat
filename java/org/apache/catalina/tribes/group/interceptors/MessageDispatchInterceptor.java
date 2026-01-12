@@ -244,18 +244,18 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
                 if (handler != null) {
                     handler.handleCompletion(new UniqueId(msg.getUniqueId()));
                 }
-            } catch (Exception ex) {
-                log.error(sm.getString("messageDispatchInterceptor.completeMessage.failed"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("messageDispatchInterceptor.completeMessage.failed"), e);
             }
-        } catch (Exception x) {
-            ChannelException cx = null;
-            if (x instanceof ChannelException) {
-                cx = (ChannelException) x;
+        } catch (Exception e) {
+            ChannelException cx;
+            if (e instanceof ChannelException) {
+                cx = (ChannelException) e;
             } else {
-                cx = new ChannelException(x);
+                cx = new ChannelException(e);
             }
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("messageDispatchInterceptor.AsyncMessage.failed"), x);
+                log.debug(sm.getString("messageDispatchInterceptor.AsyncMessage.failed"), e);
             }
             try {
                 if (handler != null) {

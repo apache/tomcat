@@ -76,7 +76,7 @@ public class ContentRange {
     public static ContentRange parse(StringReader input) throws IOException {
         // Units (required)
         String units = HttpParser.readToken(input);
-        if (units == null || units.length() == 0) {
+        if (units == null || units.isEmpty()) {
             return null;
         }
 

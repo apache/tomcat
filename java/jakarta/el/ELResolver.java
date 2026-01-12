@@ -16,9 +16,6 @@
  */
 package jakarta.el;
 
-/**
- * @author Jacob Hookom [jacob/hookom.net]
- */
 public abstract class ELResolver {
 
     /**
@@ -39,7 +36,7 @@ public abstract class ELResolver {
     public abstract Object getValue(ELContext context, Object base, Object property);
 
     /**
-     * Invokes a method on the the given object.
+     * Invokes a method on the given object.
      *
      * @param context    The EL context for this evaluation
      * @param base       The base object on which the method is to be found
@@ -113,7 +110,7 @@ public abstract class ELResolver {
      * @param context The context in which the examination takes place
      * @param base    The object to examine
      *
-     * @return {code null} if the most common type cannot be determine, otherwise the most common type
+     * @return {code null} if the most common type cannot be determined, otherwise the most common type
      */
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 
@@ -132,5 +129,24 @@ public abstract class ELResolver {
     public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         return null;
+    }
+
+    /**
+     * This class is used as a key for {@link ELContext#getContext(Class)}. The key references a context object that if
+     * present and set to {@code Boolean#TRUE}, indicates that the identifier being resolved is a single, stand-alone
+     * identifier. This allows {@link ELResolver} instances - and in particular
+     * {@code jakarta.servlet.jsp.el.ImportELResolver} - to optimise the resolution of the identifier and avoid
+     * unnecessary and expensive class loader lookups.
+     * <p>
+     * The EL implementation is required to set this key with the value {@code Boolean#TRUE} when resolving a single,
+     * stand-alone identifier.
+     *
+     * @since EL 6.1
+     */
+    public static class StandaloneIdentifierMarker {
+
+        private StandaloneIdentifierMarker() {
+            // Non-public default constructor as there is no need to create instances of this class.
+        }
     }
 }

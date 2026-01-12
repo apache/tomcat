@@ -109,15 +109,23 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.2 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.15 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <add>
+        Add <code>test.silent</code> property to suppress JUnit console output
+        during test execution. Useful for cleaner console output when running
+        tests with multiple threads. (csutherl)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add the Jakarta EE 12 XML schemas. (markt)
+      </add>
       <add>
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
@@ -128,21 +136,71 @@
         <code>AccessLog</code> and was not implemented in a scalable way.
         (remm)
       </update>
+      <add>
+        Added support for limiting the number of parameters in HTTP requests through
+        the new <code>ParameterLimitValve</code>. The valve allows configurable
+        URL-specific limits on the number of parameters. (dsoumis)
+      </add>
       <fix>
         Remove the <code>useAcceptRanges</code> initialisation parameter for
         the default servlet. It is now effectively hard coded to
         <code>true</code>. (markt)
       </fix>
+      <update>
+        Change the default for the <code>encodedSolidusHandling</code> attribute
+        of <strong>Context</strong> from <code>decode</code> to
+        <code>reject</code>. (markt)
+      </update>
+      <fix>
+        When searching the web application class loader for a resource or
+        resources by name, align the behaviour with the JRE class loaders and
+        always return <code>null</code> if the provided name starts with
+        <code>/</code>. (markt)
+      </fix>
+      <update>
+        Update the default value for the <code>allowPostAsGet</code>
+        initialisation parameter of the Default servlet from <code>true</code>
+        to <code>false</code>. This means a direct request (i.e. not a forward
+        or an include) for a static resource using the POST method will be
+        rejected by default. (markt)
+      </update>
+      <scode>
+        Calls to <code>HttpServletRequest.getContextPath()</code> now return the
+        canonical context path for the web application rather than the component
+        of the request URI presented by the user agent that maps to the context
+        path. (markt)
+      </scode>
+      <update>
+        Change the default value of the <code>archiveIndexStrategy</code>
+        attribute of the <code>Resources</code> element from <code>simple</code>
+        to <code>bloom</code> to improve web application class loading
+        performance. (markt)
+      </update>
+      <update>
+        Remove regular expression support for the configuration of internal and
+        trusted proxies for the <code>RemoteIpFilter</code> and
+        <code>RemoteIpValve</code>. (markt)
+      </update>
+      <update>
+        Remove the <code>RemoteAddrFilter</code> and
+        <code>RemoteAddrValve</code>. (markt)
+      </update>
+      <update>
+        Change the default for the <code>digestInRfc3112Order</code> attribute
+        of <code>MessageDigestCredentialHandler</code> from <code>false</code>
+        to <code>true</code>. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Add <code>tableName</code> configuration on the
-        <code>DataSourcePropertyStore</code> that may be used by the WebDAV
-        Servlet. (remm)
-      </update>
-      <update>
-        Improve HTTP If headers processing according to RFC 9110. Based on pull
-        request <pr>796</pr> by Chenjp. (remm/markt)
-      </update>
+      <fix>
+        <bug>69623</bug>: Additional fix for the long standing regression that
+        meant that calls to <code>ClassLoader.getResource().getContent()</code>
+        failed when made from within a web application with resource caching
+        enabled if the target resource was packaged in a JAR file. (markt)
+      </fix>
+      <fix>
+        Pull request <pr>923</pr>: Avoid adding multiple CSRF tokens to a URL in
+        the <code>CsrfPreventionFilter</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -157,22 +215,58 @@
         <code>certificateKeystorePassword</code> attribute of a certificate.
         (remm)
       </update>
+      <update>
+        Remove NIO2 connector. (remm)
+      </update>
+      <update>
+        Add specific certificate selection code for TLS 1.3 supporting post
+        quantum cryptography. Certificates defined with type
+        <code>MLDSA</code> will be selected depending on the TLS client hello.
+        (remm)
+      </update>
+      <update>
+        Add <code>groups</code> attribute on <code>SSLHostConfig</code>
+        allowing to restrict which groups can be enabled on the SSL engine.
+        (remm)
+      </update>
+      <update>
+        Remove support for HTTP 0.9. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Don't log warnings for registered HTTP/2 settings that Tomcat does not
-        support. These settings are now silently ignored. (markt)
+        Improve warnings when setting ciphers lists in the FFM code, mirroring
+        the tomcat-native changes. (remm)
+      </fix>
+      <fix>
+        <bug>69910</bug>: Dereference TLS objects right after closing a socket
+        to improve memory efficiency. (remm)
+      </fix>
+      <fix>
+        Relax the JSSE vs OpenSSL configuration style checks on
+        <code>SSLHostConfig</code> to reflect the existing implementation that
+        allows one configuration style to be used for the trust attributes and a
+        different style for all the other attributes. (markt)
+      </fix>
+      <fix>
+        Better warning message when <code>OpenSSLConf</code> configuration
+        elements are used with a JSSE TLS implementation. (markt)
+      </fix>
+      <fix>
+        When using OpenSSL via FFM, don't log a warning about missing CA
+        certificates unless CA certificates were configured and the
+        configuration failed. (markt)
       </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
-        Add support for the new Elvis operator (<code>:?</code>) in Jakarta
-        Expression language. (markt)
+        Add support for the new Elvis (<code>:?</code>) and Null coalescing
+        (<code>??</code>) operators in Jakarta Expression language. (markt)
       </add>
       <add>
-        Extend the existing <code>+</code> operator in Jakarta Expression
-        Language to support mergin <code>Map</code>Map and <code>Set</code>Set
+        Extend the existing <code>+=</code> operator in Jakarta Expression
+        Language to support merging <code>Map</code>Map and <code>Set</code>Set
         and concatenating <code>List</code>s. (markt)
       </add>
       <update>
@@ -180,6 +274,57 @@
         <code>compilerTargetVM</code> have been updated to 21 to align with Java
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
+      <scode>
+        Refactor the performance optimisation for
+        <code>jakarta.servlet.jsp.el.ImportELResolver</code> to use the new
+        marker class,
+        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
+      </scode>
+      <add>
+        Extend the support for relational operators to include
+        <code>TemporalAccessor</code>, <code>Clock</code> and <code>Date</code>.
+        (markt)
+      </add>
+      <add>
+        Add support for coercion to <code>java.time.Instant</code> and
+        <code>java.util.Date</code>. (markt)
+      </add>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        <bug>62814</bug>: Document that human-readable names maybe used for
+        <code>mapSendOptions</code> and align documentation with
+        <code>channelSendOptions</code>. Based on pull request <pr>929</pr> by
+        archan0621. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Update Tomcat's WebSocket support to version 2.3 of the Jakarta
+        WebSocket API. (markt)
+      </update>
+      <add>
+        Implement the new <code>HandshakeRequest</code> method,
+        <code>getUserX509CertificateChain()</code> that provides the client
+        certificate chain, if present, during the WebSocket handshake. (markt)
+      </add>
+      <fix>
+        Implement the clarification in WebSocket 2.3 that the method
+        <code>ClientEndpointConfig.Configurator.afterResponse()</code> must be
+        called after every WebSocket handshake regardless of whether the
+        handshake is successful or not. (markt)
+      </fix>
+      <add>
+        Implement the new <code>HandshakeRequest</code> methods that expose the
+        client's preferred local and the local and remote host name, address and
+        port information. (markt)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
@@ -188,12 +333,47 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        Add test profile system for selective test execution. Profiles can be
+        specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
+        test subsets without using patterns directly. Profile patterns are
+        defined in <code>test-profiles.properties</code>. (csutherl)
+      </add>
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update the internal fork of Commons Pool to 2.13.1. (markt)
+      </update>
+      <update>
+        Update the internal fork of Commons DBCP to 2.14.0. (markt)
+      </update>
+      <update>
+        Update Commons Daemon to 1.5.1. (markt)
+      </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.37. (markt)
+      </update>
+      <update>
+        Update ByteBuddy to 1.18.3. (markt)
+      </update>
+      <update>
+        Update UnboundID to 7.0.4. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 13.0.0. (markt)
+      </update>
+      <update>
+        Update bnd to 7.2.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

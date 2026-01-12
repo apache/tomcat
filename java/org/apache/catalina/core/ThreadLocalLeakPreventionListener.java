@@ -73,8 +73,7 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                 stopIdleThreads((Context) lifecycle);
             }
         } catch (Exception e) {
-            String msg = sm.getString("threadLocalLeakPreventionListener.lifecycleEvent.error", event);
-            log.error(msg, e);
+            log.error(sm.getString("threadLocalLeakPreventionListener.lifecycleEvent.error", event), e);
         }
     }
 
@@ -83,8 +82,7 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
         try {
             super.containerEvent(event);
         } catch (Exception e) {
-            String msg = sm.getString("threadLocalLeakPreventionListener.containerEvent.error", event);
-            log.error(msg, e);
+            log.error(sm.getString("threadLocalLeakPreventionListener.containerEvent.error", event), e);
         }
 
     }
@@ -118,13 +116,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                     executor = handler.getExecutor();
                 }
 
-                if (executor instanceof ThreadPoolExecutor) {
-                    @SuppressWarnings("resource")
-                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+                if (executor instanceof ThreadPoolExecutor threadPoolExecutor) {
                     threadPoolExecutor.contextStopping();
-                } else if (executor instanceof StandardThreadExecutor) {
-                    @SuppressWarnings("resource")
-                    StandardThreadExecutor stdThreadExecutor = (StandardThreadExecutor) executor;
+                } else if (executor instanceof StandardThreadExecutor stdThreadExecutor) {
                     stdThreadExecutor.contextStopping();
                 }
 

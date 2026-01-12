@@ -17,18 +17,15 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * Utilities to manipulate char chunks. While String is the easiest way to manipulate chars ( search, substrings, etc),
  * it is known to not be the most efficient solution - Strings are designed as immutable and secure objects.
- *
- * @author dac@sun.com
- * @author James Todd [gonzo@sun.com]
- * @author Costin Manolache
- * @author Remy Maucherat
  */
 public final class CharChunk extends AbstractChunk implements CharSequence {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -60,7 +57,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
          *
          * @throws IOException If an I/O occurs while writing the characters
          */
-        void realWriteChars(char buf[], int off, int len) throws IOException;
+        void realWriteChars(char[] buf, int off, int len) throws IOException;
     }
 
     // --------------------
@@ -108,7 +105,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Sets the buffer to the specified subarray of characters.
+     * Sets the buffer to the specified sub array of characters.
      *
      * @param c   the characters
      * @param off the start offset of the characters
@@ -188,7 +185,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      *
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(char src[], int off, int len) throws IOException {
+    public void append(char[] src, int off, int len) throws IOException {
         // will grow, up to limit
         makeSpace(len);
         int limit = getLimitInternal();
@@ -276,7 +273,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         int sOff = off;
         int sEnd = off + len;
         while (sOff < sEnd) {
-            int d = min(limit - end, sEnd - sOff);
+            int d = Math.min(limit - end, sEnd - sOff);
             s.getChars(sOff, sOff + d, buff, end);
             sOff += d;
             end += d;
@@ -297,14 +294,11 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    public int subtract(char dest[], int off, int len) throws IOException {
+    public int subtract(char[] dest, int off, int len) throws IOException {
         if (checkEof()) {
             return -1;
         }
-        int n = len;
-        if (len > getLength()) {
-            n = getLength();
-        }
+        int n = Math.min(len, getLength());
         System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
@@ -316,10 +310,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
             if (in == null) {
                 return true;
             }
-            int n = in.realReadChars();
-            if (n < 0) {
-                return true;
-            }
+            return in.realReadChars() < 0;
         }
         return false;
     }
@@ -349,8 +340,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      * @param count The size
      */
     public void makeSpace(int count) {
-        char[] tmp = null;
-
         int limit = getLimitInternal();
 
         long newSize;
@@ -383,12 +372,11 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         if (newSize > limit) {
             newSize = limit;
         }
-        tmp = new char[(int) newSize];
+        char[] tmp = new char[(int) newSize];
 
         // Some calling code assumes buffer will not be compacted
         System.arraycopy(buff, 0, tmp, 0, end);
         buff = tmp;
-        tmp = null;
     }
 
 
@@ -472,8 +460,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    public boolean equals(char b2[], int off2, int len2) {
-        char b1[] = buff;
+    public boolean equals(char[] b2, int off2, int len2) {
+        char[] b1 = buff;
         if (b1 == null && b2 == null) {
             return true;
         }
@@ -597,7 +585,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      *
      * @return The position of the first instance of the character or -1 if the character is not found.
      */
-    public static int indexOf(char chars[], int start, int end, char s) {
+    public static int indexOf(char[] chars, int start, int end, char s) {
         int offset = start;
 
         while (offset < end) {
@@ -612,13 +600,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     // -------------------- utils
-    private int min(int a, int b) {
-        if (a < b) {
-            return a;
-        }
-        return b;
-    }
-
 
     // Char sequence impl
 

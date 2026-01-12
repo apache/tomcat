@@ -29,10 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.Certificate;
+import java.util.concurrent.locks.Lock;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResourceLockSet;
-import org.apache.catalina.WebResourceLockSet.ResourceLock;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -65,7 +65,7 @@ public class FileResource extends AbstractResource {
     private final Manifest manifest;
     private final boolean needConvert;
     private final WebResourceLockSet lockSet;
-    private final String lockKey;
+    private final String lockPath;
 
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest) {
         this(root, webAppPath, resource, readOnly, manifest, null, null);
@@ -73,11 +73,11 @@ public class FileResource extends AbstractResource {
 
 
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest,
-            WebResourceLockSet lockSet, String lockKey) {
+            WebResourceLockSet lockSet, String lockPath) {
         super(root, webAppPath);
         this.resource = resource;
         this.lockSet = lockSet;
-        this.lockKey = lockKey;
+        this.lockPath = lockPath;
 
         if (webAppPath.charAt(webAppPath.length() - 1) == '/') {
             String realName = resource.getName() + '/';
@@ -134,15 +134,16 @@ public class FileResource extends AbstractResource {
          * HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource where some of the fields
          * are set as if the file exists and some as set as if it does not.
          */
-        ResourceLock lock = null;
+        Lock writeLock = null;
         if (lockSet != null) {
-            lock = lockSet.lockForWrite(lockKey);
+            writeLock = lockSet.getLock(lockPath).writeLock();
+            writeLock.lock();
         }
         try {
             return resource.delete();
         } finally {
-            if (lockSet != null) {
-                lockSet.unlockForWrite(lock);
+            if (writeLock != null) {
+                writeLock.unlock();
             }
         }
     }
@@ -267,9 +268,9 @@ public class FileResource extends AbstractResource {
         try {
             BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
             return attrs.creationTime().toMillis();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), e);
+                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), ioe);
             }
             return 0;
         }

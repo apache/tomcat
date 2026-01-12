@@ -33,8 +33,8 @@ import org.apache.catalina.tribes.util.StringManager;
  */
 public class MemberImpl implements Member, java.io.Externalizable {
 
-    public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] { 84, 82, 73, 66, 69, 83, 45, 66, 1, 0 };
-    public static final transient byte[] TRIBES_MBR_END = new byte[] { 84, 82, 73, 66, 69, 83, 45, 69, 1, 0 };
+    public static final byte[] TRIBES_MBR_BEGIN = new byte[] { 84, 82, 73, 66, 69, 83, 45, 66, 1, 0 };
+    public static final byte[] TRIBES_MBR_END = new byte[] { 84, 82, 73, 66, 69, 83, 45, 69, 1, 0 };
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
@@ -517,7 +517,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         for (int i = 0; data != null && i < data.length; i++) {
             buf.append(String.valueOf(data[i])).append(' ');
             if (i == max) {
-                buf.append("...(" + data.length + ")");
+                buf.append("...(").append(data.length).append(")");
                 break;
             }
         }

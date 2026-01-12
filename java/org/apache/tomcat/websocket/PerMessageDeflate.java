@@ -44,6 +44,13 @@ public class PerMessageDeflate implements Transformation {
 
     public static final String NAME = "permessage-deflate";
 
+    public static final TransformationBuilder BUILDER = new TransformationBuilder() {
+        @Override
+        public Transformation build(List<List<Parameter>> preferences, boolean isServer) {
+            return PerMessageDeflate.build(preferences, isServer);
+        }
+    };
+
     private final boolean serverContextTakeover;
     private final int serverMaxWindowBits;
     private final boolean clientContextTakeover;
@@ -61,7 +68,7 @@ public class PerMessageDeflate implements Transformation {
     // Flag to track if a message is completely empty
     private volatile boolean emptyMessage = true;
 
-    static PerMessageDeflate negotiate(List<List<Parameter>> preferences, boolean isServer) {
+    static PerMessageDeflate build(List<List<Parameter>> preferences, boolean isServer) {
         // Accept the first preference that the endpoint is able to support
         for (List<Parameter> preference : preferences) {
             boolean ok = true;
@@ -194,7 +201,8 @@ public class PerMessageDeflate implements Transformation {
                 written = inflater.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
             } catch (DataFormatException e) {
                 throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
-            } catch (NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
+                // As of Java 25, the JRE throws an ISE rather than an NPE
                 throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
             }
             dest.position(dest.position() + written);
@@ -354,7 +362,8 @@ public class PerMessageDeflate implements Transformation {
                                 compressedPayload.arrayOffset() + compressedPayload.position(),
                                 compressedPayload.remaining(), flush);
                         compressedPayload.position(compressedPayload.position() + written);
-                    } catch (NullPointerException e) {
+                    } catch (IllegalStateException | NullPointerException e) {
+                        // As of Java 25, the JRE throws an ISE rather than an NPE
                         throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
                     }
 
@@ -394,14 +403,14 @@ public class PerMessageDeflate implements Transformation {
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler,
                                 blockingWriteTimeoutExpiry);
-                    } else if (!fin && full && needsInput) {
+                    } else if (!fin && full/* note: needsInput is true here */) {
                         // Write buffer full and input message not fully read.
                         // Output and get more data.
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler,
                                 blockingWriteTimeoutExpiry);
                         deflateRequired = false;
-                    } else if (fin && full && needsInput) {
+                    } else if (fin && full/* note: needsInput is true here */) {
                         // Write buffer full. Input fully read. Deflater may be
                         // in one of four states:
                         // - output complete (just happened to align with end of

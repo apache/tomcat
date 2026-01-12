@@ -20,6 +20,7 @@ package org.apache.el.parser;
 
 import jakarta.el.ELException;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
 public class AstElvis extends SimpleNode {
@@ -36,10 +37,11 @@ public class AstElvis extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj0 = this.children[0].getValue(ctx);
-        if (obj0 == null) {
-            return this.children[1].getValue(ctx);
-        } else {
+        Boolean b = ELSupport.coerceToBoolean(ctx, obj0, true);
+        if (b.booleanValue()) {
             return obj0;
+        } else {
+            return this.children[1].getValue(ctx);
         }
     }
 }

@@ -23,8 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>The HTTP Connector</title>
   </properties>
 
@@ -115,6 +113,27 @@
       By default, DNS lookups are disabled.</p>
     </attribute>
 
+    <attribute name="encodedReverseSolidusHandling" required="false">
+      <p>When set to <code>reject</code> request paths containing a
+      <code>%5c</code> sequence will be rejected with a 400 response. When set
+      to <code>decode</code> request paths containing a <code>%5c</code>
+      sequence will have that sequence decoded to <code>\</code> at the same
+      time other <code>%nn</code> sequences are decoded. When set to
+      <code>passthrough</code> request paths containing a <code>%5c</code>
+      sequence will be processed with the <code>%5c</code> sequence unchanged.
+      </p>
+      <p>When set to <code>decoded</code>, the <strong>allowBackslash</strong>
+      attribute will be applied after decoding.
+      </p>
+      <p>If <code>passthrough</code> is used then it is the application's
+      responsibility to perform any further <code>%nn</code> decoding required.
+      Any <code>%25</code> sequences (encoded <code>%</code>) in the request
+      path with also be processed with the <code>%25</code> sequence unchanged
+      to avoid potential corruption and/or decoding failure when the path is
+      subsequently <code>%nn</code> decoded by the application.</p>
+      <p>If not specified, the default value is <code>decode</code>.</p>
+    </attribute>
+
     <attribute name="encodedSolidusHandling" required="false">
       <p>When set to <code>reject</code> request paths containing a
       <code>%2f</code> sequence will be rejected with a 400 response. When set
@@ -125,7 +144,7 @@
       sequence will be processed with the <code>%2f</code> sequence unchanged.
       </p>
       <p>If <code>passthrough</code> is used then it is the application's
-      resposibility to perform any further <code>%nn</code> decoding required.
+      responsibility to perform any further <code>%nn</code> decoding required.
       Any <code>%25</code> sequences (encoded <code>%</code>) in the request
       path with also be processed with the <code>%25</code> sequence unchanged
       to avoid potential corruption and/or decoding failure when the path is
@@ -160,12 +179,43 @@
       default of 1000 is used.</p>
     </attribute>
 
+    <attribute name="maxPartCount" required="false">
+      <p>The maximum total number of parts permitted in a request where the
+      content type is <code>multipart/form-data</code>. This limit is in
+      addition to <code>maxParameterCount</code>. Requests that exceed this
+      limit will be rejected. A value of less than 0 means no limit. If not
+      specified, a default of 50 is used.</p>
+      <p>The nature of multipart requests and the associated Servlet API
+      requirements for processing them is such that they can place a significant
+      demand on memory. Applications utilising multipart requests need to ensure
+      sufficient memory is available to avoid a potential denial of service. As
+      a guide, the memory required is <code>maxPartHeaderSize</code> x
+      <code>maxPartCount</code> x <code>maxConnections</code> x 2 (due to the
+      implementation). For the defaults that is <code>512 x 50 x 8192 x 2</code>
+      which is 400MB.</p>
+    </attribute>
+
+    <attribute name="maxPartHeaderSize" required="false">
+      <p>The maximum number of header bytes permitted per part in a request
+      where the content type is <code>multipart/form-data</code>. Requests that
+      exceed this limit will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 512 is used.</p>
+    </attribute>
+
     <attribute name="maxPostSize" required="false">
-      <p>The maximum size in bytes of the POST which will be handled by
-      the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. Requests that exceed
-      this limit will be rejected. If not specified, this attribute is set to
-      2097152 (2 MiB).</p>
+      <p>This is the maximum number of request body bytes that will be converted
+      into request parameters by Tomcat. This limit only applies in specific
+      circumstances and is <strong>not</strong> a general limit on request body
+      size for POST requests. The limit only applies when Tomcat is processing
+      the request body for parameters as per section 3.1.1
+      (<code>application/x-www-form-urlencoded</code>) or section 3.2
+      (<code>multipart/form-data</code>) of the Servlet specification. In the
+      <code>multipart/form-data</code> case, the limit only applies to the data
+      used to generate the parameters that are made available through the
+      <code>getParameter()</code> family of methods.</p>
+      <p>The limit can be disabled by setting this attribute to a value less
+      than zero. Requests that exceed this limit will be rejected. If not
+      specified, this attribute is set to 2097152 (2 MiB).</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
@@ -214,12 +264,7 @@
         To use an explicit protocol, the following values may be used:<br/>
         <code>org.apache.coyote.http11.Http11NioProtocol</code> -
               non blocking Java NIO connector<br/>
-        <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
-              non blocking Java NIO2 connector<br/>
         Custom implementations may also be used.<br/>
-        Take a look at our <a href="#Connector_Comparison">Connector
-        Comparison</a> chart. The configuration for Java connectors is
-        identical, for http and https.
       </p>
     </attribute>
 
@@ -270,6 +315,15 @@
       The default value is <code>false</code>.</p>
     </attribute>
 
+    <attribute name="strictSni" required="false">
+      <p>Set this attribute to <code>true</code> to verify that the
+      <code>SSLHostConfig</code> configuration associated with the SNI host name
+      is the same as the <code>SSLHostConfig</code> configuration associated
+      with the HTTP protocol virtual host name in use. Non matching requests
+      will be rejected.
+      The default value is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
       after %xx decoding the URL. The default value is <code>UTF-8</code>.</p>
@@ -312,7 +366,7 @@
 
   <subsection name="Standard Implementation">
 
-  <p>The standard HTTP connectors (NIO and NIO2) all support the following
+  <p>The standard HTTP connector supports the following
   attributes in addition to the common Connector attributes listed above.</p>
 
   <attributes>
@@ -338,8 +392,8 @@
       <p>For servers with more than one IP address, this attribute specifies
       which address will be used for listening on the specified port. By
       default, the connector will listen all local addresses. Unless the JVM is
-      configured otherwise using system properties, the Java based connectors
-      (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
+      configured otherwise using system properties, the NIO connector
+      will listen on both IPv4 and IPv6 addresses when configured
       with either <code>0.0.0.0</code> or <code>::</code>.</p>
     </attribute>
 
@@ -495,7 +549,7 @@
       limit has been reached, the operating system may still accept connections
       based on the <code>acceptCount</code> setting. The default value
       is <code>8192</code>.</p>
-      <p>For NIO/NIO2 only, setting the value to -1, will disable the
+      <p>For NIO only, setting the value to -1, will disable the
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
@@ -747,7 +801,7 @@
 
   <subsection name="Java TCP socket attributes">
 
-    <p>The NIO and NIO2 implementation support the following Java TCP
+    <p>The NIO implementation supports the following Java TCP
     socket attributes in addition to the common Connector and HTTP attributes
     listed above.</p>
 
@@ -972,84 +1026,6 @@
     </attributes>
   </subsection>
 
-  <subsection name="NIO2 specific configuration">
-
-    <p>The following attributes are specific to the NIO2 connector.</p>
-
-    <attributes>
-
-      <attribute name="useSendfile" required="false">
-        <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>. Note that the use of sendfile
-        will disable any compression that Tomcat may otherwise have performed on
-        the response.</p>
-      </attribute>
-
-      <attribute name="socket.directBuffer" required="false">
-        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
-        ByteBuffers. If <code>true</code> then
-        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
-        the buffers, if <code>false</code> then
-        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
-        is <code>false</code>.<br/>
-        When you are using direct buffers, make sure you allocate the
-        appropriate amount of memory for the direct memory space. On Sun's JDK
-        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
-        </p>
-      </attribute>
-
-      <attribute name="socket.directSslBuffer" required="false">
-        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
-        ByteBuffers for the SSL buffers. If <code>true</code> then
-        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
-        the buffers, if <code>false</code> then
-        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
-        is <code>false</code>.<br/>
-        When you are using direct buffers, make sure you allocate the
-        appropriate amount of memory for the direct memory space. On Oracle's JDK
-        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
-        </p>
-      </attribute>
-
-      <attribute name="socket.appReadBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with
-        a read ByteBuffer. This attribute controls the size of this buffer. By
-        default this read buffer is sized at <code>8192</code> bytes. For lower
-        concurrency, you can increase this to buffer more data. For an extreme
-        amount of keep alive connections, decrease this number or increase your
-        heap size.</p>
-      </attribute>
-
-      <attribute name="socket.appWriteBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with
-        a write ByteBuffer. This attribute controls the size of this buffer. By
-        default this write buffer is sized at <code>8192</code> bytes. For low
-        concurrency you can increase this to buffer more response data. For an
-        extreme amount of keep alive connections, decrease this number or
-        increase your heap size.<br/>
-        The default value here is pretty low, you should up it if you are not
-        dealing with tens of thousands concurrent connections.</p>
-      </attribute>
-
-      <attribute name="socket.bufferPool" required="false">
-        <p>(int)The NIO2 connector uses a class called Nio2Channel that holds
-        elements linked to a socket. To reduce garbage collection, the NIO2
-        connector caches these channel objects. This value specifies the size of
-        this cache. The default value is <code>500</code>, and represents that
-        the cache will hold 500 Nio2Channel objects. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-      <attribute name="socket.processorCache" required="false">
-        <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>0</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-    </attributes>
-  </subsection>
-
 </section>
 
 
@@ -1177,9 +1153,23 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO and NIO2 connectors use either the JSSE Java SSL implementation or
-  an OpenSSL implementation. As far as possible, common configuration attributes
-  are used for both JSSE and OpenSSL.</p>
+  <p>The NIO connector may be configured to use either a JSSE Java SSL
+  implementation or an OpenSSL implementation. As far as possible, common
+  configuration attributes are used for both JSSE and OpenSSL. For each
+  Connector, you must use a consistent configuration style (JSSE specific
+  attributes or OpenSSL specfic attributes) for each of the following groups of
+  configuration attributes but you may use a different configuration style for
+  each group:</p>
+  <ul>
+    <li>trust attributes</li>
+    <li>all other attributes</li>
+  </ul>
+  <p>The implementation used (JSSE or OpenSSL) is independent of the
+  configuration style used.</p>
+
+  <p>Any <code>OpenSSLConf</code> settings are only used with an OpenSSL
+  implementation and may override attributes set via <code>SSLHostConfig</code>
+  or <code>Certificate</code> elements.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
@@ -1277,8 +1267,8 @@
       avoided by providing an explicit list of ciphers that are supported by the
       configured SSL implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
-      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be
-      used.</p>
+      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
+      will be used.</p>
       <p>Note that, by default, the order in which ciphers are defined is
       treated as an order of preference. See <code>honorCipherOrder</code>.</p>
     </attribute>
@@ -1298,6 +1288,15 @@
       available on the first connection. Subsequent connections (that use a
       ticket to estrablish the TLS session) will only have the peer certificate,
       not the full chain.</p>
+    </attribute>
+
+    <attribute name="groups" required="false">
+      <p>JSSE only.</p>
+      <p>Allows only allowing certain named groups. The value should be a case
+      sensitive comma separated list of the names of the groups.</p>
+      <p>. If not specified, the default named groups of the provider will be
+      used, and any named groups specified by the client will be passed to it.
+      </p>
     </attribute>
 
     <attribute name="honorCipherOrder" required="false">
@@ -1435,10 +1434,11 @@
       <p>The name of the truststore provider to be used for the server
       certificate. The default is the value of the
       <code>javax.net.ssl.trustStoreProvider</code> system property. If
-      that property is null, the value of <code>keystoreProvider</code> is used
-      as the default. If neither this attribute, the default system property nor
-      <code>keystoreProvider</code> is set, the list of registered providers is
-      traversed in preference order and the first provider that supports the
+      that property is null and a single certificate has been configured for
+      this TLS virtual host then default will be the value of
+      <code>keystoreProvider</code> of the single certificate. If none of these
+      identify a default, the list of registered providers is traversed in
+      preference order and the first provider that supports the
       <code>truststoreType</code> is used.
       </p>
     </attribute>
@@ -1580,7 +1580,8 @@
     <attribute name="type" required="false">
       <p>The type of certificate. This is used to identify the ciphers that are
       compatible with the certificate. It must be one of <code>UNDEFINED</code>,
-      <code>RSA</code>, <code>DSA</code> or <code>EC</code>. If only one
+      <code>RSA</code>, <code>DSA</code>, <code>EC</code> or <code>MLDSA</code>.
+      If only one
       <strong>Certificate</strong> is nested within a <code>SSLHostConfig</code>
       then this attribute is not required and will default to
       <code>UNDEFINED</code>. If multiple <strong>Certificate</strong>s are
@@ -1592,7 +1593,7 @@
 
   </subsection>
 
-  <subsection name="SSL Support - Connector - NIO and NIO2">
+  <subsection name="SSL Support - Connector - NIO">
 
   <p>When APR/native is enabled, the connectors will default to using
   OpenSSL through JSSE, which may be more optimized than the JSSE Java
@@ -1603,7 +1604,7 @@
   OpenSSL through JSSE, which is equivalent but uses the Java FFM API from
   Java 22 to access OpenSSL.</p>
 
-  <p>The following NIO and NIO2 SSL configuration attributes are not specific to
+  <p>The following NIO SSL configuration attributes are not specific to
   a virtual host and, therefore, must be configured on the connector.</p>
 
   <attributes>
@@ -1719,74 +1720,6 @@
 
   </subsection>
 
-  <subsection name="Connector Comparison">
-
-    <p>Below is a small chart that shows how the connectors differ.</p>
-
-    <table class="defaultTable" style="text-align: center;">
-      <tr>
-        <th />
-        <th style="text-align: center;">Java Nio Connector<br />NIO</th>
-        <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-      </tr>
-      <tr>
-        <th>Classname</th>
-        <td><code class="noHighlight">Http11NioProtocol</code></td>
-        <td><code class="noHighlight">Http11Nio2Protocol</code></td>
-      </tr>
-      <tr>
-        <th>Tomcat Version</th>
-        <td>since 6.0.x</td>
-        <td>since 8.0.x</td>
-      </tr>
-      <tr>
-        <th>Support Polling</th>
-        <td>YES</td>
-        <td>YES</td>
-      </tr>
-      <tr>
-        <th>Polling Size</th>
-        <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
-      </tr>
-      <tr>
-        <th>Read Request Headers</th>
-        <td>Non Blocking</td>
-        <td>Non Blocking</td>
-      </tr>
-      <tr>
-        <th>Read Request Body</th>
-        <td>Blocking</td>
-        <td>Blocking</td>
-      </tr>
-      <tr>
-        <th>Write Response Headers and Body</th>
-        <td>Blocking</td>
-        <td>Blocking</td>
-      </tr>
-      <tr>
-        <th>Wait for next Request</th>
-        <td>Non Blocking</td>
-        <td>Non Blocking</td>
-      </tr>
-      <tr>
-        <th>SSL Support</th>
-        <td>Java SSL or OpenSSL</td>
-        <td>Java SSL or OpenSSL</td>
-      </tr>
-      <tr>
-        <th>SSL Handshake</th>
-        <td>Non blocking</td>
-        <td>Non blocking</td>
-      </tr>
-      <tr>
-        <th>Max Connections</th>
-        <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
-      </tr>
-    </table>
-
-  </subsection>
 </section>
 
 

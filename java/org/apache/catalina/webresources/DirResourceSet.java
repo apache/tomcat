@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.LifecycleException;
@@ -36,6 +37,7 @@ import org.apache.catalina.WebResourceRoot.ResourceSetType;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.http.RequestUtil;
 
 /**
@@ -45,10 +47,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     private static final Log log = LogFactory.getLog(DirResourceSet.class);
 
-    private boolean caseSensitive = true;
-
-    private Map<String,ResourceLock> resourceLocksByPath = new HashMap<>();
-    private Object resourceLocksByPathLock = new Object();
+    private KeyedReentrantReadWriteLock resourceLocksByPath = new KeyedReentrantReadWriteLock();
 
 
     /**
@@ -101,13 +100,18 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
-        if (path.startsWith(webAppMount)) {
+        boolean readOnly = isReadOnly();
+        if (isPathMounted(path, webAppMount)) {
             /*
              * Lock the path for reading until the WebResource has been constructed. The lock prevents concurrent reads
              * and writes (e.g. HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource
              * where some of the fields are set as if the file exists and some as set as if it does not.
              */
-            ResourceLock lock = lockForRead(path);
+            Lock readLock = null;
+            if (!readOnly) {
+                readLock = getLock(path).readLock();
+                readLock.lock();
+            }
             try {
                 File f = file(path.substring(webAppMount.length()), false);
                 if (f == null) {
@@ -119,9 +123,11 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                 if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                     path = path + '/';
                 }
-                return new FileResource(root, path, f, isReadOnly(), getManifest(), this, lock.key);
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path);
             } finally {
-                unlockForRead(lock);
+                if (readLock != null) {
+                    readLock.unlock();
+                }
             }
         } else {
             return new EmptyResource(root, path);
@@ -133,17 +139,13 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     public String[] list(String path) {
         checkPath(path);
         String webAppMount = getWebAppMount();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), true);
             if (f == null) {
                 return EMPTY_STRING_ARRAY;
             }
             String[] result = f.list();
-            if (result == null) {
-                return EMPTY_STRING_ARRAY;
-            } else {
-                return result;
-            }
+            return Objects.requireNonNullElse(result, EMPTY_STRING_ARRAY);
         } else {
             if (!path.endsWith("/")) {
                 path = path + "/";
@@ -165,15 +167,16 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
         checkPath(path);
         String webAppMount = getWebAppMount();
         ResourceSet<String> result = new ResourceSet<>();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), true);
             if (f != null) {
                 File[] list = f.listFiles();
                 if (list != null) {
+                    String fCanPath = null;
                     for (File entry : list) {
                         // f has already been validated so the following checks
                         // can be much simpler than those in file()
-                        if (!getRoot().getAllowLinking()) {
+                        if (!getAllowLinking()) {
                             // allow linking is disabled so need to check for
                             // symlinks
                             boolean symlink = true;
@@ -187,7 +190,9 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                                 // that what is left does not contain a symlink.
                                 absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
                                 String entryCanPath = entry.getCanonicalPath();
-                                String fCanPath = f.getCanonicalPath();
+                                if (fCanPath == null) {
+                                    fCanPath = f.getCanonicalPath();
+                                }
                                 if (entryCanPath.length() >= fCanPath.length()) {
                                     canPath = entryCanPath.substring(fCanPath.length());
                                     if (absPath.equals(canPath)) {
@@ -239,7 +244,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             return false;
         }
         String webAppMount = getWebAppMount();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), false);
             if (f == null) {
                 return false;
@@ -269,17 +274,18 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
         }
 
         String webAppMount = getWebAppMount();
-        if (!path.startsWith(webAppMount)) {
+        if (!isPathMounted(path, webAppMount)) {
             return false;
         }
 
-        File dest = null;
+        File dest;
         /*
          * Lock the path for writing until the write is complete. The lock prevents concurrent reads and writes (e.g.
          * HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource where some of the fields
          * are set as if the file exists and some as set as if it does not.
          */
-        ResourceLock lock = lockForWrite(path);
+        Lock writeLock = getLock(path).writeLock();
+        writeLock.lock();
         try {
             dest = file(path.substring(webAppMount.length()), false);
             if (dest == null) {
@@ -302,13 +308,13 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
             return true;
         } finally {
-            unlockForWrite(lock);
+            writeLock.unlock();
         }
     }
 
     @Override
     protected void checkType(File file) {
-        if (file.isDirectory() == false) {
+        if (!file.isDirectory()) {
             throw new IllegalArgumentException(
                     sm.getString("dirResourceSet.notDirectory", getBase(), File.separator, getInternalPath()));
         }
@@ -318,130 +324,37 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
-        caseSensitive = isCaseSensitive();
         // Is this an exploded web application?
-        if (getWebAppMount().equals("")) {
+        if (getWebAppMount().isEmpty()) {
             // Look for a manifest
             File mf = file("META-INF/MANIFEST.MF", true);
             if (mf != null && mf.isFile()) {
                 try (FileInputStream fis = new FileInputStream(mf)) {
                     setManifest(new Manifest(fis));
-                } catch (IOException e) {
-                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), e);
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), ioe);
                 }
             }
         }
     }
 
 
-    /*
-     * Determines if this ResourceSet is based on a case sensitive file system or not.
-     */
-    private boolean isCaseSensitive() {
-        try {
-            String canonicalPath = getFileBase().getCanonicalPath();
-            File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(upper.getCanonicalPath())) {
-                return true;
-            }
-            File lower = new File(canonicalPath.toLowerCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(lower.getCanonicalPath())) {
-                return true;
-            }
-            /*
-             * Both upper and lower case versions of the current fileBase have the same canonical path so the file
-             * system must be case insensitive.
-             */
-        } catch (IOException ioe) {
-            log.warn(sm.getString("dirResourceSet.isCaseSensitive.fail", getFileBase().getAbsolutePath()), ioe);
-        }
-
-        return false;
-    }
-
-
     private String getLockKey(String path) {
-        // Normalize path to ensure that the same key is used for the same path.
-        String normalisedPath = RequestUtil.normalize(path);
-        if (caseSensitive) {
-            return normalisedPath;
-        }
-        return normalisedPath.toLowerCase(Locale.ENGLISH);
+        /*
+         * Normalize path to ensure that the same key is used for the same path. Always convert path to lower case as
+         * the file system may be case insensitive. A minor performance improvement is possible by removing the
+         * conversion to lower case for case sensitive file systems but confirming that all the directories within a
+         * DirResourceSet are case sensitive is much harder than it might first appear due to various edge cases. In
+         * particular, Windows can make individual directories case sensitive and File.getCanonicalPath() doesn't return
+         * the canonical file name on Linux for some case insensitive file systems (such as mounted Windows shares).
+         */
+        return RequestUtil.normalize(path).toLowerCase(Locale.ENGLISH);
     }
 
 
     @Override
-    public ResourceLock lockForRead(String path) {
+    public ReadWriteLock getLock(String path) {
         String key = getLockKey(path);
-        ResourceLock resourceLock = null;
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has
-             * a consistent view of the currently "in-use" ResourceLocks.
-             */
-            resourceLock = resourceLocksByPath.get(key);
-            if (resourceLock == null) {
-                resourceLock = new ResourceLock(key);
-                resourceLocksByPath.put(key, resourceLock);
-            }
-            resourceLock.count.incrementAndGet();
-        }
-        // Obtain the lock outside the sync as it will block if there is a current write lock.
-        resourceLock.reentrantLock.readLock().lock();
-        return resourceLock;
-    }
-
-
-    @Override
-    public void unlockForRead(ResourceLock resourceLock) {
-        // Unlock outside the sync as there is no need to do it inside.
-        resourceLock.reentrantLock.readLock().unlock();
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Decrement the usage count and remove ResourceLocks no longer required inside the sync to ensure that that
-             * map always has a consistent view of the currently "in-use" ResourceLocks.
-             */
-            if (resourceLock.count.decrementAndGet() == 0) {
-                resourceLocksByPath.remove(resourceLock.key);
-            }
-        }
-    }
-
-
-    @Override
-    public ResourceLock lockForWrite(String path) {
-        String key = getLockKey(path);
-        ResourceLock resourceLock = null;
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has
-             * a consistent view of the currently "in-use" ResourceLocks.
-             */
-            resourceLock = resourceLocksByPath.get(key);
-            if (resourceLock == null) {
-                resourceLock = new ResourceLock(key);
-                resourceLocksByPath.put(key, resourceLock);
-            }
-            resourceLock.count.incrementAndGet();
-        }
-        // Obtain the lock outside the sync as it will block if there are any other current locks.
-        resourceLock.reentrantLock.writeLock().lock();
-        return resourceLock;
-    }
-
-
-    @Override
-    public void unlockForWrite(ResourceLock resourceLock) {
-        // Unlock outside the sync as there is no need to do it inside.
-        resourceLock.reentrantLock.writeLock().unlock();
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Decrement the usage count and remove ResourceLocks no longer required inside the sync to ensure that that
-             * map always has a consistent view of the currently "in-use" ResourceLocks.
-             */
-            if (resourceLock.count.decrementAndGet() == 0) {
-                resourceLocksByPath.remove(resourceLock.key);
-            }
-        }
+        return resourceLocksByPath.getLock(key);
     }
 }

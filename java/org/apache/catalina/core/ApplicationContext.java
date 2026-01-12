@@ -83,9 +83,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Standard implementation of <code>ServletContext</code> that represents a web application's execution environment. An
  * instance of this class is associated with each instance of <code>StandardContext</code>.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class ApplicationContext implements ServletContext {
 
@@ -161,7 +158,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Session Cookie config
      */
-    private SessionCookieConfig sessionCookieConfig;
+    private final SessionCookieConfig sessionCookieConfig;
 
     /**
      * Session tracking modes
@@ -200,7 +197,7 @@ public class ApplicationContext implements ServletContext {
             return null;
         }
 
-        Context child = null;
+        Context child;
         try {
             // Look for an exact match
             Container host = context.getParent();
@@ -314,7 +311,7 @@ public class ApplicationContext implements ServletContext {
             return null;
         }
         String extension = file.substring(period + 1);
-        if (extension.length() < 1) {
+        if (extension.isEmpty()) {
             return null;
         }
         return context.findMimeMapping(extension);
@@ -372,36 +369,32 @@ public class ApplicationContext implements ServletContext {
             queryString = null;
         }
 
+        // From this point, the removal of path parameters, decoding and normalization is only for mapping purposes.
         // Remove path parameters
-        String uriNoParams = stripPathParams(uri);
+        String uriToMap = org.apache.catalina.util.RequestUtil.stripPathParams(uri, null);
+
+        // Decode only if the uri derived from the provided path is expected to be encoded
+        if (getContext().getDispatchersUseEncodedPaths()) {
+            uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8, context.getEncodedSolidusHandlingEnum(),
+                    context.getEncodedReverseSolidusHandlingEnum());
+        }
 
         // Then normalize
-        String normalizedUri = RequestUtil.normalize(uriNoParams);
-        if (normalizedUri == null) {
+        uriToMap = RequestUtil.normalize(uriToMap);
+        if (uriToMap == null) {
+            getContext().getLogger().warn(sm.getString("applicationContext.illegalDispatchPath", path),
+                    new IllegalArgumentException());
             return null;
         }
 
-        // Mapping is against the normalized uri
-
+        /*
+         * uri is passed to the constructor for ApplicationDispatcher and is ultimately used as the value for
+         * getRequestURI() which returns encoded values. getContextPath() returns a decoded value. uri may be encoded or
+         * not. Need to prepend the context path to uri and ensure the result is correctly encoded.
+         */
         if (getContext().getDispatchersUseEncodedPaths()) {
-            // Decode
-            String decodedUri = UDecoder.URLDecode(normalizedUri, StandardCharsets.UTF_8);
-
-            // Security check to catch attempts to encode /../ sequences
-            normalizedUri = RequestUtil.normalize(decodedUri);
-            if (!decodedUri.equals(normalizedUri)) {
-                getContext().getLogger().warn(sm.getString("applicationContext.illegalDispatchPath", path),
-                        new IllegalArgumentException());
-                return null;
-            }
-
-            // URI needs to include the context path
             uri = URLEncoder.DEFAULT.encode(getContextPath(), StandardCharsets.UTF_8) + uri;
         } else {
-            // uri is passed to the constructor for ApplicationDispatcher and is
-            // ultimately used as the value for getRequestURI() which returns
-            // encoded values. Therefore, since the value passed in for path
-            // was decoded, encode uri here.
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
@@ -422,7 +415,7 @@ public class ApplicationContext implements ServletContext {
             CharChunk uriCC = uriMB.getCharChunk();
             try {
                 uriCC.append(context.getPath());
-                uriCC.append(normalizedUri);
+                uriCC.append(uriToMap);
                 service.getMapper().map(context, uriMB, mappingData);
                 if (mappingData.wrapper == null) {
                     return null;
@@ -450,34 +443,6 @@ public class ApplicationContext implements ServletContext {
             uriMB.recycle();
             mappingData.recycle();
         }
-    }
-
-
-    // Package private to facilitate testing
-    static String stripPathParams(String input) {
-        // Shortcut
-        if (input.indexOf(';') < 0) {
-            return input;
-        }
-
-        StringBuilder sb = new StringBuilder(input.length());
-        int pos = 0;
-        int limit = input.length();
-        while (pos < limit) {
-            int nextSemiColon = input.indexOf(';', pos);
-            if (nextSemiColon < 0) {
-                nextSemiColon = limit;
-            }
-            sb.append(input.substring(pos, nextSemiColon));
-            int followingSlash = input.indexOf('/', nextSemiColon);
-            if (followingSlash < 0) {
-                pos = limit;
-            } else {
-                pos = followingSlash;
-            }
-        }
-
-        return sb.toString();
     }
 
 
@@ -584,29 +549,26 @@ public class ApplicationContext implements ServletContext {
     @Override
     public void removeAttribute(String name) {
 
-        Object value = null;
-
         // Remove the specified attribute
         // Check for read only attribute
         if (readOnlyAttributes.containsKey(name)) {
             return;
         }
-        value = attributes.remove(name);
+        Object value = attributes.remove(name);
         if (value == null) {
             return;
         }
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletContextAttributeEvent event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
         for (Object obj : listeners) {
-            if (!(obj instanceof ServletContextAttributeListener)) {
+            if (!(obj instanceof ServletContextAttributeListener listener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 context.fireContainerEvent("beforeContextAttributeRemoved", listener);
                 listener.attributeRemoved(event);
@@ -643,11 +605,11 @@ public class ApplicationContext implements ServletContext {
         boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
-        ServletContextAttributeEvent event = null;
+        ServletContextAttributeEvent event;
         if (replaced) {
             event = new ServletContextAttributeEvent(context.getServletContext(), name, oldValue);
         } else {
@@ -655,10 +617,9 @@ public class ApplicationContext implements ServletContext {
         }
 
         for (Object obj : listeners) {
-            if (!(obj instanceof ServletContextAttributeListener)) {
+            if (!(obj instanceof ServletContextAttributeListener listener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 if (replaced) {
                     context.fireContainerEvent("beforeContextAttributeReplaced", listener);
@@ -703,7 +664,7 @@ public class ApplicationContext implements ServletContext {
     private FilterRegistration.Dynamic addFilter(String filterName, String filterClass, Filter filter)
             throws IllegalStateException {
 
-        if (filterName == null || filterName.equals("")) {
+        if (filterName == null || filterName.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidFilterName", filterName));
         }
 
@@ -786,11 +747,11 @@ public class ApplicationContext implements ServletContext {
             throw new IllegalArgumentException(sm.getString("applicationContext.addJspFile.iae", jspFile));
         }
 
-        String jspServletClassName = null;
         Map<String,String> jspFileInitParams = new HashMap<>();
 
         Wrapper jspServlet = (Wrapper) context.findChild("jsp");
 
+        String jspServletClassName;
         if (jspServlet == null) {
             // No JSP servlet currently defined.
             // Use default JSP Servlet class name
@@ -816,7 +777,7 @@ public class ApplicationContext implements ServletContext {
     private ServletRegistration.Dynamic addServlet(String servletName, String servletClass, Servlet servlet,
             Map<String,String> initParams) throws IllegalStateException {
 
-        if (servletName == null || servletName.equals("")) {
+        if (servletName == null || servletName.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidServletName", servletName));
         }
 
@@ -913,7 +874,7 @@ public class ApplicationContext implements ServletContext {
             supportedSessionTrackingModes.add(SessionTrackingMode.COOKIE);
         }
 
-        // SSL not enabled by default as it can only used on its own
+        // SSL not enabled by default as it can only be used on its own
         // Context > Host > Engine > Service
         Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
@@ -954,7 +915,7 @@ public class ApplicationContext implements ServletContext {
             }
         }
 
-        // Check SSL has not be configured with anything else
+        // Check SSL has not been configured with anything else
         if (sessionTrackingModes.contains(SessionTrackingMode.SSL)) {
             if (sessionTrackingModes.size() > 1) {
                 throw new IllegalArgumentException(
@@ -996,13 +957,10 @@ public class ApplicationContext implements ServletContext {
         try {
             if (context.getInstanceManager() != null) {
                 Object obj = context.getInstanceManager().newInstance(className);
-
-                if (!(obj instanceof EventListener)) {
+                if (!(obj instanceof EventListener listener)) {
                     throw new IllegalArgumentException(
                             sm.getString("applicationContext.addListener.iae.wrongType", className));
                 }
-
-                EventListener listener = (EventListener) obj;
                 addListener(listener);
             }
         } catch (InvocationTargetException e) {

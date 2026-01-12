@@ -85,6 +85,6 @@ public class DriverConnectionFactory implements ConnectionFactory {
     @Override
     public String toString() {
         return this.getClass().getName() + " [" + driver + ";" + connectionString + ";"
-            + Utils.cloneWithoutCredentials(properties) + "]";
+                + Utils.cloneWithoutCredentials(properties) + "]";
     }
 }

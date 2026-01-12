@@ -43,7 +43,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private final Map<String,String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     private String name;
-    private StandardContext context;
+    private final StandardContext context;
 
     public ApplicationSessionCookieConfig(StandardContext context) {
         this.context = context;
@@ -221,7 +221,9 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             cookie.setHttpOnly(true);
         }
 
-        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, Boolean.toString(context.getUsePartitioned()));
+        if (context.getUsePartitioned()) {
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "");
+        }
 
         cookie.setPath(SessionConfig.getSessionCookiePath(context));
 

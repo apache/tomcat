@@ -1,0 +1,6 @@
+V	271205191323Z		1000	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=localhost
+R	271205191327Z	251205192921Z	1001	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=localhost
+V	271205191331Z		1002	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=user1
+R	271205191335Z	251205192924Z	1003	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=user2
+V	271205191540Z		1004	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=localhost
+V	271205193355Z		1005	unknown	/C=US/ST=DE/L=Wilmington/O=The Apache Software Foundation/OU=Apache Tomcat PMC/CN=OCSP Responder

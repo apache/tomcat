@@ -33,23 +33,11 @@ public class AuthenticatorFactory {
      */
     public static Authenticator getAuthenticator(String authScheme) {
 
-        Authenticator auth = null;
-        switch (authScheme.toLowerCase(Locale.ENGLISH)) {
-
-            case BasicAuthenticator.schemeName:
-                auth = new BasicAuthenticator();
-                break;
-
-            case DigestAuthenticator.schemeName:
-                auth = new DigestAuthenticator();
-                break;
-
-            default:
-                auth = loadAuthenticators(authScheme);
-                break;
-        }
-
-        return auth;
+        return switch (authScheme.toLowerCase(Locale.ENGLISH)) {
+            case BasicAuthenticator.schemeName -> new BasicAuthenticator();
+            case DigestAuthenticator.schemeName -> new DigestAuthenticator();
+            default -> loadAuthenticators(authScheme);
+        };
 
     }
 

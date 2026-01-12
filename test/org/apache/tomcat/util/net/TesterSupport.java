@@ -87,6 +87,9 @@ public final class TesterSupport {
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
     public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
+    public static final String DB_INDEX = SSL_DIR + "index.db";
+    public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "oscp-responder-rsa-cert.pem";
+    public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "oscp-responder-rsa-key.pem";
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
@@ -178,11 +181,15 @@ public final class TesterSupport {
     }
 
     public static ClientSSLSocketFactory configureClientSsl() {
+        return configureClientSsl(false);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12) {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
-            if (TLSV13_AVAILABLE) {
-                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+            if (TLSV13_AVAILABLE && !forceTls12) {
+                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
@@ -323,7 +330,7 @@ public final class TesterSupport {
 
     protected static boolean checkLastClientAuthRequestedIssuers() {
         if (lastRequestedIssuers == null || lastRequestedIssuers.length != 1) {
-          return false;
+            return false;
         }
         return (new X500Principal(clientAuthExpectedIssuer)).equals(
                     new X500Principal(lastRequestedIssuers[0].getName()));
@@ -367,9 +374,9 @@ public final class TesterSupport {
             // Report the number of bytes read
             resp.setContentType("text/plain");
             if (contentOK) {
-              resp.getWriter().print("OK-" + read);
+                resp.getWriter().print("OK-" + read);
             } else {
-              resp.getWriter().print("CONTENT-MISMATCH-" + read);
+                resp.getWriter().print("CONTENT-MISMATCH-" + read);
             }
         }
     }

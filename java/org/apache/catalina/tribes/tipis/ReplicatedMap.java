@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.tipis;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +56,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // Lazy init to support serialization
@@ -186,10 +188,9 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
 
     @Override
     public void memberDisappeared(Member member) {
-        boolean removed = false;
         Log log = getLog();
         synchronized (mapMembers) {
-            removed = (mapMembers.remove(member) != null);
+            boolean removed = (mapMembers.remove(member) != null);
             if (!removed) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));

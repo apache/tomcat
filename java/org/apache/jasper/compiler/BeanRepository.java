@@ -23,9 +23,6 @@ import org.apache.jasper.JasperException;
 
 /**
  * Repository of {page, request, session, application}-scoped beans
- *
- * @author Mandar Raje
- * @author Remy Maucherat
  */
 public class BeanRepository {
 
@@ -56,7 +53,7 @@ public class BeanRepository {
     }
 
     public Class<?> getBeanType(String bean) throws JasperException {
-        Class<?> clazz = null;
+        Class<?> clazz;
         try {
             clazz = loader.loadClass(beanTypes.get(bean));
         } catch (ClassNotFoundException ex) {

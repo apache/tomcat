@@ -35,9 +35,9 @@ public class JspCalendar {
     public String getMonth() {
         int m = getMonthInt();
         String[] months = new String [] { "January", "February", "March",
-                                        "April", "May", "June",
-                                        "July", "August", "September",
-                                        "October", "November", "December" };
+                                                "April", "May", "June",
+                                                "July", "August", "September",
+                                                "October", "November", "December" };
         if (m > 12) {
             return "Unknown to Man";
         }

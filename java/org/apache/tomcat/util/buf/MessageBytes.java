@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -27,18 +28,15 @@ import java.nio.charset.CodingErrorAction;
 import java.util.Locale;
 
 /**
- * This class is used to represent a subarray of bytes in an HTTP message. It represents all request/response elements.
+ * This class is used to represent a sub array of bytes in an HTTP message. It represents all request/response elements.
  * The byte/char conversions are delayed and cached. Everything is recyclable.
  * <p>
- * The object can represent a byte[], a char[], or a (sub) String. All operations can be made in case sensitive mode or
+ * The object can represent a byte[], a char[], or a (sub) String. All operations can be made in case-sensitive mode or
  * not.
- *
- * @author dac@eng.sun.com
- * @author James Todd [gonzo@eng.sun.com]
- * @author Costin Manolache
  */
 public final class MessageBytes implements Cloneable, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // primary type ( whatever is set as original value )
@@ -46,15 +44,15 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     public static final int T_NULL = 0;
     /**
-     * getType() is T_STR if the the object used to create the MessageBytes was a String.
+     * getType() is T_STR if the object used to create the MessageBytes was a String.
      */
     public static final int T_STR = 1;
     /**
-     * getType() is T_BYTES if the the object used to create the MessageBytes was a byte[].
+     * getType() is T_BYTES if the object used to create the MessageBytes was a byte[].
      */
     public static final int T_BYTES = 2;
     /**
-     * getType() is T_CHARS if the the object used to create the MessageBytes was a char[].
+     * getType() is T_CHARS if the object used to create the MessageBytes was a char[].
      */
     public static final int T_CHARS = 3;
 
@@ -111,7 +109,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 
     /**
-     * Sets the content to the specified subarray of bytes.
+     * Sets the content to the specified sub array of bytes.
      *
      * @param b   the bytes
      * @param off the start offset of the bytes
@@ -288,7 +286,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         } catch (CharacterCodingException cce) {
             // Some calls to this conversion originate in application code and
             // the Servlet API methods do not declare a suitable exception that
-            // can be thrown. Therefore stick with the uncaught exception type
+            // can be thrown. Therefore, stick with the uncaught exception type
             // used by the old, pre-Java 16 optimised version of this code.
             throw new IllegalArgumentException(cce);
         }
@@ -315,7 +313,7 @@ public final class MessageBytes implements Cloneable, Serializable {
                 toString();
                 //$FALL-THROUGH$
             case T_STR: {
-                char cc[] = strValue.toCharArray();
+                char[] cc = strValue.toCharArray();
                 charC.setChars(cc, 0, cc.length);
             }
         }
@@ -356,19 +354,17 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equals(String s) {
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
                 if (strValue == null) {
-                    return s == null;
+                    yield s == null;
                 }
-                return strValue.equals(s);
-            case T_CHARS:
-                return charC.equals(s);
-            case T_BYTES:
-                return byteC.equals(s);
-            default:
-                return false;
-        }
+                yield strValue.equals(s);
+            }
+            case T_CHARS -> charC.equals(s);
+            case T_BYTES -> byteC.equals(s);
+            default -> false;
+        };
     }
 
     /**
@@ -379,19 +375,17 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equalsIgnoreCase(String s) {
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
                 if (strValue == null) {
-                    return s == null;
+                    yield s == null;
                 }
-                return strValue.equalsIgnoreCase(s);
-            case T_CHARS:
-                return charC.equalsIgnoreCase(s);
-            case T_BYTES:
-                return byteC.equalsIgnoreCase(s);
-            default:
-                return false;
-        }
+                yield strValue.equalsIgnoreCase(s);
+            }
+            case T_CHARS -> charC.equalsIgnoreCase(s);
+            case T_BYTES -> byteC.equalsIgnoreCase(s);
+            default -> false;
+        };
     }
 
     @Override
@@ -403,9 +397,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     public boolean equals(MessageBytes mb) {
-        switch (type) {
-            case T_STR:
-                return mb.equals(strValue);
+        if (type == T_STR) {
+            return mb.equals(strValue);
         }
 
         if (mb.type != T_CHARS && mb.type != T_BYTES) {
@@ -472,9 +465,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (hasHashCode) {
             return hashCode;
         }
-        int code = 0;
-
-        code = hash();
+        int code = hash();
         hashCode = code;
         hasHashCode = true;
         return code;
@@ -482,21 +473,19 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // normal hash.
     private int hash() {
-        int code = 0;
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
+                int code = 0;
                 // We need to use the same hash function
                 for (int i = 0; i < strValue.length(); i++) {
                     code = code * 37 + strValue.charAt(i);
                 }
-                return code;
-            case T_CHARS:
-                return charC.hash();
-            case T_BYTES:
-                return byteC.hash();
-            default:
-                return 0;
-        }
+                yield code;
+            }
+            case T_CHARS -> charC.hash();
+            case T_BYTES -> byteC.hash();
+            default -> 0;
+        };
     }
 
     // Inefficient initial implementation. Will be replaced on the next
@@ -606,12 +595,10 @@ public final class MessageBytes implements Cloneable, Serializable {
             return longValue;
         }
 
-        switch (type) {
-            case T_BYTES:
-                longValue = byteC.getLong();
-                break;
-            default:
-                longValue = Long.parseLong(toString());
+        if (type == T_BYTES) {
+            longValue = byteC.getLong();
+        } else {
+            longValue = Long.parseLong(toString());
         }
 
         hasLongValue = true;

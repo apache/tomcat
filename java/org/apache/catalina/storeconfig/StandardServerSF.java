@@ -42,10 +42,9 @@ public class StandardServerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aObject, StoreDescription parentDesc)
             throws Exception {
-        if (aObject instanceof StandardServer) {
-            StandardServer server = (StandardServer) aObject;
+        if (aObject instanceof StandardServer server) {
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = server.findLifecycleListeners();
+            LifecycleListener[] listeners = server.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
             // Store nested <GlobalNamingResources> element
             NamingResourcesImpl globalNamingResources = server.getGlobalNamingResources();
@@ -55,7 +54,7 @@ public class StandardServerSF extends StoreFactoryBase {
                 elementDesc.getStoreFactory().store(aWriter, indent, globalNamingResources);
             }
             // Store nested <Service> elements
-            Service services[] = server.findServices();
+            Service[] services = server.findServices();
             storeElementArray(aWriter, indent, services);
         }
     }

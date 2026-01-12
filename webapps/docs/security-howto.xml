@@ -169,13 +169,31 @@
        <li>Do not remove the use of the <a
            href="config/realm.html#LockOut_Realm_-_org.apache.catalina.realm.LockOutRealm">LockOutRealm</a>
            which prevents brute force attacks against user passwords.</li>
-       <li>Configure the <a href="config/valve.html#Remote_Address_Valve">RemoteAddrValve</a>
+       <li>Configure the <a href="config/valve.html#Remote_CIDR_Valve">RemoteCIDRValve</a>
            in the <a href="config/context.html">context.xml</a> file for the
            management application which limits access to localhost by default.
            If remote access is required, limit it to specific IP addresses using
            this valve.</li>
      </ul>
    </subsection>
+  </section>
+
+  <section name="User web applications">
+    <p>Web applications are assumed to be trusted. It is not safe to deploy web
+    applications from untrusted sources.</p>
+
+    <p>Any application functionality that permits the modification of a web
+    application (WebDAV, HTTP PUT requests etc.) may impact the security of
+    either the web application or the Tomcat instance on which it is running.
+    Such functionality should either be restricted to trusted users or
+    limited in scope (e.g. via security constraints) such that users with access
+    to the functionality are unable to imapct the security of either the web
+    application or the Tomcat instance on which it is running.</p>
+
+    <p>Consider using the
+    <a href="config/filter.html#CORS_Filter">CORS filter</a> and/or the
+    <a href="config/filter.html#CSRF_Prevention_Filter">CSRF prevention
+    filter</a> with deployed web applications.</p>
   </section>
 
   <section name="Security manager">
@@ -258,10 +276,24 @@
       will interpret as UTF-7 a response containing characters that are safe for
       ISO-8859-1 but trigger an XSS vulnerability if interpreted as UTF-7.</p>
 
+      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
+      total number of request parameters (including uploaded files) obtained
+      from the query string and, for POST requests, the request body if the
+      content type is <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Requests with excessive parameters are
+      rejected.</p>
+
+      <p>The <strong>maxPartCount</strong> attribute controls the maximum number
+      of parts supported for a multipart request. This is limited to 50 by
+      default to reduce exposure to a DoS attack. The documentation for
+      <strong>maxPartCount</strong> provides more details on the memory
+      requirements for processing multipart requests. Requests with excessive
+      parts are rejected.</p>
+
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
-      of a POST request that will be parsed for parameters. The parameters are
-      cached for the duration of the request so this is limited to 2 MiB by
-      default to reduce exposure to a DOS attack.</p>
+      of data from a POST request that will be parsed for request parameters.
+      The parameters are cached for the duration of the request so this is
+      limited to 2 MiB by default to reduce exposure to a DoS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
@@ -275,21 +307,15 @@
       the <a href="config/valve.html#Form_Authenticator_Valve">FORM
       authenticator</a>.</p>
 
-      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
-      total number of request parameters (including uploaded files) obtained
-      from the query string and, for POST requests, the request body if the
-      content type is <code>application/x-www-form-urlencoded</code> or
-      <code>multipart/form-data</code>. Requests with excessive parameters are
-      rejected.</p>
+      <p>The <strong>rejectSuspiciousURIs</strong> attribute can be used to
+      reject valid URIs that contain patterns that are often used by malicious
+      clients to mount attacks using techniques such as directory traversal.
+      Note that this attribute is <code>false</code> by default as there is some
+      overlap betweeen suspicious URIs and legitimate usage.</p>
 
-      <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
-      X-Powered-By HTTP header is sent with each request. If sent, the value of
-      the header contains the Servlet and JSP specification versions, the full
-      Tomcat version (e.g. Apache Tomcat/<version-major-minor/>), the name of
-      the JVM vendor and
-      the version of the JVM. This header is disabled by default. This header
-      can provide useful information to both legitimate clients and attackers.
-      </p>
+      <p>The <strong>requiredSecret</strong> attribute in AJP connectors
+      configures shared secret between Tomcat and reverse proxy in front of
+      Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
 
       <p>The <strong>server</strong> attribute controls the value of the Server
       HTTP header. The default value of this header for Tomcat 4.1.x to
@@ -317,9 +343,14 @@
       proxy (the authenticated user name is passed to Tomcat as part of the AJP
       protocol) with the option for Tomcat to still perform authorization.</p>
 
-      <p>The <strong>requiredSecret</strong> attribute in AJP connectors
-      configures shared secret between Tomcat and reverse proxy in front of
-      Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
+      <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
+      X-Powered-By HTTP header is sent with each request. If sent, the value of
+      the header contains the Servlet and JSP specification versions, the full
+      Tomcat version (e.g. Apache Tomcat/<version-major-minor/>), the name of
+      the JVM vendor and
+      the version of the JVM. This header is disabled by default. This header
+      can provide useful information to both legitimate clients and attackers.
+      </p>
     </subsection>
 
     <subsection name="Host">
@@ -382,6 +413,15 @@
       (<code>$CATALINA_BASE/temp</code> by default). This location should be
       secured with appropriate file permissions - typically read/write for the
       Tomcat user and no access for other users.</p>
+
+      <p>When <strong>mapperContextRootRedirectEnabled</strong> and/or
+      <strong>mapperDirectoryRedirectEnabled</strong> are enabled, request
+      processing will be more efficient but there are security side effects.
+      First, the existence of a web application or a directory may be confirmed
+      even though the user does not have access to that directory. Secondly, any
+      Valves and/or Filters - including those providing security functionality -
+      will not have an opportunity to process the request.</p>
+
     </subsection>
 
     <subsection name="Valves">
@@ -391,7 +431,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddrValve (this Valve is also available as a Filter).
+      RemoteCIDRValve (this Valve is also available as a Filter).
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 
@@ -534,6 +574,20 @@
     headers it sets unless your application is already setting them. If Tomcat
     is accessed via a reverse proxy, then the configuration of this filter needs
     to be co-ordinated with any headers that the reverse proxy sets.</p>
+
+    <p>The WebDAV servlet enables edit functionality for web application
+    content. If the WebDAV servlet is enabled, the WebDAV functionality should
+    be appropriately secured. This should include CORS protection if it is
+    expected that any legitimate users will access the web application via a
+    browser.</p>
+
+    <p>When configuring security constraints, care should be taken if the URL
+    pattern for one or more constraints covers any segment of the URL that
+    becomes part of the pathInfo for a servlet and the servlet uses the pathInfo
+    to identify some other resource (like the default servlet does). In those
+    circumstances, correct application of the security constraint depends on the
+    implementation of the Servlet. All servlets included with Tomcat will behave
+    correctly in this scenario.</p>
   </section>
 
   <section name="Embedded Tomcat">
@@ -551,6 +605,23 @@
       Consider setting the <code>java.io.tmpdir</code> system property to an
       appropriately secured directory.</li>
     </ul>
+  </section>
+
+  <section name="Reverse Proxies">
+    <p>All clients, including reverse proxies, are responsible for the
+    consequences of the data they present to Tomcat.</p>
+
+    <p>The servlet specification removes path parameters when normalizing
+    requests. HTTP servers do not normally do this. This creates the possibility
+    of a client using a <code>/..;a=b/</code> type sequence in a URI to bypass a
+    security constraint implemented in the reverse proxy. This possibility can
+    be avoided with appropriate configuration such as using the setting
+    <code>mapping=servlet</code> with httpd's mod_proxy.</p>
+
+    <p>If Tomcat is deployed behind a reverse proxy and that reverse proxy
+    implements one or more security constraints, it is recommended a defense in
+    depth approach is taken and Tomcat is secured as if the reverse proxy was
+    not in use.</p>
   </section>
 
   <section name="General">

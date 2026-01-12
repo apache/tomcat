@@ -44,8 +44,6 @@ import org.xml.sax.SAXException;
 /**
  * Class responsible for generating an implicit tag library containing tag handlers corresponding to the tag files in
  * "/WEB-INF/tags/" or a subdirectory of it.
- *
- * @author Jan Luehe
  */
 class ImplicitTagLibraryInfo extends TagLibraryInfo {
 
@@ -165,7 +163,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                 return null;
             }
 
-            TagInfo tagInfo = null;
+            TagInfo tagInfo;
             try {
                 tagInfo = TagFileProcessor.parseTagFileDirectives(pc, shortName, path, null, this);
             } catch (JasperException je) {

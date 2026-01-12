@@ -32,8 +32,6 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the <code>/deploy</code> command, supported by the Tomcat manager application.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class DeployTask extends AbstractCatalinaCommandTask {
@@ -145,15 +143,15 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     FileChannel fsChannel = fsInput.getChannel();
                     contentLength = fsChannel.size();
                     stream = new BufferedInputStream(fsInput, 1024);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     if (fsInput != null) {
                         try {
                             fsInput.close();
-                        } catch (IOException ioe) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
-                    throw new BuildException(e);
+                    throw new BuildException(ioe);
                 }
             }
             contentType = "application/octet-stream";

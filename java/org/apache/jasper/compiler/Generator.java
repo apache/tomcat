@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -50,16 +51,13 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
+import org.apache.jasper.compiler.Node.JspAttribute;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
 
 /**
- * Generate Java source from Nodes
- *
- * @author Anil K. Vijendran, Danno Ferrin, Mandar Raje, Rajiv Mordani, Pierre Delisle
- * @author Tomcat 4.1.x and Tomcat 5: Kin-man Chung, Jan Luehe, Shawn Bayern, Mark Roth, Denis Benoit
- * @author Tomcat 6.x: Jacob Hookom, Remy Maucherat
+ * Generate Java source from Nodes.
  */
 class Generator {
 
@@ -68,6 +66,8 @@ class Generator {
     private static final Pattern PRE_TAG_PATTERN = Pattern.compile("(?s).*(<pre>|</pre>).*");
 
     private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
+
+    private static final String CORE_LIBS_URI = "http://java.sun.com/jsp/jstl/core";
 
     private final ServletWriter out;
 
@@ -100,6 +100,8 @@ class Generator {
     private final DateFormat timestampFormat;
 
     private final ELInterpreter elInterpreter;
+
+    private final Set<String> nonstandardCustomTagNames;
 
     private final StringInterpreter stringInterpreter;
 
@@ -465,8 +467,8 @@ class Generator {
 
         out.pushIndent();
         if (isPoolingEnabled) {
-            for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.get(i));
+            for (String tagHandlerPoolName : tagHandlerPoolNames) {
+                out.printin(tagHandlerPoolName);
                 out.print(" = org.apache.jasper.runtime.TagHandlerPool.getTagHandlerPool(");
                 if (ctxt.isTagFile()) {
                     out.print("config");
@@ -501,8 +503,8 @@ class Generator {
         out.pushIndent();
 
         if (isPoolingEnabled) {
-            for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.get(i));
+            for (String tagHandlerPoolName : tagHandlerPoolNames) {
+                out.printin(tagHandlerPoolName);
                 out.println(".release();");
             }
         }
@@ -596,7 +598,7 @@ class Generator {
             out.println("\");");
         }
         // classes however, may be empty depending on the import declarations
-        if (classes.size() == 0) {
+        if (classes.isEmpty()) {
             out.printin("_jspx_imports_classes = null;");
             out.println();
         } else {
@@ -623,8 +625,8 @@ class Generator {
      */
     private void genPreambleClassVariableDeclarations() {
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
-            for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printil("private org.apache.jasper.runtime.TagHandlerPool " + tagHandlerPoolNames.get(i) + ";");
+            for (String tagHandlerPoolName : tagHandlerPoolNames) {
+                out.printil("private org.apache.jasper.runtime.TagHandlerPool " + tagHandlerPoolName + ";");
             }
             out.println();
         }
@@ -1075,14 +1077,10 @@ class Generator {
             // If any of the params have their values specified by
             // jsp:attribute, prepare those values first.
             Node jspBody = findJspBody(n);
-            if (jspBody != null) {
-                prepareParams(jspBody);
-            } else {
-                prepareParams(n);
-            }
+            prepareParams(Objects.requireNonNullElse(jspBody, n));
 
             if (n.getBody() != null) {
-                generateIncludeWithParameters(n, page, isFlush, pageParam);
+                generateIncludeWithParameters(n, isFlush, pageParam);
             } else {
                 generateInclude(n, page, isFlush, pageParam);
             }
@@ -1097,8 +1095,8 @@ class Generator {
             out.println(", out, " + isFlush + ");");
         }
 
-        private void generateIncludeWithParameters(Node.IncludeAction n, Node.JspAttribute page, boolean isFlush,
-                String pageParam) throws JasperException {
+        private void generateIncludeWithParameters(Node.IncludeAction n, boolean isFlush, String pageParam)
+                throws JasperException {
             // jsp:include contains jsp:param - reuse some calculations
             String temporaryVariableName = n.getRoot().nextTemporaryVariableName();
             String urlVariableName = temporaryVariableName + "_url";
@@ -1108,7 +1106,8 @@ class Generator {
             out.printin("String " + requestEncodingVariableName + " = " + REQUEST_CHARACTER_ENCODING_TEXT + ";");
             out.println();
             out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, " + urlVariableName);
-            printParams(n, urlVariableName, page.isLiteral(), requestEncodingVariableName);
+            // literal is hard-coded to false for this call since it always uses a variable
+            printParams(n, urlVariableName, false, requestEncodingVariableName);
             out.println(", out, " + isFlush + ");");
         }
 
@@ -1177,11 +1176,7 @@ class Generator {
             // If any of the params have their values specified by
             // jsp:attribute, prepare those values first.
             Node jspBody = findJspBody(n);
-            if (jspBody != null) {
-                prepareParams(jspBody);
-            } else {
-                prepareParams(n);
-            }
+            prepareParams(Objects.requireNonNullElse(jspBody, n));
 
             out.printin("_jspx_page_context.forward(");
             out.print(pageParam);
@@ -1309,7 +1304,7 @@ class Generator {
                         canonicalName = klass;
                     }
                     // Check that there is a 0 arg constructor
-                    Constructor<?> constructor = bean.getConstructor(new Class[] {});
+                    Constructor<?> constructor = bean.getConstructor();
                     // Check the bean is public, not an interface, not abstract
                     // and in an exported module
                     int modifiers = bean.getModifiers();
@@ -1486,6 +1481,9 @@ class Generator {
 
         @Override
         public void visit(Node.CustomTag n) throws JasperException {
+            if (visitPotentiallyNonstandardCustomTag(n)) {
+                return;
+            }
 
             // Use plugin to generate more efficient code if there is one.
             if (n.useTagPlugin()) {
@@ -1579,26 +1577,22 @@ class Generator {
             VariableInfo[] infos = n.getVariableInfos();
             // The Validator always calls setTagData() which ensures infos is
             // non-null
-            if (infos.length > 0) {
-                for (VariableInfo info : infos) {
-                    // A null variable name will trigger multiple compilation
-                    // failures so assume non-null here
-                    pageInfo.getVarInfoNames().add(info.getVarName());
-                }
+            for (VariableInfo info : infos) {
+                // A null variable name will trigger multiple compilation
+                // failures so assume non-null here
+                pageInfo.getVarInfoNames().add(info.getVarName());
             }
             TagVariableInfo[] tagInfos = n.getTagVariableInfos();
             // The way Tomcat constructs the TagInfo, getTagVariableInfos()
             // will never return null.
-            if (tagInfos.length > 0) {
-                for (TagVariableInfo tagInfo : tagInfos) {
-                    // tagInfo is always non-null
-                    String name = tagInfo.getNameGiven();
-                    if (name == null) {
-                        String nameFromAttribute = tagInfo.getNameFromAttribute();
-                        name = n.getAttributeValue(nameFromAttribute);
-                    }
-                    pageInfo.getVarInfoNames().add(name);
+            for (TagVariableInfo tagInfo : tagInfos) {
+                // tagInfo is always non-null
+                String name = tagInfo.getNameGiven();
+                if (name == null) {
+                    String nameFromAttribute = tagInfo.getNameFromAttribute();
+                    name = n.getAttributeValue(nameFromAttribute);
                 }
+                pageInfo.getVarInfoNames().add(name);
             }
 
 
@@ -1724,11 +1718,11 @@ class Generator {
             Map<String,String> map = new HashMap<>();
             // Validator ensures this is non-null
             Node.JspAttribute[] attrs = n.getJspAttributes();
-            for (int i = 0; i < attrs.length; i++) {
-                String value = null;
-                String nvp = null;
-                if (attrs[i].isNamedAttribute()) {
-                    NamedAttribute attr = attrs[i].getNamedAttributeNode();
+            for (Node.JspAttribute jspAttribute : attrs) {
+                String value;
+                String nvp;
+                if (jspAttribute.isNamedAttribute()) {
+                    NamedAttribute attr = jspAttribute.getNamedAttributeNode();
                     Node.JspAttribute omitAttr = attr.getOmit();
                     String omit;
                     if (omitAttr == null) {
@@ -1741,18 +1735,18 @@ class Generator {
                             continue;
                         }
                     }
-                    value = generateNamedAttributeValue(attrs[i].getNamedAttributeNode());
+                    value = generateNamedAttributeValue(jspAttribute.getNamedAttributeNode());
                     if ("\"false\"".equals(omit)) {
-                        nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " + value + " + \"\\\"\"";
+                        nvp = " + \" " + jspAttribute.getName() + "=\\\"\" + " + value + " + \"\\\"\"";
                     } else {
-                        nvp = " + (java.lang.Boolean.valueOf(" + omit + ")?\"\":\" " + attrs[i].getName() +
+                        nvp = " + (java.lang.Boolean.valueOf(" + omit + ")?\"\":\" " + jspAttribute.getName() +
                                 "=\\\"\" + " + value + " + \"\\\"\")";
                     }
                 } else {
-                    value = attributeValue(attrs[i], false, Object.class);
-                    nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " + value + " + \"\\\"\"";
+                    value = attributeValue(jspAttribute, false, Object.class);
+                    nvp = " + \" " + jspAttribute.getName() + "=\\\"\" + " + value + " + \"\\\"\"";
                 }
-                map.put(attrs[i].getName(), nvp);
+                map.put(jspAttribute.getName(), nvp);
             }
 
             // Write begin tag, using XML-style 'name' attribute as the
@@ -1857,12 +1851,7 @@ class Generator {
                 int textIndex = 0;
                 int textLength = text.length();
                 while (textIndex < textLength) {
-                    int len = 0;
-                    if (textLength - textIndex > 16384) {
-                        len = 16384;
-                    } else {
-                        len = textLength - textIndex;
-                    }
+                    int len = Math.min(textLength - textIndex, 16384);
                     String output = text.substring(textIndex, textIndex + len);
                     String charArrayName = textMap.get(output);
                     if (charArrayName == null) {
@@ -2047,9 +2036,9 @@ class Generator {
             Node.JspAttribute[] attrs = tag.getJspAttributes();
             // The TagPluginManager only creates AttributeGenerator nodes for
             // attributes that are present.
-            for (int i = 0; i < attrs.length; i++) {
-                if (attrs[i].getName().equals(n.getName())) {
-                    out.print(evaluateAttribute(getTagHandlerInfo(tag), attrs[i], tag, null));
+            for (Node.JspAttribute attr : attrs) {
+                if (attr.getName().equals(n.getName())) {
+                    out.print(evaluateAttribute(getTagHandlerInfo(tag), attr, tag, null));
                     break;
                 }
             }
@@ -2400,8 +2389,7 @@ class Generator {
             List<Object> vec = n.getScriptingVars(scope);
             if (vec != null) {
                 for (Object elem : vec) {
-                    if (elem instanceof VariableInfo) {
-                        VariableInfo varInfo = (VariableInfo) elem;
+                    if (elem instanceof VariableInfo varInfo) {
                         out.printin(varInfo.getClassName());
                         out.print(" ");
                         out.print(varInfo.getVarName());
@@ -2440,7 +2428,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -2512,7 +2500,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -2578,7 +2566,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -2666,8 +2654,8 @@ class Generator {
 
             String localName = attr.getLocalName();
 
-            Method m = null;
-            Class<?>[] c = null;
+            Method m;
+            Class<?>[] c;
             if (attr.isDynamic()) {
                 c = OBJECT_CLASS;
             } else {
@@ -2736,10 +2724,8 @@ class Generator {
                     sb.append("))");
                     // should the expression be evaluated before passing to
                     // the setter?
-                    boolean evaluate = false;
-                    if (tai.canBeRequestTime()) {
-                        evaluate = true; // JSP.2.3.2
-                    }
+                    boolean evaluate = tai.canBeRequestTime();
+                    // JSP.2.3.2
                     if (attr.isDeferredInput()) {
                         evaluate = false; // JSP.2.3.3
                     }
@@ -2974,7 +2960,7 @@ class Generator {
             fragmentHelperClass.closeFragment(fragment, methodNesting);
             // XXX - Need to change pageContext to jspContext if
             // we're not in a place where pageContext is defined (e.g.
-            // in a fragment or in a tag file.
+            // in a fragment or in a tag file).
             out.print("new " + fragmentHelperClass.getClassName() + "( " + fragment.getId() + ", _jspx_page_context, " +
                     tagHandlerVar + ", " + pushBodyCountVar + ")");
         }
@@ -3045,6 +3031,216 @@ class Generator {
             out.println(";");
 
             return varName;
+        }
+
+        /**
+         * Determines whether a tag should be handled via nonstandard code (typically faster). Considers both
+         * configuration and level of support within Tomcat.
+         * <p>
+         * Note that Tomcat is free to ignore any case it cannot handle, as long as it reports it accurately to the
+         * caller by returning false. For example, the initial implementation for c:set excludes support for body
+         * content. c:set tags with body content will be generated with the standard code and tags without body content
+         * will be generated via non-standard code.
+         *
+         * @param n             tag
+         * @param jspAttributes jsp attributes
+         *
+         * @return whether code was generated
+         *
+         * @throws JasperException unexpected error
+         */
+        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n) throws JasperException {
+            if (!nonstandardCustomTagNames.contains(n.getQName())) {
+                // tag is not configured, move along
+                return false;
+            }
+
+            // collect the attributes into one Map for further checks
+            Map<String,JspAttribute> jspAttributes = new HashMap<>();
+            if (n.getJspAttributes() != null) {
+                for (JspAttribute jspAttr : n.getJspAttributes()) {
+                    jspAttributes.put(jspAttr.getLocalName(), jspAttr);
+                }
+            }
+            switch (n.qName) {
+                case "c:set":
+                    // requires var and value, scope is optional, body is prohibited, value cannot be deferred
+                    if (n.hasEmptyBody() && jspAttributes.containsKey("var") && jspAttributes.containsKey("value") &&
+                            CORE_LIBS_URI.equals(n.getURI())) {
+                        // verify value is not a deferred expression
+                        String valueText = jspAttributes.get("value").getValue();
+                        if (valueText.startsWith("#")) {
+                            return false;
+                        } else if (jspAttributes.size() == 2 ||
+                                (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
+                            generateNonstandardSetLogic(n, jspAttributes);
+                            return true;
+                        }
+                    }
+                    break;
+                case "c:remove":
+                    // requires var, scope is optional, body is prohibited
+                    if (n.hasEmptyBody() && jspAttributes.containsKey("var") && CORE_LIBS_URI.equals(n.getURI()) &&
+                            (jspAttributes.size() == 1 ||
+                                    (jspAttributes.size() == 2 && jspAttributes.containsKey("scope")))) {
+                        generateNonstandardRemoveLogic(n, jspAttributes);
+                        return true;
+
+                    }
+                    break;
+                default:
+                    // This indicates someone configured a tag with no non-standard implementation.
+                    // Harmless, fall back to the standard implementation.
+            }
+            return false;
+        }
+
+        private void generateNonstandardSetLogic(Node.CustomTag n, Map<String,JspAttribute> jspAttributes)
+                throws JasperException {
+            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+            String tagMethod = "_jspx_meth_" + baseVar;
+            ServletWriter outSave = out;
+
+            // generate method call
+            out.printin(tagMethod);
+            out.print("(");
+            out.print("_jspx_page_context");
+            out.println(");");
+            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+            methodsBuffered.add(genBuffer);
+            out = genBuffer.getOut();
+
+            // Generate code for method declaration
+            methodNesting++;
+            out.println();
+            out.pushIndent();
+            out.printin("private void ");
+            out.print(tagMethod);
+            out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+            out.printil("        throws java.lang.Throwable {");
+            out.pushIndent();
+            // Generated body of method
+            out.printil("//  " + n.getQName());
+
+            JspAttribute varAttribute = jspAttributes.get("var");
+            Mark m = n.getStart();
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") " +
+                    varAttribute.getTagAttributeInfo());
+
+            JspAttribute valueAttribute = jspAttributes.get("value");
+            m = n.getStart();
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") " +
+                    valueAttribute.getTagAttributeInfo());
+
+            String varValue = varAttribute.getValue();
+
+            // get the scope constant at compile-time, where blank means page
+            String scopeValue = translateScopeToConstant(jspAttributes);
+
+            // translates the specified value attributes into EL-interpretation code using standard logic
+            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute, n, null);
+
+            // call the multi-line logic equivalent of SetTag
+            out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \"" +
+                    varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
+
+            // Generate end of method
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+
+            methodNesting--;
+            // restore previous writer
+            out = outSave;
+        }
+
+        /**
+         * Compile-time translation of the scope variable into the constant equivalent. Avoids runtime evaluation as
+         * performed by SetTag. Unspecified scope means page.
+         *
+         * @param jspAttributes attributes
+         *
+         * @return equivalent constant from PageContext
+         */
+        private String translateScopeToConstant(Map<String,JspAttribute> jspAttributes) {
+            String scopeValue;
+            JspAttribute scopeAttribute = jspAttributes.get("scope");
+            if (scopeAttribute == null) {
+                scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
+            } else {
+                switch (scopeAttribute.getValue()) {
+                    case "":
+                    case "page":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
+                        break;
+                    case "request":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.REQUEST_SCOPE";
+                        break;
+                    case "session":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.SESSION_SCOPE";
+                        break;
+                    case "application":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.APPLICATION_SCOPE";
+                        break;
+                    default:
+                        throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+                }
+            }
+            return scopeValue;
+        }
+
+        /**
+         * Generates the code for a non-standard remove. Note that removes w/o a specified scope will remove from all
+         * scopes.
+         *
+         * @param n             tag
+         * @param jspAttributes attributes
+         *
+         * @throws JasperException unspecified error
+         */
+        private void generateNonstandardRemoveLogic(Node.CustomTag n, Map<String,JspAttribute> jspAttributes)
+                throws JasperException {
+            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+            String tagMethod = "_jspx_meth_" + baseVar;
+            ServletWriter outSave = out;
+
+            // generate method call
+            out.printin(tagMethod);
+            out.print("(");
+            out.print("_jspx_page_context");
+            out.println(");");
+            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+            methodsBuffered.add(genBuffer);
+            out = genBuffer.getOut();
+
+            // Generate code for method declaration
+            methodNesting++;
+            out.println();
+            out.pushIndent();
+            out.printin("private void ");
+            out.print(tagMethod);
+            out.println("(jakarta.servlet.jsp.PageContext pageContext)");
+            out.printil("        throws java.lang.Throwable {");
+            out.pushIndent();
+            // Generated body of method
+            String varValue = jspAttributes.get("var").getValue();
+            JspAttribute scope = jspAttributes.get("scope");
+            if (scope == null) {
+                // c:remove without a scope means remove from all scopes
+                out.printil("pageContext.removeAttribute(\"" + varValue + "\");");
+            } else {
+                // c:remove with a scope means remove only from the specified scope
+                String scopeValue = translateScopeToConstant(jspAttributes);
+                out.printil("pageContext.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
+            }
+            // Generate end of method
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+
+            methodNesting--;
+            // restore previous writer
+            out = outSave;
         }
     }
 
@@ -3188,6 +3384,12 @@ class Generator {
         }
         timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String nonstandardOptionsList = ctxt.getOptions().getUseNonstandardTagOptimizations();
+        if (nonstandardOptionsList == null) {
+            nonstandardCustomTagNames = Collections.emptySet();
+        } else {
+            nonstandardCustomTagNames = new HashSet<>(Arrays.asList(nonstandardOptionsList.split(",")));
+        }
     }
 
     /**
@@ -3653,11 +3855,11 @@ class Generator {
      */
     private static class TagHandlerInfo {
 
-        private Map<String,Method> methodMaps;
+        private final Map<String,Method> methodMaps;
 
-        private Map<String,Class<?>> propertyEditorMaps;
+        private final Map<String,Class<?>> propertyEditorMaps;
 
-        private Class<?> tagHandlerClass;
+        private final Class<?> tagHandlerClass;
 
         /**
          * Constructor.
@@ -3718,13 +3920,13 @@ class Generator {
         /*
          * For a CustomTag, the codes that are generated at the beginning of the tag may not be in the same buffer as
          * those for the body of the tag. Two fields are used here to keep this straight. For codes that do not
-         * corresponds to any JSP lines, they should be null.
+         * correspond to any JSP lines, they should be null.
          */
-        private Node node;
+        private final Node node;
 
-        private Node.Nodes body;
+        private final Node.Nodes body;
 
-        private java.io.CharArrayWriter charWriter;
+        private final java.io.CharArrayWriter charWriter;
 
         protected ServletWriter out;
 
@@ -3803,9 +4005,9 @@ class Generator {
     private static class FragmentHelperClass {
 
         private static class Fragment {
-            private GenBuffer genBuffer;
+            private final GenBuffer genBuffer;
 
-            private int id;
+            private final int id;
 
             Fragment(int id, Node node) {
                 this.id = id;
@@ -3824,12 +4026,12 @@ class Generator {
         // True if the helper class should be generated.
         private boolean used = false;
 
-        private List<Fragment> fragments = new ArrayList<>();
+        private final List<Fragment> fragments = new ArrayList<>();
 
-        private String className;
+        private final String className;
 
         // Buffer for entire helper class
-        private GenBuffer classBuffer = new GenBuffer();
+        private final GenBuffer classBuffer = new GenBuffer();
 
         FragmentHelperClass(String className) {
             this.className = className;

@@ -88,7 +88,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
             if (buffered.getLimit() == 0) {
                 // Special case - ignore (swallow) body. Do so within a limit.
                 long swallowed = 0;
-                int read = 0;
+                int read;
                 while ((read = buffer.doRead(this)) >= 0) {
                     swallowed += read;
                     if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {

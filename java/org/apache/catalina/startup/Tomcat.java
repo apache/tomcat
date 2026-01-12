@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,8 +131,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @see <a href=
  *          "https://gitbox.apache.org/repos/asf?p=tomcat.git;a=blob;f=test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
- *
- * @author Costin Manolache
  */
 public class Tomcat {
 
@@ -191,7 +190,7 @@ public class Tomcat {
     }
 
     /**
-     * The the hostname of the default host, default is 'localhost'.
+     * The hostname of the default host, default is 'localhost'.
      *
      * @param s The default host name
      */
@@ -461,7 +460,7 @@ public class Tomcat {
     /**
      * Add a user for the in-memory realm. All created apps use this by default, can be replaced using setRealm().
      *
-     * @param user The user name
+     * @param user The username
      * @param pass The password
      */
     public void addUser(String user, String pass) {
@@ -473,7 +472,7 @@ public class Tomcat {
      *
      * @see #addUser(String, String)
      *
-     * @param user The user name
+     * @param user The username
      * @param role The role name
      */
     public void addRole(String user, String role) {
@@ -664,12 +663,12 @@ public class Tomcat {
      * @return the deployed context
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
-        LifecycleListener listener = null;
+        LifecycleListener listener;
         try {
             Class<?> clazz = Class.forName(getHost().getConfigClass());
             listener = (LifecycleListener) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            // Wrap in IAE since we can't easily change the method signature to
+            // Wrap in IAE since we can't easily change the method signature
             // to throw the specific checked exceptions
             throw new IllegalArgumentException(e);
         }
@@ -810,7 +809,7 @@ public class Tomcat {
         }
         try {
             baseFile = baseFile.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             baseFile = baseFile.getAbsoluteFile();
         }
         server.setCatalinaBase(baseFile);
@@ -827,7 +826,7 @@ public class Tomcat {
             }
             try {
                 homeFile = homeFile.getCanonicalFile();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 homeFile = homeFile.getAbsoluteFile();
             }
             server.setCatalinaHome(homeFile);
@@ -875,10 +874,10 @@ public class Tomcat {
 
 
     /**
-     * By default, when calling addWebapp() to create a Context, the settings from from the default web.xml are added to
-     * the context. Calling this method with a <code>false</code> value prior to calling addWebapp() allows to opt out
-     * of the default settings. In that event you will need to add the configurations yourself, either programmatically
-     * or by using web.xml deployment descriptors.
+     * By default, when calling addWebapp() to create a Context, the settings from the default web.xml are added to the
+     * context. Calling this method with a <code>false</code> value prior to calling addWebapp() allows to opt out of
+     * the default settings. In that event you will need to add the configurations yourself, either programmatically or
+     * by using web.xml deployment descriptors.
      *
      * @param addDefaultWebXmlToWebapp <code>false</code> will prevent the class from automatically adding the default
      *                                     settings when calling addWebapp(). <code>true</code> will add the default
@@ -908,7 +907,7 @@ public class Tomcat {
         loggerName.append(host.getName());
         loggerName.append("].[");
         // Context name
-        if (contextName == null || contextName.equals("")) {
+        if (contextName == null || contextName.isEmpty()) {
             loggerName.append('/');
         } else if (contextName.startsWith("##")) {
             loggerName.append('/');
@@ -991,7 +990,6 @@ public class Tomcat {
      * <li>MIME mappings (subset of those in conf/web.xml)</li>
      * <li>Welcome files</li>
      * </ul>
-     * TODO: Align the MIME mappings with conf/web.xml - possibly via a common file.
      *
      * @param contextPath The path of the context to set the defaults for
      */
@@ -1033,11 +1031,15 @@ public class Tomcat {
         ctx.addWelcomeFile("index.html");
         ctx.addWelcomeFile("index.htm");
         ctx.addWelcomeFile("index.jsp");
+        // Any application configured welcome files should override the defaults.
+        if (ctx instanceof StandardContext stdCtx) {
+            stdCtx.setReplaceWelcomeFiles(true);
+        }
     }
 
 
     /**
-     * Add the default MIME type mappings to the provide Context.
+     * Add the default MIME type mappings to the provided Context.
      *
      * @param context The web application to which the default MIME type mappings should be added.
      */
@@ -1048,8 +1050,8 @@ public class Tomcat {
             for (Map.Entry<Object,Object> entry : defaultMimeMappings.entrySet()) {
                 context.addMimeMapping((String) entry.getKey(), (String) entry.getValue());
             }
-        } catch (IOException e) {
-            throw new IllegalStateException(sm.getString("tomcat.defaultMimeTypeMappingsFail"), e);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(sm.getString("tomcat.defaultMimeTypeMappingsFail"), ioe);
         }
     }
 
@@ -1079,6 +1081,7 @@ public class Tomcat {
                     }
                 }
             } catch (ClassCastException e) {
+                // Ignore
             }
         }
     }
@@ -1180,9 +1183,9 @@ public class Tomcat {
             if (entry != null) {
                 result = UriUtil.buildJarUrl(docBase, Constants.ApplicationContextXml);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             Logger.getLogger(getLoggerName(getHost(), contextName)).log(Level.WARNING,
-                    sm.getString("tomcat.noContextXml", docBase), e);
+                    sm.getString("tomcat.noContextXml", docBase), ioe);
         }
         return result;
     }
@@ -1191,7 +1194,7 @@ public class Tomcat {
         // Graal native images don't load any configuration except the VM default
         if (JreCompat.isGraalAvailable()) {
             try (InputStream is = new FileInputStream(
-                    new File(System.getProperty("java.util.logging.config.file", "conf/logging.properties")))) {
+                    System.getProperty("java.util.logging.config.file", "conf/logging.properties"))) {
                 LogManager.getLogManager().readConfiguration(is);
             } catch (SecurityException | IOException e) {
                 // Ignore, the VM default will be used
@@ -1215,10 +1218,7 @@ public class Tomcat {
             } else if (args[i].equals("--catalina")) {
                 // This was already processed before
                 // Skip the rest of the arguments as they are for Catalina
-                ArrayList<String> result = new ArrayList<>();
-                for (int j = i + 1; j < args.length; j++) {
-                    result.add(args[j]);
-                }
+                ArrayList<String> result = new ArrayList<>(Arrays.asList(args).subList(i + 1, args.length));
                 catalinaArguments = result.toArray(new String[0]);
                 break;
             }
@@ -1231,28 +1231,34 @@ public class Tomcat {
         boolean await = false;
         String path = "";
         // Process command line parameters
+        label:
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--war")) {
-                if (++i >= args.length) {
-                    throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
-                }
-                File war = new File(args[i]);
-                tomcat.addWebapp(path, war.getAbsolutePath());
-            } else if (args[i].equals("--path")) {
-                if (++i >= args.length) {
-                    throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
-                }
-                path = args[i];
-            } else if (args[i].equals("--await")) {
-                await = true;
-            } else if (args[i].equals("--no-jmx")) {
-                // This was already processed before
-            } else if (args[i].equals("--catalina")) {
-                // This was already processed before
-                // Skip the rest of the arguments as they are for Catalina
-                break;
-            } else {
-                throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
+            switch (args[i]) {
+                case "--war":
+                    if (++i >= args.length) {
+                        throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
+                    }
+                    File war = new File(args[i]);
+                    tomcat.addWebapp(path, war.getAbsolutePath());
+                    break;
+                case "--path":
+                    if (++i >= args.length) {
+                        throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
+                    }
+                    path = args[i];
+                    break;
+                case "--await":
+                    await = true;
+                    break;
+                case "--no-jmx":
+                    // This was already processed before
+                    break;
+                case "--catalina":
+                    // This was already processed before
+                    // Skip the rest of the arguments as they are for Catalina
+                    break label;
+                default:
+                    throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
             }
         }
         tomcat.start();

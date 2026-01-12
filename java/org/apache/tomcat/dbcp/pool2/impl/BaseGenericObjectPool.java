@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,7 +65,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
     /**
      * The idle object eviction iterator. Holds a reference to the idle objects.
      */
-    class EvictionIterator implements Iterator<PooledObject<T>> {
+    final class EvictionIterator implements Iterator<PooledObject<T>> {
 
         private final Deque<PooledObject<T>> idleObjects;
         private final Iterator<PooledObject<T>> idleObjectIterator;
@@ -117,7 +117,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *
      * @see GenericKeyedObjectPool#setTimeBetweenEvictionRunsMillis
      */
-    class Evictor implements Runnable {
+    final class Evictor implements Runnable {
 
         private ScheduledFuture<?> scheduledFuture;
 
@@ -205,41 +205,53 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * @param <T> type of objects in the pool
      */
     static class IdentityWrapper<T> {
+
+        /**
+         * Creates a new instance for the object inside a {@link PooledObject}.
+         *
+         * @param <T> The type of the object in the {@link PooledObject}.
+         * @param p The {@link PooledObject}.
+         * @return a new instance.
+         */
+        static <T> IdentityWrapper<T> unwrap(final PooledObject<T> p) {
+            return new IdentityWrapper<>(p.getObject());
+        }
+
         /** Wrapped object */
-        private final T instance;
+        private final T object;
 
         /**
          * Constructs a wrapper for an instance.
          *
-         * @param instance object to wrap
+         * @param object object to wrap
          */
-        IdentityWrapper(final T instance) {
-            this.instance = instance;
+        IdentityWrapper(final T object) {
+            this.object = object;
         }
 
         @Override
         @SuppressWarnings("rawtypes")
         public boolean equals(final Object other) {
-            return other instanceof IdentityWrapper && ((IdentityWrapper) other).instance == instance;
+            return other instanceof IdentityWrapper && ((IdentityWrapper) other).object == object;
         }
 
         /**
          * @return the wrapped object
          */
-        public T getObject() {
-            return instance;
+        T getObject() {
+            return object;
         }
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(instance);
+            return System.identityHashCode(object);
         }
 
         @Override
         public String toString() {
             final StringBuilder builder = new StringBuilder();
             builder.append("IdentityWrapper [instance=");
-            builder.append(instance);
+            builder.append(object);
             builder.append("]");
             return builder.toString();
         }
@@ -249,7 +261,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * Maintains a cache of values for a single metric and reports
      * statistics on the cached values.
      */
-    private static class StatsStore {
+    private static final class StatsStore {
 
         private static final int NONE = -1;
         private final AtomicLong[] values;
@@ -395,6 +407,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
 
     private volatile SwallowedExceptionListener swallowedExceptionListener;
     private volatile boolean messageStatistics;
+    private volatile boolean collectDetailedStatistics = BaseObjectPoolConfig.DEFAULT_COLLECT_DETAILED_STATISTICS;
 
     /** Additional configuration properties for abandoned object tracking. */
     protected volatile AbandonedConfig abandonedConfig;
@@ -483,6 +496,16 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
     }
 
     /**
+     * Returns the duration since the given start time.
+     *
+     * @param startInstant the start time
+     * @return the duration since the given start time
+     */
+    final Duration durationSince(final Instant startInstant) {
+        return Duration.between(startInstant, Instant.now());
+    }
+
+    /**
      * Tries to ensure that the configured minimum number of idle instances are
      * available in the pool.
      * @throws Exception if an error occurs creating idle instances
@@ -522,6 +545,20 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      */
     public final long getBorrowedCount() {
         return borrowedCount.get();
+    }
+
+    /**
+     * Gets whether detailed timing statistics collection is enabled.
+     * When {@code false}, the pool will not collect detailed timing statistics for
+     * mean active time, mean idle time, and mean borrow wait time,
+     * improving performance under high load.
+     *
+     * @return {@code true} if detailed statistics collection is enabled,
+     *         {@code false} if disabled for improved performance.
+     * @since 2.13.0
+     */
+    public boolean getCollectDetailedStatistics() {
+        return collectDetailedStatistics;
     }
 
     /**
@@ -579,7 +616,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRuns
      * @since 2.11.0
      */
@@ -603,7 +639,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * used by this pool.
      *
      * @return  The fully qualified class name of the {@link EvictionPolicy}
-     *
      * @see #setEvictionPolicyClassName(String)
      */
     public final String getEvictionPolicyClassName() {
@@ -935,7 +970,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * tested per run.
      *
      * @return max number of objects to examine during each evictor run
-     *
      * @see #setNumTestsPerEvictionRun
      * @see #setTimeBetweenEvictionRunsMillis
      */
@@ -979,7 +1013,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * @return The abandoned object timeout in seconds if abandoned object
      *         removal is configured for this pool; Integer.MAX_VALUE otherwise.
      *
-     * @see AbandonedConfig#getRemoveAbandonedTimeoutDuration()
      * @see AbandonedConfig#getRemoveAbandonedTimeoutDuration()
      * @deprecated Use {@link #getRemoveAbandonedTimeoutDuration()}.
      * @since 2.11.0
@@ -1150,7 +1183,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *         being returned from the {@code borrowObject()} method
      *
      * @see #setTestOnCreate
-     *
      * @since 2.2
      */
     public final boolean getTestOnCreate() {
@@ -1182,7 +1214,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * the pool and destroyed.
      *
      * @return {@code true} if objects will be validated by the evictor
-     *
      * @see #setTestWhileIdle
      * @see #setTimeBetweenEvictionRunsMillis
      */
@@ -1196,7 +1227,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRuns
      * @since 2.10.0
      * @deprecated {@link #getDurationBetweenEvictionRuns()}.
@@ -1212,7 +1242,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRunsMillis
      * @deprecated Use {@link #getDurationBetweenEvictionRuns()}.
      */
@@ -1233,8 +1262,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
     }
 
     /**
-     * Tests whether this pool instance been closed.
-     * @return {@code true} when this pool has been closed.
+     * Tests whether this pool instance is closed.
+     *
+     * @return {@code true} when this pool is closed.
      */
     public final boolean isClosed() {
         return closed;
@@ -1265,7 +1295,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
         }
         while (!registered) {
             try {
-                ObjectName objName;
+                final ObjectName objName;
                 // Skip the numeric suffix for the first pool in case there is
                 // only one so the names are cleaner.
                 if (i == 1) {
@@ -1333,7 +1363,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * Sets the abandoned object removal configuration.
      *
      * @param abandonedConfig the new configuration to use. This is used by value.
-     *
      * @see AbandonedConfig
      * @since 2.11.0
      */
@@ -1354,6 +1383,21 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      */
     public final void setBlockWhenExhausted(final boolean blockWhenExhausted) {
         this.blockWhenExhausted = blockWhenExhausted;
+    }
+
+    /**
+     * Sets whether detailed timing statistics collection is enabled.
+     * When {@code false}, the pool will not collect detailed timing statistics,
+     * improving performance under high load at the cost of reduced monitoring capabilities.
+     * <p>
+     * This setting affects data collection for mean active time, mean idle time, and mean borrow wait time.
+     * </p>
+     *
+     * @param collectDetailedStatistics whether to collect detailed statistics.
+     * @since 2.13.0
+     */
+    public void setCollectDetailedStatistics(final boolean collectDetailedStatistics) {
+        this.collectDetailedStatistics = collectDetailedStatistics;
     }
 
     /**
@@ -1382,6 +1426,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
             setEvictionPolicy(policy);
         }
         setEvictorShutdownTimeout(config.getEvictorShutdownTimeoutDuration());
+        setCollectDetailedStatistics(config.getCollectDetailedStatistics());
     }
 
     /**
@@ -1833,7 +1878,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *                      {@code borrowObject()} method
      *
      * @see #getTestOnCreate
-     *
      * @since 2.2
      */
     public final void setTestOnCreate(final boolean testOnCreate) {
@@ -1954,6 +1998,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
         startEvictor(Duration.ofMillis(-1L));
     }
 
+
     /**
      * Swallows an exception and notifies the configured listener for swallowed
      * exceptions queue.
@@ -2054,17 +2099,19 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      */
     final void updateStatsBorrow(final PooledObject<T> p, final Duration waitDuration) {
         borrowedCount.incrementAndGet();
-        idleTimes.add(p.getIdleDuration());
-        waitTimes.add(waitDuration);
-
-        // lock-free optimistic-locking maximum
-        Duration currentMaxDuration;
-        do {
-            currentMaxDuration = maxBorrowWaitDuration.get();
-            if (currentMaxDuration.compareTo(waitDuration) >= 0) {
-                break;
-            }
-        } while (!maxBorrowWaitDuration.compareAndSet(currentMaxDuration, waitDuration));
+        // Only collect detailed statistics if enabled
+        if (collectDetailedStatistics) {
+            idleTimes.add(p.getIdleDuration());
+            waitTimes.add(waitDuration);
+            // lock-free optimistic-locking maximum
+            Duration currentMaxDuration;
+            do {
+                currentMaxDuration = maxBorrowWaitDuration.get();
+                if (currentMaxDuration.compareTo(waitDuration) >= 0) {
+                    break;
+                }
+            } while (!maxBorrowWaitDuration.compareAndSet(currentMaxDuration, waitDuration));
+        }
     }
 
     /**
@@ -2075,8 +2122,25 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      */
     final void updateStatsReturn(final Duration activeTime) {
         returnedCount.incrementAndGet();
-        activeTimes.add(activeTime);
+        // Only collect detailed statistics if enabled
+        if (collectDetailedStatistics) {
+            activeTimes.add(activeTime);
+        }
     }
 
+    /**
+     * Waits for notification on the given object for the specified duration.
+     * Duration.ZERO causes the thread to wait indefinitely.
+     *
+     * @param obj the object to wait on
+     * @param duration the duration to wait
+     * @throws InterruptedException if interrupted while waiting
+     * @throws IllegalArgumentException if the duration is negative
+     */
+    final void wait(final Object obj, final Duration duration) throws InterruptedException {
+        if (!duration.isNegative()) {
+            obj.wait(duration.toMillis(), duration.getNano() % 1_000_000);
+        }
+    }
 
 }

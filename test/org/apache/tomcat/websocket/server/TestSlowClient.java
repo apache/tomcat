@@ -19,6 +19,8 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 
 import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
@@ -34,6 +36,7 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.tomcat.websocket.TesterFirehoseServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
+import org.apache.tomcat.websocket.WsSession;
 
 public class TestSlowClient extends WebSocketBaseTest {
 
@@ -61,19 +64,26 @@ public class TestSlowClient extends WebSocketBaseTest {
         // Trigger the sending of the messages from the server
         wsSession.getBasicRemote().sendText("start");
 
-        // Wait for server to close connection (it shouldn't)
-        // 20s should be long enough even for the slowest CI system. May need to
-        // extend this if not.
+        /*
+         * Wait for server to experience a write timeout. This should take TesterFirehoseServer.SEND_TIME_OUT_MILLIS
+         * plus however long it takes for the network buffer to fill up which should be a few milliseconds. An
+         * additional 10s should be enough even for the slowest CI system.
+         *
+         * As soon as the server has experienced the write timeout, send the session close message from the client and
+         * close the network connection.
+         */
+        Thread.sleep(TesterFirehoseServer.SEND_TIME_OUT_MILLIS);
         int count = 0;
-        while (wsSession.isOpen() && count < 200) {
-            Thread.sleep(100);
+        while (wsSession.isOpen() && TesterFirehoseServer.Endpoint.getErrorCount() == 0 && count < 200) {
+            Thread.sleep(50);
             count++;
         }
+        Assert.assertTrue(TesterFirehoseServer.Endpoint.getErrorCount() > 0);
         Assert.assertTrue(wsSession.isOpen());
-        // Set a short session close timeout (milliseconds)
-        wsSession.getUserProperties().put(
-            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
-        wsSession.close();
+
+        // Cast so we can force the session and the socket to be closed quickly.
+        CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, "");
+        ((WsSession) wsSession).doClose(cr, cr, true);
 
         // BZ 64848 (non-container thread variant)
         // Confirm there are no waiting processors

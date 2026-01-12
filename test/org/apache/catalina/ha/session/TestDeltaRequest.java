@@ -44,7 +44,7 @@ public class TestDeltaRequest {
         original.setAttribute("A", "One");
         original.setAttribute("B", "Two");
 
-        // Seralize original request
+        // Serialize original request
         byte[] bytes;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {

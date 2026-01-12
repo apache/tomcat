@@ -33,8 +33,6 @@ import org.apache.tomcat.util.modeler.Registry;
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.DataSourceUserDatabase</code>
  * component.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class DataSourceUserDatabaseMBean extends BaseModelMBean {
 
@@ -134,11 +132,11 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new User and return the corresponding name.
      *
-     * @param username User name of the new user
+     * @param username Username of the new user
      * @param password Password for the new user
      * @param fullName Full name for the new user
      *
-     * @return the new user name
+     * @return the new username
      */
     public String createUser(String username, String password, String fullName) {
         UserDatabase database = (UserDatabase) this.resource;
@@ -180,7 +178,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Remove an existing user.
      *
-     * @param username User name to remove
+     * @param username Username to remove
      */
     public void removeUser(String username) {
         UserDatabase database = (UserDatabase) this.resource;
@@ -195,7 +193,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Change user credentials.
      *
-     * @param username The user name
+     * @param username The username
      * @param password The new credentials
      */
     public void changeUserPassword(String username, String password) {
@@ -210,7 +208,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Add specified role to the user.
      *
-     * @param username The user name
+     * @param username The username
      * @param rolename The role name
      */
     public void addUserRole(String username, String rolename) {
@@ -226,7 +224,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Remove specified role from the user.
      *
-     * @param username The user name
+     * @param username The username
      * @param rolename The role name
      */
     public void removeUserRole(String username, String rolename) {
@@ -242,7 +240,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Get roles for a user.
      *
-     * @param username The user name
+     * @param username The username
      *
      * @return Array of role names
      */
@@ -266,7 +264,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Add group to user.
      *
-     * @param username  The user name
+     * @param username  The username
      * @param groupname The group name
      */
     public void addUserGroup(String username, String groupname) {
@@ -282,7 +280,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Remove group from user.
      *
-     * @param username  The user name
+     * @param username  The username
      * @param groupname The group name
      */
     public void removeUserGroup(String username, String groupname) {
@@ -298,7 +296,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     /**
      * Get groups for a user.
      *
-     * @param username The user name
+     * @param username The username
      *
      * @return Array of group names
      */

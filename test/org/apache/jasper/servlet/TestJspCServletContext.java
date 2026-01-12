@@ -35,7 +35,7 @@ public class TestJspCServletContext {
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(6, context.getEffectiveMajorVersion());
-        Assert.assertEquals(1, context.getEffectiveMinorVersion());
+        Assert.assertEquals(2, context.getEffectiveMinorVersion());
         JspConfigDescriptor jspConfigDescriptor =
                 context.getJspConfigDescriptor();
         Assert.assertTrue(jspConfigDescriptor.getTaglibs().isEmpty());
@@ -150,6 +150,16 @@ public class TestJspCServletContext {
                 null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(6, context.getEffectiveMajorVersion());
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
+    }
+
+
+    @Test
+    public void testWebapp_6_2() throws Exception {
+        File appDir = new File("test/webapp-6.2");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+        Assert.assertEquals(6, context.getEffectiveMajorVersion());
+        Assert.assertEquals(2, context.getEffectiveMinorVersion());
     }
 
 

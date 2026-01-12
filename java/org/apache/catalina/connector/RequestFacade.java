@@ -45,9 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class RequestFacade implements HttpServletRequest {
 
@@ -58,7 +55,7 @@ public class RequestFacade implements HttpServletRequest {
     /**
      * The wrapped request.
      */
-    protected Request request = null;
+    protected Request request;
 
 
     /**
@@ -341,6 +338,12 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Tomcat neither normalizes nor decodes the returned value. It will be identical to the part of the request URI
+     * provided by the user agent that was used to determine the context path.
+     */
     @Override
     public String getContextPath() {
         checkFacade();

@@ -353,8 +353,8 @@ public class Benchmarks {
                         throw new IOException("Only read " + read + " bytes");
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
         }
     }

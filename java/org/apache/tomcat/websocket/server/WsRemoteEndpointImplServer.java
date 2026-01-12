@@ -78,7 +78,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * <p>
      * The close message is a special case. It needs to be blocking else implementing the clean-up that follows the
      * sending of the close message gets a lot more complicated. On the server, this creates additional complications as
-     * a dead-lock may occur in the following scenario:
+     * a deadlock may occur in the following scenario:
      * <ol>
      * <li>Application thread writes message using non-blocking</li>
      * <li>Write does not complete (write logic holds message pending lock)</li>
@@ -88,9 +88,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * <li>Container holds socket lock and is blocked waiting for message pending lock</li>
      * <li>Poller fires write possible event for socket</li>
      * <li>Container tries to process write possible event but is blocked waiting for socket lock</li>
-     * <li>Processing of the WebSocket connection is dead-locked until the original message write times out</li>
+     * <li>Processing of the WebSocket connection is deadlocked until the original message write times out</li>
      * </ol>
-     * The purpose of this method is to break the above dead-lock. It does this by returning control of the processor to
+     * The purpose of this method is to break the above deadlock. It does this by returning control of the processor to
      * the socket wrapper and releasing the socket lock while waiting for the pending message write to complete.
      * Normally, that would be a terrible idea as it creates the possibility that the processor is returned to the pool
      * more than once under various error conditions. In this instance it is safe because these are upgrade processors
@@ -105,7 +105,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
         /*
          * Special handling is required only when all of the following are true:
+         *
          * - A close message is being sent
+         *
          * - This thread currently holds the socketWrapper lock (i.e. the thread is current processing a socket event)
          */
         if (!(opCode == Constants.OPCODE_CLOSE && socketWrapper.getLock().isHeldByCurrentThread())) {
@@ -145,7 +147,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... buffers) {
         if (socketWrapper.hasAsyncIO()) {
             final boolean block = (blockingWriteTimeoutExpiry != -1);
-            long timeout = -1;
+            long timeout;
             if (block) {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout <= 0) {
@@ -163,7 +165,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout, TimeUnit.MILLISECONDS,
-                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long,Void>() {
                         @Override
                         public void completed(Long result, Void attachment) {
                             if (block) {
@@ -220,8 +222,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     socketWrapper.setWriteTimeout(timeout);
                     socketWrapper.flush(true);
                     handler.onResult(new SendResult(getSession()));
-                } catch (IOException e) {
-                    SendResult sr = new SendResult(getSession(), e);
+                } catch (IOException ioe) {
+                    SendResult sr = new SendResult(getSession(), ioe);
                     handler.onResult(sr);
                 }
             }
@@ -376,18 +378,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
-    private static class OnResultRunnable implements Runnable {
-
-        private final WsSession session;
-        private final SendHandler sh;
-        private final Throwable t;
-
-        private OnResultRunnable(WsSession session, SendHandler sh, Throwable t) {
-            this.session = session;
-            this.sh = sh;
-            this.t = t;
-        }
-
+    private record OnResultRunnable(WsSession session, SendHandler sh, Throwable t) implements Runnable {
         @Override
         public void run() {
             if (t == null) {

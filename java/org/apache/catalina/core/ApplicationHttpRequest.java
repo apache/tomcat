@@ -59,9 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
@@ -70,7 +67,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers.
      */
-    protected static final String specials[] =
+    protected static final String[] specials =
             { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
                     RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
                     RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.INCLUDE_MAPPING,
@@ -89,7 +86,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
     private static final int shortestSpecialNameLength =
-            specialsMap.keySet().stream().mapToInt(s -> s.length()).min().getAsInt();
+            specialsMap.keySet().stream().mapToInt(String::length).min().getAsInt();
 
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
@@ -346,7 +343,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Add the path info, if there is any
         String pathInfo = getPathInfo();
-        String requestPath = null;
+        String requestPath;
 
         if (pathInfo == null) {
             requestPath = servletPath;
@@ -355,7 +352,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         int pos = requestPath.lastIndexOf('/');
-        String relative = null;
+        String relative;
         if (context.getDispatchersUseEncodedPaths()) {
             if (pos >= 0) {
                 relative = URLEncoder.DEFAULT.encode(requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
@@ -556,7 +553,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     if (localSession != null && !localSession.isValid()) {
                         localSession = null;
                     }
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
                 if (localSession == null && create) {
@@ -602,14 +599,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
-            if ((session != null) && session.isValid()) {
-                return true;
-            } else {
-                return false;
-            }
+            return (session != null) && session.isValid();
 
         } else {
             return super.isRequestedSessionIdValid();
@@ -735,7 +728,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
         }
 
-        parameters = new ParameterMap<>(getRequest().getParameterMap());
+        Map<String,String[]> requestParameters = getRequest().getParameterMap();
+        if (requestParameters instanceof ParameterMap<String,String[]>) {
+            parameters = new ParameterMap<>((ParameterMap<String,String[]>) requestParameters);
+        } else {
+            parameters = new ParameterMap<>(requestParameters);
+        }
         mergeParameters();
         ((ParameterMap<String,String[]>) parameters).setLocked(true);
         parsedParams = true;
@@ -828,17 +826,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     private String[] mergeValues(String[] values1, String[] values2) {
 
-        List<Object> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
 
-        if (values1 == null) {
-            // Skip - nothing to merge
-        } else {
+        if (values1 != null) {
             results.addAll(Arrays.asList(values1));
         }
 
-        if (values2 == null) {
-            // Skip - nothing to merge
-        } else {
+        if (values2 != null) {
             results.addAll(Arrays.asList(values2));
         }
 
@@ -855,7 +849,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     private void mergeParameters() {
 
-        if ((queryParamString == null) || (queryParamString.length() < 1)) {
+        if ((queryParamString == null) || (queryParamString.isEmpty())) {
             return;
         }
 

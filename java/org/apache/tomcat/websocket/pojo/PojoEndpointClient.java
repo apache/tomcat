@@ -34,7 +34,7 @@ public class PojoEndpointClient extends PojoEndpointBase {
 
     public PojoEndpointClient(Object pojo, List<Class<? extends Decoder>> decoders, InstanceManager instanceManager)
             throws DeploymentException {
-        super(Collections.<String, String>emptyMap());
+        super(Collections.emptyMap());
         setPojo(pojo);
         setMethodMapping(new PojoMethodMapping(pojo.getClass(), decoders, null, instanceManager));
     }

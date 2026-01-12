@@ -25,8 +25,6 @@ import java.util.Iterator;
  * group inherits the {@link Role}s assigned to the group.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public interface Group extends Principal {

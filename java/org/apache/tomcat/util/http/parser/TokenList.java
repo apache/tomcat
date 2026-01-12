@@ -83,7 +83,7 @@ public class TokenList {
                 continue;
             }
 
-            if (element.length() == 0) {
+            if (element.isEmpty()) {
                 // EOF after empty element
                 break;
             }
@@ -97,12 +97,10 @@ public class TokenList {
             } else if (skipResult == SkipResult.FOUND) {
                 valid = true;
                 collection.add(element.toLowerCase(Locale.ENGLISH));
-                continue;
             } else {
                 // Not a token - ignore it
                 invalid = true;
                 HttpParser.skipUntil(input, 0, ',');
-                continue;
             }
         } while (true);
 

@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,39 +40,26 @@ import org.apache.tomcat.util.res.StringManager;
  * calls header methods, but is easy to avoid inside tomcat. The goal is to use _only_ MessageByte-based Fields, and
  * reduce to 0 the memory overhead of tomcat.
  * <p>
- * This class is used to contain standard internet message headers,
- * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
- * MIME (RFC 2045) applications such as transferring typed data and
- * grouping related items in multipart message bodies.
+ * This class is used to contain standard internet message headers, used for SMTP (RFC822) and HTTP (RFC2068) messages
+ * as well as for MIME (RFC 2045) applications such as transferring typed data and grouping related items in multipart
+ * message bodies.
  * <p>
- * Message headers, as specified in RFC822, include a field name
- * and a field body.  Order has no semantic significance, and several
- * fields with the same name may exist.  However, most fields do not
- * (and should not) exist more than once in a header.
+ * Message headers, as specified in RFC822, include a field name and a field body. Order has no semantic significance,
+ * and several fields with the same name may exist. However, most fields do not (and should not) exist more than once in
+ * a header.
  * <p>
- * Many kinds of field body must conform to a specified syntax,
- * including the standard parenthesized comment syntax.  This class
- * supports only two simple syntaxes, for dates and integers.
+ * Many kinds of field body must conform to a specified syntax, including the standard parenthesized comment syntax.
+ * This class supports only two simple syntaxes, for dates and integers.
  * <p>
- * When processing headers, care must be taken to handle the case of
- * multiple same-name fields correctly.  The values of such fields are
- * only available as strings.  They may be accessed by index (treating
- * the header as an array of fields), or by name (returning an array
- * of string values).
+ * When processing headers, care must be taken to handle the case of multiple same-name fields correctly. The values of
+ * such fields are only available as strings. They may be accessed by index (treating the header as an array of fields),
+ * or by name (returning an array of string values).
  * <p>
- * Headers are first parsed and stored in the order they are
- * received. This is based on the fact that most servlets will not
- * directly access all headers, and most headers are single-valued.
- * (the alternative - a hash or similar data structure - will add
- * an overhead that is not needed in most cases)
+ * Headers are first parsed and stored in the order they are received. This is based on the fact that most servlets will
+ * not directly access all headers, and most headers are single-valued. (the alternative - a hash or similar data
+ * structure - will add an overhead that is not needed in most cases)
  * <p>
- * Apache seems to be using a similar method for storing and manipulating
- * headers.
- *
- * @author dac@eng.sun.com
- * @author James Todd [gonzo@eng.sun.com]
- * @author Costin Manolache
- * @author kevin seguin
+ * Apache seems to be using a similar method for storing and manipulating headers.
  */
 public class MimeHeaders {
 
@@ -113,7 +101,7 @@ public class MimeHeaders {
         this.limit = limit;
         if (limit > 0 && headers.length > limit && count < limit) {
             // shrink header list array
-            MimeHeaderField tmp[] = new MimeHeaderField[limit];
+            MimeHeaderField[] tmp = new MimeHeaderField[limit];
             System.arraycopy(headers, 0, tmp, 0, count);
             headers = tmp;
         }
@@ -167,7 +155,7 @@ public class MimeHeaders {
         int j = -1;
         for (int i = 0; i < count; i++) {
             String name = headers[i].getName().toStringType();
-            if (allowedHeaders.contains(name)) {
+            if (allowedHeaders.contains(name.trim().toLowerCase(Locale.ENGLISH))) {
                 ++j;
                 if (j != i) {
                     headers[j] = headers[i];
@@ -274,7 +262,7 @@ public class MimeHeaders {
             if (limit > 0 && newLength > limit) {
                 newLength = limit;
             }
-            MimeHeaderField tmp[] = new MimeHeaderField[newLength];
+            MimeHeaderField[] tmp = new MimeHeaderField[newLength];
             System.arraycopy(headers, 0, tmp, 0, len);
             headers = tmp;
         }
@@ -308,7 +296,7 @@ public class MimeHeaders {
      *
      * @return the message bytes container for the value
      */
-    public MessageBytes addValue(byte b[], int startN, int len) {
+    public MessageBytes addValue(byte[] b, int startN, int len) {
         MimeHeaderField mhf = createHeader();
         mhf.getName().setBytes(b, startN, len);
         return mhf.getValue();
@@ -382,7 +370,7 @@ public class MimeHeaders {
 
     public String getHeader(String name) {
         MessageBytes mh = getValue(name);
-        return mh != null ? mh.toString() : null;
+        return mh != null ? mh.toStringType() : null;
     }
 
     // -------------------- Removing --------------------

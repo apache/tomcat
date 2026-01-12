@@ -75,7 +75,7 @@ public class WebappServiceLoader<T> {
         this.context = context;
         this.servletContext = context.getServletContext();
         String containerSciFilter = context.getContainerSciFilter();
-        if (containerSciFilter != null && containerSciFilter.length() > 0) {
+        if (containerSciFilter != null && !containerSciFilter.isEmpty()) {
             containerSciFilterPattern = Pattern.compile(containerSciFilter);
         } else {
             containerSciFilterPattern = null;
@@ -214,7 +214,7 @@ public class WebappServiceLoader<T> {
                     line = line.substring(0, i);
                 }
                 line = line.trim();
-                if (line.length() == 0) {
+                if (line.isEmpty()) {
                     continue;
                 }
                 servicesFound.add(line);

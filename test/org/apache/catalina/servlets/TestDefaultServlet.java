@@ -111,9 +111,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         gzipClient.reset();
         gzipClient.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                "Accept-Encoding: gzip" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip" + CRLF + CRLF });
         gzipClient.connect();
         gzipClient.processRequest();
         Assert.assertTrue(gzipClient.isResponse200());
@@ -157,9 +157,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         gzipClient.reset();
         gzipClient.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                "Accept-Encoding: gzip, br" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip, br" + CRLF + CRLF });
         gzipClient.connect();
         gzipClient.processRequest();
         Assert.assertTrue(gzipClient.isResponse200());
@@ -171,8 +171,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         gzipClient.reset();
         gzipClient.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF+ CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF+ CRLF });
         gzipClient.connect();
         gzipClient.processRequest();
         Assert.assertTrue(gzipClient.isResponse200());
@@ -211,11 +211,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         TestCompressedClient client = new TestCompressedClient(getPort());
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: br, gzip" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: br, gzip" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -225,10 +229,14 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF+ CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -266,11 +274,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         TestCompressedClient client = new TestCompressedClient(getPort());
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: br, gzip ; q = 0.5 , custom" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: br, gzip ; q = 0.5 , custom" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -280,11 +292,14 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: br;q=1,gzip,custom" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: br;q=1,gzip,custom" + CRLF +
+                    CRLF });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -322,11 +337,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         TestCompressedClient client = new TestCompressedClient(getPort());
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: gzip;q=0.9,*" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip;q=0.9,*" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -336,11 +355,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: gzip;q=0.9,br;q=0,identity," + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip;q=0.9,br;q=0,identity," + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -377,11 +400,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         // Firefox 45 Accept-Encoding
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: gzip, deflate, br" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip, deflate, br" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -392,11 +419,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         // Chrome 50 Accept-Encoding
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                        "Host: localhost" + CRLF +
-                        "Connection: Close" + CRLF +
-                        "Accept-Encoding: gzip, deflate, sdch, br" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip, deflate, sdch, br" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
@@ -506,8 +537,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 new TestCustomErrorClient(tomcat.getConnector().getLocalPort());
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
-                "GET /MyApp/missing HTTP/1.0" +CRLF + CRLF });
+                "GET /MyApp/missing HTTP/1.0" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse404());
@@ -522,11 +557,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=50413
         //
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /MyApp/missing HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: close" + CRLF +
-                "If-Modified-Since: " + tomorrow + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: close" + CRLF +
+                    "If-Modified-Since: " + tomorrow + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse404());
@@ -535,11 +574,15 @@ public class TestDefaultServlet extends TomcatBaseTest {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=50413#c6
         //
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /MyApp/missing HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: close" + CRLF +
-                "Range: bytes=0-100" + CRLF + CRLF });
+                    "Host: localhost" + CRLF +
+                    "Connection: close" + CRLF +
+                    "Range: bytes=0-100" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse404());
@@ -562,15 +605,17 @@ public class TestDefaultServlet extends TomcatBaseTest {
         File webxml = new File(appDir, "WEB-INF/web.xml");
         try (FileOutputStream fos = new FileOutputStream(webxml);
                 Writer w = new OutputStreamWriter(fos, "UTF-8")) {
-            w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
-                    + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
-                    + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
-                    + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
-                    + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
-                    + " version='2.4'>\n"
-                    + "<error-page>\n<error-code>404</error-code>\n"
-                    + "<location>/404-absent.html</location>\n</error-page>\n"
-                    + "</web-app>\n");
+            // @formatter:off
+            w.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
+                    "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' " +
+                    " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" +
+                    " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee " +
+                    " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'" +
+                    " version='2.4'>\n" +
+                    "<error-page>\n<error-code>404</error-code>\n" +
+                    "<location>/404-absent.html</location>\n</error-page>\n" +
+                    "</web-app>\n");
+            // @formatter:on
         }
 
         Tomcat tomcat = getTomcatInstance();
@@ -582,8 +627,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 new TestCustomErrorClient(tomcat.getConnector().getLocalPort());
 
         client.reset();
+        // @formatter:off
         client.setRequest(new String[] {
-                "GET /MyApp/missing HTTP/1.0" + CRLF + CRLF });
+                "GET /MyApp/missing HTTP/1.0" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.isResponse404());
@@ -699,25 +748,32 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         TestCompressedClient client = new TestCompressedClient(getPort());
 
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Accept-Language: fr-FR, fr, en" + SimpleHttpClient.CRLF +
-                "Connection: Close" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF });
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Accept-Language: fr-FR, fr, en" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Taille"));
         Assert.assertTrue(client.getResponseBody().contains("<tt>bug43nnn/"));
 
-        client.setRequest(new String[] { "GET /bug43nnn/ HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Accept-Language: fr-FR, fr, en" + SimpleHttpClient.CRLF +
-                "Connection: Close" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF });
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /bug43nnn/ HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Accept-Language: fr-FR, fr, en" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-
     }
 }

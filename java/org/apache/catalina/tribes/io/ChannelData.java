@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.io;
 
+import java.io.Serial;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
@@ -29,10 +30,9 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * The <code>ChannelData</code> object is used to transfer a message through the channel interceptor stack and
  * eventually out on a transport to be sent to another node. While the message is being processed by the different
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
- *
- * @author Peter Rossbach
  */
 public class ChannelData implements ChannelMessage {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final ChannelData[] EMPTY_DATA_ARRAY = new ChannelData[0];
@@ -153,7 +153,7 @@ public class ChannelData implements ChannelMessage {
     }
 
     public int getDataPackageLength() {
-        int length = 4 + // options
+        return 4 + // options
                 8 + // timestamp off=4
                 4 + // unique id length off=12
                 uniqueId.length + // id data off=12+uniqueId.length
@@ -161,8 +161,6 @@ public class ChannelData implements ChannelMessage {
                 address.getDataLength() + // member data off=12+uniqueId.length+4+add.length
                 4 + // message length off=12+uniqueId.length+4+add.length+4
                 message.getLength();
-        return length;
-
     }
 
     /**
@@ -339,12 +337,8 @@ public class ChannelData implements ChannelMessage {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("ClusterData[src=");
-        buf.append(getAddress()).append("; id=");
-        buf.append(bToS(getUniqueId())).append("; sent=");
-        buf.append(new Timestamp(this.getTimestamp()).toString()).append(']');
-        return buf.toString();
+        return "ClusterData[src=" + getAddress() + "; id=" + bToS(getUniqueId()) + "; sent=" +
+                new Timestamp(this.getTimestamp()).toString() + ']';
     }
 
     public static String bToS(byte[] data) {

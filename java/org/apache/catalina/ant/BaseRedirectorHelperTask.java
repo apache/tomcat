@@ -30,13 +30,11 @@ import org.apache.tools.ant.types.RedirectorElement;
 /**
  * Abstract base class to add output redirection support for Catalina Ant tasks. These tasks require Ant 1.5 or later.
  * <br>
- * <strong>WARNING:</strong> due to depends chain, Ant could call a Task more than once and this can affect the output
- * redirection when configured. If you are collecting the output in a property, it will collect the output of only the
- * first run, since Ant properties are immutable and once created they cannot be changed. <br>
+ * <strong>WARNING:</strong> due to dependency chain, Ant could call a Task more than once and this can affect the
+ * output redirection when configured. If you are collecting the output in a property, it will collect the output of
+ * only the first run, since Ant properties are immutable and once created they cannot be changed. <br>
  * If you are collecting output in a file the file will be overwritten with the output of the last run, unless you set
  * append="true", in which case each run will append it's output to the file.
- *
- * @author Gabriele Garuglieri
  *
  * @since 5.5
  */
@@ -63,7 +61,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
     /**
      * Whether to fail (with a BuildException) if ManagerServlet returns an error. The default behavior is to do so. <b>
      * This flag does not control parameters checking. If the task is called with wrong or invalid parameters, it will
-     * throw BuildException independently from the setting of this flag. </b>
+     * throw a BuildException regardless of the setting of this flag. </b>
      */
     protected boolean failOnError = true;
 
@@ -218,8 +216,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
             redirectOutput = true;
         }
         /*
-         * Due to depends chain, Ant could call the Task more than once, this is to prevent that we attempt to configure
-         * uselessly more than once the Redirector.
+         * Due to dependency chain, Ant could call the Task more than once, this is to prevent that we attempt to
+         * configure uselessly more than once the Redirector.
          */
         redirectorConfigured = true;
     }
@@ -256,8 +254,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
             log("Error closing redirector: " + ioe.getMessage(), Project.MSG_ERR);
         }
         /*
-         * Due to depends chain, Ant could call the Task more than once, this is to prevent that we attempt to reuse the
-         * previously closed Streams.
+         * Due to dependency chain, Ant could call the Task more than once, this is to prevent that we attempt to reuse
+         * the previously closed Streams.
          */
         redirectOutStream = null;
         redirectOutPrintStream = null;

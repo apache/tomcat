@@ -93,7 +93,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
     /**
      * Underlying input buffer.
      */
-    private InputBuffer inputStreamInputBuffer;
+    private final InputBuffer inputStreamInputBuffer;
 
 
     /**
@@ -115,15 +115,15 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
 
     /**
-     * Parsing state - used for non blocking parsing so that when more data arrives, we can pick up where we left off.
+     * Parsing state - used for non-blocking parsing so that when more data arrives, we can pick up where we left off.
      */
     private byte prevChr = 0;
     private byte chr = 0;
     private volatile boolean parsingRequestLine;
-    private int parsingRequestLinePhase = 0;
-    private boolean parsingRequestLineEol = false;
-    private int parsingRequestLineStart = 0;
-    private int parsingRequestLineQPos = -1;
+    private int parsingRequestLinePhase;
+    private boolean parsingRequestLineEol;
+    private int parsingRequestLineStart;
+    private int parsingRequestLineQPos;
     private final HttpParser httpParser;
     private final HttpHeaderParser httpHeaderParser;
 
@@ -131,12 +131,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
      * Maximum allowed size of the HTTP request line plus headers plus any leading blank lines.
      */
     private final int headerBufferSize;
-
-    /**
-     * Known size of the NioChannel read buffer.
-     */
-    private int socketReadBufferSize;
-
 
     // ----------------------------------------------------------- Constructors
 
@@ -250,7 +244,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             activeFilters[i].recycle();
         }
 
-        byteBuffer.limit(0).position(0);
+        // Avoid rare NPE reported on users@ list
+        if (byteBuffer != null) {
+            byteBuffer.limit(0).position(0);
+        }
         lastActiveFilter = -1;
         swallowInput = true;
 
@@ -358,7 +355,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 // just skipping blank lines)
                 if (parsingRequestLinePhase == 0) {
                     parsingRequestLinePhase = 1;
-                    request.setStartTimeNanos(System.nanoTime());
+                    request.markStartTime();
                 }
                 chr = byteBuffer.get();
             } while (chr == Constants.CR || chr == Constants.LF);
@@ -386,8 +383,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 chr = byteBuffer.get();
                 if (chr == Constants.SP || chr == Constants.HT) {
                     space = true;
-                    request.method().setBytes(byteBuffer.array(), parsingRequestLineStart,
-                            pos - parsingRequestLineStart);
+                    request.setMethod(byteBuffer.array(), parsingRequestLineStart, pos - parsingRequestLineStart);
                 } else if (!HttpParser.isToken(chr)) {
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
@@ -432,34 +428,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                     }
                 }
                 int pos = byteBuffer.position();
-                prevChr = chr;
                 chr = byteBuffer.get();
-                if (prevChr == Constants.CR && chr != Constants.LF) {
-                    // CR not followed by LF so not an HTTP/0.9 request and
-                    // therefore invalid. Trigger error handling.
-                    // Avoid unknown protocol triggering an additional error
-                    request.protocol().setString(Constants.HTTP_11);
-                    String invalidRequestTarget = parseInvalid(parsingRequestLineStart, byteBuffer);
-                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
-                }
                 if (chr == Constants.SP || chr == Constants.HT) {
                     space = true;
                     end = pos;
-                } else if (chr == Constants.CR) {
-                    // HTTP/0.9 style request. CR is optional. LF is not.
-                } else if (chr == Constants.LF) {
-                    // HTTP/0.9 style request
-                    // Stop this processing loop
-                    space = true;
-                    // Set blank protocol (indicates HTTP/0.9)
-                    request.protocol().setString("");
-                    // Skip the protocol processing
-                    parsingRequestLinePhase = 7;
-                    if (prevChr == Constants.CR) {
-                        end = pos - 1;
-                    } else {
-                        end = pos;
-                    }
                 } else if (chr == Constants.QUESTION && parsingRequestLineQPos == -1) {
                     parsingRequestLineQPos = pos;
                 } else if (parsingRequestLineQPos != -1 && !httpParser.isQueryRelaxed(chr)) {
@@ -575,20 +547,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             throw new IllegalStateException(sm.getString("iib.parseheaders.ise.error"));
         }
 
-        HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
+        HeaderParseStatus status;
 
         do {
             status = httpHeaderParser.parseHeader();
-            // Checking that
-            // (1) Headers plus request line size does not exceed its limit
-            // (2) There are enough bytes to avoid expanding the buffer when
-            // reading body
-            // Technically, (2) is technical limitation, (1) is logical
-            // limitation to enforce the meaning of headerBufferSize
-            // From the way how buf is allocated and how blank lines are being
-            // read, it should be enough to check (1) only.
-            if (byteBuffer.position() > headerBufferSize ||
-                    byteBuffer.capacity() - byteBuffer.position() < socketReadBufferSize) {
+            // Checking that headers plus request line size does not exceed its limit
+            if (byteBuffer.position() > headerBufferSize) {
                 throw new IllegalArgumentException(sm.getString("iib.requestheadertoolarge.error"));
             }
         } while (status == HeaderParseStatus.HAVE_MORE_HEADERS);
@@ -776,7 +740,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             byteBuffer.limit(end).position(end);
         }
 
-        int nRead = -1;
+        int nRead;
         int mark = byteBuffer.position();
         try {
             if (byteBuffer.position() < byteBuffer.limit()) {
@@ -888,6 +852,5 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
         temp.put(byteBuffer);
         byteBuffer = temp;
         byteBuffer.mark();
-        temp = null;
     }
 }

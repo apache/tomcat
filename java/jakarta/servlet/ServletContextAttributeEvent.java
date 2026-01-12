@@ -16,6 +16,8 @@
  */
 package jakarta.servlet;
 
+import java.io.Serial;
+
 /**
  * This is the event class for notifications about changes to the attributes of the servlet context of a web
  * application.
@@ -25,6 +27,8 @@ package jakarta.servlet;
  * @since Servlet 2.3
  */
 public class ServletContextAttributeEvent extends ServletContextEvent {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

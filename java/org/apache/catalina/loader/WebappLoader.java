@@ -20,9 +20,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 
 import javax.management.ObjectName;
 
@@ -41,7 +41,6 @@ import org.apache.tomcat.jakartaee.ClassConverter;
 import org.apache.tomcat.jakartaee.EESpecProfile;
 import org.apache.tomcat.jakartaee.EESpecProfiles;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -54,9 +53,6 @@ import org.apache.tomcat.util.res.StringManager;
  * This class loader is configured via the Resources children of its Context prior to calling <code>start()</code>. When
  * a new class is required, these Resources will be consulted first to locate the class. If it is not present, the
  * system class loader will be used instead.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
@@ -161,7 +157,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
-     * @return a non null String if the loader will attempt to use the Jakarta converter. The String is the name of the
+     * @return a non-null String if the loader will attempt to use the Jakarta converter. The String is the name of the
      *             profile used for conversion.
      */
     public String getJakartaConverter() {
@@ -251,7 +247,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
     public String getLoaderRepositoriesString() {
-        String repositories[] = getLoaderRepositories();
+        String[] repositories = getLoaderRepositories();
         StringBuilder sb = new StringBuilder();
         for (String repository : repositories) {
             sb.append(repository).append(':');
@@ -272,7 +268,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     @Override
     public boolean modified() {
-        return classLoader != null ? classLoader.modified() : false;
+        return classLoader != null && classLoader.modified();
     }
 
 
@@ -320,10 +316,10 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                 MigrationUtil.addJakartaEETransformer(classLoader, getJakartaConverter());
             }
 
+            classLoader.start();
+
             // Configure our repositories
             setClassPath();
-
-            classLoader.start();
 
             String contextName = context.getName();
             if (!contextName.startsWith("/")) {
@@ -332,12 +328,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
             ObjectName cloname =
                     new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() + ",host=" +
                             context.getParent().getName() + ",context=" + contextName);
-            Registry.getRegistry(null, null).registerComponent(classLoader, cloname, null);
+            Registry.getRegistry(null).registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
-            t = ExceptionUtils.unwrapInvocationTargetException(t);
-            ExceptionUtils.handleThrowable(t);
-            throw new LifecycleException(sm.getString("webappLoader.startError"), t);
+            Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+            ExceptionUtils.handleThrowable(throwable);
+            throw new LifecycleException(sm.getString("webappLoader.startError"), throwable);
         }
 
         setState(LifecycleState.STARTING);
@@ -381,7 +377,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                 ObjectName cloname =
                         new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() +
                                 ",host=" + context.getParent().getName() + ",context=" + contextName);
-                Registry.getRegistry(null, null).unregisterComponent(cloname);
+                Registry.getRegistry(null).unregisterComponent(cloname);
             } catch (Exception e) {
                 log.warn(sm.getString("webappLoader.stopError"), e);
             }
@@ -408,16 +404,14 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
         }
 
         Class<?> clazz = Class.forName(loaderClass);
-        WebappClassLoaderBase classLoader = null;
 
         ClassLoader parentClassLoader = context.getParentClassLoader();
 
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
         Constructor<?> constr = clazz.getConstructor(argTypes);
-        classLoader = (WebappClassLoaderBase) constr.newInstance(args);
 
-        return classLoader;
+        return (WebappClassLoaderBase) constr.newInstance(args);
     }
 
 
@@ -469,30 +463,34 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     private boolean buildClassPath(StringBuilder classpath, ClassLoader loader) {
         if (loader instanceof URLClassLoader) {
-            URL repositories[] = ((URLClassLoader) loader).getURLs();
+            URL[] repositories = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
-                if (repository.startsWith("file://")) {
-                    repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.UTF_8);
-                } else if (repository.startsWith("file:")) {
-                    repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.UTF_8);
-                } else {
-                    continue;
-                }
                 if (repository == null) {
                     continue;
                 }
-                if (classpath.length() > 0) {
+                if (repository.startsWith("file:")) {
+                    // Let the JRE handle all the edge cases for URL to path conversion.
+                    try {
+                        File f = new File(url.toURI());
+                        repository = f.getAbsolutePath();
+                    } catch (URISyntaxException | IllegalArgumentException e) {
+                        // Can't convert from URL to URI. Treat as non-file URL and skip.
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+                if (!classpath.isEmpty()) {
                     classpath.append(File.pathSeparator);
                 }
                 classpath.append(repository);
             }
         } else if (loader == ClassLoader.getSystemClassLoader()) {
-            // From Java 9 the internal class loaders no longer extend
-            // URLCLassLoader
+            // From Java 9 the internal class loaders no longer extend URLCLassLoader
             String cp = System.getProperty("java.class.path");
-            if (cp != null && cp.length() > 0) {
-                if (classpath.length() > 0) {
+            if (cp != null && !cp.isEmpty()) {
+                if (!classpath.isEmpty()) {
                     classpath.append(File.pathSeparator);
                 }
                 classpath.append(cp);
@@ -535,7 +533,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
-     * Implemented in a sub-class so EESpecProfile and EESpecProfiles are not loaded unless a profile is configured.
+     * Implemented in a subclass so EESpecProfile and EESpecProfiles are not loaded unless a profile is configured.
      * Otherwise, tomcat-embed-core.jar has a runtime dependency on the migration tool whether it is used or not.
      */
     private static class MigrationUtil {

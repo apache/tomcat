@@ -215,7 +215,7 @@ public class RewriteRule {
     protected boolean host = false;
 
     /**
-     * Stop the rewriting process here and don't apply any more rewriting rules. This corresponds to the Perl last
+     * Stop the rewriting process here and don't apply any additional rewriting rules. This corresponds to the Perl last
      * command or the break command from the C language. Use this flag to prevent the currently rewritten URL from being
      * rewritten further by following rules. For example, use it to rewrite the root-path URL ('/') to a real one, e.g.,
      * '/e/www/'.
@@ -299,7 +299,7 @@ public class RewriteRule {
     protected int skip = 0;
 
     /**
-     * Force the MIME-type of the target file to be MIME-type. For instance, this can be used to setup the content-type
+     * Force the MIME-type of the target file to be MIME-type. For instance, this can be used to set up the content-type
      * based on some conditions. For example, the following snippet allows .php files to be displayed by mod_php if they
      * are called with the .phps extension: RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]
      */

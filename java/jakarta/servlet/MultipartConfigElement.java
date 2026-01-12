@@ -16,10 +16,12 @@
  */
 package jakarta.servlet;
 
+import java.util.Objects;
+
 import jakarta.servlet.annotation.MultipartConfig;
 
 /**
- * The programmatic equivalent of {@link jakarta.servlet.annotation.MultipartConfig} used to configure multi-part
+ * The programmatic equivalent of {@link jakarta.servlet.annotation.MultipartConfig} used to configure multipart
  * handling for a Servlet when registering a Servlet via code.
  *
  * @since Servlet 3.0
@@ -32,48 +34,36 @@ public class MultipartConfigElement {
     private final int fileSizeThreshold;// = 0;
 
     /**
-     * Create a programmatic multi-part configuration with a specific location and defaults for the remaining
+     * Create a programmatic multipart configuration with a specific location and defaults for the remaining
      * configuration elements.
      *
      * @param location The temporary location to store files
      */
     public MultipartConfigElement(String location) {
         // Keep empty string default if location is null
-        if (location != null) {
-            this.location = location;
-        } else {
-            this.location = "";
-        }
+        this.location = Objects.requireNonNullElse(location, "");
         this.maxFileSize = -1;
         this.maxRequestSize = -1;
         this.fileSizeThreshold = 0;
     }
 
     /**
-     * Create a programmatic multi-part configuration from the individual configuration elements.
+     * Create a programmatic multipart configuration from the individual configuration elements.
      *
      * @param location          The temporary location to store files
      * @param maxFileSize       The maximum permitted size for a single file
      * @param maxRequestSize    The maximum permitted size for a request
-     * @param fileSizeThreshold The size above which the file is save in the temporary location rather than retained in
+     * @param fileSizeThreshold The size above which the file is saved in the temporary location rather than retained in
      *                              memory.
      */
     public MultipartConfigElement(String location, long maxFileSize, long maxRequestSize, int fileSizeThreshold) {
         // Keep empty string default if location is null
-        if (location != null) {
-            this.location = location;
-        } else {
-            this.location = "";
-        }
+        this.location = Objects.requireNonNullElse(location, "");
         this.maxFileSize = maxFileSize;
         this.maxRequestSize = maxRequestSize;
         // Avoid threshold values of less than zero as they cause trigger NPEs
         // in the Commons FileUpload port for fields that have no data.
-        if (fileSizeThreshold > 0) {
-            this.fileSizeThreshold = fileSizeThreshold;
-        } else {
-            this.fileSizeThreshold = 0;
-        }
+        this.fileSizeThreshold = Math.max(fileSizeThreshold, 0);
     }
 
     /**
@@ -116,9 +106,9 @@ public class MultipartConfigElement {
     }
 
     /**
-     * Obtain the size above which the file is save in the temporary location rather than retained in memory.
+     * Obtain the size above which the file is saved in the temporary location rather than retained in memory.
      *
-     * @return the size above which the file is save in the temporary location rather than retained in memory.
+     * @return the size above which the file is saved in the temporary location rather than retained in memory.
      */
     public int getFileSizeThreshold() {
         return fileSizeThreshold;

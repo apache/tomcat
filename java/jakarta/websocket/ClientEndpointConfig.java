@@ -71,7 +71,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder preferredSubprotocols(List<String> preferredSubprotocols) {
-            if (preferredSubprotocols == null || preferredSubprotocols.size() == 0) {
+            if (preferredSubprotocols == null || preferredSubprotocols.isEmpty()) {
                 this.preferredSubprotocols = Collections.emptyList();
             } else {
                 this.preferredSubprotocols = Collections.unmodifiableList(preferredSubprotocols);
@@ -81,7 +81,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder extensions(List<Extension> extensions) {
-            if (extensions == null || extensions.size() == 0) {
+            if (extensions == null || extensions.isEmpty()) {
                 this.extensions = Collections.emptyList();
             } else {
                 this.extensions = Collections.unmodifiableList(extensions);
@@ -91,7 +91,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder encoders(List<Class<? extends Encoder>> encoders) {
-            if (encoders == null || encoders.size() == 0) {
+            if (encoders == null || encoders.isEmpty()) {
                 this.encoders = Collections.emptyList();
             } else {
                 this.encoders = Collections.unmodifiableList(encoders);
@@ -101,7 +101,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder decoders(List<Class<? extends Decoder>> decoders) {
-            if (decoders == null || decoders.size() == 0) {
+            if (decoders == null || decoders.isEmpty()) {
                 this.decoders = Collections.emptyList();
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);

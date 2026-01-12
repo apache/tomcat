@@ -61,7 +61,7 @@ public class CloseReason {
         TRY_AGAIN_LATER(1013),
         TLS_HANDSHAKE_FAILURE(1015);
 
-        private int code;
+        private final int code;
 
         CloseCodes(int code) {
             this.code = code;
@@ -69,47 +69,26 @@ public class CloseReason {
 
         public static CloseCode getCloseCode(final int code) {
             if (code > 2999 && code < 5000) {
-                return new CloseCode() {
-                    @Override
-                    public int getCode() {
-                        return code;
-                    }
-                };
+                return () -> code;
             }
-            switch (code) {
-                case 1000:
-                    return NORMAL_CLOSURE;
-                case 1001:
-                    return GOING_AWAY;
-                case 1002:
-                    return PROTOCOL_ERROR;
-                case 1003:
-                    return CANNOT_ACCEPT;
-                case 1004:
-                    return RESERVED;
-                case 1005:
-                    return NO_STATUS_CODE;
-                case 1006:
-                    return CLOSED_ABNORMALLY;
-                case 1007:
-                    return NOT_CONSISTENT;
-                case 1008:
-                    return VIOLATED_POLICY;
-                case 1009:
-                    return TOO_BIG;
-                case 1010:
-                    return NO_EXTENSION;
-                case 1011:
-                    return UNEXPECTED_CONDITION;
-                case 1012:
-                    return SERVICE_RESTART;
-                case 1013:
-                    return TRY_AGAIN_LATER;
-                case 1015:
-                    return TLS_HANDSHAKE_FAILURE;
-                default:
-                    throw new IllegalArgumentException("Invalid close code: [" + code + "]");
-            }
+            return switch (code) {
+                case 1000 -> NORMAL_CLOSURE;
+                case 1001 -> GOING_AWAY;
+                case 1002 -> PROTOCOL_ERROR;
+                case 1003 -> CANNOT_ACCEPT;
+                case 1004 -> RESERVED;
+                case 1005 -> NO_STATUS_CODE;
+                case 1006 -> CLOSED_ABNORMALLY;
+                case 1007 -> NOT_CONSISTENT;
+                case 1008 -> VIOLATED_POLICY;
+                case 1009 -> TOO_BIG;
+                case 1010 -> NO_EXTENSION;
+                case 1011 -> UNEXPECTED_CONDITION;
+                case 1012 -> SERVICE_RESTART;
+                case 1013 -> TRY_AGAIN_LATER;
+                case 1015 -> TLS_HANDSHAKE_FAILURE;
+                default -> throw new IllegalArgumentException("Invalid close code: [" + code + "]");
+            };
         }
 
         @Override

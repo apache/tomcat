@@ -33,7 +33,7 @@ public class CertificateCreateRule extends Rule {
 
         Type type;
         String typeValue = attributes.getValue("type");
-        if (typeValue == null || typeValue.length() == 0) {
+        if (typeValue == null || typeValue.isEmpty()) {
             type = Type.UNDEFINED;
         } else {
             type = Type.valueOf(typeValue);

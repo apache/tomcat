@@ -31,8 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Convenience base class for implementations of the <b>Valve</b> interface. A subclass <strong>MUST</strong> implement
  * an <code>invoke()</code> method to provide the required functionality, and <strong>MAY</strong> implement the
  * <code>Lifecycle</code> interface to provide configuration management and lifecycle support.
- *
- * @author Craig R. McClanahan
  */
 public abstract class ValveBase extends LifecycleMBeanBase implements Contained, Valve {
 

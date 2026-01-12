@@ -45,6 +45,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 
@@ -109,7 +110,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
         parameterSets.add(new Object[] {"pct-I", JSON_TYPE, "/", "%I", "\\{\"threadName\":\"http-nio2?-" + LOCAL_IP_PATTERN + "-auto-\\d+-exec-\\d+\"\\}"});
         parameterSets.add(new Object[] {"pct-l", TEXT_TYPE, "/", "%l", "-"});
         parameterSets.add(new Object[] {"pct-l", JSON_TYPE, "/", "%l", "\\{\"logicalUserName\":\"-\"\\}"});
-        parameterSets.add(new Object[] {"pct-m", TEXT_TYPE, "/", "%m", "GET"});
+        parameterSets.add(new Object[] {"pct-m", TEXT_TYPE, "/", "%m", Method.GET});
         parameterSets.add(new Object[] {"pct-m", JSON_TYPE, "/", "%m", "\\{\"method\":\"GET\"\\}"});
         parameterSets.add(new Object[] {"pct-p", TEXT_TYPE, "/", "%p", "\\d+"});
         parameterSets.add(new Object[] {"pct-p", JSON_TYPE, "/", "%p", "\\{\"port\":\"\\d+\"\\}"});
@@ -154,16 +155,16 @@ public class TestAccessLogValve extends TomcatBaseTest {
         parameterSets.add(new Object[] {"pct-t-begin:umlaut_time_S", TEXT_TYPE, "/", "%{begin:'\u00c4'HH '\u00e4' mm '\u00f6' ss '\u00fc' SSS'\u00dc'}t", "\\\\u00c4\\d\\d \\\\u00e4 \\d\\d \\\\u00f6 \\d\\d \\\\u00fc \\d\\d\\d\\\\u00dc"});
         parameterSets.add(new Object[] {"pct-t-begin:umlaut_time_S", JSON_TYPE, "/", "%{begin:'\u00c4'HH '\u00e4' mm '\u00f6' ss '\u00fc' SSS'\u00dc'}t", "\\{\"time-begin:'\u00c4'HH '\u00e4' mm '\u00f6' ss '\u00fc' SSS'\u00dc'\":\"\\\\u00c4\\d\\d \\\\u00e4 \\d\\d \\\\u00f6 \\d\\d \\\\u00fc \\d\\d\\d\\\\u00dc\"\\}"});
         parameterSets.add(new Object[] {"common", TEXT_TYPE, "/", "common",
-            LOCAL_IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 200 " + BYTES});
+                LOCAL_IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 200 " + BYTES});
         parameterSets.add(new Object[] {"common", JSON_TYPE, "/", "common",
-            "\\{\"host\":\"" + LOCAL_IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
-            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"200\",\"size\":\"" + BYTES + "\"\\}"});
+                "\\{\"host\":\"" + LOCAL_IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
+                    "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"200\",\"size\":\"" + BYTES + "\"\\}"});
         parameterSets.add(new Object[] {"combined", TEXT_TYPE, "/", "combined",
-            LOCAL_IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 200 " + BYTES + " \"-\" \"" + UA_PATTERN + "\""});
+                LOCAL_IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 200 " + BYTES + " \"-\" \"" + UA_PATTERN + "\""});
         parameterSets.add(new Object[] {"combined", JSON_TYPE, "/", "combined",
-            "\\{\"host\":\"" + LOCAL_IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
-            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"200\",\"size\":\"" + BYTES + "\"" +
-            ",\"requestHeaders\": \\{\"Referer\":\"-\",\"User-Agent\":\"" + UA_PATTERN + "\"\\}\\}"});
+                "\\{\"host\":\"" + LOCAL_IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
+                    "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"200\",\"size\":\"" + BYTES + "\"" +
+                    ",\"requestHeaders\": \\{\"Referer\":\"-\",\"User-Agent\":\"" + UA_PATTERN + "\"\\}\\}"});
         parameterSets.add(new Object[] {"verbatim-text", TEXT_TYPE, "/", "123\u00e4\u00f6%s\u00fc%b%D\u00dc456", "123\u00e4\u00f6200\u00fc" + BYTES + "\\d+\u00dc456"});
         parameterSets.add(new Object[] {"verbatim-text", JSON_TYPE, "/", "123\u00e4\u00f6%s\u00fc%b%D\u00dc456", "\\{\"statusCode\":\"200\",\"size\":\"" + BYTES + "\",\"elapsedTime\":\"\\d+\"\\}"});
         parameterSets.add(new Object[] {"merged-cookies", TEXT_TYPE, "/", "%{Cookie}i", "COOKIE-1_1=1_1; COOKIE-1_2=1_2; COOKIE-1_3=1_3,COOKIE-2_1=2_1;COOKIE-2_2=2_2;COOKIE-2_3=2_3"});
@@ -208,18 +209,12 @@ public class TestAccessLogValve extends TomcatBaseTest {
             this.writer = writer;
         }
 
-        /**
-         * Log the specified message to the log file, switching files if
-         * the date has changed since the previous log call.
-         *
-         * @param message Message to be logged
-         */
         @Override
         public void log(CharArrayWriter message) {
             try {
                 message.writeTo(writer);
-            } catch (IOException ex) {
-                log.error("Could not write to writer", ex);
+            } catch (IOException ioe) {
+                log.error("Could not write to writer", ioe);
             }
         }
     }
@@ -235,18 +230,12 @@ public class TestAccessLogValve extends TomcatBaseTest {
             this.writer = writer;
         }
 
-        /**
-         * Log the specified message to the log file, switching files if
-         * the date has changed since the previous log call.
-         *
-         * @param message Message to be logged
-         */
         @Override
         public void log(CharArrayWriter message) {
             try {
                 message.writeTo(writer);
-            } catch (IOException ex) {
-                log.error("Could not write to writer", ex);
+            } catch (IOException ioe) {
+                log.error("Could not write to writer", ioe);
             }
         }
     }

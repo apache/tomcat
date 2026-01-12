@@ -132,6 +132,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             log.trace(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
                     se.getError(), se.getMessage()));
         }
+
+        // Treat a sent reset like a received reset and increment the overhead count
+        increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
+
         // Write a RST frame
         byte[] rstFrame = new byte[13];
         // Length
@@ -334,7 +338,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         (int) (sendfile.end - sendfile.pos);
                 sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                 sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return SendfileState.ERROR;
             }
 
@@ -371,7 +375,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         ByteBuffer.wrap(header), sendfile.mappedBuffer);
                 try {
                     handleAsyncException();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     return SendfileState.ERROR;
                 }
             }
@@ -396,13 +400,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 if (sendfile.left == 0) {
                     try {
                         sendfile.stream.getOutputBuffer().end();
-                    } catch (IOException e) {
-                        failed(e, sendfile);
+                    } catch (IOException ioe) {
+                        failed(ioe, sendfile);
                     }
                     return;
                 }
-                sendfile.streamReservation -= bytesWritten;
-                sendfile.connectionReservation -= bytesWritten;
+                sendfile.streamReservation -= (int) bytesWritten;
+                sendfile.connectionReservation -= (int) bytesWritten;
                 sendfile.pos += bytesWritten;
                 try {
                     if (sendfile.connectionReservation == 0) {
@@ -414,8 +418,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         sendfile.connectionReservation =
                                 reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
                     }
-                } catch (IOException e) {
-                    failed(e, sendfile);
+                } catch (IOException ioe) {
+                    failed(ioe, sendfile);
                     return;
                 }
 
@@ -456,8 +460,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                             ByteBuffer.wrap(header), sendfile.mappedBuffer);
                     try {
                         handleAsyncException();
-                    } catch (IOException e) {
-                        failed(e, sendfile);
+                    } catch (IOException ioe) {
+                        failed(ioe, sendfile);
                         return;
                     }
                 }
@@ -496,7 +500,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void receivePing(byte[] payload, boolean ack) throws IOException {
             if (ack) {
-                super.receivePing(payload, ack);
+                super.receivePing(payload, true);
             } else {
                 // Client originated ping. Echo it back.
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,

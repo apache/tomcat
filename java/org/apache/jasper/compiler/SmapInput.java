@@ -16,24 +16,5 @@
  */
 package org.apache.jasper.compiler;
 
-public class SmapInput {
-
-    private final String fileName;
-    private final int lineNumber;
-
-
-    public SmapInput(String fileName, int lineNumber) {
-        this.fileName = fileName;
-        this.lineNumber = lineNumber;
-    }
-
-
-    public String getFileName() {
-        return fileName;
-    }
-
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
+public record SmapInput(String fileName, int lineNumber) {
 }

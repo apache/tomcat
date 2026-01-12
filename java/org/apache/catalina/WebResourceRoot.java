@@ -21,8 +21,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.catalina.util.ResourceSet;
+
 /**
- * Represents the complete set of resources for a web application. The resources for a web application comprise of
+ * Represents the complete set of resources for a web application. The resources for a web application consist of
  * multiple ResourceSets and when looking for a Resource, the ResourceSets are processed in the following order:
  * <ol>
  * <li>Pre - Resources defined by the &lt;PreResource&gt; element in the web application's context.xml. Resources will
@@ -62,7 +64,7 @@ import java.util.Set;
  * adds all sorts complications including: - which ResourceSet to write to - unexpected behaviour when deleting a
  * resource from one ResourceSet since that may unmask a resource in a lower priority ResourceSet so what was a delete
  * looks like a replace with the user having no idea where the 'new' resource came from - how to handle PUT when the
- * target is read-only but it could be written to a higher priority ResourceSet that is read-write
+ * target is read-only, but it could be written to a higher priority ResourceSet that is read-write
  */
 public interface WebResourceRoot extends Lifecycle {
     /**
@@ -95,8 +97,8 @@ public interface WebResourceRoot extends Lifecycle {
      * calls to this method until the web application is reloaded. No guarantee is made as to what the search order for
      * JAR files may be.
      *
-     * @param path The path of the class loader resource of interest relative to the the root of class loader resources
-     *                 for this web application.
+     * @param path The path of the class loader resource of interest relative to the root of class loader resources for
+     *                 this web application.
      *
      * @return The object that represents the class loader resource at the given path
      */
@@ -190,7 +192,7 @@ public interface WebResourceRoot extends Lifecycle {
      * @param base         The location of the resources
      * @param archivePath  The path within the resource to the archive where the content is to be found. If there is no
      *                         archive then this should be <code>null</code>.
-     * @param internalPath The path within the archive (or the resource if the archivePath is <code>null</code> where
+     * @param internalPath The path within the archive (or the resource if the archivePath is <code>null</code>) where
      *                         the content is to be found. It must start with '/'.
      */
     void createWebResourceSet(ResourceSetType type, String webAppMount, String base, String archivePath,
@@ -205,7 +207,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Pre' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Pre' resource.
      */
     WebResourceSet[] getPreResources();
 
@@ -217,7 +219,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Jar' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Jar' resource.
      */
     WebResourceSet[] getJarResources();
 
@@ -229,7 +231,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPostResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Post' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Post' resource.
      */
     WebResourceSet[] getPostResources();
 
@@ -246,14 +248,16 @@ public interface WebResourceRoot extends Lifecycle {
     void setContext(Context context);
 
     /**
-     * Configure if this resources allow the use of symbolic links.
+     * Configure if this web application allows the use of symbolic links by default. Individual {@link ResourceSet}s
+     * may override this setting.
      *
      * @param allowLinking <code>true</code> if symbolic links are allowed.
      */
     void setAllowLinking(boolean allowLinking);
 
     /**
-     * Determine if this resources allow the use of symbolic links.
+     * Determine if this web application allows the use of symbolic links by default. Individual {@link ResourceSet}s
+     * may override this setting.
      *
      * @return <code>true</code> if symbolic links are allowed
      */
@@ -317,7 +321,7 @@ public interface WebResourceRoot extends Lifecycle {
 
     /**
      * Controls whether the track locked files feature is enabled. If enabled, all calls to methods that return objects
-     * that lock a file and need to be closed to release that lock (e.g. {@link WebResource#getInputStream()} will
+     * that lock a file and need to be closed to release that lock (e.g. {@link WebResource#getInputStream()}) will
      * perform a number of additional tasks.
      * <ul>
      * <li>The stack trace at the point where the method was called will be recorded and associated with the returned
@@ -380,7 +384,7 @@ public interface WebResourceRoot extends Lifecycle {
     void deregisterTrackedResource(TrackedWebResource trackedResource);
 
     /**
-     * @return the set of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
+     * @return the list of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
      */
     List<URL> getBaseUrls();
 
@@ -393,7 +397,7 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Obtain the current caching strategy.
      * <p>
-     * The default implementation returns {@code null}. Sub-classes wishing to utilise a {@link CacheStrategy} should
+     * The default implementation returns {@code null}. Subclasses wishing to utilise a {@link CacheStrategy} should
      * provide an appropriate implementation.
      *
      * @return the current caching strategy or {@code null} if no strategy has been configured
@@ -405,13 +409,30 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Set the current caching strategy.
      * <p>
-     * The default implementation is a NO-OP. Sub-classes wishing to utilise a {@link CacheStrategy} should provide an
+     * The default implementation is a NO-OP. Subclasses wishing to utilise a {@link CacheStrategy} should provide an
      * appropriate implementation.
      *
      * @param strategy The new strategy to use or {@code null} for no strategy
      */
     default void setCacheStrategy(CacheStrategy strategy) {
         // NO-OP
+    }
+
+    /**
+     * Set if the main resources are read only.
+     *
+     * @param readOnly the value
+     */
+    default void setReadOnly(boolean readOnly) {
+        // NO-OP
+    }
+
+    /**
+     * @return {@code true} if the main resources are read only, otherwise {@code false}. The default implementation
+     *             returns {@code false}.
+     */
+    default boolean isReadOnly() {
+        return false;
     }
 
     enum ResourceSetType {

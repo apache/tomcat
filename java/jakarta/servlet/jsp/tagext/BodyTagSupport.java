@@ -16,6 +16,8 @@
  */
 package jakarta.servlet.jsp.tagext;
 
+import java.io.Serial;
+
 import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.JspWriter;
 
@@ -29,6 +31,7 @@ import jakarta.servlet.jsp.JspWriter;
  */
 public class BodyTagSupport extends TagSupport implements BodyTag {
 
+    @Serial
     private static final long serialVersionUID = -7235752615580319833L;
 
     /**
@@ -98,7 +101,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
     }
 
     /**
-     * After the body evaluation: do not reevaluate and continue with the page. By default nothing is done with the
+     * After the body evaluation: do not reevaluate and continue with the page. By default, nothing is done with the
      * bodyContent data (if any).
      *
      * @return SKIP_BODY

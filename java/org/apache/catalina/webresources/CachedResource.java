@@ -32,6 +32,7 @@ import java.security.cert.Certificate;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -75,7 +76,6 @@ public class CachedResource implements WebResource {
     private volatile Boolean cachedExists = null;
     private volatile Boolean cachedIsVirtual = null;
     private volatile Long cachedContentLength = null;
-    private final Object cachedContentLengthLock = new Object();
     private volatile String cachedStrongETag = null;
 
 
@@ -85,6 +85,7 @@ public class CachedResource implements WebResource {
         this.root = root;
         this.webAppPath = path;
         this.ttl = ttl;
+        nextCheck = ttl + System.currentTimeMillis();
         this.objectMaxSizeBytes = objectMaxSizeBytes;
         this.usesClassLoaderResources = usesClassLoaderResources;
     }
@@ -101,15 +102,12 @@ public class CachedResource implements WebResource {
             return false;
         }
 
-        long now = System.currentTimeMillis();
-
         if (webResource == null) {
             synchronized (this) {
                 if (webResource == null) {
                     webResource = root.getResourceInternal(webAppPath, useClassLoaderResources);
                     getLastModified();
                     getContentLength();
-                    nextCheck = ttl + now;
                     // exists() is a relatively expensive check for a file so
                     // use the fact that we know if it exists at this point
                     if (webResource instanceof EmptyResource) {
@@ -121,6 +119,8 @@ public class CachedResource implements WebResource {
                 }
             }
         }
+
+        long now = System.currentTimeMillis();
 
         if (now < nextCheck) {
             return true;
@@ -253,23 +253,20 @@ public class CachedResource implements WebResource {
          * 1. It is relatively expensive to calculate, it shouldn't change and this method is called multiple times
          * during cache validation. Caching, therefore, offers a performance benefit.
          *
-         * 2. There is a race condition if concurrent threads are trying to PUT and DELETE the same resource. If the
-         * DELETE thread removes the cache entry after the PUT thread has created it but before validation is complete
-         * the DELETE thread sees a content length for a non-existant resource but the PUT thread sees the actual
-         * content length. While that isn't an issue for the individual requests it, does corrupt the cache size
-         * tracking as the size used for the resource is different between when it is added to the cache and when it is
-         * removed. Caching combined with locking ensures that a consistent content length is reported for the resource.
+         * 2. There is a race condition if concurrent threads are trying to PUT and DELETE the same resource. See BZ
+         * 69527 (https://bz.apache.org/bugzilla/show_bug.cgi?id=69527#c14) for full details. The short version is that
+         * getContentLength() must always return the same value for any one CachedResource instance else the cache size
+         * will be corrupted.
          */
         if (cachedContentLength == null) {
-            synchronized (cachedContentLengthLock) {
-                if (cachedContentLength == null) {
+            if (webResource == null) {
+                synchronized (this) {
                     if (webResource == null) {
-                        cachedContentLength = Long.valueOf(0);
-                    } else {
-                        cachedContentLength = Long.valueOf(webResource.getContentLength());
+                        webResource = root.getResourceInternal(webAppPath, usesClassLoaderResources);
                     }
                 }
             }
+            cachedContentLength = Long.valueOf(webResource.getContentLength());
         }
         return cachedContentLength.longValue();
     }
@@ -299,7 +296,7 @@ public class CachedResource implements WebResource {
         if (cachedStrongETag == null) {
             byte[] buf = getContent();
             if (buf != null) {
-                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                buf = ConcurrentMessageDigest.digestSHA256(buf);
                 cachedStrongETag = "\"" + HexUtils.toHexString(buf) + "\"";
             } else {
                 cachedStrongETag = webResource.getStrongETag();
@@ -426,7 +423,7 @@ public class CachedResource implements WebResource {
         // Longer paths use a noticeable amount of memory so account for this in
         // the cache size. The fixed component of a String instance's memory
         // usage is accounted for in the 500 bytes above.
-        result += getWebappPath().length() * 2;
+        result += getWebappPath().length() * 2L;
         if (getContentLength() <= objectMaxSizeBytes) {
             result += getContentLength();
         }
@@ -578,6 +575,7 @@ public class CachedResource implements WebResource {
         }
 
         @Override
+        @Deprecated
         public Permission getPermission() throws IOException {
             // Doesn't trigger a call to connect for file:// URLs
             return resourceURL.openConnection().getPermission();
@@ -595,6 +593,12 @@ public class CachedResource implements WebResource {
 
         private WebResource getResource() {
             return root.getResource(webAppPath, false, usesClassLoaderResources);
+        }
+
+        @Override
+        public String getContentType() {
+            // "content/unknown" is the value used by sun.net.www.URLConnection. It is used here for consistency.
+            return Objects.requireNonNullElse(getResource().getMimeType(), "content/unknown");
         }
     }
 
@@ -634,6 +638,7 @@ public class CachedResource implements WebResource {
         }
 
         @Override
+        @Deprecated
         public Permission getPermission() throws IOException {
             // Doesn't trigger a call to connect for jar:// URLs
             return resourceURL.openConnection().getPermission();
@@ -658,5 +663,10 @@ public class CachedResource implements WebResource {
             return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
         }
 
+        @Override
+        public String getContentType() {
+            // "content/unknown" is the value used by sun.net.www.URLConnection. It is used here for consistency.
+            return Objects.requireNonNullElse(getResource().getMimeType(), "content/unknown");
+        }
     }
 }

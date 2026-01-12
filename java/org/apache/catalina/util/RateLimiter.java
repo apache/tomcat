@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import jakarta.servlet.FilterConfig;
@@ -46,13 +45,13 @@ public interface RateLimiter {
     void setRequests(int requests);
 
     /**
-     * Increments the number of requests by the given ipAddress in the current time window.
+     * Increments the number of requests by the given identifier in the current time window.
      *
-     * @param ipAddress the ip address
+     * @param identifier the identifier for which the number of associated requests should be incremented
      *
      * @return the new value after incrementing
      */
-    int increment(String ipAddress);
+    int increment(String identifier);
 
     /**
      * Cleanup no longer needed resources.
@@ -92,7 +91,7 @@ public interface RateLimiter {
     /**
      * Provide the quota header for this rate limit for a given request count within the current time window.
      *
-     * @param requestCount  The request count within the current time window
+     * @param requestCount The request count within the current time window
      *
      * @return the quota header for the given value of request count
      *

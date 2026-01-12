@@ -208,7 +208,7 @@ class WindowAllocationManager {
                 // Reset this here so multiple notifies (possible with a
                 // backlog containing multiple streams and small window updates)
                 // are handled correctly (only the first should trigger a call
-                // to stream.notify(). Additional notify() calls may trigger
+                // to stream.notify()). Additional notify() calls may trigger
                 // unexpected timeouts.
                 waitingFor = NONE;
                 Response response = stream.getCoyoteResponse();

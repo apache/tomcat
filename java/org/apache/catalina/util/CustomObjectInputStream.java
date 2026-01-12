@@ -33,9 +33,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Custom subclass of <code>ObjectInputStream</code> that loads from the class loader for this web application. This
  * allows classes defined only with the web application to be found correctly.
- *
- * @author Craig R. McClanahan
- * @author Bip Thelin
  */
 public final class CustomObjectInputStream extends ObjectInputStream {
 

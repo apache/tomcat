@@ -118,19 +118,21 @@ public class ChatAnnotation {
             }
 
         } while (queueHasMessagesToBeSent);
-     }
+    }
 
 
     private static void broadcast(String msg) {
         for (ChatAnnotation client : connections) {
             try {
                 client.sendMessage(msg);
-            } catch (IOException e) {
-                log.debug("Chat Error: Failed to send message to client", e);
+            } catch (IOException ioe) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Chat Error: Failed to send message to client", ioe);
+                }
                 if (connections.remove(client)) {
                     try {
                         client.session.close();
-                    } catch (IOException e1) {
+                    } catch (IOException ignore) {
                         // Ignore
                     }
                     String message = String.format("* %s %s", client.nickname, "has been disconnected.");

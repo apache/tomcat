@@ -36,9 +36,6 @@ import org.xml.sax.SAXException;
  * <p>
  * In the case of a Java compilation error, the compiler error message is parsed into an array of JavacErrorDetail
  * instances, which is passed on to the configured error handler.
- *
- * @author Jan Luehe
- * @author Kin-man Chung
  */
 public class ErrorDispatcher {
 
@@ -250,7 +247,7 @@ public class ErrorDispatcher {
                     file = where.getFile();
                 }
             } else {
-                // Get the context-relative resource path, so as to not disclose any local file system details
+                // Get the context-relative resource path, to avoid disclosing any local file system details
                 file = where.getFile();
             }
             line = where.getLineNumber();
@@ -291,7 +288,7 @@ public class ErrorDispatcher {
 
         List<JavacErrorDetail> errors = new ArrayList<>();
         StringBuilder errMsgBuf = null;
-        int lineNum = -1;
+        int lineNum;
         JavacErrorDetail javacError = null;
 
         BufferedReader reader = new BufferedReader(new StringReader(errMsg));
@@ -300,7 +297,7 @@ public class ErrorDispatcher {
          * Parse compilation errors. Each compilation error consists of a file path and error line number, followed by a
          * number of lines describing the error.
          */
-        String line = null;
+        String line;
         while ((line = reader.readLine()) != null) {
 
             /*
@@ -344,7 +341,7 @@ public class ErrorDispatcher {
         reader.close();
 
         JavacErrorDetail[] errDetails = null;
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             errDetails = errors.toArray(new JavacErrorDetail[0]);
         }
 

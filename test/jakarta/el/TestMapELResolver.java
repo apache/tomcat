@@ -81,7 +81,7 @@ public class TestMapELResolver {
         MapELResolver mapELResolver = new MapELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Map<String, String> map = new HashMap<>();
+        Map<String,String> map = new HashMap<>();
         map.put("key", "value");
         Object result = mapELResolver.getValue(context, map, "key");
 
@@ -130,7 +130,7 @@ public class TestMapELResolver {
         MapELResolver mapELResolver = new MapELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Map<String, String> map = new HashMap<>();
+        Map<String,String> map = new HashMap<>();
         mapELResolver.setValue(context, map, "key", "value");
 
         Assert.assertEquals("value", mapELResolver.getValue(context, map, "key"));
@@ -145,7 +145,7 @@ public class TestMapELResolver {
         MapELResolver mapELResolver = new MapELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Map<Object, Object> map = Collections.unmodifiableMap(new HashMap<>());
+        Map<Object,Object> map = Collections.unmodifiableMap(new HashMap<>());
         mapELResolver.setValue(context, map, "key", "value");
     }
 
@@ -208,7 +208,7 @@ public class TestMapELResolver {
         MapELResolver mapELResolver = new MapELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Map<Object, Object> map = Collections.unmodifiableMap(new HashMap<>());
+        Map<Object,Object> map = Collections.unmodifiableMap(new HashMap<>());
         boolean result = mapELResolver.isReadOnly(context, map, new Object());
 
         Assert.assertTrue(result);

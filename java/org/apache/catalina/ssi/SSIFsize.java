@@ -24,12 +24,7 @@ import java.text.DecimalFormat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #fsize command
- *
- * @author Bip Thelin
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Implements the Server-side #fsize command.
  */
 public final class SSIFsize implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFsize.class);
@@ -57,8 +52,8 @@ public final class SSIFsize implements SSICommand {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiFsize.noSize", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiFsize.noSize", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }
@@ -66,23 +61,11 @@ public final class SSIFsize implements SSICommand {
     }
 
 
-    public String repeat(char aChar, int numChars) {
-        if (numChars < 0) {
-            throw new IllegalArgumentException(sm.getString("ssiFsize.invalidNumChars"));
-        }
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < numChars; i++) {
-            buf.append(aChar);
-        }
-        return buf.toString();
-    }
-
-
     public String padLeft(String str, int maxChars) {
         String result = str;
         int charsToAdd = maxChars - str.length();
         if (charsToAdd > 0) {
-            result = repeat(' ', charsToAdd) + str;
+            result = " ".repeat(charsToAdd) + str;
         }
         return result;
     }
@@ -91,8 +74,8 @@ public final class SSIFsize implements SSICommand {
     // We try to mimic httpd here, as we do everywhere.
     // All the 'magic' numbers are from the util_script.c httpd source file.
     // Should use KiB and MiB in output but use k and M for consistency with httpd.
-    protected String formatSize(long size, String format) {
-        String retString = "";
+    private String formatSize(long size, String format) {
+        String retString;
         if (format.equalsIgnoreCase("bytes")) {
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             retString = decimalFormat.format(size);

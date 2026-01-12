@@ -118,7 +118,7 @@ public abstract class PojoMessageHandlerWholeBase<T> extends PojoMessageHandlerB
                 try {
                     instanceManager.destroyInstance(decoder);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    log.warn(sm.getString("pojoMessageHandlerWholeBase.decodeDestoryFailed", decoder.getClass()), e);
+                    log.warn(sm.getString("pojoMessageHandlerWholeBase.decodeDestroyFailed", decoder.getClass()), e);
                 }
             }
         }

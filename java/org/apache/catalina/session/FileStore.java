@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import jakarta.servlet.ServletContext;
 
@@ -33,13 +34,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Concrete implementation of the <b>Store</b> interface that utilizes a file per saved Session in a configured
  * directory. Sessions that are saved are still subject to being expired based on inactivity.
- *
- * @author Craig R. McClanahan
  */
 public final class FileStore extends StoreBase {
 
@@ -61,7 +61,7 @@ public final class FileStore extends StoreBase {
      * The pathname of the directory in which Sessions are stored. This may be an absolute pathname, or a relative path
      * that is resolved against the temporary work directory for this application.
      */
-    private String directory = ".";
+    private volatile String directory = ".";
 
 
     /**
@@ -69,6 +69,7 @@ public final class FileStore extends StoreBase {
      */
     private File directoryFile = null;
 
+    private KeyedReentrantReadWriteLock sessionLocksById = new KeyedReentrantReadWriteLock();
 
     /**
      * Name to register for this Store, used for logging.
@@ -97,7 +98,7 @@ public final class FileStore extends StoreBase {
      *
      * @param path The new directory path
      */
-    public void setDirectory(String path) {
+    public synchronized void setDirectory(String path) {
         String oldDirectory = this.directory;
         this.directory = path;
         this.directoryFile = null;
@@ -126,7 +127,7 @@ public final class FileStore extends StoreBase {
         if (dir == null) {
             return 0;
         }
-        String files[] = dir.list();
+        String[] files = dir.list();
 
         // Figure out which files are sessions
         int keycount = 0;
@@ -159,7 +160,7 @@ public final class FileStore extends StoreBase {
         if (dir == null) {
             return new String[0];
         }
-        String files[] = dir.list();
+        String[] files = dir.list();
 
         // Bugzilla 32130
         if (files == null || files.length < 1) {
@@ -182,7 +183,7 @@ public final class FileStore extends StoreBase {
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
-        if (file == null || !file.exists()) {
+        if (file == null) {
             return null;
         }
 
@@ -194,19 +195,28 @@ public final class FileStore extends StoreBase {
         }
 
         ClassLoader oldThreadContextCL = context.bind(null);
-
-        try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                ObjectInputStream ois = getObjectInputStream(fis)) {
-
-            StandardSession session = (StandardSession) manager.createEmptySession();
-            session.readObjectData(ois);
-            session.setManager(manager);
-            return session;
-        } catch (FileNotFoundException e) {
-            if (contextLog.isDebugEnabled()) {
-                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()));
+        try {
+            Lock readLock = sessionLocksById.getLock(id).readLock();
+            readLock.lock();
+            try {
+                if (!file.exists()) {
+                    return null;
+                }
+                try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                        ObjectInputStream ois = getObjectInputStream(fis)) {
+                    StandardSession session = (StandardSession) manager.createEmptySession();
+                    session.readObjectData(ois);
+                    session.setManager(manager);
+                    return session;
+                } catch (FileNotFoundException e) {
+                    if (contextLog.isDebugEnabled()) {
+                        contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()), e);
+                    }
+                    return null;
+                }
+            } finally {
+                readLock.unlock();
             }
-            return null;
         } finally {
             context.unbind(oldThreadContextCL);
         }
@@ -224,8 +234,14 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
-        if (file.exists() && !file.delete()) {
-            throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+        Lock writeLock = sessionLocksById.getLock(id).writeLock();
+        writeLock.lock();
+        try {
+            if (file.exists() && !file.delete()) {
+                throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -242,9 +258,15 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
         }
 
-        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
-            ((StandardSession) session).writeObjectData(oos);
+        Lock writeLock = sessionLocksById.getLock(session.getIdInternal()).writeLock();
+        writeLock.lock();
+        try {
+            try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+                    ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
+                ((StandardSession) session).writeObjectData(oos);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -255,12 +277,12 @@ public final class FileStore extends StoreBase {
      * Return a File object representing the pathname to our session persistence directory, if any. The directory will
      * be created if it does not already exist.
      */
-    private File directory() throws IOException {
+    private synchronized File directory() throws IOException {
+        // Synchronised to avoid concurrent attempts to create the directory.
         if (this.directory == null) {
             return null;
         }
         if (this.directoryFile != null) {
-            // NOTE: Race condition is harmless, so do not synchronize
             return this.directoryFile;
         }
         File file = new File(this.directory);

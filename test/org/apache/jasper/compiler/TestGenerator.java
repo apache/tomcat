@@ -52,6 +52,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestGenerator extends TomcatBaseTest {
 
+    private static final String NEW_LINE = System.lineSeparator();
+
     @Test
     public void testBug45015a() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
@@ -244,8 +246,8 @@ public class TestGenerator extends TomcatBaseTest {
         public int doEndTag() throws JspException {
             try {
                 pageContext.getOut().print("attribute1: '" + attribute1 + "', " + "attribute2: '" + attribute2 + "'");
-            } catch (IOException e) {
-                throw new JspException(e);
+            } catch (IOException ioe) {
+                throw new JspException(ioe);
             }
             return EVAL_PAGE;
         }
@@ -260,11 +262,11 @@ public class TestGenerator extends TomcatBaseTest {
         try {
             getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56581.jsp", res, null);
             Assert.fail("An IOException was expected.");
-        } catch (IOException expected) {
-            // ErrorReportValve in Tomcat 8.0.9+ flushes and aborts the
-            // connection when an unexpected error is encountered and response
-            // has already been committed. It results in an exception here:
-            // java.io.IOException: Premature EOF
+        } catch (IOException ignore) {
+            /*
+             * ErrorReportValve flushes and aborts the connection when an unexpected error is encountered and response
+             * has already been committed. It results in an exception here: java.io.IOException: Premature EOF
+             */
         }
 
         String result = res.toString();
@@ -322,7 +324,7 @@ public class TestGenerator extends TomcatBaseTest {
             }
         }
         if (!removeBlankLines && blankLineCount == 0) {
-            Assert.fail("TrimSpaceOptions.EXTENDED not configured but balnk lines have been removed");
+            Assert.fail("TrimSpaceOptions.EXTENDED not configured but blank lines have been removed");
         } else if (removeBlankLines && blankLineCount > 0) {
             Assert.fail("TrimSpaceOptions.EXTENDED does not allow the line to be just a new line character");
         }
@@ -391,6 +393,49 @@ public class TestGenerator extends TomcatBaseTest {
     @Test
     public void testJspIdDocument() throws Exception {
         doTestJspId(true);
+    }
+
+    @Test
+    public void testNonstandardSets() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        // This should break all subsequent requests
+        ByteChunk body = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/set-01.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=testValue" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/set-02.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=testValue" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/set-03.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=null" + NEW_LINE
+                + "request value=testValue" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/set-04.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=null" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=testValue" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/set-05.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=null" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=testValue", body.toString());
+        body.recycle();
     }
 
     private void doTestJspId(boolean document) throws Exception {
@@ -688,6 +733,10 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testLambdaScriptlets() throws Exception {
+        doTestJsp("lambda.jsp");
+    }
 
     @Test
     public void testInfoConflictNone() throws Exception {
@@ -972,6 +1021,37 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
+    public void testBug69508() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69508.jsp?init=InitCommand", body, null);
+
+        String text = body.toString();
+        Assert.assertEquals(text, HttpServletResponse.SC_OK, rc);
+        // include page URL with param cmd
+        Assert.assertTrue(text, text.contains("<p>cmd - someCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param1 - value1</p>"));
+        Assert.assertTrue(text, text.contains("<p>cmd - someCommandAbs</p>"));
+        Assert.assertTrue(text, text.contains("<p>param1 - value1Abs</p>"));
+        // include page URL without param
+        Assert.assertTrue(text, text.contains("<p>param2 - value2</p>"));
+        Assert.assertTrue(text, text.contains("<p>param2 - value2Abs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param3 - InitCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param3 - InitCommandAbs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param4 - value4</p>"));
+        Assert.assertTrue(text, text.contains("<p>param4 - value4Abs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param5 - InitCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param5 - InitCommandAbs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param6 - value6</p>"));
+        Assert.assertTrue(text, text.contains("<p>param6 - value6Abs</p>"));
+    }
+
+    @Test
     public void testTagReleaseWithPooling() throws Exception {
         doTestTagRelease(true);
     }
@@ -1014,5 +1094,48 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/generator/" + jspName, body, null);
 
         Assert.assertEquals(body.toString(), expectedResponseCode, rc);
+    }
+
+    @Test
+    public void testNonstandardRemoves() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        // This should break all subsequent requests
+        ByteChunk body = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/remove-01.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=null" + NEW_LINE
+                + "request value=testValue" + NEW_LINE
+                + "session value=testValue" + NEW_LINE
+                + "application value=testValue", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/remove-02.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=testValue" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=testValue" + NEW_LINE
+                + "application value=testValue", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/remove-03.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=testValue" + NEW_LINE
+                + "request value=testValue" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=testValue", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/remove-04.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=testValue" + NEW_LINE
+                + "request value=testValue" + NEW_LINE
+                + "session value=testValue" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/remove-05.jsp", body, null);
+        Assert.assertEquals(NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE + NEW_LINE
+                + "pageContext value=null" + NEW_LINE
+                + "request value=null" + NEW_LINE
+                + "session value=null" + NEW_LINE
+                + "application value=null", body.toString());
+        body.recycle();
     }
 }

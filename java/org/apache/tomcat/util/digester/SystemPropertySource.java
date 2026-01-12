@@ -19,9 +19,8 @@ package org.apache.tomcat.util.digester;
 import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
- * that uses system properties to resolve expressions.
- * This property source is always active by default.
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource} that uses system properties to resolve
+ * expressions. This property source is always active by default.
  *
  * @see Digester
  */

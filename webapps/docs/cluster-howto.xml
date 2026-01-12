@@ -23,8 +23,6 @@
     &project;
 
     <properties>
-        <author email="fhanik@apache.org">Filip Hanik</author>
-        <author email="pero@apache.org">Peter Rossbach</author>
         <title>Clustering/Session Replication How-To</title>
     </properties>
 
@@ -74,7 +72,7 @@
     The following is the default cluster configuration:
   </p>
   <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="8">
+                 channelSendOptions="async">
 
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
@@ -277,12 +275,12 @@ should be completed:</p>
 
 <section name="Configuration Example">
     <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="6">
+                 channelSendOptions="use_ack,sync">
 
           <Manager className="org.apache.catalina.ha.session.BackupManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"
-                   mapSendOptions="6"/>
+                   mapSendOptions="use_ack,sync"/>
           <!--
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
@@ -323,7 +321,7 @@ should be completed:</p>
       Break it down!!
     </p>
     <source><![CDATA[        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="6">]]></source>
+                 channelSendOptions="use_ack,sync">]]></source>
     <p>
       The main element, inside this element all cluster details can be configured.
       The <code>channelSendOptions</code> is the flag that is attached to each message sent by the
@@ -337,7 +335,7 @@ should be completed:</p>
     <source><![CDATA[          <Manager className="org.apache.catalina.ha.session.BackupManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"
-                   mapSendOptions="6"/>
+                   mapSendOptions="use_ack,sync"/>
           <!--
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
@@ -365,7 +363,7 @@ should be completed:</p>
                         dropTime="3000"/>]]></source>
     <p>
         Membership is done using multicasting. Please note that Tribes also supports static memberships using the
-        <code>StaticMembershipInterceptor</code> if you want to extend your membership to points beyond multicasting.
+        <code>StaticMembershipService</code> if you want to extend your membership to points beyond multicasting.
         The address attribute is the multicast address used and the port is the multicast port. These two together
         create the cluster separation. If you want a QA cluster and a production cluster, the easiest config is to
         have the QA cluster be on a separate multicast address/port combination than the production cluster.<br/>

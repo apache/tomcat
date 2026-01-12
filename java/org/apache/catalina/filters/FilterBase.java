@@ -63,7 +63,7 @@ public abstract class FilterBase implements Filter {
 
     /**
      * Determines if an exception when calling a setter or an unknown configuration attribute triggers the failure of
-     * the this filter which in turn will prevent the web application from starting.
+     * this filter which in turn will prevent the web application from starting.
      *
      * @return <code>true</code> if a problem should trigger the failure of this filter, else <code>false</code>
      */

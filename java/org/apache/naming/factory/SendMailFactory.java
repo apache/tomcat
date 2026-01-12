@@ -34,13 +34,13 @@ import jakarta.mail.internet.MimePartDataSource;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * Factory class that creates a JNDI named javamail MimePartDataSource
- * object which can be used for sending email using SMTP.
+ * Factory class that creates a JNDI named javamail MimePartDataSource object which can be used for sending email using
+ * SMTP.
  * <p>
- * Can be configured in the Context scope
- * of your server.xml configuration file.
+ * Can be configured in the Context scope of your server.xml configuration file.
  * <p>
  * Example:
+ *
  * <pre>
  * &lt;Resource name="mail/send"
  *           auth="CONTAINER"
@@ -54,20 +54,14 @@ import org.apache.tomcat.util.ExceptionUtils;
  *           mail.smtp.dsn.ret="FULL"
  *           /&gt;
  * </pre>
- *
- * @author Glenn Nielsen Rich Catlett
  */
-
-public class SendMailFactory implements ObjectFactory
-{
+public class SendMailFactory implements ObjectFactory {
     // The class name for the javamail MimeMessageDataSource
-    protected static final String DataSourceClassName =
-        "jakarta.mail.internet.MimePartDataSource";
+    protected static final String DataSourceClassName = "jakarta.mail.internet.MimePartDataSource";
 
     @Override
-    public Object getObjectInstance(Object refObj, Name name, Context ctx,
-            Hashtable<?,?> env) throws Exception {
-        final Reference ref = (Reference)refObj;
+    public Object getObjectInstance(Object refObj, Name name, Context ctx, Hashtable<?,?> env) throws Exception {
+        final Reference ref = (Reference) refObj;
 
         if (ref.getClassName().equals(DataSourceClassName)) {
             // set up the smtp session that will send the message
@@ -85,8 +79,7 @@ public class SendMailFactory implements ObjectFactory
                 // set property
                 props.put(refaddr.getType(), refaddr.getContent());
             }
-            MimeMessage message = new MimeMessage(
-                Session.getInstance(props));
+            MimeMessage message = new MimeMessage(Session.getInstance(props));
             try {
                 RefAddr fromAddr = ref.get("mail.from");
                 String from = null;
@@ -101,8 +94,7 @@ public class SendMailFactory implements ObjectFactory
                 ExceptionUtils.handleThrowable(t);
                 // Otherwise ignore
             }
-            MimePartDataSource mds = new MimePartDataSource(message);
-            return mds;
+            return new MimePartDataSource(message);
         } else { // We can't create an instance of the DataSource
             return null;
         }

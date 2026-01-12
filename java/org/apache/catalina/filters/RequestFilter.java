@@ -39,7 +39,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * <li>The subclass extracts the request property to be filtered, and calls the common <code>process()</code> method.
  * <li>If there is a deny expression configured, the property will be compared to the expression. If a match is found,
  * this request will be rejected with a "Forbidden" HTTP response.</li>
- * <li>If there is a allow expression configured, the property will be compared to the expression. If a match is found,
+ * <li>If there is an allow expression configured, the property will be compared to the expression. If a match is found,
  * this request will be allowed to pass through to the next filter in the current pipeline.</li>
  * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
  * the deny expressions matched it).
@@ -94,7 +94,7 @@ public abstract class RequestFilter extends FilterBase {
      * @param allow The new allow expression
      */
     public void setAllow(String allow) {
-        if (allow == null || allow.length() == 0) {
+        if (allow == null || allow.isEmpty()) {
             this.allow = null;
         } else {
             this.allow = Pattern.compile(allow);
@@ -120,7 +120,7 @@ public abstract class RequestFilter extends FilterBase {
      * @param deny The new deny expression
      */
     public void setDeny(String deny) {
-        if (deny == null || deny.length() == 0) {
+        if (deny == null || deny.isEmpty()) {
             this.deny = null;
         } else {
             this.deny = Pattern.compile(deny);
@@ -223,12 +223,9 @@ public abstract class RequestFilter extends FilterBase {
         }
 
         // Allow if denies specified but not allows
-        if (deny != null && allow == null) {
-            return true;
-        }
+        // Deny this request otherwise
+        return deny != null && allow == null;
 
-        // Deny this request
-        return false;
     }
 
     private void sendErrorWhenNotHttp(ServletResponse response) throws IOException {

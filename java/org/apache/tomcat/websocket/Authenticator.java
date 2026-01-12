@@ -38,9 +38,9 @@ public abstract class Authenticator {
      *
      * @param requestUri         The request URI
      * @param authenticateHeader The server authentication header received
-     * @param userName           The user name
+     * @param userName           The username
      * @param userPassword       The user password
-     * @param userRealm          The realm for which the provided user name and password are valid. {@code null} to
+     * @param userRealm          The realm for which the provided username and password are valid. {@code null} to
      *                               indicate all realms.
      *
      * @return The generated authorization header value
@@ -66,10 +66,10 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseAuthenticateHeader(String authenticateHeader) {
+    public Map<String,String> parseAuthenticateHeader(String authenticateHeader) {
 
         Matcher m = pattern.matcher(authenticateHeader);
-        Map<String, String> parameterMap = new HashMap<>();
+        Map<String,String> parameterMap = new HashMap<>();
 
         while (m.find()) {
             String key = m.group(1);
@@ -104,7 +104,7 @@ public abstract class Authenticator {
         }
 
         userRealm = userRealm.trim();
-        if (userRealm.length() == 0) {
+        if (userRealm.isEmpty()) {
             return;
         }
 

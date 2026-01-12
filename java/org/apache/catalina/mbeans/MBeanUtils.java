@@ -39,12 +39,8 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Public utility methods in support of the server side MBeans implementation.
- *
- * @author Craig R. McClanahan
- * @author Amy Roh
  */
 public class MBeanUtils {
 
@@ -56,7 +52,7 @@ public class MBeanUtils {
      * The set of exceptions to the normal rules used by <code>createManagedBean()</code>. The first element of each
      * pair is a class name, and the second element is the managed bean name.
      */
-    private static final String exceptions[][] = { { "org.apache.catalina.users.GenericGroup", "Group" },
+    private static final String[][] exceptions = { { "org.apache.catalina.users.GenericGroup", "Group" },
             { "org.apache.catalina.users.GenericRole", "Role" }, { "org.apache.catalina.users.GenericUser", "User" } };
 
 
@@ -447,10 +443,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, Group group) throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
+        return new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
                 ",database=" + group.getUserDatabase().getId());
-        return name;
 
     }
 
@@ -467,9 +461,9 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, Role role) throws MalformedObjectNameException {
 
-        ObjectName name = new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) +
-                ",database=" + role.getUserDatabase().getId());
-        return name;
+        return new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) + ",database=" +
+                role.getUserDatabase().getId());
+
     }
 
 
@@ -485,9 +479,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, User user) throws MalformedObjectNameException {
 
-        ObjectName name = new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
-                ",database=" + user.getUserDatabase().getId());
-        return name;
+        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) + ",database=" +
+                user.getUserDatabase().getId());
     }
 
 
@@ -503,9 +496,7 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, UserDatabase userDatabase) throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=UserDatabase,database=" + userDatabase.getId());
-        return name;
+        return new ObjectName(domain + ":type=UserDatabase,database=" + userDatabase.getId());
 
     }
 
@@ -516,7 +507,7 @@ public class MBeanUtils {
      */
     public static synchronized Registry createRegistry() {
         if (registry == null) {
-            registry = Registry.getRegistry(null, null);
+            registry = Registry.getRegistry(null);
             ClassLoader cl = MBeanUtils.class.getClassLoader();
 
             registry.loadDescriptors("org.apache.catalina.mbeans", cl);
@@ -547,7 +538,7 @@ public class MBeanUtils {
      */
     public static synchronized MBeanServer createServer() {
         if (mserver == null) {
-            mserver = Registry.getRegistry(null, null).getMBeanServer();
+            mserver = Registry.getRegistry(null).getMBeanServer();
         }
         return mserver;
     }
@@ -723,8 +714,8 @@ public class MBeanUtils {
      */
     static void destroyMBeanUserDatabase(String userDatabase) throws Exception {
 
-        ObjectName query = null;
-        Set<ObjectName> results = null;
+        ObjectName query;
+        Set<ObjectName> results;
 
         // Groups
         query = new ObjectName("Users:type=Group,database=" + userDatabase + ",*");

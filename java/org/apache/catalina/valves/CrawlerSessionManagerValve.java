@@ -17,10 +17,12 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
@@ -46,7 +48,6 @@ public class CrawlerSessionManagerValve extends ValveBase {
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
     private final Map<String,String> clientIdSessionId = new ConcurrentHashMap<>();
-    private final Map<String,String> sessionIdClientId = new ConcurrentHashMap<>();
 
     private String crawlerUserAgents = ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
@@ -59,6 +60,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
     private boolean isHostAware = true;
 
     private boolean isContextAware = true;
+
+    private Function<Request,String> clientIdentifierFunction = this::getClientIdentifier;
 
 
     /**
@@ -77,7 +80,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
      */
     public void setCrawlerUserAgents(String crawlerUserAgents) {
         this.crawlerUserAgents = crawlerUserAgents;
-        if (crawlerUserAgents == null || crawlerUserAgents.length() == 0) {
+        if (crawlerUserAgents == null || crawlerUserAgents.isEmpty()) {
             uaPattern = null;
         } else {
             uaPattern = Pattern.compile(crawlerUserAgents);
@@ -102,7 +105,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
      */
     public void setCrawlerIps(String crawlerIps) {
         this.crawlerIps = crawlerIps;
-        if (crawlerIps == null || crawlerIps.length() == 0) {
+        if (crawlerIps == null || crawlerIps.isEmpty()) {
             ipPattern = null;
         } else {
             ipPattern = Pattern.compile(crawlerIps);
@@ -163,6 +166,15 @@ public class CrawlerSessionManagerValve extends ValveBase {
         this.isContextAware = isContextAware;
     }
 
+    /**
+     * Specify the clientIdentifier function that will be used to identify unique clients. The default is to use the
+     * client IP address, optionally combined with the host name and context name.
+     *
+     * @param clientIdentifierFunction The new function used to build identifiers for clients.
+     */
+    public void setClientIdentifierFunction(Function<Request,String> clientIdentifierFunction) {
+        this.clientIdentifierFunction = clientIdentifierFunction;
+    }
 
     @Override
     protected void initInternal() throws LifecycleException {
@@ -185,7 +197,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         boolean isBot = false;
         String sessionId = null;
         String clientIp = request.getRemoteAddr();
-        String clientIdentifier = getClientIdentifier(host, request.getContext(), clientIp);
+        String clientIdentifier = clientIdentifierFunction.apply(request);
 
         if (log.isTraceEnabled()) {
             log.trace(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId=" +
@@ -246,7 +258,6 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 HttpSession s = request.getSession(false);
                 if (s != null) {
                     clientIdSessionId.put(clientIdentifier, s.getId());
-                    sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
                     s.setAttribute(this.getClass().getName(),
                             new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
@@ -264,28 +275,22 @@ public class CrawlerSessionManagerValve extends ValveBase {
         }
     }
 
-
-    private String getClientIdentifier(Host host, Context context, String clientIp) {
-        StringBuilder result = new StringBuilder(clientIp);
+    private String getClientIdentifier(Request request) {
+        StringBuilder result = new StringBuilder(request.getRemoteAddr());
         if (isHostAware) {
-            result.append('-').append(host.getName());
+            result.append('-').append(request.getHost().getName());
         }
+        Context context = request.getContext();
         if (isContextAware && context != null) {
             result.append(context.getName());
         }
         return result.toString();
     }
 
-    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
+    private record CrawlerHttpSessionBindingListener(Map<String,String> clientIdSessionId, String clientIdentifier)
+            implements HttpSessionBindingListener, Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
-
-        private final transient Map<String,String> clientIdSessionId;
-        private final transient String clientIdentifier;
-
-        private CrawlerHttpSessionBindingListener(Map<String,String> clientIdSessionId, String clientIdentifier) {
-            this.clientIdSessionId = clientIdSessionId;
-            this.clientIdentifier = clientIdentifier;
-        }
 
         @Override
         public void valueUnbound(HttpSessionBindingEvent event) {

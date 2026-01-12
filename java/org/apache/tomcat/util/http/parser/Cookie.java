@@ -51,8 +51,8 @@ public class Cookie {
     private static final UserDataHelper invalidCookieLog = new UserDataHelper(log);
     private static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.http.parser");
 
-    private static final boolean isCookieOctet[] = new boolean[256];
-    private static final boolean isText[] = new boolean[256];
+    private static final boolean[] isCookieOctet = new boolean[256];
+    private static final boolean[] isText = new boolean[256];
     private static final byte[] EMPTY_BYTES = new byte[0];
     private static final byte TAB_BYTE = (byte) 0x09;
     private static final byte SPACE_BYTE = (byte) 0x20;
@@ -68,41 +68,17 @@ public class Cookie {
         // %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E (RFC6265)
         // %x80 to %xFF (UTF-8)
         for (int i = 0; i < 256; i++) {
-            if (i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE || i == SEMICOLON_BYTE || i == SLASH_BYTE ||
-                    i == DEL_BYTE) {
-                isCookieOctet[i] = false;
-            } else {
-                isCookieOctet[i] = true;
-            }
+            isCookieOctet[i] = !(i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE || i == SEMICOLON_BYTE ||
+                    i == SLASH_BYTE || i == DEL_BYTE);
         }
         for (int i = 0; i < 256; i++) {
-            if (i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE) {
-                isText[i] = false;
-            } else {
-                isText[i] = true;
-            }
+            isText[i] = !(i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE);
         }
     }
 
 
     private Cookie() {
         // Hide default constructor
-    }
-
-
-    /**
-     * Parse byte array as cookie header.
-     *
-     * @param bytes         Source
-     * @param offset        Start point in array
-     * @param len           Number of bytes to read
-     * @param serverCookies Structure to store results
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11 onwards.
-     */
-    @Deprecated
-    public static void parseCookie(byte[] bytes, int offset, int len, ServerCookies serverCookies) {
-        parseCookie(bytes, offset, len, serverCookies, CookiesWithoutEquals.IGNORE);
     }
 
 
@@ -138,7 +114,7 @@ public class Cookie {
                 skipLWS(bb);
                 value = readCookieValueRfc6265(bb);
                 if (value == null) {
-                    // Invalid cookie value. Skip to the next semi-colon
+                    // Invalid cookie value. Skip to the next semicolon
                     skipUntilSemiColon(bb);
                     logInvalidHeader(start, bb);
                     continue;
@@ -150,7 +126,7 @@ public class Cookie {
             if (skipResult == SkipResult.FOUND) {
                 // NO-OP
             } else if (skipResult == SkipResult.NOT_FOUND) {
-                // Invalid cookie. Ignore it and skip to the next semi-colon
+                // Invalid cookie. Ignore it and skip to the next semicolon
                 skipUntilSemiColon(bb);
                 logInvalidHeader(start, bb);
                 continue;
@@ -287,8 +263,8 @@ public class Cookie {
     private static class ByteBuffer {
 
         private final byte[] bytes;
-        private int limit;
-        private int position = 0;
+        private final int limit;
+        private int position;
 
         ByteBuffer(byte[] bytes, int offset, int len) {
             this.bytes = bytes;

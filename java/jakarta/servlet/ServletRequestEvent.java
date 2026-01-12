@@ -16,6 +16,8 @@
  */
 package jakarta.servlet;
 
+import java.io.Serial;
+
 /**
  * Events of this kind indicate lifecycle events for a ServletRequest. The source of the event is the ServletContext of
  * this web application.
@@ -25,6 +27,8 @@ package jakarta.servlet;
  * @since Servlet 2.4
  */
 public class ServletRequestEvent extends java.util.EventObject {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final transient ServletRequest request;

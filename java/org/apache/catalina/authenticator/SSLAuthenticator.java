@@ -37,12 +37,11 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication that utilizes SSL certificates to identify
  * client users.
- *
- * @author Craig R. McClanahan
  */
 public class SSLAuthenticator extends AuthenticatorBase {
 
@@ -60,14 +59,19 @@ public class SSLAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
-        // NOTE: We don't try to reauthenticate using any existing SSO session,
-        // because that will only work if the original authentication was
-        // BASIC or FORM, which are less secure than the CLIENT-CERT auth-type
-        // specified for this webapp
-        //
-        // Change to true below to allow previous FORM or BASIC authentications
-        // to authenticate users for this webapp
-        // TODO make this a configurable attribute (in SingleSignOn??)
+        /*
+         * Reauthentication using the cached user name and password (if any) is not enabled for CLIENT-CERT
+         * authentication. This was an historical design decision made because CLIENT-CERT authentication is viewed as
+         * more secure than BASIC/FORM.
+         *
+         * However, reauthentication was introduced to handle the case where the Realm took additional actions on
+         * authentication. Reauthenticating with the cached user name and password may not be sufficient for CLIENT-CERT
+         * since it will not make any TLS information (client certificate etc) available that a web application may
+         * depend on. Therefore, the reauthentication behaviour for CLIENT-CERT is to perform a normal CLIENT-CERT
+         * authentication.
+         *
+         * TODO: Make the reauthentication behaviour configurable per authenticator.
+         */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
@@ -77,7 +81,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
             containerLog.trace(" Looking up certificates");
         }
 
-        X509Certificate certs[] = getRequestCertificates(request);
+        X509Certificate[] certs = getRequestCertificates(request);
 
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled()) {
@@ -128,7 +132,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
      */
     protected X509Certificate[] getRequestCertificates(final Request request) throws IllegalStateException {
 
-        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
 
         if ((certs == null) || (certs.length < 1)) {
             try {
@@ -154,49 +158,67 @@ public class SSLAuthenticator extends AuthenticatorBase {
          * and an Engine but test at each stage to be safe.
          */
         Container container = getContainer();
-        if (!(container instanceof Context)) {
+        if (!(container instanceof Context context)) {
             return;
         }
-        Context context = (Context) container;
-
         container = context.getParent();
-        if (!(container instanceof Host)) {
+        if (!(container instanceof Host host)) {
             return;
         }
-        Host host = (Host) container;
-
         container = host.getParent();
-        if (!(container instanceof Engine)) {
+        if (!(container instanceof Engine engine)) {
             return;
         }
-        Engine engine = (Engine) container;
-
 
         Connector[] connectors = engine.getService().findConnectors();
 
         for (Connector connector : connectors) {
-            // First check for upgrade
-            UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
-            for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-                if ("h2".equals(upgradeProtocol.getAlpnName())) {
-                    log.warn(sm.getString("sslAuthenticatorValve.http2", context.getName(), host.getName(), connector));
+            /*
+             * There are two underlying issues here.
+             *
+             * 1. JSSE does not implement post-handshake authentication (PHA) for TLS 1.3. That means CLIENT-CERT
+             * authentication will only work if the virtual host requires a certificate OR the client never requests a
+             * protected resource.
+             *
+             * 2. HTTP/2 does not permit re-negotiation nor PHA. That means CLIENT-CERT authentication will only work if
+             * the virtual host requires a certificate OR the client never requests a protected resource.
+             *
+             * We can't rely on the client never requesting a protected resource but we can check if all the virtual
+             * hosts are configured to require a certificate.
+             */
+            boolean allHostsRequireCertificate = true;
+            for (SSLHostConfig sslHostConfig : connector.findSslHostConfigs()) {
+                if (sslHostConfig.getCertificateVerification() != CertificateVerification.REQUIRED) {
+                    allHostsRequireCertificate = false;
                     break;
                 }
             }
 
-            // Then check for TLS 1.3
-            SSLHostConfig[] sslHostConfigs = connector.findSslHostConfigs();
-            for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                if (!sslHostConfig.isTls13RenegotiationAvailable()) {
-                    String[] enabledProtocols = sslHostConfig.getEnabledProtocols();
-                    if (enabledProtocols == null) {
-                        // Possibly boundOnInit is used, so use the less accurate protocols
-                        enabledProtocols = sslHostConfig.getProtocols().toArray(new String[0]);
+            // Only need to check for use of HTTP/2 or TLS 1.3 if one or more hosts doesn't require a certificate
+            if (!allHostsRequireCertificate) {
+                // Check if the Connector is configured to support upgrade to HTTP/2
+                UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
+                for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+                    if ("h2".equals(upgradeProtocol.getAlpnName())) {
+                        log.warn(sm.getString("sslAuthenticatorValve.http2", context.getName(), host.getName(),
+                                connector));
+                        break;
                     }
-                    for (String enbabledProtocol : enabledProtocols) {
-                        if (Constants.SSL_PROTO_TLSv1_3.equals(enbabledProtocol)) {
-                            log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(),
-                                    connector));
+                }
+
+                // Check if any of the virtual hosts support TLS 1.3 without supporting PHA
+                for (SSLHostConfig sslHostConfig : connector.findSslHostConfigs()) {
+                    if (!sslHostConfig.isTls13RenegotiationAvailable()) {
+                        String[] enabledProtocols = sslHostConfig.getEnabledProtocols();
+                        if (enabledProtocols == null) {
+                            // Possibly boundOnInit is used, so use the less accurate protocols
+                            enabledProtocols = sslHostConfig.getProtocols().toArray(new String[0]);
+                        }
+                        for (String enabledProtocol : enabledProtocols) {
+                            if (Constants.SSL_PROTO_TLSv1_3.equals(enabledProtocol)) {
+                                log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(),
+                                        connector));
+                            }
                         }
                     }
                 }

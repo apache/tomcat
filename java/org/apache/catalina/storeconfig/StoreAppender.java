@@ -35,9 +35,9 @@ public class StoreAppender {
     /**
      * The set of classes that represent persistable properties.
      */
-    private static Class<?> persistables[] = { String.class, Integer.class, Integer.TYPE, Boolean.class, Boolean.TYPE,
-            Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE, Float.class, Float.TYPE,
-            Long.class, Long.TYPE, Short.class, Short.TYPE, InetAddress.class };
+    private static final Class<?>[] persistables = { String.class, Integer.class, Integer.TYPE, Boolean.class,
+            Boolean.TYPE, Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE,
+            Float.class, Float.TYPE, Long.class, Long.TYPE, Short.class, Short.TYPE, InetAddress.class };
 
     private int pos = 0;
 
@@ -211,7 +211,7 @@ public class StoreAppender {
         }
 
         // Acquire the list of properties for this bean
-        PropertyDescriptor descriptors[] = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
+        PropertyDescriptor[] descriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
@@ -225,8 +225,7 @@ public class StoreAppender {
             }
         }
 
-        if (bean instanceof ResourceBase) {
-            ResourceBase resource = (ResourceBase) bean;
+        if (bean instanceof ResourceBase resource) {
             for (Iterator<String> iter = resource.listProperties(); iter.hasNext();) {
                 String name = iter.next();
                 Object value = resource.getProperty(name);

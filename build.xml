@@ -198,7 +198,7 @@
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
   <!-- Tests To Run -->
-  <property name="test.name" value="**/Test*.java"/>
+  <!-- NOTE: test.name default is set in -test-profile-init target to allow profile override -->
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
   <property name="test.relaxTiming" value="false"/>
 
@@ -313,6 +313,7 @@
     <include name="**/jakarta.websocket.ContainerProvider"/>
     <include name="**/jakarta.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
+    <include name="**/*-password"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
     <include name="**/*.conf"/>
@@ -329,6 +330,7 @@
     <include name="**/*.jj"/>
     <include name="**/*.jjt"/>
     <include name="**/*.json"/>
+    <include name="**/*.json5"/>
     <include name="**/*.jsp"/>
     <include name="**/*.jspf"/>
     <include name="**/*.jspx"/>
@@ -446,15 +448,18 @@
 
   <patternset id="files.tomcat-util">
     <include name="org/apache/tomcat/util/buf/**" />
-    <include name="org/apache/tomcat/util/codec/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
+    <include name="org/apache/tomcat/util/concurrent/**" />
     <include name="org/apache/tomcat/util/file/**" />
+    <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
-    <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/*" />
+    <!-- Strictly, none of these exclusions need to be listed here. They are -->
+    <!-- listed to make it easier to check that no package has been          -->
+    <!-- overlooked.                                                         -->
     <exclude name="org/apache/tomcat/util/bcel" />
     <exclude name="org/apache/tomcat/util/descriptor" />
     <exclude name="org/apache/tomcat/util/digester" />
@@ -464,6 +469,7 @@
     <exclude name="org/apache/tomcat/util/net" />
     <exclude name="org/apache/tomcat/util/openssl"/>
     <exclude name="org/apache/tomcat/util/scan" />
+    <exclude name="org/apache/tomcat/util/xreflection" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
@@ -538,9 +544,9 @@
     <include name="org/apache/tomcat/util/*" />
     <include name="org/apache/tomcat/util/bcel/**" />
     <include name="org/apache/tomcat/util/buf/**" />
-    <include name="org/apache/tomcat/util/codec/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
+    <include name="org/apache/tomcat/util/concurrent/**" />
     <include name="org/apache/tomcat/util/descriptor/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/http/**" />
@@ -556,6 +562,7 @@
     <include name="org/apache/tomcat/util/scan/LocalStrings.properties" />
 
     <!-- Minimize JNI to what doesn't throw an error -->
+    <include name="org/apache/tomcat/jni/AprStatus.class" />
     <include name="org/apache/tomcat/jni/Library.class" />
     <include name="org/apache/tomcat/jni/LibraryNotFoundError*" />
     <exclude name="org/apache/tomcat/jni" />
@@ -563,9 +570,7 @@
     <!-- Remove connectors that are not default -->
     <exclude name="**/AbstractAjpProtocol.class"/>
     <exclude name="**/Ajp*.class"/>
-    <exclude name="**/Http11Nio2*.class"/>
     <exclude name="**/JniLifecycleListener.class"/>
-    <exclude name="org/apache/tomcat/**/*Nio2*.class"/>
 
     <!-- Minimize bundles to the default set -->
     <exclude name="org/apache/**/LocalStrings_*.properties"/>
@@ -628,7 +633,6 @@
 
     <!-- Remove optional valves -->
     <exclude name="org/apache/catalina/valves/Crawler*" />
-    <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/HealthCheckValve*" />
     <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
@@ -913,6 +917,8 @@
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
+        <!-- Exclude the default Coverity Scan output directory -->
+        <exclude name="cov-int/**" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
@@ -1918,7 +1924,7 @@
       <include name="util/**" />
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
-      <exclude name="org/apache/tomcat/buildutil/**"/>
+      <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -1935,11 +1941,112 @@
   <property name="junit.formatter.usefile" value="true" />
   <property name="junit.formatter.extension" value=".txt" />
 
+  <!-- Configure JUnit output based on test.silent property -->
+  <condition property="junit.printsummary" value="off" else="yes">
+    <istrue value="${test.silent}"/>
+  </condition>
+  <condition property="junit.showoutput" value="false" else="${test.verbose}">
+    <istrue value="${test.silent}"/>
+  </condition>
+
+  <!-- ==================== Test Profile System ==================== -->
+  <!--
+    Property-based test profiles for convenient, selective test execution.
+
+    Usage: ant test -Dtest.profile=<profile-name>
+
+    Precedence: test.entry > test.profile > default
+    If test.entry is set, the profile is ignored to maintain backward compatibility.
+
+    Profile patterns are defined in test-profiles.properties test.profile properties
+    to keep this file readable.
+  -->
+
+  <!-- ================= Initialize Test Profile Property Values ================ -->
+
+  <!-- We read test profile definitions from "test-profiles.properties.default"   -->
+  <!-- and also from "test-profiles.properties" if it exists.                     -->
+  <!-- The values in "test-profiles.properties" have stronger preference.         -->
+  <!-- If you want to customize your build, you can either change the values      -->
+  <!-- directly in the default file, or create a new test-profiles.properties and -->
+  <!-- set the values there. This way you don't have to change a file which       -->
+  <!-- is part of the original project source code.                               -->
+  <!-- See "test-profiles.properties.default" in the top level directory for some -->
+  <!-- property values you may customize.                                         -->
+  <property file="${user.home}/test-profiles.properties"/>
+  <property file="test-profiles.properties"/>
+  <property file="test-profiles.properties.default"/>
+
+  <!-- Macro to set test pattern based on profile name -->
+  <macrodef name="set-profile-pattern">
+    <attribute name="profile"/>
+    <sequential>
+      <!-- Set test.name property based on the profile attribute -->
+      <condition property="test.name" value="${test.profile.smoke}">
+        <equals arg1="@{profile}" arg2="smoke"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.catalina}">
+        <equals arg1="@{profile}" arg2="catalina"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.coyote}">
+        <equals arg1="@{profile}" arg2="coyote"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.performance}">
+        <equals arg1="@{profile}" arg2="performance"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.tribes}">
+        <equals arg1="@{profile}" arg2="tribes"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.buildutil}">
+        <equals arg1="@{profile}" arg2="buildutil"/>
+      </condition>
+    </sequential>
+  </macrodef>
+
+  <!-- New internal target to initialize tests before moving to test target -->
+  <target name="-test-profile-init" if="test.profile" unless="test.entry">
+    <set-profile-pattern profile="${test.profile}"/>
+
+    <!-- Validate that the profile exists -->
+    <fail message="Unknown test profile '${test.profile}'. Check test-profiles.properties[.default] for available profiles.">
+      <condition>
+        <not><isset property="test.name"/></not>
+      </condition>
+    </fail>
+
+    <!-- Special handling for performance profile: disable default exclusion -->
+    <condition property="test.excludePerformance" value="false">
+      <equals arg1="${test.profile}" arg2="performance"/>
+    </condition>
+
+    <!-- Special handling for buildutil profile: include buildutil tests -->
+    <condition property="test.includeBuildutil" value="true">
+      <equals arg1="${test.profile}" arg2="buildutil"/>
+    </condition>
+
+    <!-- Special handling for tribes profile: include old slow/flaky tribes tests -->
+    <condition property="test.includeTribes" value="true">
+      <equals arg1="${test.profile}" arg2="tribes"/>
+    </condition>
+
+    <echo message="Test profile: ${test.profile}"/>
+  </target>
+
+  <!-- Set default test.name if no profile specified, using ant's immutability feature -->
+  <target name="-test-name-default" depends="-test-profile-init">
+    <property name="test.name" value="**/Test*.java"/>
+  </target>
+
+  <!-- ==================== End of Test Profile System ==================== -->
+
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,test-nio2,coverage-report,test-status" />
+          depends="-test-name-default,test-nio,coverage-report,test-status" />
+
+  <target name="test-clean" description="Runs the JUnit test cases"
+          depends="clean-classes,-test-name-default,test-nio,coverage-report,test-status" />
 
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
-          depends="test-only-nio,test-only-nio2,test-status" />
+          depends="-test-name-default,test-only-nio,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -1977,27 +2084,15 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
-          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
-  </target>
-
-  <target name="test-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
-          depends="setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio2}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-              extension=".NIO2" />
-  </target>
-
-  <target name="test-only-nio2" description="Runs the JUnit test cases or NIO2 without test preparations. Does not stop on errors."
-          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio2}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-          extension=".NIO2" />
   </target>
 
   <target name="test-openssl-exists" description="Checks for the OpenSSL binary">
@@ -2024,6 +2119,8 @@
   <property name="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
   <property name="opens.javautil" value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
   <property name="opens.javautilconcurrent" value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+  <!-- Set memory properties (unset by default) -->
+  <property name="test.xmx" value="-Dnoop"/>
 
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
@@ -2039,7 +2136,7 @@
           enabled="${test.coverage}"
           destfile="${coverage.datafile}"
           >
-        <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
+        <junit printsummary="${junit.printsummary}" fork="yes" dir="." showoutput="${junit.showoutput}"
           errorproperty="test.result.error"
           failureproperty="test.result.failure"
           haltonfailure="${test.haltonfailure}"
@@ -2047,6 +2144,7 @@
 
           <jvmarg value="${test.jvmarg.egd}"/>
           <jvmarg value="-Dfile.encoding=UTF-8"/>
+          <jvmarg value="${test.xmx}"/>
           <jvmarg value="${runtests.librarypath}"/>
           <jvmarg value="${test.formatter}"/>
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
@@ -2091,14 +2189,14 @@
             <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
               <!-- Exclude helper classes -->
               <exclude name="**/Tester*.java" />
-              <!-- Exclude the tests known to fail -->
-              <exclude name="org/apache/catalina/tribes/test/**" />
+              <!-- Exclude old tribes tests (slow/flaky, excluded since 2011, unless explicitly requested via tribes profile) -->
+              <exclude name="org/apache/catalina/tribes/test/**" unless="test.includeTribes" />
               <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
               <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
               <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
-              <!-- Exclude tests that Gump can't compile -->
-              <exclude name="org/apache/tomcat/buildutil/**" />
+              <!-- Exclude tests that Gump can't compile (unless explicitly requested via buildutil profile) -->
+              <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>
@@ -2109,7 +2207,7 @@
   </macrodef>
 
   <target name="coverage-report" if="${test.coverage}"
-          depends="test-nio,test-nio2"
+          depends="test-nio"
           description="Creates report from gathered Code coverage results">
 
     <jacoco:report>
@@ -2246,6 +2344,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2271,6 +2370,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2295,6 +2395,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2319,6 +2420,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2343,6 +2445,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2367,6 +2470,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2389,6 +2493,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2458,19 +2563,22 @@
         <include name="org/apache/tomcat/util/digester/**" />
         <exclude name="org/apache/tomcat/util/bcel" />
         <exclude name="org/apache/tomcat/util/buf" />
-        <exclude name="org/apache/tomcat/util/codec" />
         <exclude name="org/apache/tomcat/util/collections" />
         <exclude name="org/apache/tomcat/util/compat" />
+        <exclude name="org/apache/tomcat/util/concurrent" />
         <exclude name="org/apache/tomcat/util/descriptor" />
         <exclude name="org/apache/tomcat/util/file" />
         <exclude name="org/apache/tomcat/util/http" />
+        <exclude name="org/apache/tomcat/util/json" />
         <exclude name="org/apache/tomcat/util/log" />
         <exclude name="org/apache/tomcat/util/modeler" />
         <exclude name="org/apache/tomcat/util/net" />
+        <exclude name="org/apache/tomcat/util/openssl" />
         <exclude name="org/apache/tomcat/util/res" />
         <exclude name="org/apache/tomcat/util/scan" />
         <exclude name="org/apache/tomcat/util/security" />
         <exclude name="org/apache/tomcat/util/threads" />
+        <exclude name="org/apache/tomcat/util/xreflection" />
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
@@ -2557,50 +2665,112 @@
     </copy>
   </target>
 
-  <target name="-installer-pre-init">
-    <property environment="env" />
+  <target name="-installer-set-properties-1">
+    <property environment="env"/>
     <condition property="wine.ok">
       <or>
-        <os family="windows" />
-        <available file="wine" filepath="${env.PATH}" />
-        <isset property="skip.installer"/>
+        <and>
+          <equals arg1="${nsis.tool}" arg2="wine" forcestring="true"/>
+          <available file="wine" filepath="${env.PATH}"/>
+        </and>
+      </or>
+    </condition>
+    <condition property="nsis.executable.unix" value="${nsis.bin.home}/Bin/makensis">
+      <and>
+        <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
+        <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+      </and>
+    </condition>
+    <condition property="nsis.executable.unix" value="makensis">
+      <and>
+        <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
+        <available file="makensis" filepath="${env.PATH}"/>
+        <not>
+          <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+        </not>
+      </and>
+    </condition>
+    <condition property="installer.ok">
+      <or>
+        <os family="windows"/>
+        <isset property="wine.ok"/>
+        <isset property="nsis.executable.unix"/>
+        <istrue value="${skip.installer}"/>
       </or>
     </condition>
   </target>
 
-  <target name="-installer-init" depends="-installer-pre-init" unless="${wine.ok}">
-    <fail message="The executable wine was not found on the current path.
-Wine is required to build the Windows installer when running a release build on
-a non-Windows platform. To skip building the Windows installer, set the
-skip.installer property in build.properties" />
+  <target name="-installer-set-properties-2"
+      depends="-installer-set-properties-1"
+      if="nsis.executable.unix">
+    <exec executable="${nsis.executable.unix}" outputproperty="nsis.executable.unix.version">
+      <arg value="-VERSION"/>
+    </exec>
+  </target>
+
+  <target name="-installer-set-properties-3"
+      depends="-installer-set-properties-2">
+    <condition property="nsis.executable.unix.version.ok">
+      <or>
+        <istrue value="${skip.installer}"/>
+        <os family="windows"/>
+        <isset property="wine.ok"/>
+        <equals arg1="v${nsis.version}" arg2="${nsis.executable.unix.version}"/>
+        <not>
+          <!-- Zero length string for version.dev indicates a release build -->
+          <equals arg1="${version.dev}" arg2=""/>
+        </not>
+      </or>
+    </condition>
+  </target>
+
+  <target name="-installer-check-available"
+      depends="-installer-set-properties-1"
+      unless="${installer.ok}">
+    <fail message="The executable ${nsis.tool} was not found on the current path.
+Either wine or makensis are required to build the Windows installer on a non-Windows platform.
+Choose the tool by setting property nsis.tool in build.properties.
+To skip building the Windows installer, set the skip.installer property in build.properties"/>
+  </target>
+
+  <target name="-installer-check-version"
+      depends="-installer-set-properties-3"
+      unless="${nsis.executable.unix.version.ok}">
+    <fail message="An executable makensis was found at: ${nsis.executable.unix}
+with version [${nsis.executable.unix.version}] but version [v${nsis.version}] is required
+for repeatable builds.
+You may need a custom build of makensis. Instructions for this may be found in BUILDING.txt"/>
+  </target>
+
+  <target name="-installer-checks"
+      depends="-installer-check-available,-installer-check-version">
   </target>
 
   <target name="-installer-prep"
-      unless="skip.installer" depends="dist-static,-installer-init">
+      depends="dist-static,-installer-checks"
+      unless="${skip.installer}">
     <copy todir="${tomcat.dist}">
       <fileset dir="res/install-win">
-        <include name="INSTALLLICENSE" />
-        <include name="*.bmp" />
-        <include name="*.ico" />
-        <include name="*.xml" />
-        <include name="Uninstall.exe.sig" />
+        <include name="INSTALLLICENSE"/>
+        <include name="*.bmp"/>
+        <include name="*.ico"/>
+        <include name="*.xml"/>
       </fileset>
     </copy>
-    <copy file="res/install-win/tomcat-installer.exe.sig"
-        tofile="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
-        failonerror="false"
-        quiet="true" />
-    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.system.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsdialogs.dll}" todir="${tomcat.dist}" />
+    <condition property="os.cmd.copy" value="copy" else="cp">
+      <or>
+        <os family="windows"/>
+        <isset property="wine.ok"/>
+      </or>
+    </condition>
     <copy file="res/install-win/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
+      <filterset>
+        <filter token="OS.CMD.COPY" value="${os.cmd.copy}"/>
+      </filterset>
     </copy>
-    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
+      <patternset refid="text.files"/>
     </fixcrlf>
     <!-- Reproducible builds: consistent timestamps for installer files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
@@ -2608,44 +2778,87 @@ skip.installer property in build.properties" />
     </touch>
   </target>
 
-  <target name="-installer-create-tempinstaller"
-      unless="skip.installer" depends="-installer-prep">
-    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
-      <arg value="/DUNINSTALLONLY" />
-      <arg value="/DNSISDIR=${nsis.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
-    </exec>
-    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
-      <arg value="${nsis.exe}" />
-      <arg value="/DUNINSTALLONLY" />
-      <arg value="/DNSISDIR=${nsis.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
+  <target name="-uninstaller-wine"
+      if="${wine.ok}"
+      unless="${skip.installer}">
+     <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.executable.windows}"/>
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/DUNINSTALLONLY"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
     </exec>
   </target>
 
-  <target name="-installer-create-uninstaller"
-      unless="skip.installer" depends="-installer-create-tempinstaller">
-    <!-- Execute the temporary installer to create the uninstaller -->
-    <exec dir="${tomcat.dist}" executable="${tomcat.dist}/tempinstaller.exe"
-        osfamily="windows"  />
-    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
-      <arg value="${tomcat.dist}/tempinstaller.exe" />
+  <target name="-uninstaller-makensis"
+      if="nsis.executable.unix"
+      unless="${skip.installer}">
+    <echo message="Using makensis: ${nsis.executable.unix} version [${nsis.executable.unix.version}]"/>
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
+      <arg value="-DNSISDIR=${nsis.bin.home}"/>
+      <arg value="-DUNINSTALLONLY"/>
+      <arg value="-V2"/>
+      <arg value="tomcat.nsi"/>
     </exec>
-    <!-- Reproducible builds: consistent timestamps for installer files -->
-    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
-      <fileset dir="${tomcat.dist}"/>
-    </touch>
   </target>
 
-  <target name="-installer-sign-uninstaller"
-      unless="skip.installer" depends="-installer-create-uninstaller,setup-jsign"
-      if="${do.codesigning}">
-    <!-- If the detached signature doesn't exist, this will sign the file    -->
-    <!-- and create the detached signature. If the detached signature does   -->
-    <!-- exist it will be attached to the file.                              -->
-    <jsign file="${tomcat.dist}/Uninstall.exe"
+  <target name="-uninstaller-build"
+      depends="-installer-prep,-uninstaller-wine,-uninstaller-makensis"
+      unless="${skip.installer}">
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/DUNINSTALLONLY"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-installer-wine"
+      if="${wine.ok}"
+      unless="${skip.installer}">
+     <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.executable.windows}"/>
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-installer-makensis"
+      if="nsis.executable.unix"
+      unless="${skip.installer}">
+    <echo message="Using makensis: ${nsis.executable.unix} version [${nsis.executable.unix.version}]"/>
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
+      <arg value="-DNSISDIR=${nsis.bin.home}"/>
+      <arg value="-V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-installer-build"
+      depends="-installer-prep,-installer-wine,-installer-makensis"
+      unless="${skip.installer}">
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-file-jsign"
+    depends="setup-jsign">
+    <fail unless="file" />
+    <fail unless="dir" />
+    <fail unless="savedir" />
+    <echo>Signing ${file} in ${dir}, using/saving signature in ${savedir}</echo>
+    <!-- Copy pre-existing detached signature to signing directory -->
+    <copy file="${savedir}/${file}.sig"
+        todir="${dir}"
+        failonerror="false"/>
+    <!-- If the detached signature doesn't exist, this will sign the file  -->
+    <!-- and create the detached signature. If the detached signature does -->
+    <!-- exist it will be attached to the file.                            -->
+    <jsign file="${dir}/${file}"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         keypass="${codesigning.keypass}"
@@ -2654,51 +2867,76 @@ skip.installer property in build.properties" />
         tsaurl="http://ts.ssl.com"
         tsmode="RFC3161"
         detached="true"/>
-    <!-- Copy detached signature to source tree -->
-    <copy file="${tomcat.dist}/Uninstall.exe.sig" todir="res/install-win"/>
-    <!-- Reproducible builds: consistent timestamps for installer files -->
+    <!-- Move detached signature to source tree -->
+    <move file="${dir}/${file}.sig" todir="${savedir}"/>
+    <!-- Reset timestamp of signed file -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
-      <fileset dir="${tomcat.dist}"/>
+      <fileset file="${dir}/${file}"/>
     </touch>
   </target>
 
-  <target name="-installer" unless="skip.installer"
-      depends="-installer-sign-uninstaller">
-    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
-      <arg value="/DNSISDIR=${nsis.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
-    </exec>
-    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
-      <arg value="${nsis.exe}" />
-      <arg value="/DNSISDIR=${nsis.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
-    </exec>
-    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+  <target name="-uninstaller-jsign"
+      if="${do.codesigning}"
+      unless="${skip.installer}">
+      <antcall target="-file-jsign" >
+        <param name="dir" value="${tomcat.dist}" />
+        <param name="file" value="Uninstall.exe" />
+        <param name="savedir" value="res/install-win" />
+      </antcall>
   </target>
 
-  <target name="installer-sign"
+  <target name="-installer-jsign"
+      if="${do.codesigning}"
+      unless="${skip.installer}">
+      <antcall target="-file-jsign" >
+        <param name="dir" value="${tomcat.dist}" />
+        <param name="file" value="tomcat-installer.exe" />
+        <param name="savedir" value="res/install-win" />
+      </antcall>
+  </target>
+
+  <target name="installer"
       description="Builds and optionally signs the Windows installer"
-      depends="-installer,setup-jsign" if="${do.codesigning}" >
-    <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
-        storepass="${codesigning.storepass}"
-        storetype="${codesigning.storetype}"
-        keypass="${codesigning.keypass}"
-        alias="${codesigning.alias}"
-        alg="${codesigning.digest}"
-        tsaurl="http://ts.ssl.com"
-        tsmode="RFC3161"
-        detached="true" />
-    <!-- Copy detached signature to source tree -->
-    <copy file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
-        tofile="res/install-win/tomcat-installer.exe.sig"/>
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig" />
+      depends="-uninstaller-build,-uninstaller-jsign,-installer-build,-installer-jsign"
+      unless="${skip.installer}">
+    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
-    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc"/>
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512"/>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
+  </target>
+
+  <target name="-local-makensis-set-properties">
+    <property environment="env"/>
+    <condition property="scons.ok">
+      <available file="scons" filepath="${env.PATH}"/>
+    </condition>
+    <condition property="local.makensis.ok">
+      <isset property="scons.ok"/>
+    </condition>
+  </target>
+
+  <target name="-local-makensis-check"
+      depends="-local-makensis-set-properties"
+      unless="${local.makensis.ok}">
+    <echo message="Unable to build local version of makensis. All following checks must pass."/>
+    <echo message="  Found scons on path: ${scons.ok}"/>
+  </target>
+
+  <target name="local-makensis"
+      description="Builds a local version of makensis with the same version as the equivalent Windows executable"
+      depends="-local-makensis-check"
+      if="${local.makensis.ok}">
+    <exec executable="scons" dir="${nsis.src.home}">
+      <arg value="UNICODE=yes"/>
+      <arg value="PREFIX=${nsis.bin.home}/Bin"/>
+      <arg value="SKIPPLUGINS=all"/>
+      <arg value="SKIPUTILS=all"/>
+      <arg value="SKIPMISC=all"/>
+      <arg value="NSIS_CONFIG_CONST_DATA_PATH=no"/>
+      <arg value="VERSION=${nsis.version}"/>
+      <arg value="install-compiler"/>
+    </exec>
   </target>
 
   <target name="release-version-check">
@@ -2825,7 +3063,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <target name="release"
-    depends="clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
@@ -2859,26 +3097,31 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="release-version-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
+  <target name="release-init" depends="release-version-check,gpg-init-test-signing,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
     <forceUtcTimeZone />
   </target>
 
-  <target name="gpg-init-1">
+  <target name="gpg-init-available">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
   </target>
 
-  <target name="gpg-init-2" if="${gpg.exec.available}">
-<echo>gpg.exec.available=${gpg.exec.available}</echo>
-<echo>gpg.exec=${gpg.exec}</echo>
-    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase
-</input>
+  <target name="gpg-init-sign-files" depends="gpg-init-available" if="${gpg.exec.available}">
+    <condition property="gpg.sign.files.available">
+      <istrue value="${gpg.sign.files}"/>
+    </condition>
+  </target>
+
+  <target name="gpg-init-passphrase" depends="gpg-init-sign-files" if="${gpg.sign.files.available}">
+    <echo>gpg.exec.available=${gpg.exec.available}</echo>
+    <echo>gpg.exec=${gpg.exec}</echo>
+    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase: </input>
   </target>
 
   <!-- Test GPG by signing build.xml as a sample file. -->
-  <target name="gpg-init-3" if="gpg.passphrase">
+  <target name="gpg-init-test-signing" depends="gpg-init-passphrase" if="gpg.passphrase">
     <exec executable="${gpg.exec}"
           inputstring="${gpg.passphrase}"
           failonerror="true"
@@ -3126,6 +3369,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
@@ -3148,6 +3392,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -3325,6 +3570,11 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <delete file="webapps/docs/jdbc-pool.xml"/>
   </target>
 
+
+  <target name="clean-classes">
+    <delete dir="${tomcat.classes}" />
+    <delete dir="${test.classes}" />
+  </target>
 
   <!-- ================ Download and dependency building =================== -->
 
@@ -3552,12 +3802,21 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     </antcall>
 
     <antcall target="downloadzip">
-      <param name="sourcefile" value="${nsis.loc}"/>
-      <param name="destfile" value="${nsis.exe}"/>
-      <param name="destdir" value="${nsis.home}/.."/>
+      <param name="sourcefile" value="${nsis.bin.loc}"/>
+      <param name="destfile" value="${nsis.executable.windows}"/>
+      <param name="destdir" value="${nsis.bin.home}/.."/>
       <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${nsis.checksum.algorithm}"/>
-      <param name="checksum.value" value="${nsis.checksum.value}"/>
+      <param name="checksum.algorithm" value="${nsis.bin.checksum.algorithm}"/>
+      <param name="checksum.value" value="${nsis.bin.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadbz2">
+      <param name="sourcefile" value="${nsis.src.loc}"/>
+      <param name="destfile" value="${nsis.src.home}/INSTALL"/>
+      <param name="destdir" value="${nsis.src.home}/.."/>
+      <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${nsis.src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${nsis.src.checksum.value}"/>
     </antcall>
 
   </target>
@@ -3732,6 +3991,23 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <untar src="${temp.file}.tar" dest="${base.path}"/>
     <delete file="${temp.file}.tar"/>
     <delete file="${temp.file}.tar.gz"/>
+  </target>
+
+  <target name="downloadbz2" unless="exist" if="${execute.download}" depends="testexist,setproxy">
+    <!-- Download and extract the package -->
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}.tar.bz2" />
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}.tar.bz2" name="${sourcefile}" />
+
+    <bunzip2 src="${temp.file}.tar.bz2" dest="${temp.file}.tar"/>
+    <untar src="${temp.file}.tar" dest="${base.path}"/>
+    <delete file="${temp.file}.tar"/>
+    <delete file="${temp.file}.tar.bz2"/>
   </target>
 
   <target name="downloadzip" unless="exist" if="${execute.download}" depends="testexist,setproxy">
@@ -4176,6 +4452,86 @@ Signature mismatch for @{src-or-bin}/@{basefile}:
     </sequential>
   </macrodef>
 
+  <macrodef name="compare-signatures">
+    <attribute name="basefile" />
+    <attribute name="num" />
+    <attribute name="src-or-bin" />
+    <sequential>
+      <exec executable="${gpg.exec}"
+            failonerror="false"
+            resultproperty="gpgverify-@{num}"
+            discardOutput="true"
+            logError="true">
+        <!-- Only use the keyring from our own repository -->
+        <arg value="--no-default-keyring" />
+        <arg value="--primary-keyring" />
+        <arg value="${tomcat.release.verify}/apache-keys" />
+        <!-- Always trust keys in this keyring, even without explicit trust -->
+        <arg value="--trust-model" />
+        <arg value="always" />
+        <arg value="--verify"/>
+        <arg value="${tomcat.release.verify}/@{basefile}.asc" />
+        <arg value="output/release/v${version}/@{src-or-bin}/@{basefile}" />
+      </exec>
+
+      <condition property="validsignature-@{num}">
+        <equals arg1="${gpgverify-@{num}}" arg2="0"/>
+      </condition>
+
+      <echo if:set="validsignature-@{num}">
+Valid signature for @{src-or-bin}/@{basefile}
+</echo>
+      <echo unless:set="validsignature-@{num}">
+
+
+
+**********************************************
+**********************************************
+Invalid signature for @{src-or-bin}/@{basefile}
+**********************************************
+**********************************************
+
+
+
+</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="get-release-signature">
+    <attribute name="basefile" />
+    <attribute name="src-or-bin" />
+
+    <sequential>
+      <local name="success" />
+
+      <!-- Release hashes can be either 'released' or staged-for-release -->
+      <!-- First, try to find a released version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.asc" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.asc" />
+      </antcall>
+      <!-- If necessary, try to find a dev version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.asc" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.asc" />
+      </antcall>
+
+      <condition property="success">
+        <or>
+          <available file="${tomcat.release.verify}/@{basefile}.asc" />
+          <and>
+            <contains string="${version}" substring="11.0." /><!-- Super hack -->
+            <contains string="@{basefile}" substring="x86" />
+          </and>
+        </or>
+      </condition>
+
+      <fail unless="success">
+Unable to locate release signature for @{basefile}
+</fail>
+    </sequential>
+  </macrodef>
+
   <target name="verify-release" depends="-check-release-toolchain-versions, -require-release-toolchain-versions" description="Verifies a release build against published hashes.">
 
     <available property="released" file="build.properties.release" />
@@ -4190,60 +4546,83 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
 </fail>
     <delete dir="${tomcat.release.verify}" />
     <mkdir dir="${tomcat.release.verify}" />
+<!--    <chmod dir="${tomcat.release.verify}" perm="700"/>--><!-- To make gpg happy -->
+
+    <exec executable="${gpg.exec}" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
+      <arg value="--no-default-keyring" />
+      <arg value="--primary-keyring" />
+      <arg value="${tomcat.release.verify}/apache-keys"/>
+      <arg value="--import"/>
+      <arg value="KEYS"/>
+    </exec>
+
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.exe" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.zip" />
     <get-release-hash src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <get-release-hash src-or-bin="src" basefile="${final-src.name}.zip" />
 
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.exe" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.zip" />
+    <get-release-signature src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <get-release-signature src-or-bin="src" basefile="${final-src.name}.zip" />
+
     <compare-hashes num="1"  src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
     <compare-hashes num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-hashes num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <compare-hashes num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <compare-hashes num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <compare-hashes num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
     <compare-hashes num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <compare-hashes num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
     <compare-hashes num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-hashes num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
-<!--
-<echo>
-reproducible-1=${reproducible-1}
-reproducible-2=${reproducible-2}
-reproducible-3=${reproducible-3}
-reproducible-4=${reproducible-4}
-reproducible-5=${reproducible-5}
-reproducible-6=${reproducible-6}
-reproducible-7=${reproducible-7}
-reproducible-8=${reproducible-8}
-reproducible-9=${reproducible-9}
-reproducible-10=${reproducible-10}
+    <echo>
+Don't worry if there are a bunch of "WARNING: untrusted key" warnings below.
+It's just because the KEYS -&gt; apache-keys import doesn't contain any ownertrust
+information.
 </echo>
--->
+
+    <compare-signatures num="1"  src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <compare-signatures num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <compare-signatures num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <compare-signatures num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <compare-signatures num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
+    <compare-signatures num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <compare-signatures num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
+    <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
     <condition property="reproducible">
       <and>
         <isset property="reproducible-1" />
         <isset property="reproducible-2" />
-<!--
         <isset property="reproducible-3" />
--->
         <isset property="reproducible-4" />
-        <or>
-          <isset property="reproducible-5" />
-          <contains string="${version}" substring="12.0." /><!-- Super hack, Tomcat 12 does not produce x86 binaries. -->
-        </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
         <isset property="reproducible-9" />
         <isset property="reproducible-10" />
+
+        <isset property="validsignature-1" />
+        <isset property="validsignature-2" />
+        <isset property="validsignature-3" />
+        <isset property="validsignature-4" />
+        <isset property="validsignature-6" />
+        <isset property="validsignature-7" />
+        <isset property="validsignature-8" />
+        <isset property="validsignature-9" />
+        <isset property="validsignature-10" />
       </and>
     </condition>
 

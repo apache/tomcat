@@ -70,8 +70,7 @@ public class MBeanDumper {
                 buf.append(code);
                 buf.append(CRLF);
 
-                MBeanAttributeInfo attrs[] = minfo.getAttributes();
-                Object value = null;
+                MBeanAttributeInfo[] attrs = minfo.getAttributes();
 
                 for (MBeanAttributeInfo attr : attrs) {
                     if (!attr.isReadable()) {
@@ -85,6 +84,7 @@ public class MBeanDumper {
                         continue;
                     }
 
+                    Object value;
                     try {
                         value = mbeanServer.getAttribute(oname, attName);
                     } catch (JMRuntimeException rme) {
@@ -127,8 +127,7 @@ public class MBeanDumper {
                                 }
                             }
                             valueString = sb.toString();
-                        } else if (TabularData.class.isInstance(value)) {
-                            TabularData tab = TabularData.class.cast(value);
+                        } else if (value instanceof TabularData tab) {
                             StringJoiner joiner = new StringJoiner(CRLF);
                             joiner.add("TabularData[" + tab.getTabularType().getRowType().getTypeName() +
                                     "] of length " + tab.size());
@@ -190,11 +189,11 @@ public class MBeanDumper {
 
         int pos = start;
         while (end - pos > 78) {
-            sb.append(value.substring(pos, pos + 78));
+            sb.append(value, pos, pos + 78);
             sb.append("\n ");
             pos = pos + 78;
         }
-        sb.append(value.substring(pos, end));
+        sb.append(value, pos, end);
     }
 
 
@@ -214,10 +213,9 @@ public class MBeanDumper {
 
     private static String valueToString(Object value) {
         String valueString;
-        if (CompositeData.class.isInstance(value)) {
+        if (value instanceof CompositeData composite) {
             StringBuilder sb = new StringBuilder("{");
             String sep = "";
-            CompositeData composite = CompositeData.class.cast(value);
             Set<String> keys = composite.getCompositeType().keySet();
             for (String key : keys) {
                 sb.append(sep).append(key).append('=').append(composite.get(key));

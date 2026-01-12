@@ -23,9 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
-        <author email="arjaquith@mindspring.com">Andrew R. Jaquith</author>
         <title>Realm Configuration How-To</title>
     </properties>
 

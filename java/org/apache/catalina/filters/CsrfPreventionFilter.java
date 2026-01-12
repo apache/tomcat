@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Provides basic CSRF protection for a web application. The filter assumes that:
@@ -103,7 +105,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @param entryPoints Comma separated list of URLs to be configured as entry points.
      */
     public void setEntryPoints(String entryPoints) {
-        String values[] = entryPoints.split(",");
+        String[] values = entryPoints.split(",");
         for (String value : values) {
             this.entryPoints.add(value.trim());
         }
@@ -176,7 +178,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A collection of predicates representing the URL patterns.
      */
     protected static Collection<Predicate<String>> createNoNoncePredicates(ServletContext context, String patterns) {
-        if (null == patterns || 0 == patterns.trim().length()) {
+        if (null == patterns || patterns.trim().isEmpty()) {
             return null;
         }
 
@@ -184,7 +186,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return Collections.singleton(new PatternPredicate(patterns.substring(1, patterns.length() - 1)));
         }
 
-        String values[] = patterns.split(",");
+        String[] values = patterns.split(",");
 
         ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
         for (String value : values) {
@@ -209,7 +211,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A Predicate which can match the specified pattern, or <code>null</code> if the pattern is null or blank.
      */
     protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
-        if (null == pattern || 0 == pattern.trim().length()) {
+        if (null == pattern || pattern.trim().isEmpty()) {
             return null;
         }
         if (pattern.startsWith("mime:")) {
@@ -319,10 +321,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             throws IOException, ServletException {
         ServletResponse wResponse = null;
 
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-
-            HttpServletRequest req = (HttpServletRequest) request;
-            HttpServletResponse res = (HttpServletResponse) response;
+        if (request instanceof HttpServletRequest req && response instanceof HttpServletResponse res) {
 
             HttpSession session = req.getSession(false);
 
@@ -446,7 +445,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     protected boolean skipNonceCheck(HttpServletRequest request) {
-        if (!Constants.METHOD_GET.equals(request.getMethod())) {
+        if (!Method.GET.equals(request.getMethod())) {
             return false;
         }
 
@@ -477,7 +476,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Determines whether a nonce should be created. This method is provided primarily for the benefit of sub-classes
+     * Determines whether a nonce should be created. This method is provided primarily for the benefit of subclasses
      * that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to potentially create the nonce.
@@ -491,7 +490,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Create a new {@link NonceCache} and store in the {@link HttpSession}. This method is provided primarily for the
-     * benefit of sub-classes that wish to customise this behaviour.
+     * benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to create the nonce cache. Unused by the default
      *                    implementation.
@@ -511,7 +510,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Obtain the {@link NonceCache} associated with the request and/or session. This method is provided primarily for
-     * the benefit of sub-classes that wish to customise this behaviour.
+     * the benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to obtain the nonce cache. Unused by the default
      *                    implementation.
@@ -545,6 +544,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeRedirectURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeRedirectURL(url));
             } else {
@@ -554,6 +555,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeURL(url));
             } else {
@@ -566,21 +569,98 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 return true;
             }
 
-            if (null != noNoncePatterns) {
-                for (Predicate<String> p : noNoncePatterns) {
-                    if (p.test(url)) {
-                        return false;
-                    }
+            for (Predicate<String> p : noNoncePatterns) {
+                if (p.test(url)) {
+                    return false;
                 }
             }
 
             return true;
         }
 
+        /**
+         * Removes zero or more query parameters from a URL. All instances of the query parameter and any associated
+         * values will be removed.
+         *
+         * @param url           The URL whose query parameters should be removed.
+         * @param parameterName The name of the parameter to remove.
+         *
+         * @return The URL without any instances of the query parameter <code>parameterName</code> present.
+         */
+        public static String removeQueryParameters(String url, String parameterName) {
+            if (null != parameterName) {
+                // Check for query string
+                int q = url.indexOf('?');
+                if (q > -1) {
+
+                    // Look for parameter end
+                    int start = q + 1;
+                    int pos = url.indexOf('&', start);
+
+                    int iterations = 0;
+
+                    while (-1 < pos) {
+                        // Process all parameters
+                        if (++iterations > 100000) {
+                            // Just in case things get out of control
+                            throw new IllegalStateException("Way too many loop iterations");
+                        }
+
+                        int eq = url.indexOf('=', start);
+                        int paramNameEnd;
+                        if (-1 == eq || eq > pos) {
+                            paramNameEnd = pos;
+                            // Found no equal sign at all or past next & ; Parameter is all name.
+                        } else {
+                            // Found this param's equal sign
+                            paramNameEnd = eq;
+                        }
+                        if (parameterName.equals(url.substring(start, paramNameEnd))) {
+                            // Remove the parameter
+                            url = url.substring(0, start) + url.substring(pos + 1); // +1 to consume the &
+                        } else {
+                            start = pos + 1; // Go to next parameter
+                        }
+                        pos = url.indexOf('&', start);
+                    }
+
+                    // Check final parameter
+                    String paramName;
+                    pos = url.indexOf('=', start);
+
+                    if (-1 < pos) {
+                        paramName = url.substring(start, pos);
+                    } else {
+                        paramName = url.substring(start);
+                        // No value
+                    }
+                    if (paramName.equals(parameterName)) {
+                        // Remove this parameter
+
+                        // Remove any trailing ? or & as well
+                        char c = url.charAt(start - 1);
+                        if ('?' == c || '&' == c) {
+                            start--;
+                        }
+
+                        url = url.substring(0, start);
+                    } else {
+                        // Remove trailing ? if it's there. Is this worth it?
+                        int length = url.length();
+                        if (length == q + 1) {
+                            url = url.substring(0, length - 1);
+                        }
+                    }
+                }
+            }
+
+            return url;
+        }
+
         /*
          * Return the specified URL with the nonce added to the query string.
          *
-         * @param url URL to be modified
+         * @param url the URL to be modified
          */
         private String addNonce(String url) {
 
@@ -602,7 +682,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 path = path.substring(0, question);
             }
             StringBuilder sb = new StringBuilder(path);
-            if (query.length() > 0) {
+            if (!query.isEmpty()) {
                 sb.append(query);
                 sb.append('&');
             } else {
@@ -632,6 +712,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     protected static class LruCache<T> implements NonceCache<T> {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         // Although the internal implementation uses a Map, this cache
@@ -640,14 +721,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         public LruCache(final int cacheSize) {
             cache = new LinkedHashMap<>() {
+                @Serial
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
-                    if (size() > cacheSize) {
-                        return true;
-                    }
-                    return false;
+                    return size() > cacheSize;
                 }
             };
         }

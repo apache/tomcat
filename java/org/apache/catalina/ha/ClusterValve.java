@@ -21,12 +21,10 @@ import org.apache.catalina.Valve;
 /**
  * Cluster valves are a simple extension to the Tomcat valve architecture with a small addition of being able to
  * reference the cluster component in the container it sits in.
- *
- * @author Peter Rossbach
  */
 public interface ClusterValve extends Valve {
     /**
-     * Returns the cluster the cluster deployer is associated with
+     * Returns the cluster the valve is associated with
      *
      * @return CatalinaCluster
      */

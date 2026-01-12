@@ -60,7 +60,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
         String type = ref.getClassName();
         Object o =
-            ClassLoaderUtil.loadClass(
+                ClassLoaderUtil.loadClass(
                 type,
                 GenericNamingResourcesFactory.class.getClassLoader(),
                 Thread.currentThread().getContextClassLoader()).getConstructor().newInstance();
@@ -75,7 +75,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (setProperty(o, param, value)) {
 
             } else {
-                log.debug("Property not configured["+param+"]. No setter found on["+o+"].");
+                log.debug("Property not configured[" + param + "]. No setter found on[" + type + "].");
             }
         }
         return o;
@@ -83,8 +83,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
     @SuppressWarnings("null") // setPropertyMethodVoid can't be null when used
     private static boolean setProperty(Object o, String name, String value) {
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils: setProperty(" +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
         }
 
@@ -127,11 +127,11 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     // Try a setFoo ( long )
                     }else if ("java.lang.Long".equals(paramType.getName())
                                 || "long".equals(paramType.getName())) {
-                            try {
-                                params[0] = Long.valueOf(value);
-                            } catch (NumberFormatException ex) {
-                                ok = false;
-                            }
+                        try {
+                            params[0] = Long.valueOf(value);
+                        } catch (NumberFormatException ex) {
+                            ok = false;
+                        }
 
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())

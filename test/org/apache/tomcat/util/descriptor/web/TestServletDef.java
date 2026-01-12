@@ -39,7 +39,7 @@ public class TestServletDef {
         ServletDef servletDef = new ServletDef();
         servletDef.setServletName("test");
         Assert.assertEquals("'test' is expected as servlet name",
-            "test", servletDef.getServletName());
+                "test", servletDef.getServletName());
     }
 
 }

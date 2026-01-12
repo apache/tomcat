@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class ConcurrentCache<K,V> {
+public final class ConcurrentCache<K, V> {
 
     private final int size;
 

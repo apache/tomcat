@@ -29,15 +29,8 @@ import org.apache.tomcat.util.res.StringManager;
  * A single packet for communication between the web server and the container. Designed to be reused many times with no
  * creation of garbage. Understands the format of data types for these packets. Can be used (somewhat confusingly) for
  * both incoming and outgoing packets.
- *
- * @author Henri Gomez
- * @author Dan Milstein
- * @author Keith Wannamaker
- * @author Kevin Seguin
- * @author Costin Manolache
  */
 public class AjpMessage {
-
 
     private static final Log log = LogFactory.getLog(AjpMessage.class);
 
@@ -47,21 +40,15 @@ public class AjpMessage {
     protected static final StringManager sm = StringManager.getManager(AjpMessage.class);
 
 
-    // ------------------------------------------------------------ Constructor
-
-
     public AjpMessage(int packetSize) {
         buf = new byte[packetSize];
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
      * Fixed size buffer.
      */
-    protected final byte buf[];
+    protected final byte[] buf;
 
 
     /**
@@ -76,9 +63,6 @@ public class AjpMessage {
      * Oh, well.
      */
     protected int len;
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -373,7 +357,7 @@ public class AjpMessage {
     // ------------------------------------------------------ Protected Methods
 
 
-    protected static String hexLine(byte buf[], int start, int len) {
+    protected static String hexLine(byte[] buf, int start, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < start + 16; i++) {
             if (i < len + 4) {

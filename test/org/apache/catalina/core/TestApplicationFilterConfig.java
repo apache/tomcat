@@ -52,17 +52,14 @@ public class TestApplicationFilterConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        final MBeanServer mbeanServer =
-                Registry.getRegistry(null, null).getMBeanServer();
+        final MBeanServer mbeanServer = Registry.getRegistry(null).getMBeanServer();
 
         // There should be one Servlet MBean registered
-        Set<ObjectName> servlets = mbeanServer.queryNames(
-                new ObjectName("Tomcat:j2eeType=Servlet,*"), null);
+        Set<ObjectName> servlets = mbeanServer.queryNames(new ObjectName("Tomcat:j2eeType=Servlet,*"), null);
         Assert.assertEquals(1, servlets.size());
 
         // There should be one Filter MBean registered
-        Set<ObjectName> filters = mbeanServer.queryNames(
-                new ObjectName("Tomcat:j2eeType=Filter,*"), null);
+        Set<ObjectName> filters = mbeanServer.queryNames(new ObjectName("Tomcat:j2eeType=Filter,*"), null);
         Assert.assertEquals(1, filters.size());
     }
 }

@@ -20,8 +20,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Simple task thread factory to use to create threads for an executor
- * implementation.
+ * Simple task thread factory to use to create threads for an executor implementation.
  */
 public class TaskThreadFactory implements ThreadFactory {
 

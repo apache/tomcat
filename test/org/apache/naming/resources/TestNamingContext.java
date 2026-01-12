@@ -154,7 +154,7 @@ public class TestNamingContext extends TomcatBaseTest {
             try {
                 Context ctx = new InitialContext();
                 NamingEnumeration<Binding> enm =
-                    ctx.listBindings("java:comp/env/list");
+                        ctx.listBindings("java:comp/env/list");
                 while (enm.hasMore()) {
                     Binding b = enm.next();
                     out.print(b.getObject().getClass().getName());
@@ -345,7 +345,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         File appDir =
-            new File("test/webapp");
+                new File("test/webapp");
         // app dir is relative to server home
         org.apache.catalina.Context ctxt =
                 tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());

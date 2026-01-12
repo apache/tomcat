@@ -27,12 +27,8 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextResource</code> component.
- * </p>
- *
- * @author Amy Roh
  */
 public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
@@ -49,22 +45,24 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
         ContextResource cr = doGetManagedResource();
 
-        String value = null;
-        if ("auth".equals(name)) {
-            return cr.getAuth();
-        } else if ("description".equals(name)) {
-            return cr.getDescription();
-        } else if ("name".equals(name)) {
-            return cr.getName();
-        } else if ("scope".equals(name)) {
-            return cr.getScope();
-        } else if ("type".equals(name)) {
-            return cr.getType();
-        } else {
-            value = (String) cr.getProperty(name);
-            if (value == null) {
-                throw new AttributeNotFoundException(sm.getString("mBean.attributeNotFound", name));
-            }
+        String value;
+        switch (name) {
+            case "auth":
+                return cr.getAuth();
+            case "description":
+                return cr.getDescription();
+            case "name":
+                return cr.getName();
+            case "scope":
+                return cr.getScope();
+            case "type":
+                return cr.getType();
+            default:
+                value = (String) cr.getProperty(name);
+                if (value == null) {
+                    throw new AttributeNotFoundException(sm.getString("mBean.attributeNotFound", name));
+                }
+                break;
         }
 
         return value;
@@ -89,21 +87,16 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
         ContextResource cr = doGetManagedResource();
 
-        if ("auth".equals(name)) {
-            cr.setAuth((String) value);
-        } else if ("description".equals(name)) {
-            cr.setDescription((String) value);
-        } else if ("name".equals(name)) {
-            cr.setName((String) value);
-        } else if ("scope".equals(name)) {
-            cr.setScope((String) value);
-        } else if ("type".equals(name)) {
-            cr.setType((String) value);
-        } else {
-            cr.setProperty(name, "" + value);
+        switch (name) {
+            case "auth" -> cr.setAuth((String) value);
+            case "description" -> cr.setDescription((String) value);
+            case "name" -> cr.setName((String) value);
+            case "scope" -> cr.setScope((String) value);
+            case "type" -> cr.setType((String) value);
+            default -> cr.setProperty(name, "" + value);
         }
 
-        // cannot use side-effects. It's removed and added back each time
+        // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = cr.getNamingResources();
         nr.removeResource(cr.getName());

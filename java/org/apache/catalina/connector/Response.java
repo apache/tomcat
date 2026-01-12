@@ -62,9 +62,6 @@ import org.apache.tomcat.util.security.Escape;
 
 /**
  * Wrapper object for the Coyote response.
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public class Response implements HttpServletResponse {
 
@@ -673,11 +670,7 @@ public class Response implements HttpServletResponse {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", encoding), e);
             return;
         }
-        if (encoding == null) {
-            isCharacterEncodingSet = false;
-        } else {
-            isCharacterEncodingSet = true;
-        }
+        isCharacterEncodingSet = encoding != null;
     }
 
 
@@ -700,11 +693,7 @@ public class Response implements HttpServletResponse {
         }
 
         getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(charset));
-        if (charset == null) {
-            isCharacterEncodingSet = false;
-        } else {
-            isCharacterEncodingSet = true;
-        }
+        isCharacterEncodingSet = charset != null;
     }
 
 
@@ -862,7 +851,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void addDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -887,7 +876,7 @@ public class Response implements HttpServletResponse {
 
     private void addHeader(String name, String value, Charset charset) {
 
-        if (name == null || name.length() == 0 || value == null) {
+        if (name == null || name.isEmpty() || value == null) {
             return;
         }
 
@@ -930,7 +919,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void addIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1157,7 +1146,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1177,7 +1166,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setHeader(String name, String value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1204,7 +1193,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1285,7 +1274,7 @@ public class Response implements HttpServletResponse {
 
     private static boolean doIsEncodeable(Context context, Request hreq, Session session, String location) {
         // Is this a valid absolute URL?
-        URL url = null;
+        URL url;
         try {
             URI uri = new URI(location);
             url = uri.toURL();
@@ -1327,9 +1316,7 @@ public class Response implements HttpServletResponse {
                 return false;
             }
             String tok = ";" + SessionConfig.getSessionUriParamName(context) + "=" + session.getIdInternal();
-            if (file.indexOf(tok, contextPath.length()) >= 0) {
-                return false;
-            }
+            return file.indexOf(tok, contextPath.length()) < 0;
         }
 
         // This URL belongs to our web application, so it is encodeable
@@ -1352,7 +1339,7 @@ public class Response implements HttpServletResponse {
     protected String toAbsolute(String location) {
 
         if (location == null) {
-            return location;
+            return null;
         }
 
         boolean leadingSlash = location.startsWith("/");
@@ -1367,8 +1354,8 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(':');
                 redirectURLCC.append(location, 0, location.length());
                 return redirectURLCC.toString();
-            } catch (IOException e) {
-                throw new IllegalArgumentException(location, e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(location, ioe);
             }
 
         } else if (leadingSlash || !UriUtil.hasScheme(location)) {
@@ -1399,8 +1386,8 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(location, 0, location.length());
 
                 normalize(redirectURLCC);
-            } catch (IOException e) {
-                throw new IllegalArgumentException(location, e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(location, ioe);
             }
 
             return redirectURLCC.toString();
@@ -1434,15 +1421,14 @@ public class Response implements HttpServletResponse {
         if (cc.endsWith("/.") || cc.endsWith("/..")) {
             try {
                 cc.append('/');
-            } catch (IOException e) {
-                throw new IllegalArgumentException(cc.toString(), e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(cc.toString(), ioe);
             }
         }
 
         char[] c = cc.getChars();
         int start = cc.getStart();
         int end = cc.getEnd();
-        int index = 0;
         int startIndex = 0;
 
         // Advance past the first three / characters (should place index just
@@ -1453,7 +1439,7 @@ public class Response implements HttpServletResponse {
         }
 
         // Remove /./
-        index = startIndex;
+        int index = startIndex;
         while (true) {
             index = cc.indexOf("/./", 0, 3, index);
             if (index < 0) {
@@ -1516,10 +1502,7 @@ public class Response implements HttpServletResponse {
             return false;
         }
         pos = uri.indexOf('/', pos + 3);
-        if (pos < 0) {
-            return false;
-        }
-        return true;
+        return pos >= 0;
     }
 
     /**
@@ -1549,7 +1532,7 @@ public class Response implements HttpServletResponse {
             path = path.substring(0, pound);
         }
         StringBuilder sb = new StringBuilder(path);
-        if (sb.length() > 0) { // jsessionid can't be first.
+        if (!sb.isEmpty()) { // jsessionid can't be first.
             sb.append(';');
             sb.append(SessionConfig.getSessionUriParamName(request.getContext()));
             sb.append('=');

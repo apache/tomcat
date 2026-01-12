@@ -43,8 +43,8 @@ public class UriTemplate {
 
     public UriTemplate(String path) throws DeploymentException {
 
-        if (path == null || path.length() == 0 || !path.startsWith("/") || path.contains("/../") ||
-                path.contains("/./") || path.contains("//")) {
+        if (path == null || !path.startsWith("/") || path.contains("/../") || path.contains("/./") ||
+                path.contains("//")) {
             throw new DeploymentException(sm.getString("uriTemplate.invalidPath", path));
         }
 
@@ -58,7 +58,7 @@ public class UriTemplate {
 
         for (int i = 0; i < segments.length; i++) {
             String segment = segments[i];
-            if (segment.length() == 0) {
+            if (segment.isEmpty()) {
                 if (i == 0 || (i == segments.length - 1 && paramCount == 0)) {
                     // Ignore the first empty segment as the path must always
                     // start with '/'
@@ -97,9 +97,9 @@ public class UriTemplate {
     }
 
 
-    public Map<String, String> match(UriTemplate candidate) {
+    public Map<String,String> match(UriTemplate candidate) {
 
-        Map<String, String> result = new HashMap<>();
+        Map<String,String> result = new HashMap<>();
 
         // Should not happen but for safety
         if (candidate.getSegmentCount() != getSegmentCount()) {
@@ -111,15 +111,15 @@ public class UriTemplate {
         for (Segment candidateSegment : candidate.getSegments()) {
             Segment targetSegment = targetSegments.next();
 
-            if (targetSegment.getParameterIndex() == -1) {
+            if (targetSegment.parameterIndex() == -1) {
                 // Not a parameter - values must match
-                if (!targetSegment.getValue().equals(candidateSegment.getValue())) {
+                if (!targetSegment.value().equals(candidateSegment.value())) {
                     // Not a match. Stop here
                     return null;
                 }
             } else {
                 // Parameter
-                result.put(targetSegment.getValue(), candidateSegment.getValue());
+                result.put(targetSegment.value(), candidateSegment.value());
             }
         }
 
@@ -147,23 +147,6 @@ public class UriTemplate {
     }
 
 
-    private static class Segment {
-        private final int parameterIndex;
-        private final String value;
-
-        Segment(int parameterIndex, String value) {
-            this.parameterIndex = parameterIndex;
-            this.value = value;
-        }
-
-
-        public int getParameterIndex() {
-            return parameterIndex;
-        }
-
-
-        public String getValue() {
-            return value;
-        }
+    private record Segment(int parameterIndex, String value) {
     }
 }

@@ -17,10 +17,9 @@
 package org.apache.tomcat.jni;
 
 /**
- * Tomcat Native 1.2.33 and earlier won't initialise unless this class is
- * present. This dummy class ensures initialisation gets as far as being able to
- * check the version of the Tomcat Native library and reporting a version error
- * if 1.2.33 or earlier is present.
+ * Tomcat Native 1.2.33 and earlier won't initialise unless this class is present. This dummy class ensures
+ * initialisation gets as far as being able to check the version of the Tomcat Native library and reporting a version
+ * error if 1.2.33 or earlier is present.
  */
 public class Sockaddr {
 

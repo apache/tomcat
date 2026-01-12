@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -113,7 +113,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         // Acquire the list of properties for this bean
         ProtocolHandler protocolHandler = bean.getProtocolHandler();
         // Acquire the list of properties for this bean
-        PropertyDescriptor descriptors[] = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
+        PropertyDescriptor[] descriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
@@ -254,7 +254,8 @@ public class ConnectorStoreAppender extends StoreAppender {
         File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
         try {
             file = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
+            // Ignore
         }
         return file;
     }
@@ -268,7 +269,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         }
         try {
             jkHomeBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             jkHomeBase = file;
         }
         return jkHomeBase;

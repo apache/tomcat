@@ -86,7 +86,7 @@ public class ConnectorCreateRule extends Rule {
         Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setExecutor",
                 new Class[] { java.util.concurrent.Executor.class });
         if (m != null) {
-            m.invoke(con.getProtocolHandler(), new Object[] { ex });
+            m.invoke(con.getProtocolHandler(), ex);
         } else {
             log.warn(sm.getString("connector.noSetExecutor", con));
         }
@@ -96,7 +96,7 @@ public class ConnectorCreateRule extends Rule {
         Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setSslImplementationName",
                 new Class[] { String.class });
         if (m != null) {
-            m.invoke(con.getProtocolHandler(), new Object[] { sslImplementationName });
+            m.invoke(con.getProtocolHandler(), sslImplementationName);
         } else {
             log.warn(sm.getString("connector.noSetSSLImplementationName", con));
         }

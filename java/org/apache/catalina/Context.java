@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
@@ -36,6 +37,7 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -49,8 +51,8 @@ import org.apache.tomcat.util.http.CookieProcessor;
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and therefore an individual web application, in
  * the Catalina servlet engine. It is therefore useful in almost every deployment of Catalina (even if a Connector
- * attached to a web server (such as Apache) uses the web server's facilities to identify the appropriate Wrapper to
- * handle this request. It also provides a convenient mechanism to use Interceptors that see every request processed by
+ * attached to a web server such as Apache uses the web server's facilities to identify the appropriate Wrapper to
+ * handle this request). It also provides a convenient mechanism to use Interceptors that see every request processed by
  * this particular web application.
  * <p>
  * The parent Container attached to a Context is generally a Host, but may be some other implementation, or may be
@@ -59,8 +61,6 @@ import org.apache.tomcat.util.http.CookieProcessor;
  * The child containers attached to a Context are generally implementations of Wrapper (representing individual servlet
  * definitions).
  * <p>
- *
- * @author Craig R. McClanahan
  */
 public interface Context extends Container, ContextBind {
 
@@ -129,7 +129,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationEventListeners(Object listeners[]);
+    void setApplicationEventListeners(Object[] listeners);
 
 
     /**
@@ -147,7 +147,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationLifecycleListeners(Object listeners[]);
+    void setApplicationLifecycleListeners(Object[] listeners);
 
 
     /**
@@ -315,7 +315,7 @@ public interface Context extends Container, ContextBind {
      * Configures if a / is added to the end of the session cookie path to ensure browsers, particularly IE, don't send
      * a session cookie for context /foo with requests intended for context /foobar.
      *
-     * @param sessionCookiePathUsesTrailingSlash <code>true</code> if the slash is should be added, otherwise
+     * @param sessionCookiePathUsesTrailingSlash <code>true</code> if the slash should be added, otherwise
      *                                               <code>false</code>
      */
     void setSessionCookiePathUsesTrailingSlash(boolean sessionCookiePathUsesTrailingSlash);
@@ -950,19 +950,19 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of application listener class names configured for this application.
+     * @return the array of application listener class names configured for this application.
      */
     String[] findApplicationListeners();
 
 
     /**
-     * @return the set of application parameters for this application.
+     * @return the array of application parameters for this application.
      */
     ApplicationParameter[] findApplicationParameters();
 
 
     /**
-     * @return the set of security constraints for this web application. If there are none, a zero-length array is
+     * @return the array of security constraints for this web application. If there are none, a zero-length array is
      *             returned.
      */
     SecurityConstraint[] findConstraints();
@@ -989,7 +989,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of defined error pages for all specified error codes and exception types.
+     * @return the array of defined error pages for all specified error codes and exception types.
      */
     ErrorPage[] findErrorPages();
 
@@ -1003,13 +1003,13 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of defined filters for this Context.
+     * @return the array of defined filters for this Context.
      */
     FilterDef[] findFilterDefs();
 
 
     /**
-     * @return the set of filter mappings for this Context.
+     * @return the array of filter mappings for this Context.
      */
     FilterMap[] findFilterMaps();
 
@@ -1102,7 +1102,8 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of watched resources for this Context. If none are defined, a zero length array will be returned.
+     * @return the array of watched resources for this Context. If none are defined, a zero length array will be
+     *             returned.
      */
     String[] findWatchedResources();
 
@@ -1111,25 +1112,26 @@ public interface Context extends Container, ContextBind {
      * @return <code>true</code> if the specified welcome file is defined for this Context; otherwise return
      *             <code>false</code>.
      *
-     * @param name Welcome file to verify
+     * @param name the welcome file to verify
      */
     boolean findWelcomeFile(String name);
 
 
     /**
-     * @return the set of welcome files defined for this Context. If none are defined, a zero-length array is returned.
+     * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is
+     *             returned.
      */
     String[] findWelcomeFiles();
 
 
     /**
-     * @return the set of LifecycleListener classes that will be added to newly created Wrappers automatically.
+     * @return the array of LifecycleListener classes that will be added to newly created Wrappers automatically.
      */
     String[] findWrapperLifecycles();
 
 
     /**
-     * @return the set of ContainerListener classes that will be added to newly created Wrappers automatically.
+     * @return the array of ContainerListener classes that will be added to newly created Wrappers automatically.
      */
     String[] findWrapperListeners();
 
@@ -1872,4 +1874,69 @@ public interface Context extends Container, ContextBind {
         return ConfigFileLoader.getSource().getResource(name);
     }
 
+
+    /**
+     * Obtain the current configuration for the handling of encoded reverse solidus (%5c - \) characters in paths used
+     * to obtain {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded reverse solidus characters
+     */
+    default String getEncodedReverseSolidusHandling() {
+        return EncodedSolidusHandling.DECODE.getValue();
+    }
+
+
+    /**
+     * Configure the handling for encoded reverse solidus (%5c - \) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @param encodedReverseSolidusHandling One of the values of {@link EncodedSolidusHandling}
+     */
+    default void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded reverse solidus (%5c - \) characters in paths used
+     * to obtain {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded reverse solidus characters
+     */
+    default EncodedSolidusHandling getEncodedReverseSolidusHandlingEnum() {
+        return EncodedSolidusHandling.DECODE;
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded solidus (%2f - /) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded solidus characters
+     */
+    default String getEncodedSolidusHandling() {
+        return EncodedSolidusHandling.REJECT.getValue();
+    }
+
+
+    /**
+     * Configure the handling for encoded solidus (%2f - /) characters in paths used to obtain {@link RequestDispatcher}
+     * instances for this {@link Context}.
+     *
+     * @param encodedSolidusHandling One of the values of {@link EncodedSolidusHandling}
+     */
+    default void setEncodedSolidusHandling(String encodedSolidusHandling) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded solidus (%2f - /) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded solidus characters
+     */
+    default EncodedSolidusHandling getEncodedSolidusHandlingEnum() {
+        return EncodedSolidusHandling.REJECT;
+    }
 }
