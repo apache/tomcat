@@ -20,13 +20,13 @@ package org.apache.coyote.http2;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.connector.Request;
-
 public class TestHttp2RequestParameters extends Http2TestBase {
     /**
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69918 POST parameters are not returned from a call
-     * to any of the {@link Request} getParameterXXX() methods if the request is HTTP/2 and the
-     * content-length header is not set.
+     * to any of the {@link org.apache.catalina.connector.Request} getParameterXXX() methods if the request is HTTP/2
+     * and the content-length header is not set.
+     *
+     * @throws Exception If the test encounters an unexpected error
      */
     @Test
     public void testBug69918() throws Exception {
