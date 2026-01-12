@@ -118,8 +118,8 @@
         the <code>CsrfPreventionFilter</code>. (schultz)
       </fix>
       <fix>
-        <bug>69918</bug>: Ensure request parameters are correctly parsed for HTTP/2 requests
-        when the content-length header is not set. (dsoumis)
+        <bug>69918</bug>: Ensure request parameters are correctly parsed for
+        HTTP/2 requests when the content-length header is not set. (dsoumis)
       </fix>
       <update>
         Enable minimum and recommended Tomcat Native versions to be set
