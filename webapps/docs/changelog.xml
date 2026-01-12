@@ -179,6 +179,9 @@
       <update>
         Update Checkstyle to 12.3.1. (markt)
       </update>
+      <add>
+        Improvements to French translations. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
