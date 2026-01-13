@@ -926,6 +926,8 @@
         <patternset refid="text.files" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
+        <!-- Exclude Maven output directory -->
+        <exclude name="target/**"/>
       </fileset>
     </checkstyle>
     <!-- jakarta package checks -->
