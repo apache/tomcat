@@ -25,6 +25,7 @@ import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,16 +39,22 @@ public class TestOcspEnabled extends OcspBaseTest {
     private static TesterOcspResponder ocspResponder;
 
     @BeforeClass
-    public static void startOcspResponder() throws IOException {
+    public static void startOcspResponder() {
         ocspResponder = new TesterOcspResponder();
-        ocspResponder.start();
+        try {
+            ocspResponder.start();
+        } catch (IOException ioe) {
+            ocspResponder = null;
+        }
     }
 
 
     @AfterClass
     public static void stopOcspResponder() {
-        ocspResponder.stop();
-        ocspResponder = null;
+        if (ocspResponder != null) {
+            ocspResponder.stop();
+            ocspResponder = null;
+        }
     }
 
 
@@ -99,6 +106,7 @@ public class TestOcspEnabled extends OcspBaseTest {
 
     @Test
     public void test() throws Exception {
+        Assume.assumeNotNull(ocspResponder);
         try {
             doTest(clientCertValid, serverCertValid, verifyClientCert, verifyServerCert);
             if (handshakeFailureExpected) {
