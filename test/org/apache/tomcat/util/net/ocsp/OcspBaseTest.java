@@ -30,8 +30,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
@@ -62,7 +62,7 @@ public class OcspBaseTest extends TomcatBaseTest {
     }
 
 
-    @Parameterized.Parameters(name = "{0} with OpenSSL trust {2}")
+    @Parameters(name = "{0} with OpenSSL trust {2}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, Boolean.FALSE,
