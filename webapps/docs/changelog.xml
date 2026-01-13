@@ -333,6 +333,11 @@
         <code>java.util.Date</code>. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69333</bug>: Correct a regression in the previous fix for
+        <bug>69333</bug> and ensure that <code>reuse()</code> or
+        <code>release()</code> is always called for a tag. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
