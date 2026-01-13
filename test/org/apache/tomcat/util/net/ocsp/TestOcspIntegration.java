@@ -297,8 +297,8 @@ public class TestOcspIntegration extends TomcatBaseTest {
         context.addServletMappingDecoded("/", "simple");
 
         KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
-        String trustStorePass = new String(Files.readAllBytes(new File(getPath(TRUSTSTORE_PASS)).toPath())).trim();
-        trustStore.load(Files.newInputStream(Paths.get(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath())), trustStorePass.toCharArray());
+        trustStore.load(Files.newInputStream(Paths.get(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath())),
+                truststorePass.toCharArray());
         KeyStore clientKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
         String clientKeystorePass = new String(Files.readAllBytes(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath())).trim();
         clientKeystore.load(Files.newInputStream(Paths.get(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath())), clientKeystorePass.toCharArray());
