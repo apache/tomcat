@@ -2325,6 +2325,10 @@ class Generator {
                 writeNewInstance(tagHandlerVar, tagHandlerClass);
             }
 
+            // Wrap use of tag in try/finally to ensure clean-up takes place
+            out.printil("try {");
+            out.pushIndent();
+
             // includes setting the context
             generateSetters(n, tagHandlerVar, handlerInfo, false);
 
@@ -2504,12 +2508,14 @@ class Generator {
                 out.pushIndent();
                 out.printin(tagHandlerVar);
                 out.println(".doFinally();");
-            }
-
-            if (n.implementsTryCatchFinally()) {
                 out.popIndent();
                 out.printil("}");
             }
+
+            // Ensure clean-up takes place
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
 
             if (usePooling(n)) {
                 // Print tag reuse
@@ -2523,6 +2529,8 @@ class Generator {
                 out.print(tagHandlerVar);
                 out.println(", _jsp_getInstanceManager());");
             }
+            out.popIndent();
+            out.printil("}");
 
             // Declare and synchronize AT_END scripting variables (must do this
             // outside the try/catch/finally block)
