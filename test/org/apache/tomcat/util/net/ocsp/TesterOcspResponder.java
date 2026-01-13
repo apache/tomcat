@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -79,8 +81,8 @@ public class TesterOcspResponder {
 
         p = pb.start();
 
-        redirect(p.inputReader(), System.out, true);
-        redirect(p.errorReader(), System.err, true);
+        redirect(new BufferedReader(new InputStreamReader(p.getInputStream())) , System.out, true);
+        redirect(new BufferedReader(new InputStreamReader(p.getErrorStream())), System.err, true);
 
         Assert.assertTrue(p.isAlive());
     }
