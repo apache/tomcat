@@ -282,7 +282,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
         File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
         File truststoreFile = new File(getPath(TRUSTSTORE_PATH));
-        String truststorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
+        String truststorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
         initSsl(tomcat, serverSideOcspVerification, useOpenSSLTrust, certificateFile, certificateKeyFile,
                 certificateChainFile, truststoreFile, truststorePass);
 
@@ -293,9 +293,8 @@ public class TestOcspIntegration extends TomcatBaseTest {
         context.addServletMappingDecoded("/", "simple");
 
         KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
-        String trustStorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
         trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()),
-                trustStorePass.toCharArray());
+                truststorePass.toCharArray());
         KeyStore clientKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
         String clientKeystorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
         clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()),
