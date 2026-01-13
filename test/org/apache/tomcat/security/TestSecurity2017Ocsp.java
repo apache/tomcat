@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,16 +44,22 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
     private static TesterOcspResponder ocspResponder;
 
     @BeforeClass
-    public static void startOcspResponder() throws IOException {
+    public static void startOcspResponder() {
         ocspResponder = new TesterOcspResponder();
-        ocspResponder.start();
+        try {
+            ocspResponder.start();
+        } catch (IOException ioe) {
+            ocspResponder = null;
+        }
     }
 
 
     @AfterClass
     public static void stopOcspResponder() {
-        ocspResponder.stop();
-        ocspResponder = null;
+        if (ocspResponder != null) {
+            ocspResponder.stop();
+            ocspResponder = null;
+        }
     }
 
 
@@ -61,6 +68,7 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
      */
     @Test(expected=SSLHandshakeException.class)
     public void testCVE_2017_15698() throws Exception {
+        Assume.assumeNotNull(ocspResponder);
 
         Tomcat tomcat = getTomcatInstance();
 
