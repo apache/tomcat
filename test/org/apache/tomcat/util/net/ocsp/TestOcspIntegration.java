@@ -318,7 +318,15 @@ public class TestOcspIntegration extends TomcatBaseTest {
             }
             connection.setSSLSocketFactory(sslSocketFactory);
             connection.connect();
-            return connection.getResponseCode();
+            try {
+                return connection.getResponseCode();
+            } catch (IOException ioe) {
+                if (tomcat.getConnector().getProtocolHandlerClassName().contains("Nio2")) {
+                    throw new SSLHandshakeException(ioe.getMessage());
+                } else {
+                    throw ioe;
+                }
+            }
         } finally {
             tomcat.stop();
         }
