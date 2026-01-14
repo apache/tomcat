@@ -208,6 +208,17 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>69920</bug>: When attempting to write to a closed
+        <code>Writer</code> or <code>OutputStream</code> obtained from a
+        WebSocket session, throw an <code>IOException</code> rather than an
+        <code>IllegalStateExcpetion</code> as required by <code>Writer</code>
+        and strongly suggested by <code>OutputStream</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
