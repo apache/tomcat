@@ -17,6 +17,7 @@
 package org.apache.tomcat.security;
 
 import java.io.IOException;
+import java.net.SocketException;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.http.HttpServletResponse;
@@ -95,7 +96,17 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
 
         tomcat.start();
 
-        int rc = getUrl("https://localhost:" + getPort() + "/simple", new ByteChunk(), false);
+        int rc;
+        try {
+            rc = getUrl("https://localhost:" + getPort() + "/simple", new ByteChunk(), false);
+        } catch (SocketException se) {
+            // NIO2 may throw a SocketException rather than a SSLHandshakeException
+            if (getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2")) {
+                throw new SSLHandshakeException(se.getMessage());
+            } else {
+                throw se;
+            }
+        }
 
         // If the TLS handshake fails, the test won't get this far.
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
