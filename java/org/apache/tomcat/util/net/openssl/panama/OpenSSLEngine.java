@@ -1300,7 +1300,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static int processOCSPRequest(EngineState state, URL url, MemorySegment issuer, MemorySegment x509,
             MemorySegment /* X509_STORE_CTX */ x509ctx, Arena localArena) {
-        if (openssl_h_Compatibility.BORINGSSL) {
+        if (openssl_h_Compatibility.BORINGSSL || openssl_h_Compatibility.LIBRESSL) {
             return V_OCSP_CERTSTATUS_UNKNOWN();
         }
         MemorySegment ocspRequest = MemorySegment.NULL;
