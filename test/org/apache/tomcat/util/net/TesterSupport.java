@@ -190,7 +190,7 @@ public final class TesterSupport {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.contains("Apr")) {
             // Only run for OpenSSL to avoid running the test multiple times
-            Assume.assumeTrue(OpenSSLImplementation.class.getName().equals(sslImplementationName));
+            Assume.assumeTrue("With APR, only run for OpenSSL", OpenSSLImplementation.class.getName().equals(sslImplementationName));
             // If APR is being used, the listener will have been configured in TomcatBaseTest.setUp()
         } else {
             if (useOpenSSL) {
