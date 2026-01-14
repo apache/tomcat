@@ -69,6 +69,9 @@ public class openssl_h_Compatibility {
 
     // OpenSSL 1.1 FIPS_mode
     public static int FIPS_mode() {
+        if (isLibreSSLPre35()) {
+            return 0;
+        }
         class Holder {
             static final String NAME = "FIPS_mode";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT);
@@ -87,6 +90,9 @@ public class openssl_h_Compatibility {
 
     // OpenSSL 1.1 FIPS_mode_set
     public static int FIPS_mode_set(int r) {
+        if (isLibreSSLPre35()) {
+            return 0;
+        }
         class Holder {
             static final String NAME = "FIPS_mode_set";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, JAVA_INT);
