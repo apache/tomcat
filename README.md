@@ -57,9 +57,7 @@ Please see [LICENSE](LICENSE) for more info.
 ### Support and Mailing List Information
 
 * Free community support is available through the
-[tomcat-users](https://tomcat.apache.org/lists.html#tomcat-users) email list and
-a dedicated [IRC channel](https://tomcat.apache.org/irc.html) (#tomcat on
-Freenode).
+[tomcat-users](https://tomcat.apache.org/lists.html#tomcat-users) email list.
 
 * If you want freely available support for running Apache Tomcat, please see the
 resources page [here](https://tomcat.apache.org/findhelp.html).
