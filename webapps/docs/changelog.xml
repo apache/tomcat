@@ -374,6 +374,13 @@
         port information. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69920</bug>: When attempting to write to a closed
+        <code>Writer</code> or <code>OutputStream</code> obtained from a
+        WebSocket session, throw an <code>IOException</code> rather than an
+        <code>IllegalStateExcpetion</code> as required by <code>Writer</code>
+        and strongly suggested by <code>OutputStream</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
