@@ -101,12 +101,7 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
         try {
             rc = getUrl("https://localhost:" + getPort() + "/simple", new ByteChunk(), false);
         } catch (SocketException se) {
-            // NIO2 may throw a SocketException rather than a SSLHandshakeException
-            if (getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2")) {
-                throw new SSLHandshakeException(se.getMessage());
-            } else {
-                throw se;
-            }
+            throw new SSLHandshakeException(se.getMessage());
         }
 
         // If the TLS handshake fails, the test won't get this far.
