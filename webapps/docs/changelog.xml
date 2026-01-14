@@ -187,6 +187,10 @@
         <code>OCSP_basic_verify</code> when using an OpenSSL based TLS
         implementation. (markt)
       </add>
+      <fix>
+        Fix OpenSSL FFM code compatibility with LibreSSL versions below 3.5.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
