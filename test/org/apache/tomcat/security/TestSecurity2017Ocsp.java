@@ -38,6 +38,7 @@ import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 import org.apache.tomcat.util.net.ocsp.OcspBaseTest;
 import org.apache.tomcat.util.net.ocsp.TesterOcspResponder;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 
 @RunWith(Parameterized.class)
 public class TestSecurity2017Ocsp extends OcspBaseTest {
@@ -69,6 +70,9 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
      */
     @Test(expected=SSLHandshakeException.class)
     public void testCVE_2017_15698() throws Exception {
+        if ("OpenSSL-FFM".equals(connectorName)) {
+            Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL || openssl_h_Compatibility.isLibreSSLPre35());
+        }
         Assume.assumeNotNull(ocspResponder);
 
         Tomcat tomcat = getTomcatInstance();

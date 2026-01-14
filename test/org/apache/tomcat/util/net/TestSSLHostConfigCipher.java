@@ -23,6 +23,7 @@ import java.util.List;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,6 +35,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 
 @RunWith(Parameterized.class)
 public class TestSSLHostConfigCipher extends TomcatBaseTest {
@@ -91,6 +93,10 @@ public class TestSSLHostConfigCipher extends TomcatBaseTest {
 
     @Test
     public void testTls12CipherAvailable() throws Exception {
+        if ("OpenSSL-FFM".equals(connectorName)) {
+            // The functionality works, but the two ciphers used are not available
+            Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL);
+        }
         // Client-side TLS configuration
         TesterSupport.configureClientSsl(true, new String[] { CIPHER_12_AVAILABLE } );
 
@@ -100,6 +106,9 @@ public class TestSSLHostConfigCipher extends TomcatBaseTest {
 
     @Test(expected=SSLHandshakeException.class)
     public void testTls12CipherNotAvailable() throws Exception {
+        if ("OpenSSL-FFM".equals(connectorName)) {
+            Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL);
+        }
         // Client-side TLS configuration
         TesterSupport.configureClientSsl(true, new String[] { CIPHER_12_NOT_AVAILABLE } );
 
@@ -109,6 +118,9 @@ public class TestSSLHostConfigCipher extends TomcatBaseTest {
 
     @Test
     public void testTls13CipherAvailable() throws Exception {
+        if ("OpenSSL-FFM".equals(connectorName)) {
+            Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL);
+        }
         // Client-side TLS configuration
         TesterSupport.configureClientSsl(new String[] { CIPHER_13_AVAILABLE } );
 
@@ -118,6 +130,11 @@ public class TestSSLHostConfigCipher extends TomcatBaseTest {
 
     @Test(expected=SSLHandshakeException.class)
     public void testTls13CipherNotAvailable() throws Exception {
+        if ("OpenSSL-FFM".equals(connectorName)) {
+            // The TLS 1.3 call might not be present
+            Assume.assumeFalse(openssl_h_Compatibility.isLibreSSLPre35());
+            Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL);
+        }
         // Client-side TLS configuration
         TesterSupport.configureClientSsl(new String[] { CIPHER_13_NOT_AVAILABLE } );
 
