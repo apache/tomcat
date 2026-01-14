@@ -48,12 +48,8 @@ public class TestOcspSoftFail extends OcspBaseTest {
         try {
             doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
         } catch (SocketException se) {
-            // NIO2 may throw a SocketException rather than a SSLHandshakeException
-            if (getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2")) {
-                throw new SSLHandshakeException(se.getMessage());
-            } else {
-                throw se;
-            }
+            // APR or NIO2 may throw a SocketException rather than a SSLHandshakeException
+            throw new SSLHandshakeException(se.getMessage());
         }
     }
 }
