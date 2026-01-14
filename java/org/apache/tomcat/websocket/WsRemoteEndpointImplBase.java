@@ -412,7 +412,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             // Actual write has to be outside sync block to avoid possible
             // deadlock between messagePartLock and writeLock in
             // o.a.coyote.http11.upgrade.AbstractServletOutputStream
-            writeMessagePart(mp);
+            try {
+                writeMessagePart(mp);
+            } catch (IOException ioe) {
+                handler.onResult(new SendResult(getSession(), ioe));
+                return;
+            }
         }
     }
 
@@ -440,7 +445,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             // Actual write has to be outside sync block to avoid possible
             // deadlock between messagePartLock and writeLock in
             // o.a.coyote.http11.upgrade.AbstractServletOutputStream
-            writeMessagePart(mpNext);
+            try {
+                writeMessagePart(mpNext);
+            } catch (IOException ioe) {
+                handler.onResult(new SendResult(getSession(), ioe));
+                return;
+            }
         }
 
         wsSession.updateLastActiveWrite();
@@ -453,9 +463,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void writeMessagePart(MessagePart mp) {
+    void writeMessagePart(MessagePart mp) throws IOException {
         if (closed) {
-            throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closed"));
+            throw new IOException(sm.getString("wsRemoteEndpoint.closed"));
         }
 
         if (Constants.INTERNAL_OPCODE_FLUSH == mp.getOpCode()) {

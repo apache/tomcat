@@ -373,6 +373,12 @@
         client's preferred local and the local and remote host name, address and
         port information. (markt)
       </add>
+      <fix>
+        <bug>69920</bug>: When attempting to write a message via a WebSocket
+        session that has been closed, throw an <code>IOException</code> rather
+        than an <code>IllegalStateExcpetion</code> for consistency with
+        <code>Writer</code> and <code>OutputStream</code>. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>69920</bug>: When attempting to write to a closed
