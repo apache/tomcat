@@ -34,12 +34,38 @@ public class openssl_h_Compatibility {
     public static final boolean OPENSSL3;
     public static final boolean BORINGSSL;
     public static final boolean LIBRESSL;
+
+    public static final int MAJOR;
+    public static final int MINOR;
+
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
         OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
+        int majorVersion = 0;
+        int minorVersion = 0;
+        try {
+            String[] blocks = versionString.split("\\s");
+            if (blocks.length >= 2) {
+                versionString = blocks[1];
+            }
+            String[] versionNumberStrings = versionString.split("\\.");
+            if (versionNumberStrings.length >= 2) {
+                majorVersion = Integer.parseInt(versionNumberStrings[0]);
+                minorVersion = Integer.parseInt(versionNumberStrings[1]);
+            }
+        } catch (Exception e) {
+            // Ignore, default to 0
+        } finally {
+            MAJOR = majorVersion;
+            MINOR = minorVersion;
+        }
+    }
+
+    public static boolean isLibreSSLPre35() {
+        return LIBRESSL && ((MAJOR == 3 && MINOR < 5) || MAJOR < 3);
     }
 
     // OpenSSL 1.1 FIPS_mode
