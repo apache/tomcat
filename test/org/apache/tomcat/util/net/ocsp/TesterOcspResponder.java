@@ -30,12 +30,12 @@ import org.junit.Assert;
 import org.apache.tomcat.util.net.TesterSupport;
 
 /*
- * The OpenSSL ocsp tool is great. But is does generate a lot of output. That needs to be swallowed else the
- * process will freeze with the output buffers (stdout and stderr) are full.
+ * The OpenSSL ocsp tool is great, but it does generate a lot of output. That output needs to be swallowed, else the
+ * process will freeze when the output buffers (stdout and stderr) are full.
  *
- * There is a command line option to redirect stdout (which could be redirected to /dev/null) but there is no option to
+ * There is a command line option to redirect stdout (which could be redirected to /dev/null), but there is no option to
  * redirect stderr. Therefore, this class uses a couple of dedicated threads to read stdout and stderr. By default, the
- * output is ignored but it can be dumped to Java's stdout/stderr if required for debugging purposes.
+ * output is ignored, but it can be dumped to Java's stdout/stderr if required for debugging purposes.
  */
 public class TesterOcspResponder {
 
