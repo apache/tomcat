@@ -1060,9 +1060,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             doWrite(true);
         }
 
-        private void checkOpen() {
+        private void checkOpen() throws IOException {
             if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
+                throw new IOException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
             }
         }
 
@@ -1138,9 +1138,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             doWrite(true);
         }
 
-        private void checkOpen() {
+        private void checkOpen() throws IOException {
             if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedWriter"));
+                throw new IOException(sm.getString("wsRemoteEndpoint.closedWriter"));
             }
         }
 
