@@ -65,13 +65,8 @@ public class TestOcspTimeout extends OcspBaseTest {
         try {
             doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
         } catch (SocketTimeoutException ste) {
-            // NIO2 may throw a SocketTimeoutException rather than a SSLHandshakeException
-            if (getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2")) {
-                throw new SSLHandshakeException(ste.getMessage());
-            } else {
-                throw ste;
-            }
+            // May throw a SocketTimeoutException rather than a SSLHandshakeException
+            throw new SSLHandshakeException(ste.getMessage());
         }
-
     }
 }
