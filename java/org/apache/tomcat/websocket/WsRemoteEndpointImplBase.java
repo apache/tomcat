@@ -999,9 +999,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(int b) throws IOException {
-            if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
-            }
+            checkOpen();
 
             used = true;
             if (buffer.remaining() == 0) {
@@ -1012,9 +1010,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
-            }
+            checkOpen();
             if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
             }
@@ -1042,9 +1038,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void flush() throws IOException {
-            if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
-            }
+            checkOpen();
 
             // Optimisation. If there is no data to flush then do not send an
             // empty message.
@@ -1063,6 +1057,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
 
             doWrite(true);
+        }
+
+        private void checkOpen() {
+            if (closed) {
+                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedOutputStream"));
+            }
         }
 
         private void doWrite(boolean last) throws IOException {
@@ -1090,9 +1090,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(char[] cbuf, int off, int len) throws IOException {
-            if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedWriter"));
-            }
+            checkOpen();
             if ((off < 0) || (off > cbuf.length) || (len < 0) || ((off + len) > cbuf.length) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
             }
@@ -1120,9 +1118,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void flush() throws IOException {
-            if (closed) {
-                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedWriter"));
-            }
+            checkOpen();
 
             if (buffer.position() > 0) {
                 doWrite(false);
@@ -1139,6 +1135,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
 
             doWrite(true);
+        }
+
+        private void checkOpen() {
+            if (closed) {
+                throw new IllegalStateException(sm.getString("wsRemoteEndpoint.closedWriter"));
+            }
         }
 
         private void doWrite(boolean last) throws IOException {
