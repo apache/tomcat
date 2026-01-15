@@ -103,6 +103,8 @@ public final class TesterSupport {
     public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "ocsp-responder-rsa-cert.pem";
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
     public static final String LOCALHOST_CRL_RSA_JKS = SSL_DIR + "localhost-crl-rsa.jks";
+    public static final String LOCALHOST_CRL_RSA_CERT_PEM = SSL_DIR + "localhost-crl-rsa-cert.pem";
+    public static final String LOCALHOST_CRL_RSA_KEY_PEM = SSL_DIR + "localhost-crl-rsa-key.pem";
     public static final String CLIENT_CRL_JKS = SSL_DIR + "user2-crl.jks";
     public static final String CLIENT_CRL_LONG_JKS = SSL_DIR + "user3-crl-long.jks";
     public static final boolean TLSV13_AVAILABLE;
@@ -128,17 +130,24 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        // TLS material for tests uses default password
-        initSsl(tomcat, LOCALHOST_RSA_JKS, false);
+        // By default, use JSSE JSSE trust
+        initSsl(tomcat, false);
     }
 
-    public static void initSsl(Tomcat tomcat, String keystore, boolean opensslTrust) {
+    public static void initSsl(Tomcat tomcat, boolean opensslTrust) {
+        // By default, use JSSE configuration
         // TLS material for tests uses default password
-        initSsl(tomcat, keystore, opensslTrust, null, null, null, null);
+        initSsl(tomcat, LOCALHOST_RSA_JKS, LOCALHOST_RSA_CERT_PEM, LOCALHOST_RSA_KEY_PEM, opensslTrust);
     }
 
-    protected static void initSsl(Tomcat tomcat, String keystore, boolean opensslTrust,
-            String keystorePass, String keystorePassFile, String keyPass, String keyPassFile) {
+    public static void initSsl(Tomcat tomcat, String keystore, String certifcateFile, String certificateKeyFile,
+            boolean opensslTrust) {
+        // TLS material for tests uses default password
+        initSsl(tomcat, keystore, certifcateFile, certificateKeyFile, opensslTrust, null, null, null, null);
+    }
+
+    protected static void initSsl(Tomcat tomcat, String keystore, String certifcateFile, String certificateKeyFile,
+            boolean opensslTrust, String keystorePass, String keystorePassFile, String keyPass, String keyPassFile) {
 
         Connector connector = tomcat.getConnector();
         connector.setSecure(true);
@@ -161,11 +170,6 @@ public final class TesterSupport {
             }
             sslHostConfig.setSslProtocol("tls");
             certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
-            if (opensslTrust) {
-                sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
-            } else {
-                sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
-            }
             if (keystorePassFile != null) {
                 certificate.setCertificateKeystorePasswordFile(new File(keystorePassFile).getAbsolutePath());
             }
@@ -179,9 +183,12 @@ public final class TesterSupport {
                 certificate.setCertificateKeyPassword(keyPass);
             }
         } else {
-            certificate.setCertificateFile(new File(LOCALHOST_RSA_CERT_PEM).getAbsolutePath());
-            certificate.setCertificateKeyFile(new File(LOCALHOST_RSA_KEY_PEM).getAbsolutePath());
+            certificate.setCertificateFile(new File(certifcateFile).getAbsolutePath());
+            certificate.setCertificateKeyFile(new File(certificateKeyFile).getAbsolutePath());
+        }
+        if (opensslTrust) {
             sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
+        } else {
             sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
         }
     }

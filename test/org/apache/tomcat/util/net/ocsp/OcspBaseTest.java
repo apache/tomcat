@@ -123,9 +123,10 @@ public class OcspBaseTest extends TomcatBaseTest {
         ctx.addServletMappingDecoded("/simple", "simple");
 
         if (serverCertValid) {
-            TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_RSA_JKS, useOpenSSLTrust);
+            TesterSupport.initSsl(tomcat, useOpenSSLTrust);
         } else {
-            TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_CRL_RSA_JKS, useOpenSSLTrust);
+            TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_CRL_RSA_JKS, TesterSupport.LOCALHOST_CRL_RSA_CERT_PEM,
+                    TesterSupport.LOCALHOST_CRL_RSA_KEY_PEM, useOpenSSLTrust);
         }
         SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
         switch (verifyClientCert) {

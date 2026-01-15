@@ -258,8 +258,9 @@ public class TestSsl extends TomcatBaseTest {
         Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
-        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, false,
-                TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS, null);
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, TesterSupport.LOCALHOST_RSA_CERT_PEM,
+                TesterSupport.LOCALHOST_RSA_KEY_PEM, false, TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS,
+                null);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
@@ -281,8 +282,9 @@ public class TestSsl extends TomcatBaseTest {
         Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
-        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, false,
-                      null, TesterSupport.JKS_PASS_FILE, null, TesterSupport.JKS_KEY_PASS_FILE);
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, TesterSupport.LOCALHOST_RSA_CERT_PEM,
+                TesterSupport.LOCALHOST_RSA_KEY_PEM, false, null, TesterSupport.JKS_PASS_FILE, null,
+                TesterSupport.JKS_KEY_PASS_FILE);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
