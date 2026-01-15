@@ -84,8 +84,8 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
         ctx.addServletMappingDecoded("/simple", "simple");
 
-        // User a valid (non-revoked) server certificate
-        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_RSA_JKS, useOpenSSLTrust);
+        // Use the default (valid, non-revoked) server certificate
+        TesterSupport.initSsl(tomcat, useOpenSSLTrust);
 
         // Require client certificates and enable verification
         SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];

@@ -128,8 +128,13 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        // TLS material for tests uses default password
-        initSsl(tomcat, LOCALHOST_RSA_JKS, false);
+        // By default, use JSSE JSSE trust
+        initSsl(tomcat, false);
+    }
+
+    public static void initSsl(Tomcat tomcat, boolean opensslTrust) {
+        // By default, use valid JSSE configuration
+        initSsl(tomcat, LOCALHOST_RSA_JKS, opensslTrust);
     }
 
     public static void initSsl(Tomcat tomcat, String keystore, boolean opensslTrust) {
