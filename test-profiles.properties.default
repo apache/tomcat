@@ -27,13 +27,8 @@
 
 # Smoke test profile
 test.profile.smoke=\
-jakarta/servlet/http/TestHttpServletResponseSendError.java,\
 org/apache/catalina/authenticator/TestFormAuthenticatorA.java,\
-org/apache/catalina/authenticator/TestFormAuthenticatorB.java,\
-org/apache/catalina/authenticator/TestFormAuthenticatorC.java,\
 org/apache/catalina/authenticator/TestSSOnonLoginAndBasicAuthenticator.java,\
-org/apache/catalina/authenticator/TestSSOnonLoginAndDigestAuthenticator.java,\
-org/apache/catalina/core/TestAsyncContextImpl.java,\
 org/apache/catalina/core/TestAsyncContextStateChanges.java,\
 org/apache/catalina/core/TestStandardContextResources.java,\
 org/apache/catalina/core/TestStandardWrapper.java,\
@@ -62,7 +57,6 @@ org/apache/coyote/http2/TestAsync.java,\
 org/apache/coyote/http2/TestHttp2ConnectionTimeouts.java,\
 org/apache/coyote/http2/TestHttp2Limits.java,\
 org/apache/coyote/http2/TestHttp2Section_6_8.java,\
-org/apache/coyote/http2/TestHttp2Timeouts.java,\
 org/apache/coyote/http2/TestStreamQueryString.java,\
 org/apache/el/TestELInJsp.java,\
 org/apache/jasper/compiler/TestCompiler.java,\
@@ -89,10 +83,7 @@ org/apache/tomcat/websocket/server/TestWsRemoteEndpointImplServerDeadlock.java,\
 org/apache/tomcat/websocket/TestWebSocketFrameClientSSL.java,\
 org/apache/tomcat/websocket/TestWsWebSocketContainer.java,\
 org/apache/tomcat/websocket/TestWsWebSocketContainerTimeoutServer.java,\
-org/apache/catalina/tribes/group/interceptors/TestTcpFailureDetector.java,\
-org/apache/catalina/filters/TestRateLimitFilter.java,\
-jakarta/servlet/http/TestHttpServletDoHeadInvalidWrite*.java,\
-jakarta/servlet/http/TestHttpServletDoHeadValidWrite*.java
+org/apache/catalina/tribes/group/interceptors/TestTcpFailureDetector.java
 
 # Component test profiles
 test.profile.catalina=**/catalina/**/*Test*.java
