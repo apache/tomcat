@@ -38,8 +38,9 @@ public class OpenSSLStatus {
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
     private static volatile long version = 0;
+    private static volatile int majorVersion = 0;
+    private static volatile int minorVersion = 0;
     private static volatile Name name = Name.UNKNOWN;
-
 
     public static boolean isLibraryInitialized() {
         return libraryInitialized;
@@ -96,6 +97,34 @@ public class OpenSSLStatus {
     }
 
     /**
+     * @return the majorVersion
+     */
+    public static int getMajorVersion() {
+        return majorVersion;
+    }
+
+    /**
+     * @param majorVersion the majorVersion to set
+     */
+    public static void setMajorVersion(int majorVersion) {
+        OpenSSLStatus.majorVersion = majorVersion;
+    }
+
+    /**
+     * @return the minorVersion
+     */
+    public static int getMinorVersion() {
+        return minorVersion;
+    }
+
+    /**
+     * @param minorVersion the minorVersion to set
+     */
+    public static void setMinorVersion(int minorVersion) {
+        OpenSSLStatus.minorVersion = minorVersion;
+    }
+
+    /**
      * @return the library name
      */
     public static Name getName() {
@@ -114,6 +143,20 @@ public class OpenSSLStatus {
      */
     public static boolean isOpenSSL3() {
         return Name.OPENSSL3.equals(name);
+    }
+
+    /**
+     * @return true if running with BoringSSL
+     */
+    public static boolean isBoringSSL() {
+        return Name.BORINGSSL.equals(name);
+    }
+
+    /**
+     * @return true if running with LibreSSL < 3.5
+     */
+    public static boolean isLibreSSLPre35() {
+        return Name.LIBRESSL.equals(name) && ((majorVersion == 3 && minorVersion < 5) || majorVersion < 3);
     }
 
 }

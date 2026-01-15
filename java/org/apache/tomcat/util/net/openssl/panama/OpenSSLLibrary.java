@@ -178,6 +178,8 @@ public class OpenSSLLibrary {
                 initLibrary();
 
                 OpenSSLStatus.setVersion(OpenSSL_version_num());
+                OpenSSLStatus.setMajorVersion(openssl_h_Compatibility.MAJOR);
+                OpenSSLStatus.setMinorVersion(openssl_h_Compatibility.MINOR);
                 if (openssl_h_Compatibility.OPENSSL3) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL3);
                 } else if (openssl_h_Compatibility.OPENSSL) {
