@@ -153,7 +153,7 @@ public class OpenSSLStatus {
     }
 
     /**
-     * @return true if running with LibreSSL < 3.5
+     * @return true if running with LibreSSL &lt; 3.5
      */
     public static boolean isLibreSSLPre35() {
         return Name.LIBRESSL.equals(name) && ((majorVersion == 3 && minorVersion < 5) || majorVersion < 3);
