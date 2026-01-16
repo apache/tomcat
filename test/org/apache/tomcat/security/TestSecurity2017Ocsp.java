@@ -17,6 +17,7 @@
 package org.apache.tomcat.security;
 
 import java.io.IOException;
+
 import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.http.HttpServletResponse;
 
