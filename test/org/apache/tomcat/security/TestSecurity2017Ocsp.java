@@ -17,8 +17,6 @@
 package org.apache.tomcat.security;
 
 import java.io.IOException;
-import java.net.SocketException;
-
 import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.http.HttpServletResponse;
 
@@ -103,8 +101,8 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
         int rc;
         try {
             rc = getUrl("https://localhost:" + getPort() + "/simple", new ByteChunk(), false);
-        } catch (SocketException se) {
-            throw new SSLHandshakeException(se.getMessage());
+        } catch (IOException ioe) {
+            throw new SSLHandshakeException(ioe.getMessage());
         }
 
         // If the TLS handshake fails, the test won't get this far.
