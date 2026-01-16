@@ -2727,8 +2727,8 @@ public class Request implements HttpServletRequest {
                 partsParseException = e;
             } finally {
                 /*
-                 * GC will delete any temporary copies of uploaded files left in the work directory but if we know that the
-                 * upload has failed then explicitly clean up now.
+                 * GC will delete any temporary copies of uploaded files left in the work directory but if we know that
+                 * the upload has failed then explicitly clean up now.
                  */
                 if (!success) {
                     parts.clear();
@@ -3075,8 +3075,8 @@ public class Request implements HttpServletRequest {
                     return;
                 }
                 parameters.processParameters(formData, 0, len);
-            } else if (coyoteRequest.protocol().equals("HTTP/2.0")
-                || "chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
+            } else if (coyoteRequest.protocol().equals("HTTP/2.0") ||
+                    "chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
                 byte[] formData = null;
                 try {
                     formData = readChunkedPostBody();

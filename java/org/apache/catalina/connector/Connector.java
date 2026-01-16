@@ -1068,8 +1068,8 @@ public class Connector extends LifecycleMBeanBase {
                 // If SSL is enabled and a specific implementation isn't specified, select the correct default.
                 if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()) {
                     // Use FFM and OpenSSL if available
-                    jsseProtocolHandler
-                            .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
+                    jsseProtocolHandler.setSslImplementationName(
+                            "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
                 } else if (aprStatusPresent && AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL()) {
                     // Use tomcat-native and OpenSSL otherwise, if available
                     jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
