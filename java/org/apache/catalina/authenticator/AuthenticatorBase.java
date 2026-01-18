@@ -941,7 +941,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Check for a cached Principal. Most likely from SSO but could be another component.
         if (checkPrincipal) {
-            if (ssoId != null && sso.getRequireReauthentication()) {
+            if (ssoId != null && sso != null && sso.getRequireReauthentication()) {
                 // There is a valid SSO session but SSO Valve won't have cached the Principal.
                 sso.populateRequestFromSsoEntry(request, ssoId);
             }
