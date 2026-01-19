@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -64,9 +65,9 @@ public class TestOcspTimeout extends OcspBaseTest {
     public void testTimeoutWithoutSoftFail() throws Exception {
         try {
             doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
-        } catch (SocketTimeoutException ste) {
-            // May throw a SocketTimeoutException rather than a SSLHandshakeException
-            throw new SSLHandshakeException(ste.getMessage());
+        } catch (SocketTimeoutException | SocketException e) {
+            // May throw a SocketTimeoutException or SocketException rather than a SSLHandshakeException
+            throw new SSLHandshakeException(e.getMessage());
         }
     }
 }
