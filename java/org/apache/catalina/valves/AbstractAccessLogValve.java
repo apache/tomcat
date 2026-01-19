@@ -1061,7 +1061,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             Instant requestStartInstant = Instant.from(request.getCoyoteRequest().getStartInstant());
             long frac;
             if (!usesBegin) {
-                requestStartInstant.plusNanos(time);
+                requestStartInstant = requestStartInstant.plusNanos(time);
             }
             switch (type) {
                 case CLF:
