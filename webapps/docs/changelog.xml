@@ -136,6 +136,10 @@
         Ensure URL encoding errors in the Rewrite Valve trigger an exception
         rather than silently using a replacement character. (markt)
       </fix>
+      <fix>
+        <bug>69932</bug>: Fix request end access log pattern regression,
+        which would log the start time of the request instead. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
