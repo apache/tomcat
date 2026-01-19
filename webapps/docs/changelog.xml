@@ -130,6 +130,10 @@
         Authenticators that provides a per Authenticator override of the SSO
         Valve <code>requireReauthentication</code> attribute. (markt)
       </add>
+      <fix>
+        Ensure URL encoding errors in the Rewrite Valve trigger an exception
+        rather than silently using a replacement character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
