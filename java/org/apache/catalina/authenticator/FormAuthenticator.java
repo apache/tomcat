@@ -362,15 +362,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         // a resource is protected for some HTTP methods but not protected for
         // GET which is used after authentication when redirecting to the
         // protected resource.
-        // TODO: This is similar to the FormAuthenticator.matchRequest() logic
-        // Is there a way to remove the duplication?
-        Session session = request.getSessionInternal(false);
-        if (session != null) {
-            SavedRequest savedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            return savedRequest != null && decodedRequestURI.equals(savedRequest.getDecodedRequestURI());
-        }
-
-        return false;
+        return matchRequest(request, false);
     }
 
 
@@ -504,15 +496,21 @@ public class FormAuthenticator extends AuthenticatorBase {
     }
 
 
+    protected boolean matchRequest(Request request) {
+        return matchRequest(request, true);
+    }
+
     /**
      * Does this request match the saved one (so that it must be the redirect we signaled after successful
      * authentication?)
      *
      * @param request The request to be verified
+     * @param strict  <code>true</code> to check for a valid Principal and valid Session ID, <code>false</code> to only
+     * check for a valid saved request and matching URI
      *
      * @return <code>true</code> if the requests matched the saved one
      */
-    protected boolean matchRequest(Request request) {
+    protected boolean matchRequest(Request request, boolean strict) {
         // Has a session been created?
         Session session = request.getSessionInternal(false);
         if (session == null) {
@@ -525,16 +523,18 @@ public class FormAuthenticator extends AuthenticatorBase {
             return false;
         }
 
-        // Is there a saved principal?
-        if (cache && session.getPrincipal() == null || !cache && request.getPrincipal() == null) {
-            return false;
-        }
-
-        // Does session id match?
-        if (getChangeSessionIdOnAuthentication()) {
-            String expectedSessionId = (String) session.getNote(Constants.SESSION_ID_NOTE);
-            if (expectedSessionId == null || !expectedSessionId.equals(request.getRequestedSessionId())) {
+        if (strict) {
+            // Is there a saved principal?
+            if (cache && session.getPrincipal() == null || !cache && request.getPrincipal() == null) {
                 return false;
+            }
+
+            // Does session id match?
+            if (getChangeSessionIdOnAuthentication()) {
+                String expectedSessionId = (String) session.getNote(Constants.SESSION_ID_NOTE);
+                if (expectedSessionId == null || !expectedSessionId.equals(request.getRequestedSessionId())) {
+                    return false;
+                }
             }
         }
 
