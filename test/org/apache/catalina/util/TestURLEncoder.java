@@ -16,10 +16,13 @@
  */
 package org.apache.catalina.util;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.UDecoder;
 
 public class TestURLEncoder {
 
@@ -52,5 +55,30 @@ public class TestURLEncoder {
         Assert.assertEquals(AMPERSAND, xml.encode(AMPERSAND, StandardCharsets.UTF_8));
         xml.removeSafeCharacter('&');
         Assert.assertEquals(AMPERSAND_ENCODED, xml.encode(AMPERSAND, StandardCharsets.UTF_8));
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testOssFuzz01() {
+        /*
+         * Round-trip URL encoding with ASCII only works for valid ASCII characters.
+         */
+        testRoundTrip("\uFFFD", StandardCharsets.US_ASCII);
+    }
+
+
+    @Test
+    public void testOssFuzz02() {
+        testRoundTrip("\uFFFD", StandardCharsets.UTF_8);
+    }
+
+
+    private void testRoundTrip(String input, Charset charset) {
+        URLEncoder encoder = new URLEncoder();
+
+        String encoded = encoder.encode(input, charset);
+        String decoded = UDecoder.URLDecode(encoded, charset);
+
+        Assert.assertEquals(input, decoded);
     }
 }

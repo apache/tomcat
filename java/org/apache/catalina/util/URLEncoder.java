@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.util.BitSet;
 
 /**
@@ -146,7 +147,15 @@ public final class URLEncoder implements Cloneable {
         int maxBytesPerChar = 10;
         StringBuilder rewrittenPath = new StringBuilder(path.length());
         ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
-        OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
+        /*
+         * Most calls to this method use UTF-8 where malformed input and unmappable character issues are not expected to
+         * happen. The only Tomcat code that currently (January 2026) might call this method with something other than
+         * UTF-8 is the rewrite valve. In that case, the rewrite rules should be consistent with the configured URI
+         * encoding on the Connector. Given all of this, the IAE is only expected to be thrown as a result of
+         * configuration errors.
+         */
+        OutputStreamWriter writer = new OutputStreamWriter(buf, charset.newEncoder()
+                .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT));
 
         for (int i = 0; i < path.length(); i++) {
             int c = path.charAt(i);
@@ -160,8 +169,7 @@ public final class URLEncoder implements Cloneable {
                     writer.write((char) c);
                     writer.flush();
                 } catch (IOException ioe) {
-                    buf.reset();
-                    continue;
+                    throw new IllegalArgumentException(ioe);
                 }
                 byte[] ba = buf.toByteArray();
                 for (byte toEncode : ba) {
