@@ -267,6 +267,10 @@
       <update>
         Update Tomcat Native to 2.0.12. (markt)
       </update>
+      <add>
+        Add property "gpg.sign.files" to optionally disable release artefact
+        signing with GPG. (rjung)
+      </add>
     </changelog>
   </subsection>
 </section>
