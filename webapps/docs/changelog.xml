@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Add property "gpg.sign.files" to optionally disable release artefact
+        signing with GPG. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.16 (markt)" rtext="release in progress">
   <subsection name="Catalina">
