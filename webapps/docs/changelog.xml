@@ -202,6 +202,11 @@
         Fix OpenSSL FFM code compatibility with LibreSSL versions below 3.5.
         (remm)
       </fix>
+      <fix>
+        Prevent concurrent release of <code>OpenSSLEngine</code> resources and
+        the termination of the Tomcat Native library as it can cause crashes
+        during Tomcat shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
