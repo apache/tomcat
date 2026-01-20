@@ -3135,7 +3135,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="release-version-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
+  <target name="release-init" depends="release-version-check,gpg-init-test-signing,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
@@ -3155,19 +3155,24 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <echo level="error" if:set="no-ffm">JAVA VERSION 22 OR NEWER IS REQUIRED FOR RELEASE</echo>
   </target>
 
-  <target name="gpg-init-1">
+  <target name="gpg-init-available">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
   </target>
 
-  <target name="gpg-init-2" if="${gpg.exec.available}">
-<echo>gpg.exec.available=${gpg.exec.available}</echo>
-<echo>gpg.exec=${gpg.exec}</echo>
-    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase
-</input>
+  <target name="gpg-init-sign-files" depends="gpg-init-available" if="${gpg.exec.available}">
+    <condition property="gpg.sign.files.available">
+      <istrue value="${gpg.sign.files}"/>
+    </condition>
+  </target>
+
+  <target name="gpg-init-passphrase" depends="gpg-init-sign-files" if="${gpg.sign.files.available}">
+    <echo>gpg.exec.available=${gpg.exec.available}</echo>
+    <echo>gpg.exec=${gpg.exec}</echo>
+    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase: </input>
   </target>
 
   <!-- Test GPG by signing build.xml as a sample file. -->
-  <target name="gpg-init-3" if="gpg.passphrase">
+  <target name="gpg-init-test-signing" depends="gpg-init-passphrase" if="gpg.passphrase">
     <exec executable="${gpg.exec}"
           inputstring="${gpg.passphrase}"
           failonerror="true"
