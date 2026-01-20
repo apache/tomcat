@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSessionContext;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Buffer;
+import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
@@ -134,6 +135,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     // OpenSSL state
     private final long ssl;
     private final long networkBIO;
+    private final long aprGeneration;
 
     private enum Accepted {
         NOT,
@@ -195,6 +197,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (sslCtx == 0) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
+        aprGeneration = Library.getGeneration();
         session = new OpenSSLSession();
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
@@ -218,14 +221,20 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            if (networkBIO != 0) {
-                SSL.freeBIO(networkBIO);
-            }
-            if (ssl != 0) {
-                SSL.freeSSL(ssl);
-            }
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
+            if (Library.tryCleanUpLock(aprGeneration)) {
+                try {
+                    if (networkBIO != 0) {
+                        SSL.freeBIO(networkBIO);
+                    }
+                    if (ssl != 0) {
+                        SSL.freeSSL(ssl);
+                    }
+                } finally {
+                    Library.returnCleanUpLock();
+                }
+            }
         }
     }
 
@@ -1442,5 +1451,4 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
     }
-
 }
