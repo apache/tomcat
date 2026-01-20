@@ -118,7 +118,7 @@
       <add>
         Add property "gpg.sign.files" to optionally disable release artefact
         signing with GPG. (rjung)
-      </fix>
+      </add>
     </changelog>
   </subsection>
 </section>
