@@ -312,18 +312,18 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
+    <include name="**/index.db"/>
+    <include name="**/index.db.attr"/>
     <include name="**/jakarta.el.ExpressionFactory"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
     <include name="**/jakarta.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
     <include name="**/*-password"/>
-    <include name="**/*.attr"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
     <include name="**/*.conf"/>
     <include name="**/*.css"/>
-    <include name="**/*.db"/>
     <include name="**/*.dtd"/>
     <include name="**/*.editorconfig"/>
     <include name="**/*.h"/>
@@ -928,6 +928,8 @@
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
@@ -965,6 +967,8 @@
         <exclude name="webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
         <exclude name="webapp/jsp/encoding/**"/>
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
     </checkstyle>
   </target>
