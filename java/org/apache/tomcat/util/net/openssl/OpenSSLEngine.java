@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -42,6 +43,7 @@ import javax.net.ssl.SSLSessionContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.jni.Buffer;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
@@ -222,9 +224,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            cleanable.clean();
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
+            cleanable.clean();
             ByteBufferUtils.cleanDirectBuffer(buf);
         }
     }
@@ -1400,11 +1402,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private record OpenSSLState(long ssl, long networkBIO) implements Runnable {
         @Override
         public void run() {
-            if (networkBIO != 0) {
-                SSL.freeBIO(networkBIO);
-            }
-            if (ssl != 0) {
-                SSL.freeSSL(ssl);
+            Lock readLock = AprStatus.getStatusLock().readLock();
+            readLock.lock();
+            try {
+                if (!AprStatus.isAprInitialized()) {
+                    if (networkBIO != 0) {
+                        SSL.freeBIO(networkBIO);
+                    }
+                    if (ssl != 0) {
+                        SSL.freeSSL(ssl);
+                    }
+                }
+            } finally {
+                readLock.unlock();
             }
         }
     }

@@ -113,6 +113,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Prevent concurrent release of <code>OpenSSLEngine</code> resources and
+        the termination of the Tomcat Native library as it can cause crashes
+        during Tomcat shutdown. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
