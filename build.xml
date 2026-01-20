@@ -318,10 +318,12 @@
     <include name="**/jakarta.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
     <include name="**/*-password"/>
+    <include name="**/*.attr"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
     <include name="**/*.conf"/>
     <include name="**/*.css"/>
+    <include name="**/*.db"/>
     <include name="**/*.dtd"/>
     <include name="**/*.editorconfig"/>
     <include name="**/*.h"/>
