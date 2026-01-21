@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.15 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.17 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -191,35 +191,6 @@
         to <code>true</code>. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69623</bug>: Additional fix for the long standing regression that
-        meant that calls to <code>ClassLoader.getResource().getContent()</code>
-        failed when made from within a web application with resource caching
-        enabled if the target resource was packaged in a JAR file. (markt)
-      </fix>
-      <fix>
-        Pull request <pr>923</pr>: Avoid adding multiple CSRF tokens to a URL in
-        the <code>CsrfPreventionFilter</code>. (schultz)
-      </fix>
-      <fix>
-        <bug>69918</bug>: Ensure request parameters are correctly parsed for
-        HTTP/2 requests when the content-length header is not set. (dsoumis)
-      </fix>
-      <update>
-        Enable minimum and recommended Tomcat Native versions to be set
-        separately for Tomcat Native 1.x and 2.x. Update the minimum and
-        recommended versions for Tomcat Native 1.x to 1.3.4. Update the minimum
-        and recommended versions for Tomcat Native 2.x to 2.0.12. (markt)
-      </update>
-      <add>
-        Add a new <code>ssoReauthenticationMode</code> to the Tomcat provided
-        Authenticators that provides a per Authenticator override of the SSO
-        Valve <code>requireReauthentication</code> attribute. (markt)
-      </add>
-      <fix>
-        Ensure URL encoding errors in the Rewrite Valve trigger an exception
-        rather than silently using a replacement character. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -252,66 +223,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Improve warnings when setting ciphers lists in the FFM code, mirroring
-        the tomcat-native changes. (remm)
-      </fix>
-      <fix>
-        <bug>69910</bug>: Dereference TLS objects right after closing a socket
-        to improve memory efficiency. (remm)
-      </fix>
-      <fix>
-        Relax the JSSE vs OpenSSL configuration style checks on
-        <code>SSLHostConfig</code> to reflect the existing implementation that
-        allows one configuration style to be used for the trust attributes and a
-        different style for all the other attributes. (markt)
-      </fix>
-      <fix>
-        Better warning message when <code>OpenSSLConf</code> configuration
-        elements are used with a JSSE TLS implementation. (markt)
-      </fix>
-      <fix>
-        When using OpenSSL via FFM, don't log a warning about missing CA
-        certificates unless CA certificates were configured and the
-        configuration failed. (markt)
-      </fix>
-      <add>
-        For configuration consistency between OpenSSL and JSSE TLS
-        implementations, TLSv1.3 cipher suites included in the
-        <code>ciphers</code> attribute of an <code>SSLHostConfig</code> are now
-        always ignored (previously they would be ignored with OpenSSL
-        implementations and used with JSSE implementations) and a warning is
-        logged that the cipher suite has been ignored. (markt)
-      </add>
-      <add>
-        Add the <code>ciphersuite</code> attribute to
-        <code>SSLHostConfig</code> to configure the TLSv1.3 cipher suites.
-        (markt)
-      </add>
-      <add>
-        Add OCSP support to JSSE based TLS connectors and make the use of OCSP
-        configurable per connector for both JSSE and OpenSSL based TLS
-        implementations. Align the checks performed by OpenSSL with those
-        performed by JSSE. (markt)
-      </add>
-      <add>
-        Add support for soft failure of OCSP checks with soft failure support
-        disabled by default. (markt)
-      </add>
-      <add>
-        Add support for configuring the verification flags passed to
-        <code>OCSP_basic_verify</code> when using an OpenSSL based TLS
-        implementation. (markt)
-      </add>
-      <fix>
-        Fix OpenSSL FFM code compatibility with LibreSSL versions below 3.5.
-        (remm)
-      </fix>
-      <fix>
-        Prevent concurrent release of <code>OpenSSLEngine</code> resources and
-        the termination of the Tomcat Native library as it might cause crashes
-        during Tomcat shutdown. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -346,22 +257,11 @@
         <code>java.util.Date</code>. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69333</bug>: Correct a regression in the previous fix for
-        <bug>69333</bug> and ensure that <code>reuse()</code> or
-        <code>release()</code> is always called for a tag. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        <bug>62814</bug>: Document that human-readable names maybe used for
-        <code>mapSendOptions</code> and align documentation with
-        <code>channelSendOptions</code>. Based on pull request <pr>929</pr> by
-        archan0621. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -393,13 +293,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69920</bug>: When attempting to write to a closed
-        <code>Writer</code> or <code>OutputStream</code> obtained from a
-        WebSocket session, throw an <code>IOException</code> rather than an
-        <code>IllegalStateExcpetion</code> as required by <code>Writer</code>
-        and strongly suggested by <code>OutputStream</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -424,43 +317,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update the internal fork of Commons Pool to 2.13.1. (markt)
-      </update>
-      <update>
-        Update the internal fork of Commons DBCP to 2.14.0. (markt)
-      </update>
-      <update>
-        Update Commons Daemon to 1.5.1. (markt)
-      </update>
-      <update>
-        Update to the Eclipse JDT compiler 4.37. (markt)
-      </update>
-      <update>
-        Update ByteBuddy to 1.18.3. (markt)
-      </update>
-      <update>
-        Update UnboundID to 7.0.4. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 13.0.0. (markt)
-      </update>
-      <update>
-        Update bnd to 7.2.0. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (markt)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </add>
-      <add>
-        Improvements to Chinese translations provided by Yang. vincent.h and
-        yong hu. (markt)
-      </add>
-      <update>
-        Update Tomcat Native to 2.0.12. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
