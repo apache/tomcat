@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.115 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Prevent concurrent release of <code>OpenSSLEngine</code> resources and
+        the termination of the Tomcat Native library as it can cause crashes
+        during Tomcat shutdown. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
@@ -114,7 +123,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.114 (remm)" rtext="release in progress">
+<section name="Tomcat 9.0.114 (remm)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -413,7 +422,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.112 (remm)" rtext="release in progress">
+<section name="Tomcat 9.0.112 (remm)" rtext="2025-11-10">
   <subsection name="Catalina">
     <changelog>
       <fix>
