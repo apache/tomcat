@@ -184,7 +184,10 @@ public class Http11Processor extends AbstractProcessor {
 
         // Create and add the gzip filters.
         // inputBuffer.addFilter(new GzipInputFilter());
-        outputBuffer.addFilter(new GzipOutputFilter());
+        GzipOutputFilter gzipOutputFilter = new GzipOutputFilter();
+        gzipOutputFilter.setLevel(protocol.getGzipLevel());
+        gzipOutputFilter.setBufferSize(protocol.getGzipBufferSize());
+        outputBuffer.addFilter(gzipOutputFilter);
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
     }
