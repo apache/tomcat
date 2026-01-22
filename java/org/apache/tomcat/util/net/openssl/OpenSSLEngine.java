@@ -1405,7 +1405,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             Lock readLock = AprStatus.getStatusLock().readLock();
             readLock.lock();
             try {
-                if (!AprStatus.isAprInitialized()) {
+                if (AprStatus.isAprInitialized()) {
                     if (networkBIO != 0) {
                         SSL.freeBIO(networkBIO);
                     }
