@@ -1172,34 +1172,34 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{3}</small>\n" +
+            "  <label for=\"deployPath\"><small>{3}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"text\" name=\"deployPath\" size=\"20\">\n" +
+            "  <input type=\"text\" name=\"deployPath\" id=\"deployPath\" size=\"20\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{4}</small>\n" +
+            "  <label for=\"deployVersion\"><small>{4}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"text\" name=\"deployVersion\" size=\"20\">\n" +
+            "  <input type=\"text\" name=\"deployVersion\" id=\"deployVersion\" size=\"20\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{5}</small>\n" +
+            "  <label for=\"deployConfig\"><small>{5}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"text\" name=\"deployConfig\" size=\"20\">\n" +
+            "  <input type=\"text\" name=\"deployConfig\" id=\"deployConfig\" size=\"20\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{6}</small>\n" +
+            "  <label for=\"deployWar\"><small>{6}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"text\" name=\"deployWar\" size=\"40\">\n" +
+            "  <input type=\"text\" name=\"deployWar\" id=\"deployWar\" size=\"40\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
@@ -1226,10 +1226,10 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{2}</small>\n" +
+            "  <label for=\"deployWarFile\"><small>{2}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"file\" name=\"deployWar\" size=\"40\">\n" +
+            "  <input type=\"file\" name=\"deployWar\" id=\"deployWarFile\" size=\"40\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
@@ -1262,10 +1262,10 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
-            "  <small>{3}</small>\n" +
+            "  <label for=\"tlsHostName\"><small>{3}</small></label>\n" +
             " </td>\n" +
             " <td class=\"row-left\">\n" +
-            "  <input type=\"text\" name=\"tlsHostName\" size=\"20\">\n" +
+            "  <input type=\"text\" name=\"tlsHostName\" id=\"tlsHostName\" size=\"20\">\n" +
             " </td>\n" +
             "</tr>\n" +
             "<tr>\n" +
