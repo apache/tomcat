@@ -504,7 +504,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     /**
      * Parse CRLF at end of chunk.
      *
-     * @return {@code true} if the read is complete or {@code false if incomplete}. In complete reads can only happen
+     * @return {@code true} if the read is complete or {@code false if incomplete}. Incomplete reads can only happen
      *             with non-blocking I/O.
      *
      * @throws IOException An error occurred parsing CRLF
