@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.53 (schultz)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>69931</bug>: Add &lt;label&gt; for fields in the HTML manager
+        application. Patch provided by yukitidev. (schultz)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.52 (schultz)" rtext="release in progress">
   <subsection name="Coyote">
