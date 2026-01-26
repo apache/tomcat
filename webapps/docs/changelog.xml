@@ -228,6 +228,10 @@
         shutdown that triggered a significant memory leak. Patch provided by
         Wes. (markt)
       </fix>
+      <fix>
+        <bug>69938</bug>: Avoid changing the closed state of TLS channel when
+        resetting it after close. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
