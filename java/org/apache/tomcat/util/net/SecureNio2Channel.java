@@ -137,13 +137,15 @@ public class SecureNio2Channel extends Nio2Channel {
     public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket) throws IOException {
         super.reset(channel, socket);
         sslEngine = null;
-        sniComplete = false;
-        handshakeComplete = false;
-        handshakeWrapQueueLength.set(0);
-        unwrapBeforeRead = true;
-        closed = false;
-        closing = false;
-        netInBuffer.clear();
+        if (channel != null) {
+            sniComplete = false;
+            handshakeComplete = false;
+            handshakeWrapQueueLength.set(0);
+            unwrapBeforeRead = true;
+            closed = false;
+            closing = false;
+            netInBuffer.clear();
+        }
     }
 
     @Override
