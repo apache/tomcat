@@ -48,7 +48,8 @@ public class JspWriterImpl extends JspWriter {
      * Create a new buffered character-output stream that uses an output buffer of the given size.
      *
      * @param response  A Servlet Response
-     * @param sz        Output-buffer size, a positive integer
+     * @param sz        Output-buffer size, a non-negative integer. A zero value indicates that the Writer is not
+     *                      buffering output.
      * @param autoFlush <code>true</code> to automatically flush on buffer full, <code>false</code> to throw an overflow
      *                      exception in that case
      *
