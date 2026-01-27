@@ -199,6 +199,10 @@
         stream reset or a 400 response as appropriate rather then with a
         connection reset. (markt)
       </fix>
+      <fix>
+        Add validation of chunk extensions for chunked transfer encoding.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

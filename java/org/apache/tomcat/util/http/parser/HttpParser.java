@@ -378,6 +378,10 @@ public class HttpParser {
     }
 
 
+    public static boolean isWhiteSpace(int c) {
+        return c == 9 || c == 32;
+    }
+
     public static boolean isAbsolutePath(int c) {
         return DEFAULT.isAbsolutePathRelaxed(c);
     }
