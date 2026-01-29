@@ -23,7 +23,7 @@ import org.apache.catalina.Context;
 public class SessionConfig {
 
     private static final String DEFAULT_SESSION_COOKIE_NAME = "JSESSIONID";
-    private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
+    private static final String SESSION_PARAMETER_NAME = "jsessionid";
 
     /**
      * Determine the name to use for the session cookie for the provided context.
@@ -44,10 +44,20 @@ public class SessionConfig {
      * @return the parameter name for the session
      */
     public static String getSessionUriParamName(Context context) {
-        return getConfiguredSessionCookieName(context, DEFAULT_SESSION_PARAMETER_NAME);
+        return getSessionUriParamName();
     }
-
-
+    
+    /**
+     * Determine the name to use for the session path parameter.
+     * <p>
+     * per Servlet Spec 6.1 Section 7.1.3 - The name of the parameter must be jsessionid.
+     * 
+     * @return {@link #getSessionCookieName(Context)} the parameter name for the session
+     */
+    public static String getSessionUriParamName() {
+        return SESSION_PARAMETER_NAME;
+    }
+    
     private static String getConfiguredSessionCookieName(Context context, String defaultName) {
         // Priority is:
         // 1. Cookie name defined in context
