@@ -196,11 +196,104 @@ public class TestLoadBalancerDrainingValve {
     }
 
 
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69940
+     */
+    @Test
+    public void runValveWithInvalidSessionUri() throws Exception {
+        IMocksControl control = EasyMock.createControl();
+        ServletContext servletContext = control.createMock(ServletContext.class);
+        Context ctx = control.createMock(Context.class);
+        Request request = control.createMock(Request.class);
+        Response response = control.createMock(Response.class);
+
+        String sessionUriParamName = "jsessionid";
+        String sessionCookieName = sessionUriParamName;
+        String sessionId = "cafebabe";
+        String requestURI =
+                String.format("/test;%s=0x01/path;%s=%s", sessionUriParamName, sessionUriParamName, sessionId);
+        SessionCookieConfig cookieConfig = new CookieConfig();
+        cookieConfig.setDomain("example.com");
+        cookieConfig.setName(sessionCookieName);
+        cookieConfig.setPath("/");
+        cookieConfig.setSecure(secureSessionConfig);
+
+        // Valve.init requires all of this stuff
+        EasyMock.expect(ctx.getMBeanKeyProperties()).andStubReturn("");
+        EasyMock.expect(ctx.getName()).andStubReturn("");
+        EasyMock.expect(ctx.getPipeline()).andStubReturn(new StandardPipeline());
+        EasyMock.expect(ctx.getDomain()).andStubReturn("foo");
+        EasyMock.expect(ctx.getLogger())
+                .andStubReturn(org.apache.juli.logging.LogFactory.getLog(LoadBalancerDrainingValve.class));
+        EasyMock.expect(ctx.getServletContext()).andStubReturn(servletContext);
+
+        // Set up the actual test
+        EasyMock.expect(request.getAttribute(LoadBalancerDrainingValve.ATTRIBUTE_KEY_JK_LB_ACTIVATION))
+                .andStubReturn(jkActivation);
+        EasyMock.expect(Boolean.valueOf(request.isRequestedSessionIdValid()))
+                .andStubReturn(Boolean.valueOf(validSessionId));
+
+        ArrayList<Cookie> cookies = new ArrayList<>();
+        if (enableIgnore) {
+            cookies.add(new Cookie("ignore", "true"));
+        }
+
+        if (!validSessionId && jkActivation.equals("DIS")) {
+            String expectedRequestUriAfterRedirect = "/test/path";
+
+            EasyMock.expect(request.getRequestedSessionId()).andStubReturn(sessionId);
+            EasyMock.expect(request.getRequestURI()).andStubReturn(requestURI);
+            EasyMock.expect(request.getCookies()).andStubReturn(cookies.toArray(new Cookie[0]));
+            EasyMock.expect(request.getContext()).andStubReturn(ctx);
+            EasyMock.expect(ctx.getSessionCookieName()).andStubReturn(sessionCookieName);
+            EasyMock.expect(servletContext.getSessionCookieConfig()).andStubReturn(cookieConfig);
+            EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
+            EasyMock.expect(ctx.getSessionCookiePath()).andStubReturn("/");
+
+            if (!enableIgnore) {
+                EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash()))
+                        .andStubReturn(Boolean.TRUE);
+                EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
+
+                // These two lines just mean EasyMock.expect(response.addCookie) but for a void method
+                String expectedRequestURI = expectedRequestUriAfterRedirect;
+                if (null != queryString) {
+                    expectedRequestURI = expectedRequestURI + '?' + queryString;
+                }
+                response.setHeader("Location", expectedRequestURI);
+                response.setStatus(307);
+            }
+        }
+
+        Valve next = control.createMock(Valve.class);
+
+        if (expectInvokeNext) {
+            // Expect the "next" Valve to fire
+            // Next 2 lines are basically EasyMock.expect(next.invoke(req,res)) but for a void method
+            next.invoke(request, response);
+            EasyMock.expectLastCall();
+        }
+
+        // Get set to actually test
+        control.replay();
+
+        LoadBalancerDrainingValve valve = new LoadBalancerDrainingValve();
+        valve.setContainer(ctx);
+        valve.init();
+        valve.setNext(next);
+        valve.setIgnoreCookieName("ignore");
+        valve.setIgnoreCookieValue("true");
+
+        valve.invoke(request, response);
+
+        control.verify();
+    }
+
     private static class CookieConfig implements SessionCookieConfig {
 
         private String name;
 
-        private final Map<String, String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        private final Map<String,String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         @Override
         public String getName() {
@@ -295,7 +388,7 @@ public class TestLoadBalancerDrainingValve {
         }
 
         @Override
-        public Map<String, String> getAttributes() {
+        public Map<String,String> getAttributes() {
             return Collections.unmodifiableMap(attributes);
         }
     }
