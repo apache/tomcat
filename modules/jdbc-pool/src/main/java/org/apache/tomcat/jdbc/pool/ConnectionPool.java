@@ -19,7 +19,9 @@ package org.apache.tomcat.jdbc.pool;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -137,6 +139,17 @@ public class ConnectionPool {
     private final AtomicLong reconnectedCount = new AtomicLong(0);
     private final AtomicLong removeAbandonedCount = new AtomicLong(0);
     private final AtomicLong releasedIdleCount = new AtomicLong(0);
+
+    /**
+     * Request boundaries
+     */
+    private static final Method beginRequest;
+    private static final Method endRequest;
+
+    static {
+        beginRequest = getConnectionMethod("beginRequest");
+        endRequest = getConnectionMethod("endRequest");
+    }
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -342,6 +355,14 @@ public class ConnectionPool {
                 connection = (Connection)proxyClassConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
             } else {
                 connection = (Connection)proxyClassConstructor.newInstance(new Object[] {handler});
+            }
+            if (beginRequest != null) {
+                Connection underlyingConnection = con.getConnection();
+                try {
+                    beginRequest.invoke(underlyingConnection);
+                } catch (InvocationTargetException | IllegalAccessException ex) {
+                    log.warn("Error calling beginRequest on connection", ex);
+                }
             }
             //return the connection
             return connection;
@@ -815,6 +836,21 @@ public class ConnectionPool {
     }
 
     /**
+     * Uses reflection to get the method form the Connection interface
+     * @param methodName name of the method to get
+     * @return the method if it exists, otherwise null
+     */
+    private static Method getConnectionMethod(String methodName) {
+        Method method = null;
+        try {
+            method = Connection.class.getMethod(methodName);
+        } catch (NoSuchMethodException ex) {
+            // Ignore exception and set both methods to null
+        }
+        return method;
+    }
+
+    /**
      * Validates and configures a previously idle connection
      * @param now - timestamp
      * @param con - the connection to validate and configure
@@ -1037,6 +1073,14 @@ public class ConnectionPool {
                         con.clearWarnings();
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
+                        if (endRequest != null) {
+                            Connection underlyingConnection = con.getConnection();
+                            try {
+                                endRequest.invoke(underlyingConnection);
+                            } catch (InvocationTargetException | IllegalAccessException ex) {
+                                log.warn("Error calling endRequest on connection", ex);
+                            }
+                        }
                         if (((idle.size()>=poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle["+idle.size()+"]>=maxIdle["+poolProperties.getMaxIdle()+"] idle.offer failed.");

@@ -317,6 +317,12 @@ public class Connection implements java.sql.Connection {
         return 0;
     }
 
+    public void beginRequest() {
+        Driver.beginRequestCount.incrementAndGet();
+    }
 
+    public void endRequest() {
+        Driver.endRequestCount.incrementAndGet();
+    }
 
 }
