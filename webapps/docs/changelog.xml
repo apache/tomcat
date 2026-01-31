@@ -190,6 +190,12 @@
         of <code>MessageDigestCredentialHandler</code> from <code>false</code>
         to <code>true</code>. (markt)
       </update>
+      <add>
+        Enhance <code>version.sh</code> and <code>version.bat</code> to display
+        APR, Tomcat Native, and OpenSSL version information (both APR and FFM
+        implementations), along with version compatibility warnings and
+        third-party library version information. (csutherl)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
