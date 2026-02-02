@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestStartupIPv6Connectors extends TomcatBaseTest {
 
@@ -122,6 +123,14 @@ public class TestStartupIPv6Connectors extends TomcatBaseTest {
     }
 
     private void assertHttpOkOnAddress(String address) throws Exception {
+        /*
+         * Test fails on Java 8 due to this bug:
+         * https://bugs.openjdk.org/browse/JDK-8027308
+         *
+         * Needs this fix back-porting to Java 8 to address this issue:
+         * https://github.com/openjdk/jdk11u/commit/66135672e1fb2290834277d9c359478fff4ddd12
+         */
+        Assume.assumeTrue(JreCompat.isJre11Available());
         Tomcat tomcat = getTomcatInstance();
         tomcat.getConnector().setProperty("address", address);
         File baseDir = new File(getTemporaryDirectory(), "ipv6");
@@ -138,6 +147,7 @@ public class TestStartupIPv6Connectors extends TomcatBaseTest {
             Assume.assumeNoException("Can't bind to " + address, e);
         }
         if (address.contains(":")) {
+            // Java 8 doesn't handle
             address = "[" + address + "]";
         }
         URL url = new URI("http://" + address + ":" + getPort() + "/").toURL();
