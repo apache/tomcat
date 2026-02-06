@@ -16,6 +16,7 @@
  */
 package org.apache.el;
 
+import jakarta.el.PropertyNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import jakarta.el.ExpressionFactory;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
 
+import org.apache.el.parser.TesterBeanEmptyMap;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -383,5 +385,25 @@ public class TestValueExpressionImpl extends ELBaseTest {
         // Check the result
         Integer result = (Integer) ve.getValue(context);
         Assert.assertNull(result);
+    }
+
+    @Test
+    public void testBug69948() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanEmptyMap beanEmptyMap = new TesterBeanEmptyMap();
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setName(null);
+
+        ValueExpression var = factory.createValueExpression(beanEmptyMap, TesterBeanEmptyMap.class);
+        context.getVariableMapper().setVariable("beanEmptyMap", var);
+        var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanEmptyMap[beanA.name][beanA.name]}", Object.class);
+
+        Assert.assertThrows(PropertyNotFoundException.class, () -> ve.getValueReference(context));
     }
 }
