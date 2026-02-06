@@ -682,6 +682,18 @@
       used.</p>
     </attribute>
 
+    <attribute name="noCompressionEncodings" requried="false">
+      <p>A comma-separated list of content encodings that indicate
+      already-compressed content. When the response already has a
+      <code>Content-Encoding</code> header with one of these values, compression
+      will not be applied to prevent double compression. This attribute is only
+      used if <strong>compression</strong> is set to <code>on</code> or
+      <code>force</code>.</p>
+      <p>If not specified, the default values is
+      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      includes all commonly used compression algorithms.</p>
+    </attribute>
+
     <attribute name="noCompressionStrongETag" required="false">
       <p>This flag configures whether resources with a strong ETag will be
       considered for compression. If <code>true</code>, resources with a strong
