@@ -159,10 +159,12 @@ public class RewriteValve extends ValveBase {
             context = true;
             String webInfResourcePath = "/WEB-INF/" + resourcePath;
             is = ((Context) getContainer()).getServletContext().getResourceAsStream(webInfResourcePath);
-            if (containerLog.isDebugEnabled()) {
-                if (is == null) {
-                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
-                } else {
+            if (is == null) {
+                if (containerLog.isInfoEnabled()) {
+                    containerLog.info(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
+                }
+            } else {
+                if (containerLog.isDebugEnabled()) {
                     containerLog.debug(sm.getString("rewriteValve.readConfiguration", webInfResourcePath));
                 }
             }
@@ -172,8 +174,8 @@ public class RewriteValve extends ValveBase {
                 ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
             } catch (IOException ioe) {
-                if (containerLog.isDebugEnabled()) {
-                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
+                if (containerLog.isInfoEnabled()) {
+                    containerLog.info(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
                 }
             }
         }
@@ -566,7 +568,7 @@ public class RewriteValve extends ValveBase {
                     chunk.append(urlStringRewriteDecoded);
                     // Set the new Query String
                     if (queryStringRewriteEncoded == null) {
-                         // No new query string. Therefore the original is retained unless QSD is defined.
+                        // No new query string. Therefore the original is retained unless QSD is defined.
                         if (qsd) {
                             request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         }

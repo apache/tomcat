@@ -316,10 +316,10 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                 MigrationUtil.addJakartaEETransformer(classLoader, getJakartaConverter());
             }
 
+            classLoader.start();
+
             // Configure our repositories
             setClassPath();
-
-            classLoader.start();
 
             String contextName = context.getName();
             if (!contextName.startsWith("/")) {
@@ -474,8 +474,9 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                     try {
                         File f = new File(url.toURI());
                         repository = f.getAbsolutePath();
-                    } catch (URISyntaxException e) {
+                    } catch (URISyntaxException | IllegalArgumentException e) {
                         // Can't convert from URL to URI. Treat as non-file URL and skip.
+                        continue;
                     }
                 } else {
                     continue;

@@ -716,8 +716,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return (buf, request, res, l) -> wrap(request.getRequestedSessionId(), buf);
             }
             case "requestedSessionIdFromCookie" -> {
-                return (buf, request, res, l) -> wrap(String.valueOf(request.isRequestedSessionIdFromCookie()),
-                        buf);
+                return (buf, request, res, l) -> wrap(String.valueOf(request.isRequestedSessionIdFromCookie()), buf);
             }
             case "requestedSessionIdValid" -> {
                 return (buf, request, res, l) -> wrap(String.valueOf(request.isRequestedSessionIdValid()), buf);

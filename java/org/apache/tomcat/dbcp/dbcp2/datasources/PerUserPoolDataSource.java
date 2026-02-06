@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,7 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -41,7 +42,7 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool;
 
 /**
  * <p>
- * A pooling {@code DataSource} appropriate for deployment within J2EE environment. There are many configuration
+ * A pooling {@link DataSource} appropriate for deployment within J2EE environment. There are many configuration
  * options, most of which are defined in the parent class. This datasource uses individual pools per user, and some
  * properties can be set specifically for a given user, if the deployment environment can support initialization of
  * mapped properties. So for example, a pool of admin or write-access Connections can be guaranteed a certain number of
@@ -641,7 +642,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Returns a {@code PerUserPoolDataSource} {@link Reference}.
+     * Returns a {@link PerUserPoolDataSource} {@link Reference}.
      */
     @Override
     public Reference getReference() throws NamingException {
@@ -684,7 +685,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         // the factory with the pool, so we do not have to do so
         // explicitly)
         final CPDSConnectionFactory factory = new CPDSConnectionFactory(cpds, getValidationQuery(), getValidationQueryTimeoutDuration(),
-                isRollbackAfterValidation(), userName, password);
+                isRollbackAfterValidation(), userName, Utils.toCharArray(password));
         factory.setMaxConn(getMaxConnDuration());
         // Create an object pool to contain our PooledConnections
         final GenericObjectPool<PooledConnectionAndInfo> pool = new GenericObjectPool<>(factory);

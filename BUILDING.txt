@@ -293,13 +293,14 @@ in build.xml and the default property values in build.properties.default.
         # Location of GPG executable (used only for releases)
         gpg.exec=/path/to/gpg
 
-    You do not need it if you do not plan to sign the release.
-
-    If "gpg.exec" property does not point to an existing file, it will be
-    ignored and this feature will be deactivated.
-
     You will be prompted for the GPG passphrase when the release build
     starts, unless "gpg.passphrase" property is set.
+
+    The ant target "verify-release" also uses the property "gpg.exec" to
+    call the GPG executable. If you want to use "verify-release" but you
+    do not want to sign the release artefacts, set "gpg.exec" and also
+    "gpg.sign.files=false".
+
 
  3. If building the Windows installer on Windows
 
@@ -529,7 +530,16 @@ as for the property "test.name".
  This is configured by setting "test.threads" property. The recommended
  value is one thread per core.
 
- 6. Optional support is provided for the Cobertura code coverage tool.
+ 6. Test output can be suppressed for cleaner console output, especially useful
+ when running tests with multiple threads:
+
+        ant test -Dtest.silent=true
+
+ This suppresses JUnit console output while still saving all test results to
+ individual log files in output/build/logs. The test-status target will still
+ display a summary of any failures or skipped tests.
+
+ 7. Optional support is provided for the Cobertura code coverage tool.
 
 NOTE: Cobertura is licensed under GPL v2 with parts of it being under
       Apache License v1.1. See https://cobertura.github.io/cobertura/ for details.

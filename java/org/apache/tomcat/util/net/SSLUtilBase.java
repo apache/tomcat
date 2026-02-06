@@ -28,6 +28,7 @@ import java.security.KeyStore;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathParameters;
+import java.security.cert.CertPathValidator;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreParameters;
 import java.security.cert.Certificate;
@@ -37,12 +38,14 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.PKIXRevocationChecker;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -128,7 +131,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             // OpenSSL profiles cannot be resolved without Java 22
             this.enabledCiphers = new String[0];
         } else {
-            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
+            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12);
             List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
             Set<String> implementedCiphers = getImplementedCiphers();
             List<String> enabledCiphers =
@@ -520,8 +523,10 @@ public abstract class SSLUtilBase implements SSLUtil {
      *
      * @throws Exception An error occurred
      */
-    protected CertPathParameters getParameters(String crlf, KeyStore trustStore, boolean revocationEnabled)
-            throws Exception {
+    protected CertPathParameters getParameters(final String crlf, final KeyStore trustStore,
+            final boolean revocationEnabled) throws Exception {
+
+        boolean enableRevocation = revocationEnabled;
 
         PKIXBuilderParameters xparams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
         if (crlf != null && !crlf.isEmpty()) {
@@ -529,11 +534,24 @@ public abstract class SSLUtilBase implements SSLUtil {
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
-            xparams.setRevocationEnabled(true);
-        } else {
-            xparams.setRevocationEnabled(revocationEnabled);
+            enableRevocation = true;
         }
+
+        if (sslHostConfig.getOcspEnabled()) {
+            PKIXRevocationChecker revocationChecker =(PKIXRevocationChecker) CertPathValidator.getInstance("PKIX").getRevocationChecker();
+            if (sslHostConfig.getOcspSoftFail()) {
+                revocationChecker.setOptions(EnumSet.of(PKIXRevocationChecker.Option.SOFT_FAIL));
+            } else {
+                revocationChecker.setOptions(Collections.emptySet());
+            }
+            xparams.addCertPathChecker(revocationChecker);
+            enableRevocation = true;
+        }
+
+        xparams.setRevocationEnabled(enableRevocation);
+
         xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
+
         return xparams;
     }
 

@@ -101,7 +101,7 @@ public class RpcChannel implements ChannelListener {
                 channel.send(destination, rmsg, sendOptions);
                 if (rpcOptions != NO_REPLY) {
                     long timeoutExpiry = System.nanoTime() + timeout * 1_000_000;
-                    while (collector.isComplete() && timeout > 0) {
+                    while (!collector.isComplete() && timeout > 0) {
                         collector.wait(timeout);
                         timeout = (timeoutExpiry - System.nanoTime()) / 1_000_000;
                     }

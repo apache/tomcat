@@ -125,12 +125,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * HTTP/0.9 flag.
-     */
-    private boolean http09 = false;
-
-
-    /**
      * Content delimiter for the request (if false, the connection will be closed at the end of the request).
      */
     private boolean contentDelimitation = true;
@@ -292,8 +286,7 @@ public class Http11Processor extends AbstractProcessor {
                     keptAlive = true;
                     // Set this every time in case limit has been changed via JMX
                     request.getMimeHeaders().setLimit(protocol.getMaxHeaderCount());
-                    // Don't parse headers for HTTP/0.9
-                    if (!http09 && !inputBuffer.parseHeaders()) {
+                    if (!inputBuffer.parseHeaders()) {
                         // We've read part of the request, don't recycle it
                         // instead associate it with the socket
                         openSocket = true;
@@ -597,22 +590,14 @@ public class Http11Processor extends AbstractProcessor {
 
         MessageBytes protocolMB = request.protocol();
         if (protocolMB.equals(Constants.HTTP_11)) {
-            http09 = false;
             http11 = true;
             protocolMB.setString(Constants.HTTP_11);
         } else if (protocolMB.equals(Constants.HTTP_10)) {
-            http09 = false;
             http11 = false;
             keepAlive = false;
             protocolMB.setString(Constants.HTTP_10);
-        } else if (protocolMB.equals("")) {
-            // HTTP/0.9
-            http09 = true;
-            http11 = false;
-            keepAlive = false;
         } else {
             // Unsupported protocol
-            http09 = false;
             http11 = false;
             // Send 505; Unsupported HTTP version
             response.setStatus(505);
@@ -778,6 +763,11 @@ public class Http11Processor extends AbstractProcessor {
         // Validate host name and extract port if present
         parseHost(hostValueMB);
 
+        // Match host name with SNI if required
+        if (!protocol.checkSni(socketWrapper.getSniHostName(), request.serverName().toString())) {
+            badRequest("http11processor.request.sni");
+        }
+
         if (!getErrorState().isIoAllowed()) {
             getAdapter().log(request, response, 0);
         }
@@ -805,18 +795,16 @@ public class Http11Processor extends AbstractProcessor {
         // Parse transfer-encoding header
         // HTTP specs say an HTTP 1.1 server should accept any recognised
         // HTTP 1.x header from a 1.x client unless the specs says otherwise.
-        if (!http09) {
-            MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
-            if (transferEncodingValueMB != null) {
-                List<String> encodingNames = new ArrayList<>();
-                if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
-                    for (String encodingName : encodingNames) {
-                        addInputFilter(inputFilters, encodingName);
-                    }
-                } else {
-                    // Invalid transfer encoding
-                    badRequest("http11processor.request.invalidTransferEncoding");
+        MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
+        if (transferEncodingValueMB != null) {
+            List<String> encodingNames = new ArrayList<>();
+            if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
+                for (String encodingName : encodingNames) {
+                    addInputFilter(inputFilters, encodingName);
                 }
+            } else {
+                // Invalid transfer encoding
+                badRequest("http11processor.request.invalidTransferEncoding");
             }
         }
 
@@ -871,13 +859,6 @@ public class Http11Processor extends AbstractProcessor {
         contentDelimitation = false;
 
         OutputFilter[] outputFilters = outputBuffer.getFilters();
-
-        if (http09) {
-            // HTTP/0.9
-            outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
-            outputBuffer.commit();
-            return;
-        }
 
         int statusCode = response.getStatus();
         if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304) {

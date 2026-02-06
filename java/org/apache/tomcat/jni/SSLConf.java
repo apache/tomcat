@@ -53,7 +53,11 @@ public final class SSLConf {
     public static native void free(long cctx);
 
     /**
-     * Check a command with an SSL_CONF context.
+     * Optionally used to check a command with an SSL_CONF context.
+     * <p>
+     * This call is also used to pass Tomcat specific settings to Tomcat Native. It must be called for for each Tomcat
+     * specific setting (e.g. {@link org.apache.tomcat.util.net.openssl.OpenSSLConfCmd#NO_OCSP_CHECK}) before {@link
+     * #assign(long, long)} is called.
      *
      * @param cctx  SSL_CONF context to use.
      * @param name  command name.
@@ -71,6 +75,10 @@ public final class SSLConf {
     /**
      * Assign an SSL context to an SSL_CONF context. All following calls to {@link #apply(long, String, String)} will be
      * applied to this SSL context.
+     * <p>
+     * For Tomcat specific settings this call applies previous settings set via calls to {@link
+     * #check(long, String, String)}. Further calls to {@link #check(long, String, String)} after a call to this method
+     * will have no effect.
      *
      * @param cctx SSL_CONF context to use.
      * @param ctx  SSL context to assign to the given SSL_CONF context.
@@ -82,6 +90,8 @@ public final class SSLConf {
 
     /**
      * Apply a command to an SSL_CONF context.
+     * <p>
+     * This call has no effect for Tomcat specific settings.
      *
      * @param cctx  SSL_CONF context to use.
      * @param name  command name.
@@ -97,6 +107,8 @@ public final class SSLConf {
 
     /**
      * Finish commands for an SSL_CONF context.
+     * <p>
+     * This call has no effect for Tomcat specific settings.
      *
      * @param cctx SSL_CONF context to use.
      *

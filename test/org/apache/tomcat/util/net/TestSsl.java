@@ -34,7 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -51,6 +54,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -59,11 +63,14 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
@@ -252,7 +259,7 @@ public class TestSsl extends TomcatBaseTest {
         Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
-        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, false,
                 TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS, null);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
@@ -275,7 +282,7 @@ public class TestSsl extends TomcatBaseTest {
         Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
-        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS, false,
                       null, TesterSupport.JKS_PASS_FILE, null, TesterSupport.JKS_KEY_PASS_FILE);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
@@ -286,6 +293,159 @@ public class TestSsl extends TomcatBaseTest {
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
         Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
+    }
+
+    @Test
+    public void testSni() throws Exception {
+        System.setProperty("jsse.enableSNIExtension", "true");
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("strictSni", "true");
+
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsContextListener.class.getName());
+
+        TesterSupport.initSsl(tomcat);
+
+        // Add another config for localhost
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
+        sslHostConfig.addCertificate(certificate);
+        certificate.setCertificateKeystoreFile(new File(TesterSupport.LOCALHOST_RSA_JKS).getAbsolutePath());
+        certificate.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+        sslHostConfig.setHostName("localhost");
+        tomcat.getConnector().addSslHostConfig(sslHostConfig);
+
+        // Add another config for foobar
+        sslHostConfig = new SSLHostConfig();
+        certificate = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
+        sslHostConfig.addCertificate(certificate);
+        certificate.setCertificateKeystoreFile(new File(TesterSupport.LOCALHOST_RSA_JKS).getAbsolutePath());
+        certificate.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+        sslHostConfig.setHostName("foobar");
+        tomcat.getConnector().addSslHostConfig(sslHostConfig);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
+        tomcat.start();
+
+        // Send SNI and it matches
+        SSLSocket sslSocket = (SSLSocket) clientSSLSocketFactory.createSocket("localhost", getPort());
+        SNIHostName serverName = new SNIHostName("localhost");
+        List<SNIServerName> serverNames = new ArrayList<>(1);
+        serverNames.add(serverName);
+        SSLParameters params = sslSocket.getSSLParameters();
+        params.setServerNames(serverNames);
+        sslSocket.setSSLParameters(params);
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect(sslSocket);
+        client.processRequest(true);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<a href=\"../helloworld.html\">"));
+        client.disconnect();
+        client.reset();
+
+        // Send SNI and it does not match
+        sslSocket = (SSLSocket) clientSSLSocketFactory.createSocket("localhost", getPort());
+        params = sslSocket.getSSLParameters();
+        params.setServerNames(serverNames);
+        sslSocket.setSSLParameters(params);
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1" + CRLF +
+                    "Host: foobar" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect(sslSocket);
+        client.processRequest(true);
+
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, client.getStatusCode());
+        client.disconnect();
+        client.reset();
+
+        // Send SNI and it does not match, but this goes to the default host which is the same one
+        tomcat.getConnector().setProperty("defaultSSLHostConfigName", "localhost");
+        sslSocket = (SSLSocket) clientSSLSocketFactory.createSocket("localhost", getPort());
+        params = sslSocket.getSSLParameters();
+        params.setServerNames(serverNames);
+        sslSocket.setSSLParameters(params);
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1" + CRLF +
+                    "Host: something" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect(sslSocket);
+        client.processRequest(true);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        client.disconnect();
+        client.reset();
+        tomcat.getConnector().setProperty("defaultSSLHostConfigName", "_default_");
+
+        tomcat.getConnector().setProperty("strictSni", "false");
+
+        // SNI is not verified
+        sslSocket = (SSLSocket) clientSSLSocketFactory.createSocket("localhost", getPort());
+        params = sslSocket.getSSLParameters();
+        params.setServerNames(serverNames);
+        sslSocket.setSSLParameters(params);
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1" + CRLF +
+                    "Host: foobar" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect(sslSocket);
+        client.processRequest(true);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        client.disconnect();
+        client.reset();
+
+        tomcat.getConnector().setProperty("strictSni", "true");
+
+        // No SNI but this is the default config
+        tomcat.getConnector().setProperty("defaultSSLHostConfigName", "localhost");
+        Assert.assertEquals(HttpServletResponse.SC_OK,
+                getUrl("https://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample", new ByteChunk(), null));
+
+        // No SNI and this is not the default config
+        tomcat.getConnector().setProperty("defaultSSLHostConfigName", "_default_");
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST,
+                getUrl("https://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample", new ByteChunk(), null));
+
+    }
+
+    private static final class Client extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+
     }
 
     @Test

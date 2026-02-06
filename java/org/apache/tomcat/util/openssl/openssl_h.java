@@ -196,6 +196,16 @@ public class openssl_h {
         return X509_V_OK;
     }
 
+    private static final int X509_V_ERR_UNABLE_TO_GET_CRL = (int) 3L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_UNABLE_TO_GET_CRL 3
+     * }
+     */
+    public static int X509_V_ERR_UNABLE_TO_GET_CRL() {
+        return X509_V_ERR_UNABLE_TO_GET_CRL;
+    }
+
     private static final int X509_V_ERR_CRL_HAS_EXPIRED = (int) 12L;
 
     /**
@@ -226,26 +236,6 @@ public class openssl_h {
         return X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN;
     }
 
-    private static final int X509_V_ERR_CERT_REVOKED = (int) 23L;
-
-    /**
-     * {@snippet lang = c : * #define X509_V_ERR_CERT_REVOKED 23
-     * }
-     */
-    public static int X509_V_ERR_CERT_REVOKED() {
-        return X509_V_ERR_CERT_REVOKED;
-    }
-
-    private static final int X509_V_ERR_UNABLE_TO_GET_CRL = (int) 3L;
-
-    /**
-     * {@snippet lang = c : * #define X509_V_ERR_UNABLE_TO_GET_CRL 3
-     * }
-     */
-    public static int X509_V_ERR_UNABLE_TO_GET_CRL() {
-        return X509_V_ERR_UNABLE_TO_GET_CRL;
-    }
-
     private static final int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = (int) 20L;
 
     /**
@@ -266,6 +256,16 @@ public class openssl_h {
         return X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE;
     }
 
+    private static final int X509_V_ERR_CERT_REVOKED = (int) 23L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_CERT_REVOKED 23
+     * }
+     */
+    public static int X509_V_ERR_CERT_REVOKED() {
+        return X509_V_ERR_CERT_REVOKED;
+    }
+
     private static final int X509_V_ERR_CERT_UNTRUSTED = (int) 27L;
 
     /**
@@ -284,6 +284,46 @@ public class openssl_h {
      */
     public static int X509_V_ERR_APPLICATION_VERIFICATION() {
         return X509_V_ERR_APPLICATION_VERIFICATION;
+    }
+
+    private static final int X509_V_ERR_OCSP_RESP_INVALID = (int) 96L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_OCSP_RESP_INVALID 96
+     * }
+     */
+    public static int X509_V_ERR_OCSP_RESP_INVALID() {
+        return X509_V_ERR_OCSP_RESP_INVALID;
+    }
+
+    private static final int X509_V_ERR_OCSP_SIGNATURE_FAILURE = (int) 97L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_OCSP_SIGNATURE_FAILURE 97
+     * }
+     */
+    public static int X509_V_ERR_OCSP_SIGNATURE_FAILURE() {
+        return X509_V_ERR_OCSP_SIGNATURE_FAILURE;
+    }
+
+    private static final int X509_V_ERR_OCSP_NOT_YET_VALID = (int) 98L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_OCSP_NOT_YET_VALID 98
+     * }
+     */
+    public static int X509_V_ERR_OCSP_NOT_YET_VALID() {
+        return X509_V_ERR_OCSP_NOT_YET_VALID;
+    }
+
+    private static final int X509_V_ERR_OCSP_HAS_EXPIRED = (int) 99L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_OCSP_HAS_EXPIRED 99
+     * }
+     */
+    public static int X509_V_ERR_OCSP_HAS_EXPIRED() {
+        return X509_V_ERR_OCSP_HAS_EXPIRED;
     }
 
     private static final int X509_V_FLAG_CRL_CHECK = (int) 4L;
@@ -3091,6 +3131,66 @@ public class openssl_h {
         }
     }
 
+    private static class X509_STORE_CTX_get0_store {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get0_store");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * X509_STORE *X509_STORE_CTX_get0_store(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static FunctionDescriptor X509_STORE_CTX_get0_store$descriptor() {
+        return X509_STORE_CTX_get0_store.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * X509_STORE *X509_STORE_CTX_get0_store(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MethodHandle X509_STORE_CTX_get0_store$handle() {
+        return X509_STORE_CTX_get0_store.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * X509_STORE *X509_STORE_CTX_get0_store(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MemorySegment X509_STORE_CTX_get0_store$address() {
+        return X509_STORE_CTX_get0_store.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * X509_STORE *X509_STORE_CTX_get0_store(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MemorySegment X509_STORE_CTX_get0_store(MemorySegment ctx) {
+        var mh$ = X509_STORE_CTX_get0_store.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get0_store", ctx);
+            }
+            return (MemorySegment)mh$.invokeExact(ctx);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class X509_STORE_CTX_get0_untrusted {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
@@ -3605,7 +3705,8 @@ public class openssl_h {
     }
 
     private static class X509_STORE_CTX_get1_issuer {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get1_issuer");
 
@@ -8788,6 +8889,315 @@ public class openssl_h {
             return (int) mh$.invokeExact(issuer, subject);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class OCSP_resp_get0_certs {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_resp_get0_certs");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * const struct stack_st_X509 *OCSP_resp_get0_certs(const OCSP_BASICRESP *bs)
+     * }
+     */
+    public static FunctionDescriptor OCSP_resp_get0_certs$descriptor() {
+        return OCSP_resp_get0_certs.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * const struct stack_st_X509 *OCSP_resp_get0_certs(const OCSP_BASICRESP *bs)
+     * }
+     */
+    public static MethodHandle OCSP_resp_get0_certs$handle() {
+        return OCSP_resp_get0_certs.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * const struct stack_st_X509 *OCSP_resp_get0_certs(const OCSP_BASICRESP *bs)
+     * }
+     */
+    public static MemorySegment OCSP_resp_get0_certs$address() {
+        return OCSP_resp_get0_certs.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * const struct stack_st_X509 *OCSP_resp_get0_certs(const OCSP_BASICRESP *bs)
+     * }
+     */
+    public static MemorySegment OCSP_resp_get0_certs(MemorySegment bs) {
+        var mh$ = OCSP_resp_get0_certs.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_resp_get0_certs", bs);
+            }
+            return (MemorySegment)mh$.invokeExact(bs);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class OCSP_basic_verify {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_INT,
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER,
+            openssl_h.C_LONG
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_basic_verify");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * int OCSP_basic_verify(OCSP_BASICRESP *bs, struct stack_st_X509 *certs, X509_STORE *st, unsigned long flags)
+     * }
+     */
+    public static FunctionDescriptor OCSP_basic_verify$descriptor() {
+        return OCSP_basic_verify.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * int OCSP_basic_verify(OCSP_BASICRESP *bs, struct stack_st_X509 *certs, X509_STORE *st, unsigned long flags)
+     * }
+     */
+    public static MethodHandle OCSP_basic_verify$handle() {
+        return OCSP_basic_verify.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * int OCSP_basic_verify(OCSP_BASICRESP *bs, struct stack_st_X509 *certs, X509_STORE *st, unsigned long flags)
+     * }
+     */
+    public static MemorySegment OCSP_basic_verify$address() {
+        return OCSP_basic_verify.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int OCSP_basic_verify(OCSP_BASICRESP *bs, struct stack_st_X509 *certs, X509_STORE *st, unsigned long flags)
+     * }
+     */
+    public static int OCSP_basic_verify(MemorySegment bs, MemorySegment certs, MemorySegment st, long flags) {
+        var mh$ = OCSP_basic_verify.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_basic_verify", bs, certs, st, flags);
+            }
+            return (int)mh$.invokeExact(bs, certs, st, flags);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class OCSP_check_validity {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_INT,
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER,
+            openssl_h.C_LONG,
+            openssl_h.C_LONG
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_check_validity");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * int OCSP_check_validity(ASN1_GENERALIZEDTIME *thisupd, ASN1_GENERALIZEDTIME *nextupd, long sec, long maxsec)
+     * }
+     */
+    public static FunctionDescriptor OCSP_check_validity$descriptor() {
+        return OCSP_check_validity.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * int OCSP_check_validity(ASN1_GENERALIZEDTIME *thisupd, ASN1_GENERALIZEDTIME *nextupd, long sec, long maxsec)
+     * }
+     */
+    public static MethodHandle OCSP_check_validity$handle() {
+        return OCSP_check_validity.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * int OCSP_check_validity(ASN1_GENERALIZEDTIME *thisupd, ASN1_GENERALIZEDTIME *nextupd, long sec, long maxsec)
+     * }
+     */
+    public static MemorySegment OCSP_check_validity$address() {
+        return OCSP_check_validity.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int OCSP_check_validity(ASN1_GENERALIZEDTIME *thisupd, ASN1_GENERALIZEDTIME *nextupd, long sec, long maxsec)
+     * }
+     */
+    public static int OCSP_check_validity(MemorySegment thisupd, MemorySegment nextupd, long sec, long maxsec) {
+        var mh$ = OCSP_check_validity.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_check_validity", thisupd, nextupd, sec, maxsec);
+            }
+            return (int)mh$.invokeExact(thisupd, nextupd, sec, maxsec);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class OCSP_request_add1_nonce {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_INT,
+            openssl_h.C_POINTER,
+            ValueLayout.JAVA_CHAR,
+            openssl_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_request_add1_nonce");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * int OCSP_request_add1_nonce(OCSP_REQUEST *req, unsigned char *val, int len)
+     * }
+     */
+    public static FunctionDescriptor OCSP_request_add1_nonce$descriptor() {
+        return OCSP_request_add1_nonce.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * int OCSP_request_add1_nonce(OCSP_REQUEST *req, unsigned char *val, int len)
+     * }
+     */
+    public static MethodHandle OCSP_request_add1_nonce$handle() {
+        return OCSP_request_add1_nonce.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * int OCSP_request_add1_nonce(OCSP_REQUEST *req, unsigned char *val, int len)
+     * }
+     */
+    public static MemorySegment OCSP_request_add1_nonce$address() {
+        return OCSP_request_add1_nonce.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int OCSP_request_add1_nonce(OCSP_REQUEST *req, unsigned char *val, int len)
+     * }
+     */
+    public static int OCSP_request_add1_nonce(MemorySegment req, char val, int len) {
+        var mh$ = OCSP_request_add1_nonce.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_request_add1_nonce", req, val, len);
+            }
+            return (int)mh$.invokeExact(req, val, len);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class OCSP_check_nonce {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            openssl_h.C_INT,
+            openssl_h.C_POINTER,
+            openssl_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_check_nonce");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * int OCSP_check_nonce(OCSP_REQUEST *req, OCSP_BASICRESP *bs)
+     * }
+     */
+    public static FunctionDescriptor OCSP_check_nonce$descriptor() {
+        return OCSP_check_nonce.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * int OCSP_check_nonce(OCSP_REQUEST *req, OCSP_BASICRESP *bs)
+     * }
+     */
+    public static MethodHandle OCSP_check_nonce$handle() {
+        return OCSP_check_nonce.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * int OCSP_check_nonce(OCSP_REQUEST *req, OCSP_BASICRESP *bs)
+     * }
+     */
+    public static MemorySegment OCSP_check_nonce$address() {
+        return OCSP_check_nonce.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int OCSP_check_nonce(OCSP_REQUEST *req, OCSP_BASICRESP *bs)
+     * }
+     */
+    public static int OCSP_check_nonce(MemorySegment req, MemorySegment bs) {
+        var mh$ = OCSP_check_nonce.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_check_nonce", req, bs);
+            }
+            return (int)mh$.invokeExact(req, bs);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
         }
     }
 

@@ -31,7 +31,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Git Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Set up Java
       uses: actions/setup-java@v5
       with:
@@ -45,7 +45,7 @@ jobs:
 
     - name: Upload logs
       if: ${{ !cancelled() }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: JDK25-macos-latest-logs
         path: |

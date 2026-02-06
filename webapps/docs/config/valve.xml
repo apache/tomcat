@@ -1218,7 +1218,9 @@
     <p>The <em>Single Sign On Valve</em> is utilized when you wish to give users
     the ability to sign on to any one of the web applications associated with
     your virtual host, and then have their identity recognized by all other
-    web applications on the same virtual host.</p>
+    web applications on the same virtual host. The SSO Valve caches the
+    authenticated Principal and authentication type and provides them to all web
+    applications.</p>
 
     <p>See the <a href="host.html#Single_Sign_On">Single Sign On</a> special
     feature on the <strong>Host</strong> element for more information.</p>
@@ -1240,12 +1242,21 @@
 
       <attribute name="requireReauthentication" required="false">
         <p>Default false. Flag to determine whether each request needs to be
-        reauthenticated to the security <strong>Realm</strong>. If "true", this
-        Valve uses cached security credentials (username and password) to
-        reauthenticate to the <strong>Realm</strong> each request associated
-        with an SSO session.  If "false", the Valve can itself authenticate
-        requests based on the presence of a valid SSO cookie, without
-        rechecking with the <strong>Realm</strong>.</p>
+        reauthenticated to the security <strong>Realm</strong>. This is required
+        if the Realm or the authentication process provides additional
+        information (beyond added an authenticated Principal) to the request
+        that is required by a web application.</p>
+        <p>If "true", this Valve uses cached security credentials (username and
+        password) to reauthenticate to the <strong>Realm</strong> each request
+        associated with an SSO session where the web application is configured
+        with BASIC or FORM authentication. Web applications using DIGEST, SPNEGO
+        or CLIENT-CERT authentication will reauthenticate using the standard
+        authentication process for the authenticator. Therefore, it only makes
+        sense to use the SSO Valve with this attribute set to "true" if there
+        are two or more web applications using BASIC or FORM.</p>
+        <p>If "false", the Valve can itself authenticate requests based on the
+        presence of a valid SSO cookie, without rechecking with the
+        <strong>Realm</strong>.</p>
       </attribute>
 
       <attribute name="cookieDomain" required="false">
@@ -1414,6 +1425,28 @@
         <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
         This is useful, e.g., for access log consistency or other decisions to make.
         If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
       </attribute>
 
     </attributes>
@@ -1598,6 +1631,28 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
+      </attribute>
+
       <attribute name="validateUri" required="false">
         <p>Should the URI be validated as required by RFC2617? If not specified,
         the default value of <code>true</code> will be used. This should
@@ -1755,6 +1810,28 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -1869,6 +1946,28 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
       </attribute>
 
     </attributes>
@@ -2047,6 +2146,28 @@
         <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
         This is useful, e.g., for access log consistency or other decisions to make.
         If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="ssoReauthenticationMode" required="false">
+        <p>Provides a per Authenicator override of the SSO Valve attribute
+        <code>requireReauthentication</code>. It has the following options:</p>
+        <dl>
+          <dt>default</dt>
+          <dd>Reauthentication behaviour depends on the SSO Valve configuration
+              and the authentictaor type.</dd>
+          <dt>principal</dt>
+          <dd>The authenticator will look first for a cached Principal. If none
+              is found, the authenticator will look for a cached user name and
+              password and attempt to use them to reauthenticate. If that fails,
+              a normal authentication will be performed.</dd>
+          <dt>password</dt>
+          <dd>The authenticator will look for a cached user name and password
+              and attempt to use them to reauthenticate. If that fails, a normal
+              authentication will be performed.</dd>
+          <dt>full</dt>
+          <dd>Only a normal authentication will be performed. The SSO Valve is
+              effectively ignored.</dd>
+        </dl>
       </attribute>
 
       <attribute name="storeDelegatedCredential" required="false">

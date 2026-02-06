@@ -85,6 +85,8 @@ public abstract class SocketWrapperBase<E> {
     protected int remotePort = -1;
     protected volatile ServletConnection servletConnection = null;
 
+    protected String sniHostName = null;
+
     /**
      * Used to record the first IOException that occurs during non-blocking read/writes that can't be usefully
      * propagated up the stack since there is no user code or appropriate container code in the stack to handle it.
@@ -206,6 +208,20 @@ public abstract class SocketWrapperBase<E> {
 
     public void setNegotiatedProtocol(String negotiatedProtocol) {
         this.negotiatedProtocol = negotiatedProtocol;
+    }
+
+    /**
+     * @return the sniHostName
+     */
+    public String getSniHostName() {
+        return this.sniHostName;
+    }
+
+    /**
+     * @param sniHostName the SNI host name to set
+     */
+    public void setSniHostName(String sniHostName) {
+        this.sniHostName = sniHostName;
     }
 
     /**
@@ -1361,7 +1377,7 @@ public abstract class SocketWrapperBase<E> {
                     try {
                         long timeoutExpiry = System.nanoTime() + unit.toNanos(timeout);
                         long timeoutMillis = unit.toMillis(timeout);
-                         // Spurious wake-ups are possible. Keep waiting until state changes or timeout expires.
+                        // Spurious wake-ups are possible. Keep waiting until state changes or timeout expires.
                         while (state.state == CompletionState.PENDING && timeoutMillis > 0) {
                             state.wait(unit.toMillis(timeout));
                             timeoutMillis = (timeoutExpiry - System.nanoTime()) / 1_000_000;

@@ -198,7 +198,7 @@
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
   <!-- Tests To Run -->
-  <property name="test.name" value="**/Test*.java"/>
+  <!-- NOTE: test.name default is set in -test-profile-init target to allow profile override -->
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
   <property name="test.relaxTiming" value="false"/>
 
@@ -308,6 +308,8 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
+    <include name="**/index.db"/>
+    <include name="**/index.db.attr"/>
     <include name="**/jakarta.el.ExpressionFactory"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
@@ -562,6 +564,7 @@
     <include name="org/apache/tomcat/util/scan/LocalStrings.properties" />
 
     <!-- Minimize JNI to what doesn't throw an error -->
+    <include name="org/apache/tomcat/jni/AprStatus.class" />
     <include name="org/apache/tomcat/jni/Library.class" />
     <include name="org/apache/tomcat/jni/LibraryNotFoundError*" />
     <exclude name="org/apache/tomcat/jni" />
@@ -632,7 +635,6 @@
 
     <!-- Remove optional valves -->
     <exclude name="org/apache/catalina/valves/Crawler*" />
-    <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/HealthCheckValve*" />
     <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
@@ -919,6 +921,8 @@
         <exclude name="res/maven/mvn.properties" />
         <!-- Exclude the default Coverity Scan output directory -->
         <exclude name="cov-int/**" />
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
@@ -926,6 +930,8 @@
         <patternset refid="text.files" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
+        <!-- Exclude Maven output directory -->
+        <exclude name="target/**"/>
       </fileset>
     </checkstyle>
     <!-- jakarta package checks -->
@@ -954,6 +960,8 @@
         <exclude name="webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
         <exclude name="webapp/jsp/encoding/**"/>
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
     </checkstyle>
   </target>
@@ -1924,7 +1932,7 @@
       <include name="util/**" />
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
-      <exclude name="org/apache/tomcat/buildutil/**"/>
+      <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -1941,14 +1949,112 @@
   <property name="junit.formatter.usefile" value="true" />
   <property name="junit.formatter.extension" value=".txt" />
 
+  <!-- Configure JUnit output based on test.silent property -->
+  <condition property="junit.printsummary" value="off" else="yes">
+    <istrue value="${test.silent}"/>
+  </condition>
+  <condition property="junit.showoutput" value="false" else="${test.verbose}">
+    <istrue value="${test.silent}"/>
+  </condition>
+
+  <!-- ==================== Test Profile System ==================== -->
+  <!--
+    Property-based test profiles for convenient, selective test execution.
+
+    Usage: ant test -Dtest.profile=<profile-name>
+
+    Precedence: test.entry > test.profile > default
+    If test.entry is set, the profile is ignored to maintain backward compatibility.
+
+    Profile patterns are defined in test-profiles.properties test.profile properties
+    to keep this file readable.
+  -->
+
+  <!-- ================= Initialize Test Profile Property Values ================ -->
+
+  <!-- We read test profile definitions from "test-profiles.properties.default"   -->
+  <!-- and also from "test-profiles.properties" if it exists.                     -->
+  <!-- The values in "test-profiles.properties" have stronger preference.         -->
+  <!-- If you want to customize your build, you can either change the values      -->
+  <!-- directly in the default file, or create a new test-profiles.properties and -->
+  <!-- set the values there. This way you don't have to change a file which       -->
+  <!-- is part of the original project source code.                               -->
+  <!-- See "test-profiles.properties.default" in the top level directory for some -->
+  <!-- property values you may customize.                                         -->
+  <property file="${user.home}/test-profiles.properties"/>
+  <property file="test-profiles.properties"/>
+  <property file="test-profiles.properties.default"/>
+
+  <!-- Macro to set test pattern based on profile name -->
+  <macrodef name="set-profile-pattern">
+    <attribute name="profile"/>
+    <sequential>
+      <!-- Set test.name property based on the profile attribute -->
+      <condition property="test.name" value="${test.profile.smoke}">
+        <equals arg1="@{profile}" arg2="smoke"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.catalina}">
+        <equals arg1="@{profile}" arg2="catalina"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.coyote}">
+        <equals arg1="@{profile}" arg2="coyote"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.performance}">
+        <equals arg1="@{profile}" arg2="performance"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.tribes}">
+        <equals arg1="@{profile}" arg2="tribes"/>
+      </condition>
+      <condition property="test.name" value="${test.profile.buildutil}">
+        <equals arg1="@{profile}" arg2="buildutil"/>
+      </condition>
+    </sequential>
+  </macrodef>
+
+  <!-- New internal target to initialize tests before moving to test target -->
+  <target name="-test-profile-init" if="test.profile" unless="test.entry">
+    <set-profile-pattern profile="${test.profile}"/>
+
+    <!-- Validate that the profile exists -->
+    <fail message="Unknown test profile '${test.profile}'. Check test-profiles.properties[.default] for available profiles.">
+      <condition>
+        <not><isset property="test.name"/></not>
+      </condition>
+    </fail>
+
+    <!-- Special handling for performance profile: disable default exclusion -->
+    <condition property="test.excludePerformance" value="false">
+      <equals arg1="${test.profile}" arg2="performance"/>
+    </condition>
+
+    <!-- Special handling for buildutil profile: include buildutil tests -->
+    <condition property="test.includeBuildutil" value="true">
+      <equals arg1="${test.profile}" arg2="buildutil"/>
+    </condition>
+
+    <!-- Special handling for tribes profile: include old slow/flaky tribes tests -->
+    <condition property="test.includeTribes" value="true">
+      <equals arg1="${test.profile}" arg2="tribes"/>
+    </condition>
+
+    <echo message="Test profile: ${test.profile}"/>
+  </target>
+
+  <!-- Set default test.name if no profile specified, using ant's immutability feature -->
+  <target name="-test-name-default" depends="-test-profile-init">
+    <property name="test.name" value="**/Test*.java"/>
+  </target>
+
+  <!-- ==================== End of Test Profile System ==================== -->
+
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,coverage-report,test-status" />
+          depends="-test-name-default,test-nio,coverage-report,test-status" />
 
   <target name="test-clean" description="Runs the JUnit test cases"
-          depends="clean-classes,test-nio,coverage-report,test-status" />
+          depends="clean-classes,-test-name-default,test-nio,coverage-report,test-status" />
 
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
-          depends="test-only-nio,test-status" />
+          depends="-test-name-default,test-only-nio,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -1986,13 +2092,13 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
-          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
@@ -2038,7 +2144,7 @@
           enabled="${test.coverage}"
           destfile="${coverage.datafile}"
           >
-        <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
+        <junit printsummary="${junit.printsummary}" fork="yes" dir="." showoutput="${junit.showoutput}"
           errorproperty="test.result.error"
           failureproperty="test.result.failure"
           haltonfailure="${test.haltonfailure}"
@@ -2091,14 +2197,14 @@
             <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
               <!-- Exclude helper classes -->
               <exclude name="**/Tester*.java" />
-              <!-- Exclude the tests known to fail -->
-              <exclude name="org/apache/catalina/tribes/test/**" />
+              <!-- Exclude old tribes tests (slow/flaky, excluded since 2011, unless explicitly requested via tribes profile) -->
+              <exclude name="org/apache/catalina/tribes/test/**" unless="test.includeTribes" />
               <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
               <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
               <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
-              <!-- Exclude tests that Gump can't compile -->
-              <exclude name="org/apache/tomcat/buildutil/**" />
+              <!-- Exclude tests that Gump can't compile (unless explicitly requested via buildutil profile) -->
+              <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>
@@ -2999,26 +3105,31 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="release-version-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
+  <target name="release-init" depends="release-version-check,gpg-init-test-signing,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
     <forceUtcTimeZone />
   </target>
 
-  <target name="gpg-init-1">
+  <target name="gpg-init-available">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
   </target>
 
-  <target name="gpg-init-2" if="${gpg.exec.available}">
-<echo>gpg.exec.available=${gpg.exec.available}</echo>
-<echo>gpg.exec=${gpg.exec}</echo>
-    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase
-</input>
+  <target name="gpg-init-sign-files" depends="gpg-init-available" if="${gpg.exec.available}">
+    <condition property="gpg.sign.files.available">
+      <istrue value="${gpg.sign.files}"/>
+    </condition>
+  </target>
+
+  <target name="gpg-init-passphrase" depends="gpg-init-sign-files" if="${gpg.sign.files.available}">
+    <echo>gpg.exec.available=${gpg.exec.available}</echo>
+    <echo>gpg.exec=${gpg.exec}</echo>
+    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase: </input>
   </target>
 
   <!-- Test GPG by signing build.xml as a sample file. -->
-  <target name="gpg-init-3" if="gpg.passphrase">
+  <target name="gpg-init-test-signing" depends="gpg-init-passphrase" if="gpg.passphrase">
     <exec executable="${gpg.exec}"
           inputstring="${gpg.passphrase}"
           failonerror="true"
@@ -4445,7 +4556,7 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <mkdir dir="${tomcat.release.verify}" />
 <!--    <chmod dir="${tomcat.release.verify}" perm="700"/>--><!-- To make gpg happy -->
 
-    <exec executable="gpg" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
+    <exec executable="${gpg.exec}" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
       <arg value="--no-default-keyring" />
       <arg value="--primary-keyring" />
       <arg value="${tomcat.release.verify}/apache-keys"/>
@@ -4457,7 +4568,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.exe" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4468,7 +4578,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.exe" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4479,7 +4588,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <compare-hashes num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-hashes num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <compare-hashes num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <compare-hashes num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <compare-hashes num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
     <compare-hashes num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <compare-hashes num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4496,40 +4604,18 @@ information.
     <compare-signatures num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-signatures num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <compare-signatures num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <compare-signatures num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <compare-signatures num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
     <compare-signatures num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <compare-signatures num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
     <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
-<!--
-<echo>
-reproducible-1=${reproducible-1}
-reproducible-2=${reproducible-2}
-reproducible-3=${reproducible-3}
-reproducible-4=${reproducible-4}
-reproducible-5=${reproducible-5}
-reproducible-6=${reproducible-6}
-reproducible-7=${reproducible-7}
-reproducible-8=${reproducible-8}
-reproducible-9=${reproducible-9}
-reproducible-10=${reproducible-10}
-</echo>
--->
-
     <condition property="reproducible">
       <and>
         <isset property="reproducible-1" />
         <isset property="reproducible-2" />
-<!--
         <isset property="reproducible-3" />
--->
         <isset property="reproducible-4" />
-        <or>
-          <isset property="reproducible-5" />
-          <contains string="${version}" substring="12.0." /><!-- Super hack, Tomcat 12 does not produce x86 binaries. -->
-        </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
@@ -4540,7 +4626,6 @@ reproducible-10=${reproducible-10}
         <isset property="validsignature-2" />
         <isset property="validsignature-3" />
         <isset property="validsignature-4" />
-        <isset property="validsignature-5" />
         <isset property="validsignature-6" />
         <isset property="validsignature-7" />
         <isset property="validsignature-8" />

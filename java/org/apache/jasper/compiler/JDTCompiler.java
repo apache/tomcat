@@ -310,11 +310,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 case "22" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_22);
                 case "23" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_23);
                 case "24" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_24);
-                case "25" ->
+                case "25" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_25);
+                case "26" ->
                         // Constant not available in latest ECJ version shipped with
                         // Tomcat. May be supported in a snapshot build.
                         // This is checked against the actual version below.
-                        settings.put(CompilerOptions.OPTION_Source, "25");
+                        settings.put(CompilerOptions.OPTION_Source, "26");
                 default -> {
                     log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                     settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_21);
@@ -416,11 +417,15 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_24);
                 }
                 case "25" -> {
+                    settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_25);
+                    settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_25);
+                }
+                case "26" -> {
                     // Constant not available in latest ECJ version shipped with
                     // Tomcat. May be supported in a snapshot build.
                     // This is checked against the actual version below.
-                    settings.put(CompilerOptions.OPTION_TargetPlatform, "25");
-                    settings.put(CompilerOptions.OPTION_Compliance, "25");
+                    settings.put(CompilerOptions.OPTION_TargetPlatform, "26");
+                    settings.put(CompilerOptions.OPTION_Compliance, "26");
                 }
                 default -> {
                     log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));

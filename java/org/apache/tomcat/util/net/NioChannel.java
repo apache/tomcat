@@ -54,7 +54,11 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * @throws IOException If a problem was encountered resetting the channel
      */
     public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
-        this.sc = channel;
+        // Don't reset socket on null as it can lead to NPEs
+        if (channel != null) {
+            this.sc = channel;
+        }
+        // Resetting socketWrapper is possible
         this.socketWrapper = socketWrapper;
         bufHandler.reset();
     }

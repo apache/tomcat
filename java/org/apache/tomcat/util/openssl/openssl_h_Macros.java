@@ -371,6 +371,24 @@ public class openssl_h_Macros {
 
 
     /**
+     * Set automatic dh.
+     * {@snippet lang = c : # define SSL_CTX_set_dh_auto(ctx, onoff) \
+     *    SSL_CTX_ctrl(ctx,SSL_CTRL_SET_DH_AUTO,onoff,NULL)
+     * }
+     * @param sslCtx  the SSL context
+     * @param onoff 1 to enable
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set_dh_auto(MemorySegment sslCtx, int onoff) {
+        if (openssl_h_Compatibility.BORINGSSL) {
+            return 1;
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+        }
+    }
+
+
+    /**
      * Free memory.
      * {@snippet lang = c : # define OPENSSL_free(addr) CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
      * }
@@ -448,8 +466,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set1_groups_list";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
-                        openssl_h.C_POINTER);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -66,7 +66,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     private Collection<String> disconnectionIgnoreSqlCodes;
 
-    private boolean fastFailValidation = true;
+    private volatile boolean fastFailValidation = true;
 
     private volatile ObjectPool<PoolableConnection> pool;
 
@@ -74,23 +74,23 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     private Boolean defaultAutoCommit;
 
-    private boolean autoCommitOnReturn = true;
+    private volatile boolean autoCommitOnReturn = true;
 
-    private boolean rollbackOnReturn = true;
+    private volatile boolean rollbackOnReturn = true;
 
-    private int defaultTransactionIsolation = UNKNOWN_TRANSACTION_ISOLATION;
+    private volatile int defaultTransactionIsolation = UNKNOWN_TRANSACTION_ISOLATION;
 
     private String defaultCatalog;
 
     private String defaultSchema;
 
-    private boolean cacheState;
+    private volatile boolean cacheState;
 
-    private boolean poolStatements;
+    private volatile boolean poolStatements;
 
-    private boolean clearStatementPoolOnReturn;
+    private volatile boolean clearStatementPoolOnReturn;
 
-    private int maxOpenPreparedStatements = GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL_PER_KEY;
+    private volatile int maxOpenPreparedStatements = GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL_PER_KEY;
 
     private Duration maxConnDuration = Duration.ofMillis(-1);
 
@@ -99,7 +99,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     private Duration defaultQueryTimeoutDuration;
 
     /**
-     * Creates a new {@code PoolableConnectionFactory}.
+     * Creates a new {@link PoolableConnectionFactory}.
      *
      * @param connFactory
      *            the {@link ConnectionFactory} from which to obtain base {@link Connection}s
@@ -113,29 +113,26 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     @Override
     public void activateObject(final PooledObject<PoolableConnection> p) throws SQLException {
-
         validateLifetime(p);
-
-        final PoolableConnection pConnection = p.getObject();
-        pConnection.activate();
-
-        if (defaultAutoCommit != null && pConnection.getAutoCommit() != defaultAutoCommit.booleanValue()) {
-            pConnection.setAutoCommit(defaultAutoCommit.booleanValue());
+        final PoolableConnection poolableConnection = p.getObject();
+        poolableConnection.activate();
+        if (defaultAutoCommit != null && poolableConnection.getAutoCommit() != defaultAutoCommit.booleanValue()) {
+            poolableConnection.setAutoCommit(defaultAutoCommit.booleanValue());
         }
         if (defaultTransactionIsolation != UNKNOWN_TRANSACTION_ISOLATION
-                && pConnection.getTransactionIsolation() != defaultTransactionIsolation) {
-            pConnection.setTransactionIsolation(defaultTransactionIsolation);
+                && poolableConnection.getTransactionIsolation() != defaultTransactionIsolation) {
+            poolableConnection.setTransactionIsolation(defaultTransactionIsolation);
         }
-        if (defaultReadOnly != null && pConnection.isReadOnly() != defaultReadOnly.booleanValue()) {
-            pConnection.setReadOnly(defaultReadOnly.booleanValue());
+        if (defaultReadOnly != null && poolableConnection.isReadOnly() != defaultReadOnly.booleanValue()) {
+            poolableConnection.setReadOnly(defaultReadOnly.booleanValue());
         }
-        if (defaultCatalog != null && !defaultCatalog.equals(pConnection.getCatalog())) {
-            pConnection.setCatalog(defaultCatalog);
+        if (defaultCatalog != null && !defaultCatalog.equals(poolableConnection.getCatalog())) {
+            poolableConnection.setCatalog(defaultCatalog);
         }
-        if (defaultSchema != null && !defaultSchema.equals(Jdbc41Bridge.getSchema(pConnection))) {
-            Jdbc41Bridge.setSchema(pConnection, defaultSchema);
+        if (defaultSchema != null && !defaultSchema.equals(Jdbc41Bridge.getSchema(poolableConnection))) {
+            Jdbc41Bridge.setSchema(poolableConnection, defaultSchema);
         }
-        pConnection.setDefaultQueryTimeout(defaultQueryTimeoutDuration);
+        poolableConnection.setDefaultQueryTimeout(defaultQueryTimeoutDuration);
     }
 
     @Override
@@ -699,8 +696,8 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
      * @param disconnectionSqlCodes
      *            The disconnection SQL codes.
      * @see #getDisconnectionSqlCodes()
-     * @since 2.1
      * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionIgnoreSqlCodes}.
+     * @since 2.1
      */
     public void setDisconnectionSqlCodes(final Collection<String> disconnectionSqlCodes) {
         Utils.checkSqlCodes(disconnectionSqlCodes, this.disconnectionIgnoreSqlCodes);
@@ -718,9 +715,10 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
+     * Sets whether connections created by this factory will fast fail validation.
+     *
+     * @param fastFailValidation true means connections created by this factory will fast fail validation
      * @see #isFastFailValidation()
-     * @param fastFailValidation
-     *            true means connections created by this factory will fast fail validation
      * @since 2.1
      */
     public void setFastFailValidation(final boolean fastFailValidation) {

@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.jni;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Holds APR status without the need to load other classes.
@@ -25,6 +27,7 @@ public class AprStatus {
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
     private static volatile int openSSLVersion = 0;
+    private static ReentrantReadWriteLock statusLock = new ReentrantReadWriteLock();
 
     public static boolean isAprInitialized() {
         return aprInitialized;
@@ -72,4 +75,15 @@ public class AprStatus {
         AprStatus.openSSLVersion = openSSLVersion;
     }
 
+    /**
+     * Code that changes the status of the APR library MUST hold the write lock while making any changes.
+     * <p>
+     * Code that needs the status to be consistent for an operation must hold the read lock for the duration of that
+     * operation.
+     *
+     * @return The read/write lock for APR library status
+     */
+    public static ReentrantReadWriteLock getStatusLock() {
+        return statusLock;
+    }
 }

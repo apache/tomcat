@@ -569,7 +569,7 @@ public class AjpProcessor extends AbstractProcessor {
             // Zero length message.
             return true;
         } else {
-            if (messageLength > message.getBuffer().length) {
+            if (messageLength > (buf.length - Constants.H_SIZE)) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
                 String msg = sm.getString("ajpprocessor.header.tooLong", Integer.valueOf(messageLength),
@@ -797,7 +797,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 // nothing
                 case Constants.SC_A_SSL_CERT ->
-                    // SSL certificate extraction is lazy, moved to JkCoyoteHandler
+                        // SSL certificate extraction is lazy, moved to JkCoyoteHandler
                         requestHeaderMessage.getBytes(certificates);
                 case Constants.SC_A_SSL_CIPHER -> {
                     requestHeaderMessage.getBytes(tmpMB);

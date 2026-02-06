@@ -134,7 +134,17 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
-        if (checkForCachedAuthentication(request, response, true)) {
+        /*
+         * Reauthentication using the cached user name and password (if any) is not enabled for SPNEGO authentication.
+         * This is because the delegated credentials will nto be available unless a normal SPNEGO authentication takes
+         * place.
+         *
+         * Reauthentication was introduced to handle the case where the Realm took additional actions on authentication.
+         * Reauthenticating with the cached user name and password may not be sufficient for SPNEGO since it will not
+         * make the delegated credentials available that a web application may depend on. Therefore, the
+         * reauthentication behaviour for SPNEGO is to perform a normal SPNEGO authentication.
+         */
+        if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
 

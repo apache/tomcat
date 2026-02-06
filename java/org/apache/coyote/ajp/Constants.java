@@ -104,10 +104,10 @@ public final class Constants {
     public static final int MAX_SEND_SIZE = MAX_PACKET_SIZE - SEND_HEAD_LEN;
 
     // Translates integer codes to names of HTTP methods
-    private static final String[] methodTransArray =
-            { Method.OPTIONS, Method.GET, Method.HEAD, Method.POST, Method.PUT, Method.DELETE, Method.TRACE, Method.PROPFIND, Method.PROPPATCH, Method.MKCOL, Method.COPY,
-                    Method.MOVE, Method.LOCK, Method.UNLOCK, "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
-                    "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE", "BASELINE-CONTROL", "MKACTIVITY" };
+    private static final String[] methodTransArray = { Method.OPTIONS, Method.GET, Method.HEAD, Method.POST, Method.PUT,
+            Method.DELETE, Method.TRACE, Method.PROPFIND, Method.PROPPATCH, Method.MKCOL, Method.COPY, Method.MOVE,
+            Method.LOCK, Method.UNLOCK, "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
+            "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE", "BASELINE-CONTROL", "MKACTIVITY" };
 
     /**
      * Converts an AJP coded HTTP method to the method name.

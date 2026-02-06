@@ -315,6 +315,15 @@
       The default value is <code>false</code>.</p>
     </attribute>
 
+    <attribute name="strictSni" required="false">
+      <p>Set this attribute to <code>true</code> to verify that the
+      <code>SSLHostConfig</code> configuration associated with the SNI host name
+      is the same as the <code>SSLHostConfig</code> configuration associated
+      with the HTTP protocol virtual host name in use. Non matching requests
+      will be rejected.
+      The default value is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
       after %xx decoding the URL. The default value is <code>UTF-8</code>.</p>
@@ -1176,9 +1185,23 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO connector use either the JSSE Java SSL implementation or
-  an OpenSSL implementation. As far as possible, common configuration attributes
-  are used for both JSSE and OpenSSL.</p>
+  <p>The NIO connector may be configured to use either a JSSE Java SSL
+  implementation or an OpenSSL implementation. As far as possible, common
+  configuration attributes are used for both JSSE and OpenSSL. For each
+  Connector, you must use a consistent configuration style (JSSE specific
+  attributes or OpenSSL specfic attributes) for each of the following groups of
+  configuration attributes but you may use a different configuration style for
+  each group:</p>
+  <ul>
+    <li>trust attributes</li>
+    <li>all other attributes</li>
+  </ul>
+  <p>The implementation used (JSSE or OpenSSL) is independent of the
+  configuration style used.</p>
+
+  <p>Any <code>OpenSSLConf</code> settings are only used with an OpenSSL
+  implementation and may override attributes set via <code>SSLHostConfig</code>
+  or <code>Certificate</code> elements.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
@@ -1258,10 +1281,11 @@
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>The ciphers to enable using the OpenSSL syntax. (See the OpenSSL
-      documentation for the list of ciphers supported and the syntax).
-      Alternatively, a comma separated list of ciphers using the standard
-      OpenSSL cipher names or the standard JSSE cipher names may be used.</p>
+      <p>The TLSv1.2 and below ciphers to enable using the OpenSSL syntax. (See
+      the OpenSSL documentation for the list of ciphers supported and the
+      syntax). Alternatively, a comma separated list of TLS v1.2 and below
+      ciphers using the standard OpenSSL cipher names or the standard JSSE
+      cipher names may be used.</p>
       <p>Different versions of OpenSSL may interpret the same cipher string
       differently. For example, the <code>CCM8</code> ciphers were moved from
       <code>HIGH</code> to <code>MEDIUM</code> in OpenSSL 3.2. Regardless of
@@ -1269,17 +1293,40 @@
       value to a list of ciphers in a manner consistent with the latest OpenSSL
       development branch. This list of ciphers is then passed to the SSL
       implementation.</p>
-      <p>Only the ciphers that are supported by the SSL implementation will be
-      used. Any ciphers in the list derived from a non-default cipher string
-      that are not supported by the SSL implementation will be logged in a
+      <p>Only the TLSv1.2 and below ciphers that are supported by the SSL
+      implementation will be used. Any ciphers in the list derived from a
+      non-default cipher string that are not supported by the SSL implementation
+      or are TLSv1.3 cipher suites will be ignored and logged in a
       <code>WARNING</code> message when the Connector starts. The warning can be
-      avoided by providing an explicit list of ciphers that are supported by the
-      configured SSL implementation.</p>
+      avoided by providing an explicit list of TLSv1.2 and below ciphers that
+      are supported by the configured SSL implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
-      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be
-      used.</p>
+      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
+      will be used.</p>
       <p>Note that, by default, the order in which ciphers are defined is
-      treated as an order of preference. See <code>honorCipherOrder</code>.</p>
+      not treated as an order of preference. See
+      <code>honorCipherOrder</code>.</p>
+      <p>For JSSE (which - unlike OpenSSL - uses a single configuration setting
+      for both ciphers and cipher suites) the cipher suites attribute will be
+      prepended to the ciphers attribute before the combined value is used to
+      configure the JSSE implementation.</p>
+    </attribute>
+
+    <attribute name="cipherSuites" required="false">
+      <p>The TLSv1.3 cipher suites to enable using either the OpenSSL syntax
+      (colon separated list) or the JSSE syntax (comma separated list) using the
+      standard TLSv1.3 cipher suite names.</p>
+      <p>Only TLSv1.3 cipher suites will be used. Any other entries in the list
+      will be ignored and logged in a <code>WARNING</code> message when the
+      Connector starts. The warning can be avoided by providing an explicit list
+      of TLSv1.3 cipher suites.</p>
+      <p>If not specified, a default (using the OpenSSL notation) of
+      <code>TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
+      will be used.</p>
+      <p>For JSSE (which - unlike OpenSSL - uses a single configuration setting
+      for both ciphers and cipher suites) the cipher suites attribute will be
+      prepended to the ciphers attribute before the combined value is used to
+      configure the JSSE implementation.</p>
     </attribute>
 
     <attribute name="disableCompression" required="false">
@@ -1337,6 +1384,32 @@
       <code>SunX509</code> for Sun JVMs. IBM JVMs return
       <code>IbmX509</code>. For other vendors, consult the JVM
       documentation for the default value.</p>
+    </attribute>
+
+    <attribute name="ocspEnabled" required="false">
+      <p>If enabled, client certificates with an OCSP responder URI in the
+      Authority Information Access extension will be validated using that OCSP
+      responder.</p>
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
+    </attribute>
+
+    <attribute name="ocspSoftFail" required="false">
+      <p>By default, if an OCSP check fails for any reason the associated TLS
+      handhskae will also fail and a TLS connection will not be established. If
+      this attribute is set to <code>true</code>, OCSP checks that fail but do
+      not return an explicit failure status to Tomcat (e.g. the OCSP check times
+      out) will not cause the TLS handshake to fail.</p>
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
+    </attribute>
+
+    <attribute name="ocspVerify" required="false">
+      <p>Configures the verification flags passed to
+      <code>OCSP_basic_verify</code> when using OCSP checks with an OpenSSL
+      based TLS implementation. This attribute has no effect if a JSSE based TLS
+      implementation is used.</p>
+      <p>If not specified, the default value of <code>0</code> will be used.</p>
     </attribute>
 
     <attribute name="protocols" required="false">

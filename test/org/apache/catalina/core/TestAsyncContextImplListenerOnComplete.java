@@ -98,7 +98,8 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
             try (var writer = new OutputStreamWriter(socket.getOutputStream())) {
                 // @formatter:off
                 writer.write(
-                        "GET /repro" + CRLF +
+                        "GET /repro HTTP/1.1" + CRLF +
+                        "Host: localhost:" + port + CRLF +
                         "Accept: text/event-stream" + CRLF +
                         CRLF);
                 // @formatter:on

@@ -194,12 +194,12 @@ public class GzipOutputFilter implements OutputFilter {
 
         @Override
         public void flush() throws IOException {
-            /* NOOP */
+            // NOOP
         }
 
         @Override
         public void close() throws IOException {
-            /* NOOP */
+            // NOOP
         }
     }
 

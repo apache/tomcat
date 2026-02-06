@@ -58,6 +58,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
     private Charset encoding = StandardCharsets.UTF_8;
     private String algorithm = null;
+    private boolean digestInRfc3112Order = true;
 
 
     public String getEncoding() {
@@ -88,6 +89,16 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
     public void setAlgorithm(String algorithm) throws NoSuchAlgorithmException {
         ConcurrentMessageDigest.init(algorithm);
         this.algorithm = algorithm;
+    }
+
+
+    public boolean getDigestInRfc3112Order() {
+        return digestInRfc3112Order;
+    }
+
+
+    public void setDigestInRfc3112Order(boolean digestInRfc3112Order) {
+        this.digestInRfc3112Order = digestInRfc3112Order;
     }
 
 
@@ -162,7 +173,12 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
             if (salt == null) {
                 userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, inputCredentialbytes);
             } else {
-                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, salt, inputCredentialbytes);
+                if (digestInRfc3112Order) {
+                    // RFC 3112 states that the input order for the digest is credentials then salt
+                    userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, inputCredentialbytes, salt);
+                } else {
+                    userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, salt, inputCredentialbytes);
+                }
             }
             return HexUtils.toHexString(userDigest);
         }

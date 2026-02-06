@@ -254,7 +254,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
                 SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
                 sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
                 sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
-                sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+                sslHostConfigCertificateRsa.setCertificateKeyPassword(TesterSupport.JKS_PASS);
                 sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
                 break;
             }
@@ -276,7 +276,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
                 SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
                 sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
                 sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
-                sslHostConfigCertificateEc.setCertificateKeyPassword(TesterSupport.JKS_PASS);
                 sslHostConfig.addCertificate(sslHostConfigCertificateEc);
                 break;
             }

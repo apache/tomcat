@@ -247,12 +247,6 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     @Test
-    public void testUnimplementedMethodHttp09() throws Exception {
-        doTestUnimplementedMethod("0.9");
-    }
-
-
-    @Test
     public void testUnimplementedMethodHttp10() throws Exception {
         doTestUnimplementedMethod("1.0");
     }
@@ -289,7 +283,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         request.append(CRLF);
 
-        Client client = new Client(request.toString(), "0.9".equals(httpVersion));
+        Client client = new Client(request.toString());
 
         client.doRequest();
 
@@ -366,9 +360,8 @@ public class TestHttpServlet extends TomcatBaseTest {
 
     private class Client extends SimpleHttpClient {
 
-        Client(String request, boolean isHttp09) {
+        Client(String request) {
             setRequest(new String[] { request });
-            setUseHttp09(isHttp09);
         }
 
         private Exception doRequest() {

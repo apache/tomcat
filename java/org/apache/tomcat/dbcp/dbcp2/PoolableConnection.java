@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,8 +60,9 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
 
     private final ObjectNameWrapper jmxObjectName;
 
-    // Use a prepared statement for validation, retaining the last used SQL to
-    // check if the validation query has changed.
+    /**
+     * Use a prepared statement for validation, retaining the last used SQL to check if the validation query has changed.
+     */
     private PreparedStatement validationPreparedStatement;
     private String lastValidationSql;
 
@@ -68,7 +70,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * Indicate that unrecoverable SQLException was thrown when using this connection. Such a connection should be
      * considered broken and not pass validation in the future.
      */
-    private boolean fatalSqlExceptionThrown;
+    private final AtomicBoolean fatalSqlExceptionThrown = new AtomicBoolean();
 
     /**
      * SQL State codes considered to signal fatal conditions. Overrides the defaults in
@@ -83,13 +85,14 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      */
     private final Collection<String> disconnectionIgnoreSqlCodes;
 
-
     /** Whether or not to fast fail validation after fatal connection errors */
     private final boolean fastFailValidation;
 
     private final Lock lock = new ReentrantLock();
 
     /**
+     * Constructs a new instance.
+     *
      * @param conn
      *            my underlying connection
      * @param pool
@@ -103,6 +106,8 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
+     * Constructs a new instance.
+     *
      * @param conn
      *            my underlying connection
      * @param pool
@@ -237,6 +242,8 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
+     * Gets the disconnection SQL codes.
+     *
      * @return The disconnection SQL codes.
      * @since 2.6.0
      */
@@ -254,7 +261,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
 
     @Override
     protected void handleException(final SQLException e) throws SQLException {
-        fatalSqlExceptionThrown |= isFatalException(e);
+        fatalSqlExceptionThrown.compareAndSet(false, isFatalException(e));
         super.handleException(e);
     }
 
@@ -264,6 +271,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * This method should not be used by a client to determine whether or not a connection should be return to the
      * connection pool (by calling {@link #close()}). Clients should always attempt to return a connection to the pool
      * once it is no longer required.
+     * </p>
      */
     @Override
     public boolean isClosed() throws SQLException {
@@ -310,6 +318,8 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
+     * Tests whether to fail-fast.
+     *
      * @return Whether to fail-fast.
      * @since 2.6.0
      */
@@ -384,11 +394,11 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * Validates the connection, using the following algorithm:
      * <ol>
      * <li>If {@code fastFailValidation} (constructor argument) is {@code true} and this connection has previously
-     * thrown a fatal disconnection exception, a {@code SQLException} is thrown.</li>
+     * thrown a fatal disconnection exception, a {@link SQLException} is thrown.</li>
      * <li>If {@code sql} is null, the driver's #{@link Connection#isValid(int) isValid(timeout)} is called. If it
-     * returns {@code false}, {@code SQLException} is thrown; otherwise, this method returns successfully.</li>
-     * <li>If {@code sql} is not null, it is executed as a query and if the resulting {@code ResultSet} contains at
-     * least one row, this method returns successfully. If not, {@code SQLException} is thrown.</li>
+     * returns {@code false}, {@link SQLException} is thrown; otherwise, this method returns successfully.</li>
+     * <li>If {@code sql} is not null, it is executed as a query and if the resulting {@link ResultSet} contains at
+     * least one row, this method returns successfully. If not, {@link SQLException} is thrown.</li>
      * </ol>
      *
      * @param sql
@@ -400,7 +410,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * @since 2.10.0
      */
     public void validate(final String sql, Duration timeoutDuration) throws SQLException {
-        if (fastFailValidation && fatalSqlExceptionThrown) {
+        if (fastFailValidation && fatalSqlExceptionThrown.get()) {
             throw new SQLException(Utils.getMessage("poolableConnection.validate.fastFail"));
         }
 
@@ -438,11 +448,11 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * Validates the connection, using the following algorithm:
      * <ol>
      * <li>If {@code fastFailValidation} (constructor argument) is {@code true} and this connection has previously
-     * thrown a fatal disconnection exception, a {@code SQLException} is thrown.</li>
+     * thrown a fatal disconnection exception, a {@link SQLException} is thrown.</li>
      * <li>If {@code sql} is null, the driver's #{@link Connection#isValid(int) isValid(timeout)} is called. If it
-     * returns {@code false}, {@code SQLException} is thrown; otherwise, this method returns successfully.</li>
-     * <li>If {@code sql} is not null, it is executed as a query and if the resulting {@code ResultSet} contains at
-     * least one row, this method returns successfully. If not, {@code SQLException} is thrown.</li>
+     * returns {@code false}, {@link SQLException} is thrown; otherwise, this method returns successfully.</li>
+     * <li>If {@code sql} is not null, it is executed as a query and if the resulting {@link ResultSet} contains at
+     * least one row, this method returns successfully. If not, {@link SQLException} is thrown.</li>
      * </ol>
      *
      * @param sql

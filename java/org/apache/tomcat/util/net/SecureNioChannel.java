@@ -94,11 +94,13 @@ public class SecureNioChannel extends NioChannel {
     public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
         super.reset(channel, socketWrapper);
         sslEngine = null;
-        sniComplete = false;
-        handshakeComplete = false;
-        closed = false;
-        closing = false;
-        netInBuffer.clear();
+        if (channel != null) {
+            sniComplete = false;
+            handshakeComplete = false;
+            closed = false;
+            closing = false;
+            netInBuffer.clear();
+        }
     }
 
     @Override
@@ -279,6 +281,7 @@ public class SecureNioChannel extends NioChannel {
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
+                socketWrapper.setSniHostName(hostName);
                 clientRequestedApplicationProtocols = extractor.getClientRequestedApplicationProtocols();
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:

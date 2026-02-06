@@ -59,7 +59,14 @@ public class SSLHostConfig implements Serializable {
     // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
-    public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    public static final String DEFAULT_TLS_CIPHERS_12 = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    public static final String DEFAULT_TLS_CIPHERS_13 = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256";
+    /**
+     * Default cipher list for TLS 1.2 and below.
+     * @deprecated Replaced by {@link #DEFAULT_TLS_CIPHERS_12}
+     */
+    @Deprecated
+    public static final String DEFAULT_TLS_CIPHERS = DEFAULT_TLS_CIPHERS_12;
 
     static {
         /*
@@ -73,6 +80,7 @@ public class SSLHostConfig implements Serializable {
     }
 
     private Type configType = null;
+    private Type trustConfigType = null;
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
@@ -103,10 +111,16 @@ public class SSLHostConfig implements Serializable {
     private int certificateVerificationDepth = 10;
     // Used to track if certificateVerificationDepth has been explicitly set
     private boolean certificateVerificationDepthConfigured = false;
-    private String ciphers = DEFAULT_TLS_CIPHERS;
+    private String ciphers = DEFAULT_TLS_CIPHERS_12;
+    private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
     private LinkedHashSet<Cipher> cipherList = null;
+    private LinkedHashSet<Cipher> cipherSuiteList = null;
     private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = false;
+    private boolean ocspEnabled = false;
+    private boolean ocspSoftFail = true;
+    private int ocspTimeout = 15000;
+    private int ocspVerifyFlags = 0;
     private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
@@ -181,7 +195,7 @@ public class SSLHostConfig implements Serializable {
      * @param name       the property name
      * @param configType the configuration type
      *
-     * @return true if the property belongs to the current configuration, and false otherwise
+     * @return true if the property belongs to the current configuration type, and false otherwise
      */
     boolean setProperty(String name, Type configType) {
         if (this.configType == null) {
@@ -189,6 +203,28 @@ public class SSLHostConfig implements Serializable {
         } else {
             if (configType != this.configType) {
                 log.warn(sm.getString("sslHostConfig.mismatch", name, getHostName(), configType, this.configType));
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Set property which belongs to the specified trust configuration type.
+     *
+     * @param name            the property name
+     * @param trustConfigType the trust configuration type
+     *
+     * @return true if the property belongs to the current trust configuration type, and false otherwise
+     */
+    boolean setTrustProperty(String name, Type trustConfigType) {
+        if (this.trustConfigType == null) {
+            this.trustConfigType = trustConfigType;
+        } else {
+            if (trustConfigType != this.trustConfigType) {
+                log.warn(sm.getString("sslHostConfig.mismatch.trust", name, getHostName(), trustConfigType,
+                        this.trustConfigType));
                 return false;
             }
         }
@@ -280,7 +316,6 @@ public class SSLHostConfig implements Serializable {
         } else if (openSslConf != null) {
             throw new IllegalArgumentException(sm.getString("sslHostConfig.opensslconf.alreadySet"));
         }
-        setProperty("<OpenSSLConf>", Type.OPENSSL);
         openSslConf = conf;
     }
 
@@ -354,36 +389,59 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
-     * Set the new cipher configuration. Note: Regardless of the format used to set the configuration, it is always
-     * stored in OpenSSL format.
+     * Set the new cipher (TLSv1.2 and below) configuration. Note: Regardless of the format used to set the
+     * configuration, it is always stored in OpenSSL format.
      *
      * @param ciphersList The new cipher configuration in OpenSSL or JSSE format
      */
     public void setCiphers(String ciphersList) {
         // Ciphers is stored in OpenSSL format. Convert the provided value if
         // necessary.
-        if (ciphersList != null && !ciphersList.contains(":")) {
-            StringBuilder sb = new StringBuilder();
-            // Not obviously in OpenSSL format. Might be a single OpenSSL or JSSE
-            // cipher name. Might be a comma separated list of cipher names
-            String[] ciphers = ciphersList.split(",");
-            for (String cipher : ciphers) {
-                String trimmed = cipher.trim();
-                if (!trimmed.isEmpty()) {
-                    String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
-                    if (openSSLName == null) {
-                        // Not a JSSE name. Maybe an OpenSSL name or alias
-                        openSSLName = trimmed;
+        if (ciphersList != null) {
+            if (ciphersList.contains(":")) {
+                // OpenSSL format
+                StringBuilder sb = new StringBuilder();
+                String[] components = ciphersList.split(":");
+                // Remove any TLS 1.3 cipher suites
+                for (String component : components) {
+                    String trimmed = component.trim();
+                    if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
+                        log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
+                    } else {
+                        if (!sb.isEmpty()) {
+                            sb.append(':');
+                        }
+                        sb.append(trimmed);
                     }
-                    if (!sb.isEmpty()) {
-                        sb.append(':');
-                    }
-                    sb.append(openSSLName);
                 }
+                this.ciphers = sb.toString();
+            } else {
+                // Not obviously in OpenSSL format. Might be a single OpenSSL or JSSE
+                // cipher name. Might be a comma separated list of cipher names
+                StringBuilder sb = new StringBuilder();
+                String[] ciphers = ciphersList.split(",");
+                for (String cipher : ciphers) {
+                    String trimmed = cipher.trim();
+                    if (!trimmed.isEmpty()) {
+                        if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
+                            log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
+                            continue;
+                        }
+                        String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
+                        if (openSSLName == null) {
+                            // Not a JSSE name. Maybe an OpenSSL name or alias
+                            openSSLName = trimmed;
+                        }
+                        if (!sb.isEmpty()) {
+                            sb.append(':');
+                        }
+                        sb.append(openSSLName);
+                    }
+                }
+                this.ciphers = sb.toString();
             }
-            this.ciphers = sb.toString();
         } else {
-            this.ciphers = ciphersList;
+            this.ciphers = null;
         }
         this.cipherList = null;
         this.jsseCipherNames = null;
@@ -414,9 +472,73 @@ public class SSLHostConfig implements Serializable {
      */
     public List<String> getJsseCipherNames() {
         if (jsseCipherNames == null) {
-            jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(getCipherList());
+            Set<Cipher> jsseCiphers = new HashSet<>();
+            jsseCiphers.addAll(getCipherSuiteList());
+            jsseCiphers.addAll(getCipherList());
+            jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(jsseCiphers);
         }
         return jsseCipherNames;
+    }
+
+
+    /**
+     * Set the cipher suite (TLSv1.3) configuration.
+     *
+     * @param cipherSuites The cipher suites to use in a colon-separated, preference order list
+     */
+    public void setCipherSuites(String cipherSuites) {
+        StringBuilder sb = new StringBuilder();
+        String[] values;
+        if (cipherSuites.contains(":")) {
+            // OpenSSL format
+            values = cipherSuites.split(":");
+        } else {
+            // JSSE format or possible a single cipher suite name
+            values = cipherSuites.split(",");
+        }
+        for (String value : values) {
+            String trimmed = value.trim();
+            if (!trimmed.isEmpty()) {
+                if (!OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
+                    log.warn(sm.getString("sslHostConfig.ignoreNonTls13Ciphersuite", trimmed));
+                    continue;
+                }
+                /*
+                 * OpenSSL and JSSE names for TLSv1.3 cipher suites are currently (January 2026) the same but handle the
+                 * possible future case where they are not.
+                 */
+                String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
+                if (openSSLName == null) {
+                    // Not a JSSE name. Maybe an OpenSSL name or alias
+                    openSSLName = trimmed;
+                }
+                if (!sb.isEmpty()) {
+                    sb.append(':');
+                }
+                sb.append(trimmed);
+            }
+        }
+        this.cipherSuites = sb.toString();
+        this.cipherSuiteList = null;
+        this.jsseCipherNames = null;
+    }
+
+
+    /**
+     * Obtain the current cipher suite (TLSv1.3) configuration.
+     *
+     * @return An OpenSSL cipher suite string for the current configuration.
+     */
+    public String getCipherSuites() {
+        return cipherSuites;
+    }
+
+
+    private LinkedHashSet<Cipher> getCipherSuiteList() {
+        if (cipherSuiteList == null) {
+            cipherSuiteList = OpenSSLCipherConfigurationParser.parse(getCipherSuites());
+        }
+        return cipherSuiteList;
     }
 
 
@@ -440,6 +562,46 @@ public class SSLHostConfig implements Serializable {
      */
     public String getHostName() {
         return hostName;
+    }
+
+
+    public boolean getOcspEnabled() {
+        return ocspEnabled;
+    }
+
+
+    public void setOcspEnabled(boolean ocspEnabled) {
+        this.ocspEnabled = ocspEnabled;
+    }
+
+
+    public boolean getOcspSoftFail() {
+        return ocspSoftFail;
+    }
+
+
+    public void setOcspSoftFail(boolean ocspSoftFail) {
+        this.ocspSoftFail = ocspSoftFail;
+    }
+
+
+    public int getOcspTimeout() {
+        return ocspTimeout;
+    }
+
+
+    public void setOcspTimeout(int ocspTimeout) {
+        this.ocspTimeout = ocspTimeout;
+    }
+
+
+    public int getOcspVerifyFlags() {
+        return ocspVerifyFlags;
+    }
+
+
+    public void setOcspVerifyFlags(int ocspVerifyFlags) {
+        this.ocspVerifyFlags = ocspVerifyFlags;
     }
 
 
@@ -537,6 +699,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Set the enabled named groups.
+     *
      * @param groupsString the case sensitive comma separated list of groups
      */
     public void setGroups(String groupsString) {
@@ -598,7 +761,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTrustManagerClassName(String trustManagerClassName) {
-        setProperty("trustManagerClassName", Type.JSSE);
+        setTrustProperty("trustManagerClassName", Type.JSSE);
         this.trustManagerClassName = trustManagerClassName;
     }
 
@@ -609,7 +772,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreAlgorithm(String truststoreAlgorithm) {
-        setProperty("truststoreAlgorithm", Type.JSSE);
+        setTrustProperty("truststoreAlgorithm", Type.JSSE);
         this.truststoreAlgorithm = truststoreAlgorithm;
     }
 
@@ -620,7 +783,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreFile(String truststoreFile) {
-        setProperty("truststoreFile", Type.JSSE);
+        setTrustProperty("truststoreFile", Type.JSSE);
         this.truststoreFile = truststoreFile;
     }
 
@@ -631,7 +794,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststorePassword(String truststorePassword) {
-        setProperty("truststorePassword", Type.JSSE);
+        setTrustProperty("truststorePassword", Type.JSSE);
         this.truststorePassword = truststorePassword;
     }
 
@@ -642,7 +805,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreProvider(String truststoreProvider) {
-        setProperty("truststoreProvider", Type.JSSE);
+        setTrustProperty("truststoreProvider", Type.JSSE);
         this.truststoreProvider = truststoreProvider;
     }
 
@@ -661,7 +824,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTruststoreType(String truststoreType) {
-        setProperty("truststoreType", Type.JSSE);
+        setTrustProperty("truststoreType", Type.JSSE);
         this.truststoreType = truststoreType;
     }
 
@@ -685,6 +848,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setTrustStore(KeyStore truststore) {
+        setTrustProperty("trustStore", Type.JSSE);
         this.truststore = truststore;
     }
 
@@ -729,7 +893,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificateFile(String caCertificateFile) {
-        if (setProperty("caCertificateFile", Type.OPENSSL)) {
+        if (setTrustProperty("caCertificateFile", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
             if (truststoreFile != null) {
                 truststoreFile = null;
@@ -745,7 +909,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificatePath(String caCertificatePath) {
-        if (setProperty("caCertificatePath", Type.OPENSSL)) {
+        if (setTrustProperty("caCertificatePath", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
             if (truststoreFile != null) {
                 truststoreFile = null;

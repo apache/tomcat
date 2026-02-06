@@ -21,8 +21,9 @@ import java.util.Map;
 
 /**
  * All the signature schemes for TLS 1.3.
- * @see <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme" >The signature schemes
- *          registry</a>
+ *
+ * @see <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme" >The
+ *          signature schemes registry</a>
  */
 public enum SignatureScheme {
 

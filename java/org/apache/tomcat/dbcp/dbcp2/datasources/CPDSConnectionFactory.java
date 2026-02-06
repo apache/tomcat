@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,21 +17,14 @@
 package org.apache.tomcat.dbcp.dbcp2.datasources;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
-import org.apache.tomcat.dbcp.dbcp2.Utils;
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
 import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
@@ -42,31 +35,16 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
  *
  * @since 2.0
  */
-final class CPDSConnectionFactory
+final class CPDSConnectionFactory extends AbstractConnectionFactory
         implements PooledObjectFactory<PooledConnectionAndInfo>, ConnectionEventListener, PooledConnectionManager {
 
     private static final String NO_KEY_MESSAGE = "close() was called on a Connection, but I have no record of the underlying PooledConnection.";
 
-    private final ConnectionPoolDataSource cpds;
-    private final String validationQuery;
-    private final Duration validationQueryTimeoutDuration;
-    private final boolean rollbackAfterValidation;
     private ObjectPool<PooledConnectionAndInfo> pool;
     private UserPassKey userPassKey;
-    private Duration maxConnDuration = Duration.ofMillis(-1);
 
     /**
-     * Map of PooledConnections for which close events are ignored. Connections are muted when they are being validated.
-     */
-    private final Set<PooledConnection> validatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-    /**
-     * Map of PooledConnectionAndInfo instances
-     */
-    private final Map<PooledConnection, PooledConnectionAndInfo> pcMap = new ConcurrentHashMap<>();
-
-    /**
-     * Creates a new {@code PoolableConnectionFactory}.
+     * Creates a new {@link PoolableConnectionFactory}.
      *
      * @param cpds
      *            the ConnectionPoolDataSource from which to obtain PooledConnection's
@@ -87,96 +65,13 @@ final class CPDSConnectionFactory
     CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final Duration validationQueryTimeoutDuration, final boolean rollbackAfterValidation, final String userName,
             final char[] userPassword) {
-        this.cpds = cpds;
-        this.validationQuery = validationQuery;
-        this.validationQueryTimeoutDuration = validationQueryTimeoutDuration;
+        super(cpds, validationQuery, validationQueryTimeoutDuration, rollbackAfterValidation);
         this.userPassKey = new UserPassKey(userName, userPassword);
-        this.rollbackAfterValidation = rollbackAfterValidation;
-    }
-
-    /**
-     * Creates a new {@code PoolableConnectionFactory}.
-     *
-     * @param cpds
-     *            the ConnectionPoolDataSource from which to obtain PooledConnection's
-     * @param validationQuery
-     *            a query to use to {@link #validateObject validate} {@link Connection}s. Should return at least one
-     *            row. May be {@code null} in which case {@link Connection#isValid(int)} will be used to validate
-     *            connections.
-     * @param validationQueryTimeoutDuration
-     *            Timeout in seconds before validation fails
-     * @param rollbackAfterValidation
-     *            whether a rollback should be issued after {@link #validateObject validating} {@link Connection}s.
-     * @param userName
-     *            The user name to use to create connections
-     * @param userPassword
-     *            The password to use to create connections
-     * @since 2.10.0
-     */
-    CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery, final Duration validationQueryTimeoutDuration,
-            final boolean rollbackAfterValidation, final String userName, final String userPassword) {
-        this(cpds, validationQuery, validationQueryTimeoutDuration, rollbackAfterValidation, userName, Utils.toCharArray(userPassword));
-    }
-
-    /**
-     * Creates a new {@code PoolableConnectionFactory}.
-     *
-     * @param cpds
-     *            the ConnectionPoolDataSource from which to obtain PooledConnection's
-     * @param validationQuery
-     *            a query to use to {@link #validateObject validate} {@link Connection}s. Should return at least one
-     *            row. May be {@code null} in which case {@link Connection#isValid(int)} will be used to validate
-     *            connections.
-     * @param validationQueryTimeoutSeconds
-     *            Timeout in seconds before validation fails
-     * @param rollbackAfterValidation
-     *            whether a rollback should be issued after {@link #validateObject validating} {@link Connection}s.
-     * @param userName
-     *            The user name to use to create connections
-     * @param userPassword
-     *            The password to use to create connections
-     * @since 2.4.0
-     * @deprecated Use {@link #CPDSConnectionFactory(ConnectionPoolDataSource, String, Duration, boolean, String, char[])}.
-     */
-    @Deprecated
-    CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
-            final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation, final String userName,
-            final char[] userPassword) {
-        this.cpds = cpds;
-        this.validationQuery = validationQuery;
-        this.validationQueryTimeoutDuration = Duration.ofSeconds(validationQueryTimeoutSeconds);
-        this.userPassKey = new UserPassKey(userName, userPassword);
-        this.rollbackAfterValidation = rollbackAfterValidation;
-    }
-
-    /**
-     * Creates a new {@code PoolableConnectionFactory}.
-     *
-     * @param cpds
-     *            the ConnectionPoolDataSource from which to obtain PooledConnection's
-     * @param validationQuery
-     *            a query to use to {@link #validateObject validate} {@link Connection}s. Should return at least one
-     *            row. May be {@code null} in which case {@link Connection#isValid(int)} will be used to validate
-     *            connections.
-     * @param validationQueryTimeoutSeconds
-     *            Timeout in seconds before validation fails
-     * @param rollbackAfterValidation
-     *            whether a rollback should be issued after {@link #validateObject validating} {@link Connection}s.
-     * @param userName
-     *            The user name to use to create connections
-     * @param userPassword
-     *            The password to use to create connections
-     * @deprecated Use {@link #CPDSConnectionFactory(ConnectionPoolDataSource, String, Duration, boolean, String, String)}.
-     */
-    @Deprecated
-    CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery, final int validationQueryTimeoutSeconds,
-            final boolean rollbackAfterValidation, final String userName, final String userPassword) {
-        this(cpds, validationQuery, validationQueryTimeoutSeconds, rollbackAfterValidation, userName, Utils.toCharArray(userPassword));
     }
 
     @Override
-    public void activateObject(final PooledObject<PooledConnectionAndInfo> p) throws SQLException {
-        validateLifetime(p);
+    public void activateObject(final PooledObject<PooledConnectionAndInfo> pooledObject) throws SQLException {
+        validateLifetime(pooledObject);
     }
 
     /**
@@ -216,7 +111,7 @@ final class CPDSConnectionFactory
             try {
                 pool.returnObject(pci);
             } catch (final Exception e) {
-                System.err.println("CLOSING DOWN CONNECTION AS IT COULD " + "NOT BE RETURNED TO THE POOL");
+                System.err.println("CLOSING DOWN CONNECTION AS IT COULD NOT BE RETURNED TO THE POOL");
                 pc.removeConnectionEventListener(this);
                 try {
                     doDestroyObject(pci);
@@ -296,8 +191,9 @@ final class CPDSConnectionFactory
             throw new IllegalStateException(NO_KEY_MESSAGE);
         }
         try {
-            pool.invalidateObject(pci); // Destroy instance and update pool counters
             pool.close(); // Clear any other instances in this pool and kill others as they come back
+            // Calling close before invalidate ensures that invalidate will not trigger a create attempt
+            pool.invalidateObject(pci); // Destroy instance and update pool counters
         } catch (final Exception ex) {
             throw new SQLException("Error invalidating connection", ex);
         }
@@ -328,50 +224,12 @@ final class CPDSConnectionFactory
     }
 
     /**
-     * Sets the maximum Duration of a connection after which the connection will always fail activation,
-     * passivation and validation.
-     *
-     * @param maxConnDuration
-     *            A value of zero or less indicates an infinite lifetime. The default value is -1 milliseconds.
-     * @since 2.10.0
-     */
-    public void setMaxConn(final Duration maxConnDuration) {
-        this.maxConnDuration = maxConnDuration;
-    }
-
-    /**
-     * Sets the maximum lifetime in milliseconds of a connection after which the connection will always fail activation,
-     * passivation and validation.
-     *
-     * @param maxConnDuration
-     *            A value of zero or less indicates an infinite lifetime. The default value is -1 milliseconds.
-     * @since 2.9.0
-     * @deprecated Use {@link #setMaxConn(Duration)}.
-     */
-    @Deprecated
-    public void setMaxConnLifetime(final Duration maxConnDuration) {
-        this.maxConnDuration = maxConnDuration;
-    }
-
-    /**
-     * Sets the maximum lifetime in milliseconds of a connection after which the connection will always fail activation,
-     * passivation and validation.
-     *
-     * @param maxConnLifetimeMillis
-     *            A value of zero or less indicates an infinite lifetime. The default value is -1.
-     * @deprecated Use {@link #setMaxConn(Duration)}.
-     */
-    @Deprecated
-    public void setMaxConnLifetimeMillis(final long maxConnLifetimeMillis) {
-        setMaxConnLifetime(Duration.ofMillis(maxConnLifetimeMillis));
-    }
-
-    /**
      * Sets the database password used when creating new connections.
      *
      * @param userPassword
      *            new password
      */
+    @Override
     public synchronized void setPassword(final char[] userPassword) {
         this.userPassKey = new UserPassKey(userPassKey.getUserName(), userPassword);
     }
@@ -419,62 +277,5 @@ final class CPDSConnectionFactory
         builder.append(pcMap);
         builder.append("]");
         return builder.toString();
-    }
-
-    private void validateLifetime(final PooledObject<PooledConnectionAndInfo> p) throws SQLException {
-        Utils.validateLifetime(p, maxConnDuration);
-    }
-
-    @Override
-    public boolean validateObject(final PooledObject<PooledConnectionAndInfo> p) {
-        try {
-            validateLifetime(p);
-        } catch (final Exception e) {
-            return false;
-        }
-        boolean valid = false;
-        final PooledConnection pconn = p.getObject().getPooledConnection();
-        Connection conn = null;
-        validatingSet.add(pconn);
-        if (null == validationQuery) {
-            Duration timeoutDuration = validationQueryTimeoutDuration;
-            if (timeoutDuration.isNegative()) {
-                timeoutDuration = Duration.ZERO;
-            }
-            try {
-                conn = pconn.getConnection();
-                valid = conn.isValid((int) timeoutDuration.getSeconds());
-            } catch (final SQLException e) {
-                valid = false;
-            } finally {
-                Utils.closeQuietly((AutoCloseable) conn);
-                validatingSet.remove(pconn);
-            }
-        } else {
-            Statement stmt = null;
-            ResultSet rset = null;
-            // logical Connection from the PooledConnection must be closed
-            // before another one can be requested and closing it will
-            // generate an event. Keep track so we know not to return
-            // the PooledConnection
-            validatingSet.add(pconn);
-            try {
-                conn = pconn.getConnection();
-                stmt = conn.createStatement();
-                rset = stmt.executeQuery(validationQuery);
-                valid = rset.next();
-                if (rollbackAfterValidation) {
-                    conn.rollback();
-                }
-            } catch (final Exception e) {
-                valid = false;
-            } finally {
-                Utils.closeQuietly((AutoCloseable) rset);
-                Utils.closeQuietly((AutoCloseable) stmt);
-                Utils.closeQuietly((AutoCloseable) conn);
-                validatingSet.remove(pconn);
-            }
-        }
-        return valid;
     }
 }

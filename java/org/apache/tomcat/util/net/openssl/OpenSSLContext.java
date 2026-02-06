@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -46,6 +47,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
@@ -100,8 +102,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         boolean success = false;
         try {
             // Create OpenSSLConfCmd context if used
-            OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
-            if (openSslConf != null) {
+            if (sslHostConfig.getOpenSslConf() == null && sslHostConfig.getTrustManagerClassName() == null &&
+                    sslHostConfig.getTruststore() == null) {
+                /*
+                 * If an instance of OpenSSLConf is required, it must be created here so the reference can be placed in
+                 * the (immutable) OpenSSLState record.
+                 *
+                 * If OpenSSL managed trust is used, an instance of OpenSSLConf is required to pass OCSP configuration
+                 * parameters to Tomcat Native. Create one if one hasn't already been created.
+                 */
+                sslHostConfig.setOpenSslConf(new OpenSSLConf());
+            }
+            if (sslHostConfig.getOpenSslConf() != null) {
                 try {
                     if (log.isTraceEnabled()) {
                         log.trace(sm.getString("openssl.makeConf"));
@@ -314,8 +326,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.clearOptions(state.ctx, SSL.SSL_OP_NO_TICKET);
             }
 
-            // List the ciphers that the client is permitted to negotiate
+            // Configure the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(state.ctx, sslHostConfig.getCiphers());
+            SSLContext.setCipherSuitesEx(state.ctx, sslHostConfig.getCipherSuites());
 
             // If there is no certificate file must be using a KeyStore so a KeyManager is required.
             // If there is a certificate file a KeyManager is helpful but not strictly necessary.
@@ -352,6 +365,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.setCACertificate(state.ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.NO_OCSP_CHECK,
+                        Boolean.toString(!sslHostConfig.getOcspEnabled())));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_SOFT_FAIL,
+                        Boolean.toString(sslHostConfig.getOcspSoftFail())));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_TIMEOUT,
+                        Integer.toString(sslHostConfig.getOcspTimeout())));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_VERIFY_FLAGS,
+                        Integer.toString(sslHostConfig.getOcspVerifyFlags())));
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
@@ -592,14 +613,33 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private record OpenSSLState(long aprPool, long cctx, long ctx) implements Runnable {
         @Override
         public void run() {
-            if (ctx != 0) {
-                SSLContext.free(ctx);
-            }
-            if (cctx != 0) {
-                SSLConf.free(cctx);
-            }
-            if (aprPool != 0) {
-                Pool.destroy(aprPool);
+            /*
+             * During shutdown there is a possibility that both the cleaner and the APR library termination code try and
+             * free these resources. If both call free, there will be a JVM crash.
+             *
+             * If the cleaner frees the resources, the APR library termination won't try free them as well.
+             *
+             * If the APR library termination frees the resources, the cleaner MUST NOT attempt to do so.
+             *
+             * The locks and checks below ensure that a) the cleaner only runs if the APR library has not yet been
+             * terminated and that the APR library status will not change while the cleaner is running.
+             */
+            Lock readLock = AprStatus.getStatusLock().readLock();
+            readLock.lock();
+            try {
+                if (AprStatus.isAprInitialized()) {
+                    if (ctx != 0) {
+                        SSLContext.free(ctx);
+                    }
+                    if (cctx != 0) {
+                        SSLConf.free(cctx);
+                    }
+                    if (aprPool != 0) {
+                        Pool.destroy(aprPool);
+                    }
+                }
+            } finally {
+                readLock.unlock();
             }
         }
     }

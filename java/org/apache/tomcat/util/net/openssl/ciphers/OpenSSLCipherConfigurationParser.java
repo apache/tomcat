@@ -72,6 +72,8 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final Map<String,List<Cipher>> aliases = new LinkedHashMap<>();
 
+    private static final Set<String> tls13CipherSuiteNames = new HashSet<>();
+
     /**
      * the 'NULL' ciphers that is those offering no encryption. Because these offer no encryption at all and are a
      * security risk they are disabled unless explicitly included.
@@ -422,6 +424,16 @@ public class OpenSSLCipherConfigurationParser {
             Set<String> jsseNames = cipher.getJsseNames();
             for (String jsseName : jsseNames) {
                 jsseToOpenSSL.put(jsseName, cipher.getOpenSSLAlias());
+            }
+
+            if (cipher.getProtocol().equals(Protocol.TLSv1_3)) {
+                tls13CipherSuiteNames.add(cipher.getOpenSSLAlias());
+                /*
+                 * The TLS 1.3 cipher suites do not, currently (January 2026), have any alternative names defined so the
+                 * following two calls are NO-OPs but are implemented in case alternative names are used in the future.
+                 */
+                tls13CipherSuiteNames.addAll(cipher.getOpenSSLAltNames());
+                tls13CipherSuiteNames.addAll(cipher.getJsseNames());
             }
         }
         List<Cipher> allCiphersList = Arrays.asList(Cipher.values());
@@ -817,6 +829,20 @@ public class OpenSSLCipherConfigurationParser {
                     displayResult(ciphers, true, ",")));
         }
         return result;
+    }
+
+    /**
+     * Determines if the provided name is the name of a TLS 1.3 cipher suite.
+     *
+     * @param cipherSuiteName The name to test
+     *
+     * @return {@code true} if the provided String is recognised as the name of a TLS 1.3 cipherSuite.
+     */
+    public static boolean isTls13Cipher(String cipherSuiteName) {
+        if (!initialized) {
+            init();
+        }
+        return tls13CipherSuiteNames.contains(cipherSuiteName);
     }
 
     /**

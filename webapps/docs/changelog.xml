@@ -109,11 +109,16 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.13 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.17 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <add>
+        Add <code>test.silent</code> property to suppress JUnit console output
+        during test execution. Useful for cleaner console output when running
+        tests with multiple threads. (csutherl)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Catalina">
@@ -180,12 +185,12 @@
         Remove the <code>RemoteAddrFilter</code> and
         <code>RemoteAddrValve</code>. (markt)
       </update>
+      <update>
+        Change the default for the <code>digestInRfc3112Order</code> attribute
+        of <code>MessageDigestCredentialHandler</code> from <code>false</code>
+        to <code>true</code>. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        When generating the class path in the Loader, re-order the check on
-        individual class path components to avoid a potential
-        <code>NullPointerException</code>. Identified by Coverity Scan. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -214,13 +219,18 @@
         allowing to restrict which groups can be enabled on the SSL engine.
         (remm)
       </update>
+      <update>
+        Remove support for HTTP 0.9. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Graceful failure for OCSP on BoringSSL in the FFM code. (remm)
+        <bug>69936</bug>: Fix bug in previous fix for Tomcat Native crashes on
+        shutdown that triggered a significant memory leak. Patch provided by
+        Wes. (markt)
       </fix>
       <fix>
-        <bug>69866</bug>: Fix a memory leak when using a trust store with the
-        OpenSSL provider. Pull request <pr>912</pr> by aogburn. (markt)
+        <bug>69938</bug>: Avoid changing the closed state of TLS channel when
+        resetting it after close. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -257,8 +267,10 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>69862</bug>: Avoid NPE unwrapping Servlet exception which would
-        hide some exception details. Patch submitted by Eric Blanquer. (remm)
+        <bug>69948</bug>: Avoid ArrayOutOfBoundsException instead of
+        PropertyNotFoundException when generating a properties not found
+        exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
+        Besnard. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -289,6 +301,12 @@
         client's preferred local and the local and remote host name, address and
         port information. (markt)
       </add>
+      <fix>
+        <bug>69920</bug>: When attempting to write a message via a WebSocket
+        session that has been closed, throw an <code>IOException</code> rather
+        than an <code>IllegalStateExcpetion</code> for consistency with
+        <code>Writer</code> and <code>OutputStream</code>. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
@@ -297,36 +315,23 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        Add test profile system for selective test execution. Profiles can be
+        specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
+        test subsets without using patterns directly. Profile patterns are
+        defined in <code>test-profiles.properties</code>. (csutherl)
+      </add>
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update the internal fork of Apache Commons BCEL to 6.11.0. (markt)
-      </update>
-      <update>
-        Update to the Eclipse JDT compiler 4.37. (markt)
-      </update>
-      <update>
-        Update to Byte Buddy 1.17.8. (markt)
-      </update>
-      <update>
-        Update to Checkstyle 12.1.1. (markt)
-      </update>
-      <update>
-        Update to Jacoco 0.8.14. (markt)
-      </update>
-      <update>
-        Update to SpotBugs 4.9.8. (markt)
-      </update>
-      <update>
-        Update to JSign 7.4. (markt)
-      </update>
-      <update>
-        Update Maven Resolver Ant Tasks to 1.6.0. (rjung)
-      </update>
     </changelog>
   </subsection>
 </section>

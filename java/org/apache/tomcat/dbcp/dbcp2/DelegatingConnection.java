@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,8 +69,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     private volatile C connection;
 
     private volatile boolean closed;
-
-    private boolean cacheState = true;
+    private volatile boolean cacheState = true;
     private Boolean cachedAutoCommit;
     private Boolean cachedReadOnly;
     private String cachedCatalog;
@@ -167,6 +166,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         }
     }
 
+    /**
+     * Closes the underlying connection for {@link #close()}.
+     *
+     * @throws SQLException SQLException if a database access error occurs.
+     */
     protected final void closeInternal() throws SQLException {
         try {
             passivate();
@@ -426,14 +430,14 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * If my underlying {@link Connection} is not a {@code DelegatingConnection}, returns it, otherwise recursively
+     * If my underlying {@link Connection} is not a {@link DelegatingConnection}, returns it, otherwise recursively
      * invokes this method on my delegate.
      * <p>
-     * Hence this method will return the first delegate that is not a {@code DelegatingConnection}, or {@code null} when
-     * no non-{@code DelegatingConnection} delegate can be found by traversing this chain.
+     * Hence this method will return the first delegate that is not a {@link DelegatingConnection}, or {@code null} when
+     * no non-{@link DelegatingConnection} delegate can be found by traversing this chain.
      * </p>
      * <p>
-     * This method is useful when you may have nested {@code DelegatingConnection}s, and you want to make sure to obtain
+     * This method is useful when you may have nested {@link DelegatingConnection}s, and you want to make sure to obtain
      * a "genuine" {@link Connection}.
      * </p>
      *
@@ -541,11 +545,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Handles the given {@code SQLException}.
+     * Handles the given {@link SQLException}.
      *
      * @param <T> The throwable type.
      * @param e   The SQLException
-     * @return the given {@code SQLException}
+     * @return the given {@link SQLException}
      * @since 2.7.0
      */
     protected <T extends Throwable> T handleExceptionNoThrow(final T e) {
@@ -643,10 +647,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (iface.isAssignableFrom(getClass())) {
-            return true;
-        }
-        if (iface.isAssignableFrom(connection.getClass())) {
+        if (iface.isAssignableFrom(getClass()) || iface.isAssignableFrom(connection.getClass())) {
             return true;
         }
         return connection.isWrapperFor(iface);
