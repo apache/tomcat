@@ -227,6 +227,12 @@
         <bug>69938</bug>: Avoid changing the closed state of TLS channel when
         resetting it after close. (remm)
       </fix>
+      <add>
+        Add an HTTP configuration setting, <code>noCompressionEncodings</code>,
+        that can be used to control which content encodings will not be
+        compressed when compression is enabled. Based on pull request
+        <pr>914</pr> by Long9725. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

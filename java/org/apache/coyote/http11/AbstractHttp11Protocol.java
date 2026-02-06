@@ -340,6 +340,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public String getNoCompressionEncodings() {
+        return compressionConfig.getNoCompressionEncodings();
+    }
+
+    public void setNoCompressionEncodings(String encodings) {
+        compressionConfig.setNoCompressionEncodings(encodings);
+    }
+
+
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
     }
