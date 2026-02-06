@@ -266,6 +266,12 @@
         <code>java.util.Date</code>. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69948</bug>: Avoid ArrayOutOfBoundsException instead of
+        PropertyNotFoundException when generating a properties not found
+        exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
+        Besnard. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
