@@ -81,4 +81,19 @@ public class TestGzipOutputFilter {
         // most of the data should have been flushed out
         Assert.assertTrue(dataFound.length >= (dataExpected.length - 20));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidLevelLow() {
+        new GzipOutputFilter().setLevel(-2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidLevelHigh() {
+        new GzipOutputFilter().setLevel(10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipBufferSize() {
+        new GzipOutputFilter().setBufferSize(0);
+    }
 }
