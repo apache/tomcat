@@ -117,6 +117,10 @@
         compressed when compression is enabled. Based on pull request
         <pr>914</pr> by Long9725. (markt)
       </add>
+      <fix>
+        Add size limit for OCSP responses. Based on code submitted by Chenjp.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
