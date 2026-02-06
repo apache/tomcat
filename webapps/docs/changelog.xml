@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.17 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.18 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -223,11 +223,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69936</bug>: Fix bug in previous fix for Tomcat Native crashes on
-        shutdown that triggered a significant memory leak. Patch provided by
-        Wes. (markt)
-      </fix>
       <fix>
         <bug>69938</bug>: Avoid changing the closed state of TLS channel when
         resetting it after close. (remm)
