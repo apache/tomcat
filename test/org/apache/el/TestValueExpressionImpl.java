@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import jakarta.el.ELContext;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
 
@@ -326,5 +327,34 @@ public class TestValueExpressionImpl {
         // Result is null but is coerced to String which makes it ""
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isEmpty());
+    }
+
+
+    @Test
+    public void testBug69948() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl(factory);
+
+        TesterBeanEmptyMap beanEmptyMap = new TesterBeanEmptyMap();
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setName(null);
+
+        ValueExpression var = factory.createValueExpression(beanEmptyMap, TesterBeanEmptyMap.class);
+        context.getVariableMapper().setVariable("beanEmptyMap", var);
+        var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanEmptyMap[beanA.name][beanA.name]}", Object.class);
+
+        Assert.assertThrows(PropertyNotFoundException.class, () -> ve.getValueReference(context));
+    }
+
+    public static class TesterBeanEmptyMap extends HashMap<Object, Map<String, Object>> {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public Map<String, Object> get(Object key) {
+            return Collections.emptyMap();
+        }
     }
 }
