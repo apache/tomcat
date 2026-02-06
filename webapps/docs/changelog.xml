@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.53 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Add an HTTP configuration setting, <code>noCompressionEncodings</code>,
+        that can be used to control which content encodings will not be
+        compressed when compression is enabled. Based on pull request
+        <pr>914</pr> by Long9725. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

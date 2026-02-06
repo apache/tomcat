@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,29 +34,30 @@ public class TestCompressionConfig {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { new String[] {  },              null, Boolean.FALSE, Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "xgzip" },       null, Boolean.FALSE, Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "<>gzip" },      null, Boolean.FALSE, Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "<>", "gzip" },  null, Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] {}, null, Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, null, Boolean.TRUE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "xgzip" }, null, Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "<>gzip" }, null, Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "<>", "gzip" }, null, Boolean.TRUE, Boolean.FALSE });
 
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, null, Boolean.TRUE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, "W/", Boolean.TRUE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, "XX", Boolean.FALSE, Boolean.FALSE });
 
-        parameterSets.add(new Object[] { new String[] {  },              null, Boolean.FALSE, Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "xgzip" },       null, Boolean.FALSE, Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "<>gzip" },      null, Boolean.FALSE, Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "<>", "gzip" },  null, Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] {}, null, Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, null, Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "xgzip" }, null, Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "<>gzip" }, null, Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "<>", "gzip" }, null, Boolean.TRUE, Boolean.TRUE });
 
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, null, Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, "W/", Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" }, "XX", Boolean.TRUE, Boolean.TRUE });
 
-        parameterSets.add(new Object[] { new String[] { "foobar;foo=bar, gzip;bla=\"quoted\"" }, "XX", Boolean.TRUE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "foobar;foo=bar, gzip;bla=\"quoted\"" }, "XX", Boolean.TRUE,
+                Boolean.TRUE });
 
         return parameterSets;
     }
@@ -109,5 +111,19 @@ public class TestCompressionConfig {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
             }
         }
+    }
+
+
+    @Test
+    public void testNoCompressionEncodings() {
+        CompressionConfig config = new CompressionConfig();
+        String encodings = config.getNoCompressionEncodings();
+        Assert.assertTrue(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd")
+                .stream().anyMatch(encodings::contains));
+
+        config.setNoCompressionEncodings("br");
+        String newEncodings = config.getNoCompressionEncodings();
+        Assert.assertTrue(newEncodings.contains("br"));
+        Assert.assertFalse(newEncodings.contains("gzip"));
     }
 }

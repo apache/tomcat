@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,35 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
+    private Set<String> noCompressionEncodings =
+            new HashSet<>(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"));
+
+
+    public String getNoCompressionEncodings() {
+        return String.join(",", noCompressionEncodings);
+    }
+
+
+    /**
+     * Set the list of content encodings that indicate already-compressed content.
+     * When content is already encoded with one of these encodings, compression will not be applied
+     * to prevent double compression.
+     *
+     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
+     */
+    public void setNoCompressionEncodings(String encodings) {
+        Set<String> newEncodings = new HashSet<>();
+        if (encodings != null && !encodings.isEmpty()) {
+            StringTokenizer tokens = new StringTokenizer(encodings, ",");
+            while (tokens.hasMoreTokens()) {
+                String token = tokens.nextToken().trim();
+                if(!token.isEmpty()) {
+                    newEncodings.add(token);
+                }
+            }
+        }
+        this.noCompressionEncodings = newEncodings;
+    }
 
 
     /**
@@ -215,9 +245,7 @@ public class CompressionConfig {
             if (tokens.contains("identity")) {
                 // If identity, do not do content modifications
                 useContentEncoding = false;
-            } else if (tokens.contains("br") || tokens.contains("compress") || tokens.contains("dcb") ||
-                    tokens.contains("dcz") || tokens.contains("deflate") || tokens.contains("gzip") ||
-                    tokens.contains("pack200-gzip") || tokens.contains("zstd")) {
+            } else if (noCompressionEncodings.stream().anyMatch(tokens::contains)) {
                 // Content should not be compressed twice
                 return false;
             }
