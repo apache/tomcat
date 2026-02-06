@@ -91,33 +91,30 @@ public final class AstValue extends SimpleNode {
                 // Method call at end of expression
                 ctx.setPropertyResolved(false);
                 property = this.children[i].getValue(ctx);
-                i += 2;
-
                 if (property == null) {
                     throw new PropertyNotFoundException(
                             MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
+                i += 2;
             } else if (i + 1 < propCount) {
                 // Object with property not at end of expression
                 property = this.children[i].getValue(ctx);
                 ctx.setPropertyResolved(false);
                 base = resolver.getValue(ctx, base, property);
                 i++;
-
             } else {
                 // Object with property at end of expression
                 ctx.setPropertyResolved(false);
                 property = this.children[i].getValue(ctx);
-                i++;
-
                 if (property == null) {
                     throw new PropertyNotFoundException(
                             MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
+                i++;
             }
             if (base == null) {
                 throw new PropertyNotFoundException(
-                        MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
+                        MessageFactory.get("error.unreachable.property", this.children[propCount - 1].getImage()));
             }
         }
 

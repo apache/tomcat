@@ -113,6 +113,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69948</bug>: Avoid ArrayOutOfBoundsException instead of
+        PropertyNotFoundException when generating a properties not found
+        exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
+        Besnard. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
