@@ -244,13 +244,18 @@ public class TesterOpenSSL {
 
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
+        String[] ciphers = getOpenSSLCiphersAsExpression(specification, true).trim().split(":");
         Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
     }
 
 
     public static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
+        return getOpenSSLCiphersAsExpression(specification, false);
+    }
+
+
+    public static String getOpenSSLCiphersAsExpression(String specification, boolean withProtocol) throws Exception {
 
         List<String> args = new ArrayList<>();
         // Standard command to list the ciphers
@@ -294,10 +299,12 @@ public class TesterOpenSSL {
                 i++;
             }
 
-            // Protocol is the second
-            int j = cipher.indexOf(' ', i);
-            name.append('+');
-            name.append(cipher.substring(i, j));
+            if (withProtocol) {
+                // Optionally include the protocol, separated with a '+'
+                int j = cipher.indexOf(' ', i);
+                name.append('+');
+                name.append(cipher.substring(i, j));
+            }
 
             // More renames
             if (OPENSSL_RENAMED_CIPHERS.containsKey(name.toString())) {
