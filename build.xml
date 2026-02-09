@@ -222,6 +222,10 @@
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
 
+  <!-- Location of Httpd binary (file name, not directory) -->
+  <!-- The Httpd tests cases be disabled by specifying an invalid path here -->
+  <property name="test.httpd.path" value="" />
+
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
   <defaultexcludes add="**/.git" />
@@ -2119,6 +2123,22 @@
     </condition>
   </target>
 
+  <target name="test-httpd-exists" description="Checks for the httpd binary">
+    <property environment="env" />
+    <condition property="test.httpd.exists">
+      <or>
+        <and>
+          <length string="${test.httpd.path}" trim="true" length="0" when="gt"/>
+          <available file="${test.httpd.path}" property="test.httpd.exists"/>
+        </and>
+        <and>
+          <length string="${test.httpd.path}" trim="true" length="0" when="eq"/>
+          <available file="httpd" filepath="${env.PATH}" property="test.httpd.exists"/>
+        </and>
+      </or>
+    </condition>
+  </target>
+
   <!-- Set native specific properties -->
   <property name="native.nativeaccess" value="--enable-native-access=ALL-UNNAMED"/>
   <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}${path.separator}${java.library.path}"/>
@@ -2176,6 +2196,7 @@
           <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
           <sysproperty key="tomcat.test.reports" value="${test.reports}" />
           <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
+          <sysproperty key="tomcat.test.httpd.path" value="${test.httpd.path}" />
           <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
           <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
           <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
