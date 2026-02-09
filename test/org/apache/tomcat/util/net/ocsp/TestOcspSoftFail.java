@@ -50,7 +50,7 @@ public class TestOcspSoftFail extends OcspBaseTest {
             doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
         } catch (SocketException | SSLException e) {
             // APR or NIO2 may throw a SocketException rather than a SSLHandshakeException
-            // Older Java versions may throw an SSLException rather than a SSLHandshakeException
+            // Different Java versions may throw an SSLException rather than a SSLHandshakeException
             throw new SSLHandshakeException(e.getMessage());
         }
     }
