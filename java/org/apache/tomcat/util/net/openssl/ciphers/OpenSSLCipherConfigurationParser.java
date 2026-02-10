@@ -100,18 +100,6 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String LOW = "LOW";
     /**
-     * Export encryption algorithms. Including 40 and 56 bits algorithms.
-     */
-    private static final String EXPORT = "EXPORT";
-    /**
-     * 40 bit export encryption algorithms.
-     */
-    private static final String EXPORT40 = "EXPORT40";
-    /**
-     * 56 bit export encryption algorithms.
-     */
-    private static final String EXPORT56 = "EXPORT56";
-    /**
      * Cipher suites using RSA key exchange.
      */
     private static final String kRSA = "kRSA";
@@ -450,11 +438,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(HIGH, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.HIGH)));
         addListAlias(MEDIUM, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.MEDIUM)));
         addListAlias(LOW, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.LOW)));
-        addListAlias(EXPORT, filterByEncryptionLevel(allCiphers,
-                new HashSet<>(Arrays.asList(EncryptionLevel.EXP40, EncryptionLevel.EXP56))));
-        aliases.put("EXP", aliases.get(EXPORT));
-        addListAlias(EXPORT40, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.EXP40)));
-        addListAlias(EXPORT56, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.EXP56)));
         aliases.put("NULL", aliases.get(eNULL));
         aliases.put(COMPLEMENTOFALL, aliases.get(eNULL));
         addListAlias(aNULL, filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
@@ -573,13 +556,12 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         addListAlias(DEFAULT, parse(
-                "ALL:!EXPORT:!eNULL:!aNULL:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
+                "ALL:!eNULL:!aNULL:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault =
                 filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH, KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
         aliases.get(eNULL).forEach(complementOfDefault::remove);
-        complementOfDefault.addAll(aliases.get(EXPORT));
         complementOfDefault.addAll(aliases.get(DES));
         complementOfDefault.addAll(aliases.get(TRIPLE_DES));
         complementOfDefault.addAll(aliases.get(RC2));
