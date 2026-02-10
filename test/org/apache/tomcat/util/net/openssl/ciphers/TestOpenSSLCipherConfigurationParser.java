@@ -233,30 +233,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testkFZA() throws Exception {
-        testSpecification("kFZA");
-    }
-
-
-    @Test
-    public void testaFZA() throws Exception {
-        testSpecification("aFZA");
-    }
-
-
-    @Test
-    public void testeFZA() throws Exception {
-        testSpecification("eFZA");
-    }
-
-
-    @Test
-    public void testFZA() throws Exception {
-        testSpecification("FZA");
-    }
-
-
-    @Test
     public void testTLSv1_2() throws Exception {
         testSpecification("TLSv1.2");
     }
@@ -596,6 +572,30 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecificationIsEmptyKRB5() throws Exception {
         testSpecificationIsEmpty("KRB5");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptykFZA() throws Exception {
+        testSpecificationIsEmpty("kFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyaFZA() throws Exception {
+        testSpecificationIsEmpty("aFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyeFZA() throws Exception {
+        testSpecificationIsEmpty("eFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyFZA() throws Exception {
+        testSpecificationIsEmpty("FZA");
     }
 
 
