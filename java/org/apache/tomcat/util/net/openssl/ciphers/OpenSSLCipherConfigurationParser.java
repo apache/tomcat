@@ -501,7 +501,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(Constants.SSL_PROTO_TLSv1_2,
                 filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
         addListAlias(Constants.SSL_PROTO_TLSv1_0, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1)));
-        addListAlias(Constants.SSL_PROTO_SSLv3, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
         aliases.put(Constants.SSL_PROTO_TLSv1, aliases.get(Constants.SSL_PROTO_TLSv1_0));
         addListAlias(DH, filterByKeyExchange(allCiphers,
                 new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));

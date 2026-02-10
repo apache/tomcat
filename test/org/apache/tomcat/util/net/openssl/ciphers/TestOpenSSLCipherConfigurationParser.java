@@ -282,6 +282,10 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSSLv3() throws Exception {
+        if (TesterOpenSSL.VERSION < 40000) {
+            return;
+        }
+        // As of OpenSSL 4.0.0, support for the SSLv3 alias has been removed
         testSpecification("SSLv3");
     }
 
