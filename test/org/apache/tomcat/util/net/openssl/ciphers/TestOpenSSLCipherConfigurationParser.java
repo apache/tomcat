@@ -417,12 +417,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testKRB5() throws Exception {
-        testSpecification("KRB5");
-    }
-
-
-    @Test
     public void testaGOST() throws Exception {
         testSpecification("aGOST");
     }
@@ -596,6 +590,12 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecificationIsEmptyEXPORT56() throws Exception {
         testSpecificationIsEmpty("EXPORT56");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyKRB5() throws Exception {
+        testSpecificationIsEmpty("KRB5");
     }
 
 
