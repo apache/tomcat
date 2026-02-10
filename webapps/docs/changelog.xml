@@ -252,6 +252,13 @@
         <code>CBC</code>when setting the <code>ciphers</code> attribute of
         an <code>SSLHostConfig</code> element. (markt)
       </fix>
+      <add>
+        <bug>69870</bug>: Add a <code>drainTimeout</code> to the HTTP/2
+        <code>UpgradeProtocol</code> element to allow configuration of an
+        time between the two final <code>GOAWAY</code> frames sent by Tomcat
+        when closing am HTTP/2 connection. Pull request <pr>917</pr> provided by
+        Kai Burjack. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
