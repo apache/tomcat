@@ -513,6 +513,12 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
+    public void testARIAGCM() throws Exception {
+        testSpecification("ARIAGCM");
+    }
+
+
+    @Test
     public void testARIA128() throws Exception {
         testSpecification("ARIA128");
     }
