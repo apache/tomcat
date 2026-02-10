@@ -193,8 +193,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             for (String enabledProtocol : sslHostConfig.getEnabledProtocols()) {
                 if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(enabledProtocol)) {
                     // NO-OP. OpenSSL always supports SSLv2Hello
-                } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(enabledProtocol)) {
-                    protocol |= SSL_PROTOCOL_SSLV2;
                 } else if (Constants.SSL_PROTO_SSLv3.equalsIgnoreCase(enabledProtocol)) {
                     protocol |= SSL_PROTOCOL_SSLV3;
                 } else if (Constants.SSL_PROTO_TLSv1.equalsIgnoreCase(enabledProtocol)) {
@@ -687,9 +685,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 if ((opts & SSL_OP_NO_TLSv1_3()) == 0) {
                     enabled.add(Constants.SSL_PROTO_TLSv1_3);
-                }
-                if ((opts & SSL_OP_NO_SSLv2()) == 0) {
-                    enabled.add(Constants.SSL_PROTO_SSLv2);
                 }
                 if ((opts & SSL_OP_NO_SSLv3()) == 0) {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
