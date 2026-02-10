@@ -16,7 +16,7 @@
  */
 
 /**
- * Basic classes for the <a href="https://commons.apache.org/bcel/">Apache Byte Code Engineering Library (BCEL)</a> and constants defined by the
- * <a href="https://docs.oracle.com/javase/specs/"> JVM specification</a>.
+ * Basic classes for the <a href="https://commons.apache.org/bcel/">Apache Byte Code Engineering Library (BCEL)</a> and
+ * constants defined by the <a href="https://docs.oracle.com/javase/specs/"> JVM specification</a>.
  */
 package org.apache.tomcat.util.bcel;

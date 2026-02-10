@@ -27,7 +27,7 @@ public class SimpleElementValue extends ElementValue {
     }
 
     /**
-     * @return Value entry index in the cpool
+     * @return Value entry index in the constant pool.
      */
     public int getIndex() {
         return index;
