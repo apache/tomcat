@@ -123,9 +123,15 @@
       </fix>
       <fix>
         To maintain the documented alignment with the OpenSSL development
-        branch, the use of the alias SSLv3 is no longer supported when setting
-        the <code>ciphers</code> attribute of an <code>SSLHostConfig</code>
-        element. (markt)
+        branch, the use of the alias <code>SSLv3</code> is no longer supported
+        when setting the <code>ciphers</code> attribute of an
+        <code>SSLHostConfig</code> element. (markt)
+      </fix>
+      <fix>
+        To maintain the documented alignment with the OpenSSL development
+        branch, add support for the alias <code>ARIAGCM</code> when setting the
+        <code>ciphers</code> attribute of an <code>SSLHostConfig</code> element.
+        (markt)
       </fix>
     </changelog>
   </subsection>
