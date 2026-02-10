@@ -287,12 +287,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testSSLv2() throws Exception {
-        testSpecification("SSLv2");
-    }
-
-
-    @Test
     public void testDH() throws Exception {
         testSpecification("DH");
     }
@@ -544,8 +538,8 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSpecification02() throws Exception {
-        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/
-        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
+        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/, s/\!SSLv2//)
+        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
     }
 
 
@@ -568,6 +562,25 @@ public class TestOpenSSLCipherConfigurationParser {
         } else {
             testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
         }
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyNonsense() throws Exception {
+        testSpecificationIsEmpty("Nonsense");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptySSLv2() throws Exception {
+        testSpecificationIsEmpty("SSLv2");
+    }
+
+
+    private void testSpecificationIsEmpty(String specification) throws Exception {
+        String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
+        Assert.assertEquals("Specification [" + specification + "] returned [" + openSSLCipherList +
+                "] rather than the expected empty list", "", openSSLCipherList);
     }
 
 

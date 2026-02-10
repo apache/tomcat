@@ -101,7 +101,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         HashSet<String> protocols = new HashSet<>();
         protocols.add(Constants.SSL_PROTO_SSLv2Hello);
-        protocols.add(Constants.SSL_PROTO_SSLv2);
         protocols.add(Constants.SSL_PROTO_SSLv3);
         protocols.add(Constants.SSL_PROTO_TLSv1);
         protocols.add(Constants.SSL_PROTO_TLSv1_1);
@@ -813,9 +812,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1_2);
         }
-        if ((opts & SSL.SSL_OP_NO_SSLv2) == 0) {
-            enabled.add(Constants.SSL_PROTO_SSLv2);
-        }
         if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
@@ -834,7 +830,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return;
         }
-        boolean sslv2 = false;
         boolean sslv3 = false;
         boolean tlsv1 = false;
         boolean tlsv1_1 = false;
@@ -844,7 +839,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
             switch (p) {
-                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
                 case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
                 case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
                 case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
@@ -853,10 +847,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         // Enable all and then disable what we not want
         SSL.setOptions(state.ssl, SSL.SSL_OP_ALL);
-
-        if (!sslv2) {
-            SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv2);
-        }
+        // Always disable SSLv2
+        SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv2);
         if (!sslv3) {
             SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv3);
         }

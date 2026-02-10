@@ -1411,8 +1411,7 @@
       based secure connector it will always support <code>SSLv2Hello</code>. If a
       single protocol is specified it will not support
       <code>SSLv2Hello</code>.</p>
-      <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
-      unsafe.</p>
+      <p>Note that <code>SSLv3</code> is inherently unsafe.</p>
       <p>If not specified, the default value of <code>all</code> will be
       used.</p>
     </attribute>
