@@ -140,6 +140,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
 
+    // Time between the "graceful" GOAWAY (max stream id) and the final GOAWAY (last seen stream id)
+    private long drainTimeout = 0;
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
         super(STREAM_ID_ZERO);
@@ -169,6 +171,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize(), true);
 
         pingManager.initiateDisabled = protocol.getInitiatePingDisabled();
+
+        drainTimeout = protocol.getDrainTimeout();
 
         // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {
@@ -540,7 +544,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     void checkPauseState() throws IOException {
         if (connectionState.get() == ConnectionState.PAUSING) {
-            if (pausedNanoTime + pingManager.getRoundTripTimeNano() < System.nanoTime()) {
+            if (pausedNanoTime + pingManager.getRoundTripTimeNano() + drainTimeout < System.nanoTime()) {
                 connectionState.compareAndSet(ConnectionState.PAUSING, ConnectionState.PAUSED);
                 writeGoAwayFrame(maxProcessedStreamId, Http2Error.NO_ERROR.getCode(), null);
             }
