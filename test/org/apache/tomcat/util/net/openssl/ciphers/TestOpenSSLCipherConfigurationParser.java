@@ -89,18 +89,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testEXPORT40() throws Exception {
-        testSpecification("EXPORT40");
-    }
-
-
-    @Test
-    public void testEXPORT() throws Exception {
-        testSpecification("EXPORT");
-    }
-
-
-    @Test
     public void testRSA() throws Exception {
         testSpecification("RSA");
     }
@@ -545,17 +533,17 @@ public class TestOpenSSLCipherConfigurationParser {
         // a number of the reference browsers
         if (TesterOpenSSL.VERSION < 30200) {
             // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
-            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!DES:!RC4:!MD5");
         } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!MD5");
         }
     }
 
 
     @Test
     public void testSpecification02() throws Exception {
-        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/, s/\!SSLv2//)
-        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
+        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/, s/\!SSLv2//, s/\!EXPORT//)
+        testSpecification("!aNULL:!eNULL:!DSS:!DES:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
     }
 
 
@@ -574,9 +562,9 @@ public class TestOpenSSLCipherConfigurationParser {
     public void testSpecification04() throws Exception {
         if (TesterOpenSSL.VERSION < 30200) {
             // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
         } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
         }
     }
 
@@ -590,6 +578,24 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecificationIsEmptySSLv2() throws Exception {
         testSpecificationIsEmpty("SSLv2");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT() throws Exception {
+        testSpecificationIsEmpty("EXPORT");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT40() throws Exception {
+        testSpecificationIsEmpty("EXPORT40");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT56() throws Exception {
+        testSpecificationIsEmpty("EXPORT56");
     }
 
 
