@@ -200,22 +200,6 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String ECDSA = "ECDSA";
     /**
-     * Ciphers suites using FORTEZZA key exchange algorithms.
-     */
-    private static final String kFZA = "kFZA";
-    /**
-     * Ciphers suites using FORTEZZA authentication algorithms.
-     */
-    private static final String aFZA = "aFZA";
-    /**
-     * Ciphers suites using FORTEZZA encryption algorithms.
-     */
-    private static final String eFZA = "eFZA";
-    /**
-     * Ciphers suites using all FORTEZZA algorithms.
-     */
-    private static final String FZA = "FZA";
-    /**
      * Cipher suites using DH, including anonymous DH, ephemeral DH and fixed DH.
      */
     private static final String DH = "DH";
@@ -476,11 +460,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aECDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDH)));
         addListAlias(ECDSA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDSA)));
         aliases.put(aECDSA, aliases.get(ECDSA));
-        addListAlias(kFZA, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.FZA)));
-        addListAlias(aFZA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.FZA)));
-        addListAlias(eFZA, filterByEncryption(allCiphers, Collections.singleton(Encryption.FZA)));
-        addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA),
-                Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
         addListAlias(Constants.SSL_PROTO_TLSv1_2,
                 filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
         addListAlias(Constants.SSL_PROTO_TLSv1_0, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1)));
