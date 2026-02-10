@@ -129,11 +129,11 @@ public class Http2Protocol implements UpgradeProtocol {
 
     /*
      * Additional time in nanoseconds between sending the first graceful GOAWAY (max stream id) and the final GOAWAY
-     * (last seen stream id). During this time the server will continue to process new streams on the connection.
-     * This is to mitigate the race of client-buffered/sent packets for new streams and the final GOAWAY (with last
-     * seen stream id). By default, Tomcat uses the last computed RTT for this interval, but the RTT might have
-     * fluctuated due to network or server load conditions, or the client (e.g. nghttp2) might have already buffered
-     * frames for opening new streams on a connection.
+     * (last seen stream id). During this time the server will continue to process new streams on the connection. This
+     * is to mitigate the race of client-buffered/sent packets for new streams and the final GOAWAY (with last seen
+     * stream id). By default, Tomcat uses the last computed RTT for this interval, but the RTT might have fluctuated
+     * due to network or server load conditions, or the client (e.g. nghttp2) might have already buffered frames for
+     * opening new streams on a connection.
      *
      * The name "drainTimeout" is taken from Envoy proxy's identical HTTP Connection Manager property and means exactly
      * the same.
