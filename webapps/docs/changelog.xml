@@ -125,9 +125,9 @@
       </fix>
       <fix>
         To maintain the documented alignment with the OpenSSL development
-        branch, add support for the alias <code>ARIAGCM</code> when setting the
-        <code>ciphers</code> attribute of an <code>SSLHostConfig</code> element.
-        (markt)
+        branch, add support for the aliases <code>ARIAGCM</code> and
+        <code>CBC</code>when setting the <code>ciphers</code> attribute of
+        an <code>SSLHostConfig</code> element. (markt)
       </fix>
     </changelog>
   </subsection>

@@ -530,6 +530,12 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testCBC() throws Exception {
+        testSpecification("CBC");
+    }
+
+
     // TODO: Add tests for the individual operators
 
     @Test
