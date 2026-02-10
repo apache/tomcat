@@ -324,10 +324,6 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String SHA384 = "SHA384";
     /**
-     * Cipher suites using KRB5.
-     */
-    private static final String KRB5 = "KRB5";
-    /**
      * Cipher suites using GOST R 34.10 (either 2001 or 94) for authentication.
      */
     private static final String aGOST = "aGOST";
@@ -549,8 +545,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(kRSAPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.RSAPSK)));
         addListAlias(kECDHEPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHEPSK)));
         addListAlias(kDHEPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHEPSK)));
-        addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5),
-                Collections.singleton(Authentication.KRB5), null, null, null));
         addListAlias(aSRP, filterByAuthentication(allCiphers, Collections.singleton(Authentication.SRP)));
         addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
