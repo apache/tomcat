@@ -117,6 +117,12 @@
         Add size limit for OCSP responses. Based on code submitted by Chenjp.
         (remm)
       </fix>
+      <fix>
+        To maintain the documented alignment with the OpenSSL development
+        branch, the use of the alias SSLv3 is no longer supported when setting
+        the <code>ciphers</code> attribute of an <code>SSLHostConfig</code>
+        element. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
