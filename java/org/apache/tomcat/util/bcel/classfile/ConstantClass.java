@@ -34,7 +34,7 @@ public final class ConstantClass extends Constant {
     /**
      * Constructs an instance from file data.
      *
-     * @param dataInput Input stream
+     * @param dataInput Input stream.
      * @throws IOException if an I/O error occurs reading from the given {@code dataInput}.
      */
     ConstantClass(final DataInput dataInput) throws IOException {
@@ -44,6 +44,8 @@ public final class ConstantClass extends Constant {
 
 
     /**
+     * Gets the name index in constant pool of class name.
+     *
      * @return Name index in constant pool of class name.
      */
     public int getNameIndex() {

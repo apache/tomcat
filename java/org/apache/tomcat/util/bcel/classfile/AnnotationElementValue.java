@@ -28,6 +28,11 @@ public class AnnotationElementValue extends ElementValue {
         this.annotationEntry = annotationEntry;
     }
 
+    /**
+     * Gets the annotation entry.
+     *
+     * @return the annotation entry.
+     */
     public AnnotationEntry getAnnotationEntry() {
         return annotationEntry;
     }
