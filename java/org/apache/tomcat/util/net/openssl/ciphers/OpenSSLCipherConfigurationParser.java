@@ -520,6 +520,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(ARIA256, filterByEncryption(allCiphers, Collections.singleton(Encryption.ARIA256GCM)));
         addListAlias(ARIA, filterByEncryption(allCiphers,
                 new HashSet<>(Arrays.asList(Encryption.ARIA128GCM, Encryption.ARIA256GCM))));
+        aliases.put("ARIAGCM", aliases.get(ARIA));
         addListAlias(AESGCM, filterByEncryption(allCiphers,
                 new HashSet<>(Arrays.asList(Encryption.AES128GCM, Encryption.AES256GCM))));
         addListAlias(AESCCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM,
