@@ -55,14 +55,18 @@ public class AnnotationEntry {
     }
 
     /**
-     * @return the annotation type name
+     * Gets the annotation type name.
+     *
+     * @return the annotation type name.
      */
     public String getAnnotationType() {
         return constantPool.getConstantUtf8(typeIndex).getBytes();
     }
 
     /**
-     * @return the element value pairs in this annotation entry
+     * Gets the element value pairs in this annotation entry.
+     *
+     * @return the element value pairs in this annotation entry.
      */
     public List<ElementValuePair> getElementValuePairs() {
         return elementValuePairs;
