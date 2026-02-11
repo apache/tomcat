@@ -32,21 +32,25 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
+    @Deprecated
     public Http11AprProtocol() {
         this(new AprEndpoint());
     }
 
 
+    @Deprecated
     public Http11AprProtocol(AprEndpoint endpoint) {
         super(endpoint);
     }
 
 
+    @Deprecated
     @Override
     protected Log getLog() {
         return log;
     }
 
+    @Deprecated
     @Override
     public boolean isAprRequired() {
         // Override since this protocol implementation requires the APR/native
@@ -54,33 +58,51 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         return true;
     }
 
+    @Deprecated
     public int getPollTime() {
         return ((AprEndpoint) getEndpoint()).getPollTime();
     }
 
+    @Deprecated
     public void setPollTime(int pollTime) {
         ((AprEndpoint) getEndpoint()).setPollTime(pollTime);
     }
 
+    @Deprecated
     public int getSendfileSize() {
         return ((AprEndpoint) getEndpoint()).getSendfileSize();
     }
 
+    @Deprecated
     public void setSendfileSize(int sendfileSize) {
         ((AprEndpoint) getEndpoint()).setSendfileSize(sendfileSize);
     }
 
+    @Deprecated
     public boolean getDeferAccept() {
         return ((AprEndpoint) getEndpoint()).getDeferAccept();
     }
 
+    @Deprecated
     public void setDeferAccept(boolean deferAccept) {
         ((AprEndpoint) getEndpoint()).setDeferAccept(deferAccept);
     }
 
 
-    // ----------------------------------------------------- JMX related methods
 
+    @Override
+    public void init() throws Exception {
+        super.init();
+
+        if (isSSLEnabled()) {
+            log.info(sm.getString("ajpHttpsProtocol.deprecated", getName()));
+        } else {
+            log.info(sm.getString("ajpHttpProtocol.deprecated", getName()));
+        }
+    }
+
+
+    @Deprecated
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {

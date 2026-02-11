@@ -32,12 +32,14 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     private static final Log log = LogFactory.getLog(AjpAprProtocol.class);
 
+    @Deprecated
     @Override
     protected Log getLog() {
         return log;
     }
 
 
+    @Deprecated
     @Override
     public boolean isAprRequired() {
         // Override since this protocol implementation requires the APR/native
@@ -46,26 +48,33 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     }
 
 
-    // ------------------------------------------------------------ Constructor
-
+    @Deprecated
     public AjpAprProtocol() {
         super(new AprEndpoint());
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
+    @Deprecated
     public int getPollTime() {
         return ((AprEndpoint) getEndpoint()).getPollTime();
     }
 
+    @Deprecated
     public void setPollTime(int pollTime) {
         ((AprEndpoint) getEndpoint()).setPollTime(pollTime);
     }
 
 
-    // ----------------------------------------------------- JMX related methods
+    @Deprecated
+    @Override
+    public void init() throws Exception {
+        super.init();
 
+        log.info(sm.getString("ajpAprProtocol.deprecated", getName()));
+    }
+
+
+    @Deprecated
     @Override
     protected String getNamePrefix() {
         return "ajp-apr";

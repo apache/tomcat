@@ -143,6 +143,10 @@
         when closing am HTTP/2 connection. Pull request <pr>917</pr> provided by
         Kai Burjack. (markt)
       </add>
+      <add>
+        Log an information message if an APR Connector is used, recommending
+        that the appropriate NIO Connector is used instead. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
