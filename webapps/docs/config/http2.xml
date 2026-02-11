@@ -88,7 +88,7 @@
       If not specified, this attribute is set to <code>false</code>.</p>
     </attribute>
 
-    <attribute name="drainTimpout" required="false">
+    <attribute name="drainTimeout" required="false">
       <p>Additional time in nanoseconds between sending the first graceful
       GOAWAY (max stream id) and the final GOAWAY (last seen stream id). During
       this time the server will continue to process new streams on the
