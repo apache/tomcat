@@ -613,6 +613,73 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         test.verbose=false
 
+(7.5) Running httpd integration tests
+
+  Tomcat includes integration tests that verify Tomcat's behavior when
+  running behind an Apache HTTP Server (httpd) reverse proxy. These tests
+  require a working httpd installation and are skipped when httpd is not
+  available.
+
+   1. Prerequisites
+
+      An Apache HTTP Server (httpd) installation is required.
+      The following httpd modules must be available:
+
+        - mod_proxy
+        - mod_proxy_http
+        - mod_headers
+        - mod_ssl
+        - mod_authz_core
+        - mod_unixd (Linux and macOS only)
+        - mod_mpm_event or mod_mpm_prefork (Linux and macOS)
+
+      On most Linux distributions, httpd can be installed via the system
+      package manager:
+
+          # Debian/Ubuntu
+          sudo apt install apache2
+
+          # RHEL/Fedora
+          sudo dnf install httpd
+
+      On macOS, httpd is included with the system or can be installed via
+      Homebrew:
+
+          brew install httpd
+
+   2. Configuration
+
+      If the httpd binary is on the system PATH, the tests will find it
+      automatically. If httpd is installed in a non-standard location, set
+      the "test.httpd.path" property in your build.properties file to point
+      to the httpd binary:
+
+          test.httpd.path=/usr/sbin/httpd
+
+   3. Running the tests
+      Integration tests are excluded from the default test run. To run
+      them, use the integration test profile:
+
+          ant test -Dtest.profile=integration
+
+      The httpd integration tests are located in:
+
+          test/org/apache/tomcat/integration/httpd/
+
+   4. How the tests work
+
+      Each test starts an httpd instance in foreground mode (-X) with a
+      generated configuration that proxies requests to a Tomcat instance
+      managed by the test framework. A file lock (httpd-binary.lock) is
+      used to serialize test classes so that only one httpd instance runs
+      at a time.
+
+      The base class (HttpdIntegrationBaseTest) handles platform-specific
+      httpd module loading automatically. Test subclasses only need to
+      provide the test-specific httpd directives (proxy rules, extra
+      modules, etc.).
+
+
 (8) Source code checks
 
 (8.1) Checkstyle
