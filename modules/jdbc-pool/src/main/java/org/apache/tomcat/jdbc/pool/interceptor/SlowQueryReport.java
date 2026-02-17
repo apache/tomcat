@@ -216,21 +216,70 @@ public class SlowQueryReport extends AbstractQueryReport  {
         return qs;
     }
 
+    static class MiniQueryStats {
+        public final QueryStats queryStats;
+        public final long lastInvocation;
+
+        MiniQueryStats(QueryStats queryStats) {
+            this.queryStats = queryStats;
+            this.lastInvocation = queryStats.lastInvocation;
+        }
+    }
+
+    static class MiniQueryStatsComparator implements Comparator<MiniQueryStats>
+    {
+        @Override
+        public int compare(MiniQueryStats stats1, MiniQueryStats stats2) {
+            return Long.compare(handleZero(stats1.lastInvocation),
+                    handleZero(stats2.lastInvocation));
+        }
+
+        private static long handleZero(long value) {
+            return value == 0 ? Long.MAX_VALUE : value;
+        }
+    }
+
+    private MiniQueryStatsComparator miniQueryStatsComparator = new MiniQueryStatsComparator();
+
     /**
      * Sort QueryStats by last invocation time
      * @param queries The queries map
      */
     protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
-        ArrayList<QueryStats> list = new ArrayList<>(queries.values());
-        Collections.sort(list, queryStatsComparator);
+        // Make a defensive deep-copy of the query stats list to prevent
+        // concurrent changes to the lastModified member during list-sort
+        ArrayList<MiniQueryStats> list = new ArrayList<>(queries.size());
+        for(QueryStats stats : queries.values()) {
+            list.add(new MiniQueryStats(stats));
+        }
+        int queryCount = list.size();
+
+        Collections.sort(list, miniQueryStatsComparator);
+
         int removeIndex = 0;
-        while (queries.size() > maxQueries) {
-            String sql = list.get(removeIndex).getQuery();
-            queries.remove(sql);
-            if (log.isDebugEnabled()) {
-                log.debug("Removing slow query, capacity reached:"+sql);
+        // Remove old queries until we have fewer than maxQueries or
+        // run out of queries to remove. If there is high enough turnover
+        // in the queries map, this one-time process may not remove enough
+        // old queries. We will rely on this process running multiple
+        // times to eventually reduce the query count back down to less
+        // than the maxQueries count.
+        while (queries.size() > maxQueries && removeIndex < queryCount) {
+            MiniQueryStats mqs = list.get(removeIndex);
+            // Check to see if the lastInvocation has been updated since we
+            // took our snapshot. If the timestamps disagree, it means
+            // that this item is no longer the oldest (and it likely now
+            // one of the newest).
+            if(mqs.lastInvocation == mqs.queryStats.lastInvocation) {
+                String sql = mqs.queryStats.query;
+                queries.remove(sql);
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing slow query, capacity reached:"+sql);
+                }
             }
             removeIndex++;
+        }
+        if (queries.size() > maxQueries) {
+            log.warn("removeOldest: unable to remove enough old queries; will try again next time");
         }
     }
 
