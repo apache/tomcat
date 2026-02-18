@@ -26,6 +26,7 @@ import java.nio.channels.FileLock;
 import java.util.List;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 import org.apache.catalina.Context;
@@ -34,6 +35,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.net.TesterSupport;
 
 /**
  * Base class for httpd integration tests.
@@ -41,11 +43,35 @@ import org.apache.tomcat.util.compat.JrePlatform;
  */
 public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
+    private static final String HTTPD_CONFIG =
+               """
+                      Listen %{HTTPD_PORT}
+                      PidFile %{CONF_DIR}/httpd.pid
+                      LoadModule authz_core_module modules/mod_authz_core.so
+                """
+                + (JrePlatform.IS_WINDOWS ?
+                """
+                      LoadModule mpm_winnt_module modules/mod_mpm_winnt.so
+                      ErrorLog "|C:/Windows/System32/more.com"
+                """
+                :
+                """
+                      LoadModule unixd_module modules/mod_unixd.so
+                      LoadModule mpm_event_module modules/mod_mpm_event.so
+                      ErrorLog /dev/stderr
+                """
+                ) +
+                """
+                      LogLevel warn
+                      ServerName localhost:%{HTTPD_PORT}
+                """;
+
     private static final File lockFile = new File("test/org/apache/tomcat/integration/httpd/httpd-binary.lock");
     private static FileLock lock = null;
 
     private TesterHttpd httpd;
     private int httpdPort;
+    private int httpdSslPort;
     protected File httpdConfDir;
 
     private int tomcatPort;
@@ -98,6 +124,7 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
     private void setUpHttpd() throws IOException {
         httpdPort = findFreePort();
+        httpdSslPort = findFreePort();
         httpdConfDir = getTemporaryDirectory();
         generateHttpdConfig(getHttpdConfig());
 
@@ -106,6 +133,10 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
             httpd.start();
         } catch (IOException | InterruptedException ioe) {
             httpd = null;
+        } catch (IllegalStateException ise) {
+            httpd = null;
+            Assume.assumeFalse("Required httpd module not available", ise.getMessage() != null && ise.getMessage().contains("Cannot load modules"));
+            throw ise;
         }
     }
 
@@ -117,12 +148,15 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
     public void generateHttpdConfig(String httpdConf) throws IOException {
 
-        httpdConf = getPlatformHttpdConfig() + httpdConf;
+        httpdConf = HTTPD_CONFIG + httpdConf;
 
         httpdConf = httpdConf.replace("%{HTTPD_PORT}", Integer.toString(httpdPort))
                              .replace("%{TOMCAT_PORT}", Integer.toString(tomcatPort))
-                             .replace("%{CONF_DIR}", httpdConfDir.getAbsolutePath());
-
+                             .replace("%{CONF_DIR}", httpdConfDir.getAbsolutePath())
+                             .replace("%{HTTPD_SSL_PORT}", Integer.toString(httpdSslPort))
+                             .replace("%{SSL_CERT_FILE}", new File(TesterSupport.LOCALHOST_RSA_CERT_PEM).getAbsolutePath())
+                             .replace("%{SSL_KEY_FILE}", new File(TesterSupport.LOCALHOST_RSA_KEY_PEM).getAbsolutePath())
+                             .replace("%{SSL_CA_CERT_FILE}", new File(TesterSupport.CA_CERT_PEM).getAbsolutePath());
 
         try (PrintWriter writer = new PrintWriter(new File(httpdConfDir, "httpd.conf"))) {
             writer.write(httpdConf);
@@ -130,25 +164,11 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
     }
 
-    private String getPlatformHttpdConfig() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Listen %{HTTPD_PORT}\n");
-        sb.append("PidFile %{CONF_DIR}/httpd.pid\n");
-        sb.append("LoadModule authz_core_module modules/mod_authz_core.so\n");
-        if (JrePlatform.IS_WINDOWS) {
-            sb.append("LoadModule mpm_winnt_module modules/mod_mpm_winnt.so\n");
-            sb.append("ErrorLog \"|C:/Windows/System32/more.com\"\n");
-        } else {
-            sb.append("LoadModule unixd_module modules/mod_unixd.so\n");
-            sb.append("LoadModule mpm_event_module modules/mod_mpm_event.so\n");
-            sb.append("ErrorLog /dev/stderr\n");
-        }
-        sb.append("LogLevel warn\n");
-        sb.append("ServerName localhost:%{HTTPD_PORT}\n");
-        return sb.toString();
-    }
-
     public int getHttpdPort() {
         return httpdPort;
+    }
+
+    public int getHttpdSslPort() {
+        return httpdSslPort;
     }
 }
