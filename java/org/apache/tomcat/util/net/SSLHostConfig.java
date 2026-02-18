@@ -134,7 +134,7 @@ public class SSLHostConfig implements Serializable {
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     private transient KeyStore truststore = null;
-    private String groups = null;
+    private String groups = System.getProperty("jdk.tls.namedGroups");
     private LinkedHashSet<Group> groupList = null;
     // OpenSSL
     private String certificateRevocationListPath;
@@ -717,6 +717,10 @@ public class SSLHostConfig implements Serializable {
      * @return the groupList
      */
     public LinkedHashSet<Group> getGroupList() {
+        if (groupList == null) {
+            // Initialize groups list with the default value
+            setGroups(this.groups);
+        }
         return this.groupList;
     }
 

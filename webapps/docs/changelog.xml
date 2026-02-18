@@ -143,6 +143,11 @@
         Update the minimum recommended version of Tomcat Native so that users of
         1.3.x are recommended to update to 2.0.x. (markt)
       </update>
+      <fix>
+        Respect the value for the <code>jdk.tls.namedGroups</code> system
+        property as the default value for the configured group list on the
+        Connector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
