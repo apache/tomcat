@@ -147,6 +147,11 @@
         Log an information message if an APR Connector is used, recommending
         that the appropriate NIO Connector is used instead. (markt)
       </add>
+      <fix>
+        Respect the value for the <code>jdk.tls.namedGroups</code> system
+        property as the default value for the configured group list on the
+        Connector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

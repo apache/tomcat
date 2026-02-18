@@ -91,6 +91,12 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
     @Override
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
+        // Initialize group list
+        LinkedHashSet<Group> groupList = sslHostConfig.getGroupList();
+        if (groupList != null && getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("endpoint.tls.enabledGroups", groupList));
+        }
+
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
