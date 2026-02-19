@@ -2012,6 +2012,9 @@
       <condition property="test.name" value="${test.profile.buildutil}">
         <equals arg1="@{profile}" arg2="buildutil"/>
       </condition>
+      <condition property="test.name" value="${test.profile.integration}">
+        <equals arg1="@{profile}" arg2="integration"/>
+      </condition>
     </sequential>
   </macrodef>
 
@@ -2039,6 +2042,11 @@
     <!-- Special handling for tribes profile: include old slow/flaky tribes tests -->
     <condition property="test.includeTribes" value="true">
       <equals arg1="${test.profile}" arg2="tribes"/>
+    </condition>
+
+    <!-- Special handling for integration profile: include integration tests -->
+    <condition property="test.includeIntegration" value="true">
+      <equals arg1="${test.profile}" arg2="integration"/>
     </condition>
 
     <echo message="Test profile: ${test.profile}"/>
@@ -2226,6 +2234,8 @@
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
               <!-- Exclude tests that Gump can't compile (unless explicitly requested via buildutil profile) -->
               <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil" />
+              <!-- Exclude integration tests requiring external binaries (unless explicitly requested via integration profile) -->
+              <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>
