@@ -36,10 +36,10 @@ public class TestRemoteIpValveWithProxy extends HttpdIntegrationBaseTest {
                       LoadModule headers_module modules/mod_headers.so
                       ProxyRequests Off
                       ProxyPreserveHost On
-                      ProxyPass /snoop http://localhost:%{TOMCAT_PORT}/snoop
-                      ProxyPassReverse /snoop http://localhost:%{TOMCAT_PORT}/snoop
+                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
+                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
                       ProxyAddHeaders Off
-                      RequestHeader set X-Forwarded-For 140.211.11.130                                                                                                                                                                                \s
+                      RequestHeader set X-Forwarded-For 140.211.11.130
                       RequestHeader set X-Forwarded-Proto https
                       RequestHeader set X-Forwarded-Host whoamI.tomcat
                 """;
@@ -63,7 +63,7 @@ public class TestRemoteIpValveWithProxy extends HttpdIntegrationBaseTest {
     @Test
     public void testRemoteIpValveProxying() throws Exception {
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getHttpdPort() + "/snoop", res, false);
+        int rc = getUrl("http://localhost:" + getHttpdPort() + "/endpoint", res, false);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         RequestDescriptor requestDesc = SnoopResult.parse(res.toString());
 

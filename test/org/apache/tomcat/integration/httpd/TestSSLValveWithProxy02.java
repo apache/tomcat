@@ -45,14 +45,14 @@ public class TestSSLValveWithProxy02 extends HttpdIntegrationBaseTest {
                         SSLCertificateFile "%{SSL_CERT_FILE}"
                         SSLCertificateKeyFile "%{SSL_KEY_FILE}"
                         ProxyRequests Off
-                        ProxyPass /snoop http://localhost:%{TOMCAT_PORT}/snoop
-                        ProxyPassReverse /snoop http://localhost:%{TOMCAT_PORT}/snoop
+                        ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
+                        ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
                         RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
                         RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
                         RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
                         RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
-                        SSLVerifyClient optional                                                                                                                                                                                                                 \s
-                        SSLCACertificateFile "%{SSL_CA_CERT_FILE}"                                                                                                                                                                                               \s
+                        SSLVerifyClient optional
+                        SSLCACertificateFile "%{SSL_CA_CERT_FILE}"
                         SSLOptions +ExportCertData
                       </VirtualHost>
                 """;
@@ -77,7 +77,7 @@ public class TestSSLValveWithProxy02 extends HttpdIntegrationBaseTest {
         TesterSupport.configureClientSsl();
 
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("https://localhost:" + getHttpdSslPort() + "/snoop", res, false);
+        int rc = getUrl("https://localhost:" + getHttpdSslPort() + "/endpoint", res, false);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         RequestDescriptor requestDesc = SnoopResult.parse(res.toString());
 
