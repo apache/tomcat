@@ -53,7 +53,7 @@ public class TesterHttpd {
         }
 
         String httpdPath = System.getProperty(HTTPD_PATH);
-        if (httpdPath == null) {
+        if (httpdPath == null || httpdPath.isEmpty()) {
             httpdPath = "httpd";
         }
 

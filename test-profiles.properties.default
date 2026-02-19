@@ -98,3 +98,7 @@ test.profile.tribes=**/tribes/**/*Test*.java
 # Build utility test profile: Tests for build tools (normally excluded)
 # Note: These tests depend on classes not in output JARs and are excluded by default
 test.profile.buildutil=**/buildutil/**/*Test*.java
+
+# Integration test profile: Tests requiring external processes (e.g. httpd)
+# Note: These tests are excluded by default as they require external binaries
+test.profile.integration=**/integration/**/Test*.java
