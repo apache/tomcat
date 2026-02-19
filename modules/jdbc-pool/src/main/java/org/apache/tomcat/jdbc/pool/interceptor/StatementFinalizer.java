@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +41,13 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     protected List<StatementEntry> statements = new LinkedList<>();
 
     private boolean logCreationStack = false;
+    private int createStatementCount=0;
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
             if (statement instanceof Statement) {
+                clearEntry();
                 statements.add(new StatementEntry((Statement)statement));
             }
         }catch (ClassCastException x) {
@@ -91,6 +94,22 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public void reset(ConnectionPool parent, PooledConnection con) {
         statements.clear();
         super.reset(parent, con);
+    }
+
+    public void clearEntry() {
+        if(createStatementCount%10!=0) {
+            createStatementCount++;
+            return;
+        }else {
+            createStatementCount=0;
+            Iterator<StatementEntry> iterator = statements.iterator();
+            while (iterator.hasNext()) {
+                StatementEntry st  = iterator.next();
+                if(st.getStatement()==null || st.getStatement().isClosed()) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     protected class StatementEntry {
