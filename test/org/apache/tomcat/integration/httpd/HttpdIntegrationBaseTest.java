@@ -66,6 +66,8 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
                       ServerName localhost:%{HTTPD_PORT}
                 """;
 
+    private static final String SERVLET_NAME = "snoop";
+
     private static final File lockFile = new File("test/org/apache/tomcat/integration/httpd/httpd-binary.lock");
     private static FileLock lock = null;
 
@@ -116,8 +118,8 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
         for (Valve valve : getValveConfig()) {
             ctx.getPipeline().addValve(valve);
         }
-        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/snoop", "snoop");
+        Tomcat.addServlet(ctx, SERVLET_NAME, new SnoopServlet());
+        ctx.addServletMappingDecoded("/" + SERVLET_NAME, SERVLET_NAME);
         tomcat.start();
         tomcatPort = getPort();
     }
@@ -152,6 +154,7 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
         httpdConf = httpdConf.replace("%{HTTPD_PORT}", Integer.toString(httpdPort))
                              .replace("%{TOMCAT_PORT}", Integer.toString(tomcatPort))
+                             .replace("%{SERVLET_NAME}", SERVLET_NAME)
                              .replace("%{CONF_DIR}", httpdConfDir.getAbsolutePath())
                              .replace("%{HTTPD_SSL_PORT}", Integer.toString(httpdSslPort))
                              .replace("%{SSL_CERT_FILE}", new File(TesterSupport.LOCALHOST_RSA_CERT_PEM).getAbsolutePath())
