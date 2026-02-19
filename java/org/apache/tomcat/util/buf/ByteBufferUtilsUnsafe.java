@@ -28,6 +28,7 @@ import org.apache.tomcat.util.res.StringManager;
 /*
  * This functionality is in a separate class so it is only loaded if cleanDirectBuffer() is called. This is because the
  * use of unsafe triggers an unavoidable warning with Java 24.
+ * Note: Use (either mandatory or optional) of direct ByteBuffer can be removed once tomcat-native is dropped.
  */
 class ByteBufferUtilsUnsafe {
 
