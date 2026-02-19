@@ -67,6 +67,29 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return OpenSSLStatus.isAvailable();
     }
 
+    /**
+     * Get the installed OpenSSL version string (via FFM), if available.
+     *
+     * @return the OpenSSL version string (e.g., "OpenSSL 3.2.6 30 Sep 2025"), or null if not available
+     */
+    public static String getInstalledOpenSslVersion() {
+        if (!isAvailable()) {
+            return null;
+        }
+
+        if (JreCompat.isJre22Available()) {
+            try {
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                return (String) openSSLLibraryClass.getMethod("getVersionString").invoke(null);
+            } catch (Throwable t) {
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
+            }
+        }
+        return null;
+    }
+
     public OpenSSLLifecycleListener() {
         OpenSSLStatus.setInstanceCreated(true);
     }

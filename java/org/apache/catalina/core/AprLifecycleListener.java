@@ -122,6 +122,96 @@ public class AprLifecycleListener implements LifecycleListener {
         return org.apache.tomcat.jni.AprStatus.isAprAvailable();
     }
 
+    /**
+     * Helper method to safely get a version string from APR/TCN.
+     * Checks APR availability and handles exceptions.
+     *
+     * @param versionSupplier supplier that returns the version string
+     * @return the version string, or null if APR is not available or an error occurs
+     */
+    private static String getVersionString(java.util.function.Supplier<String> versionSupplier) {
+        if (!isAprAvailable()) {
+            return null;
+        }
+
+        try {
+            return versionSupplier.get();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the installed Tomcat Native version string, if available.
+     *
+     * @return the version string, or null if APR is not available
+     */
+    public static String getInstalledTcnVersion() {
+        return getVersionString(org.apache.tomcat.jni.Library::versionString);
+    }
+
+    /**
+     * Get the installed APR version string, if available.
+     *
+     * @return the APR version string, or null if APR is not available
+     */
+    public static String getInstalledAprVersion() {
+        return getVersionString(org.apache.tomcat.jni.Library::aprVersionString);
+    }
+
+    /**
+     * Get the installed OpenSSL version string (via APR), if available.
+     *
+     * @return the OpenSSL version string, or null if not available
+     */
+    public static String getInstalledOpenSslVersion() {
+        return getVersionString(org.apache.tomcat.jni.SSL::versionString);
+    }
+
+    /**
+     * Helper method to convert version components to a comparable integer.
+     *
+     * @param major major version number
+     * @param minor minor version number
+     * @param patch patch version number
+     *
+     * @return comparable version integer
+     */
+    private static int versionToInt(int major, int minor, int patch) {
+        return major * 1000 + minor * 100 + patch;
+    }
+
+    /**
+     * Get a warning message if the installed Tomcat Native version is older than recommended.
+     * This performs the same version check used during Tomcat startup.
+     *
+     * @return a warning message if the installed version is outdated, or null if the version
+     *         is acceptable or APR is not available
+     */
+    public static String getTcnVersionWarning() {
+        if (!isAprAvailable()) {
+            return null;
+        }
+
+        try {
+            int installedVersion = versionToInt(
+                    org.apache.tomcat.jni.Library.TCN_MAJOR_VERSION,
+                    org.apache.tomcat.jni.Library.TCN_MINOR_VERSION,
+                    org.apache.tomcat.jni.Library.TCN_PATCH_VERSION);
+            int recommendedVersion = versionToInt(
+                    TCN_RECOMMENDED_MAJOR,
+                    TCN_RECOMMENDED_MINOR,
+                    TCN_RECOMMENDED_PV);
+            if (installedVersion < recommendedVersion) {
+                return "WARNING: Tomcat recommends a minimum version of " +
+                        TCN_RECOMMENDED_MAJOR + "." + TCN_RECOMMENDED_MINOR + "." + TCN_RECOMMENDED_PV;
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public AprLifecycleListener() {
         org.apache.tomcat.jni.AprStatus.setInstanceCreated(true);
     }
