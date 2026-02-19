@@ -36,10 +36,10 @@ public class TestBasicProxy extends HttpdIntegrationBaseTest {
                       LoadModule headers_module modules/mod_headers.so
                       ProxyRequests Off
                       ProxyPreserveHost On
-                      ProxyPass /snoop http://localhost:%{TOMCAT_PORT}/snoop
-                      ProxyPassReverse /snoop http://localhost:%{TOMCAT_PORT}/snoop
-                      RequestHeader set X-Forwarded-For 140.211.11.130                                                                                                                                                                    \s
-                      RequestHeader set X-Forwarded-Proto "http"
+                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
+                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
+                      RequestHeader set X-Forwarded-For 140.211.11.130
+                      RequestHeader set X-Forwarded-Proto "https"
                 """;
 
     @Override
@@ -55,7 +55,7 @@ public class TestBasicProxy extends HttpdIntegrationBaseTest {
     @Test
     public void testBasicProxying() throws Exception {
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getHttpdPort() + "/snoop", res, false);
+        int rc = getUrl("http://localhost:" + getHttpdPort() + "/endpoint", res, false);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         RequestDescriptor requestDesc = SnoopResult.parse(res.toString());
 
@@ -63,10 +63,11 @@ public class TestBasicProxy extends HttpdIntegrationBaseTest {
         Assert.assertEquals("127.0.0.1", requestDesc.getRequestInfo("REQUEST-REMOTE-ADDR"));
         Assert.assertEquals(getHttpdPort(), Integer.valueOf(requestDesc.getRequestInfo("REQUEST-SERVER-PORT")).intValue());
         Assert.assertEquals(getPort(), Integer.valueOf(requestDesc.getRequestInfo("REQUEST-LOCAL-PORT")).intValue());
+        // httpd sets X-Forwarded-Proto: https, but without RemoteIpValve Tomcat does not process it.
         Assert.assertEquals("http", requestDesc.getRequestInfo("REQUEST-SCHEME"));
         Assert.assertEquals("false", requestDesc.getRequestInfo("REQUEST-IS-SECURE"));
         Assert.assertNotNull(requestDesc.getHeaders());
         Assert.assertNotNull(requestDesc.getHeader("X-Forwarded-For"));
-        Assert.assertEquals("http", requestDesc.getHeader("X-Forwarded-Proto"));
+        Assert.assertEquals("https", requestDesc.getHeader("X-Forwarded-Proto"));
     }
 }
