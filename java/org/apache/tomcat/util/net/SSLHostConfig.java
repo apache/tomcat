@@ -464,13 +464,13 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Obtain the list of JSSE cipher names for the current configuration. Ciphers included in the configuration but not
-     * supported by JSSE will be excluded from this list.
+     * supported by JSSE will be excluded from this list. TLS 1.3 ciphers will be first in the list.
      *
      * @return A list of the JSSE cipher names
      */
     public List<String> getJsseCipherNames() {
         if (jsseCipherNames == null) {
-            Set<Cipher> jsseCiphers = new HashSet<>();
+            Set<Cipher> jsseCiphers = new LinkedHashSet<>();
             jsseCiphers.addAll(getCipherSuiteList());
             jsseCiphers.addAll(getCipherList());
             jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(jsseCiphers);
