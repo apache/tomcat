@@ -40,6 +40,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
+import org.apache.catalina.valves.Constants;
 
 /**
  * Implementation of a Valve that outputs HTML error pages.
@@ -50,9 +51,13 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class ErrorReportValve extends ValveBase {
 
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+
     private boolean showReport = true;
 
     private boolean showServerInfo = true;
+
+    private boolean logOnError = false;
 
     private final ErrorPageSupport errorPageSupport = new ErrorPageSupport();
 
@@ -187,6 +192,18 @@ public class ErrorReportValve extends ValveBase {
         response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, result);
         if (!result.get()) {
             return;
+        }
+
+        // Log error if enabled
+        if (isLogOnError()) {
+            container.getLogger().error(
+                    sm.getString("errorReportValve.errorLogged",
+                            request.getCoyoteRequest().getMethod(),
+                            request.getCoyoteRequest().requestURI(),
+                            request.getCoyoteRequest().decodedURI(),
+                            request.getCoyoteRequest().queryString(),
+                            request.getCoyoteRequest().getMimeHeaders().toString()),
+                    throwable);
         }
 
         ErrorPage errorPage = findErrorPage(statusCode, throwable);
@@ -410,6 +427,19 @@ public class ErrorReportValve extends ValveBase {
 
     public boolean isShowServerInfo() {
         return showServerInfo;
+    }
+
+    /**
+     * Enables/Disables error logging when an error page is generated
+     *
+     * @param logOnError <code>true</code> to log errors when error pages are generated
+     */
+    public void setLogOnError(boolean logOnError) {
+        this.logOnError = logOnError;
+    }
+
+    public boolean isLogOnError() {
+        return logOnError;
     }
 
 

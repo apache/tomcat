@@ -2258,6 +2258,15 @@
         </p>
       </attribute>
 
+      <attribute name="logOnError" required="false">
+        <p>Flag to determine if errors are logged when an error page is
+           generated. If set to <code>true</code>, then error information
+           (method, URI, query string, headers, and exception if present)
+           will be logged at error level when an error page is generated.
+           Default value: <code>false</code>
+        </p>
+      </attribute>
+
     </attributes>
 
   </subsection>
