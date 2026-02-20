@@ -697,19 +697,11 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Set the enabled named groups.
-     * @param groupsString the case sensitive comma separated list of groups
+     * @param groups the case sensitive comma separated list of groups
      */
-    public void setGroups(String groupsString) {
-        if (groupsString != null) {
-            LinkedHashSet<Group> groupList = new LinkedHashSet<>();
-            String[] groupNames = groupsString.split(",");
-            for (String groupName : groupNames) {
-                Group group = Group.valueOf(groupName.trim());
-                groupList.add(group);
-            }
-            this.groups = groupsString;
-            this.groupList = groupList;
-        }
+    public void setGroups(String groups) {
+        this.groups = groups;
+        this.groupList = null;
     }
 
 
@@ -718,8 +710,20 @@ public class SSLHostConfig implements Serializable {
      */
     public LinkedHashSet<Group> getGroupList() {
         if (groupList == null) {
-            // Initialize groups list with the default value
-            setGroups(this.groups);
+            String groups = this.groups;
+            if (groups != null) {
+                LinkedHashSet<Group> groupList = new LinkedHashSet<>();
+                String[] groupNames = groups.split(",");
+                for (String groupName : groupNames) {
+                    try {
+                        Group group = Group.valueOf(groupName.trim());
+                        groupList.add(group);
+                    } catch (IllegalArgumentException e) {
+                        log.warn(sm.getString("sslHostConfig.unknownGroup", groupName));
+                    }
+                }
+                this.groupList = groupList;
+            }
         }
         return this.groupList;
     }
