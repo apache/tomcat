@@ -2068,7 +2068,17 @@
         <contains text="Failures: 0, Errors: 0" />
       </not>
     </fileset>
-    <concat>
+    <condition property="has.skipped">
+      <not>
+        <equals arg1="${toString:test.result.skippedtests}" arg2="" trim="true"/>
+      </not>
+    </condition>
+    <condition property="has.failed">
+      <not>
+        <equals arg1="${toString:test.result.failedtests}" arg2="" trim="true"/>
+      </not>
+    </condition>
+    <concat if:set="has.skipped">
       <header>Testsuites with skipped tests:${line.separator}</header>
       <string>${toString:test.result.skippedtests}</string>
       <filterchain>
@@ -2077,7 +2087,11 @@
         </tokenfilter>
       </filterchain>
     </concat>
-    <concat>
+    <concat unless:set="has.skipped">
+      <header>Testsuites with skipped tests: </header>
+      <string>None${line.separator}</string>
+    </concat>
+    <concat if:set="has.failed">
       <header>Testsuites with failed tests:${line.separator}</header>
       <string>${toString:test.result.failedtests}</string>
       <filterchain>
@@ -2085,6 +2099,10 @@
           <stringtokenizer delims=";"/>
         </tokenfilter>
       </filterchain>
+    </concat>
+    <concat unless:set="has.failed">
+      <header>Testsuites with failed tests: </header>
+      <string>None${line.separator}</string>
     </concat>
 
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
