@@ -148,6 +148,11 @@
         property as the default value for the configured group list on the
         Connector. (remm)
       </fix>
+      <fix>
+        Respect the configured cipher order, which was no longer respected
+        following the addition of TLS 1.3 specific cipher configuration.
+        TLS 1.3 ciphers will always be first in the list. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
