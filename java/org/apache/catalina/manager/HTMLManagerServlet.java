@@ -125,6 +125,16 @@ public class HTMLManagerServlet extends ManagerServlet {
             sslConnectorCerts(request, response, smClient);
         } else if (command.equals("/sslConnectorTrustedCerts")) {
             sslConnectorTrustedCerts(request, response, smClient);
+        } else if (command.equals("/logout")) {
+            try {
+                request.logout();
+                // Forward to logout page which will use JavaScript to clear browser credentials
+                request.getRequestDispatcher("/WEB-INF/jsp/logout.jsp").forward(request, response);
+                return;
+            } catch (Exception e) {
+                log(sm.getString("htmlManagerServlet.error.logout"), e);
+                message = smClient.getString("managerServlet.exception", e.toString());
+            }
         } else if (command.equals("/upload") || command.equals("/deploy") || command.equals("/reload") ||
                 command.equals("/undeploy") || command.equals("/expire") || command.equals("/start") ||
                 command.equals("/stop")) {

@@ -76,6 +76,16 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
             // No command == list
         } else if (command.equals("/list")) {
             // Nothing to do - always generate list
+        } else if (command.equals("/logout")) {
+            try {
+                request.logout();
+                // Forward to logout page which will use JavaScript to clear browser credentials
+                request.getRequestDispatcher("/WEB-INF/jsp/logout.jsp").forward(request, response);
+                return;
+            } catch (Exception e) {
+                log(sm.getString("htmlHostManagerServlet.error.logout"), e);
+                message = smClient.getString("hostManagerServlet.exception", e.toString());
+            }
         } else if (command.equals("/add") || command.equals("/remove") || command.equals("/start") ||
                 command.equals("/stop") || command.equals("/persist")) {
             message = smClient.getString("hostManagerServlet.postCommand", command);
