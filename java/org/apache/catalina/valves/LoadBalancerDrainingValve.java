@@ -212,7 +212,7 @@ public class LoadBalancerDrainingValve extends ValveBase {
             String uri = request.getRequestURI();
             String sessionURIParamName = SessionConfig.getSessionUriParamName(request.getContext());
             if (uri.contains(";" + sessionURIParamName + "=")) {
-                uri = uri.replaceFirst(";" + sessionURIParamName + "=[^&?]*", "");
+                uri = uri.replaceAll(";" + sessionURIParamName + "=[^/&?]*", "");
             }
 
             String queryString = request.getQueryString();
