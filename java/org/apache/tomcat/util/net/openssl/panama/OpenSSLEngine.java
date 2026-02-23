@@ -834,6 +834,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
             if (length <= 0) {
+                X509_free(x509);
                 return null;
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
