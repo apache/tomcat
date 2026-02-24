@@ -51,7 +51,6 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
                 """
                 + (JrePlatform.IS_WINDOWS ?
                 """
-                      LoadModule mpm_winnt_module modules/mod_mpm_winnt.so
                       ErrorLog "|C:/Windows/System32/more.com"
                 """
                 :
