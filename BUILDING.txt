@@ -54,7 +54,7 @@ source distribution, do the following:
       listed above and that compilation will fail if a later version of Java is
       used.
 
-      See Apache Commons DBCP 2 project web site for more details on
+      See Apache Commons DBCP 2 project website for more details on
       available versions of the library and its requirements,
 
         https://commons.apache.org/dbcp/
@@ -140,7 +140,7 @@ each release package has the appropriate line-endings.
 
     The base.path property specifies the place where Tomcat dependencies
     required by the build are downloaded. It is recommended to place this
-    directory outside of the source tree, so that you do not waste your
+    directory outside the source tree, so that you do not waste your
     time re-downloading the libraries.
 
 * NOTE: The default value of the base.path property configures the build script
@@ -252,10 +252,10 @@ You can build them by using the following commands:
 (5.4) Building the Windows installer
 
 The Windows installer uses the NSIS installer framework.
-It can be build on Windows, on any other platform which provides
+It can be built on Windows, on any other platform which provides
 the Wine Windows emulator or the NSIS binary "makensis".
 
-Linux and MacOS are platforms, on which you can install Wine or
+Linux and macOS are platforms, on which you can install Wine or
 "makensis".
 
 Selecting between Wine and makensis on non-Windows platforms can
@@ -279,7 +279,7 @@ in build.xml and the default property values in build.properties.default.
     For details see below.
 
     Provided that Wine or "makensis" is available on non-Windows platforms,
-    a full release build may be made on Windows, Linux or MacOS.
+    a full release build may be made on Windows, Linux or macOS.
 
     If you do not want to build the Windows installer, the skip.installer
     property may be set to skip the creation of the Windows installer.
@@ -368,7 +368,7 @@ in build.xml and the default property values in build.properties.default.
     the NSIS binary distribution that "ant download-dist" installed. When using
     "NSIS_CONFIG_CONST_DATA_PATH=no" the binary is independent of the value of "PREFIX".
 
-    In addition set the ant property "nsis.tool" to "makensis" in
+    In addition, set the ant property "nsis.tool" to "makensis" in
     build.properties.
 
  6. Build the release:
@@ -534,7 +534,7 @@ as for the property "test.name".
 
         junit.formatter.usefile=false
 
- 5. It is possible to speed up testing by letting JUnit to run several
+ 5. It is possible to speed up testing by letting JUnit run several
  tests in parallel.
 
  This is configured by setting "test.threads" property. The recommended
@@ -568,7 +568,7 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         output/coverage
 
- 7. The performance tests are written to run on reasonably powerful machines
+ 8. The performance tests are written to run on reasonably powerful machines
     (such as a developer may use day to day) assuming no other resource hungry
     processes are running.
 
@@ -589,26 +589,26 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         test.excludePerformance=true
 
- 8. Some tests are require large heaps (e.g. 8GB). The CI systems used by the
+ 9. Some tests are require large heaps (e.g. 8GB). The CI systems used by the
     project either cannot support heaps of this size or do not support them by
     default. These tests are therefore disabled by default and may be enabled by
     using the following property:
 
         test.includeLargeHeap=true
 
- 9. Some tests include checks that the access log valve entries are as expected.
+ 10. Some tests include checks that the access log valve entries are as expected.
     These checks include timings. On slower / loaded systems these checks will
     often fail. The checks may be relaxed by using the following property:
 
         test.relaxTiming=true
 
- 10. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+ 11. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
      be the default for the multicast tests to work. This is configured by
      the following property:
 
         java.net.preferIPv4Stack=true
 
- 11. By default the output of unit tests is sent to the console and can be
+ 12. By default, the output of unit tests is sent to the console and can be
      quite verbose. The output can be deactivated by setting the property:
 
         test.verbose=false
