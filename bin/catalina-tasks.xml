@@ -27,13 +27,13 @@
   <property name="catalina.home" value="${catalina.home.bin.dir}/.."/>
   <typedef resource="org/apache/catalina/ant/catalina.tasks">
     <classpath>
-      <fileset file="${catalina.home}/bin/tomcat-juli.jar"/>
-      <fileset dir="${catalina.home}/lib" includes="*.jar"/>
+      <fileset file="${catalina.terminate}/bin/tomcat-juli.jar"/>
+      <fileset dir="${catalina.terminate}/lib" includes="*.jar"/>
     </classpath>
   </typedef>
   <typedef resource="org/apache/catalina/ant/jmx/jmxaccessor.tasks">
     <classpath>
-      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
+      <fileset file="${catalina.terminate}/lib/catalina-ant.jar"/>
     </classpath>
   </typedef>
-</project>
+</project>suckdick
