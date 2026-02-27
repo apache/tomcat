@@ -18,11 +18,12 @@
 package org.apache.tomcat.integration.httpd;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -91,7 +92,7 @@ public class TestSessionWithProxy extends HttpdIntegrationBaseTest {
 
         // Send the session cookie back
         Map<String, List<String>> reqHead = new HashMap<>();
-        reqHead.put("Cookie", List.of("JSESSIONID=" + sessionId));
+        reqHead.put("Cookie", new ArrayList<>(Collections.singletonList("JSESSIONID=" + sessionId)));
         rc = getUrl("http://localhost:" + getHttpdPort() + "/endpoint", res, reqHead, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 

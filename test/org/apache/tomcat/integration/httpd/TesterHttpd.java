@@ -18,6 +18,7 @@
 package org.apache.tomcat.integration.httpd;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -126,7 +127,13 @@ public class TesterHttpd {
 
         Process p = pb.start();
 
-        String output = new String(p.getInputStream().readAllBytes());
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int len;
+        while ((len = p.getInputStream().read(buf)) != -1) {
+            byteArrayOutputStream.write(buf, 0, len);
+        }
+        String output = byteArrayOutputStream.toString();
         int exitCode = p.waitFor();
 
         if (exitCode != 0) {

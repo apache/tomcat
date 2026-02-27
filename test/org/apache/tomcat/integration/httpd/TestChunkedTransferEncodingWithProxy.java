@@ -19,11 +19,12 @@ package org.apache.tomcat.integration.httpd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,7 +87,7 @@ public class TestChunkedTransferEncodingWithProxy extends HttpdIntegrationBaseTe
 
         ByteChunk res = new ByteChunk();
         Map<String, List<String>> reqHead = new HashMap<>();
-        reqHead.put("Content-Type", List.of("application/octet-stream"));
+        reqHead.put("Content-Type", new ArrayList<>(Collections.singletonList("application/octet-stream")));
         int rc = postUrl(true, streamer, "http://localhost:" + getHttpdPort() + "/endpoint", res, reqHead, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
