@@ -33,25 +33,25 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestSessionWithProxy extends HttpdIntegrationBaseTest {
-    private static final String HTTPD_CONFIG = """
-                    LoadModule proxy_module modules/mod_proxy.so
-                    LoadModule proxy_http_module modules/mod_proxy_http.so
-                    LoadModule headers_module modules/mod_headers.so
-                    LoadModule ssl_module modules/mod_ssl.so
-                    SSLSessionCache none
-                    ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                    ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                    Listen %{HTTPD_SSL_PORT} https
-                    <VirtualHost *:%{HTTPD_SSL_PORT}>
-                      ServerName localhost:%{HTTPD_SSL_PORT}
-                      SSLEngine on
-                      SSLCertificateFile "%{SSL_CERT_FILE}"
-                      SSLCertificateKeyFile "%{SSL_KEY_FILE}"
-                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      RequestHeader set X-Forwarded-Proto https
-                    </VirtualHost>
-              """;
+    private static final String HTTPD_CONFIG =
+                    "LoadModule proxy_module modules/mod_proxy.so\n" +
+                    "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                    "LoadModule headers_module modules/mod_headers.so\n" +
+                    "LoadModule ssl_module modules/mod_ssl.so\n" +
+                    "SSLSessionCache none\n" +
+                    "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                    "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                    "Listen %{HTTPD_SSL_PORT} https\n" +
+                    "<VirtualHost *:%{HTTPD_SSL_PORT}>\n" +
+                      "ServerName localhost:%{HTTPD_SSL_PORT}\n" +
+                      "SSLEngine on\n" +
+                      "SSLCertificateFile \"%{SSL_CERT_FILE}\"\n" +
+                      "SSLCertificateKeyFile \"%{SSL_KEY_FILE}\"\n" +
+                      "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "RequestHeader set X-Forwarded-Proto https\n" +
+                    "</VirtualHost>"
+              ;
 
     @Override
     protected List<Valve> getValveConfig() {

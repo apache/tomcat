@@ -36,12 +36,12 @@ public class TestLargePayloadWithProxy extends HttpdIntegrationBaseTest {
 
     private static final int PAYLOAD_SIZE = 10 * 1024 * 1024;
 
-    private static final String HTTPD_CONFIG = """
-                      LoadModule proxy_module modules/mod_proxy.so
-                      LoadModule proxy_http_module modules/mod_proxy_http.so
-                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                  """;
+    private static final String HTTPD_CONFIG =
+                      "LoadModule proxy_module modules/mod_proxy.so\n" +
+                      "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                      "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}"
+                  ;
 
     @Override
     protected List<Valve> getValveConfig() {

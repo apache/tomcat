@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Serial;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
@@ -476,7 +475,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      */
     public static final class SnoopServlet extends HttpServlet {
 
-        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override

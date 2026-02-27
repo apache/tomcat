@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.integration.httpd;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,14 +35,14 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestErrorHandling extends HttpdIntegrationBaseTest {
 
-    private static final String HTTPD_CONFIG = """
-                      LoadModule proxy_module modules/mod_proxy.so
-                      LoadModule proxy_http_module modules/mod_proxy_http.so
-                      ProxyRequests Off
-                      ProxyPreserveHost On
-                      ProxyPass / http://localhost:%{TOMCAT_PORT}/
-                      ProxyPassReverse / http://localhost:%{TOMCAT_PORT}/
-                """;
+    private static final String HTTPD_CONFIG =
+                      "LoadModule proxy_module modules/mod_proxy.so\n" +
+                      "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                      "ProxyRequests Off\n" +
+                      "ProxyPreserveHost On\n" +
+                      "ProxyPass / http://localhost:%{TOMCAT_PORT}/\n" +
+                      "ProxyPassReverse / http://localhost:%{TOMCAT_PORT}/"
+                ;
 
     @Override
     protected List<Valve> getValveConfig() {
@@ -65,7 +64,6 @@ public class TestErrorHandling extends HttpdIntegrationBaseTest {
     public void test500InternalError() throws Exception {
         Context ctx = (Context) getTomcatInstance().getHost().findChildren()[0];
         Tomcat.addServlet(ctx, "error", new HttpServlet() {
-            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
