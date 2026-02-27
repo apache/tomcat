@@ -136,7 +136,7 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
             httpd = null;
         } catch (IllegalStateException ise) {
             httpd = null;
-            Assume.assumeFalse("Required httpd module not available", ise.getMessage() != null && ise.getMessage().contains("Cannot load modules"));
+            Assume.assumeFalse("Required httpd module not available: " + ise.getMessage(), ise.getMessage() != null && ise.getMessage().contains("Cannot load modules"));
             throw ise;
         }
     }
