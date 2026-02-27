@@ -36,14 +36,14 @@ public class TestChunkedTransferEncodingWithProxy extends HttpdIntegrationBaseTe
 
     private static final int PAYLOAD_SIZE = 10 * 1024 * 1024 * 100;
 
-    private static final String HTTPD_CONFIG = """
-                      LoadModule env_module modules/mod_env.so                                                                                                                                                                                                 \s
-                      SetEnv proxy-sendchunked 1
-                      LoadModule proxy_module modules/mod_proxy.so
-                      LoadModule proxy_http_module modules/mod_proxy_http.so
-                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                  """;
+    private static final String HTTPD_CONFIG =
+                      "LoadModule env_module modules/mod_env.so\n" +
+                      "SetEnv proxy-sendchunked 1\n" +
+                      "LoadModule proxy_module modules/mod_proxy.so\n" +
+                      "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                      "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}"
+                  ;
 
     @Override
     protected List<Valve> getValveConfig() {

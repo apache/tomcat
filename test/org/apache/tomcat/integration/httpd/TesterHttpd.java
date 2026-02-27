@@ -17,8 +17,10 @@
 
 package org.apache.tomcat.integration.httpd;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.net.Socket;
@@ -70,8 +72,8 @@ public class TesterHttpd {
 
         p = pb.start();
 
-        redirect(p.inputReader(), System.out, swallowOutput);
-        redirect(p.errorReader(), System.err, swallowOutput);
+        redirect(new BufferedReader(new InputStreamReader(p.getInputStream())), System.out, swallowOutput);
+        redirect(new BufferedReader(new InputStreamReader(p.getErrorStream())), System.err, swallowOutput);
 
         Assert.assertTrue(p.isAlive() && isHttpdReady());
     }

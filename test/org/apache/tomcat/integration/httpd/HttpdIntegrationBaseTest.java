@@ -44,26 +44,26 @@ import org.apache.tomcat.util.net.TesterSupport;
 public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
 
     private static final String HTTPD_CONFIG =
-               """
-                      Listen %{HTTPD_PORT}
-                      PidFile %{CONF_DIR}/httpd.pid
-                      LoadModule authz_core_module modules/mod_authz_core.so
-                """
+
+                      "Listen %{HTTPD_PORT}\n" +
+                      "PidFile %{CONF_DIR}/httpd.pid\n" +
+                      "LoadModule authz_core_module modules/mod_authz_core.so\n"
+
                 + (JrePlatform.IS_WINDOWS ?
-                """
-                      ErrorLog "|C:/Windows/System32/more.com"
-                """
+
+                      "ErrorLog \"|C:/Windows/System32/more.com\"\n"
+
                 :
-                """
-                      LoadModule unixd_module modules/mod_unixd.so
-                      LoadModule mpm_event_module modules/mod_mpm_event.so
-                      ErrorLog /dev/stderr
-                """
+
+                      "LoadModule unixd_module modules/mod_unixd.so\n" +
+                      "LoadModule mpm_event_module modules/mod_mpm_event.so\n" +
+                      "ErrorLog /dev/stderr\n"
+
                 ) +
-                """
-                      LogLevel warn
-                      ServerName localhost:%{HTTPD_PORT}
-                """;
+
+                      "LogLevel warn\n" +
+                      "ServerName localhost:%{HTTPD_PORT}\n"
+                ;
 
     private static final String SERVLET_NAME = "snoop";
 

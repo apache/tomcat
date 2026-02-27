@@ -32,30 +32,30 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestSSLValveWithProxy02 extends HttpdIntegrationBaseTest {
-    private static final String HTTPD_CONFIG = """
-                      LoadModule proxy_module modules/mod_proxy.so
-                      LoadModule proxy_http_module modules/mod_proxy_http.so
-                      LoadModule headers_module modules/mod_headers.so
-                      LoadModule ssl_module modules/mod_ssl.so
-                      SSLSessionCache none
-                      Listen %{HTTPD_SSL_PORT} https
-                      <VirtualHost *:%{HTTPD_SSL_PORT}>
-                        ServerName localhost:%{HTTPD_SSL_PORT}
-                        SSLEngine on
-                        SSLCertificateFile "%{SSL_CERT_FILE}"
-                        SSLCertificateKeyFile "%{SSL_KEY_FILE}"
-                        ProxyRequests Off
-                        ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                        ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                        RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
-                        RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
-                        RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
-                        RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
-                        SSLVerifyClient optional
-                        SSLCACertificateFile "%{SSL_CA_CERT_FILE}"
-                        SSLOptions +ExportCertData
-                      </VirtualHost>
-                """;
+    private static final String HTTPD_CONFIG =
+                      "LoadModule proxy_module modules/mod_proxy.so\n" +
+                      "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                      "LoadModule headers_module modules/mod_headers.so\n" +
+                      "LoadModule ssl_module modules/mod_ssl.so\n" +
+                      "SSLSessionCache none\n" +
+                      "Listen %{HTTPD_SSL_PORT} https\n" +
+                      "<VirtualHost *:%{HTTPD_SSL_PORT}>\n" +
+                        "ServerName localhost:%{HTTPD_SSL_PORT}\n" +
+                        "SSLEngine on\n" +
+                        "SSLCertificateFile \"%{SSL_CERT_FILE}\"\n" +
+                        "SSLCertificateKeyFile \"%{SSL_KEY_FILE}\"\n" +
+                        "ProxyRequests Off\n" +
+                        "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                        "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                        "RequestHeader set SSL_CLIENT_CERT \"%{SSL_CLIENT_CERT}s\"\n" +
+                        "RequestHeader set SSL_CIPHER \"%{SSL_CIPHER}s\"\n" +
+                        "RequestHeader set SSL_SESSION_ID \"%{SSL_SESSION_ID}s\"\n" +
+                        "RequestHeader set SSL_CIPHER_USEKEYSIZE \"%{SSL_CIPHER_USEKEYSIZE}s\"\n" +
+                        "SSLVerifyClient optional\n" +
+                        "SSLCACertificateFile \"%{SSL_CA_CERT_FILE}\"\n" +
+                        "SSLOptions +ExportCertData\n" +
+                      "</VirtualHost>"
+                ;
 
     @Override
     protected List<Valve> getValveConfig() {

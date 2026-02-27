@@ -30,17 +30,17 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestBasicProxy extends HttpdIntegrationBaseTest {
 
-    private static final String HTTPD_CONFIG = """
-                      LoadModule proxy_module modules/mod_proxy.so
-                      LoadModule proxy_http_module modules/mod_proxy_http.so
-                      LoadModule headers_module modules/mod_headers.so
-                      ProxyRequests Off
-                      ProxyPreserveHost On
-                      ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}
-                      RequestHeader set X-Forwarded-For 140.211.11.130
-                      RequestHeader set X-Forwarded-Proto "https"
-                """;
+    private static final String HTTPD_CONFIG =
+                      "LoadModule proxy_module modules/mod_proxy.so\n" +
+                      "LoadModule proxy_http_module modules/mod_proxy_http.so\n" +
+                      "LoadModule headers_module modules/mod_headers.so\n" +
+                      "ProxyRequests Off\n" +
+                      "ProxyPreserveHost On\n" +
+                      "ProxyPass /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "ProxyPassReverse /endpoint http://localhost:%{TOMCAT_PORT}/%{SERVLET_NAME}\n" +
+                      "RequestHeader set X-Forwarded-For 140.211.11.130\n" +
+                      "RequestHeader set X-Forwarded-Proto \"https\""
+                ;
 
     @Override
     protected List<Valve> getValveConfig() {
