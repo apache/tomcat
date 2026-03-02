@@ -269,9 +269,9 @@
         Connector. (remm)
       </fix>
       <fix>
-        Respect the configured cipher order, which was no longer respected
-        following the addition of TLS 1.3 specific cipher configuration.
-        TLS 1.3 ciphers will always be first in the list. (remm)
+        <bug>69964</bug>: Respect the configured cipher order, which was no
+        longer respected following the addition of TLS 1.3 specific cipher
+        configuration. TLS 1.3 ciphers will always be first in the list. (remm)
       </fix>
       <fix>
         Free the x509 object in the FFM code when getting the peer certificate
