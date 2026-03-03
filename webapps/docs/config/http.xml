@@ -1410,12 +1410,10 @@
     </attribute>
 
     <attribute name="groups" required="false">
-      <p>JSSE only.</p>
       <p>Allows only allowing certain named groups. The value should be a case
       sensitive comma separated list of the names of the groups.</p>
-      <p>. If not specified, the default named groups of the provider will be
-      used, and any named groups specified by the client will be passed to it.
-      </p>
+      <p>The default is the value of the <code>jdk.tls.namedGroups</code>
+      system property.</p>
     </attribute>
 
     <attribute name="honorCipherOrder" required="false">
