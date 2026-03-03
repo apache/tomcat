@@ -409,7 +409,6 @@ public class ClassLoaderLogManager extends LogManager {
                     is = new FileInputStream(replace(configFileStr));
                 } catch (IOException ioe) {
                     System.err.println("Configuration error");
-                    ioe.printStackTrace();
                 }
             }
             // Try the default JVM configuration
@@ -419,7 +418,6 @@ public class ClassLoaderLogManager extends LogManager {
                     is = new FileInputStream(defaultFile);
                 } catch (IOException ioe) {
                     System.err.println("Configuration error");
-                    ioe.printStackTrace();
                 }
             }
         }
@@ -475,7 +473,7 @@ public class ClassLoaderLogManager extends LogManager {
         } catch (IOException ioe) {
             // Report error
             System.err.println("Configuration error");
-            ioe.printStackTrace();
+            
         }
         // Ignore
 
@@ -515,7 +513,7 @@ public class ClassLoaderLogManager extends LogManager {
                 } catch (Exception e) {
                     // Report error
                     System.err.println("Handler error");
-                    e.printStackTrace();
+                    
                 }
             }
 
