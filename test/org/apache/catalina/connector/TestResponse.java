@@ -739,6 +739,24 @@ public class TestResponse extends TomcatBaseTest {
 
 
     @Test
+    public void testSetContentLengthHeader() {
+        Response response = setupResponse();
+
+        response.setContentLength(10);
+        Assert.assertEquals("10", response.getHeader("Content-Length"));
+    }
+
+
+    @Test
+    public void testSetContentTypeHeader() {
+        Response response = setupResponse();
+
+        response.setContentType(TEXT_UTF_8);
+        Assert.assertEquals(TEXT_UTF_8, response.getHeader("Content-Type"));
+    }
+
+
+    @Test
     public void testSetContentType01() {
         Response response = setupResponse();
 
