@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -790,6 +791,23 @@ public class Response implements HttpServletResponse {
 
     @Override
     public String getHeader(String name) {
+        // Need special handling for Content-Type and Content-Length due to
+        // special handling of these in coyoteResponse
+        char cc = name.charAt(0);
+        if (cc == 'C' || cc == 'c') {
+            if (name.equalsIgnoreCase("Content-Type")) {
+                // Will return null if this has not been set
+                return getCoyoteResponse().getContentType();
+            }
+            if (name.equalsIgnoreCase("Content-Length")) {
+                // -1 means not known and is not sent to client
+                if (getCoyoteResponse().getContentLengthLong() != -1) {
+                    return String.valueOf(getCoyoteResponse().getContentLengthLong());
+                } else {
+                    return null;
+                }
+            }
+        }
         return getCoyoteResponse().getMimeHeaders().getHeader(name);
     }
 
@@ -802,13 +820,44 @@ public class Response implements HttpServletResponse {
         for (int i = 0; i < n; i++) {
             result.add(headers.getName(i).toString());
         }
+        if (getCoyoteResponse().getContentType() != null) {
+            result.add("Content-Type");
+        }
+        if (getCoyoteResponse().getContentLengthLong() != -1) {
+            result.add("Content-Length");
+        }
         return result;
-
     }
 
 
     @Override
     public Collection<String> getHeaders(String name) {
+        // Need special handling for Content-Type and Content-Length due to
+        // special handling of these in coyoteResponse
+        char cc = name.charAt(0);
+        if (cc == 'C' || cc == 'c') {
+            if (name.equalsIgnoreCase("Content-Type")) {
+                // Will return null if this has not been set
+                String contentType = getCoyoteResponse().getContentType();
+                if (contentType != null) {
+                    Set<String> result = new HashSet<>();
+                    result.add(contentType);
+                    return result;
+                } else {
+                    return new HashSet<>();
+                }
+            }
+            if (name.equalsIgnoreCase("Content-Length")) {
+                // -1 means not known and is not sent to client
+                if (getCoyoteResponse().getContentLengthLong() != -1) {
+                    Set<String> result = new HashSet<>();
+                    result.add(String.valueOf(getCoyoteResponse().getContentLengthLong()));
+                    return result;
+                } else {
+                    return new HashSet<>();
+                }
+            }
+        }
         Enumeration<String> enumeration = getCoyoteResponse().getMimeHeaders().values(name);
         Set<String> result = new LinkedHashSet<>();
         while (enumeration.hasMoreElements()) {

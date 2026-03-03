@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.116 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>69967</bug>: Fix inconsistencies related to
+        <code>Content-Length</code> and <code>Content-Type</code> headers when
+        accessed using the <code>getHeader</code> method and similar. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
