@@ -262,6 +262,11 @@ public class HpackDecoder {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {
             addStaticTableEntry(index);
         } else {
+            // index is 1 based
+            if (index > Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
+                throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
+                        Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));
+            }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
