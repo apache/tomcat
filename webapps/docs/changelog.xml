@@ -171,6 +171,10 @@
         if getting the bytes from the certificate somehow fails.
         Pull request <pr>951</pr> provided by Chenjp. (remm)
       </fix>
+      <fix>
+        Improve HPACK exception use, making sure <code>HpackException</code>
+        is thrown instead of unexpected types. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
