@@ -114,11 +114,6 @@
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
-      <add>
-        Add <code>test.silent</code> property to suppress JUnit console output
-        during test execution. Useful for cleaner console output when running
-        tests with multiple threads. (csutherl)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Catalina">
@@ -228,10 +223,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69938</bug>: Avoid changing the closed state of TLS channel when
-        resetting it after close. (remm)
-      </fix>
       <add>
         Add an HTTP configuration setting, <code>noCompressionEncodings</code>,
         that can be used to control which content encodings will not be
