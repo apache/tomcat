@@ -495,16 +495,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         int i;
         try {
             i = Host.parse(value);
+            if (i > -1) {
+                coyoteRequest.serverName().setString(value.substring(0, i));
+                coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
+            } else {
+                coyoteRequest.serverName().setString(value);
+            }
         } catch (IllegalArgumentException iae) {
             // Host value invalid
             throw new HpackException(sm.getString("stream.header.invalid", getConnectionId(), getIdAsString(),
                     host ? "host" : ":authority", value));
-        }
-        if (i > -1) {
-            coyoteRequest.serverName().setString(value.substring(0, i));
-            coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
-        } else {
-            coyoteRequest.serverName().setString(value);
         }
         // Match host name with SNI if required
         if (!handler.getProtocol().getHttp11Protocol().checkSni(handler.getSniHostName(), coyoteRequest.serverName().getString())) {
@@ -518,17 +518,17 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         int i;
         try {
             i = Host.parse(value);
+            if (i == -1 && (!value.equals(coyoteRequest.serverName().getString()) || coyoteRequest.getServerPort() != -1) ||
+                    i > -1 && ((!value.substring(0, i).equals(coyoteRequest.serverName().getString()) ||
+                            Integer.parseInt(value.substring(i + 1)) != coyoteRequest.getServerPort()))) {
+                // Host value inconsistent
+                throw new HpackException(sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
+                        coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())));
+            }
         } catch (IllegalArgumentException iae) {
             // Host value invalid
             throw new HpackException(
                     sm.getString("stream.header.invalid", getConnectionId(), getIdAsString(), "host", value));
-        }
-        if (i == -1 && (!value.equals(coyoteRequest.serverName().getString()) || coyoteRequest.getServerPort() != -1) ||
-                i > -1 && ((!value.substring(0, i).equals(coyoteRequest.serverName().getString()) ||
-                        Integer.parseInt(value.substring(i + 1)) != coyoteRequest.getServerPort()))) {
-            // Host value inconsistent
-            throw new HpackException(sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
-                    coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())));
         }
 
     }
