@@ -581,6 +581,39 @@ for more information about installation of APR. A basic OCSP-enabled connector
 
 </section>
 
+<section name="Post Quantum Cryptography">
+
+<p>Use of PQC functionality requires OpenSSL 3.5 or newer.</p>
+
+<p>Setting up a hybrid PQC configuration involves generating two certificates.
+A traditional RSA one will handle non PQC clients, while a MLDSA certificate
+will be used for PQC. This kind of hybrid setup allows transitioning to PQC
+while still maintaining support for existing clients.</p>
+
+<p>A pure PQC configuration needs only a MLDSA certificate.</p>
+
+<p>Example hybrid configuration, assuming two certificates generated with
+OpenSSL and protected with a password:</p>
+
+<source><![CDATA[<Connector port="8443" protocol="HTTP/1.1"
+    SSLEnabled="true" scheme="https" secure="true">
+    <SSLHostConfig>
+        <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
+            certificateKeystorePassword="changeit"
+            type="RSA" />
+        <Certificate certificateKeystoreFile="conf/localhost-mldsa.jks"
+            certificateKeystorePassword="changeit"
+            type="MLDSA" />
+    </SSLHostConfig>
+</Connector>]]>
+</source>
+
+<p>PQC support can then be verified by connecting using curl:</p>
+
+<source><![CDATA[curl -k -v --curves X25519MLKEM768 --sigalgs ML-DSA-65 https://localhost:8443/]]></source>
+
+</section>
+
 <section name="Troubleshooting">
 
 <p>Additional information may be obtained about TLS handshake failures by
