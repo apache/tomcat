@@ -537,7 +537,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue(appRoot.mkdirs() && appRoot.isDirectory());
         addDeleteOnTearDown(appRoot);
 
-        try (@SuppressWarnings("unused") TomcatBaseTest.ContainerInjector ignored =
+        try (TomcatBaseTest.ContainerInjector ignored =
                  TomcatBaseTest.ContainerInjector.inject(ctx.getParent(),
                      c -> c.getPath().equals("/bug57700"),
                      c -> {

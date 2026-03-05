@@ -134,15 +134,15 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
             List<String> clientRequestedApplicationProtocols) {
         List<String> clientRequestedProtocols = clientRequestedProtocolsThreadLocal.get();
         if (clientRequestedProtocols == null) {
-            clientRequestedProtocols = new ArrayList<String>();
+            clientRequestedProtocols = new ArrayList<>();
         }
         List<Group> clientSupportedGroups = clientSupportedGroupsThreadLocal.get();
         if (clientSupportedGroups == null) {
-            clientSupportedGroups = new ArrayList<Group>();
+            clientSupportedGroups = new ArrayList<>();
         }
         List<SignatureScheme> clientSignatureSchemes = clientSignatureSchemesThreadLocal.get();
         if (clientSignatureSchemes == null) {
-            clientSignatureSchemes = new ArrayList<SignatureScheme>();
+            clientSignatureSchemes = new ArrayList<>();
         }
 
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);

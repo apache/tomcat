@@ -26,6 +26,7 @@ import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version_num;
 /**
  * Methods used present in older OpenSSL versions but not in the current major version or OpenSSL derivatives.
  */
+@SuppressWarnings("javadoc")
 public class openssl_h_Compatibility {
 
     public static final boolean OPENSSL;
