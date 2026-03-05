@@ -31,6 +31,7 @@ import java.util.Deque;
  * @param <T> the type of object in the pool.
  * @since 2.0
  */
+@SuppressWarnings("deprecation")
 public interface PooledObject<T> extends Comparable<PooledObject<T>> {
 
     /**
@@ -273,6 +274,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      * @return the last time this object was used
      * @since 2.11.0
      */
+    @SuppressWarnings("javadoc")
     default Instant getLastUsedInstant() {
         return Instant.ofEpochMilli(getLastUsedTime());
     }

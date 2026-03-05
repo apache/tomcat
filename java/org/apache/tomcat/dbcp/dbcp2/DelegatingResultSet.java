@@ -595,14 +595,14 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     }
 
     /**
-     * If my underlying {@link ResultSet} is not a {@link DelegatingResultSet}, returns it, otherwise recursively
+     * If my underlying {@link ResultSet} is not a {@code DelegatingResultSet}, returns it, otherwise recursively
      * invokes this method on my delegate.
      * <p>
-     * Hence this method will return the first delegate that is not a {@link DelegatingResultSet}, or {@code null} when
-     * no non-{@link DelegatingResultSet} delegate can be found by traversing this chain.
+     * Hence this method will return the first delegate that is not a {@code DelegatingResultSet}, or {@code null} when
+     * no non-{@code DelegatingResultSet} delegate can be found by traversing this chain.
      * </p>
      * <p>
-     * This method is useful when you may have nested {@link DelegatingResultSet}s, and you want to make sure to obtain
+     * This method is useful when you may have nested {@code DelegatingResultSet}s, and you want to make sure to obtain
      * a "genuine" {@link ResultSet}.
      * </p>
      *
