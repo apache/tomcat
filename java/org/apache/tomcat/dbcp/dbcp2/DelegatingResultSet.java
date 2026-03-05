@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -1052,6 +1052,12 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
+    /**
+     * Handles a SQL exception by delegating to a DelegatingStatement or DelegatingConnection.
+     *
+     * @param e The exception to handle.
+     * @throws SQLException Throws the given exception if not handled.
+     */
     protected void handleException(final SQLException e) throws SQLException {
         if (statement instanceof DelegatingStatement) {
             ((DelegatingStatement) statement).handleException(e);
@@ -1123,10 +1129,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
 
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (iface.isAssignableFrom(getClass())) {
-            return true;
-        }
-        if (iface.isAssignableFrom(resultSet.getClass())) {
+        if (iface.isAssignableFrom(getClass()) || iface.isAssignableFrom(resultSet.getClass())) {
             return true;
         }
         return resultSet.isWrapperFor(iface);
