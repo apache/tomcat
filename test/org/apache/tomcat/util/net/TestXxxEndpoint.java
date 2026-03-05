@@ -32,8 +32,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.compat.JreCompat;
 
 /**
- * Test case for the Endpoint implementations. The testing framework will ensure
- * that each implementation is tested.
+ * Test case for the Endpoint implementations. The testing framework will ensure that each implementation is tested.
  */
 public class TestXxxEndpoint extends TomcatBaseTest {
 
@@ -49,7 +48,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
         Exception e = null;
-        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))){
+        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))) {
         } catch (Exception e1) {
             e = e1;
         }

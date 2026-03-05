@@ -138,7 +138,7 @@ public class TesterHttpd {
     private boolean isHttpdReady() throws InterruptedException {
         long deadline = System.currentTimeMillis() + 1000;
         while (System.currentTimeMillis() < deadline) {
-            try (@SuppressWarnings("unused") Socket ignored = new Socket("localhost", this.httpdPort)) {
+            try (Socket ignored = new Socket("localhost", this.httpdPort)) {
                 return true;
             } catch (IOException e) {
                 Thread.sleep(100);
