@@ -129,7 +129,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Returns a {@link java.sql.Connection} from my pool, according to the contract specified by
+     * Returns a {@link Connection} from my pool, according to the contract specified by
      * {@link ObjectPool#borrowObject}.
      */
     @Override
