@@ -24,7 +24,7 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 
 /**
- * A JNDI ObjectFactory which creates {@code SharedPoolDataSource}s
+ * A JNDI ObjectFactory which creates {@link SharedPoolDataSource}s
  *
  * @since 2.0
  */
