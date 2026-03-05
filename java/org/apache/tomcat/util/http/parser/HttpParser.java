@@ -491,6 +491,19 @@ public class HttpParser {
     /**
      * @return the number if digits were found, -1 if no data was found or if data other than digits was found
      */
+    static long readInteger(Reader input) throws IOException {
+        String digits = readDigits(input);
+
+        if (digits.isEmpty()) {
+            return -1;
+        }
+
+        return Integer.parseInt(digits);
+    }
+
+    /**
+     * @return the number if digits were found, -1 if no data was found or if data other than digits was found
+     */
     static long readLong(Reader input) throws IOException {
         String digits = readDigits(input);
 
@@ -943,7 +956,7 @@ public class HttpParser {
 
     static int validatePort(Reader reader, int colonPosition) throws IOException {
         // Remaining characters should be numeric ...
-        readLong(reader);
+        readInteger(reader);
         // ... followed by EOS
         if (reader.read() == -1) {
             return colonPosition;
