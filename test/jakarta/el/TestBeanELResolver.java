@@ -366,6 +366,7 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, null);
 
         Assert.assertNull(result);
@@ -380,6 +381,7 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, new Bean());
 
         while (result.hasNext()) {

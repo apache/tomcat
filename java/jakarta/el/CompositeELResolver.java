@@ -234,6 +234,7 @@ public class CompositeELResolver extends ELResolver {
             this.guaranteeIterator();
         }
 
+        @SuppressWarnings("removal")
         private void guaranteeIterator() {
             while (this.itr == null && this.idx < this.size) {
                 this.itr = this.resolvers[this.idx].getFeatureDescriptors(this.context, this.base);

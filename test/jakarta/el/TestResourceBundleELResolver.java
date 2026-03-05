@@ -217,6 +217,7 @@ public class TestResourceBundleELResolver {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, new Object());
 
         Assert.assertNull(result);
@@ -232,6 +233,7 @@ public class TestResourceBundleELResolver {
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ResourceBundle resourceBundle = new TesterResourceBundle(new Object[][] { { "key", "value" } });
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, resourceBundle);
 
         while (result.hasNext()) {

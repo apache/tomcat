@@ -106,6 +106,7 @@ public final class ELResolverImpl extends ELResolver {
         return elResolver.isReadOnly(context, base, property);
     }
 
+    @SuppressWarnings("removal")
     @Override
     public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return elResolver.getFeatureDescriptors(context, base);

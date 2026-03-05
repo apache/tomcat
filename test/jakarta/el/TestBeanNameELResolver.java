@@ -450,6 +450,7 @@ public class TestBeanNameELResolver {
         BeanNameELResolver resolver = createBeanNameELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
+        @SuppressWarnings("removal")
         Object result = resolver.getFeatureDescriptors(context, null);
 
         Assert.assertNull(result);
@@ -464,6 +465,7 @@ public class TestBeanNameELResolver {
     public void testGetFeatureDescriptors02() {
         BeanNameELResolver resolver = createBeanNameELResolver();
 
+        @SuppressWarnings("removal")
         Object result = resolver.getFeatureDescriptors(null, new Object());
 
         Assert.assertNull(result);

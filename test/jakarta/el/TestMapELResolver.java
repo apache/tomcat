@@ -226,6 +226,7 @@ public class TestMapELResolver {
         MapELResolver mapELResolver = new MapELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = mapELResolver.getFeatureDescriptors(context, new Object());
 
         Assert.assertNull(result);
@@ -242,6 +243,7 @@ public class TestMapELResolver {
 
         Map<String,String> map = new HashMap<>();
         map.put("key", "value");
+        @SuppressWarnings("removal")
         Iterator<FeatureDescriptor> result = mapELResolver.getFeatureDescriptors(context, map);
 
         while (result.hasNext()) {
