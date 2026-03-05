@@ -291,7 +291,7 @@ element.</p>
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
            .../>]]></source>
-<p>With Java 22 FFM API:</p>
+<p>With Java FFM API:</p>
 <source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"
@@ -302,7 +302,7 @@ OpenSSL on all connectors without having to add the
 <code>sslImplementationName</code> attribute on each.</p>
 <p>With Tomcat Native:</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"/>]]></source>
-<p>With Java 22 FFM API:</p>
+<p>With Java FFM API:</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.OpenSSLLifecycleListener"/>]]></source>
 <p>
 The <code>SSLRandomSeed</code> attribute of the listeners allows specifying a
@@ -528,6 +528,39 @@ nsComment="Testing OCSP Certificate"
   </li>
 </ul>
 </subsection>
+
+</section>
+
+<section name="Post Quantum Cryptography">
+
+<p>Use of PQC functionality requires OpenSSL 3.5 or newer.</p>
+
+<p>Setting up a hybrid PQC configuration involves generating two certificates.
+A traditional RSA one will handle non PQC clients, while a MLDSA certificate
+will be used for PQC. This kind of hybrid setup allows transitioning to PQC
+while still maintaining support for existing clients.</p>
+
+<p>A pure PQC configuration needs only a MLDSA certificate.</p>
+
+<p>Example hybrid configuration, assuming two certificates generated with
+OpenSSL and protected with a password:</p>
+
+<source><![CDATA[<Connector port="8443" protocol="HTTP/1.1"
+    SSLEnabled="true" scheme="https" secure="true">
+    <SSLHostConfig>
+        <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
+            certificateKeystorePassword="changeit"
+            type="RSA" />
+        <Certificate certificateKeystoreFile="conf/localhost-mldsa.jks"
+            certificateKeystorePassword="changeit"
+            type="MLDSA" />
+    </SSLHostConfig>
+</Connector>]]>
+</source>
+
+<p>PQC support can then be verified by connecting using curl:</p>
+
+<source><![CDATA[curl -k -v --curves X25519MLKEM768 --sigalgs ML-DSA-65 https://localhost:8443/]]></source>
 
 </section>
 
