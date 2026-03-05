@@ -227,6 +227,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     /**
      * The HTTP session context associated with this session.
      */
+    @SuppressWarnings("deprecation")
     @Deprecated
     protected static volatile javax.servlet.http.HttpSessionContext sessionContext = null;
 

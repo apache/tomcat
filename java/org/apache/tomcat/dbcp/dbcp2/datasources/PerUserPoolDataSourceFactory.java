@@ -31,13 +31,6 @@ import javax.naming.Reference;
 public class PerUserPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
     private static final String PER_USER_POOL_CLASSNAME = PerUserPoolDataSource.class.getName();
 
-    /**
-     * Constructs a new instance.
-     */
-    public PerUserPoolDataSourceFactory() {
-        // empty
-    }
-
     @SuppressWarnings("unchecked") // Avoid warnings on deserialization
     @Override
     protected InstanceKeyDataSource getNewInstance(final Reference ref) throws IOException, ClassNotFoundException {
