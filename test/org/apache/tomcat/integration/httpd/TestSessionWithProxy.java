@@ -69,7 +69,7 @@ public class TestSessionWithProxy extends HttpdIntegrationBaseTest {
         return HTTPD_CONFIG;
     }
 
-    /**
+    /*
      * Verify that a session created through httpd can be retrieved
      * on a subsequent request using the session cookie.
      */
@@ -102,7 +102,7 @@ public class TestSessionWithProxy extends HttpdIntegrationBaseTest {
         Assert.assertEquals("false", requestDesc.getRequestInfo("SESSION-IS-NEW"));
     }
 
-    /**
+    /*
      * Verify that when SSL is used at httpd, but not Tomcat, and RemoteIpValve
      * sets the scheme to https, session cookies have the Secure flag.
      */

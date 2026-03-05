@@ -56,7 +56,7 @@ public class TestChunkedTransferEncodingWithProxy extends HttpdIntegrationBaseTe
         return HTTPD_CONFIG;
     }
 
-    /**
+    /*
      * Verify that chunked transfer encoding works correctly through the httpd reverse proxy
      * which sets proxy-sendchunked to minimize resource usage by using chunked encoding.
      */

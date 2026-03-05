@@ -54,7 +54,7 @@ public class TestLargePayloadWithProxy extends HttpdIntegrationBaseTest {
         return HTTPD_CONFIG;
     }
 
-    /**
+    /*
      * Verify that a large POST body passes through the httpd reverse proxy
      */
     @Test
@@ -72,7 +72,7 @@ public class TestLargePayloadWithProxy extends HttpdIntegrationBaseTest {
         Assert.assertEquals(String.valueOf(PAYLOAD_SIZE), requestDesc.getRequestInfo("REQUEST-BODY-SIZE"));
     }
 
-    /**
+    /*
      * Verify that chunked transfer encoding works correctly through the httpd reverse proxy.
      */
     @Test

@@ -53,28 +53,28 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
 
     @Test
     public void testBug61232() throws Exception {
-        testHandler = new FileHandler(this.getTemporaryDirectory().toString(),
+        testHandler = new FileHandler(getTemporaryDirectory().toString(),
                 "juli.", ".log");
 
-        File logFile = new File(this.getTemporaryDirectory(), "juli.log");
+        File logFile = new File(getTemporaryDirectory(), "juli.log");
         Assert.assertTrue(logFile.exists());
     }
 
     @Test
     public void testCustomSuffixWithoutSeparator() throws Exception {
-        testHandler = new FileHandler(this.getTemporaryDirectory().toString(),
+        testHandler = new FileHandler(getTemporaryDirectory().toString(),
                 "juli.", "log");
 
-        File logFile = new File(this.getTemporaryDirectory(), "juli.log");
+        File logFile = new File(getTemporaryDirectory(), "juli.log");
         Assert.assertTrue(logFile.exists());
     }
 
     @Test
     public void testCustomPrefixWithoutSeparator() throws Exception {
-        testHandler = new FileHandler(this.getTemporaryDirectory().toString(),
+        testHandler = new FileHandler(getTemporaryDirectory().toString(),
                 "juli", ".log");
 
-        File logFile = new File(this.getTemporaryDirectory(), "juli.log");
+        File logFile = new File(getTemporaryDirectory(), "juli.log");
         Assert.assertTrue(logFile.exists());
     }
 }
