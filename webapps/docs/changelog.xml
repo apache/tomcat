@@ -175,6 +175,12 @@
         Improve HPACK exception use, making sure <code>HpackException</code>
         is thrown instead of unexpected types. (remm)
       </fix>
+      <fix>
+        Update the parser for the HTTP <code>Host</code> header and
+        <code>:authority</code> pseudo header to convert the port, if any, to an
+        <code>Integer</code> rather than a <code>Long</code> to be consistent
+        with how port is exposed in the Servlet API. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
