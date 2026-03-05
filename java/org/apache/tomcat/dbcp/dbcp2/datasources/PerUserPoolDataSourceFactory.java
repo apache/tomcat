@@ -24,19 +24,12 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 
 /**
- * A JNDI ObjectFactory which creates {@link SharedPoolDataSource}s
+ * A JNDI ObjectFactory which creates {@code SharedPoolDataSource}s
  *
  * @since 2.0
  */
 public class PerUserPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
     private static final String PER_USER_POOL_CLASSNAME = PerUserPoolDataSource.class.getName();
-
-    /**
-     * Constructs a new instance.
-     */
-    public PerUserPoolDataSourceFactory() {
-        // empty
-    }
 
     @SuppressWarnings("unchecked") // Avoid warnings on deserialization
     @Override
