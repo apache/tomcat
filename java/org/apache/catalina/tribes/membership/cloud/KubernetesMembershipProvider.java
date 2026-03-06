@@ -46,6 +46,9 @@ import org.apache.tomcat.util.json.JSONParser;
 
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
+    private static final String IPV6_URL = "%s://[%s]:%s/api/%s/namespaces/%s/pods";
+    private static final String URL = "%s://%s:%s/api/%s/namespaces/%s/pods";
+
     private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
 
     private Path saTokenPath;
@@ -122,7 +125,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         namespace = URLEncoder.encode(namespace, "UTF-8");
         labels = labels == null ? null : URLEncoder.encode(labels, "UTF-8");
 
-        url = String.format("%s://%s:%s/api/%s/namespaces/%s/pods", protocol, masterHost, masterPort, ver, namespace);
+        String urlFormat = URL;
+        if (masterHost != null && masterHost.indexOf(':') != -1) {
+            // [] must be used around raw IPv6
+            urlFormat = IPV6_URL;
+        }
+        url = String.format(urlFormat, protocol, masterHost, masterPort, ver, namespace);
         if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
