@@ -284,6 +284,10 @@
         <code>Integer</code> rather than a <code>Long</code> to be consistent
         with how port is exposed in the Servlet API. (markt)
       </fix>
+      <scode>
+        Replace the external OpenSSL based OCSP responder used during unit tests
+        with a Bouncy Castle based, in-process Java OCSP responder. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

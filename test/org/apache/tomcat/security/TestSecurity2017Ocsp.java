@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.security;
 
-import java.io.IOException;
-
 import javax.net.ssl.SSLHandshakeException;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +48,7 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
         ocspResponder = new TesterOcspResponder();
         try {
             ocspResponder.start();
-        } catch (IOException ioe) {
+        } catch (Exception e) {
             ocspResponder = null;
         }
     }
