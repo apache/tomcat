@@ -42,6 +42,7 @@ import javax.net.ssl.SSLException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 /**
  * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS. This needs a lot more testing before it can be considered
@@ -57,14 +58,23 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private final SSLEngine sslEngine;
     private final ByteBuffer socketReadBuffer;
     private final ByteBuffer socketWriteBuffer;
-    // One thread for read, one for write
-    private final ExecutorService executor = Executors.newFixedThreadPool(2, new SecureIOThreadFactory());
+    private final ExecutorService executor;
     private final AtomicBoolean writing = new AtomicBoolean(false);
     private final AtomicBoolean reading = new AtomicBoolean(false);
 
     public AsyncChannelWrapperSecure(AsynchronousSocketChannel socketChannel, SSLEngine sslEngine) {
+        // One thread for read, one for write
+        this(socketChannel, sslEngine, Executors.newFixedThreadPool(2, new SecureIOThreadFactory()));
+    }
+
+    public AsyncChannelWrapperSecure(AsynchronousSocketChannel socketChannel, SSLEngine sslEngine, VirtualThreadExecutor executor) {
+        this(socketChannel, sslEngine, (ExecutorService) executor);
+    }
+
+    private AsyncChannelWrapperSecure(AsynchronousSocketChannel socketChannel, SSLEngine sslEngine, ExecutorService executor) {
         this.socketChannel = socketChannel;
         this.sslEngine = sslEngine;
+        this.executor = executor;
 
         int socketBufferSize = sslEngine.getSession().getPacketBufferSize();
         socketReadBuffer = ByteBuffer.allocateDirect(socketBufferSize);
@@ -142,7 +152,10 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 log.info(sm.getString("asyncChannelWrapperSecure.closeFail"));
             }
         }
-        executor.shutdownNow();
+
+        if (!(executor instanceof VirtualThreadExecutor)) {
+            executor.shutdownNow();
+        }
     }
 
     @Override
