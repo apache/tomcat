@@ -372,3 +372,23 @@ derby-shared.jar=${derby.home}/derby-shared-${derby.version}.jar
 derby-shared.loc=${base-maven.loc}/org/apache/derby/derbyshared/${derby.version}/derbyshared-${derby.version}.jar
 derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
+
+# ----- Bouncy Castle, used by unit tests ----
+bouncycastle.version=1.83
+bouncycastle-provider.checksum.enabled=true
+bouncycastle-provider.checksum.algorithm=SHA-512
+bouncycastle-provider.checksum.value=e51cc843ca130ad4a15ff667360063bbb583af3f22e14193840a734da6665b470ba1855ce975f88a94ddd6419aa020d3a9966980bc1deb7514f92a7215d6e229
+bouncycastle-pkix.checksum.enabled=true
+bouncycastle-pkix.checksum.algorithm=SHA-512
+bouncycastle-pkix.checksum.value=9c67d990a56a5c448f9bb9edbb8b99dc15971e16de7e6f10c3eab129a1389eef4882c5a5d910ac4ddc27d44f7bc9fa4054c7f56dc031154c131bccc50ebd67b9
+bouncycastle-util.checksum.enabled=true
+bouncycastle-util.checksum.algorithm=SHA-512
+bouncycastle-util.checksum.value=e19831d4afc0a709fd57694f33bfe3a8e881cba287c34fb076a44ef436e56e6bdf49299ca9525028a4de9bf5fadeaa254654d0e527855f1f5659c5a7be538576
+
+bouncycastle.home=${base.path}/bouncycastle-${bouncycastle.version}
+bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.jar
+bouncycastle-provider.loc=${base-maven.loc}/org/bouncycastle/bcprov-jdk18on/${bouncycastle.version}/bcprov-jdk18on-${bouncycastle.version}.jar
+bouncycastle-pkix.jar=${bouncycastle.home}/bouncycastle-pkix-${bouncycastle.version}.jar
+bouncycastle-pkix.loc=${base-maven.loc}/org/bouncycastle/bcpkix-jdk18on/${bouncycastle.version}/bcpkix-jdk18on-${bouncycastle.version}.jar
+bouncycastle-util.jar=${bouncycastle.home}/bouncycastle-util-${bouncycastle.version}.jar
+bouncycastle-util.loc=${base-maven.loc}/org/bouncycastle/bcutil-jdk18on/${bouncycastle.version}/bcutil-jdk18on-${bouncycastle.version}.jar

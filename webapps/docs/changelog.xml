@@ -186,6 +186,10 @@
         <code>cipherSuites</code> attribute. This behaviour will be removed in
         Tomcat 12.0.x onwards. (markt)
       </add>
+      <scode>
+        Replace the external OpenSSL based OCSP responder used during unit tests
+        with a Bouncy Castle based, in-process Java OCSP responder. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
