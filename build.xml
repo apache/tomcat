@@ -256,6 +256,9 @@
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
     <pathelement location="${derby-tools.jar}"/>
+    <pathelement location="${bouncycastle-provider.jar}"/>
+    <pathelement location="${bouncycastle-pkix.jar}"/>
+    <pathelement location="${bouncycastle-util.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -273,6 +276,9 @@
     <filter token="BND_JAR" value="${bnd.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
+    <filter token="BC_PROVIDER_JAR" value="${bouncycastle-provider.jar}"/>
+    <filter token="BC_PKIX_JAR" value="${bouncycastle-pkix.jar}"/>
+    <filter token="BC_UTIL_JAR" value="${bouncycastle-util.jar}"/>
     <filter token="OUTPUT_DIR" value="${tomcat.output}"/>
   </filterset>
 
@@ -3833,6 +3839,33 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <param name="checksum.enabled" value="${derby-tools.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${derby-tools.checksum.algorithm}"/>
       <param name="checksum.value" value="${derby-tools.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-provider.loc}"/>
+      <param name="destfile" value="${bouncycastle-provider.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-provider.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-provider.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-provider.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-pkix.loc}"/>
+      <param name="destfile" value="${bouncycastle-pkix.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-pkix.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-pkix.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-pkix.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-util.loc}"/>
+      <param name="destfile" value="${bouncycastle-util.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-util.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-util.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-util.checksum.value}"/>
     </antcall>
 
   </target>

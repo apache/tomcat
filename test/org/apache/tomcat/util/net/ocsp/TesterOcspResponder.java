@@ -16,110 +16,79 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.junit.Assert;
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.ExpandWar;
+import org.apache.catalina.startup.Tomcat;
 
-import org.apache.tomcat.util.net.TesterSupport;
-
-/*
- * The OpenSSL ocsp tool is great, but it does generate a lot of output. That output needs to be swallowed, else the
- * process will freeze when the output buffers (stdout and stderr) are full.
- *
- * There is a command line option to redirect stdout (which could be redirected to /dev/null), but there is no option to
- * redirect stderr. Therefore, this class uses a couple of dedicated threads to read stdout and stderr. By default, the
- * output is ignored, but it can be dumped to Java's stdout/stderr if required for debugging purposes.
- */
 public class TesterOcspResponder {
 
-    private static List<String> ocspArgs = Arrays.asList("ocsp", "-port", "8888", "-text", "-index",
-            TesterSupport.DB_INDEX, "-CA", TesterSupport.CA_CERT_PEM, "-rkey", TesterSupport.OCSP_RESPONDER_RSA_KEY,
-            "-rsigner", TesterSupport.OCSP_RESPONDER_RSA_CERT, "-nmin", "60");
+    private File catalinaBase;
+    private Tomcat ocspResponder;
 
-    private Process p;
+    public void start() throws Exception {
+        ocspResponder = new Tomcat();
 
-    public void start() throws IOException {
-        if (p != null) {
-            throw new IllegalStateException("Already started");
+        Connector connector = new Connector("HTTP/1.1");
+        connector.setPort(8888);
+        connector.setThrowOnFailure(true);
+        connector.setEncodedSolidusHandling("passthrough");
+        ocspResponder.getService().addConnector(connector);
+
+        // Create a temporary directory structure for the OCSP responder
+        File tempBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
+        if (!tempBase.mkdirs() && !tempBase.isDirectory()) {
+            throw new IllegalStateException("Unable to create tempBase");
         }
 
-        String openSSLPath = System.getProperty("tomcat.test.openssl.path");
-        String openSSLLibPath = null;
-        if (openSSLPath == null || openSSLPath.length() == 0) {
-            openSSLPath = "openssl";
-        } else {
-            // Explicit OpenSSL path may also need explicit lib path
-            // (e.g. Gump needs this)
-            openSSLLibPath = openSSLPath.substring(0, openSSLPath.lastIndexOf('/'));
-            openSSLLibPath = openSSLLibPath + "/../:" + openSSLLibPath + "/../lib:" + openSSLLibPath + "/../lib64";
+        // Create and configure CATALINA_BASE
+        Path tempBasePath = FileSystems.getDefault().getPath(tempBase.getAbsolutePath());
+        catalinaBase = Files.createTempDirectory(tempBasePath, "ocsp").toFile();
+        if (!catalinaBase.isDirectory()) {
+            throw new IllegalStateException("Unable to create CATALINA_BASE for OCSP responder");
         }
-        List<String> cmd = new ArrayList<>();
-        cmd.add(openSSLPath);
-        cmd.addAll(ocspArgs);
+        ocspResponder.setBaseDir(catalinaBase.getAbsolutePath());
 
-        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[0]));
-
-        if (openSSLLibPath != null) {
-            Map<String,String> env = pb.environment();
-            String libraryPath = env.get("LD_LIBRARY_PATH");
-            if (libraryPath == null) {
-                libraryPath = openSSLLibPath;
-            } else {
-                libraryPath = libraryPath + ":" + openSSLLibPath;
-            }
-            env.put("LD_LIBRARY_PATH", libraryPath);
+        // Create and configure a web apps directory
+        File appBase = new File(catalinaBase, "webapps");
+        if (!appBase.exists() && !appBase.mkdir()) {
+            throw new IllegalStateException("Unable to create appBase for OCSP responder");
         }
+        ocspResponder.getHost().setAppBase(appBase.getAbsolutePath());
 
-        p = pb.start();
+        // Configure the ROOT web application
+        // No file system docBase required
+        Context ctx = ocspResponder.addContext("", null);
+        Tomcat.addServlet(ctx, "responder", new TesterOcspResponderServlet());
+        ctx.addServletMappingDecoded("/", "responder");
 
-        redirect(new BufferedReader(new InputStreamReader(p.getInputStream())) , System.out, true);
-        redirect(new BufferedReader(new InputStreamReader(p.getErrorStream())), System.err, true);
-
-        Assert.assertTrue(p.isAlive());
+        // Start the responder
+        ocspResponder.start();
     }
 
     public void stop() {
-        if (p == null) {
-            throw new IllegalStateException("Not started");
-        }
-        p.destroy();
-
-        try {
-            if (!p.waitFor(30, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Failed to stop");
-            }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("Interrupted while waiting to stop", e);
-        }
-    }
-
-
-    private void redirect(final Reader r, final PrintStream os, final boolean swallow) {
-        /*
-         * InputStream will close when process ends. Thread will exit once stream closes.
-         */
-        new Thread( () -> {
-            char[] cbuf = new char[1024];
+        if (ocspResponder != null) {
             try {
-                int read;
-                while ((read = r.read(cbuf)) > 0) {
-                    if (!swallow) {
-                        os.print(new String(cbuf, 0, read));
-                    }
-                }
-            } catch (IOException ignore) {
-                // Ignore
+                ocspResponder.stop();
+            } catch (LifecycleException e) {
+                // Good enough for testing
+                e.printStackTrace();
             }
-
-        }).start();
+            try {
+                ocspResponder.destroy();
+            } catch (LifecycleException e) {
+                // Good enough for testing
+                e.printStackTrace();
+            }
+        }
+        if (catalinaBase != null) {
+            ExpandWar.deleteDir(catalinaBase);
+        }
     }
 }
