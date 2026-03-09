@@ -40,6 +40,9 @@ public class TestSSLHostConfig {
         // Single JSSE name
         hc.setCiphers(c.getJsseNames().iterator().next());
         Assert.assertEquals(c.getOpenSSLAlias(), hc.getCiphers());
+
+        // TLS 1.3 should be using defaults
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
     }
 
 
@@ -53,6 +56,9 @@ public class TestSSLHostConfig {
         hc.setCiphers(c1.getJsseNames().iterator().next() + "," +
                 c2.getJsseNames().iterator().next());
         Assert.assertEquals(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias(), hc.getCiphers());
+
+        // TLS 1.3 should be using defaults
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
     }
 
 
@@ -62,6 +68,9 @@ public class TestSSLHostConfig {
         // Single OpenSSL alias
         hc.setCiphers("ALL");
         Assert.assertEquals("ALL", hc.getCiphers());
+
+        // TLS 1.3 should be using defaults
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
     }
 
 
@@ -73,6 +82,9 @@ public class TestSSLHostConfig {
         // Single OpenSSLName name
         hc.setCiphers(c.getOpenSSLAlias());
         Assert.assertEquals(c.getOpenSSLAlias(), hc.getCiphers());
+
+        // TLS 1.3 should be using defaults
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
     }
 
 
@@ -81,9 +93,12 @@ public class TestSSLHostConfig {
         SSLHostConfig hc = new SSLHostConfig();
         Cipher c = Cipher.TLS_AES_128_CCM_SHA256;
 
-        // Single TLSv1.3 name - should be filtered out
+        // Single TLSv1.3 name - should be filtered out ...
         hc.setCiphers(c.getOpenSSLAlias());
         Assert.assertEquals("", hc.getCiphers());
+
+        // ... and added to cipher suite list
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13 + ":" + c.getOpenSSLAlias(), hc.getCipherSuites());
     }
 
 
@@ -93,9 +108,12 @@ public class TestSSLHostConfig {
         Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
         Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
 
-        // TLSv1.3 then TLSv1.2 - TLSv1.3 name should be filtered out
+        // TLSv1.3 then TLSv1.2 - TLSv1.3 name should be filtered out ...
         hc.setCiphers(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias());
         Assert.assertEquals(c2.getOpenSSLAlias(), hc.getCiphers());
+
+        // ... and added to cipher suite list
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13 + ":" + c1.getOpenSSLAlias(), hc.getCipherSuites());
     }
 
 
@@ -105,9 +123,12 @@ public class TestSSLHostConfig {
         Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
         Cipher c2 = Cipher.TLS_RSA_WITH_NULL_MD5;
 
-        // TLSv1.2 then TLSv1.3 - TLSv1.3 name should be filtered out
+        // TLSv1.2 then TLSv1.3 - TLSv1.3 name should be filtered out ...
         hc.setCiphers(c2.getOpenSSLAlias() + ":" + c1.getOpenSSLAlias());
         Assert.assertEquals(c2.getOpenSSLAlias(), hc.getCiphers());
+
+        // ... and added to cipher suite list
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13 + ":" + c1.getOpenSSLAlias(), hc.getCipherSuites());
     }
 
 

@@ -111,6 +111,7 @@ public class SSLHostConfig implements Serializable {
     private boolean certificateVerificationDepthConfigured = false;
     private String ciphers = DEFAULT_TLS_CIPHERS_12;
     private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
+    private String cipherSuitesFromCiphers = null;
     private LinkedHashSet<Cipher> cipherList = null;
     private LinkedHashSet<Cipher> cipherSuiteList = null;
     private List<String> jsseCipherNames = null;
@@ -455,51 +456,65 @@ public class SSLHostConfig implements Serializable {
         if (ciphersList != null) {
             if (ciphersList.contains(":")) {
                 // OpenSSL format
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sbCiphers = new StringBuilder();
+                StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
                 String[] components = ciphersList.split(":");
                 // Remove any TLS 1.3 cipher suites
                 for (String component : components) {
                     String trimmed = component.trim();
                     if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
-                        log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
-                    } else {
-                        if (sb.length() > 0) {
-                            sb.append(':');
+                        log.warn(sm.getString("sslHostConfig.handleTls13CiphersuiteInCiphers", trimmed));
+                        if (sbCipherSuitesFromCiphers.length() > 0) {
+                            sbCipherSuitesFromCiphers.append(':');
                         }
-                        sb.append(trimmed);
+                        sbCipherSuitesFromCiphers.append(trimmed);
+                    } else {
+                        if (sbCiphers.length() > 0) {
+                            sbCiphers.append(':');
+                        }
+                        sbCiphers.append(trimmed);
                     }
                 }
-                this.ciphers = sb.toString();
+                this.ciphers = sbCiphers.toString();
+                this.cipherSuitesFromCiphers = sbCipherSuitesFromCiphers.toString();
             } else {
                 // Not obviously in OpenSSL format. Might be a single OpenSSL or JSSE
                 // cipher name. Might be a comma separated list of cipher names
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sbCiphers = new StringBuilder();
+                StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
                 String[] ciphers = ciphersList.split(",");
                 for (String cipher : ciphers) {
                     String trimmed = cipher.trim();
                     if (!trimmed.isEmpty()) {
                         if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
-                            log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
-                            continue;
+                            log.warn(sm.getString("sslHostConfig.handleTls13CiphersuiteInCiphers", trimmed));
+                            if (sbCipherSuitesFromCiphers.length() > 0) {
+                                sbCipherSuitesFromCiphers.append(':');
+                            }
+                            sbCipherSuitesFromCiphers.append(trimmed);
+                        } else {
+                            String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
+                            if (openSSLName == null) {
+                                // Not a JSSE name. Maybe an OpenSSL name or alias
+                                openSSLName = trimmed;
+                            }
+                            if (sbCiphers.length() > 0) {
+                                sbCiphers.append(':');
+                            }
+                            sbCiphers.append(openSSLName);
                         }
-                        String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
-                        if (openSSLName == null) {
-                            // Not a JSSE name. Maybe an OpenSSL name or alias
-                            openSSLName = trimmed;
-                        }
-                        if (sb.length() > 0) {
-                            sb.append(':');
-                        }
-                        sb.append(openSSLName);
                     }
                 }
-                this.ciphers = sb.toString();
+                this.ciphers = sbCiphers.toString();
+                this.cipherSuitesFromCiphers = sbCipherSuitesFromCiphers.toString();
             }
         } else {
             this.ciphers = null;
+            this.cipherSuitesFromCiphers = null;
         }
         this.cipherList = null;
         this.jsseCipherNames = null;
+        this.cipherSuiteList = null;
     }
 
 
@@ -585,7 +600,14 @@ public class SSLHostConfig implements Serializable {
      * @return An OpenSSL cipher suite string for the current configuration.
      */
     public String getCipherSuites() {
-        return cipherSuites;
+        StringBuilder sb = new StringBuilder(cipherSuites);
+        if (cipherSuitesFromCiphers != null && !cipherSuitesFromCiphers.isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append(':');
+            }
+            sb.append(cipherSuitesFromCiphers);
+        }
+        return sb.toString();
     }
 
 
