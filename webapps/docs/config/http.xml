@@ -1388,10 +1388,14 @@
       <p>Only the TLSv1.2 and below ciphers that are supported by the SSL
       implementation will be used. Any ciphers in the list derived from a
       non-default cipher string that are not supported by the SSL implementation
-      or are TLSv1.3 cipher suites will be ignored and logged in a
-      <code>WARNING</code> message when the Connector starts. The warning can be
-      avoided by providing an explicit list of TLSv1.2 and below ciphers that
-      are supported by the configured SSL implementation.</p>
+      will be ignored and logged in a <code>WARNING</code> message when the
+      Connector starts. Any entires in the list that are TLSv1.3 cipher suites
+      will be removed from the cipher list, added to the end of the cipher suite
+      list (they will not be added to the cipher suite list from Tomact 12.0.x
+      onwards) and logged in a <code>WARNING</code> message when the Connector
+      starts.  The warnings can be avoided by providing an explicit list of
+      TLSv1.2 and below ciphers that are supported by the configured SSL
+      implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256</code>
       will be used.</p>
