@@ -177,6 +177,15 @@
         <code>Integer</code> rather than a <code>Long</code> to be consistent
         with how port is exposed in the Servlet API. (markt)
       </fix>
+      <add>
+        To aid the migration from the single <code>ciphers</code> configuration
+        attribute to the use of <code>ciphers</code> and
+        <code>cipherSuites</code>, TLS 1.3 cipher suites listed in the
+        <code>ciphers</code> attribute will be removed from the
+        <code>ciphers</code> attribute and added to the end of the
+        <code>cipherSuites</code> attribute. This behaviour will be removed in
+        Tomcat 12.0.x onwards. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
