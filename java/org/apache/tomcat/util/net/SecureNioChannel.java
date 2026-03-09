@@ -608,7 +608,8 @@ public class SecureNioChannel extends NioChannel {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         // are we in the middle of closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             return -1;
         }
         // did we finish our handshake?
@@ -695,7 +696,8 @@ public class SecureNioChannel extends NioChannel {
     @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
         // are we in the middle of closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             return -1;
         }
         // did we finish our handshake?
@@ -826,7 +828,8 @@ public class SecureNioChannel extends NioChannel {
             return sc.write(src);
         } else {
             // Are we closing or closed?
-            if (closing || closed) {
+            SSLEngine sslEngine = this.sslEngine;
+            if (closing || closed || sslEngine == null) {
                 throw new IOException(sm.getString("channel.nio.ssl.closing"));
             }
 
@@ -869,7 +872,8 @@ public class SecureNioChannel extends NioChannel {
     public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
         checkInterruptStatus();
         // Are we closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             throw new IOException(sm.getString("channel.nio.ssl.closing"));
         }
 
