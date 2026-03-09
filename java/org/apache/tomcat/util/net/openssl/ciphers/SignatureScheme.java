@@ -57,7 +57,22 @@ public enum SignatureScheme {
     // ML-DSA algorithms
     mldsa44(0x0904, Authentication.MLDSA),
     mldsa65(0x0905, Authentication.MLDSA),
-    mldsa87(0x0906, Authentication.MLDSA);
+    mldsa87(0x0906, Authentication.MLDSA),
+
+    // SLH-DSA algorithms
+    // Note: Mapped to ML-DSA for now, since not working
+    slhdsa_sha2_128s(0x0911, Authentication.MLDSA),
+    slhdsa_sha2_128f(0x0912, Authentication.MLDSA),
+    slhdsa_sha2_192s(0x0913, Authentication.MLDSA),
+    slhdsa_sha2_192f(0x0914, Authentication.MLDSA),
+    slhdsa_sha2_256s(0x0915, Authentication.MLDSA),
+    slhdsa_sha2_256f(0x0916, Authentication.MLDSA),
+    slhdsa_shake_128s(0x0917, Authentication.MLDSA),
+    slhdsa_shake_128f(0x0918, Authentication.MLDSA),
+    slhdsa_shake_192s(0x0919, Authentication.MLDSA),
+    slhdsa_shake_192f(0x091a, Authentication.MLDSA),
+    slhdsa_shake_256s(0x091b, Authentication.MLDSA),
+    slhdsa_shake_256f(0x091c, Authentication.MLDSA);
 
     private final int id;
     private final Authentication auth;
