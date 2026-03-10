@@ -74,4 +74,5 @@ instructions for reporting a bug
 
 ### Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for more info.
+For information on how to contribute to Apache Tomcat, please see
+[CONTRIBUTING.md](CONTRIBUTING.md).
