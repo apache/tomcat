@@ -54,6 +54,10 @@ public final class Request {
     // Expected maximum typical number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
 
+    // public static final int NOTE_ADAPTER = 1; // Defined in CoyoteAdapter
+    public static final int NOTE_BAD_REQUEST = 2;
+
+
     // ----------------------------------------------------------- Constructors
 
     public Request() {

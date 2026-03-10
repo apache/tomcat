@@ -279,6 +279,54 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     @Test
+    public void testHostHeaderInvalid() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", Method.GET));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "local!host:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[400]"));
+    }
+
+
+    @Test
+    public void testAuthorityHeaderInvalid() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", Method.GET));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header(":authority", "local!host:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[400]"));
+    }
+
+
+    @Test
     public void testHostHeaderDuplicate() throws Exception {
         http2Connect();
 
@@ -299,7 +347,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         parser.readFrame();
 
         String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+        Assert.assertTrue(trace, trace.contains("3-RST-[1]"));
     }
 
 
@@ -411,7 +459,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         parser.readFrame();
 
         String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+        Assert.assertTrue(trace, trace.contains("3-RST-[1]"));
     }
 
 
