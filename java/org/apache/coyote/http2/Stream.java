@@ -329,17 +329,28 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         // Header names must be lowercase
         if (!name.toLowerCase(Locale.US).equals(name)) {
-            throw new HpackException(sm.getString("stream.header.case", getConnectionId(), getIdAsString(), name));
+            headerException =
+                    new StreamException(sm.getString("stream.headercase", getConnectionId(), getIdAsString(), name),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            // No need for further processing. The stream will be reset.
+            return;
         }
 
         if (HTTP_CONNECTION_SPECIFIC_HEADERS.contains(name)) {
-            throw new HpackException(
-                    sm.getString("stream.header.connection", getConnectionId(), getIdAsString(), name));
+            headerException = new StreamException(
+                    sm.getString("stream.header.connection", getConnectionId(), getIdAsString(), name),
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            // No need for further processing. The stream will be reset.
+            return;
         }
 
         if ("te".equals(name)) {
             if (!"trailers".equals(value)) {
-                throw new HpackException(sm.getString("stream.header.te", getConnectionId(), getIdAsString(), value));
+                headerException =
+                        new StreamException(sm.getString("stream.header.te", getConnectionId(), getIdAsString(), name),
+                                Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                // No need for further processing. The stream will be reset.
+                return;
             }
         }
 
@@ -350,7 +361,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
         if (name.isEmpty()) {
-            throw new HpackException(sm.getString("stream.header.empty", getConnectionId(), getIdAsString()));
+            headerException =
+                    new StreamException(sm.getString("stream.header.empty", getConnectionId(), getIdAsString(), name),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            // No need for further processing. The stream will be reset.
+            return;
         }
 
         boolean pseudoHeader = name.charAt(0) == ':';
@@ -375,8 +390,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                         configureVoidOutputFilter();
                     }
                 } else {
-                    throw new HpackException(
-                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":method"));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":method"),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 break;
             }
@@ -384,18 +402,28 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (coyoteRequest.scheme().isNull()) {
                     coyoteRequest.scheme().setString(value);
                 } else {
-                    throw new HpackException(
-                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":scheme"));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":scheme"),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 break;
             }
             case ":path": {
                 if (!coyoteRequest.requestURI().isNull()) {
-                    throw new HpackException(
-                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":path"));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":path"),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 if (value.isEmpty()) {
-                    throw new HpackException(sm.getString("stream.header.noPath", getConnectionId(), getIdAsString()));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.noPath", getConnectionId(), getIdAsString()),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 int queryStart = value.indexOf('?');
                 String uri;
@@ -416,10 +444,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
             case ":authority": {
                 if (coyoteRequest.serverName().isNull()) {
-                    parseAuthority(value, false);
+                    parseAuthority(value);
                 } else {
-                    throw new HpackException(
-                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":authority"));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":authority"),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 break;
             }
@@ -438,15 +469,18 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (coyoteRequest.serverName().isNull()) {
                     // No :authority header. This is first host header. Use it.
                     hostHeaderSeen = true;
-                    parseAuthority(value, true);
+                    parseAuthority(value);
                 } else if (!hostHeaderSeen) {
                     // First host header - must be consistent with :authority
                     hostHeaderSeen = true;
                     compareAuthority(value);
                 } else {
                     // Multiple hosts headers - illegal
-                    throw new HpackException(
-                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), "host"));
+                    headerException = new StreamException(
+                            sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), "host"),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // No need for further processing. The stream will be reset.
+                    return;
                 }
                 break;
             }
@@ -496,7 +530,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         streamOutputBuffer.closed = true;
     }
 
-    private void parseAuthority(String value, boolean host) throws HpackException {
+    private void parseAuthority(String value) {
         int i;
         try {
             i = Host.parse(value);
@@ -507,34 +541,40 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 coyoteRequest.serverName().setString(value);
             }
         } catch (IllegalArgumentException iae) {
-            // Host value invalid
-            throw new HpackException(sm.getString("stream.header.invalid", getConnectionId(), getIdAsString(),
-                    host ? "host" : ":authority", value));
+            // Bad :authority / host header -> 400 response
+            coyoteRequest.setNote(Request.NOTE_BAD_REQUEST, Boolean.TRUE);
         }
         // Match host name with SNI if required
         if (!handler.getProtocol().getHttp11Protocol().checkSni(handler.getSniHostName(),
                 coyoteRequest.serverName().getString())) {
-            throw new HpackException(sm.getString("stream.host.sni", getConnectionId(), getIdAsString(), value,
-                    handler.getSniHostName()));
+            headerException = new StreamException(
+                    sm.getString("stream.host.sni", getConnectionId(), getIdAsString(), value, handler.getSniHostName()),
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            // No need for further processing. The stream will be reset.
+            return;
         }
     }
 
 
-    private void compareAuthority(String value) throws HpackException {
+    private void compareAuthority(String value) {
         int i;
         try {
             i = Host.parse(value);
-            if (i == -1 && (!value.equals(coyoteRequest.serverName().getString()) || coyoteRequest.getServerPort() != -1) ||
+            if (i == -1 &&
+                    (!value.equals(coyoteRequest.serverName().getString()) || coyoteRequest.getServerPort() != -1) ||
                     i > -1 && ((!value.substring(0, i).equals(coyoteRequest.serverName().getString()) ||
                             Integer.parseInt(value.substring(i + 1)) != coyoteRequest.getServerPort()))) {
                 // Host value inconsistent
-                throw new HpackException(sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
-                        coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())));
+                headerException = new StreamException(
+                        sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
+                                coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())),
+                        Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                // No need for further processing. The stream will be reset.
+                return;
             }
         } catch (IllegalArgumentException iae) {
-            // Host value invalid
-            throw new HpackException(
-                    sm.getString("stream.header.invalid", getConnectionId(), getIdAsString(), "host", value));
+            // Bad :authority / host header -> 400 response
+            coyoteRequest.setNote(Request.NOTE_BAD_REQUEST, Boolean.TRUE);
         }
 
     }
