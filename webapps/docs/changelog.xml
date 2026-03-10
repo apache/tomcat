@@ -288,6 +288,11 @@
         Replace the external OpenSSL based OCSP responder used during unit tests
         with a Bouncy Castle based, in-process Java OCSP responder. (markt)
       </scode>
+      <fix>
+        Relax HTTP/2 header validation and respond to invalid requests with a
+        stream reset or a 400 response as appropriate rather then with a
+        connection reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

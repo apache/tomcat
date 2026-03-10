@@ -68,6 +68,10 @@ public final class Request {
      */
     private static final AtomicLong requestIdGenerator = new AtomicLong(0);
 
+    // public static final int NOTE_ADAPTER = 1; // Defined in CoyoteAdapter
+    public static final int NOTE_BAD_REQUEST = 2;
+
+
     // ----------------------------------------------------------- Constructors
 
     public Request() {
