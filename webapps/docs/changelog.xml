@@ -262,6 +262,9 @@
       <update>
         Update Byte Buddy to 1.18.7. (markt)
       </update>
+      <update>
+        Update BND to 7.2.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -470,6 +473,9 @@
       </add>
       <update>
         Update Tomcat Native to 2.0.12. (markt)
+      </update>
+      <update>
+        Update bnd to 7.2.0. (markt)
       </update>
     </changelog>
   </subsection>
@@ -5347,12 +5353,6 @@
       <update>
         Update the internal fork of Apache Commons FileUpload to aa8eff6
         (2022-11-29, 2.0-SNAPSHOT). (markt)
-      </update>
-      <update>
-        Update bnd to 7.2.0. (markt)
-      </update>
-      <update>
-        Update BND to 7.2.1. (markt)
       </update>
     </changelog>
   </subsection>
