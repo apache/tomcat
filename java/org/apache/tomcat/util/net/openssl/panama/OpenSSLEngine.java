@@ -1402,6 +1402,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         return V_OCSP_CERTSTATUS_UNKNOWN();
                     }
                     return status;
+                } else {
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 }
             }
         } catch (IOException ioe) {
