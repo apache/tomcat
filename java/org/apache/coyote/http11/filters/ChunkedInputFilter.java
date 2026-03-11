@@ -359,13 +359,17 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             byte chr = readChunk.get(readChunk.position());
 
             if (extensionState != null) {
-                extensionState = ChunkExtension.parse(chr, extensionState);
+                try {
+                    extensionState = ChunkExtension.parse(chr, extensionState);
+                } catch (IOException ioe) {
+                    throwBadRequestException(sm.getString("chunkedInputFilter.invalidHeader"));
+                }
                 if (extensionState == State.CR) {
+                    extensionState = null;
                     if (!parseCRLF()) {
                         return false;
                     }
                     eol = true;
-                    extensionState = null;
                 } else {
                     // Check the size
                     long extSize = extensionSize.incrementAndGet();
@@ -444,11 +448,11 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                     return false;
                 }
                 if (extensionState == State.CR) {
+                    extensionState = null;
                     if (!skipCRLF()) {
                         return false;
                     }
                     eol = true;
-                    extensionState = null;
                 } else {
                     // Check the size
                     long extSize = extensionSize.incrementAndGet();
