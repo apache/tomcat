@@ -72,7 +72,7 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         challenge.append("Digest ");
-        challenge.append("username =\"").append(userName).append("\",");
+        challenge.append("username=\"").append(userName).append("\",");
         challenge.append("realm=\"").append(realm).append("\",");
         challenge.append("nonce=\"").append(nonce).append("\",");
         challenge.append("uri=\"").append(requestUri).append("\",");
