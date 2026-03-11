@@ -263,6 +263,9 @@
       <update>
         Update Byte Buddy to 1.18.7. (markt)
       </update>
+      <update>
+        Update BND to 7.2.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -446,6 +449,9 @@
       </add>
       <update>
         Update Tomcat Native to 1.3.5. (markt)
+      </update>
+      <update>
+        Update bnd to 7.2.0. (markt)
       </update>
     </changelog>
   </subsection>
@@ -6910,12 +6916,6 @@
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.30. Also
         update the minimum recommended version to 1.2.30. (markt)
-      </update>
-      <update>
-        Update bnd to 7.2.0. (markt)
-      </update>
-      <update>
-        Update BND to 7.2.1. (markt)
       </update>
     </changelog>
   </subsection>
