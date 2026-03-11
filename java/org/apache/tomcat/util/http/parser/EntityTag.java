@@ -51,7 +51,7 @@ public class EntityTag {
 
         while (true) {
             boolean strong = false;
-            HttpParser.skipLws(input);
+            HttpParser.skipWhitespace(input);
 
             switch (HttpParser.skipConstant(input, "W/")) {
                 case EOF:
@@ -79,7 +79,7 @@ public class EntityTag {
                 }
             }
 
-            HttpParser.skipLws(input);
+            HttpParser.skipWhitespace(input);
 
             switch (HttpParser.skipConstant(input, ",")) {
                 case EOF:
