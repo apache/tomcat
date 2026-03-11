@@ -327,9 +327,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.processRequest();
 
         if (ok) {
-            Assert.assertTrue(client.isResponse200());
+            Assert.assertTrue(client.getResponseLine(), client.isResponse200());
         } else {
-            Assert.assertTrue(client.isResponse500());
+            Assert.assertTrue(client.getResponseLine(), client.isResponse500());
         }
     }
 
