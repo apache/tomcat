@@ -23,14 +23,21 @@ import java.nio.file.Path;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.Tomcat;
 
 public class TesterOcspResponder {
 
+    private OcspResponse fixedResponse;
+
     private File catalinaBase;
     private Tomcat ocspResponder;
+
+    public void setFixedResponse(OcspResponse fixedResponse) {
+        this.fixedResponse = fixedResponse;
+    }
 
     public void start() throws Exception {
         ocspResponder = new Tomcat();
@@ -65,8 +72,11 @@ public class TesterOcspResponder {
         // Configure the ROOT web application
         // No file system docBase required
         Context ctx = ocspResponder.addContext("", null);
-        Tomcat.addServlet(ctx, "responder", new TesterOcspResponderServlet());
+        Wrapper w = Tomcat.addServlet(ctx, "responder", new TesterOcspResponderServlet());
         ctx.addServletMappingDecoded("/", "responder");
+        if (fixedResponse != null) {
+            w.addInitParameter(TesterOcspResponderServlet.INIT_FIXED_RESPONSE, fixedResponse.toString());
+        }
 
         // Start the responder
         ocspResponder.start();
@@ -90,5 +100,12 @@ public class TesterOcspResponder {
         if (catalinaBase != null) {
             ExpandWar.deleteDir(catalinaBase);
         }
+    }
+
+    public enum OcspResponse {
+        OK,
+        REVOKED,
+        UNKNOWN,
+        TRY_LATER
     }
 }
