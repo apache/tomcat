@@ -69,8 +69,8 @@ public class Upgrade {
                 Reader r = new StringReader(headerValue);
                 SkipResult skipComma;
                 do {
-                    // Skip any leading LWS
-                    HttpParser.skipLws(r);
+                    // Skip any leading whitespace
+                    HttpParser.skipWhitespace(r);
                     String protocolName = HttpParser.readToken(r);
                     if (protocolName == null || protocolName.isEmpty()) {
                         // Invalid
@@ -84,7 +84,7 @@ public class Upgrade {
                             return null;
                         }
                     }
-                    HttpParser.skipLws(r);
+                    HttpParser.skipWhitespace(r);
 
                     skipComma = HttpParser.skipConstant(r, ",");
                     if (skipComma == SkipResult.NOT_FOUND) {
