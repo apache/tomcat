@@ -256,6 +256,9 @@
       <update>
         Update Objenesis to 3.5. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.18.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
