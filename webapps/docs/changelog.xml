@@ -300,6 +300,10 @@
       <update>
         Update the recommended version for Tomcat Native 2.x to 2.0.14. (markt)
       </update>
+      <fix>
+        Align the FFM handling of OCSP <code>TRY_LATER</code> responses with
+        Tomcat Native. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
