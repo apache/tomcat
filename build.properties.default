@@ -269,10 +269,10 @@ easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
 # ----- objenesis, used by EasyMock, version 3.3 or later -----
-objenesis.version=3.4
+objenesis.version=3.5
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=MD5|SHA-1
-objenesis.checksum.value=51242320cb2bb25a3f36e2e21fa87de0|675cbe121a68019235d27f6c34b4f0ac30e07418
+objenesis.checksum.algorithm=SHA-512
+objenesis.checksum.value=7587fabe1dd4a639e869e4478a097665d34686de8c1ec5794356a5ebc27501fdad42a365e0f000bdf30b0b0f73d6c02523346fc6cfb9109239e5b2f7876e981e
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
