@@ -404,6 +404,9 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.12.0. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.39. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
