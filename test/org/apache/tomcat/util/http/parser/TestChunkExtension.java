@@ -77,6 +77,16 @@ public class TestChunkExtension {
     }
 
     @Test
+    public void testTokenOnlyTokenOnly01() {
+        doTest(";abc;abc\r\n", true);
+    }
+
+    @Test
+    public void testTokenOnlyTokenOnly02() {
+        doTest("; abc ; abc \r\n", true);
+    }
+
+    @Test
     public void testTokenToken01() {
         doTest(";abc=abc\r\n", true);
     }
