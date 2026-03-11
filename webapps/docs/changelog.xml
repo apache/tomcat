@@ -209,6 +209,13 @@
         exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
         Besnard. (remm)
       </fix>
+      <add>
+        Add support for specifying Java 27 (with the value <code>27</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will be used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
