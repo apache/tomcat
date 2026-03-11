@@ -215,6 +215,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>69972</bug>: Remove unwanted space in DIGEST authorization header.
+        Patch submitted by Stefan Kalscheuer in <pr>957</pr>. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
