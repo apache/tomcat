@@ -73,6 +73,11 @@ public class TesterOcspResponderServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    // Config
+    public static final String INIT_FIXED_RESPONSE = "fixedResponse";
+    private TesterOcspResponder.OcspResponse fixedResponse;
+
+    // Cached OCSP processing components
     private DigestCalculatorProvider digestCalculatorProvider;
     private X509CertificateHolder[] responderCertificateChain;
     private RespID responderID;
@@ -81,6 +86,11 @@ public class TesterOcspResponderServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        String value = config.getInitParameter(INIT_FIXED_RESPONSE);
+        if (value != null) {
+            fixedResponse = TesterOcspResponder.OcspResponse.valueOf(value);
+        }
+
         // Enable the Bouncy Castle Provider
         Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
@@ -206,21 +216,38 @@ public class TesterOcspResponderServlet extends HttpServlet {
         Req[] requests = ocspReq.getRequestList();
         for (Req request : requests) {
             CertificateID certificateID = request.getCertID();
-            switch (certificateID.getSerialNumber().intValue()) {
-                // TODO read index.db rather than hard-code certificate serial numbers
-                case 4096:
-                case 4098:
-                case 4100:
-                case 4101:
-                    responseBuilder.addResponse(certificateID, CertificateStatus.GOOD);
-                    break;
-                case 4097:
-                case 4099:
-                case 4102:
-                    responseBuilder.addResponse(certificateID, new RevokedStatus(new Date(0)));
-                    break;
-                default:
-                    responseBuilder.addResponse(certificateID, new UnknownStatus());
+            if (fixedResponse == null) {
+                switch (certificateID.getSerialNumber().intValue()) {
+                    // TODO read index.db rather than hard-code certificate serial numbers
+                    case 4096:
+                    case 4098:
+                    case 4100:
+                    case 4101:
+                        responseBuilder.addResponse(certificateID, CertificateStatus.GOOD);
+                        break;
+                    case 4097:
+                    case 4099:
+                    case 4102:
+                        responseBuilder.addResponse(certificateID, new RevokedStatus(new Date(0)));
+                        break;
+                    default:
+                        responseBuilder.addResponse(certificateID, new UnknownStatus());
+                }
+            } else {
+                switch (fixedResponse) {
+                    case OK:
+                        responseBuilder.addResponse(certificateID, CertificateStatus.GOOD);
+                        break;
+                    case REVOKED:
+                        responseBuilder.addResponse(certificateID, new RevokedStatus(new Date(0)));
+                        break;
+                    case TRY_LATER:
+                        // NO-OP
+                        break;
+                    case UNKNOWN:
+                        responseBuilder.addResponse(certificateID, new UnknownStatus());
+                        break;
+                }
             }
         }
 
@@ -228,7 +255,11 @@ public class TesterOcspResponderServlet extends HttpServlet {
         OCSPResp ocspResponse;
         try {
             BasicOCSPResp basicResponse = responseBuilder.build(contentSigner, responderCertificateChain, new Date());
-            ocspResponse = new OCSPRespBuilder().build(OCSPRespBuilder.SUCCESSFUL, basicResponse);
+            if (fixedResponse == TesterOcspResponder.OcspResponse.TRY_LATER) {
+                ocspResponse = new OCSPRespBuilder().build(OCSPRespBuilder.TRY_LATER, null);
+            } else {
+                ocspResponse = new OCSPRespBuilder().build(OCSPRespBuilder.SUCCESSFUL, basicResponse);
+            }
         } catch (OCSPException e) {
             throw new ServletException(e);
         }
