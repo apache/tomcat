@@ -420,6 +420,9 @@
       <update>
         Update Tomcat Native to 2.0.14. (markt)
       </update>
+      <update>
+        Update Objenesis to 3.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
