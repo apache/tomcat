@@ -108,7 +108,7 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     @Override
-    protected DataSource createDataSourceInstance() throws SQLException {
+    protected synchronized DataSource createDataSourceInstance() throws SQLException {
         final PoolingDataSource<PoolableConnection> pds = new ManagedDataSource<>(getConnectionPool(),
                 transactionRegistry);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
