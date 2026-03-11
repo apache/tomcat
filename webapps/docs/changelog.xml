@@ -429,6 +429,9 @@
       <update>
         Update Checkstyle to 13.3.0. (markt)
       </update>
+      <update>
+        Update BND to 7.2.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
