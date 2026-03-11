@@ -414,6 +414,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.39. (markt)
       </update>
+      <update>
+        Update Tomcat Native to 2.0.14. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
