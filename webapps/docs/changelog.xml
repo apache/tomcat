@@ -203,6 +203,9 @@
         Add validation of chunk extensions for chunked transfer encoding.
         (markt)
       </fix>
+      <update>
+        Update the recommended version for Tomcat Native to 1.3.7. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
