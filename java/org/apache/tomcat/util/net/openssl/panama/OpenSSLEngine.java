@@ -413,7 +413,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
 
                 if (bytesWritten == 0) {
-                    throw new IllegalStateException(sm.getString("engine.failedToWriteBytes"));
+                    throw new SSLException(sm.getString("engine.failedToWriteBytes"));
                 }
 
                 // Check to see if the engine wrote data into the network BIO
@@ -541,7 +541,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (bytesRead == 0) {
                     // This should not be possible. pendingApp is positive
                     // therefore the read should have read at least one byte.
-                    throw new IllegalStateException(sm.getString("engine.failedToReadAvailableBytes"));
+                    throw new SSLException(sm.getString("engine.failedToReadAvailableBytes"));
                 }
 
                 bytesProduced += bytesRead;
