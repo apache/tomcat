@@ -210,6 +210,10 @@
         Align the FFM handling of OCSP <code>TRY_LATER</code> responses with
         Tomcat Native. (remm)
       </fix>
+      <fix>
+        Free CA certificate after calling <code>SSL_CTX_add_client_CA</code>
+        in the FFM code. Based on code from PR 44 from tomcat-native. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
