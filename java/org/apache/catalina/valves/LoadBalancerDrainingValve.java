@@ -223,8 +223,7 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
             // NOTE: Do not call response.encodeRedirectURL or the bad
             // sessionid will be restored
-            response.setHeader("Location", uri);
-            response.setStatus(_redirectStatusCode);
+            response.sendRedirect(uri, _redirectStatusCode);
         } else {
             getNext().invoke(request, response);
         }

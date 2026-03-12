@@ -191,6 +191,10 @@
         <code>Content-Length</code> and <code>Content-Type</code> headers when
         accessed using the <code>getHeader</code> method and similar. (remm)
       </fix>
+      <fix>
+        <bug>69940</bug>: Improve redirect handling in the
+        <code>LoadBalancerDrainingValve</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
