@@ -217,6 +217,10 @@
       <fix>
         Free certificate chain if an error occurs, in the FFM code. (remm)
       </fix>
+      <fix>
+        Report handshake issues as <code>SSLException</code> in the FFM
+        code, rather than <code>IllegalStateException</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
