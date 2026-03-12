@@ -214,6 +214,9 @@
         Free CA certificate after calling <code>SSL_CTX_add_client_CA</code>
         in the FFM code. Based on code from PR 44 from tomcat-native. (remm)
       </fix>
+      <fix>
+        Free certificate chain if an error occurs, in the FFM code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
