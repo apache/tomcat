@@ -162,8 +162,7 @@ public class TestLoadBalancerDrainingValve {
                 if (null != queryString) {
                     expectedRequestURI = expectedRequestURI + '?' + queryString;
                 }
-                response.setHeader("Location", expectedRequestURI);
-                response.setStatus(307);
+                response.sendRedirect(expectedRequestURI, 307);
             }
         }
 
