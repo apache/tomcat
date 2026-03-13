@@ -811,7 +811,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
                     MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                     int length = i2d_X509(x509, bufPointer);
-                    if (length < 0) {
+                    if (length <= 0) {
                         certificateChain[i] = new byte[0];
                         continue;
                     }
