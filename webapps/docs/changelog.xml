@@ -246,6 +246,10 @@
         <bug>69970</bug>: Support raw IPv6 in Kubernetes membership provider
         for the service host. (remm)
       </fix>
+      <add>
+        Add support for new algorithms provided by JPA providers to the
+        <code>EncyptInterceptor</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
