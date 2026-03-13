@@ -370,11 +370,19 @@
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <scode>
+        Change the default algorithm for the <code>EncyptInterceptor</code> to
+        <code>AES/GCM/NoPadding</code>. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>69970</bug>: Support raw IPv6 in Kubernetes membership provider
         for the service host. (remm)
       </fix>
+      <add>
+        Add support for new algorithms provided by JPA providers to the
+        <code>EncyptInterceptor</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
