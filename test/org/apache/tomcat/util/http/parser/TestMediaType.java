@@ -60,9 +60,7 @@ public class TestMediaType {
             new Parameter("charset", CHARSET_QUOTED);
 
 
-    private static final String[] LWS_VALUES = new String[] {
-            "", " ", "\t", "\r", "\n", "\r\n", " \r", " \n", " \r\n",
-            "\r ", "\n ", "\r\n ", " \r ", " \n ", " \r\n " };
+    private static final String[] WHITESPACE = new String[] { "", " ", "\t", " \t", "\t " };
 
 
     @Test
@@ -236,7 +234,7 @@ public class TestMediaType {
 
 
     private void doTest(Parameter... parameters) throws IOException {
-        for (String lws : LWS_VALUES) {
+        for (String lws : WHITESPACE) {
             doTest(lws, parameters);
         }
     }

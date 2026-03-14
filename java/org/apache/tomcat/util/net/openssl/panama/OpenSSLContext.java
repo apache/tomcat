@@ -599,6 +599,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     } else if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                     }
+                    X509_free(x509CACert);
                 }
             } else if (sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) {
                 // Client certificate verification based on trusted CA files and dirs
@@ -1294,6 +1295,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     if (SSL_CTX_add0_chain_cert(state.sslCtx, x509certChain) <= 0) {
                         logLastError("openssl.errorAddingCertificate");
+                        X509_free(x509certChain);
                         return false;
                     }
                 }

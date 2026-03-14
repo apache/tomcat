@@ -191,6 +191,10 @@
         <code>Content-Length</code> and <code>Content-Type</code> headers when
         accessed using the <code>getHeader</code> method and similar. (remm)
       </fix>
+      <fix>
+        <bug>69940</bug>: Improve redirect handling in the
+        <code>LoadBalancerDrainingValve</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -288,6 +292,33 @@
         Replace the external OpenSSL based OCSP responder used during unit tests
         with a Bouncy Castle based, in-process Java OCSP responder. (markt)
       </scode>
+      <fix>
+        Relax HTTP/2 header validation and respond to invalid requests with a
+        stream reset or a 400 response as appropriate rather then with a
+        connection reset. (markt)
+      </fix>
+      <fix>
+        Add validation of chunk extensions for chunked transfer encoding.
+        (markt)
+      </fix>
+      <update>
+        Update the recommended version for Tomcat Native 2.x to 2.0.14. (markt)
+      </update>
+      <fix>
+        Align the FFM handling of OCSP <code>TRY_LATER</code> responses with
+        Tomcat Native. (remm)
+      </fix>
+      <fix>
+        Free CA certificate after calling <code>SSL_CTX_add_client_CA</code>
+        in the FFM code. Based on code from PR 44 from tomcat-native. (remm)
+      </fix>
+      <fix>
+        Free certificate chain if an error occurs, in the FFM code. (remm)
+      </fix>
+      <fix>
+        Report handshake issues as <code>SSLException</code> in the FFM
+        code, rather than <code>IllegalStateException</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -328,15 +359,30 @@
         exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
         Besnard. (remm)
       </fix>
+      <add>
+        Add support for specifying Java 27 (with the value <code>27</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will be used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <scode>
+        Change the default algorithm for the <code>EncyptInterceptor</code> to
+        <code>AES/GCM/NoPadding</code>. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>69970</bug>: Support raw IPv6 in Kubernetes membership provider
         for the service host. (remm)
       </fix>
+      <add>
+        Add support for new algorithms provided by JPA providers to the
+        <code>EncyptInterceptor</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -394,6 +440,33 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         Update the internal fork of Apache Commons BCEL to 6.12.0. (markt)
+      </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.39. (markt)
+      </update>
+      <update>
+        Update Tomcat Native to 2.0.14. (markt)
+      </update>
+      <update>
+        Update Objenesis to 3.5. (markt)
+      </update>
+      <update>
+        Update Byte Buddy to 1.18.7. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 13.3.0. (markt)
+      </update>
+      <update>
+        Update BND to 7.2.1. (markt)
+      </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
+      <update>
+        Improvements to Chinese translations provided by eaststrongox. (markt)
+      </update>
+      <update>
+        Improvements to Japanese translations provided by tak7iji. (markt)
       </update>
     </changelog>
   </subsection>
