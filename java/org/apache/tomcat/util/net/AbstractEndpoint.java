@@ -740,7 +740,8 @@ public abstract class AbstractEndpoint<S, U> {
     public boolean checkSni(String sniHostName, String protocolHostName) {
         return (!strictSni || !isSSLEnabled()
                 || (sniHostName != null && sniHostName.equalsIgnoreCase(protocolHostName))
-                || getSSLHostConfig(sniHostName) == getSSLHostConfig(protocolHostName));
+                || getSSLHostConfig(sniHostName) == getSSLHostConfig(
+                        protocolHostName != null ? protocolHostName.toLowerCase(Locale.ENGLISH) : null));
     }
 
 

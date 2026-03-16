@@ -319,6 +319,9 @@
         Report handshake issues as <code>SSLException</code> in the FFM
         code, rather than <code>IllegalStateException</code>. (remm)
       </fix>
+      <fix>
+        Fix case sensitive handling of the protocol host name. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
