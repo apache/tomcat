@@ -19,6 +19,7 @@ package org.apache.el.parser;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.el.ELException;
 
@@ -52,7 +53,8 @@ public abstract class AstAbstractEmpty extends SimpleNode {
         if (obj == null || obj instanceof String && ((String) obj).isEmpty() ||
                 obj instanceof Object[] && ((Object[]) obj).length == 0 ||
                 obj instanceof Collection<?> && ((Collection<?>) obj).isEmpty() ||
-                obj instanceof Map<?,?> && ((Map<?,?>) obj).isEmpty()) {
+                obj instanceof Map<?,?> && ((Map<?,?>) obj).isEmpty() ||
+                obj instanceof Optional && ((Optional<?>) obj).isEmpty()) {
             return RETURN_EMPTY;
         }
         return RETURN_NOT_EMPTY;

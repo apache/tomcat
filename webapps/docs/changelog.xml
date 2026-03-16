@@ -355,6 +355,10 @@
         Add support for coercion to <code>java.time.Instant</code> and
         <code>java.util.Date</code>. (markt)
       </add>
+      <add>
+        Add support for <code>java.util.Optional</code> to the empty operator.
+        (markt)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>69948</bug>: Avoid ArrayOutOfBoundsException instead of
