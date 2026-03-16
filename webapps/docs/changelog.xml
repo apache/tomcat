@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.20 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix case sensitive handling of the protocol host name. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
@@ -222,9 +229,6 @@
       <fix>
         Report handshake issues as <code>SSLException</code> in the FFM
         code, rather than <code>IllegalStateException</code>. (remm)
-      </fix>
-      <fix>
-        Fix case sensitive handling of the protocol host name. (remm)
       </fix>
     </changelog>
   </subsection>
