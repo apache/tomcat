@@ -870,10 +870,32 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
   <subsection name="Introduction">
 
-    <p>There are a number of HTTP headers that can be added to the response to
-    improve the security of the connection. This filter provides a mechanism for
-    adding those headers. Note that security related headers with more complex
-    requirements, like CORS, are implemented as separate Filters.</p>
+    <p>The HTTP Header Security Filter adds security-related HTTP response
+      headers to help protect against common web vulnerabilities. It supports
+      three independent protections, each of which can be enabled or disabled
+      individually:</p>
+
+    <ul>
+      <li><strong>HTTP Strict Transport Security (HSTS)</strong> - instructs
+        browsers to only access the site over HTTPS, preventing protocol
+        downgrade attacks and cookie hijacking. The
+        <code>Strict-Transport-Security</code> header is only added to responses
+        for secure (HTTPS) requests. See
+        <a href="https://tools.ietf.org/html/rfc6797">RFC 6797</a> for further
+        details.</li>
+      <li><strong>Click-jacking protection</strong> - sets the
+        <code>X-Frame-Options</code> header to control whether the page can be
+        rendered in a frame, iframe, or object, preventing click-jacking
+        attacks.</li>
+      <li><strong>Content-Type sniffing protection</strong> - sets the
+        <code>X-Content-Type-Options</code> header to <code>nosniff</code>,
+        preventing browsers from MIME-sniffing the response away from the
+        declared content type.</li>
+    </ul>
+
+    <p>Note that security-related headers with more complex requirements, such
+      as CORS, are implemented as separate filters.</p>
+
 
   </subsection>
 
@@ -885,6 +907,39 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
   </subsection>
 
+  <subsection name="Basic configuration sample">
+
+    <p>To enable the filter with a one-year HSTS policy including subdomains,
+      click-jacking protection allowing same-origin framing, and content-type
+      sniffing protection:</p>
+
+    <source><![CDATA[<filter>
+  <filter-name>httpHeaderSecurity</filter-name>
+  <filter-class>
+    org.apache.catalina.filters.HttpHeaderSecurityFilter
+  </filter-class>
+  <async-supported>true</async-supported>
+  <init-param>
+    <param-name>hstsMaxAgeSeconds</param-name>
+    <param-value>31536000</param-value>
+  </init-param>
+  <init-param>
+    <param-name>hstsIncludeSubDomains</param-name>
+    <param-value>true</param-value>
+  </init-param>
+  <init-param>
+    <param-name>antiClickJackingOption</param-name>
+    <param-value>SAMEORIGIN</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>httpHeaderSecurity</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>]]></source>
+
+  </subsection>
+
+
   <subsection name="Initialisation parameters">
 
     <p>The HTTP Header Security Filter supports the following initialization
@@ -893,58 +948,61 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <attributes>
 
       <attribute name="hstsEnabled" required="false">
-        <p>Will an HTTP Strict Transport Security (HSTS) header
-        (<code>Strict-Transport-Security</code>) be set on the response for
-        secure requests. Any HSTS header already present will be replaced. See
-        <a href="https://tools.ietf.org/html/rfc6797">RFC 6797</a> for further
-        details of HSTS. If not specified, the default value of
-        <code>true</code> will be used.</p>
+        <p>Should the <code>Strict-Transport-Security</code> header be set on
+          the response for secure requests? The header is only added when the
+          request is secure (HTTPS). Any HSTS header already present will be
+          replaced. If not specified, the default value of <code>true</code>
+          will be used.</p>
       </attribute>
 
       <attribute name="hstsMaxAgeSeconds" required="false">
-        <p>The max age value that should be used in the HSTS header. Negative
-        values will be treated as zero. If not specified, the default value of
-        <code>0</code> will be used.</p>
+        <p>The max age value (in seconds) to use in the HSTS header. This
+          tells the browser how long to remember that the site should only be
+          accessed over HTTPS. Negative values will be treated as zero. If not
+          specified, the default value of <code>0</code> will be used.</p>
       </attribute>
 
       <attribute name="hstsIncludeSubDomains" required="false">
-        <p>Should the includeSubDomains parameter be included in the HSTS
-        header. If not specified, the default value of <code>false</code> will
-        be used.</p>
+        <p>Should the <code>includeSubDomains</code> directive be included in
+          the HSTS header? When enabled, the HSTS policy applies to all
+          subdomains as well. If not specified, the default value of
+          <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="hstsPreload" required="false">
-        <p>Should the preload parameter be included in the HSTS header. If not
-        specified, the default value of <code>false</code> will be used. See
-        <a href="https://hstspreload.org/">https://hstspreload.org</a> for
-        important information about this parameter.</p>
+        <p>Should the <code>preload</code> directive be included in the HSTS
+          header? This signals to browser vendors that the domain should be
+          included in built-in HSTS preload lists. If not specified, the default
+          value of <code>false</code> will be used. See
+          <a href="https://hstspreload.org/">https://hstspreload.org</a> for
+          requirements and important information about this parameter.</p>
       </attribute>
 
       <attribute name="antiClickJackingEnabled" required="false">
-        <p>Should the anti click-jacking header (<code>X-Frame-Options</code>)
-        be set on the response. Any anti click-jacking header already present
-        will be replaced. If not specified, the default value of
-        <code>true</code> will be used.</p>
+        <p>Should the <code>X-Frame-Options</code> header be set on the
+          response? Any existing header with the same name will be replaced. If
+          not specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="antiClickJackingOption" required="false">
-        <p>What value should be used for the anticlick-jacking header? Must be
-        one of <code>DENY</code>, <code>SAMEORIGIN</code>,
-        <code>ALLOW-FROM </code> (case-insensitive). If not specified, the
-        default value of <code>DENY</code> will be used.</p>
+        <p>The value to use for the <code>X-Frame-Options</code> header. Must
+          be one of <code>DENY</code>, <code>SAMEORIGIN</code>, or
+          <code>ALLOW-FROM</code> (case-insensitive). If not specified, the
+          default value of <code>DENY</code> will be used.</p>
       </attribute>
 
       <attribute name="antiClickJackingUri" required="false">
-        <p>If ALLOW-FROM is used for <strong>antiClickJackingOption</strong>,
-        what URI should be allowed? If not specified, the default value of an
-        empty string will be used.</p>
+        <p>When <code>ALLOW-FROM</code> is used for
+          <strong>antiClickJackingOption</strong>, this specifies the URI that is
+          permitted to frame the page. Must be a valid URI. If not specified, the
+          default value of an empty string will be used.</p>
       </attribute>
 
       <attribute name="blockContentTypeSniffingEnabled" required="false">
-        <p>Should the header that blocks content type sniffing
-        (<code>X-Content-Type-Options</code>) be set on every response. If
-        already present, the header will be replaced. If not specified, the
-        default value of <code>true</code> will be used.</p>
+        <p>Should the <code>X-Content-Type-Options: nosniff</code> header be
+          set on every response? Any existing header with the same name will be
+          replaced. If not specified, the default value of <code>true</code>
+          will be used.</p>
       </attribute>
 
     </attributes>
