@@ -1882,6 +1882,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         String hrefPath = hrefUri.getPath();
+        if (hrefPath == null) {
+            return null;
+        }
 
         // Avoid path traversals
         if (!hrefPath.equals(RequestUtil.normalize(hrefPath))) {
@@ -2044,6 +2047,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         String destinationPath = destinationUri.getPath();
+        if (destinationPath == null) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return false;
+        }
 
         // Destination isn't allowed to use '.' or '..' segments
         if (!destinationPath.equals(RequestUtil.normalize(destinationPath))) {
