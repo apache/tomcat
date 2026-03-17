@@ -57,6 +57,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     private String serverName;
     private int serverPort;
     private String contentType;
+    private boolean secure = false;
 
     @Override
     public Object getAttribute(String name) {
@@ -190,14 +191,13 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This test implementation is hard coded to return false.
-     */
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
     @Override
     public boolean isSecure() {
-        return false;
+        return secure;
     }
 
     @Override
