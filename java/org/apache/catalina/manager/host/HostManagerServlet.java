@@ -67,6 +67,9 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>host-name#host-aliases</code>.</li>
  * <li><b>/start?name={host-name}</b> - Start the virtual host.</li>
  * <li><b>/stop?name={host-name}</b> - Stop the virtual host.</li>
+ * <li><b>/persist</b> - Persist the current server configuration to {@code server.xml}. Requires the
+ * {@link org.apache.catalina.storeconfig.StoreConfigLifecycleListener StoreConfigLifecycleListener} to
+ * be configured.</li>
  * </ul>
  * <p>
  * <b>NOTE</b> - Attempting to stop or remove the host containing this servlet itself will not succeed. Therefore, this
