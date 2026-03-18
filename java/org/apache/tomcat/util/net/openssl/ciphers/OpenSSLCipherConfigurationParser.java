@@ -493,9 +493,8 @@ public class OpenSSLCipherConfigurationParser {
                 new HashSet<>(Arrays.asList(Encryption.CAMELLIA128, Encryption.CAMELLIA256))));
         addListAlias(CAMELLIA128, filterByEncryption(allCiphers, Collections.singleton(Encryption.CAMELLIA128)));
         addListAlias(CAMELLIA256, filterByEncryption(allCiphers, Collections.singleton(Encryption.CAMELLIA256)));
-        addListAlias(CBC, filterByEncryption(allCiphers,
-                new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES256, Encryption.CAMELLIA128,
-                        Encryption.CAMELLIA256))));
+        addListAlias(CBC, filterByEncryption(allCiphers, new HashSet<>(
+                Arrays.asList(Encryption.AES128, Encryption.AES256, Encryption.CAMELLIA128, Encryption.CAMELLIA256))));
         addListAlias(CHACHA20, filterByEncryption(allCiphers, Collections.singleton(Encryption.CHACHA20POLY1305)));
         addListAlias(TRIPLE_DES, filterByEncryption(allCiphers, Collections.singleton(Encryption.TRIPLE_DES)));
         addListAlias(DES, filterByEncryption(allCiphers, Collections.singleton(Encryption.DES)));
@@ -528,8 +527,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
-        addListAlias(DEFAULT, parse(
-                "ALL:!eNULL:!aNULL:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
+        addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault =
                 filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH, KeyExchange.EECDH)));
