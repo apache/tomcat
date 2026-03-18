@@ -267,7 +267,7 @@ public class PersistentValve extends ValveBase {
      * @throws IOException If an I/O error occurs while working with the request or response
      */
     protected void onSemaphoreNotAcquired(Request request, Response response) throws IOException {
-        response.sendError(429);
+        response.sendError(HttpServletResponse.SC_TOO_MANY_REQUESTS);
     }
 
 

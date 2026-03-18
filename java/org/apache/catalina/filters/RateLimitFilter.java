@@ -116,7 +116,7 @@ public class RateLimitFilter extends FilterBase {
     /**
      * Default status code to return if requests per duration is exceeded.
      */
-    public static final int DEFAULT_STATUS_CODE = 429;
+    public static final int DEFAULT_STATUS_CODE = HttpServletResponse.SC_TOO_MANY_REQUESTS;
 
     /**
      * Default status message to return if requests per duration is exceeded.
