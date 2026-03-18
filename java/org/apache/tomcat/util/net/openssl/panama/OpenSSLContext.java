@@ -265,8 +265,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Set server groups
             // Note: It is also possible to override setSSLParameters in OpenSSLEngine to set the final
-            //  list of groups per connection, but this is less efficient than setting the configured
-            //  group list on the SSL context and letting OpenSSL figure it out.
+            // list of groups per connection, but this is less efficient than setting the configured
+            // group list on the SSL context and letting OpenSSL figure it out.
             if (sslHostConfig.getGroupList() != null) {
                 StringBuilder sb = new StringBuilder();
                 boolean first = true;
@@ -532,7 +532,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             if (maxTlsVersion >= TLS1_3_VERSION()) {
                 try {
-                    if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCipherSuites())) <= 0) {
+                    if (SSL_CTX_set_ciphersuites(state.sslCtx,
+                            localArena.allocateFrom(sslHostConfig.getCipherSuites())) <= 0) {
                         tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCipherSuites());
                     } else {
                         ciphersSet = true;
@@ -611,7 +612,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         localArena
                                 .allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) :
                         MemorySegment.NULL;
-                if (SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative, caCertificatePathNative) <= 0) {
+                if (SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative,
+                        caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
@@ -1368,8 +1370,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     public SSLEngine createSSLEngine() {
         return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, false, sessionContext, alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
-                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA,
-                noOcspCheck, ocspSoftFail, ocspTimeout, ocspVerifyFlags);
+                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA, noOcspCheck,
+                ocspSoftFail, ocspTimeout, ocspVerifyFlags);
     }
 
     @Override
