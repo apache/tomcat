@@ -26,7 +26,9 @@ import javax.xml.parsers.SAXParserFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Catalina;
+import org.apache.catalina.startup.CatalinaBaseConfigurationSource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
@@ -129,7 +131,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         File serverXml = new File(tomcat.getServer().getCatalinaBase(), Catalina.SERVER_XML);
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
-        String serverXmlDump = "";
+        String serverXmlDump;
         try (FileReader reader = new FileReader(serverXml);
                 StringWriter writer = new StringWriter()) {
             IOTools.flow(reader, writer);
@@ -142,6 +144,20 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertTrue(serverXmlDump.contains("+TLSv1.1"));
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(serverXmlDump)));
 
+        tomcat.stop();
+
+        tomcat.init(new CatalinaBaseConfigurationSource(getTemporaryDirectory(), Catalina.SERVER_XML));
+        // If the persisted server.xml is malformed, start() will fail
+        tomcat.start();
+        Connector[] connectors = tomcat.getService().findConnectors();
+        boolean foundSsl = false;
+        for (Connector c : connectors) {
+            if (c.getSecure()) {
+                foundSsl = true;
+                break;
+            }
+        }
+        Assert.assertTrue("SSL connector not found after round-trip", foundSsl);
         tomcat.stop();
     }
 
