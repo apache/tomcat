@@ -111,6 +111,11 @@
         Align buffer reuse of the OpenSSLEngine for tomcat-native with the FFM
         code. (remm)
       </update>
+      <fix>
+        Fix an HTTP/2 header frame parsing bug that could result in a connection
+        being closed without a <code>GOAWAY</code> frame if an invalid
+        <code>HEADERS</code> frame was received. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
