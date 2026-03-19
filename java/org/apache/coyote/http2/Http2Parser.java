@@ -247,6 +247,12 @@ class Http2Parser {
             } else {
                 buffer.get(optional);
             }
+            /*
+             * The optional padLength byte and priority bytes (if any) don't count towards the payload size when
+             * comparing payload size to padLength as required by RFC 9113, section 6.2.
+             */
+            payloadSize -= optionalLen;
+
             if (padding) {
                 padLength = ByteUtil.getOneByte(optional, 0);
                 if (padLength >= payloadSize) {
@@ -255,11 +261,10 @@ class Http2Parser {
                             Http2Error.PROTOCOL_ERROR);
                 }
             }
-
-            // Ignore RFC 7450 priority data if present
-
-            payloadSize -= optionalLen;
+            // The padding does not count towards the size of payload that is read below.
             payloadSize -= padLength;
+
+            // Any RFC 7450 priority data was read into the byte[] optional above. It is ignored.
         }
 
         readHeaderPayload(streamId, payloadSize, buffer);
