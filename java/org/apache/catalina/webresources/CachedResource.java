@@ -576,6 +576,7 @@ public class CachedResource implements WebResource {
 
         @Override
         @Deprecated
+        @SuppressWarnings("removal")
         public Permission getPermission() throws IOException {
             // Doesn't trigger a call to connect for file:// URLs
             return resourceURL.openConnection().getPermission();
@@ -639,6 +640,7 @@ public class CachedResource implements WebResource {
 
         @Override
         @Deprecated
+        @SuppressWarnings("removal")
         public Permission getPermission() throws IOException {
             // Doesn't trigger a call to connect for jar:// URLs
             return resourceURL.openConnection().getPermission();
