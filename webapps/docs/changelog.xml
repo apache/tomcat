@@ -222,6 +222,11 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix an HTTP/2 header frame parsing bug that could result in a connection
+        being closed without a <code>GOAWAY</code> frame if an invalid
+        <code>HEADERS</code> frame was received. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
