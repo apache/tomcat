@@ -130,7 +130,7 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        // By default, use JSSE JSSE trust
+        // By default, use JSSE trust
         initSsl(tomcat, false);
     }
 
