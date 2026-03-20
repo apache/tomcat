@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.crypto.Cipher;
@@ -42,7 +43,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
 /**
  * Adds encryption using a pre-shared key. The length of the key (in bytes) must be acceptable for the encryption
  * algorithm being used. For example, for AES, you must use a key of either 16 bytes (128 bits, 24 bytes 192 bits), or
@@ -54,7 +54,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     private static final Log log = LogFactory.getLog(EncryptInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(EncryptInterceptor.class);
 
-    private static final String DEFAULT_ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String DEFAULT_ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
 
     private String providerName;
     private String encryptionAlgorithm = DEFAULT_ENCRYPTION_ALGORITHM;
@@ -140,17 +140,17 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             xbb.clear();
             xbb.append(data, 0, data.length);
 
-            super.messageReceived(msg);
         } catch (GeneralSecurityException gse) {
             log.error(sm.getString("encryptInterceptor.decrypt.failed"), gse);
         }
+        super.messageReceived(msg);
     }
 
     /**
      * Sets the encryption algorithm to be used for encrypting and decrypting channel messages. You must specify the
      * <code>algorithm/mode/padding</code>. Information on standard algorithm names may be found in the
      * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">Java
-     * documentation</a>. Default is <code>AES/CBC/PKCS5Padding</code>.
+     * documentation</a>. Default is <code>AES/GCM/NoPadding</code>.
      *
      * @param algorithm The algorithm to use.
      */
@@ -314,33 +314,68 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
         String algorithmName;
         String algorithmMode;
+        String algorithmPadding;
 
-        // We need to break-apart the algorithm name e.g. AES/CBC/PKCS5Padding
+        // We need to break-apart the algorithm name e.g. AES/GCM/NoPadding
         // take just the algorithm part.
         int pos = algorithm.indexOf('/');
 
         if (pos >= 0) {
-            algorithmName = algorithm.substring(0, pos);
+            algorithmName = algorithm.substring(0, pos).toUpperCase(Locale.ENGLISH);
             int pos2 = algorithm.indexOf('/', pos + 1);
 
             if (pos2 >= 0) {
-                algorithmMode = algorithm.substring(pos + 1, pos2);
+                algorithmMode = algorithm.substring(pos + 1, pos2).toUpperCase(Locale.ENGLISH);
+                algorithmPadding = algorithm.substring(pos2 + 1).toUpperCase(Locale.ENGLISH);
             } else {
-                algorithmMode = "CBC";
+                algorithmMode = "GCM";
+                algorithmPadding = "NOPADDING";
             }
         } else {
             algorithmName = algorithm;
-            algorithmMode = "CBC";
+            algorithmMode = "GCM";
+            algorithmPadding = "NOPADDING";
         }
 
-        if ("GCM".equalsIgnoreCase(algorithmMode)) {
-            return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
-        } else if ("CBC".equalsIgnoreCase(algorithmMode) || "OFB".equalsIgnoreCase(algorithmMode) ||
-                "CFB".equalsIgnoreCase(algorithmMode)) {
-            return new BaseEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
-        } else {
+        /*
+         * Limit the cipher algorithm modes available. The limits are based on the cipher algorithm modes listed in the
+         * Java Standard Names documentation. Those modes that are not appropriate or provide no protection are blocked.
+         * Where there are performance or security concerns regarding a mode, a warning is logged. Unrecognised modes,
+         * such as those provided by custom JCA providers are allowed but will be rejected if there is no JCA provider
+         * to support them.
+         */
+        if ("NONE".equals(algorithmMode) || "ECB".equals(algorithmMode) || "PCBC".equals(algorithmMode) ||
+                "CTS".equals(algorithmMode) || "KW".equals(algorithmMode) || "KWP".equals(algorithmMode) ||
+                "CTR".equals(algorithmMode) ||
+                ("CBC".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) ||
+                ("CFB".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) ||
+                ("GCM".equals(algorithmMode) && "PKCS5PADDING".equals(algorithmPadding)) ||
+                ("OFB".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding))) {
+            // Insecure, unsuitable or unsupported
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithm));
+
+        } else if (("CBC".equals(algorithmMode) && "PKCS5PADDING".equals(algorithmPadding)) ||
+                ("CFB".equals(algorithmMode) && "PKCS5PADDING".equals(algorithmPadding)) ||
+                ("OFB".equals(algorithmMode) && "PKCS5PADDING".equals(algorithmPadding))) {
+            // Supported but not recommended as more secure modes are available
+            log.warn(sm.getString("encryptInterceptor.algorithm.switch", algorithm));
+
+        } else if (algorithmMode.startsWith("CFB") || algorithmMode.startsWith("OFB")) {
+            // Using a non-default block size. Not supported as insecure and/or inefficient.
             throw new IllegalArgumentException(
-                    sm.getString("encryptInterceptor.algorithm.unsupported-mode", algorithmMode));
+                    sm.getString("encryptInterceptor.algorithm.unsupported", algorithm));
+
+        } else if ("GCM".equalsIgnoreCase(algorithmMode) && "NOPADDING".equals(algorithmPadding)) {
+            // Needs a specialised encryption manager to handle the differences between GCM and other modes
+            return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+        }
+
+        // Use the default encryption manager
+        try {
+            return new BaseEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException ex) {
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithmMode),
+                    ex);
         }
     }
 

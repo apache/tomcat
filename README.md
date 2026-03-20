@@ -48,11 +48,11 @@ The most up-to-date documentation for each version can be found at:
 
 ### Installation
 
-Please see [RUNNING.txt](RUNNING.txt) for more info.
+Please see [RUNNING.txt](RUNNING.txt) for more information.
 
 ### Licensing
 
-Please see [LICENSE](LICENSE) for more info.
+Please see [LICENSE](LICENSE) for more information.
 
 ### Support and Mailing List Information
 

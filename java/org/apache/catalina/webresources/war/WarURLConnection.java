@@ -55,6 +55,7 @@ public class WarURLConnection extends URLConnection {
 
     @Override
     @Deprecated
+    @SuppressWarnings("removal")
     public Permission getPermission() throws IOException {
         return wrappedJarUrlConnection.getPermission();
     }

@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.18 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.20 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -185,12 +185,11 @@
         of <code>MessageDigestCredentialHandler</code> from <code>false</code>
         to <code>true</code>. (markt)
       </update>
+      <scode>
+        Add constants to <code>HttpServletResponse</code> for the HTTP status
+        codes defined in RFC 6585. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69967</bug>: Fix inconsistencies related to
-        <code>Content-Length</code> and <code>Content-Type</code> headers when
-        accessed using the <code>getHeader</code> method and similar. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -223,71 +222,11 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Add an HTTP configuration setting, <code>noCompressionEncodings</code>,
-        that can be used to control which content encodings will not be
-        compressed when compression is enabled. Based on pull request
-        <pr>914</pr> by Long9725. (markt)
-      </add>
       <fix>
-        Add size limit for OCSP responses. Based on code submitted by Chenjp.
-        (remm)
+        Fix an HTTP/2 header frame parsing bug that could result in a connection
+        being closed without a <code>GOAWAY</code> frame if an invalid
+        <code>HEADERS</code> frame was received. (markt)
       </fix>
-      <fix>
-        To maintain the documented alignment with the OpenSSL development
-        branch, the use of the aliases <code>SSLv3</code>, <code>EXPORT</code>,
-        <code>EXPORT40</code>, <code>EXPORT56</code>, <code>KRB5</code>,
-        <code>kFZA</code>, <code>aFZA</code>, <code>eFZA</code> and
-        <code>FZA</code> are no longer supported when setting the
-        <code>ciphers</code> attribute of an <code>SSLHostConfig</code> element.
-        (markt)
-      </fix>
-      <fix>
-        To maintain the documented alignment with the OpenSSL development
-        branch, add support for the aliases <code>ARIAGCM</code> and
-        <code>CBC</code>when setting the <code>ciphers</code> attribute of
-        an <code>SSLHostConfig</code> element. (markt)
-      </fix>
-      <add>
-        <bug>69870</bug>: Add a <code>drainTimeout</code> to the HTTP/2
-        <code>UpgradeProtocol</code> element to allow configuration of an
-        time between the two final <code>GOAWAY</code> frames sent by Tomcat
-        when closing am HTTP/2 connection. Pull request <pr>917</pr> provided by
-        Kai Burjack. (markt)
-      </add>
-      <update>
-        Update the minimum recommended version of Tomcat Native so that users of
-        1.3.x are recommended to update to 2.0.x. (markt)
-      </update>
-      <fix>
-        Respect the value for the <code>jdk.tls.namedGroups</code> system
-        property as the default value for the configured group list on the
-        Connector. (remm)
-      </fix>
-      <fix>
-        <bug>69964</bug>: Respect the configured cipher order, which was no
-        longer respected following the addition of TLS 1.3 specific cipher
-        configuration. TLS 1.3 ciphers will always be first in the list. (remm)
-      </fix>
-      <fix>
-        Free the x509 object in the FFM code when getting the peer certificate
-        if getting the bytes from the certificate somehow fails.
-        Pull request <pr>951</pr> provided by Chenjp. (remm)
-      </fix>
-      <fix>
-        Improve HPACK exception use, making sure <code>HpackException</code>
-        is thrown instead of unexpected types. (remm)
-      </fix>
-      <fix>
-        Update the parser for the HTTP <code>Host</code> header and
-        <code>:authority</code> pseudo header to convert the port, if any, to an
-        <code>Integer</code> rather than a <code>Long</code> to be consistent
-        with how port is exposed in the Servlet API. (markt)
-      </fix>
-      <scode>
-        Replace the external OpenSSL based OCSP responder used during unit tests
-        with a Bouncy Castle based, in-process Java OCSP responder. (markt)
-      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -321,22 +260,20 @@
         Add support for coercion to <code>java.time.Instant</code> and
         <code>java.util.Date</code>. (markt)
       </add>
+      <add>
+        Add support for <code>java.util.Optional</code> to the empty operator.
+        (markt)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69948</bug>: Avoid ArrayOutOfBoundsException instead of
-        PropertyNotFoundException when generating a properties not found
-        exception in AstValue. Based on <pr>950</pr> submitted by Jérôme
-        Besnard. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <scode>
+        Change the default algorithm for the <code>EncyptInterceptor</code> to
+        <code>AES/GCM/NoPadding</code>. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69970</bug>: Support raw IPv6 in Kubernetes membership provider
-        for the service host. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -392,9 +329,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update the internal fork of Apache Commons BCEL to 6.12.0. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>

@@ -24,10 +24,9 @@ import java.security.cert.X509Certificate;
  */
 public interface SSLSupport {
     /**
-     * The Request attribute key for the cipher suite.
+     * The Request attribute key for the protocol that created the SSL socket. e.g. TLSv1 or TLSv1.2 etc.
      */
     String SECURE_PROTOCOL_KEY = "jakarta.servlet.request.secure_protocol";
-
 
     /**
      * The Request attribute key for the cipher suite.

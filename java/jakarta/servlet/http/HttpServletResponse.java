@@ -624,6 +624,22 @@ public interface HttpServletResponse extends ServletResponse {
     int SC_UPGRADE_REQUIRED = 426;
 
     /**
+     * Status code (428) indicating that the origin server requires this request to be conditional.
+     */
+    int SC_PRECONDITION_REQUIRED = 428;
+
+    /**
+     * Status code (429) indicating that the user has sent too many requests in a given amount of time ("rate limiting").
+     */
+    int SC_TOO_MANY_REQUESTS = 429;
+
+    /**
+     * Status code (431) indicating that the server is unwilling to process the request because its header fields are too
+     * large.
+     */
+    int SC_REQUEST_HEADER_FIELDS_TOO_LARGE = 431;
+
+    /**
      * Status code (500) indicating an error inside the HTTP server which prevented it from fulfilling the request.
      */
     int SC_INTERNAL_SERVER_ERROR = 500;
@@ -655,4 +671,9 @@ public interface HttpServletResponse extends ServletResponse {
      * that was used in the request message.
      */
     int SC_HTTP_VERSION_NOT_SUPPORTED = 505;
+
+    /**
+     * Status code (511) indicating that the client needs to authenticate to gain network access.
+     */
+    int SC_NETWORK_AUTHENTICATION_REQUIRED = 511;
 }
