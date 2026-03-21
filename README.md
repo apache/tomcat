@@ -74,4 +74,4 @@ instructions for reporting a bug
 
 ### Contributing
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for more information.
