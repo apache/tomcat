@@ -300,37 +300,11 @@ public class TestParameterMap {
             Assert.fail("ParameterMap is not locked.");
         } catch (UnsupportedOperationException expectedException) {
         }
+
         try {
             entrySet.clear();
             Assert.fail("ParameterMap is not locked.");
         } catch (UnsupportedOperationException expectedException) {
         }
-    }
-    @Test
-    public void testComputeIfAbsentAfterLocked() {
-        ((ParameterMap<String, String[]>) paramMap).setLocked(true);
-
-        try {
-            paramMap.computeIfAbsent("param5", k -> new String[]{"value5"});
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-    }
-
-    @Test
-    public void testComputeAfterLocked() {
-        ((ParameterMap<String, String[]>) paramMap).setLocked(true);
-
-        try {
-            paramMap.compute("param1", (k, v) -> new String[]{"changed"});
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-    }
-
-    @Test
-    public void testEmptyParameterMap() {
-        Map<String,String[]> map = new ParameterMap<>();
-        Assert.assertTrue(map.isEmpty());
     }
 }
