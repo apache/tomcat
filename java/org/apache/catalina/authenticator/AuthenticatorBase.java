@@ -224,7 +224,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     private AllowCorsPreflight allowCorsPreflight = AllowCorsPreflight.NEVER;
 
     private volatile String jaspicAppContextID = null;
-    private volatile Optional<AuthConfigProvider> jaspicProvider = null;
+    private volatile AuthConfigProvider jaspicProvider;
     private volatile CallbackHandler jaspicCallbackHandler = null;
 
 
@@ -1311,28 +1311,19 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         return false;
     }
 
-
     private AuthConfigProvider getJaspicProvider() {
-        Optional<AuthConfigProvider> provider = jaspicProvider;
-        if (provider == null) {
-            provider = findJaspicProvider();
+        if (jaspicProvider == null) {
+            findJaspicProvider();
         }
-        return provider.orElse(null);
+        return jaspicProvider;
     }
 
-
-    private Optional<AuthConfigProvider> findJaspicProvider() {
-        AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        Optional<AuthConfigProvider> provider;
-        if (factory == null) {
-            provider = Optional.empty();
-        } else {
-            provider = Optional.ofNullable(factory.getConfigProvider("HttpServlet", jaspicAppContextID, this));
-        }
-        jaspicProvider = provider;
-        return provider;
+    private void findJaspicProvider() {
+        Optional<AuthConfigFactory> factoryOpt = Optional.ofNullable(AuthConfigFactory.getFactory());
+        factoryOpt.ifPresent(authConfigFactory ->
+            jaspicProvider = authConfigFactory.getConfigProvider("HttpServlet", jaspicAppContextID, this)
+        );
     }
-
 
     @Override
     public void notify(String layer, String appContext) {
