@@ -112,6 +112,12 @@
         being closed without a <code>GOAWAY</code> frame if an invalid
         <code>HEADERS</code> frame was received. (markt)
       </fix>
+      <fix>
+        <bug>69982</bug>: Fix a bug in the non-blocking flushing code for
+        NIO+TLS that meant that a response may not be fully written until the
+        connection is closed. Pull request <pr>966</pr> provided by Phil Clay.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
