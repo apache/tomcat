@@ -122,6 +122,10 @@
         connection is closed. Pull request <pr>966</pr> provided by Phil Clay.
         (markt)
       </fix>
+      <fix>
+        Ensure the HTTP/2 request header read buffer is reset (including
+        restoration to default size) after a stream reset. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
