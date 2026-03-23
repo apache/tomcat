@@ -305,6 +305,12 @@ class Http2Parser {
         long errorCode = ByteUtil.getFourBytes(payload, 0);
         output.reset(streamId, errorCode);
         headersCurrentStream = -1;
+        if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
+            // Reset size for new request if the buffer was previously expanded
+            headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
+        } else {
+            headerReadBuffer.clear();
+        }
         headersEndStream = false;
     }
 
