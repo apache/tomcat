@@ -579,7 +579,7 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
     Where there is no benefit in running an absolute performance test as part
     of a standard test run, the test will be excluded by naming it
-    Tester*Performance.java.
+    Test*Performance.java.
 
     The relative tests are included as part of a standard test run however,
     where the assumptions made about host capabilities are  not true (e.g. on
