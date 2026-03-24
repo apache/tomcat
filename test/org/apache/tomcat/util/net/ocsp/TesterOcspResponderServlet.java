@@ -247,6 +247,8 @@ public class TesterOcspResponderServlet extends HttpServlet {
                     case UNKNOWN:
                         responseBuilder.addResponse(certificateID, new UnknownStatus());
                         break;
+                    case INTERNAL_ERROR:
+                        throw new ServletException("Internal error");
                 }
             }
         }

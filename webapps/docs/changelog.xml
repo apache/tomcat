@@ -134,6 +134,10 @@
         non-trailer fields. Control characters (excluding TAB), and characters
         with code points above 255 will be replaced with a space. (markt)
       </add>
+      <fix>
+        Align OpenSSl FFM behaviour with Tomcat Native for various OCSP edge
+        cases. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

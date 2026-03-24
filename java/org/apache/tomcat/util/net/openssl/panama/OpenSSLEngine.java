@@ -1305,6 +1305,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static int processOCSPRequest(EngineState state, URL url, MemorySegment issuer, MemorySegment x509,
             MemorySegment /* X509_STORE_CTX */ x509ctx, Arena localArena) {
         if (openssl_h_Compatibility.BORINGSSL || openssl_h_Compatibility.isLibreSSLPre35()) {
+            X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
             return V_OCSP_CERTSTATUS_UNKNOWN();
         }
         MemorySegment ocspRequest = MemorySegment.NULL;
@@ -1317,20 +1318,24 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ocspRequest = OCSP_REQUEST_new();
             if (MemorySegment.NULL.equals(ocspRequest)) {
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             id = OCSP_cert_to_id(MemorySegment.NULL, x509, issuer);
             if (MemorySegment.NULL.equals(id)) {
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             ocspOneReq = OCSP_request_add0_id(ocspRequest, id);
             if (MemorySegment.NULL.equals(ocspOneReq)) {
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             OCSP_request_add1_nonce(ocspRequest, (char) 0, -1);
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int requestLength = i2d_OCSP_REQUEST(ocspRequest, bufPointer);
             if (requestLength <= 0) {
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
@@ -1352,6 +1357,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             connection.getOutputStream().write(ocspRequestData);
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             InputStream is = connection.getInputStream();
@@ -1359,6 +1365,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             byte[] responseBuf = new byte[1024];
             while ((read = is.read(responseBuf)) > 0) {
                 if (baos.size() > OCSP_MAX_RESPONSE_SIZE) {
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                     return V_OCSP_CERTSTATUS_UNKNOWN();
                 }
                 baos.write(responseBuf, 0, read);
