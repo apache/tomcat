@@ -181,10 +181,10 @@ public class ChunkedOutputFilter implements OutputFilter {
                     if (disallowedTrailerFieldNames.contains(trailerField.getKey().toLowerCase(Locale.ENGLISH))) {
                         continue;
                     }
-                    osw.write(trailerField.getKey());
+                    osw.write(filterForHeaders(trailerField.getKey()));
                     osw.write(':');
                     osw.write(' ');
-                    osw.write(trailerField.getValue());
+                    osw.write(filterForHeaders(trailerField.getValue()));
                     osw.write("\r\n");
                 }
             }
@@ -195,6 +195,33 @@ public class ChunkedOutputFilter implements OutputFilter {
             crlfChunk.position(0).limit(crlfChunk.capacity());
         }
         buffer.end();
+    }
+
+
+    /*
+     * Filters out CTLs excluding TAB and any code points above 255 (since this is meant to be ISO-8859-1).
+     *
+     * This doesn't perform full HTTP validation. For example, it does not limit field names to tokens.
+     *
+     * Strictly, correct trailer fields is an application concern. The filtering here is a basic attempt to help
+     * mis-behaving applications prevent the worst of the potential side-effects of invalid trailer fields.
+     */
+    // package private so it is visible for testing
+    static String filterForHeaders(String input) {
+        char[] chars = input.toCharArray();
+        boolean updated = false;
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] < 32 && chars [i] != 9 || chars[i] == 127 || chars[i] > 255) {
+                chars[i] = ' ';
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            return new String(chars);
+        } else {
+            return input;
+        }
     }
 
 
