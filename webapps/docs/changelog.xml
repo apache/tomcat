@@ -237,6 +237,11 @@
         Ensure the HTTP/2 request header read buffer is reset (including
         restoration to default size) after a stream reset. (markt)
       </fix>
+      <add>
+        Provide trailer field filtering equivalent to that provided for
+        non-trailer fields. Control characters (excluding TAB), and characters
+        with code points above 255 will be replaced with a space. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
