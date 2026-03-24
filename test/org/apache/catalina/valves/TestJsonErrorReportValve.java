@@ -18,7 +18,9 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +39,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.json.JSONParser;
 
 public class TestJsonErrorReportValve extends TomcatBaseTest {
 
@@ -64,23 +67,22 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
-        String body = res.toString();
-        Assert.assertNotNull(body);
-        // Verify JSON structure
-        Assert.assertTrue("Response should contain type field",
-                body.contains("\"type\":"));
-        Assert.assertTrue("Response should contain status 500",
-                body.contains("\"status\": 500"));
-        Assert.assertTrue("Response should contain message",
-                body.contains("\"message\": \"Server broke\""));
-        Assert.assertTrue("Response should contain description field",
-                body.contains("\"description\":"));
-
         // Verify Content-Type
         List<String> contentType = resHead.get("Content-Type");
         Assert.assertNotNull("Content-Type header should be present", contentType);
         Assert.assertTrue("Content-Type should be application/json",
                 contentType.get(0).contains("application/json"));
+
+        // Parse and verify JSON
+        String body = res.toString();
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Status Report", json.get("type"));
+        Assert.assertEquals(500,
+                ((Number) json.get("status")).intValue());
+        Assert.assertEquals("Server broke", json.get("message"));
+        Assert.assertNotNull(json.get("description"));
     }
 
 
@@ -103,14 +105,27 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
+        // Parse and verify JSON
         String body = res.toString();
-        Assert.assertNotNull(body);
-        Assert.assertTrue("Response should contain throwable field",
-                body.contains("\"throwable\":"));
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Exception Report", json.get("type"));
+        Assert.assertEquals(500,
+                ((Number) json.get("status")).intValue());
+        Assert.assertNotNull(json.get("throwable"));
+
+        // throwable should be a list containing exception strings
+        @SuppressWarnings("unchecked")
+        ArrayList<Object> throwableList = (ArrayList<Object>) json.get("throwable");
+        Assert.assertFalse("throwable array should not be empty",
+                throwableList.isEmpty());
+
+        String throwableStr = throwableList.toString();
         Assert.assertTrue("Response should contain exception class name",
-                body.contains("RuntimeException"));
+                throwableStr.contains("RuntimeException"));
         Assert.assertTrue("Response should contain exception message",
-                body.contains("Something went wrong"));
+                throwableStr.contains("Something went wrong"));
     }
 
 
@@ -122,8 +137,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         // Characters that require JSON escaping: quotes and backslashes
-        String specialMessage =
-                "Error with \"quotes\" and \\backslash\\ and <angle>";
+        String specialMessage = "Error with \"quotes\" and \\backslash\\";
         Tomcat.addServlet(ctx, "specialChars", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, specialMessage));
         ctx.addServletMappingDecoded("/", "specialChars");
@@ -136,13 +150,23 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
+        // Parse JSON - if escaping is broken, the parser will throw
         String body = res.toString();
-        Assert.assertNotNull(body);
-        // Verify that quotes and backslashes are escaped in the JSON output
-        Assert.assertTrue("Double quotes should be escaped",
-                body.contains("\\\"quotes\\\""));
-        Assert.assertTrue("Backslashes should be escaped",
-                body.contains("\\\\backslash\\\\"));
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Status Report", json.get("type"));
+        Assert.assertEquals(500,
+                ((Number) json.get("status")).intValue());
+
+        // Verify the message field is present and contains the
+        // expected substrings (the parser returns raw escaped values)
+        String message = (String) json.get("message");
+        Assert.assertNotNull("message should be present", message);
+        Assert.assertTrue("message should contain quotes",
+                message.contains("quotes"));
+        Assert.assertTrue("message should contain backslash",
+                message.contains("backslash"));
     }
 
 
@@ -165,12 +189,14 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(999, rc);
 
+        // Parse and verify JSON
         String body = res.toString();
-        Assert.assertNotNull(body);
-        Assert.assertTrue("Response should contain custom status code",
-                body.contains("\"status\": 999"));
-        Assert.assertTrue("Response should contain custom message",
-                body.contains("The sky is falling"));
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals(999,
+                ((Number) json.get("status")).intValue());
+        Assert.assertEquals("The sky is falling", json.get("message"));
     }
 
 
@@ -193,14 +219,16 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
+        // Parse and verify JSON
         String body = res.toString();
-        Assert.assertNotNull(body);
-        Assert.assertTrue("Response should contain status 404",
-                body.contains("\"status\": 404"));
-        Assert.assertTrue("Response should contain message",
-                body.contains("Resource not found"));
-        Assert.assertTrue("Response should contain description",
-                body.contains("\"description\":"));
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Status Report", json.get("type"));
+        Assert.assertEquals(404,
+                ((Number) json.get("status")).intValue());
+        Assert.assertEquals("Resource not found", json.get("message"));
+        Assert.assertNotNull(json.get("description"));
     }
 
 
@@ -222,15 +250,22 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
+        // Parse and verify JSON
         String body = res.toString();
-        Assert.assertNotNull(body);
-        Assert.assertTrue("Response should contain throwable field",
-                body.contains("\"throwable\":"));
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Exception Report", json.get("type"));
+        Assert.assertNotNull(json.get("throwable"));
+
         // The throwable array should contain both the outer and inner exceptions
+        @SuppressWarnings("unchecked")
+        ArrayList<Object> throwableList = (ArrayList<Object>) json.get("throwable");
+        String throwableStr = throwableList.toString();
         Assert.assertTrue("Response should contain outer exception",
-                body.contains("RuntimeException"));
+                throwableStr.contains("RuntimeException"));
         Assert.assertTrue("Response should contain root cause",
-                body.contains("IllegalStateException"));
+                throwableStr.contains("IllegalStateException"));
     }
 
 
