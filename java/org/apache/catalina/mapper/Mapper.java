@@ -710,7 +710,7 @@ public final class Mapper {
             // skipped all mapping work in this case. That behaviour has a risk
             // of returning an inconsistent result.
             // I do not see a valid use case for it.
-            throw new AssertionError();
+            throw new IllegalStateException(sm.getString("mapper.alreadyDone", mappingData.host));
         }
 
         // Virtual host mapping
