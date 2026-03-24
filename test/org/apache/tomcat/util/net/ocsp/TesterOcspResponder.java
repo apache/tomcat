@@ -106,6 +106,7 @@ public class TesterOcspResponder {
         OK,
         REVOKED,
         UNKNOWN,
-        TRY_LATER
+        TRY_LATER,
+        INTERNAL_ERROR
     }
 }
