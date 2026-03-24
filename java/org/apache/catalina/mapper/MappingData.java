@@ -63,4 +63,10 @@ public class MappingData {
         redirectPath.recycle();
         matchType = null;
     }
+
+    @Override
+    public final String toString() {
+        return "MappingData[" + host + ":" + context + ":" + wrapper + "]";
+    }
+
 }
