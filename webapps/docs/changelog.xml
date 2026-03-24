@@ -130,7 +130,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 11.0.20 (markt)" rtext="release in progress">
+<section name="Tomcat 11.0.20 (markt)" rtext="2026-03-20">
   <subsection name="Coyote">
     <changelog>
       <fix>
