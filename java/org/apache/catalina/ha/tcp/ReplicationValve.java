@@ -364,14 +364,21 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         try {
             // send invalid sessions
             sendInvalidSessions(clusterManager);
+        } catch (Exception e) {
+            log.error(sm.getString("ReplicationValve.send.failure"), e);
+        }
+        try {
             // send replication
             sendSessionReplicationMessage(request, clusterManager);
+        } catch (Exception e) {
+            log.error(sm.getString("ReplicationValve.send.replication.failure"), e);
+        }
+        try {
             if (isCrossContext) {
                 sendCrossContextSession();
             }
         } catch (Exception e) {
-            // FIXME we have a lot of sends, but the trouble with one node stops the correct replication to other nodes!
-            log.error(sm.getString("ReplicationValve.send.failure"), e);
+            log.error(sm.getString("ReplicationValve.send.crosscontext.failure"), e);
         } finally {
             if (doStatistics()) {
                 updateStats(totalstart, start, isAsync);
