@@ -18,11 +18,15 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +40,7 @@ import java.security.cert.PKIXRevocationChecker;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -79,6 +84,15 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public final class TesterSupport {
 
@@ -409,6 +423,68 @@ public final class TesterSupport {
         return (new X500Principal(clientAuthExpectedIssuer)).equals(
                     new X500Principal(lastRequestedIssuers[0].getName()));
     }
+
+    @FunctionalInterface
+    public interface CertificateExtensionsCustomizer {
+        void customize(KeyPair keyPair, X509v3CertificateBuilder certBuilder)
+            throws Exception;
+    }
+
+    /**
+     * Generate a temporary JKS keystore containing a self-signed RSA certificate.
+     *
+     * @param cn       the Common Name for the certificate subject
+     * @param alias    the keystore alias for the key entry
+     * @param sanNames DNS Subject Alternative Names to include, or {@code null} for none
+     * @param customizer callback to add extensions to the certificate, or {@code null} for none.
+     *
+     *  @return a temporary keystore file with password {@link #JKS_PASS}
+     *
+     *  @throws Exception if certificate generation or keystore creation fails
+     */
+    public static File generateKeystore(String cn, String alias, String[] sanNames,
+                                        CertificateExtensionsCustomizer customizer) throws Exception {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(4096);
+        KeyPair keyPair = kpg.generateKeyPair();
+
+        X500Name subject = new X500Name("CN=" + cn);
+        BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
+        long oneDay = 86400000L;
+        Date notBefore = new Date(System.currentTimeMillis() - oneDay);
+        Date notAfter = new Date(System.currentTimeMillis() + 365L * oneDay);
+
+        X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(subject, serial, notBefore, notAfter,
+                subject, keyPair.getPublic());
+
+        if (sanNames != null && sanNames.length > 0) {
+            GeneralName[] generalNames = new GeneralName[sanNames.length];
+            for (int i = 0; i < sanNames.length; i++) {
+                generalNames[i] = new GeneralName(GeneralName.dNSName, sanNames[i]);
+            }
+            certBuilder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(generalNames));
+        }
+
+        if (customizer != null) {
+            customizer.customize(keyPair, certBuilder);
+        }
+
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
+        X509Certificate certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
+
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null, null);
+        ks.setKeyEntry(alias, keyPair.getPrivate(), JKS_PASS.toCharArray(), new X509Certificate[] { certificate });
+
+        File keystoreFile = File.createTempFile("test-cert-", ".jks");
+        keystoreFile.deleteOnExit();
+        try (FileOutputStream fos = new FileOutputStream(keystoreFile)) {
+            ks.store(fos, JKS_PASS.toCharArray());
+        }
+
+        return keystoreFile;
+    }
+
 
     public static final byte DATA = (byte)33;
 
