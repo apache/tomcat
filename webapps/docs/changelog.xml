@@ -133,6 +133,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update bnd to 7.2.3. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.53 (schultz)" rtext="2026-03-23">
   <subsection name="Catalina">
