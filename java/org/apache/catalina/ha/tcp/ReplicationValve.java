@@ -371,14 +371,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             // send replication
             sendSessionReplicationMessage(request, clusterManager);
         } catch (Exception e) {
-            log.error(sm.getString("ReplicationValve.send.replication.failure"), e);
+            log.error(sm.getString("ReplicationValve.send.failure"), e);
         }
         try {
             if (isCrossContext) {
                 sendCrossContextSession();
             }
         } catch (Exception e) {
-            log.error(sm.getString("ReplicationValve.send.crosscontext.failure"), e);
+            log.error(sm.getString("ReplicationValve.send.failure"), e);
         } finally {
             if (doStatistics()) {
                 updateStats(totalstart, start, isAsync);
@@ -506,7 +506,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             try {
                 send(manager, invalidId);
             } catch (Exception e) {
-                log.error(sm.getString("ReplicationValve.send.invalid.failure", invalidId), e);
+                log.error(sm.getString("ReplicationValve.send.failure"), e);
             }
         }
     }
