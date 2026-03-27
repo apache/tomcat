@@ -492,6 +492,9 @@ public class SecureNioChannel extends NioChannel {
             // call unwrap
             getBufHandler().configureReadBufferForWrite();
             result = sslEngine.unwrap(netInBuffer, getBufHandler().getReadBuffer());
+            if (log.isDebugEnabled() && result.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW) {
+                log.debug(sm.getString("channel.nio.ssl.handshakeUnwrapBufferUnderflow"));
+            }
             /*
              * ByteBuffer.compact() is an optional method but netInBuffer is created from either ByteBuffer.allocate()
              * or ByteBuffer.allocateDirect() and the ByteBuffers returned by those methods do implement compact(). The
