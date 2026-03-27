@@ -344,6 +344,9 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update bnd to 7.2.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
