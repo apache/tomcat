@@ -343,6 +343,13 @@
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
+      <add>
+        Add warning when OpenSSL binary is not found. (csutherl)
+      </add>
+      <add>
+        Add check for Tomcat Native library, and log warning when it's not found
+        to make it easier to see when it's not used by the suite. (csutherl)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
