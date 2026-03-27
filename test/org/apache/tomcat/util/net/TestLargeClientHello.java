@@ -42,7 +42,7 @@ public class TestLargeClientHello extends TomcatBaseTest {
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=67938
     @Test
     public void testLargeClientHelloWithSessionResumption() throws Exception {
-        File keystoreFile = TesterSupport.generateKeystore("localhost", "tomcat",
+        File keystoreFile = TesterKeystoreGenerator.generateKeystore("localhost", "tomcat",
             new String[]{"localhost", "*.localhost"},
                 (keyPair, certBuilder) -> {
                 JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
