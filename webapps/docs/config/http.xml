@@ -1514,7 +1514,7 @@
       <li>TLSv1.2</li><li>TLSv1.3</li><li>all</li></ul>
       <p>Each token in the list can be prefixed with a plus sign ("+")
       or a minus sign ("-"). A plus sign adds the protocol, a minus sign
-      removes it form the current list. The list is built starting from
+      removes it from the current list. The list is built starting from
       an empty list.</p>
       <p>The token <code>all</code> is an alias for
       <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2,TLSv1.3</code>.</p>
