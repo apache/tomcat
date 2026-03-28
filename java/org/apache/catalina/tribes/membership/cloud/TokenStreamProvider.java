@@ -61,7 +61,7 @@ public class TokenStreamProvider extends AbstractStreamProvider {
             return super.openStream(url, headers, connectTimeout, readTimeout);
         } catch (IOException ioe) {
             // Add debug information
-            throw new IOException(sm.getString("tokenStream.failedConnection", url, token), ioe);
+            throw new IOException(sm.getString("tokenStream.failedConnection", url), ioe);
         }
     }
 }

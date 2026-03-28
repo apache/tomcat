@@ -81,7 +81,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     public URLConnection openConnection(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
             throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.connection", getClass().getSimpleName(), url, headers,
+            log.debug(sm.getString("abstractStream.connection", getClass().getSimpleName(), url,
                     Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         URLConnection connection;

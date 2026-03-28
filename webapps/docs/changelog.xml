@@ -289,6 +289,10 @@
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Reduce log verbosity of the Kubernetes connection attempts and failure.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
