@@ -1133,7 +1133,7 @@ public class JNDIRealm extends RealmBase {
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
-            // running on a JVM that includes a fix for
+            // running on Java 27+ that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
                 currentThread = Thread.currentThread();
@@ -1234,7 +1234,7 @@ public class JNDIRealm extends RealmBase {
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
-            // running on a JVM that includes a fix for
+            // running on Java 27+ that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
                 currentThread = Thread.currentThread();
@@ -1299,7 +1299,7 @@ public class JNDIRealm extends RealmBase {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553 This method can be removed and the class loader switch moved
-     * back to open() once it is known that Tomcat must be running on a JVM that includes a fix for
+     * back to open() once it is known that Tomcat must be running on Java 27+ that includes a fix for
      * https://bugs.openjdk.java.net/browse/JDK-8273874
      */
     @Override
@@ -1323,7 +1323,7 @@ public class JNDIRealm extends RealmBase {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553 This method can be removed and the class loader switch moved
-     * back to open() once it is known that Tomcat must be running on a JVM that includes a fix for
+     * back to open() once it is known that Tomcat must be running on Java 27+ that includes a fix for
      * https://bugs.openjdk.java.net/browse/JDK-8273874
      */
     @Override
@@ -1348,7 +1348,7 @@ public class JNDIRealm extends RealmBase {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553 This method can be removed and the class loader switch moved
-     * back to open() once it is known that Tomcat must be running on a JVM that includes a fix for
+     * back to open() once it is known that Tomcat must be running on Java 27+ that includes a fix for
      * https://bugs.openjdk.java.net/browse/JDK-8273874
      */
     @Override
@@ -1372,7 +1372,7 @@ public class JNDIRealm extends RealmBase {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553 This method can be removed and the class loader switch moved
-     * back to open() once it is known that Tomcat must be running on a JVM that includes a fix for
+     * back to open() once it is known that Tomcat must be running on Java 27+ that includes a fix for
      * https://bugs.openjdk.java.net/browse/JDK-8273874
      */
     @Override
@@ -1396,7 +1396,7 @@ public class JNDIRealm extends RealmBase {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553 This method can be removed and the class loader switch moved
-     * back to open() once it is known that Tomcat must be running on a JVM that includes a fix for
+     * back to open() once it is known that Tomcat must be running on Java 27+ that includes a fix for
      * https://bugs.openjdk.java.net/browse/JDK-8273874
      */
     @Override
@@ -2712,7 +2712,7 @@ public class JNDIRealm extends RealmBase {
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
-            // running on a JVM that includes a fix for
+            // running on Java 27+ that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
                 currentThread = Thread.currentThread();
