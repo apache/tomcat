@@ -142,6 +142,9 @@
       <update>
         Update bnd to 7.2.3. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
