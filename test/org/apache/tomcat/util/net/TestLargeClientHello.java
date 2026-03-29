@@ -65,7 +65,10 @@ public class TestLargeClientHello extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat, keystoreFile.getAbsolutePath(), false);
 
-        try (LogCapture logCapture = attachLogCapture(Level.FINE, "org.apache.tomcat.util.net.SecureNioChannel")) {
+        try (LogCapture nioCapture = attachLogCapture(Level.FINE,
+            "org.apache.tomcat.util.net.SecureNioChannel");
+             LogCapture nio2Capture = attachLogCapture(Level.FINE,
+                 "org.apache.tomcat.util.net.SecureNio2Channel")) {
 
             tomcat.start();
 
@@ -77,8 +80,10 @@ public class TestLargeClientHello extends TomcatBaseTest {
             Assert.assertTrue(getUrl(url).toString().contains("Hello World"));
             Assert.assertTrue(getUrl(url).toString().contains("Hello World"));
 
-            Assert.assertTrue(logCapture.containsText(
+            Assert.assertTrue(nioCapture.containsText(
                     TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
+                    "channel.nio.ssl.handshakeUnwrapBufferUnderflow")) || nio2Capture.containsText(
+                TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
                     "channel.nio.ssl.handshakeUnwrapBufferUnderflow")));
         }
 
