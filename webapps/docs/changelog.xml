@@ -104,6 +104,8 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
+<section name="Tomcat 11.0.22 (markt)" rtext="in development">
+</section>
 <section name="Tomcat 11.0.21 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
@@ -135,7 +137,7 @@
         with code points above 255 will be replaced with a space. (markt)
       </add>
       <fix>
-        Align OpenSSl FFM behaviour with Tomcat Native for various OCSP edge
+        Align OpenSSL FFM behaviour with Tomcat Native for various OCSP edge
         cases. (markt)
       </fix>
     </changelog>
