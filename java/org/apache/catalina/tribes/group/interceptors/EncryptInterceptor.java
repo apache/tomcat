@@ -140,10 +140,10 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             xbb.clear();
             xbb.append(data, 0, data.length);
 
+            super.messageReceived(msg);
         } catch (GeneralSecurityException gse) {
             log.error(sm.getString("encryptInterceptor.decrypt.failed"), gse);
         }
-        super.messageReceived(msg);
     }
 
     /**
