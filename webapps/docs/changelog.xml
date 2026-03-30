@@ -142,6 +142,9 @@
         Reduce log verbosity of the Kubernetes connection attempts and failure.
         (remm)
       </fix>
+      <fix>
+        Better error handling for the <code>EncryptInterceptor</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
