@@ -1136,10 +1136,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 } else {
                     buf.append(request.getMethod());
                     buf.append(' ');
-                    buf.append(request.getRequestURI());
+                    escapeAndAppend(request.getRequestURI(), buf);
                     if (request.getQueryString() != null) {
                         buf.append('?');
-                        buf.append(request.getQueryString());
+                        escapeAndAppend(request.getQueryString(), buf);
                     }
                     buf.append(' ');
                     buf.append(request.getProtocol());
@@ -1336,7 +1336,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (query != null) {
                 buf.append('?');
-                buf.append(query);
+                escapeAndAppend(query, buf);
             }
         }
     }
@@ -1367,7 +1367,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request != null) {
-                buf.append(request.getRequestURI());
+                escapeAndAppend(request.getRequestURI(), buf);
             } else {
                 buf.append('-');
             }
