@@ -17,14 +17,20 @@
 package org.apache.tomcat.util.scan;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.Jar;
@@ -57,6 +63,57 @@ public class TestStandardJarScanner {
         scanner.scan(JarScanType.PLUGGABILITY, context, callback);
     }
 
+    @Test
+    public void testScanManifestDefault() throws Exception {
+        Assert.assertTrue("Referenced JAR from manifest Class-Path should be scanned",
+                doTestScanManifest(true));
+    }
+
+    @Test
+    public void testScanManifestDisabled() throws Exception {
+        Assert.assertFalse("Referenced JAR from manifest Class-Path should not be scanned",
+                doTestScanManifest(false));
+    }
+
+    private boolean doTestScanManifest(boolean scanManifest) throws Exception {
+        File referencedJar = new File(System.getProperty("java.io.tmpdir"), "referenced.jar");
+        referencedJar.deleteOnExit();
+        JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(referencedJar), new Manifest());
+        jarOutputStream.close();
+
+        File testJar = new File(System.getProperty("java.io.tmpdir"), "manifest-test.jar");
+        testJar.deleteOnExit();
+
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, "referenced.jar");
+
+        jarOutputStream = new JarOutputStream(new FileOutputStream(testJar), manifest);
+        jarOutputStream.close();
+
+        StandardJarScanner scanner = new StandardJarScanner() {
+            @Override
+            protected void addClassPath(Deque<URL> classPathUrlsToProcess) {
+                super.addClassPath(classPathUrlsToProcess);
+                try {
+                    classPathUrlsToProcess.add(testJar.toURI().toURL());
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        scanner.setScanManifest(scanManifest);
+
+        LoggingCallback callback = new LoggingCallback();
+        scanner.scan(JarScanType.PLUGGABILITY, new TesterServletContext(), callback);
+
+        for (String cb : callback.callbacks) {
+            if (cb.contains("referenced.jar")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static class LoggingCallback implements JarScannerCallback {
 
