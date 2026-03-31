@@ -322,7 +322,7 @@
       </fix>
       <add>
         Add support for new algorithms provided by JPA providers to the
-        <code>EncyptInterceptor</code>. (markt)
+        <code>EncryptInterceptor</code>. (markt)
       </add>
     </changelog>
   </subsection>
