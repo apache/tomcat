@@ -246,7 +246,7 @@
         with code points above 255 will be replaced with a space. (markt)
       </add>
       <fix>
-        Align OpenSSl FFM behaviour with Tomcat Native for various OCSP edge
+        Align OpenSSL FFM behaviour with Tomcat Native for various OCSP edge
         cases. (markt)
       </fix>
     </changelog>
@@ -292,7 +292,7 @@
   <subsection name="Cluster">
     <changelog>
       <scode>
-        Change the default algorithm for the <code>EncyptInterceptor</code> to
+        Change the default algorithm for the <code>EncryptInterceptor</code> to
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
