@@ -113,7 +113,11 @@ public class TestSSLHostConfigProtocol extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
 
-        TesterSupport.configureClientSsl(true);
+        SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
+        sc.init(null, new TrustManager[] { new TesterSupport.TrustAllCerts() }, null);
+        TesterSupport.ClientSSLSocketFactory clientSSLSocketFactory = new TesterSupport.ClientSSLSocketFactory(sc.getSocketFactory());
+        clientSSLSocketFactory.setProtocols(new String[] { Constants.SSL_PROTO_TLSv1_2 });
+        HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
 
         getUrl("https://localhost:" + getPort() + "/");
     }
