@@ -20,12 +20,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.TrustManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -93,6 +99,44 @@ public class TestSSLHostConfigProtocol extends TomcatBaseTest {
         Assert.assertNotNull(enabledProtocols);
         Assert.assertEquals(1, enabledProtocols.length);
         Assert.assertEquals("TLSv1.2", enabledProtocols[0]);
+    }
+
+    @Test(expected = SSLHandshakeException.class)
+    public void testTlsVersionMismatchServerTls13ClientTls12() throws Exception {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
+        sslHostConfig.setProtocols(Constants.SSL_PROTO_TLSv1_3);
+
+        Context ctx = getProgrammaticRootContext();
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+
+        TesterSupport.configureClientSsl(true);
+
+        getUrl("https://localhost:" + getPort() + "/");
+    }
+
+    @Test(expected = SSLHandshakeException.class)
+    public void testTlsVersionMismatchServerTls12ClientTls13() throws Exception {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
+        sslHostConfig.setProtocols(Constants.SSL_PROTO_TLSv1_2);
+
+        Context ctx = getProgrammaticRootContext();
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+
+        SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+        sc.init(null, new TrustManager[] { new TesterSupport.TrustAllCerts() }, null);
+        TesterSupport.ClientSSLSocketFactory clientSSLSocketFactory = new TesterSupport.ClientSSLSocketFactory(sc.getSocketFactory());
+        clientSSLSocketFactory.setProtocols(new String[] { Constants.SSL_PROTO_TLSv1_3 });
+        HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
+
+        getUrl("https://localhost:" + getPort() + "/");
     }
 
 

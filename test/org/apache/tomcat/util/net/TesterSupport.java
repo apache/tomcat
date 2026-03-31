@@ -656,6 +656,7 @@ public final class TesterSupport {
         private final SSLSocketFactory delegate;
 
         private String[] ciphers = null;
+        private String[] protocols = null;
 
 
         public ClientSSLSocketFactory(SSLSocketFactory delegate) {
@@ -669,6 +670,15 @@ public final class TesterSupport {
          */
         public void setCipher(String[] ciphers) {
             this.ciphers = ciphers;
+        }
+
+        /**
+         * Forces the use of the specified protocols.
+         *
+         * @param protocols Array of standard protocols to use
+         */
+        public void setProtocols(String[] protocols) {
+            this.protocols = protocols;
         }
 
         @Override
@@ -721,6 +731,9 @@ public final class TesterSupport {
         private Socket reconfigureSocket(Socket socket) {
             if (ciphers != null) {
                 ((SSLSocket) socket).setEnabledCipherSuites(ciphers);
+            }
+            if (protocols != null) {
+                ((SSLSocket) socket).setEnabledProtocols(protocols);
             }
             return socket;
         }
