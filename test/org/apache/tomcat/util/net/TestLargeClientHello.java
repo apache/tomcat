@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.util.net;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -30,6 +29,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.net.TesterCredentialGenerator.TesterCredential;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -42,23 +42,21 @@ public class TestLargeClientHello extends TomcatBaseTest {
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=67938
     @Test
     public void testLargeClientHelloWithSessionResumption() throws Exception {
-        File keystoreFile = TesterKeystoreGenerator.generateKeystore("localhost", "tomcat",
-            new String[]{"localhost", "*.localhost"},
-                (keyPair, certBuilder) -> {
-                JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
-                certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
-                        extUtils.createSubjectKeyIdentifier(keyPair.getPublic()));
-                certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
-                        extUtils.createAuthorityKeyIdentifier(keyPair.getPublic()));
-                certBuilder.addExtension(Extension.basicConstraints, true,
-                    new BasicConstraints(true));
-                certBuilder.addExtension(Extension.keyUsage, false,
-                    new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
-                char[] padding = new char[16922];
-                Arrays.fill(padding, 'x');
-                certBuilder.addExtension(new ASN1ObjectIdentifier("2.999"), false,
-                    new DERUTF8String(new String(padding)));
-            });
+        TesterCredential credential = TesterCredentialGenerator.generateCredential("localhost", "tomcat",
+                new String[] { "localhost", "*.localhost" }, (keyPair, certBuilder) -> {
+                    JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+                    certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+                            extUtils.createSubjectKeyIdentifier(keyPair.getPublic()));
+                    certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
+                            extUtils.createAuthorityKeyIdentifier(keyPair.getPublic()));
+                    certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+                    certBuilder.addExtension(Extension.keyUsage, false,
+                            new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
+                    char[] padding = new char[16922];
+                    Arrays.fill(padding, 'x');
+                    certBuilder.addExtension(new ASN1ObjectIdentifier("2.999"), false,
+                            new DERUTF8String(new String(padding)));
+                });
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -66,28 +64,32 @@ public class TestLargeClientHello extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "hello");
 
-        TesterSupport.initSsl(tomcat, keystoreFile.getAbsolutePath(), null, null, false);
+        TesterSupport.initSsl(tomcat, credential.getKeystore().getAbsolutePath(),
+                credential.getCertificate().getAbsolutePath(), credential.getKey().getAbsolutePath(), false);
 
-        try (LogCapture nioCapture = attachLogCapture(Level.FINE,
-            "org.apache.tomcat.util.net.SecureNioChannel");
-             LogCapture nio2Capture = attachLogCapture(Level.FINE,
-                 "org.apache.tomcat.util.net.SecureNio2Channel")) {
+        try (LogCapture nioCapture = attachLogCapture(Level.FINE, "org.apache.tomcat.util.net.SecureNioChannel");
+                LogCapture nio2Capture = attachLogCapture(Level.FINE, "org.apache.tomcat.util.net.SecureNio2Channel")) {
 
             tomcat.start();
 
             SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
-            sc.init(null, new TrustManager[]{new TesterSupport.TrustAllCerts()}, null);
+            sc.init(null, new TrustManager[] { new TesterSupport.TrustAllCerts() }, null);
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             String url = "https://localhost:" + getPort() + "/";
             Assert.assertTrue(getUrl(url).toString().contains("Hello World"));
             Assert.assertTrue(getUrl(url).toString().contains("Hello World"));
 
-            Assert.assertTrue(nioCapture.containsText(
-                    TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
-                    "channel.nio.ssl.handshakeUnwrapBufferUnderflow")) || nio2Capture.containsText(
-                TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
-                    "channel.nio.ssl.handshakeUnwrapBufferUnderflow")));
+            /*
+             * We don't have the same visibility into the internal processing for the handshake with APR so for APR the
+             * test is simply to ensure that the handshake required by getUrl() above does not fail.
+             */
+            Assert.assertTrue(nioCapture
+                    .containsText(TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
+                            "channel.nio.ssl.handshakeUnwrapBufferUnderflow")) ||
+                    nio2Capture.containsText(TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
+                            "channel.nio.ssl.handshakeUnwrapBufferUnderflow")) ||
+                    "org.apache.coyote.http11.Http11AprProtocol".equals(System.getProperty("tomcat.test.protocol")));
         }
 
     }

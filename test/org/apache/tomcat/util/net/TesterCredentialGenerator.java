@@ -19,11 +19,13 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -36,9 +38,9 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-public final class TesterKeystoreGenerator {
+public final class TesterCredentialGenerator {
 
-    private TesterKeystoreGenerator() {}
+    private TesterCredentialGenerator() {}
 
     @FunctionalInterface
     public interface CertificateExtensionsCustomizer {
@@ -47,18 +49,18 @@ public final class TesterKeystoreGenerator {
     }
 
     /**
-     * Generate a temporary JKS keystore containing a self-signed RSA certificate.
+     * Generate a temporary credential using a self-signed RSA certificate.
      *
      * @param cn       the Common Name for the certificate subject
      * @param alias    the keystore alias for the key entry
      * @param sanNames DNS Subject Alternative Names to include, or {@code null} for none
      * @param customizer callback to add extensions to the certificate, or {@code null} for none.
      *
-     *  @return a temporary keystore file with password {@link  TesterSupport#JKS_PASS}
+     *  @return a temporary set of credential files with password {@link TesterSupport#JKS_PASS}
      *
-     *  @throws Exception if certificate generation or keystore creation fails
+     *  @throws Exception if credential creation fails
      */
-    public static File generateKeystore(String cn, String alias, String[] sanNames,
+    public static TesterCredential generateCredential(String cn, String alias, String[] sanNames,
                                         CertificateExtensionsCustomizer customizer) throws Exception {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(4096);
@@ -88,6 +90,7 @@ public final class TesterKeystoreGenerator {
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
         X509Certificate certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
 
+        // Create the keystore from the key and certificate
         KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(null, null);
         ks.setKeyEntry(alias, keyPair.getPrivate(), TesterSupport.JKS_PASS.toCharArray(), new X509Certificate[] { certificate });
@@ -98,6 +101,50 @@ public final class TesterKeystoreGenerator {
             ks.store(fos, TesterSupport.JKS_PASS.toCharArray());
         }
 
-        return keystoreFile;
+        // Create the key file
+        File keyFile = File.createTempFile("test-key-", ".key");
+        keyFile.deleteOnExit();
+        try (FileWriter fw = new FileWriter(keyFile)) {
+            fw.write("-----BEGIN PRIVATE KEY-----\n");
+            fw.write(Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded()));
+            fw.write("\n-----END PRIVATE KEY-----");
+        }
+
+        // Create the certificate file
+        File certificateFile = File.createTempFile("test-certificate-", ".cert");
+        certificateFile.deleteOnExit();
+        try (FileWriter fw = new FileWriter(certificateFile)) {
+            fw.write("-----BEGIN CERTIFICATE-----\n");
+            fw.write(Base64.getEncoder().encodeToString(certificate.getEncoded()));
+            fw.write("\n-----END CERTIFICATE-----");
+        }
+
+        return new TesterCredential(keystoreFile, keyFile, certificateFile);
+    }
+
+
+    public static class TesterCredential {
+
+        private final File keystore;
+        private final File key;
+        private final File certificate;
+
+        public TesterCredential(File keystore, File key, File certificate) {
+            this.keystore = keystore;
+            this.key = key;
+            this.certificate = certificate;
+        }
+
+        public File getKeystore() {
+            return keystore;
+        }
+
+        public File getKey() {
+            return key;
+        }
+
+        public File getCertificate() {
+            return certificate;
+        }
     }
 }
