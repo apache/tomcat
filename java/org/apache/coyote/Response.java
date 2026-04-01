@@ -408,8 +408,6 @@ public final class Response {
      * need to set the header.
      */
     private boolean checkSpecialHeader(String name, String value) {
-        // XXX Eliminate redundant fields !!!
-        // ( both header and in special fields )
         if (name.equalsIgnoreCase("Content-Type")) {
             setContentType(value);
             return true;
@@ -418,12 +416,11 @@ public final class Response {
             try {
                 long cL = Long.parseLong(value);
                 setContentLength(cL);
-                return true;
             } catch (NumberFormatException ex) {
-                // Do nothing - the spec doesn't have any "throws"
-                // and the user might know what they're doing
-                return false;
+                setContentLength(-1);
+                log.warn(sm.getString("response.contentlength.invalid", value), ex);
             }
+            return true;
         }
         return false;
     }
