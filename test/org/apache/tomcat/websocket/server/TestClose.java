@@ -46,7 +46,7 @@ import org.apache.tomcat.websocket.WebSocketBaseTest;
  */
 public class TestClose extends WebSocketBaseTest {
 
-    private static Log log = LogFactory.getLog(TestClose.class);
+    private static final Log log = LogFactory.getLog(TestClose.class);
 
     // These are static because it is simpler than trying to inject them into
     // the endpoint
@@ -132,7 +132,9 @@ public class TestClose extends WebSocketBaseTest {
         client.httpUpgrade(BaseEndpointConfig.PATH);
         client.forceCloseSocket();
 
-        // TODO: I'm not entirely sure when onError should be called
+        // A TCP reset causes an IOException when the server reads from
+        // the connection. Per WSC-5.2.2-2, errors arising during the
+        // functioning of the endpoint must be reported via onError.
         awaitOnError(IOException.class);
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
     }
