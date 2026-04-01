@@ -190,6 +190,10 @@
         codes defined in RFC 6585. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <scode>
+        Refactor generation of the remote user element in the access log to
+        remove unnecessary code. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

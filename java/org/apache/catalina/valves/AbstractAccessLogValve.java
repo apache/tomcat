@@ -916,12 +916,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             if (request != null) {
-                String value = request.getRemoteUser();
-                if (value != null) {
-                    escapeAndAppend(value, buf);
-                } else {
-                    buf.append('-');
-                }
+                escapeAndAppend(request.getRemoteUser(), buf);
             } else {
                 buf.append('-');
             }
