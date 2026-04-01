@@ -231,6 +231,13 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Avoid various edge cases if <code>Content-Length</code> is set via
+        <code>setHeader(String,String)</code> or
+        <code>addHeader(String,String)</code> with an invalid value by always
+        clearing the previous value whether the new value is valid or not and
+        ignoring any invalid new value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

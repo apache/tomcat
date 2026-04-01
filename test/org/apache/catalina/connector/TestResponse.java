@@ -1032,4 +1032,31 @@ public class TestResponse extends TomcatBaseTest {
             }
         }
     }
+
+
+    @Test
+    public void testSpecialHeaderContentLength() throws Exception {
+        Response response = setupResponse();
+
+        // Valid
+        response.setHeader("Content-Length", "10");
+        Assert.assertEquals(10, response.getContentLength());
+        Assert.assertEquals("10", response.getHeader("Content-Length"));
+        Assert.assertEquals(1, response.getHeaderNames().stream().filter(s -> s.equalsIgnoreCase("Content-Length")).count());
+        Assert.assertEquals(1, response.getHeaders("Content-Length").size());
+
+        // Invalid
+        response.setHeader("Content-Length", "zzz");
+        Assert.assertEquals(-1, response.getContentLength());
+        Assert.assertNull(response.getHeader("Content-Length"));
+        Assert.assertEquals(0, response.getHeaderNames().stream().filter(s -> s.equalsIgnoreCase("Content-Length")).count());
+        Assert.assertEquals(0, response.getHeaders("Content-Length").size());
+
+        // Valid
+        response.setHeader("Content-Length", "20");
+        Assert.assertEquals(20, response.getContentLength());
+        Assert.assertEquals("20", response.getHeader("Content-Length"));
+        Assert.assertEquals(1, response.getHeaderNames().stream().filter(s -> s.equalsIgnoreCase("Content-Length")).count());
+        Assert.assertEquals(1, response.getHeaders("Content-Length").size());
+    }
 }
