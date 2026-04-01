@@ -545,8 +545,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             headerException = new StreamException(
                     sm.getString("stream.host.sni", getConnectionId(), getIdAsString(), value),
                     Http2Error.PROTOCOL_ERROR, getIdAsInt());
-            // No need for further processing. The stream will be reset.
-            return;
         }
     }
 
@@ -564,8 +562,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                         sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
                                 coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())),
                         Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                // No need for further processing. The stream will be reset.
-                return;
             }
         } catch (IllegalArgumentException iae) {
             // Bad :authority / host header -> 400 response
