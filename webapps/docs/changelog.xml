@@ -111,6 +111,11 @@
         Refactor generation of the remote user element in the access log to
         remove unnecessary code. (markt)
       </scode>
+      <fix>
+        Fix a regression in the previous release that meant <code>?-</code>
+        could appear in the access log rather than <code>?</code> when the query
+        string was present but empty. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

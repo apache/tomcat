@@ -114,10 +114,18 @@ public class TestAccessLogValve extends TomcatBaseTest {
         parameterSets.add(new Object[] {"pct-m", JSON_TYPE, "/", "%m", "\\{\"method\":\"GET\"\\}"});
         parameterSets.add(new Object[] {"pct-p", TEXT_TYPE, "/", "%p", "\\d+"});
         parameterSets.add(new Object[] {"pct-p", JSON_TYPE, "/", "%p", "\\{\"port\":\"\\d+\"\\}"});
+        parameterSets.add(new Object[] {"pct-q", TEXT_TYPE, "/", "%q", "-"});
+        parameterSets.add(new Object[] {"pct-q", JSON_TYPE, "/", "%q", "\\{\"query\":\"-\"\\}"});
+        parameterSets.add(new Object[] {"pct-q", TEXT_TYPE, "/?", "%q", "\\?"});
+        parameterSets.add(new Object[] {"pct-q", JSON_TYPE, "/?", "%q", "\\{\"query\":\"\\?\"\\}"});
         parameterSets.add(new Object[] {"pct-q", TEXT_TYPE, "/?data=123", "%q", "\\?data=123"});
         parameterSets.add(new Object[] {"pct-q", JSON_TYPE, "/?data=123", "%q", "\\{\"query\":\"\\?data=123\"\\}"});
         parameterSets.add(new Object[] {"pct-r", TEXT_TYPE, "/", "%r", "GET / HTTP/1.1"});
         parameterSets.add(new Object[] {"pct-r", JSON_TYPE, "/", "%r", "\\{\"request\":\"GET / HTTP/1.1\"\\}"});
+        parameterSets.add(new Object[] {"pct-r", TEXT_TYPE, "/?", "%r", "GET /\\? HTTP/1.1"});
+        parameterSets.add(new Object[] {"pct-r", JSON_TYPE, "/?", "%r", "\\{\"request\":\"GET /\\? HTTP/1.1\"\\}"});
+        parameterSets.add(new Object[] {"pct-r", TEXT_TYPE, "/?data=123", "%r", "GET /\\?data=123 HTTP/1.1"});
+        parameterSets.add(new Object[] {"pct-r", JSON_TYPE, "/?data=123", "%r", "\\{\"request\":\"GET /\\?data=123 HTTP/1.1\"\\}"});
         parameterSets.add(new Object[] {"pct-s", TEXT_TYPE, "/", "%s", "200"});
         parameterSets.add(new Object[] {"pct-s", JSON_TYPE, "/", "%s", "\\{\"statusCode\":\"200\"\\}"});
         parameterSets.add(new Object[] {"pct-S", TEXT_TYPE, "/", "%S", "[A-F0-9]{32}"});
@@ -312,9 +320,9 @@ public class TestAccessLogValve extends TomcatBaseTest {
         Assert.assertFalse("Access log line empty after " + (System.currentTimeMillis() - startWait) + " milliseconds", "".equals(result));
         boolean matches = Pattern.matches(resultMatch, result);
         if (!matches) {
-            log.error("Resulting log line '" + result + "' does not match '" + resultMatch + "'");
+            log.error("Resulting log line '" + result + "' does not match pattern '" + resultMatch + "'");
         }
-        Assert.assertTrue("Resulting log line '" + result + "' does not match '" + resultMatch + "'", matches);
+        Assert.assertTrue("Resulting log line '" + result + "' does not match pattern '" + resultMatch + "'", matches);
 
         if (JSON_TYPE.equals(type)) {
             JSONParser parser = new JSONParser(result);
