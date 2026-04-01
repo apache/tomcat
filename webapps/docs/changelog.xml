@@ -127,6 +127,10 @@
         clearing the previous value whether the new value is valid or not and
         ignoring any invalid new value. (markt)
       </fix>
+      <scode>
+        Refactor the calculation of the real index in the HPACK dynamic header
+        table implementation to reduce code duplication. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
