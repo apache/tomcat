@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.20 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.21 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -190,9 +190,6 @@
         codes defined in RFC 6585. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Add escaping for URI and query string in the access log. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -225,30 +222,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix an HTTP/2 header frame parsing bug that could result in a connection
-        being closed without a <code>GOAWAY</code> frame if an invalid
-        <code>HEADERS</code> frame was received. (markt)
-      </fix>
-      <fix>
-        <bug>69982</bug>: Fix a bug in the non-blocking flushing code for
-        NIO+TLS that meant that a response may not be fully written until the
-        connection is closed. Pull request <pr>966</pr> provided by Phil Clay.
-        (markt)
-      </fix>
-      <fix>
-        Ensure the HTTP/2 request header read buffer is reset (including
-        restoration to default size) after a stream reset. (markt)
-      </fix>
-      <add>
-        Provide trailer field filtering equivalent to that provided for
-        non-trailer fields. Control characters (excluding TAB), and characters
-        with code points above 255 will be replaced with a space. (markt)
-      </add>
-      <fix>
-        Align OpenSSL FFM behaviour with Tomcat Native for various OCSP edge
-        cases. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -296,13 +269,6 @@
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Reduce log verbosity of the Kubernetes connection attempts and failure.
-        (remm)
-      </fix>
-      <fix>
-        Better error handling for the <code>EncryptInterceptor</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -358,9 +324,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update bnd to 7.2.3. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
