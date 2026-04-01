@@ -186,6 +186,19 @@ public class TestClose extends WebSocketBaseTest {
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
     }
 
+    @Test
+    public void testCustomCloseCode() throws Exception {
+        startServer(TestEndpointConfig.class);
+
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
+        client.httpUpgrade(BaseEndpointConfig.PATH);
+        client.sendCloseFrame(CloseCodes.getCloseCode(3500));
+        client.closeSocket();
+
+        awaitLatch(events.onCloseCalled, "onClose not called");
+        Assert.assertEquals(3500, events.closeReason.getCloseCode().getCode());
+    }
+
 
     @Test
     public void testTcpResetInOnMessage() throws Exception {
