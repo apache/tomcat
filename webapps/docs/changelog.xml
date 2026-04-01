@@ -118,6 +118,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid various edge cases if <code>Content-Length</code> is set via
+        <code>setHeader(String,String)</code> or
+        <code>addHeader(String,String)</code> with an invalid value by always
+        clearing the previous value whether the new value is valid or not and
+        ignoring any invalid new value. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.54 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
