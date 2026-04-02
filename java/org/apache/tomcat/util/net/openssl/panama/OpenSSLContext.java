@@ -1248,12 +1248,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         PEM_read_bio_PrivateKey(keyBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                 if (MemorySegment.NULL.equals(privateKeyAddress)) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    X509_free(x509cert);
                     return false;
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    X509_free(x509cert);
                     return false;
                 }
+                X509_free(x509cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
                     return false;
