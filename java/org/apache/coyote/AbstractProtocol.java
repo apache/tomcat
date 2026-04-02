@@ -59,12 +59,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      */
     private static final StringManager sm = StringManager.getManager(AbstractProtocol.class);
 
-
     /**
      * Counter used to generate unique JMX names for connectors using automatic port binding.
      */
     private static final AtomicInteger nameCounter = new AtomicInteger(0);
-
 
     /**
      * Unique ID for this connector. Only used if the connector is configured to use a random port as the port will
@@ -91,6 +89,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     private ScheduledFuture<?> timeoutFuture = null;
     private ScheduledFuture<?> monitorFuture;
 
+    /**
+     * Creates a new protocol handler.
+     *
+     * @param endpoint The endpoint for low-level network I/O
+     */
     public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
         this.endpoint = endpoint;
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
@@ -137,6 +140,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      */
     protected ObjectName rgOname = null;
 
+    /**
+     * Gets the MBean name for the Global Request Processor.
+     *
+     * @return the MBean name
+     */
     public ObjectName getGlobalRequestProcessorMBeanName() {
         return rgOname;
     }
@@ -146,11 +154,21 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      */
     protected Adapter adapter;
 
+    /**
+     * Sets the adapter.
+     *
+     * @param adapter The adapter
+     */
     @Override
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }
 
+    /**
+     * Gets the adapter.
+     *
+     * @return the adapter
+     */
     @Override
     public Adapter getAdapter() {
         return adapter;
@@ -165,10 +183,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      */
     protected int processorCache = 200;
 
+    /**
+     * Gets the processor cache size.
+     *
+     * @return the processor cache size
+     */
     public int getProcessorCache() {
         return this.processorCache;
     }
 
+    /**
+     * Sets the maximum number of idle processors to cache.
+     *
+     * @param processorCache The processor cache size (-1 for unlimited)
+     */
     public void setProcessorCache(int processorCache) {
         this.processorCache = processorCache;
     }
@@ -188,6 +216,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         return clientCertProvider;
     }
 
+    /**
+     * Sets the JSSE provider to use for client certificate conversion.
+     *
+     * @param s The provider name
+     */
     public void setClientCertProvider(String s) {
         this.clientCertProvider = s;
     }
@@ -195,21 +228,40 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     private int maxHeaderCount = 100;
 
+    /**
+     * Gets the maximum header count.
+     *
+     * @return the maximum header count
+     */
     public int getMaxHeaderCount() {
         return maxHeaderCount;
     }
 
+    /**
+     * Sets the maximum header count.
+     *
+     * @param maxHeaderCount The maximum header count
+     */
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
     }
 
 
+    /**
+     * Checks if sendfile is supported.
+     *
+     * @return <code>true</code> if sendfile is supported
+     */
     @Override
     public boolean isSendfileSupported() {
         return endpoint.getUseSendfile();
     }
 
-
+    /**
+     * Gets the protocol ID.
+     *
+     * @return the protocol ID
+     */
     @Override
     public String getId() {
         return endpoint.getId();
@@ -218,11 +270,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ---------------------- Properties that are passed through to the EndPoint
 
+
+    /**
+     * Gets the executor for this protocol handler.
+     *
+     * @return the executor
+     */
     @Override
     public Executor getExecutor() {
         return endpoint.getExecutor();
     }
 
+    /**
+     * Sets the executor for this protocol handler.
+     *
+     * @param executor The executor
+     */
     @Override
     public void setExecutor(Executor executor) {
         endpoint.setExecutor(executor);
@@ -240,71 +303,148 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Gets the maximum number of threads.
+     *
+     * @return the maximum number of threads
+     */
     public int getMaxThreads() {
         return endpoint.getMaxThreads();
     }
 
+    /**
+     * Sets the maximum number of threads.
+     *
+     * @param maxThreads The maximum number of threads
+     */
     public void setMaxThreads(int maxThreads) {
         endpoint.setMaxThreads(maxThreads);
     }
 
+    /**
+     * Gets the maximum number of connections.
+     *
+     * @return the maximum number of connections
+     */
     public int getMaxConnections() {
         return endpoint.getMaxConnections();
     }
 
+    /**
+     * Sets the maximum number of connections.
+     *
+     * @param maxConnections The maximum number of connections
+     */
     public void setMaxConnections(int maxConnections) {
         endpoint.setMaxConnections(maxConnections);
     }
 
-
+    /**
+     * Gets the minimum number of spare threads.
+     *
+     * @return the minimum spare threads
+     */
     public int getMinSpareThreads() {
         return endpoint.getMinSpareThreads();
     }
 
+    /**
+     * Sets the minimum number of spare threads.
+     *
+     * @param minSpareThreads The minimum spare threads
+     */
     public void setMinSpareThreads(int minSpareThreads) {
         endpoint.setMinSpareThreads(minSpareThreads);
     }
 
-
+    /**
+     * Gets the thread priority.
+     *
+     * @return the thread priority
+     */
     public int getThreadPriority() {
         return endpoint.getThreadPriority();
     }
 
+    /**
+     * Sets the thread priority.
+     *
+     * @param threadPriority The thread priority
+     */
     public void setThreadPriority(int threadPriority) {
         endpoint.setThreadPriority(threadPriority);
     }
 
-
+    /**
+     * Gets the maximum queue size.
+     *
+     * @return the maximum queue size
+     */
     public int getMaxQueueSize() {
         return endpoint.getMaxQueueSize();
     }
 
+    /**
+     * Sets the maximum queue size.
+     *
+     * @param maxQueueSize The maximum queue size
+     */
     public void setMaxQueueSize(int maxQueueSize) {
         endpoint.setMaxQueueSize(maxQueueSize);
     }
 
+    /**
+     * Gets the accept count.
+     *
+     * @return the accept count
+     */
     public int getAcceptCount() {
         return endpoint.getAcceptCount();
     }
 
+    /**
+     * Sets the accept count.
+     *
+     * @param acceptCount The accept count
+     */
     public void setAcceptCount(int acceptCount) {
         endpoint.setAcceptCount(acceptCount);
     }
 
 
+    /**
+     * Gets whether TCP no-delay is enabled.
+     *
+     * @return <code>true</code> if TCP no-delay is enabled
+     */
     public boolean getTcpNoDelay() {
         return endpoint.getTcpNoDelay();
     }
 
+    /**
+     * Sets whether TCP no-delay is enabled.
+     *
+     * @param tcpNoDelay <code>true</code> to enable TCP no-delay
+     */
     public void setTcpNoDelay(boolean tcpNoDelay) {
         endpoint.setTcpNoDelay(tcpNoDelay);
     }
 
-
+    /**
+     * Gets the connection linger time.
+     *
+     * @return the connection linger time
+     */
     public int getConnectionLinger() {
         return endpoint.getConnectionLinger();
     }
 
+
+    /**
+     * Sets the connection linger time.
+     *
+     * @param connectionLinger The connection linger time
+     */
     public void setConnectionLinger(int connectionLinger) {
         endpoint.setConnectionLinger(connectionLinger);
     }
@@ -320,66 +460,143 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         return endpoint.getKeepAliveTimeout();
     }
 
+
+    /**
+     * Sets the keep-alive timeout.
+     *
+     * @param keepAliveTimeout The keep-alive timeout in milliseconds
+     */
     public void setKeepAliveTimeout(int keepAliveTimeout) {
         endpoint.setKeepAliveTimeout(keepAliveTimeout);
     }
 
+
+    /**
+     * Gets the address.
+     *
+     * @return the address
+     */
     public InetAddress getAddress() {
         return endpoint.getAddress();
     }
 
+
+    /**
+     * Sets the address.
+     *
+     * @param ia The address
+     */
     public void setAddress(InetAddress ia) {
         endpoint.setAddress(ia);
     }
 
 
+    /**
+     * Gets the port.
+     *
+     * @return the port
+     */
     public int getPort() {
         return endpoint.getPort();
     }
 
+
+    /**
+     * Sets the port.
+     *
+     * @param port The port
+     */
     public void setPort(int port) {
         endpoint.setPort(port);
     }
 
 
+    /**
+     * Gets the port offset.
+     *
+     * @return the port offset
+     */
     public int getPortOffset() {
         return endpoint.getPortOffset();
     }
 
+
+    /**
+     * Sets the port offset.
+     *
+     * @param portOffset The port offset
+     */
     public void setPortOffset(int portOffset) {
         endpoint.setPortOffset(portOffset);
     }
 
-
+    /**
+     * Gets the port with offset applied.
+     *
+     * @return the port with offset
+     */
     public int getPortWithOffset() {
         return endpoint.getPortWithOffset();
     }
 
 
+    /**
+     * Gets the local port.
+     *
+     * @return the local port
+     */
     public int getLocalPort() {
         return endpoint.getLocalPort();
     }
 
-    /*
+
+    /**
+     * Gets the connection timeout.
      * When Tomcat expects data from the client, this is the time Tomcat will wait for that data to arrive before
      * closing the connection.
+     *
+     * @return the connection timeout
      */
     public int getConnectionTimeout() {
         return endpoint.getConnectionTimeout();
     }
 
+
+    /**
+     * Sets the connection timeout.
+     *
+     * @param timeout The connection timeout in milliseconds
+     */
     public void setConnectionTimeout(int timeout) {
         endpoint.setConnectionTimeout(timeout);
     }
 
+
+    /**
+     * Gets the connection count.
+     *
+     * @return the connection count
+     */
     public long getConnectionCount() {
         return endpoint.getConnectionCount();
     }
 
+
+    /**
+     * Sets the acceptor thread priority.
+     *
+     * @param threadPriority The thread priority
+     */
     public void setAcceptorThreadPriority(int threadPriority) {
         endpoint.setAcceptorThreadPriority(threadPriority);
     }
 
+
+    /**
+     * Gets the acceptor thread priority.
+     *
+     * @return the acceptor thread priority
+     */
     public int getAcceptorThreadPriority() {
         return endpoint.getAcceptorThreadPriority();
     }
@@ -387,6 +604,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ---------------------------------------------------------- Public methods
 
+
+    /**
+     * Gets the name index for this protocol.
+     *
+     * @return the name index
+     */
     public synchronized int getNameIndex() {
         if (nameIndex == 0) {
             nameIndex = nameCounter.incrementAndGet();
@@ -397,6 +620,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
 
     /**
+     * Gets the name of this protocol instance.
      * The name will be prefix-address-port if address is non-null and prefix-port if the address is null.
      *
      * @return A name for this protocol instance that is appropriately quoted for use in an ObjectName.
@@ -435,6 +659,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Adds a processor to the waiting processors set.
+     *
+     * @param processor The processor
+     */
     public void addWaitingProcessor(Processor processor) {
         if (getLog().isTraceEnabled()) {
             getLog().trace(sm.getString("abstractProtocol.waitingProcessor.add", processor));
@@ -443,6 +672,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Removes a processor from the waiting processors set.
+     *
+     * @param processor The processor
+     */
     public void removeWaitingProcessor(Processor processor) {
         boolean result = waitingProcessors.remove(processor);
         if (getLog().isTraceEnabled()) {
@@ -455,6 +689,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     /*
      * Primarily for debugging and testing. Could be exposed via JMX if considered useful.
      */
+    /**
+     * Gets the count of waiting processors.
+     *
+     * @return the waiting processor count
+     */
     public int getWaitingProcessorCount() {
         return waitingProcessors.size();
     }
@@ -462,15 +701,29 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ----------------------------------------------- Accessors for sub-classes
 
+    /**
+     * Gets the endpoint.
+     *
+     * @return the endpoint
+     */
     protected AbstractEndpoint<S,?> getEndpoint() {
         return endpoint;
     }
 
-
+    /**
+     * Gets the handler.
+     *
+     * @return the handler
+     */
     public Handler<S> getHandler() {
         return handler;
     }
 
+    /**
+     * Sets the handler.
+     *
+     * @param handler The handler
+     */
     protected void setHandler(Handler<S> handler) {
         this.handler = handler;
     }
@@ -541,14 +794,35 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     protected ObjectName oname;
     protected MBeanServer mserver;
 
+    /**
+     * Gets the object name.
+     *
+     * @return the object name
+     */
     public ObjectName getObjectName() {
         return oname;
     }
 
+    /**
+     * Gets the domain.
+     *
+     * @return the domain
+     */
     public String getDomain() {
         return domain;
     }
 
+
+    /**
+     * Pre-registers this MBean.
+     *
+     * @param server The MBean server
+     * @param name   The object name
+     *
+     * @return the object name
+     *
+     * @throws Exception if registration fails
+     */
     @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         oname = name;
@@ -557,16 +831,29 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         return name;
     }
 
+    /**
+     * Post-registers this MBean.
+     *
+     * @param registrationDone The registration status
+     */
     @Override
     public void postRegister(Boolean registrationDone) {
         // NOOP
     }
 
+    /**
+     * Pre-deregisters this MBean.
+     *
+     * @throws Exception if deregistration fails
+     */
     @Override
     public void preDeregister() throws Exception {
         // NOOP
     }
 
+    /**
+     * Post-deregisters this MBean.
+     */
     @Override
     public void postDeregister() {
         // NOOP
@@ -605,6 +892,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      * the connector will maintain state and prevent invalid state transitions.
      */
 
+    /**
+     * Initializes the protocol handler.
+     *
+     * @throws Exception if initialization fails
+     */
     @Override
     public void init() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -634,6 +926,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Starts the protocol handler.
+     *
+     * @throws Exception if start fails
+     */
     @Override
     public void start() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -676,6 +973,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
     }
 
+    /**
+     * Pauses the protocol handler.
+     *
+     * @throws Exception if pause fails
+     */
     @Override
     public void pause() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -686,11 +988,21 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Checks if the protocol handler is paused.
+     *
+     * @return <code>true</code> if paused
+     */
     public boolean isPaused() {
         return endpoint.isPaused();
     }
 
 
+    /**
+     * Resumes the protocol handler.
+     *
+     * @throws Exception if resume fails
+     */
     @Override
     public void resume() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -701,6 +1013,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Stops the protocol handler.
+     *
+     * @throws Exception if stop fails
+     */
     @Override
     public void stop() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -722,6 +1039,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Destroys the protocol handler.
+     *
+     * @throws Exception if destroy fails
+     */
     @Override
     public void destroy() throws Exception {
         if (getLog().isInfoEnabled()) {
@@ -753,12 +1075,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Closes the server socket gracefully.
+     */
     @Override
     public void closeServerSocketGraceful() {
         endpoint.closeServerSocketGraceful();
     }
 
 
+    /**
+     * Awaits for connections to close.
+     *
+     * @param waitMillis The maximum time to wait in milliseconds
+     *
+     * @return the number of connections remaining after the wait
+     */
     @Override
     public long awaitConnectionsClose(long waitMillis) {
         getLog().info(sm.getString("abstractProtocol.closeConnectionsAwait", Long.valueOf(waitMillis), getName()));
@@ -783,29 +1115,59 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         private final AtomicLong registerCount = new AtomicLong(0);
         private final RecycledProcessors recycledProcessors = new RecycledProcessors(this);
 
+        /**
+         * Creates a new connection handler.
+         *
+         * @param proto The protocol
+         */
         public ConnectionHandler(AbstractProtocol<S> proto) {
             this.proto = proto;
         }
 
+        /**
+         * Gets the protocol.
+         *
+         * @return the protocol
+         */
         protected AbstractProtocol<S> getProtocol() {
             return proto;
         }
 
+        /**
+         * Gets the logger.
+         *
+         * @return the logger
+         */
         protected Log getLog() {
             return getProtocol().getLog();
         }
 
+        /**
+         * Gets the global request processor.
+         *
+         * @return the global request processor
+         */
         @Override
         public Object getGlobal() {
             return global;
         }
 
+        /**
+         * Recycles the handler.
+         */
         @Override
         public void recycle() {
             recycledProcessors.clear();
         }
 
-
+        /**
+         * Processes a socket event.
+         *
+         * @param wrapper The socket wrapper
+         * @param status  The socket event
+         *
+         * @return the socket state
+         */
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
             if (getLog().isTraceEnabled()) {
@@ -1074,6 +1436,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
 
+        /**
+         * Performs a long poll on the socket.
+         *
+         * @param socket    The socket wrapper
+         * @param processor The processor
+         */
         protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
             if (!processor.isAsync()) {
                 // This is currently only used with HTTP
@@ -1119,6 +1487,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
 
+        /**
+         * Releases the socket wrapper.
+         *
+         * @param socketWrapper The socket wrapper
+         */
         @Override
         public void release(SocketWrapperBase<S> socketWrapper) {
             Processor processor = (Processor) socketWrapper.takeCurrentProcessor();
@@ -1126,6 +1499,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
 
+        /**
+         * Registers a processor.
+         *
+         * @param processor The processor
+         */
         protected void register(Processor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
@@ -1148,6 +1526,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             }
         }
 
+        /**
+         * Unregisters a processor.
+         *
+         * @param processor The processor
+         */
         protected void unregister(Processor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
@@ -1172,6 +1555,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             }
         }
 
+        /**
+         * Pauses all processors.
+         */
         @Override
         public final void pause() {
             /*
@@ -1195,10 +1581,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         private final transient ConnectionHandler<?> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
+        /**
+         * Creates a new recycled processors pool.
+         *
+         * @param handler The connection handler
+         */
         public RecycledProcessors(ConnectionHandler<?> handler) {
             this.handler = handler;
         }
 
+        /**
+         * Pushes a processor to the pool.
+         *
+         * @param processor The processor
+         *
+         * @return <code>true</code> if the processor was pushed
+         */
         @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
         public boolean push(Processor processor) {
@@ -1218,6 +1616,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             return result;
         }
 
+        /**
+         * Pops a processor from the pool.
+         *
+         * @return the processor or null if empty
+         */
         @SuppressWarnings("sync-override") // OK if size is too big briefly
         @Override
         public Processor pop() {
@@ -1228,6 +1631,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             return result;
         }
 
+        /**
+         * Clears the recycled processors pool.
+         */
         @Override
         public synchronized void clear() {
             Processor next = pop();
