@@ -21,6 +21,9 @@ import java.net.URLEncoder;
 
 import org.apache.tools.ant.BuildException;
 
+/**
+ * Abstract task for Catalina commands.
+ */
 public abstract class AbstractCatalinaCommandTask extends AbstractCatalinaTask {
 
     /**
@@ -28,10 +31,20 @@ public abstract class AbstractCatalinaCommandTask extends AbstractCatalinaTask {
      */
     protected String path = null;
 
+    /**
+     * Returns the path.
+     *
+     * @return the path
+     */
     public String getPath() {
         return this.path;
     }
 
+    /**
+     * Sets the path.
+     *
+     * @param path The path to set
+     */
     public void setPath(String path) {
         this.path = path;
     }
@@ -41,10 +54,20 @@ public abstract class AbstractCatalinaCommandTask extends AbstractCatalinaTask {
      */
     protected String version = null;
 
+    /**
+     * Returns the version.
+     *
+     * @return the version
+     */
     public String getVersion() {
         return this.version;
     }
 
+    /**
+     * Sets the version.
+     *
+     * @param version The version to set
+     */
     public void setVersion(String version) {
         this.version = version;
     }

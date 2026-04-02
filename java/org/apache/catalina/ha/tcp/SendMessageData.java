@@ -26,6 +26,8 @@ public class SendMessageData {
 
 
     /**
+     * Data about a message send operation.
+     *
      * @param message     The message to send
      * @param destination Member destination
      * @param exception   Associated error
