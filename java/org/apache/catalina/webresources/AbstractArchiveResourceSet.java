@@ -34,19 +34,45 @@ import org.apache.catalina.util.ResourceSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Abstract resource set implementation for archive-based resources.
+ */
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private static final Log log = LogFactory.getLog(AbstractArchiveResourceSet.class);
 
     private URL baseUrl;
     private String baseUrlString;
+    /**
+     * The archive JAR file.
+     */
     protected JarFile archive = null;
+    /**
+     * The archive entries.
+     */
     protected Map<String,JarEntry> archiveEntries = null;
+    /**
+     * The lock for archive operations.
+     */
     protected final Object archiveLock = new Object();
+    /**
+     * The archive use count.
+     */
     protected long archiveUseCount = 0;
+    /**
+     * The JAR contents.
+     */
     protected JarContents jarContents;
+    /**
+     * Whether to retain the bloom filter for archives.
+     */
     protected boolean retainBloomFilterForArchives = false;
 
+    /**
+     * Sets the base URL.
+     *
+     * @param baseUrl The base URL
+     */
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
         if (baseUrl == null) {
@@ -61,6 +87,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         return baseUrl;
     }
 
+    /**
+     * Returns the base URL string.
+     *
+     * @return the base URL string
+     */
     protected final String getBaseUrlString() {
         return baseUrlString;
     }
@@ -279,8 +310,21 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         }
     }
 
+    /**
+     * Checks if this is a multi-release JAR.
+     *
+     * @return true if this is a multi-release JAR, false otherwise
+     */
     protected abstract boolean isMultiRelease();
 
+    /**
+     * Creates an archive resource.
+     *
+     * @param jarEntry   The JAR entry
+     * @param webAppPath The web application path
+     * @param manifest   The manifest
+     * @return the archive resource
+     */
     protected abstract WebResource createArchiveResource(JarEntry jarEntry, String webAppPath, Manifest manifest);
 
     @Override
@@ -332,6 +376,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         }
     }
 
+    /**
+     * Closes the JAR file.
+     */
     protected void closeJarFile() {
         synchronized (archiveLock) {
             archiveUseCount--;

@@ -151,6 +151,11 @@ public abstract class AbstractResource implements WebResource {
         return new TrackedInputStream(root, getName(), is);
     }
 
+    /**
+     * Returns the input stream for this resource.
+     *
+     * @return the input stream for this resource
+     */
     protected abstract InputStream doGetInputStream();
 
 
