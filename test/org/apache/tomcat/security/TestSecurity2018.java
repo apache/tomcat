@@ -17,11 +17,8 @@
 
 package org.apache.tomcat.security;
 
-import java.io.File;
 import java.net.URI;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
