@@ -128,10 +128,25 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * The list of our time format types.
      */
     private enum FormatType {
+        /**
+         * Common Log Format.
+         */
         CLF,
+        /**
+         * Seconds since epoch.
+         */
         SEC,
+        /**
+         * Milliseconds since epoch.
+         */
         MSEC,
+        /**
+         * Millisecond fraction of timestamp.
+         */
         MSEC_FRAC,
+        /**
+         * SimpleDateFormat format.
+         */
         SDF
     }
 
@@ -139,7 +154,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * The list of our port types.
      */
     private enum PortType {
+        /**
+         * Local port.
+         */
         LOCAL,
+        /**
+         * Remote port.
+         */
         REMOTE
     }
 
@@ -147,11 +168,22 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * The list of our ip address types.
      */
     private enum RemoteAddressType {
+        /**
+         * Remote address.
+         */
         REMOTE,
+        /**
+         * Peer address.
+         */
         PEER
     }
 
     // ------------------------------------------------------ Constructor
+
+
+    /**
+     * Default constructor.
+     */
     public AbstractAccessLogValve() {
         super(true);
     }
@@ -215,6 +247,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     protected static class DateFormatCache {
 
+        /**
+         * Cache for formatted timestamps.
+         */
         protected class Cache {
 
             /* CLF log format */
@@ -240,14 +275,32 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
             private final Cache parent;
 
+            /**
+             * Creates a new cache with the given parent cache.
+             *
+             * @param parent The parent cache
+             */
             private Cache(Cache parent) {
                 this(null, parent);
             }
 
+            /**
+             * Creates a new cache with the given format and parent cache.
+             *
+             * @param format The format string
+             * @param parent The parent cache
+             */
             private Cache(String format, Cache parent) {
                 this(format, null, parent);
             }
 
+            /**
+             * Creates a new cache with the given format, locale and parent cache.
+             *
+             * @param format The format string
+             * @param loc The locale
+             * @param parent The parent cache
+             */
             private Cache(String format, Locale loc, Cache parent) {
                 cache = new String[cacheSize];
                 for (int i = 0; i < cacheSize; i++) {
@@ -267,6 +320,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 this.parent = parent;
             }
 
+            /**
+             * Gets the formatted timestamp for the given time.
+             *
+             * @param time The time in milliseconds
+             *
+             * @return The formatted timestamp
+             */
             private String getFormatInternal(long time) {
 
                 long seconds = time / 1000;
@@ -344,6 +404,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         protected final Cache cLFCache;
         private final Map<String,Cache> formatCache = new HashMap<>();
 
+        /**
+         * Creates a new date format cache.
+         *
+         * @param size The cache size
+         * @param loc The default locale
+         * @param parentFC The parent cache
+         */
         protected DateFormatCache(int size, Locale loc, DateFormatCache parentFC) {
             cacheSize = size;
             cacheDefaultLocale = loc;
@@ -357,6 +424,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             cLFCache = new Cache(parentCache);
         }
 
+        /**
+         * Gets the cache for the given format.
+         *
+         * @param format The format string
+         * @param loc The locale
+         *
+         * @return The cache
+         */
         private Cache getCache(String format, Locale loc) {
             Cache cache;
             if (format == null) {
@@ -377,10 +452,26 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return cache;
         }
 
+        /**
+         * Gets the formatted timestamp in CLF format.
+         *
+         * @param time The time in milliseconds
+         *
+         * @return The formatted timestamp
+         */
         public String getFormat(long time) {
             return cLFCache.getFormatInternal(time);
         }
 
+        /**
+         * Gets the formatted timestamp in the given format.
+         *
+         * @param format The format string
+         * @param loc The locale
+         * @param time The time in milliseconds
+         *
+         * @return The formatted timestamp
+         */
         public String getFormat(String format, Locale loc, long time) {
             return getCache(format, loc).getFormatInternal(time);
         }
@@ -411,6 +502,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     /**
      * Are we doing conditional logging ? default null. It is the value of <code>conditionIf</code> property.
+     * If the ServletRequest.getAttribute(conditionIf) yields a non-null value, the logging will be performed.
      */
     protected String conditionIf = null;
 
@@ -742,13 +834,26 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * cache the value in the element since the elements are state-less.
      */
     protected interface CachedElement {
+        /**
+         * Cache the value for the specified request.
+         *
+         * @param request The request to cache the value for
+         */
         void cache(Request request);
     }
 
     /**
-     * write thread name - %I
+     * Write thread name - %I.
      */
     protected static class ThreadNameElement implements AccessLogElement {
+        /**
+         * Adds the thread name element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
@@ -761,12 +866,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write local IP address - %A
+     * Write local IP address - %A.
      */
     protected static class LocalAddrElement implements AccessLogElement {
 
         private final String localAddrValue;
 
+        /**
+         * Creates a new local address element.
+         *
+         * @param ipv6Canonical Whether to use IPv6 canonical representation
+         */
         public LocalAddrElement(boolean ipv6Canonical) {
             String init;
             try {
@@ -790,21 +900,29 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write remote IP address - %a
+     * Write remote IP address - %a.
      */
     protected class RemoteAddrElement implements AccessLogElement, CachedElement {
         /**
-         * Type of address to log
+         * Type of address to log.
          */
         private static final String remoteAddress = "remote";
         private static final String peerAddress = "peer";
 
         private final RemoteAddressType remoteAddressType;
 
+        /**
+         * Creates a new remote address element using remote address type.
+         */
         public RemoteAddrElement() {
             remoteAddressType = RemoteAddressType.REMOTE;
         }
 
+        /**
+         * Creates a new remote address element with the specified type.
+         *
+         * @param type The address type ("remote" or "peer")
+         */
         public RemoteAddrElement(String type) {
             switch (type) {
                 case remoteAddress:
@@ -857,9 +975,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write remote host name - %h
+     * Write remote host name - %h.
      */
     protected class HostElement implements AccessLogElement, CachedElement {
+        /**
+         * Adds the host element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             String value = null;
@@ -891,9 +1017,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write remote logical username from identd (always returns '-') - %l
+     * Write remote logical username from identd (always returns '-') - %l.
      */
     protected static class LogicalUserNameElement implements AccessLogElement {
+        /**
+         * Adds the logical user name element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             buf.append('-');
@@ -901,9 +1035,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write request protocol - %H
+     * Write request protocol - %H.
      */
     protected class ProtocolElement implements AccessLogElement {
+        /**
+         * Adds the protocol element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (requestAttributesEnabled) {
@@ -920,9 +1062,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write remote user that was authenticated (if any), else '-' - %u
+     * Write remote user that was authenticated (if any), else '-' - %u.
      */
     protected static class UserElement implements AccessLogElement {
+        /**
+         * Adds the user element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request != null) {
@@ -934,42 +1084,42 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write date and time, in configurable format (default CLF) - %t or %{format}t
+     * Write date and time, in configurable format (default CLF) - %t or %{format}t.
      */
     protected class DateAndTimeElement implements AccessLogElement {
 
         /**
-         * Format prefix specifying request start time
+         * Format prefix specifying request start time.
          */
         private static final String requestStartPrefix = "begin";
 
         /**
-         * Format prefix specifying response end time
+         * Format prefix specifying response end time.
          */
         private static final String responseEndPrefix = "end";
 
         /**
-         * Separator between optional prefix and rest of format
+         * Separator between optional prefix and rest of format.
          */
         private static final String prefixSeparator = ":";
 
         /**
-         * Special format for seconds since epoch
+         * Special format for seconds since epoch.
          */
         private static final String secFormat = "sec";
 
         /**
-         * Special format for milliseconds since epoch
+         * Special format for milliseconds since epoch.
          */
         private static final String msecFormat = "msec";
 
         /**
-         * Special format for millisecond part of timestamp
+         * Special format for millisecond part of timestamp.
          */
         private static final String msecFractionFormat = "msec_frac";
 
         /**
-         * The patterns we use to replace "S" and "SSS" millisecond formatting of SimpleDateFormat by our own handling
+         * The patterns we use to replace "S" and "SSS" millisecond formatting of SimpleDateFormat by our own handling.
          */
         private static final String msecPattern = "{#}";
         private static final String tripleMsecPattern = msecPattern + msecPattern + msecPattern;
@@ -985,6 +1135,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /* Whether we need to postprocess by adding milliseconds */
         private boolean usesMsecs = false;
 
+        /**
+         * Creates a new date and time element using CLF format.
+         */
         protected DateAndTimeElement() {
             this(null);
         }
@@ -993,6 +1146,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          * Replace the millisecond formatting character 'S' by some dummy characters in order to make the resulting
          * formatted time stamps cacheable. We replace the dummy chars later with the actual milliseconds because that's
          * relatively cheap.
+         *
+         * @param format The format string
+         *
+         * @return The tidied format string
          */
         private String tidyFormat(String format) {
             boolean escape = false;
@@ -1014,6 +1171,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return result.toString();
         }
 
+        /**
+         * Creates a new date and time element with the specified format.
+         *
+         * @param sdf The SimpleDateFormat pattern or special format identifier
+         */
         protected DateAndTimeElement(String sdf) {
             String format = sdf;
             boolean needsEscaping = false;
@@ -1118,9 +1280,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write first line of the request (method and request URI) - %r
+     * Write first line of the request (method and request URI) - %r.
      */
     protected static class RequestElement implements AccessLogElement {
+        /**
+         * Adds the request element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request != null) {
@@ -1150,9 +1320,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write HTTP status code of the response - %s
+     * Write HTTP status code of the response - %s.
      */
     protected static class HttpStatusCodeElement implements AccessLogElement {
+        /**
+         * Adds the HTTP status code element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (response != null) {
@@ -1171,7 +1349,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write local or remote port for request connection - %p and %{xxx}p
+     * Write local or remote port for request connection - %p and %{xxx}p.
      */
     protected class PortElement implements AccessLogElement, CachedElement {
 
@@ -1183,10 +1361,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         private final PortType portType;
 
+        /**
+         * Creates a new port element using local port type.
+         */
         public PortElement() {
             portType = PortType.LOCAL;
         }
 
+        /**
+         * Creates a new port element with the specified type.
+         *
+         * @param type The port type ("local" or "remote")
+         */
         public PortElement(String type) {
             switch (type) {
                 case remotePort:
@@ -1229,18 +1415,28 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write bytes sent, excluding HTTP headers - %b, %B
+     * Write bytes sent, excluding HTTP headers - %b, %B.
      */
     protected static class ByteSentElement implements AccessLogElement {
         private final boolean conversion;
 
         /**
+         * Creates a new ByteSentElement.
+         *
          * @param conversion <code>true</code> to write '-' instead of 0 - %b.
          */
         public ByteSentElement(boolean conversion) {
             this.conversion = conversion;
         }
 
+        /**
+         * Adds the byte sent element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             // Don't need to flush since trigger for log message is after the
@@ -1266,9 +1462,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write request method (GET, POST, etc.) - %m
+     * Write request method (GET, POST, etc.) - %m.
      */
     protected static class MethodElement implements AccessLogElement {
+        /**
+         * Adds the method element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request != null) {
@@ -1278,7 +1482,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write time taken to process the request - %D, %T
+     * Write time taken to process the request - %D, %T.
      */
     protected static class ElapsedTimeElement implements AccessLogElement {
         private final boolean millis;
@@ -1308,9 +1512,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write time until first byte is written (commit time) in millis - %F
+     * Write time until first byte is written (commit time) in millis - %F.
      */
     protected static class FirstByteTimeElement implements AccessLogElement {
+        /**
+         * Adds the first byte time element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             long commitTime = response.getCoyoteResponse().getCommitTime();
@@ -1324,9 +1536,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write Query string (prepended with a '?' if it exists) - %q
+     * Write query string (prepended with a '?' if it exists) - %q.
      */
     protected static class QueryElement implements AccessLogElement {
+        /**
+         * Adds the query element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             String query = null;
@@ -1346,9 +1566,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write user session ID - %S
+     * Write user session ID - %S.
      */
     protected static class SessionIdElement implements AccessLogElement {
+        /**
+         * Adds the session ID element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request == null) {
@@ -1365,9 +1593,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write requested URL path - %U
+     * Write requested URL path - %U.
      */
     protected static class RequestURIElement implements AccessLogElement {
+        /**
+         * Adds the request URI element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (request != null) {
@@ -1379,9 +1615,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write local server name - %v
+     * Write local server name - %v.
      */
     protected class LocalServerNameElement implements AccessLogElement {
+        /**
+         * Adds the local server name element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             String value = null;
@@ -1406,11 +1650,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write any string
+     * Write any constant string.
      */
     protected static class StringElement implements AccessLogElement {
         private final String str;
 
+        /**
+         * Creates a new string element.
+         *
+         * @param str The string to write
+         */
         public StringElement(String str) {
             this.str = str;
         }
@@ -1422,11 +1671,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write incoming headers - %{xxx}i
+     * Write incoming headers - %{xxx}i.
      */
     protected static class HeaderElement implements AccessLogElement {
         private final String header;
 
+        /**
+         * Creates a new header element.
+         *
+         * @param header The header name
+         */
         public HeaderElement(String header) {
             this.header = header;
         }
@@ -1447,11 +1701,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write a specific cookie - %{xxx}c
+     * Write a specific cookie - %{xxx}c.
      */
     protected static class CookieElement implements AccessLogElement {
         private final String cookieNameToLog;
 
+        /**
+         * Creates a new cookie element.
+         *
+         * @param cookieNameToLog The cookie name to log
+         */
         public CookieElement(String cookieNameToLog) {
             this.cookieNameToLog = cookieNameToLog;
         }
@@ -1485,11 +1744,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write a specific response header - %{xxx}o
+     * Write a specific response header - %{xxx}o.
      */
     protected static class ResponseHeaderElement implements AccessLogElement {
         private final String header;
 
+        /**
+         * Creates a new response header element.
+         *
+         * @param header The header name
+         */
         public ResponseHeaderElement(String header) {
             this.header = header;
         }
@@ -1512,11 +1776,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write an attribute in the ServletRequest - %{xxx}r
+     * Write an attribute in the ServletRequest - %{xxx}r.
      */
     protected static class RequestAttributeElement implements AccessLogElement {
         private final String attribute;
 
+        /**
+         * Creates a new request attribute element.
+         *
+         * @param attribute The attribute name
+         */
         public RequestAttributeElement(String attribute) {
             this.attribute = attribute;
         }
@@ -1542,11 +1811,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write an attribute in the HttpSession - %{xxx}s
+     * Write an attribute in the HttpSession - %{xxx}s.
      */
     protected static class SessionAttributeElement implements AccessLogElement {
         private final String attribute;
 
+        /**
+         * Creates a new session attribute element.
+         *
+         * @param attribute The attribute name
+         */
         public SessionAttributeElement(String attribute) {
             this.attribute = attribute;
         }
@@ -1574,10 +1848,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
-    /**
-     * Write connection status when response is completed - %X
+/**
+     * Write connection status when response is completed - %X.
      */
     protected static class ConnectionStatusElement implements AccessLogElement {
+        /**
+         * Adds the connection status element to the buffer.
+         *
+         * @param buf      The buffer to which the log element should be added
+         * @param request  The request that triggered this access log entry
+         * @param response The response to the request that triggered this access log entry
+         * @param time     The time taken in nanoseconds to process the request
+         */
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (response != null && request != null) {
@@ -1615,6 +1897,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
         }
     }
+
 
     /**
      * Parse pattern string and create the array of AccessLogElement.
@@ -1667,6 +1950,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
 
+    /**
+     * Create an array of cached elements from the given access log elements.
+     *
+     * @param elements The access log elements
+     *
+     * @return the cached elements array
+     */
     private CachedElement[] createCachedElements(AccessLogElement[] elements) {
         List<CachedElement> list = new ArrayList<>();
         for (AccessLogElement element : elements) {
@@ -1800,10 +2090,24 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Reviewing the httpd code, characters with the high bit set are escaped. The httpd is assuming a single byte
      * encoding which may not be true for Tomcat so Tomcat uses the Java \\uXXXX encoding.
      */
+    /**
+     * Escapes and appends the input string to the destination writer.
+     *
+     * @param input The input string
+     * @param dest  The destination writer
+     */
     protected static void escapeAndAppend(String input, CharArrayWriter dest) {
         escapeAndAppend(input, dest, false);
     }
 
+
+    /**
+     * Escapes and appends the input string to the destination writer.
+     *
+     * @param input                The input string
+     * @param dest                 The destination writer
+     * @param escapeQuoteAsDouble  Whether to escape quotes as double quotes
+     */
     protected static void escapeAndAppend(String input, CharArrayWriter dest, boolean escapeQuoteAsDouble) {
         if (input == null || input.isEmpty()) {
             dest.append('-');
