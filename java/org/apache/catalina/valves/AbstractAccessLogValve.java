@@ -287,6 +287,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             /* Helper object to be able to call SimpleDateFormat.format(). */
             private final Date currentDate = new Date();
 
+            /**
+             * The cached values.
+             */
             protected final String[] cache;
             private final SimpleDateFormat formatter;
             private boolean isCLF = false;
@@ -419,6 +422,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
+        /**
+         * The cache for CLF format.
+         */
         protected final Cache cLFCache;
         private final Map<String,Cache> formatCache = new HashMap<>();
 
@@ -568,21 +574,38 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Returns the max log message buffer size.
+     *
+     * @return the max log message buffer size.
+     */
     public int getMaxLogMessageBufferSize() {
         return maxLogMessageBufferSize;
     }
 
-
+    /**
+     * Sets the max log message buffer size.
+     *
+     * @param maxLogMessageBufferSize The max log message buffer size.
+     */
     public void setMaxLogMessageBufferSize(int maxLogMessageBufferSize) {
         this.maxLogMessageBufferSize = maxLogMessageBufferSize;
     }
 
-
+    /**
+     * Returns the ipv6 canonical flag.
+     *
+     * @return the ipv6 canonical flag.
+     */
     public boolean getIpv6Canonical() {
         return ipv6Canonical;
     }
 
-
+    /**
+     * Sets the ipv6 canonical flag.
+     *
+     * @param ipv6Canonical The ipv6 canonical flag.
+     */
     public void setIpv6Canonical(boolean ipv6Canonical) {
         this.ipv6Canonical = ipv6Canonical;
     }
@@ -603,6 +626,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
+     * Returns the enabled flag.
+     *
      * @return the enabled flag.
      */
     public boolean getEnabled() {
@@ -610,6 +635,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
+     * Sets the enabled flag.
+     *
      * @param enabled The enabled to set.
      */
     public void setEnabled(boolean enabled) {
@@ -617,6 +644,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
+     * Returns the format pattern.
+     *
      * @return the format pattern.
      */
     public String getPattern() {
@@ -1910,7 +1939,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
-/**
+    /**
      * Write connection status when response is completed - %X.
      */
     protected static class ConnectionStatusElement implements AccessLogElement {

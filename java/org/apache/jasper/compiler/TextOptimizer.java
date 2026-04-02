@@ -21,6 +21,7 @@ import org.apache.jasper.Options;
 import org.apache.jasper.TrimSpacesOption;
 
 /**
+ * Optimizes text in JSP pages.
  */
 public class TextOptimizer {
 
