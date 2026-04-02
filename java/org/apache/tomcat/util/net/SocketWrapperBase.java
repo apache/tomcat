@@ -963,6 +963,8 @@ public abstract class SocketWrapperBase<E> {
 
     /**
      * Internal state tracker for vectored operations.
+     *
+     * @param <A> The attachment type
      */
     protected abstract class OperationState<A> implements Runnable {
         protected final boolean read;
@@ -1053,6 +1055,8 @@ public abstract class SocketWrapperBase<E> {
     /**
      * Completion handler for vectored operations. This will check the completion of the operation, then either continue
      * or call the user provided completion handler.
+     *
+     * @param <A> The attachment type
      */
     protected class VectoredIOCompletionHandler<A> implements CompletionHandler<Long,OperationState<A>> {
         @Override
