@@ -242,6 +242,10 @@
         Refactor the calculation of the real index in the HPACK dynamic header
         table implementation to reduce code duplication. (markt)
       </scode>
+      <fix>
+        Fix various minor issues with some HTTP/2 stream error messages for
+        HTTP/2. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
