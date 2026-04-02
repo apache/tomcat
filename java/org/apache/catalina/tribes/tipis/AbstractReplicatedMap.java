@@ -49,6 +49,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
+ * An abstract replicated map implementation.
+ *
  * @param <K> The type of Key
  * @param <V> The type of Value
  */

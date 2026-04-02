@@ -819,6 +819,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     protected abstract Processor createProcessor();
 
 
+    /**
+     * Create and configure a new Processor instance for upgrade connections.
+     *
+     * @param socket       The socket for the upgrade connection
+     * @param upgradeToken The upgrade token containing upgrade information
+     * @return A fully configured Processor instance that is ready to use
+     */
     protected abstract Processor createUpgradeProcessor(SocketWrapperBase<?> socket, UpgradeToken upgradeToken);
 
 

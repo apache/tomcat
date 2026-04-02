@@ -81,6 +81,8 @@ public interface AccessLog {
     void setRequestAttributesEnabled(boolean requestAttributesEnabled);
 
     /**
+     * Checks if request attributes will be logged.
+     *
      * @see #setRequestAttributesEnabled(boolean)
      *
      * @return <code>true</code> if the attributes will be logged, otherwise <code>false</code>

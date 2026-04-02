@@ -207,6 +207,8 @@ public interface WebResourceRoot extends Lifecycle {
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
+     * Returns the array of WebResourceSet configured to this web application as a 'Pre' resource.
+     *
      * @return the array of WebResourceSet configured to this web application as a 'Pre' resource.
      */
     WebResourceSet[] getPreResources();
@@ -219,6 +221,8 @@ public interface WebResourceRoot extends Lifecycle {
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
+     * Returns the array of WebResourceSet configured to this web application as a 'Jar' resource.
+     *
      * @return the array of WebResourceSet configured to this web application as a 'Jar' resource.
      */
     WebResourceSet[] getJarResources();
@@ -231,11 +235,15 @@ public interface WebResourceRoot extends Lifecycle {
     void addPostResources(WebResourceSet webResourceSet);
 
     /**
+     * Returns the array of WebResourceSet configured to this web application as a 'Post' resource.
+     *
      * @return the array of WebResourceSet configured to this web application as a 'Post' resource.
      */
     WebResourceSet[] getPostResources();
 
     /**
+     * Returns the web application this WebResourceRoot is associated with.
+     *
      * @return the web application this WebResourceRoot is associated with.
      */
     Context getContext();
@@ -271,6 +279,8 @@ public interface WebResourceRoot extends Lifecycle {
     void setCachingAllowed(boolean cachingAllowed);
 
     /**
+     * Checks if caching is permitted for this web application.
+     *
      * @return <code>true</code> if caching is permitted for this web application.
      */
     boolean isCachingAllowed();
@@ -428,6 +438,8 @@ public interface WebResourceRoot extends Lifecycle {
     }
 
     /**
+     * Checks if the main resources are read only.
+     *
      * @return {@code true} if the main resources are read only, otherwise {@code false}. The default implementation
      *             returns {@code false}.
      */

@@ -23,6 +23,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 public interface UpgradeProtocol {
 
     /**
+     * Returns the name that clients will use to request an upgrade to this protocol.
+     *
      * @param isSSLEnabled Is this for a connector that is configured to support TLS. Some protocols (e.g. HTTP/2) only
      *                         support HTTP upgrade over non-secure connections.
      *
@@ -32,12 +34,16 @@ public interface UpgradeProtocol {
     String getHttpUpgradeName(boolean isSSLEnabled);
 
     /**
+     * Returns the byte sequence as listed in the IANA registry for this protocol.
+     *
      * @return The byte sequence as listed in the IANA registry for this protocol or <code>null</code> if upgrade via
      *             ALPN is not supported.
      */
     byte[] getAlpnIdentifier();
 
     /**
+     * Returns the name of the protocol as listed in the IANA registry.
+     *
      * @return The name of the protocol as listed in the IANA registry if and only if {@link #getAlpnIdentifier()}
      *             returns the UTF-8 encoding of this name. If {@link #getAlpnIdentifier()} returns some other byte
      *             sequence, then this method returns the empty string. If upgrade via ALPN is not supported then
@@ -53,6 +59,8 @@ public interface UpgradeProtocol {
     String getAlpnName();
 
     /**
+     * Returns a processor instance for processing a connection using this protocol.
+     *
      * @param socketWrapper The socketWrapper for the connection that requires a processor
      * @param adapter       The Adapter instance that provides access to the standard Engine/Host/Context/Wrapper
      *                          processing chain
@@ -63,6 +71,8 @@ public interface UpgradeProtocol {
 
 
     /**
+     * Returns an instance of the HTTP upgrade handler for this protocol.
+     *
      * @param socketWrapper The socket
      * @param adapter       The Adapter to use to configure the new upgrade handler
      * @param request       A copy (may be incomplete) of the request that triggered the upgrade

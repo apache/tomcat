@@ -30,6 +30,9 @@ import java.util.jar.Manifest;
 
 import org.apache.catalina.util.URLEncoder;
 
+/**
+ * Abstract resource implementation for archive-based resources.
+ */
 public abstract class AbstractArchiveResource extends AbstractResource {
 
     private final AbstractArchiveResourceSet archiveResourceSet;
@@ -40,6 +43,18 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private boolean readCerts = false;
     private Certificate[] certificates;
 
+    /*
+     * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
+     * from the JRE and it has been confirmed that the JRE no longer depends on code base.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=69426
+     *
+     * @param archiveResourceSet The archive resource set
+     * @param webAppPath         The web application path
+     * @param baseUrl            The base URL
+     * @param jarEntry           The JAR entry
+     * @param codeBaseUrl        The code base URL
+     */
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
             JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
@@ -65,18 +80,38 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         }
     }
 
+    /**
+     * Returns the archive resource set.
+     *
+     * @return the archive resource set
+     */
     protected AbstractArchiveResourceSet getArchiveResourceSet() {
         return archiveResourceSet;
     }
 
+    /**
+     * Returns the base.
+     *
+     * @return the base
+     */
     protected final String getBase() {
         return archiveResourceSet.getBase();
     }
 
+    /**
+     * Returns the base URL.
+     *
+     * @return the base URL
+     */
     protected final String getBaseUrl() {
         return baseUrl;
     }
 
+    /**
+     * Returns the resource.
+     *
+     * @return the resource
+     */
     protected final JarEntry getResource() {
         return resource;
     }
@@ -246,6 +281,12 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         private final AtomicBoolean closed = new AtomicBoolean(false);
 
 
+        /**
+          * Creates a new JarInputStreamWrapper.
+          *
+          * @param jarEntry The JAR entry
+          * @param is       The input stream
+          */
         public JarInputStreamWrapper(JarEntry jarEntry, InputStream is) {
             this.jarEntry = jarEntry;
             this.is = is;
@@ -309,6 +350,11 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             return is.markSupported();
         }
 
+        /**
+         * Returns the certificates.
+         *
+         * @return the certificates
+         */
         public Certificate[] getCertificates() {
             return jarEntry.getCertificates();
         }

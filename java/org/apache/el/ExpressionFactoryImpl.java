@@ -29,7 +29,7 @@ import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
 /**
- * @see javax.el.ExpressionFactory
+ * Implementation of {@link javax.el.ExpressionFactory}.
  */
 @aQute.bnd.annotation.spi.ServiceProvider(value = ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
