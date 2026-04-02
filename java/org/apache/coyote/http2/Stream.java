@@ -330,7 +330,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // Header names must be lowercase
         if (!name.toLowerCase(Locale.US).equals(name)) {
             headerException =
-                    new StreamException(sm.getString("stream.headercase", getConnectionId(), getIdAsString(), name),
+                    new StreamException(sm.getString("stream.header.case", getConnectionId(), getIdAsString(), name),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
             // No need for further processing. The stream will be reset.
             return;
@@ -347,7 +347,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if ("te".equals(name)) {
             if (!"trailers".equals(value)) {
                 headerException =
-                        new StreamException(sm.getString("stream.header.te", getConnectionId(), getIdAsString(), name),
+                        new StreamException(sm.getString("stream.header.te", getConnectionId(), getIdAsString(), value),
                                 Http2Error.PROTOCOL_ERROR, getIdAsInt());
                 // No need for further processing. The stream will be reset.
                 return;
@@ -362,7 +362,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         if (name.isEmpty()) {
             headerException =
-                    new StreamException(sm.getString("stream.header.empty", getConnectionId(), getIdAsString(), name),
+                    new StreamException(sm.getString("stream.header.empty", getConnectionId(), getIdAsString()),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
             // No need for further processing. The stream will be reset.
             return;
@@ -547,9 +547,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // Match host name with SNI if required
         if (!handler.getProtocol().getHttp11Protocol().checkSni(handler.getSniHostName(),
                 coyoteRequest.serverName().getString())) {
-            headerException = new StreamException(
-                    sm.getString("stream.host.sni", getConnectionId(), getIdAsString(), value, handler.getSniHostName()),
-                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            headerException = new StreamException(sm.getString("stream.host.sni", getConnectionId(), getIdAsString(),
+                    value, handler.getSniHostName()), Http2Error.PROTOCOL_ERROR, getIdAsInt());
         }
     }
 
@@ -565,7 +564,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 // Host value inconsistent
                 headerException = new StreamException(
                         sm.getString("stream.host.inconsistent", getConnectionId(), getIdAsString(), value,
-                                coyoteRequest.serverName().getString(), Integer.toString(coyoteRequest.getServerPort())),
+                                coyoteRequest.serverName().getString(),
+                                Integer.toString(coyoteRequest.getServerPort())),
                         Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
         } catch (IllegalArgumentException iae) {
