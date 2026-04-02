@@ -133,7 +133,7 @@
       </scode>
       <fix>
         Fix various minor issues with some HTTP/2 stream error messages for
-        HTTP/2. (markt)  
+        HTTP/2. (markt)
       </fix>
     </changelog>
   </subsection>
