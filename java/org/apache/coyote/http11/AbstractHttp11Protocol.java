@@ -61,7 +61,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractHttp11Protocol.class);
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
-    private OutputFilterFactory outputFilterFactory = new GzipOutputFilterFactory();
+    private final List<OutputFilterFactory> outputFilterFactories = new ArrayList<>();
+    private boolean outputFilterFactoryConfigured = false;
 
     private HttpParser httpParser = null;
 
@@ -342,22 +343,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
 
-    public int getGzipLevel() {
-        return compressionConfig.getGzipLevel();
-    }
-
-    public void setGzipLevel(int gzipLevel) {
-        compressionConfig.setGzipLevel(gzipLevel);
-    }
-
-    public int getGzipBufferSize() {
-        return compressionConfig.getGzipBufferSize();
-    }
-
-    public void setGzipBufferSize(int gzipBufferSize) {
-        compressionConfig.setGzipBufferSize(gzipBufferSize);
-    }
-
     public String getNoCompressionEncodings() {
         return compressionConfig.getNoCompressionEncodings();
     }
@@ -366,36 +351,43 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setNoCompressionEncodings(encodings);
     }
 
-    public OutputFilterFactory getOutputFilterFactory() {
-        return outputFilterFactory;
+    /**
+     * Add an output filter factory. Called by Digester when parsing
+     * {@code <OutputFilterFactory>} elements in server.xml.
+     *
+     * @param factory The factory to add
+     */
+    public void addOutputFilterFactory(OutputFilterFactory factory) {
+        outputFilterFactories.add(factory);
+        outputFilterFactoryConfigured = true;
     }
 
-    public void setOutputFilterFactory(OutputFilterFactory outputFilterFactory) {
-        this.outputFilterFactory = outputFilterFactory;
-    }
-
-    public void setOutputFilterFactory(String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            this.outputFilterFactory = (OutputFilterFactory) clazz.getDeclaredConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalArgumentException(sm.getString("abstractHttp11Protocol.invalidOutputFilterFactory", className), e);
+    /**
+     * Get the list of configured output filter factories.
+     * If none have been explicitly configured, a default
+     * {@link GzipOutputFilterFactory} is returned.
+     *
+     * @return The list of output filter factories, never null
+     */
+    public List<OutputFilterFactory> getOutputFilterFactories() {
+        if (!outputFilterFactoryConfigured && outputFilterFactories.isEmpty()) {
+            outputFilterFactories.add(new GzipOutputFilterFactory());
         }
+        return outputFilterFactories;
     }
 
-    public String getNoCompressionEncodings() {
-        return compressionConfig.getNoCompressionEncodings();
+    /**
+     * Determin if compression should be used for this response.
+     *
+     * @param request   The request
+     * @param response  The response
+     *
+     * @return The factory to use for compression, or {@code null} if
+     *         compression should not be used
+     */
+    public OutputFilterFactory useCompression(Request request, Response response) {
+        return compressionConfig.useCompression(request, response, getOutputFilterFactories());
     }
-
-    public void setNoCompressionEncodings(String encodings) {
-        compressionConfig.setNoCompressionEncodings(encodings);
-    }
-
-
-    public boolean useCompression(Request request, Response response) {
-        return compressionConfig.useCompression(request, response, outputFilterFactory.getEncodingName());
-    }
-
 
     private Pattern restrictedUserAgents = null;
 
