@@ -403,4 +403,74 @@ public class TestSSLValve {
         Assert.assertNotNull(certificates[0]);
         Assert.assertEquals(0, f.getMessageCount());
     }
+
+
+    @Test
+    public void testCustomHeaderNames() throws Exception {
+        SSLValve customValve = new SSLValve();
+        customValve.setSslCipherHeader("X-Custom-Cipher");
+        customValve.setSslSessionIdHeader("X-Custom-Session");
+        customValve.setSslSecureProtocolHeader("X-Custom-Protocol");
+        customValve.setSslCipherUserKeySizeHeader("X-Custom-KeySize");
+
+        Valve next = EasyMock.createMock(Valve.class);
+        customValve.setNext(next);
+
+        Connector connector = EasyMock.createNiceMock(Connector.class);
+        EasyMock.replay(connector);
+        MockRequest req = new MockRequest(connector);
+
+        next.invoke(req, null);
+        EasyMock.replay(next);
+
+        req.setHeader("X-Custom-Cipher", "AES256");
+        req.setHeader("X-Custom-Session", "sess123");
+        req.setHeader("X-Custom-Protocol", "TLSv1.3");
+        req.setHeader("X-Custom-KeySize", "256");
+
+        customValve.invoke(req, null);
+
+        EasyMock.verify(next);
+        Assert.assertEquals("AES256", req.getAttribute(Globals.CIPHER_SUITE_ATTR));
+        Assert.assertEquals("sess123", req.getAttribute(Globals.SSL_SESSION_ID_ATTR));
+        Assert.assertEquals("TLSv1.3", req.getAttribute(Globals.SECURE_PROTOCOL_ATTR));
+        Assert.assertEquals(Integer.valueOf(256), req.getAttribute(Globals.KEY_SIZE_ATTR));
+    }
+
+
+    @Test
+    public void testNoCertHeaders() throws Exception {
+        // Use a fresh request to avoid stale headers from singleton
+        SSLValve freshValve = new SSLValve();
+        Valve freshNext = EasyMock.createMock(Valve.class);
+        freshValve.setNext(freshNext);
+
+        Connector connector = EasyMock.createNiceMock(Connector.class);
+        EasyMock.replay(connector);
+        MockRequest freshRequest = new MockRequest(connector);
+
+        freshNext.invoke(freshRequest, null);
+        EasyMock.replay(freshNext);
+
+        // No cert headers set, only an unrelated one
+        freshRequest.setHeader("some_unrelated_header", "value");
+
+        freshValve.invoke(freshRequest, null);
+
+        EasyMock.verify(freshNext);
+        Assert.assertNull(freshRequest.getAttribute(Globals.CERTIFICATES_ATTR));
+    }
+
+
+    @Test
+    public void testEscapedCertTakesPriority() throws Exception {
+        setUp();
+        String escapedCert = certificateEscaped();
+        mockRequest.setHeader(valve.getSslClientEscapedCertHeader(), escapedCert);
+        mockRequest.setHeader(valve.getSslClientCertHeader(), "short");
+
+        valve.invoke(mockRequest, null);
+
+        assertCertificateParsed();
+    }
 }
