@@ -6,16 +6,21 @@ import org.apache.coyote.http11.OutputFilter;
 /**
  * Factory interface for creating output filters.
  * Allows pluggable compression and transformation filters.
+ * <p>
+ * Implementations hold their own configuration as JavaBean properties.
+ * Which can be set via nested elements in server.xml.
  */
 public interface OutputFilterFactory {
 
     /**
-     * Create a new output filter instance configured for the given protocol.
+     * Create a new output filter instance.
+     * <p>
+     * The factory is expected to configure the filter using its own
+     * JavaBean properties rather than relying on external configuration
      *
-     * @param protocol The HTTP protocol instance providing configuration
      * @return A configured output filter ready for use
      */
-    OutputFilter createFilter(AbstractHttp11Protocol<?> protocol);
+    OutputFilter createFilter();
 
     /**
      * Get the encoding name for this filter.
