@@ -23,8 +23,10 @@ import jakarta.servlet.ServletException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.session.StandardSession;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterResponse;
 
@@ -73,6 +75,207 @@ public class TestPersistentValve {
     }
 
 
+    @Test
+    public void testFilterMatchBypassesSession() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        Request request = new TesterRequest();
+        Response response = new TesterResponse();
+        CountingValve countingValve = new CountingValve();
+
+        // Set a filter that matches the default TesterRequest URI
+        // TesterRequest.getDecodedRequestURI() returns /level1/level2/foo.html
+        pv.setFilter(".*\\.html");
+        request.setRequestedSessionId("1234");
+
+        pv.setContainer(request.getContext());
+        pv.setNext(countingValve);
+        pv.init();
+
+        pv.invoke(request, response);
+
+        // The request should have gone through (bypassing session handling)
+        Assert.assertEquals(1, countingValve.getCount());
+    }
+
+
+    @Test
+    public void testFilterNoMatchProcesses() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        Request request = new TesterRequest();
+        Response response = new TesterResponse();
+        CountingValve countingValve = new CountingValve();
+
+        // Set a filter that does NOT match the default TesterRequest URI
+        pv.setFilter(".*\\.css");
+
+        pv.setContainer(request.getContext());
+        pv.setNext(countingValve);
+        pv.init();
+
+        pv.invoke(request, response);
+
+        // The request should still proceed (but through session handling path)
+        Assert.assertEquals(1, countingValve.getCount());
+    }
+
+
+    @Test
+    public void testGetSetFilter() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        pv.setContainer(new TesterRequest().getContext());
+
+        Assert.assertNull(pv.getFilter());
+
+        pv.setFilter(".*\\.jpg");
+        Assert.assertEquals(".*\\.jpg", pv.getFilter());
+    }
+
+
+    @Test
+    public void testFilterNull() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        pv.setContainer(new TesterRequest().getContext());
+
+        pv.setFilter(".*\\.jpg");
+        Assert.assertNotNull(pv.getFilter());
+
+        pv.setFilter(null);
+        Assert.assertNull(pv.getFilter());
+    }
+
+
+    @Test
+    public void testFilterEmpty() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        pv.setContainer(new TesterRequest().getContext());
+
+        pv.setFilter(".*\\.jpg");
+        Assert.assertNotNull(pv.getFilter());
+
+        pv.setFilter("");
+        Assert.assertNull(pv.getFilter());
+    }
+
+
+    @Test
+    public void testGetSetSemaphoreProperties() throws Exception {
+        PersistentValve pv = new PersistentValve();
+
+        // semaphoreFairness
+        Assert.assertTrue(pv.isSemaphoreFairness());
+        pv.setSemaphoreFairness(false);
+        Assert.assertFalse(pv.isSemaphoreFairness());
+
+        // semaphoreBlockOnAcquire
+        Assert.assertTrue(pv.isSemaphoreBlockOnAcquire());
+        pv.setSemaphoreBlockOnAcquire(false);
+        Assert.assertFalse(pv.isSemaphoreBlockOnAcquire());
+
+        // semaphoreAcquireUninterruptibly
+        Assert.assertTrue(pv.isSemaphoreAcquireUninterruptibly());
+        pv.setSemaphoreAcquireUninterruptibly(false);
+        Assert.assertFalse(pv.isSemaphoreAcquireUninterruptibly());
+    }
+
+
+    @Test
+    public void testIsSessionStaleExpired() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        StandardSession session = new StandardSession(null);
+        session.setId("test-stale", false);
+        session.setValid(true);
+        session.setMaxInactiveInterval(1); // 1 second timeout
+
+        // Set creation time to a long time ago so the session appears idle
+        session.setCreationTime(
+                System.currentTimeMillis() - (60 * 1000)); // 60 seconds ago
+
+        Assert.assertTrue("Session should be stale",
+                pv.isSessionStale(session, System.currentTimeMillis()));
+    }
+
+
+    @Test
+    public void testIsSessionStaleValid() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        StandardSession session = new StandardSession(null);
+        session.setId("test-valid", false);
+        session.setValid(true);
+        session.setMaxInactiveInterval(3600); // 1 hour timeout
+
+        // Session was just created so its access times are current
+        session.setCreationTime(System.currentTimeMillis());
+
+        Assert.assertFalse("Session should not be stale",
+                pv.isSessionStale(session, System.currentTimeMillis()));
+    }
+
+
+    @Test
+    public void testIsSessionStaleNoTimeout() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        StandardSession session = new StandardSession(null);
+        session.setId("test-notimeout", false);
+        session.setValid(true);
+        session.setMaxInactiveInterval(-1); // No timeout
+
+        Assert.assertFalse("Session with no timeout should not be stale",
+                pv.isSessionStale(session, System.currentTimeMillis()));
+    }
+
+
+    @Test
+    public void testIsSessionStaleNullSession() throws Exception {
+        PersistentValve pv = new PersistentValve();
+
+        Assert.assertFalse("Null session should not be stale",
+                pv.isSessionStale(null, System.currentTimeMillis()));
+    }
+
+
+    @Test
+    public void testRequestWithoutSessionNoFilter() throws Exception {
+        PersistentValve pv = new PersistentValve();
+
+        // With no filter set, no request should be considered "without session"
+        Assert.assertFalse(pv.isRequestWithoutSession("/index.html"));
+        Assert.assertFalse(pv.isRequestWithoutSession("/style.css"));
+    }
+
+
+    @Test
+    public void testRequestWithoutSessionWithFilter() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        pv.setContainer(new TesterRequest().getContext());
+
+        pv.setFilter(".*\\.(css|js|png|jpg)");
+
+        Assert.assertTrue(pv.isRequestWithoutSession("/style.css"));
+        Assert.assertTrue(pv.isRequestWithoutSession("/app.js"));
+        Assert.assertTrue(pv.isRequestWithoutSession("/logo.png"));
+        Assert.assertFalse(pv.isRequestWithoutSession("/index.html"));
+        Assert.assertFalse(pv.isRequestWithoutSession("/api/data"));
+    }
+
+
+    @Test
+    public void testNoSessionIdInvoke() throws Exception {
+        PersistentValve pv = new PersistentValve();
+        Request request = new TesterRequest();
+        Response response = new TesterResponse();
+        CountingValve countingValve = new CountingValve();
+
+        // Don't set session id — null by default
+        pv.setContainer(request.getContext());
+        pv.setNext(countingValve);
+        pv.init();
+
+        pv.invoke(request, response);
+
+        Assert.assertEquals(1, countingValve.getCount());
+    }
+
+
     private static class TesterValve extends ValveBase {
 
         private static AtomicInteger maximumConcurrency = new AtomicInteger();
@@ -92,6 +295,22 @@ public class TestPersistentValve {
 
         public int getMaximumConcurrency() {
             return maximumConcurrency.get();
+        }
+    }
+
+
+    private static class CountingValve extends ValveBase {
+
+        private final AtomicInteger count = new AtomicInteger(0);
+
+        @Override
+        public void invoke(Request request, Response response)
+                throws IOException, ServletException {
+            count.incrementAndGet();
+        }
+
+        public int getCount() {
+            return count.get();
         }
     }
 }
