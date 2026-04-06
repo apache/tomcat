@@ -386,7 +386,9 @@ public class CompressionConfig {
     /**
      * Negotiate the best encoding from Accept-Encoding entries against available factories.
      */
-    private OutputFilterFactory negotiateAcceptEncoding(List<OutputFilterFactory> factories, List<AcceptEncoding> acceptEncodings) {
+    private OutputFilterFactory negotiateAcceptEncoding(
+            List<OutputFilterFactory> factories,
+            List<AcceptEncoding> acceptEncodings) {
         OutputFilterFactory bestFactory = null;
         double bestQuality = 0;
         int bestServerPriority = Integer.MAX_VALUE;

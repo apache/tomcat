@@ -474,7 +474,10 @@ public class Catalina {
 
         digester.addObjectCreate("Server/Service/Connector/OutputFilterFactory", null, "className");
         digester.addSetProperties("Server/Service/Connector/OutputFilterFactory");
-        digester.addSetNext("Server/Service/Connector/OutputFilterFactory", "addOutputFilterFactory", "org.apache.coyote.http11.filters.OutputFilterFactory");
+        digester.addSetNext(
+                "Server/Service/Connector/OutputFilterFactory",
+                "addOutputFilterFactory",
+                "org.apache.coyote.http11.filters.OutputFilterFactory");
 
         // Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));

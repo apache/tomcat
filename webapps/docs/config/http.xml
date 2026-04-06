@@ -423,7 +423,8 @@
       compression may be used.
       The default value is
       <code>
-      text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+      text/html,text/xml,text/plain,text/css,
+      text/javascript,application/javascript,application/json,application/xml
       </code>.
       If you specify a type explicitly, the default is over-ridden.</p>
     </attribute>
@@ -459,25 +460,21 @@
       Units are in bytes.</p>
     </attribute>
 
-    <attribute name="gzipLevel" required="false">
-      <p>If <strong>compression</strong> is set to "on" or "force" then this
-      attribute may be used to configure the compression level for gzip
-      compression. Valid values are <code>-1</code> (default compression)
-      or <code>1</code> through <code>9</code> where <code>1</code> gives
-      beset speed and <code>9</code> gives best compression ratio. If not
-      specified, this attribute defaults to <code>-1</code> (JDK default compression).</p>
-    </attribute>
+    <p>Advanced gzip settings such as compression level and internal buffer
+    size are configured via a nested
+    <code>&lt;OutputFilterFactory&gt;</code> element inside the
+    <code>&lt;Connector&gt;</code>
+    when <strong>compression</strong> is enabled.</p>
+    <pre>
+      &lt;Connector ... compression="on"&gt;
+        &lt;OutputFilterFactory
+            className="org.apache.coyote.http11.filters.GzipOutputFilterFactory"
+            level="-1"
+            bufferSize="512"/&gt;
+      &lt;/Connector&gt;
+    </pre>
 
-    <attribute name="gzipBufferSize" required="false">
-      <p>If <strong>compression</strong> is set to "on" or "force" then this
-        attribute may be used to configure the internal buffer size (in bytes)
-        for the gzip compression stream. Larger buffers can improve compression
-        ratios and throughput for bulk responses, while smaller buffers reduce
-        latency for streaming scenarios. If not specified, this attribute
-        defaults to <code>512</code> bytes. </p>
-    </attribute>
-
-    <attribute name="noCompressionEncodings" requried="false">
+    <attribute name="noCompressionEncodings" required="false">
       <p>A comma-separated list of content encodings that indicate
       already-compressed content. When the response already has a
       <code>Content-Encoding</code> header with one of these values, compression
@@ -485,7 +482,7 @@
       used if <strong>compression</strong> is set to <code>on</code> or
       <code>force</code>.</p>
       <p>If not specified, the default values is
-      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      <code>br,compress,dcb,dcz,deflate,gzip,pack200-gzip,zstd</code>, which
       includes all commonly used compression algorithms. This can be customized
       to support custom compression algorithms when using a custom
       <code>outputFilterFactory</code>.</p>
@@ -683,7 +680,7 @@
       used.</p>
     </attribute>
 
-    <attribute name="noCompressionEncodings" requried="false">
+    <attribute name="noCompressionEncodings" required="false">
       <p>A comma-separated list of content encodings that indicate
       already-compressed content. When the response already has a
       <code>Content-Encoding</code> header with one of these values, compression
@@ -691,7 +688,7 @@
       used if <strong>compression</strong> is set to <code>on</code> or
       <code>force</code>.</p>
       <p>If not specified, the default values is
-      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      <code>br,compress,dcb,dcz,deflate,gzip,pack200-gzip,zstd</code>, which
       includes all commonly used compression algorithms.</p>
     </attribute>
 

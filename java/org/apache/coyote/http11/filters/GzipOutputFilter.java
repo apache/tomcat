@@ -169,7 +169,8 @@ public class GzipOutputFilter implements OutputFilter {
      */
     public void setBufferSize(int bufferSize) {
         if (bufferSize <= 0) {
-            throw new IllegalArgumentException(sm.getString("gzipOutputFilter.invalidBufferSize", Integer.valueOf(bufferSize)));
+            throw new IllegalArgumentException(
+                    sm.getString("gzipOutputFilter.invalidBufferSize", Integer.valueOf(bufferSize)));
         }
         this.bufferSize = bufferSize;
     }
