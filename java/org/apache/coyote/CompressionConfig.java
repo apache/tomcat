@@ -18,16 +18,10 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -49,11 +43,6 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
-    private Set<String> noCompressionEncodings = new HashSet<String>(Arrays.asList(
-        "br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"
-    ));
-    private int gzipLevel = -1;
-    private int gzipBufferSize = GzipOutputFilter.DEFAULT_BUFFER_SIZE;
     private Set<String> noCompressionEncodings =
             new HashSet<>(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"));
 
@@ -68,7 +57,7 @@ public class CompressionConfig {
      * When content is already encoded with one of these encodings, compression will not be applied
      * to prevent double compression.
      *
-     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
+     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.deflate")
      */
     public void setNoCompressionEncodings(String encodings) {
         Set<String> newEncodings = new HashSet<>();
@@ -76,7 +65,7 @@ public class CompressionConfig {
             StringTokenizer tokens = new StringTokenizer(encodings, ",");
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
-                if(!token.isEmpty()) {
+                if (!token.isEmpty()) {
                     newEncodings.add(token);
                 }
             }
@@ -199,64 +188,6 @@ public class CompressionConfig {
     }
 
     /**
-     * Set the compression level for gzip.
-     * @param gzipLevel The compression level. Valid values are -1 (default), or 1-9.
-     *                  -1 uses the default compression level.
-     *                  1 gives best speed, 9 gives best compression.
-     */
-    public void setGzipLevel(int gzipLevel) {
-        if (gzipLevel < -1 || gzipLevel > 9) {
-            throw new IllegalArgumentException(sm.getString("compressionConfig.invalidGzipLevel", Integer.valueOf(gzipLevel)));
-        }
-        this.gzipLevel = gzipLevel;
-    }
-
-    public int getGzipLevel() {
-        return gzipLevel;
-    }
-
-    /**
-     * Set the buffer size for gzip compression stream.
-     *
-     * @param gzipBufferSize The buffer size in bytes. Must be positive.
-     */
-    public void setGzipBufferSize(int gzipBufferSize) {
-        if (gzipBufferSize <= 0) {
-            throw new IllegalArgumentException(sm.getString("compressionConfig.invalidGzipBufferSize", Integer.valueOf(gzipBufferSize)));
-        }
-        this.gzipBufferSize = gzipBufferSize;
-    }
-
-    public int getGzipBufferSize() {
-        return gzipBufferSize;
-    }
-
-    public String getNoCompressionEncodings() {
-        return String.join(",", noCompressionEncodings);
-    }
-
-    /**
-     * Set the list of content encodings that indicate already-compressed content.
-     * When content is already encoded with one of these encodings, compression will not be applied
-     * to prevent double compression.
-     *
-     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
-     */
-    public void setNoCompressionEncodings(String encodings) {
-        Set<String> newEncodings = new HashSet<String>();
-        if (encodings != null && !encodings.isEmpty()) {
-            StringTokenizer tokens = new StringTokenizer(encodings, ",");
-            while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                if(!token.isEmpty()) {
-                    newEncodings.add(token);
-                }
-            }
-        }
-        this.noCompressionEncodings = newEncodings;
-    }
-
-    /**
      * Set Minimum size to trigger compression.
      *
      * @param compressionMinSize The minimum content length required for compression in bytes
@@ -265,34 +196,25 @@ public class CompressionConfig {
         this.compressionMinSize = compressionMinSize;
     }
 
-
     /**
-     * Determines if gzip compression should be enabled for the given response and if it is, sets any necessary headers to
-     * mark it as such.
+     * Determines if compression should be enabled for the given response using the
+     * registered output filter factories. Performs Accept-Encoding negotiation to
+     * select the best matching factory.
      *
-     * @param request  The request that triggered the response
-     * @param response The response to consider compressing
+     * @param request   The request that triggered the response
+     * @param response  The response to consider compressing
+     * @param factories The list of available output filter factories (in server priority order)
      *
-     * @return {@code true} if compression was enabled for the given response, otherwise {@code false}
+     * @return The selected factory if compression should be used, or {@code null} if not
      */
-    public boolean useCompression(Request request, Response response) {
-        return this.useCompression(request, response, "gzip");
-    }
+    public OutputFilterFactory useCompression(Request request, Response response, List<OutputFilterFactory> factories) {
+        if (factories == null || factories.isEmpty()) {
+            return null;
+        }
 
-    /**
-     * Determines if compression should be enabled for the given response and if it is, sets any necessary headers to
-     * mark it as such.
-     *
-     * @param request  The request that triggered the response
-     * @param response The response to consider compressing
-     * @param encoding The compression encoding to use (e.g., "gzip", "br", "deflate", "zstd")
-     *
-     * @return {@code true} if compression was enabled for the given response, otherwise {@code false}
-     */
-    public boolean useCompression(Request request, Response response, String encoding) {
         // Check if compression is enabled
         if (compressionLevel == 0) {
-            return false;
+            return null;
         }
 
         boolean useTransferEncoding = false;
@@ -312,14 +234,14 @@ public class CompressionConfig {
                 // Because we are using StringReader, any exception here is a
                 // Tomcat bug.
                 log.warn(sm.getString("compressionConfig.ContentEncodingParseFail"), ioe);
-                return false;
+                return null;
             }
             if (tokens.contains("identity")) {
                 // If identity, do not do content modifications
                 useContentEncoding = false;
             } else if (noCompressionEncodings.stream().anyMatch(tokens::contains)) {
                 // Content should not be compressed twice
-                return false;
+                return null;
             }
         }
 
@@ -328,75 +250,73 @@ public class CompressionConfig {
             // Check if the response is of sufficient length to trigger the compression
             long contentLength = response.getContentLengthLong();
             if (contentLength != -1 && contentLength < compressionMinSize) {
-                return false;
+                return null;
             }
 
             // Check for compatible MIME-TYPE
             String[] compressibleMimeTypes = getCompressibleMimeTypes();
             if (compressibleMimeTypes != null &&
                     !startsWithStringArray(compressibleMimeTypes, response.getContentType())) {
-                return false;
+                return null;
             }
         }
 
+        // Try TE header first
+        OutputFilterFactory teFactory = null;
         Enumeration<String> headerValues = request.getMimeHeaders().values("TE");
-        boolean foundEncoding = false;
         // TE and accept-encoding seem to have equivalent syntax
-        while (!foundEncoding && headerValues.hasMoreElements()) {
+        while (headerValues.hasMoreElements()) {
             List<TE> tes;
             try {
                 tes = TE.parse(new StringReader(headerValues.nextElement()));
             } catch (IOException ioe) {
                 // If there is a problem reading the header, disable compression
-                return false;
+                return null;
             }
 
-            for (TE te : tes) {
-                if (encoding.equalsIgnoreCase(te.getEncoding())) {
-                    useTransferEncoding = true;
-                    foundEncoding = true;
-                    break;
-                }
+            teFactory = negotiateTE(factories, tes);
+            if(teFactory != null) {
+                useTransferEncoding = true;
+                break;
             }
         }
 
         // Check if the resource has a strong ETag
         String eTag = responseHeaders.getHeader("ETag");
-        if (!useTransferEncoding && eTag != null && !eTag.trim().startsWith("W/")) {
+        if (teFactory == null && eTag != null && !eTag.trim().startsWith("W/")) {
             // Has an ETag that doesn't start with "W/..." so it must be a
             // strong ETag
-            return false;
+            return null;
         }
 
-        if (useContentEncoding && !useTransferEncoding) {
-            // If processing reaches this far, the response might be compressed.
-            // Therefore, set the Vary header to keep proxies happy
+        OutputFilterFactory selectedFactory = teFactory;
+
+        if (useContentEncoding && selectedFactory == null) {
+            // Set Vary header before checking Accept-Encoding
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
             // Check if user-agent supports the specified encoding
             // Only interested in whether the encoding is supported. Other
             // encodings and weights can be ignored.
             headerValues = request.getMimeHeaders().values("accept-encoding");
-            while (!foundEncoding && headerValues.hasMoreElements()) {
+            while (headerValues.hasMoreElements()) {
                 List<AcceptEncoding> acceptEncodings;
                 try {
                     acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
                 } catch (IOException ioe) {
                     // If there is a problem reading the header, disable compression
-                    return false;
+                    return null;
                 }
 
-                for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                    if (encoding.equalsIgnoreCase(acceptEncoding.getEncoding())) {
-                        foundEncoding = true;
-                        break;
-                    }
+                selectedFactory = negotiateAcceptEncoding(factories, acceptEncodings);
+                if (selectedFactory != null) {
+                    break;
                 }
             }
         }
 
-        if (!foundEncoding) {
-            return false;
+        if (selectedFactory == null) {
+            return null;
         }
 
         // If force mode, the browser checks are skipped
@@ -408,13 +328,14 @@ public class CompressionConfig {
                 if (userAgentValueMB != null) {
                     String userAgentValue = userAgentValueMB.toString();
                     if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
-                        return false;
+                        return null;
                     }
                 }
             }
         }
 
         // All checks have passed. Compression is enabled.
+        String encoding = selectedFactory.getEncodingName();
 
         // Compressed content length is unknown so mark it as such.
         response.setContentLength(-1);
@@ -426,9 +347,74 @@ public class CompressionConfig {
             responseHeaders.addValue("Content-Encoding").setString(encoding);
         }
 
-        return true;
+        return selectedFactory;
     }
 
+    /**
+     * Negotiate the best encoding from TE header entries against available factories
+     */
+    private OutputFilterFactory negotiateTE(List<OutputFilterFactory> factories, List<TE> entries) {
+        OutputFilterFactory bestFactory = null;
+        double bestQuality = 0;
+        int bestServerPriority = Integer.MAX_VALUE;
+
+        for (int i = 0; i < factories.size(); i++) {
+            OutputFilterFactory factory = factories.get(i);
+            String factoryEncoding = factory.getEncodingName().toLowerCase(Locale.ENGLISH);
+
+            for (TE entry : entries) {
+                String entryEncoding = entry.getEncoding().toLowerCase(Locale.ENGLISH);
+                double quality = entry.getQuality();
+
+                if (quality <= 0) {
+                    continue;
+                }
+
+                if (factoryEncoding.equals(entryEncoding) || "*".equals(entryEncoding)) {
+                    if (quality > bestQuality || (quality == bestQuality && i < bestServerPriority)) {
+                        bestFactory = factory;
+                        bestQuality = quality;
+                        bestServerPriority = i;
+                    }
+                }
+            }
+        }
+
+        return bestFactory;
+    }
+
+    /**
+     * Negotiate the best encoding from Accept-Encoding entries against available factories.
+     */
+    private OutputFilterFactory negotiateAcceptEncoding(List<OutputFilterFactory> factories, List<AcceptEncoding> acceptEncodings) {
+        OutputFilterFactory bestFactory = null;
+        double bestQuality = 0;
+        int bestServerPriority = Integer.MAX_VALUE;
+
+        for (int i = 0; i < factories.size(); i++) {
+            OutputFilterFactory factory = factories.get(i);
+            String factoryEncoding = factory.getEncodingName().toLowerCase(Locale.ENGLISH);
+
+            for (AcceptEncoding ae : acceptEncodings) {
+                String aeEncoding = ae.getEncoding().toLowerCase(Locale.ENGLISH);
+                double quality = ae.getQuality();
+
+                if (quality <= 0) {
+                    continue;
+                }
+
+                if (factoryEncoding.equals(aeEncoding) || "*".equals(aeEncoding)) {
+                    if (quality > bestQuality || (quality == bestQuality && i < bestServerPriority)) {
+                        bestFactory = factory;
+                        bestQuality = quality;
+                        bestServerPriority = i;
+                    }
+                }
+            }
+        }
+
+        return bestFactory;
+    }
 
     /**
      * Checks if any entry in the string array starts with the specified value
