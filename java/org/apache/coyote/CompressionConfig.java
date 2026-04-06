@@ -274,7 +274,7 @@ public class CompressionConfig {
                 return null;
             }
 
-            teFactory = negotiateTE(factories, tes);
+            teFactory = EncodingNegotiator.negotiateTE(factories, tes);
             if(teFactory != null) {
                 useTransferEncoding = true;
                 break;
@@ -308,7 +308,7 @@ public class CompressionConfig {
                     return null;
                 }
 
-                selectedFactory = negotiateAcceptEncoding(factories, acceptEncodings);
+                selectedFactory = EncodingNegotiator.negotiateAcceptEncoding(factories, acceptEncodings);
                 if (selectedFactory != null) {
                     break;
                 }
@@ -348,74 +348,6 @@ public class CompressionConfig {
         }
 
         return selectedFactory;
-    }
-
-    /**
-     * Negotiate the best encoding from TE header entries against available factories
-     */
-    private OutputFilterFactory negotiateTE(List<OutputFilterFactory> factories, List<TE> entries) {
-        OutputFilterFactory bestFactory = null;
-        double bestQuality = 0;
-        int bestServerPriority = Integer.MAX_VALUE;
-
-        for (int i = 0; i < factories.size(); i++) {
-            OutputFilterFactory factory = factories.get(i);
-            String factoryEncoding = factory.getEncodingName().toLowerCase(Locale.ENGLISH);
-
-            for (TE entry : entries) {
-                String entryEncoding = entry.getEncoding().toLowerCase(Locale.ENGLISH);
-                double quality = entry.getQuality();
-
-                if (quality <= 0) {
-                    continue;
-                }
-
-                if (factoryEncoding.equals(entryEncoding) || "*".equals(entryEncoding)) {
-                    if (quality > bestQuality || (quality == bestQuality && i < bestServerPriority)) {
-                        bestFactory = factory;
-                        bestQuality = quality;
-                        bestServerPriority = i;
-                    }
-                }
-            }
-        }
-
-        return bestFactory;
-    }
-
-    /**
-     * Negotiate the best encoding from Accept-Encoding entries against available factories.
-     */
-    private OutputFilterFactory negotiateAcceptEncoding(
-            List<OutputFilterFactory> factories,
-            List<AcceptEncoding> acceptEncodings) {
-        OutputFilterFactory bestFactory = null;
-        double bestQuality = 0;
-        int bestServerPriority = Integer.MAX_VALUE;
-
-        for (int i = 0; i < factories.size(); i++) {
-            OutputFilterFactory factory = factories.get(i);
-            String factoryEncoding = factory.getEncodingName().toLowerCase(Locale.ENGLISH);
-
-            for (AcceptEncoding ae : acceptEncodings) {
-                String aeEncoding = ae.getEncoding().toLowerCase(Locale.ENGLISH);
-                double quality = ae.getQuality();
-
-                if (quality <= 0) {
-                    continue;
-                }
-
-                if (factoryEncoding.equals(aeEncoding) || "*".equals(aeEncoding)) {
-                    if (quality > bestQuality || (quality == bestQuality && i < bestServerPriority)) {
-                        bestFactory = factory;
-                        bestQuality = quality;
-                        bestServerPriority = i;
-                    }
-                }
-            }
-        }
-
-        return bestFactory;
     }
 
     /**
