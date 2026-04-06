@@ -2281,12 +2281,14 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     public static class MockOutputFilterFactory implements OutputFilterFactory {
 
-        public OutputFilter createFilter(AbstractHttp11Protocol<?> protocol) {
+        @Override
+        public OutputFilter createFilter() {
             return null;
         }
 
+        @Override
         public String getEncodingName() {
-            return "";
+            return "mock";
         }
     }
 }

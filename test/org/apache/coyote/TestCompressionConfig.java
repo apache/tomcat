@@ -22,6 +22,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.zip.Deflater;
 
+import org.apache.coyote.http11.OutputFilter;
+import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,19 +98,21 @@ public class TestCompressionConfig {
             response.getMimeHeaders().addValue("ETag").setString(eTag);
         }
 
-        boolean useCompression = compressionConfig.useCompression(request, response, "gzip");
-        Assert.assertEquals(compress, Boolean.valueOf(useCompression));
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory result = compressionConfig.useCompression(request, response, factories);
+        Assert.assertEquals(compress.booleanValue(), result != null);
 
         if (useTE.booleanValue()) {
             Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
-            if (useCompression) {
+            if (result != null) {
                 Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Transfer-Encoding"));
             } else {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
             }
         } else {
             Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
-            if (useCompression) {
+            if (result != null) {
                 Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Content-Encoding"));
             } else {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
@@ -129,41 +135,22 @@ public class TestCompressionConfig {
     }
 
     @Test
-    public void testGzipLevelConfiguration() {
-        CompressionConfig config = new CompressionConfig();
+    public void testGzipOutputFilterFactoryJavaBeanProperties() {
+        GzipOutputFilterFactory factory = new GzipOutputFilterFactory();
 
-        Assert.assertEquals(-1, config.getGzipLevel());
+        Assert.assertEquals(-1, factory.getLevel());
+        Assert.assertEquals(GzipOutputFilter.DEFAULT_BUFFER_SIZE, factory.getBufferSize());
+        Assert.assertEquals("gzip", factory.getEncodingName());
 
-        config.setGzipLevel(Deflater.BEST_SPEED);
-        Assert.assertEquals(Deflater.BEST_SPEED, config.getGzipLevel());
+        factory.setLevel(6);
+        factory.setBufferSize(1024);
 
-        config.setGzipLevel(Deflater.BEST_COMPRESSION);
-        Assert.assertEquals(Deflater.BEST_COMPRESSION, config.getGzipLevel());
-    }
+        Assert.assertEquals(6, factory.getLevel());
+        Assert.assertEquals(1024, factory.getBufferSize());
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidGzipLevelLow() {
-        new CompressionConfig().setGzipLevel(-2);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidGzipLevelHigh() {
-        new CompressionConfig().setGzipLevel(10);
-    }
-
-    @Test
-    public void testGzipBufferSizeConfiguration() {
-        CompressionConfig config = new CompressionConfig();
-
-        Assert.assertEquals(512, config.getGzipBufferSize());
-
-        config.setGzipBufferSize(1024);
-        Assert.assertEquals(1024, config.getGzipBufferSize());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidGzipBufferSize() {
-        new CompressionConfig().setGzipBufferSize(0);
+        OutputFilter filter = factory.createFilter();
+        Assert.assertNotNull(filter);
+        Assert.assertTrue(filter instanceof GzipOutputFilter);
     }
 
     @Test
@@ -175,7 +162,123 @@ public class TestCompressionConfig {
             .anyMatch(encodings::contains));
 
         config.setNoCompressionEncodings("br");
-        Assert.assertTrue(encodings.contains("br"));
-        Assert.assertFalse(encodings.contains("gzip"));
+        String newEncodings = config.getNoCompressionEncodings();
+        Assert.assertTrue(newEncodings.contains("br"));
+        Assert.assertFalse(newEncodings.contains("gzip"));
+    }
+
+    @Test
+    public void testNegotiationQualityFactor() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        // Create a dummy "deflate" factory for testing
+        OutputFilterFactory deflateFactory = new OutputFilterFactory() {
+            public OutputFilter createFilter() {
+                return new GzipOutputFilter();
+            }
+
+            public String getEncodingName() {
+                return "deflate";
+            }
+        };
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory()); // server priority 0
+        factories.add(deflateFactory);                // server priority 1
+
+        // Client prefers deflate over gzip
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("gzip;q=0.5, defalte;q=1.0");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNotNull(result);
+        Assert.assertEquals("deflate", result.getEncodingName());
+    }
+
+    @Test
+    public void testNegotiationServerPriority() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        OutputFilterFactory brFactory = new OutputFilterFactory() {
+            @Override
+            public OutputFilter createFilter() {
+                return new GzipOutputFilter();
+            }
+
+            @Override
+            public String getEncodingName() {
+                return "br";
+            }
+        };
+
+        // brotil first (server priority), then gzip
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(brFactory);
+        factories.add(new GzipOutputFilterFactory());
+
+        // Client accepts both with equal quality
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("gzip, br");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNotNull(result);
+        // Server priority wins on equal quality
+        Assert.assertEquals("br", result.getEncodingName());
+    }
+
+    @Test
+    public void testNegotiationWildcard() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+
+        // Client accepts any encoding
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("*");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNotNull(result);
+        Assert.assertEquals("gzip", result.getEncodingName());
+    }
+
+    @Test
+    public void testNegotiationNoMatch() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+
+        // Client only accepts brotil, but server only has gzip
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("br");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testNegotiationQZero() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+
+        // Client explicitly rejects gzip with q=0
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("gzip;q=0");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNull(result);
     }
 }
