@@ -1235,6 +1235,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
             resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return;
         }
         deleteResource(path, req, resp, true);
     }
