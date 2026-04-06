@@ -472,6 +472,10 @@ public class Catalina {
         digester.addSetNext("Server/Service/Connector/UpgradeProtocol", "addUpgradeProtocol",
                 "org.apache.coyote.UpgradeProtocol");
 
+        digester.addObjectCreate("Server/Service/Connector/OutputFilterFactory", null, "className");
+        digester.addSetProperties("Server/Service/Connector/OutputFilterFactory");
+        digester.addSetNext("Server/Service/Connector/OutputFilterFactory", "addOutputFilterFactory", "org.apache.coyote.http11.filters.OutputFilterFactory");
+
         // Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));

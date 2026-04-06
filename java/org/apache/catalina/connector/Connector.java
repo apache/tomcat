@@ -34,6 +34,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.AprStatus;
@@ -909,6 +910,12 @@ public class Connector extends LifecycleMBeanBase {
         return protocolHandler.findUpgradeProtocols();
     }
 
+
+    public void addOutputFilterFactory(OutputFilterFactory factory) {
+        if (protocolHandler instanceof AbstractHttp11Protocol) {
+            ((AbstractHttp11Protocol<?>) protocolHandler).addOutputFilterFactory(factory);
+        }
+    }
 
     public String getEncodedReverseSolidusHandling() {
         return encodedReverseSolidusHandling.getValue();
