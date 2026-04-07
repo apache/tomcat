@@ -366,7 +366,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             throw new IllegalArgumentException(
                     sm.getString("encryptInterceptor.algorithm.unsupported", algorithm));
 
-        } else if ("GCM".equalsIgnoreCase(algorithmMode) && "NOPADDING".equals(algorithmPadding)) {
+        } else if ("GCM".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) {
             // Needs a specialised encryption manager to handle the differences between GCM and other modes
             return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
         }
