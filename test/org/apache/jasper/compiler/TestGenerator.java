@@ -22,9 +22,16 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.CodingErrorAction;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
+import org.apache.jasper.compiler.JspRuntimeContext;
+import org.apache.jasper.servlet.JspServlet;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.jsp.JspException;
@@ -826,6 +833,44 @@ public class TestGenerator extends TomcatBaseTest {
     @Test
     public void testInclude01() throws Exception {
         doTestJsp("include-01.jsp");
+    }
+
+    /*
+     * Verify that _jspx_dependants entries appear in the same order as the
+     * <%@ include file="..." %> directives in the source JSP, ensuring
+     * reproducible builds (LinkedHashMap preserves insertion order).
+     */
+    @Test
+    public void testDependantsOrder() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jsp/generator/dependants-order.jsp", body, null);
+        Assert.assertEquals(body.toString(), HttpServletResponse.SC_OK, rc);
+
+        // JSP classes are loaded by a per-JSP JasperLoader child classloader,
+        // not by the webapp classloader. Retrieve the dependants map through
+        // the JspServletWrapper, which calls getDependants() on the live
+        // servlet instance via the JspSourceDependent interface.
+        Context ctx = (Context) tomcat.getHost().findChild("/test");
+        Wrapper jspWrapper = (Wrapper) ctx.findChild("jsp");
+        JspServlet jspServlet = (JspServlet) jspWrapper.getServlet();
+        Field rctxtField = JspServlet.class.getDeclaredField("rctxt");
+        rctxtField.setAccessible(true);
+        JspRuntimeContext rctxt = (JspRuntimeContext) rctxtField.get(jspServlet);
+        Map<String,Long> dependants = rctxt.getWrapper(
+                "/jsp/generator/dependants-order.jsp").getDependants();
+
+        // Expect exactly the three fragments, in directive order: a, b, c.
+        List<String> keys = new ArrayList<>(dependants.keySet());
+        Assert.assertEquals(3, keys.size());
+        Assert.assertTrue("a.jspf should precede b.jspf in _jspx_dependants",
+                keys.indexOf("/jsp/generator/dependants-order-a.jspf") <
+                keys.indexOf("/jsp/generator/dependants-order-b.jspf"));
+        Assert.assertTrue("b.jspf should precede c.jspf in _jspx_dependants",
+                keys.indexOf("/jsp/generator/dependants-order-b.jspf") <
+                keys.indexOf("/jsp/generator/dependants-order-c.jspf"));
     }
 
     @Test
