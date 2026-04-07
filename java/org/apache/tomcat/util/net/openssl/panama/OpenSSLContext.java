@@ -1076,8 +1076,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    X509_free(cert);
                     return false;
                 }
+                X509_free(cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
                     return false;
@@ -1179,6 +1181,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             if (SSL_CTX_add0_chain_cert(state.sslCtx, certChainEntry) <= 0) {
                                 log.error(sm.getString("openssl.errorLoadingCertificateWithError",
                                         certificate.getCertificateChainFile(), OpenSSLLibrary.getLastError()));
+                                X509_free(certChainEntry);
                             }
                             certChainEntry = PEM_read_bio_X509_AUX(certificateChainBIO, MemorySegment.NULL,
                                     MemorySegment.NULL, MemorySegment.NULL);
