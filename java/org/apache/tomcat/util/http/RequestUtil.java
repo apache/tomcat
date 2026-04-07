@@ -46,7 +46,7 @@ public class RequestUtil {
     /**
      * Normalize a relative URI path. This method normalizes "/./", "/../" and "//". This method optionally normalizes
      * "\". If the input path is an attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to
-     * prevent attempts to 'escape the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
+     * prevent attempts to 'escape the root'. URI paths containing null bytes will be rejected.
      *
      * @param path             Relative path to be normalized
      * @param replaceBackSlash Should '\\' be normalized to '/'
@@ -55,7 +55,13 @@ public class RequestUtil {
      */
     public static String normalize(String path, boolean replaceBackSlash) {
 
+        // Keep behaviour aligned with CoyoteAdapter.normalize()
         if (path == null) {
+            return null;
+        }
+
+        // Reject paths containing null bytes
+        if (path.indexOf(0) > -1) {
             return null;
         }
 
