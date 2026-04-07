@@ -375,8 +375,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         try {
             return new BaseEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException ex) {
-            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithmMode),
-                    ex);
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithm), ex);
         }
     }
 
