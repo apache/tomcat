@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,24 +70,30 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         tc2.join();
         tc3.join();
         tc4.join();
-        Assert.assertEquals(200, tc1.results[24]); // only 25 requests made in 5 seconds, all allowed
+        // only 25 requests made in 5 seconds, all allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc1.results[24]);
 
-        Assert.assertEquals(200, tc2.results[49]); // only 50 requests made in 5 seconds, all allowed
+        // only 50 requests made in 5 seconds, all allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc2.results[49]);
 
-        Assert.assertEquals(200, tc3.results[39]); // first allowedRequests allowed
+        // first allowedRequests allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc3.results[39]);
 
         if (enforce) {
-            Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
+            // subsequent requests dropped
+            Assert.assertEquals(429, tc3.results[allowedRequests]);
         } else {
-            Assert.assertEquals(200, tc3.results[allowedRequests]);
+            Assert.assertEquals(HttpServletResponse.SC_OK, tc3.results[allowedRequests]);
         }
 
-        Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
+        // first allowedRequests allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc4.results[allowedRequests - 1]);
 
         if (enforce) {
-            Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+            // subsequent requests dropped
+            Assert.assertEquals(429, tc4.results[allowedRequests]);
         } else {
-            Assert.assertEquals(200, tc4.results[allowedRequests]);
+            Assert.assertEquals(HttpServletResponse.SC_OK, tc4.results[allowedRequests]);
         }
 
         if (exposeHeaders) {
