@@ -45,11 +45,12 @@ import org.easymock.IMocksControl;
 public class TestLoadBalancerDrainingValve {
 
     @Parameters(name = "{index}: activation[{0}], validSessionID[{1}], expectInvokeNext[{2}], enableIgnore[{3}], " +
-            "queryString[{4}]")
+            "leadingSlashes[{4}], queryString[{5}]]")
     public static Collection<Object[]> parameters() {
 
         String[] jkActivations = new String[] { "ACT", "DIS" };
         Boolean[] booleans = new Boolean[] { Boolean.TRUE, Boolean.FALSE };
+        Integer[] integers = new Integer[] { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) };
         String[] queryStrings = new String[] { null, "foo=bar" };
 
         List<Object[]> parameterSets = new ArrayList<>();
@@ -58,11 +59,14 @@ public class TestLoadBalancerDrainingValve {
                 for (Boolean enableIgnore : booleans) {
                     Boolean expectInvokeNext = Boolean.valueOf(
                             "ACT".equals(jkActivation) || enableIgnore.booleanValue() || validSessionId.booleanValue());
-                    for (String queryString : queryStrings) {
-                        for (Boolean secureRequest : booleans) {
-                            for (Boolean secureSessionConfig : booleans) {
-                                parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
-                                        enableIgnore, queryString, secureRequest, secureSessionConfig });
+                    for (Integer leadingSlashes : integers) {
+                        for (String queryString : queryStrings) {
+                            for (Boolean secureRequest : booleans) {
+                                for (Boolean secureSessionConfig : booleans) {
+                                    parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
+                                            enableIgnore, leadingSlashes, queryString, secureRequest,
+                                            secureSessionConfig });
+                                }
                             }
                         }
                     }
@@ -86,12 +90,15 @@ public class TestLoadBalancerDrainingValve {
     public boolean enableIgnore;
 
     @Parameter(4)
-    public String queryString;
+    public Integer leadingSlashes;
 
     @Parameter(5)
-    public Boolean secureRequest;
+    public String queryString;
 
     @Parameter(6)
+    public Boolean secureRequest;
+
+    @Parameter(7)
     public boolean secureSessionConfig;
 
 
@@ -140,7 +147,7 @@ public class TestLoadBalancerDrainingValve {
             cookies.add(cookie);
 
             EasyMock.expect(request.getRequestedSessionId()).andStubReturn(sessionId);
-            EasyMock.expect(request.getRequestURI()).andStubReturn(requestURI);
+            EasyMock.expect(request.getRequestURI()).andStubReturn("/".repeat(leadingSlashes.intValue()) + requestURI);
             EasyMock.expect(request.getCookies()).andStubReturn(cookies.toArray(new Cookie[0]));
             EasyMock.expect(request.getContext()).andStubReturn(ctx);
             EasyMock.expect(ctx.getSessionCookieName()).andStubReturn(sessionCookieName);
