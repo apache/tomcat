@@ -2694,6 +2694,68 @@
 
 </section>
 
+<section name="Filter Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Filter Valve</strong> allows a Servlet Filter to be run as
+      part of the Valve pipeline. This enables reuse of existing Filter
+      implementations at the Valve level without duplicating their logic.</p>
+
+    <p>There are several caveats when using this Valve:</p>
+    <ul>
+      <li>A <em>separate instance</em> of the Filter class is created, distinct
+        from any instance that may be instantiated within a web application.</li>
+      <li>Calls to <code>FilterConfig.getFilterName()</code> will return
+        <code>null</code>.</li>
+      <li><code>FilterConfig.getServletContext()</code> will return the proper
+        <code>ServletContext</code> for a Valve attached to a
+        <code>&lt;Context&gt;</code>, but will return a
+        <code>ServletContext</code> of limited use for a Valve specified on an
+        <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.</li>
+      <li>The Filter <strong>MUST NOT</strong> wrap the
+        <code>ServletRequest</code> or <code>ServletResponse</code> objects, or
+        an <code>IllegalStateException</code> will be thrown.</li>
+    </ul>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Filter Valve</strong> supports the following
+      configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use. This MUST be set to
+          <strong>org.apache.catalina.valves.FilterValve</strong>.</p>
+      </attribute>
+
+      <attribute name="filterClass" required="true">
+        <p>The fully qualified class name of the <code>Filter</code>
+          implementation to use. The class must have a no-argument
+          constructor.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>The <strong>Filter Valve</strong> also supports nested
+      <code>&lt;init-param&gt;</code> elements to pass initialization
+      parameters to the Filter:</p>
+
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.FilterValve"
+        filterClass="com.example.MyFilter">
+    <init-param>
+      <param-name>myParam</param-name>
+      <param-value>myValue</param-value>
+    </init-param>
+  </Valve>]]></source>
+
+    </subsection>
+
+</section>
+
 </body>
 
 
