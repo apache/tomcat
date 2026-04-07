@@ -284,6 +284,10 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
+        by Jan Luehe. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
