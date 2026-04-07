@@ -556,7 +556,7 @@ class Generator {
         if (!dependants.isEmpty()) {
             out.printil("static {");
             out.pushIndent();
-            out.printin("_jspx_dependants = new java.util.HashMap<java.lang.String,java.lang.Long>(");
+            out.printin("_jspx_dependants = new java.util.LinkedHashMap<java.lang.String,java.lang.Long>(");
             out.print("" + dependants.size());
             out.println(");");
             for (Entry<String,Long> entry : dependants.entrySet()) {

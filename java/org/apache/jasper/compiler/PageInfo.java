@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +114,7 @@ public class PageInfo {
         this.jspPrefixMapper = new HashMap<>();
         this.xmlPrefixMapper = new HashMap<>();
         this.nonCustomTagPrefixMap = new HashMap<>();
-        this.dependants = new HashMap<>();
+        this.dependants = new LinkedHashMap<>();
         this.includePrelude = new ArrayList<>();
         this.includeCoda = new ArrayList<>();
         this.pluginDcls = new ArrayList<>();
