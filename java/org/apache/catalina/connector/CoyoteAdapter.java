@@ -1109,6 +1109,8 @@ public class CoyoteAdapter implements Adapter {
      */
     public static boolean normalize(MessageBytes uriMB, boolean allowBackslash) {
 
+        // Keep behaviour aligned with RequestUtil.normalize()
+
         ByteChunk uriBC = uriMB.getByteChunk();
         final byte[] b = uriBC.getBytes();
         final int start = uriBC.getStart();
