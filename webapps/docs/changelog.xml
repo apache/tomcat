@@ -116,6 +116,10 @@
         could appear in the access log rather than <code>?</code> when the query
         string was present but empty. (markt)
       </fix>
+      <fix>
+        Failed precondition should make WebDAV DELETE fail. <pr>982</pr>
+        submitted by Mahmoud Alarby. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
