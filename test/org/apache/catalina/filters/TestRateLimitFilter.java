@@ -23,6 +23,7 @@ import java.time.Instant;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,16 +80,22 @@ public class TestRateLimitFilter extends TomcatBaseTest {
             count++;
         }
 
-        Assert.assertEquals(200, tc1.results[24]); // only 25 requests made, all allowed
+        // only 25 requests made, all allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc1.results[24]);
 
-        Assert.assertEquals(200, tc2.results[49]); // only 25 requests made, all allowed
+        // only 25 requests made, all allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc2.results[49]);
 
-        Assert.assertEquals(200, tc3.results[allowedRequests - 1]); // first allowedRequests allowed
+        // first allowedRequests allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc3.results[allowedRequests - 1]);
 
-        Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
+        // first allowedRequests allowed
+        Assert.assertEquals(HttpServletResponse.SC_OK, tc4.results[allowedRequests - 1]);
         if (enforce) {
-            Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
-            Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+            // subsequent requests dropped
+            Assert.assertEquals(HttpServletResponse.SC_TOO_MANY_REQUESTS, tc3.results[allowedRequests]);
+            // subsequent requests dropped
+            Assert.assertEquals(HttpServletResponse.SC_TOO_MANY_REQUESTS, tc4.results[allowedRequests]);
         }
         if (exposeHeaders) {
             Assert.assertTrue(tc3.rlpHeader[24].contains("q=" + allowedRequests));
