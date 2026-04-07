@@ -143,6 +143,10 @@
         Consistently reject URIs containing <code>NULL</code> bytes when
         normalizing. (markt)
       </fix>
+      <fix>
+        Fix a few minor memory leaks on error paths reading TLS keys and
+        certificates when using FFM. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
