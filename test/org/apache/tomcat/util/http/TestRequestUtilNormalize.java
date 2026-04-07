@@ -59,6 +59,9 @@ public class TestRequestUtilNormalize {
         parameterSets.add(new String[] { "/a/b/.", "/a/b" });
         parameterSets.add(new String[] { "/a/b/../", "/a/" });
         parameterSets.add(new String[] { "/a/b/./", "/a/b/" });
+        parameterSets.add(new String[] { "/a\u0000/b/./", null });
+        parameterSets.add(new String[] { "\u0000/a/b/./", null });
+        parameterSets.add(new String[] { "/a/b/./\u0000", null });
 
         return parameterSets;
     }

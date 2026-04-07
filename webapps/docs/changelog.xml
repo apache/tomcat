@@ -139,6 +139,10 @@
         Fix various minor issues with some HTTP/2 stream error messages for
         HTTP/2. (markt)
       </fix>
+      <fix>
+        Consistently reject URIs containing <code>NULL</code> bytes when
+        normalizing. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
