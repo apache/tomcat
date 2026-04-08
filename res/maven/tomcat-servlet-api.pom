@@ -34,7 +34,7 @@
       </name>
       <url>
         http://www.apache.org/licenses/LICENSE-2.0.txt and
-        http://www.opensource.org/licenses/cddl1.txt and
+        https://opensource.org/license/CDDL-1.0 and
         https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt
       </url>
       <distribution>repo</distribution>

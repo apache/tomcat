@@ -161,6 +161,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>69993</bug>: Update the URL to the CDDL 1.0 license. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.54 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
