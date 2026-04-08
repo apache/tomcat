@@ -30,6 +30,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterResponse;
+import org.apache.tomcat.unittest.TesterResponseWithStatus;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -56,7 +57,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
             for (int j = 0; j < 256; j += 11) {
                 ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
-                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                response = new TesterResponseWithStatus();
                 expected = (i == 10 || i == 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
                 filter.doFilter(request, response, filterChain);
                 Assert.assertEquals(expected, response.getStatus());
@@ -85,7 +86,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
             for (int j = 0; j < 256; j += 11) {
                 ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
-                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                response = new TesterResponseWithStatus();
                 expected = (i != 10 && i != 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
                 filter.doFilter(request, response, filterChain);
                 Assert.assertEquals(expected, response.getStatus());
@@ -115,7 +116,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
             for (int j = 0; j < 256; j += 11) {
                 ipAddr = String.format("10.10.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
-                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                response = new TesterResponseWithStatus();
                 expected = (i != 10 && i != 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
                 filter.doFilter(request, response, filterChain);
                 Assert.assertEquals(expected, response.getStatus());
@@ -145,7 +146,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
             for (int j = 0; j < 256; j += 11) {
                 ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
-                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                response = new TesterResponseWithStatus();
                 expected = HttpServletResponse.SC_FORBIDDEN;
                 filter.doFilter(request, response, filterChain);
                 Assert.assertEquals(expected, response.getStatus());
@@ -179,7 +180,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
             for (int j = 0; j < 256; j += 11) {
                 ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
-                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                response = new TesterResponseWithStatus();
                 expected = HttpServletResponse.SC_FORBIDDEN;
                 filter.doFilter(request, response, filterChain);
                 Assert.assertEquals(expected, response.getStatus());

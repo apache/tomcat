@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.filters;
 
-import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,11 +24,9 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
-import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.ExactRateLimiter;
-import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -49,10 +45,10 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
+        tomcat.start();
 
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
-        tomcat.start();
 
         ExactRateLimiter exactRateLimiter = (ExactRateLimiter) rateLimitFilter.rateLimiter;
 
@@ -149,80 +145,26 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         return rateLimitFilter;
     }
 
-    static class TestClient extends Thread {
-        RateLimitFilter filter;
-        FilterChain filterChain;
-        String ip;
+    static class TestClient extends TesterRateLimitClientBase {
 
-        int requests;
         int timePerRequest;
 
-        int[] results;
-        volatile String[] rlpHeader;
-        volatile String[] rlHeader;
-
         TestClient(RateLimitFilter filter, FilterChain filterChain, String ip, int requests, int rps) {
-            this.filter = filter;
-            this.filterChain = filterChain;
-            this.ip = ip;
-            this.requests = requests;
+            super(filter, filterChain, ip, requests);
             this.timePerRequest = 1000 / rps;
-            this.results = new int[requests];
-            this.rlpHeader = new String[requests];
-            this.rlHeader = new String[requests];
-            super.setDaemon(true);
-            super.start();
         }
 
         @Override
-        public void run() {
-            long start = System.nanoTime();
-
-            try {
-                for (int i = 0; i < requests; i++) {
-                    MockHttpServletRequest request = new MockHttpServletRequest();
-                    request.setRemoteAddr(ip);
-                    TesterResponse response = new TesterResponseWithStatus();
-                    response.setRequest(request);
-                    filter.doFilter(request, response, filterChain);
-                    results[i] = response.getStatus();
-
-                    rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
-                    rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
-
-                    if (results[i] != 200) {
-                        break;
-                    }
-                    /*
-                     * Ensure requests are evenly spaced through time irrespective of how long each request takes to
-                     * complete. Do comparisons in milliseconds.
-                     */
-                    long expectedDuration = (i + 1) * timePerRequest;
-                    long duration = (System.nanoTime() - start) / 1000000;
-                    if (expectedDuration > duration) {
-                        sleep(expectedDuration - duration);
-                    }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        void waitForNextRequest(long start, int requestIndex) throws Exception {
+            /*
+             * Ensure requests are evenly spaced through time irrespective of how long each request takes to
+             * complete. Do comparisons in milliseconds.
+             */
+            long expectedDuration = (requestIndex + 1) * timePerRequest;
+            long duration = (System.nanoTime() - start) / 1000000;
+            if (expectedDuration > duration) {
+                sleep(expectedDuration - duration);
             }
-        }
-    }
-
-    static class TesterResponseWithStatus extends TesterResponse {
-
-        int status = 200;
-        String message = "OK";
-
-        @Override
-        public void sendError(int status, String message) throws IOException {
-            this.status = status;
-            this.message = message;
-        }
-
-        @Override
-        public int getStatus() {
-            return status;
         }
     }
 }
