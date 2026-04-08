@@ -199,6 +199,10 @@
         could appear in the access log rather than <code>?</code> when the query
         string was present but empty. (markt)
       </fix>
+      <fix>
+        Align the escaping in <code>ExtendedAccessLogValve</code> with the other
+        <code>AccessLogValve</code> implementations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
