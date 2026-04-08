@@ -599,7 +599,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                                     buf.append('?');
                                     // Don't want to write "-" if the query string is present but empty
                                     if (!query.isEmpty()) {
-                                        buf.append(request.getQueryString());
+                                        buf.append(query);
                                     }
                                 }
                             } else {
