@@ -238,7 +238,7 @@ public class HpackDecoder {
             return Hpack.STATIC_TABLE[index].name;
         } else {
             // index is 1 based
-            int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
+            int adjustedIndex = getRealIndex(index);
             Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
                 throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
@@ -259,7 +259,7 @@ public class HpackDecoder {
             addStaticTableEntry(index);
         } else {
             // index is 1 based
-            int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
+            int adjustedIndex = getRealIndex(index);
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
             }
@@ -279,14 +279,15 @@ public class HpackDecoder {
      * @return the real index into the array
      */
     int getRealIndex(int index) throws HpackException {
+        int dynamicIndex = index - Hpack.STATIC_TABLE_LENGTH;
         // The index is one based, but our table is zero based
         // Also, because of our ring buffer set up, the indexes are reversed
         // index = 1 is at position firstSlotPosition + filledSlots
-        if (index < 1 || index > filledTableSlots) {
+        if (dynamicIndex < 1 || dynamicIndex > filledTableSlots) {
             throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
                     Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));
         }
-        return (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
+        return (firstSlotPosition + (filledTableSlots - dynamicIndex)) % headerTable.length;
     }
 
     private void addStaticTableEntry(int index) throws HpackException {
