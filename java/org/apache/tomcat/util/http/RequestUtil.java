@@ -32,7 +32,7 @@ public class RequestUtil {
     /**
      * Normalize a relative URI path. This method normalizes "/./", "/../", "//" and "\". If the input path is an
      * attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to prevent attempts to 'escape
-     * the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
+     * the root'. URI paths containing null bytes will be rejected.
      *
      * @param path Relative path to be normalized
      *
