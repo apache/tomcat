@@ -1375,14 +1375,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     buf.append(request.getMethod());
                     buf.append(' ');
                     escapeAndAppend(request.getRequestURI(), buf);
-                    String query = request.getQueryString();
-                    if (query != null) {
-                        buf.append('?');
-                        // Don't want to write "-" if the query string is empty
-                        if (!query.isEmpty()) {
-                            escapeAndAppend(query, buf);
-                        }
-                    }
+                    appendQueryString(request.getQueryString(), buf, false);
                     buf.append(' ');
                     buf.append(request.getProtocol());
                 }
@@ -1694,15 +1687,19 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (request != null) {
                 query = request.getQueryString();
             }
-            if (query != null) {
-                buf.append('?');
-                // Don't want to write "-" if the query string is empty
-                if (!query.isEmpty()) {
-                    escapeAndAppend(query, buf);
-                }
-            } else {
-                buf.append('-');
+            appendQueryString(query, buf, true);
+        }
+    }
+
+    protected static void appendQueryString(String query, CharArrayWriter buf, boolean writeDashOnNull) {
+        if (query != null) {
+            buf.append('?');
+            // Don't want to write "-" if the query string is empty
+            if (!query.isEmpty()) {
+                escapeAndAppend(query, buf);
             }
+        } else if (writeDashOnNull) {
+            buf.append('-');
         }
     }
 
