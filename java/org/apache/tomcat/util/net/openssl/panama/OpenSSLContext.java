@@ -1071,11 +1071,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     if (MemorySegment.NULL.equals(cert)) {
                         log.error(sm.getString("openssl.errorLoadingCertificateWithError",
                                 certificate.getCertificateFile(), OpenSSLLibrary.getLastError()));
+                        EVP_PKEY_free(key);
                         return false;
                     }
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    EVP_PKEY_free(key);
                     X509_free(cert);
                     return false;
                 }
