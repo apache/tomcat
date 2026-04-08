@@ -389,8 +389,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":method"),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
                 }
                 break;
             }
@@ -401,8 +399,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":scheme"),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
                 }
                 break;
             }
@@ -445,8 +441,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":authority"),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
                 }
                 break;
             }
@@ -475,8 +469,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), "host"),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
                 }
                 break;
             }
