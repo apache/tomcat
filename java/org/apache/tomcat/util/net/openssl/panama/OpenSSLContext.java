@@ -1082,8 +1082,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509_free(cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    EVP_PKEY_free(key);
                     return false;
                 }
+                EVP_PKEY_free(key);
                 if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
@@ -1262,8 +1264,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509_free(x509cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    EVP_PKEY_free(privateKeyAddress);
                     return false;
                 }
+                EVP_PKEY_free(privateKeyAddress);
                 if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;

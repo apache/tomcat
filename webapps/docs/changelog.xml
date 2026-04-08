@@ -266,6 +266,10 @@
         Align HTTP/2 trailer fields with HTTP/1.1 and filter out any fields
         not permitted in trailers. (markt)
       </fix>
+      <fix>
+        Free private keys after use in FFM based connector configuration.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
