@@ -21,16 +21,14 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.http.HeaderUtil;
 
 /**
  * Chunked output filter.
@@ -40,26 +38,6 @@ public class ChunkedOutputFilter implements OutputFilter {
     private static final byte[] LAST_CHUNK_BYTES = { (byte) '0', (byte) '\r', (byte) '\n' };
     private static final byte[] CRLF_BYTES = { (byte) '\r', (byte) '\n' };
     private static final byte[] END_CHUNK_BYTES = { (byte) '0', (byte) '\r', (byte) '\n', (byte) '\r', (byte) '\n' };
-
-    private static final Set<String> disallowedTrailerFieldNames = new HashSet<>();
-
-    static {
-        // Always add these in lower case
-        disallowedTrailerFieldNames.add("age");
-        disallowedTrailerFieldNames.add("cache-control");
-        disallowedTrailerFieldNames.add("content-length");
-        disallowedTrailerFieldNames.add("content-encoding");
-        disallowedTrailerFieldNames.add("content-range");
-        disallowedTrailerFieldNames.add("content-type");
-        disallowedTrailerFieldNames.add("date");
-        disallowedTrailerFieldNames.add("expires");
-        disallowedTrailerFieldNames.add("location");
-        disallowedTrailerFieldNames.add("retry-after");
-        disallowedTrailerFieldNames.add("trailer");
-        disallowedTrailerFieldNames.add("transfer-encoding");
-        disallowedTrailerFieldNames.add("vary");
-        disallowedTrailerFieldNames.add("warning");
-    }
 
     /**
      * Next buffer in the pipeline.
@@ -178,7 +156,7 @@ public class ChunkedOutputFilter implements OutputFilter {
             try (OutputStreamWriter osw = new OutputStreamWriter(baos, StandardCharsets.ISO_8859_1)) {
                 for (Map.Entry<String,String> trailerField : trailerFields.entrySet()) {
                     // Ignore disallowed headers
-                    if (disallowedTrailerFieldNames.contains(trailerField.getKey().toLowerCase(Locale.ENGLISH))) {
+                    if (HeaderUtil.isHeaderDisallowedInTrailers(trailerField.getKey())) {
                         continue;
                     }
                     osw.write(filterForHeaders(trailerField.getKey()));
