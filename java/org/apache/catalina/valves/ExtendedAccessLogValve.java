@@ -588,13 +588,18 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     } else if ("query".equals(token)) {
                         return new AccessLogElement() {
                             @Override
-                            public void addElement(CharArrayWriter buf, Request request, Response response,
-                                    long time) {
-                                String query = request.getQueryString();
-                                if (query != null) {
-                                    buf.append(query);
-                                } else {
+                            public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
+                                String query = null;
+                                if (request != null) {
+                                    query = request.getQueryString();
+                                }
+                                if (query == null) {
                                     buf.append('-');
+                                } else if (query.isEmpty()) {
+                                    // NO-OP
+                                    // Don't want to write "-" if the query string is present but empty
+                                } else {
+                                    escapeAndAppend(query, buf, true);
                                 }
                             }
                         };
@@ -602,13 +607,19 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 } else {
                     return new AccessLogElement() {
                         @Override
-                        public void addElement(CharArrayWriter buf, Request request, Response response,
-                                long time) {
-                            String query = request.getQueryString();
-                            buf.append(request.getRequestURI());
-                            if (query != null) {
-                                buf.append('?');
-                                buf.append(request.getQueryString());
+                        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
+                            if (request != null) {
+                                escapeAndAppend(request.getRequestURI(), buf);
+                                String query = request.getQueryString();
+                                if (query != null) {
+                                    buf.append('?');
+                                    // Don't want to write "-" if the query string is present but empty
+                                    if (!query.isEmpty()) {
+                                        buf.append(request.getQueryString());
+                                    }
+                                }
+                            } else {
+                                buf.append('-');
                             }
                         }
                     };
