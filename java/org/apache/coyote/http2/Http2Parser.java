@@ -321,14 +321,11 @@ class Http2Parser {
 
         long errorCode = ByteUtil.getFourBytes(payload, 0);
         output.reset(streamId, errorCode);
+
         headersCurrentStream = -1;
-        if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
-            // Reset size for new request if the buffer was previously expanded
-            headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
-        } else {
-            headerReadBuffer.clear();
-        }
         headersEndStream = false;
+        // Force clearing of header buffer as there may be data left over
+        afterHeadersCompleteCleanUp(true);
     }
 
 
@@ -663,12 +660,6 @@ class Http2Parser {
                     Http2Error.COMPRESSION_ERROR);
         }
 
-        /*
-         * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
-         * HPack decoder does not retain a reference to this stream. This aids GC.
-         */
-        hpackDecoder.clearHeaderEmitter();
-
         synchronized (output) {
             output.headersEnd(streamId, headersEndStream);
 
@@ -677,10 +668,24 @@ class Http2Parser {
             }
         }
 
+        // We know from test above that buffer is empty so no need to force it to be cleared
+        afterHeadersCompleteCleanUp(false);
+    }
+
+
+    protected void afterHeadersCompleteCleanUp(boolean forceClear) {
         // Reset size for new request if the buffer was previously expanded
         if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
             headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
+        } else if (forceClear) {
+            headerReadBuffer.clear();
         }
+
+        /*
+         * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
+         * HPack decoder does not retain a reference to this stream. This aids GC.
+         */
+        hpackDecoder.clearHeaderEmitter();
     }
 
 
