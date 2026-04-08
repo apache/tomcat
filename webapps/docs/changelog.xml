@@ -147,6 +147,10 @@
         Fix a few minor memory leaks on error paths reading TLS keys and
         certificates when using FFM. (markt)
       </fix>
+      <fix>
+        Refactor clean-up after HTTP/2 headers have been processed to aid GC
+        after a stream reset. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
