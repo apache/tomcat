@@ -363,10 +363,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             start = System.currentTimeMillis();
         }
         try {
-            // FIXME we have a lot of sends, but the trouble with one node stops the correct replication to other nodes!
-            // send invalid sessions
             sendInvalidSessions(clusterManager);
-            // send replication
             try {
                 sendSessionReplicationMessage(request, clusterManager);
             } catch (Exception e) {
