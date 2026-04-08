@@ -17,12 +17,8 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serial;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +31,6 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.descriptor.web.ErrorPage;
 
 public class TestProxyErrorReportValve extends TomcatBaseTest {
 
@@ -46,7 +41,8 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
     @Test
     public void testRedirectMode() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        ((StandardHost) tomcat.getHost()).setErrorReportValveClass(PROXY_VALVE);
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
 
         Context ctx = getProgrammaticRootContext();
 
@@ -54,28 +50,49 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
         ctx.addServletMappingDecoded("/", "error");
 
-        // Register an error page that the valve will redirect to
+        // Register an error page at the Host's error report valve level
+        // so findErrorPage() returns a URL for the redirect
         Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
         ctx.addServletMappingDecoded("/error-page", "errorPage");
-        ErrorPage errorPage = new ErrorPage();
-        errorPage.setErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        errorPage.setLocation("/error-page");
-        ctx.addErrorPage(errorPage);
 
         tomcat.start();
 
-        ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
-        Map<String, List<String>> resHead = new HashMap<>();
-        // Don't follow redirects
-        int rc = getUrl("http://localhost:" + getPort(), res, resHead);
+        ProxyErrorReportValve valve = (ProxyErrorReportValve) host.getPipeline().getFirst();
+        valve.setProperty("errorCode." + HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "http://localhost:" + getPort() + "/error-page");
 
-        // ProxyErrorReportValve uses error pages from context — but since
-        // it calls findErrorPage() which uses Host-level error pages,
-        // the context error page might not be found and it falls back to
-        // the superclass. The test verifies the valve is loaded correctly.
-        Assert.assertTrue("Status should indicate an error",
-                rc >= 400 || rc == 302);
+        int rc = getUrl("http://localhost:" + getPort(), new ByteChunk(), false);
+
+        Assert.assertEquals(HttpServletResponse.SC_FOUND, rc);
+    }
+
+    @Test
+    public void testProxyMode() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_NOT_FOUND, "Not found"));
+        ctx.addServletMappingDecoded("/", "error");
+
+        Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
+        ctx.addServletMappingDecoded("/error-page", "errorPage");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = (ProxyErrorReportValve) host.getPipeline().getFirst();
+        valve.setUseRedirect(false);
+        valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND,
+                "http://localhost:" + getPort() + "/error-page");
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertTrue(res.toString().contains("ERROR_PAGE_OK"));
     }
 
 
@@ -90,20 +107,18 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No page configured"));
         ctx.addServletMappingDecoded("/", "error");
 
-        // No error page configured — should fall back to ErrorReportValve's report()
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
         String body = res.toString();
         Assert.assertNotNull(body);
-        // The default ErrorReportValve produces HTML
         Assert.assertTrue("Should contain HTML error report",
-                body.contains("<html>") || body.contains("<h1>"));
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)));
     }
 
 
@@ -114,17 +129,16 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
 
-        Tomcat.addServlet(ctx, "ok", new OkServlet());
-        ctx.addServletMappingDecoded("/", "ok");
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
 
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", res.toString());
+        Assert.assertEquals(HelloWorldServlet.RESPONSE_TEXT, res.toString());
     }
 
 
@@ -142,28 +156,24 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         String body = res.toString();
         Assert.assertNotNull(body);
-        // Falls back to parent ErrorReportValve HTML
         Assert.assertTrue("Should contain error report",
-                body.contains("404") || body.contains("Not Found"));
+                body.contains(String.valueOf(HttpServletResponse.SC_NOT_FOUND)));
     }
 
 
     @Test
-    public void testGetSetProperties() throws Exception {
+    public void testGetSetProperties() {
         ProxyErrorReportValve valve = new ProxyErrorReportValve();
 
-        // Defaults
         Assert.assertTrue(valve.getUseRedirect());
         Assert.assertFalse(valve.getUsePropertiesFile());
 
-        // Setters
         valve.setUseRedirect(false);
         Assert.assertFalse(valve.getUseRedirect());
 
@@ -174,19 +184,19 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
     @Test
     public void testMessageInErrorReport() throws Exception {
+        final String customErrorMessage = "Custom error message";
         Tomcat tomcat = getTomcatInstance();
         ((StandardHost) tomcat.getHost()).setErrorReportValveClass(PROXY_VALVE);
 
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "error", new SendErrorServlet(
-                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Custom error message"));
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, customErrorMessage));
         ctx.addServletMappingDecoded("/", "error");
 
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
@@ -194,8 +204,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         String body = res.toString();
         Assert.assertNotNull(body);
         // Falls back to super.report() which includes the message
-        Assert.assertTrue("Should contain the custom error message",
-                body.contains("Custom error message"));
+        Assert.assertTrue(body.contains(customErrorMessage));
     }
 
 
@@ -212,21 +221,21 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
 
         String body = res.toString();
         Assert.assertNotNull(body);
-        Assert.assertTrue("Should contain exception info",
-                body.contains("RuntimeException"));
+        Assert.assertTrue(body.contains("RuntimeException"));
     }
 
 
     private static final class SendErrorServlet extends HttpServlet {
 
+        @Serial
         private static final long serialVersionUID = 1L;
+
         private final int statusCode;
         private final String message;
 
@@ -237,33 +246,19 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+                throws IOException {
             resp.sendError(statusCode, message);
         }
     }
 
-
-    private static final class OkServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.getWriter().print("OK");
-        }
-    }
-
-
     private static final class ErrorPageServlet extends HttpServlet {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
+                throws IOException {
             resp.getWriter().print("ERROR_PAGE_OK");
         }
     }
@@ -271,11 +266,11 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
     private static final class ExceptionServlet extends HttpServlet {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override
-        public void service(jakarta.servlet.ServletRequest request,
-                jakarta.servlet.ServletResponse response) throws IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
             throw new RuntimeException("Test exception");
         }
     }
