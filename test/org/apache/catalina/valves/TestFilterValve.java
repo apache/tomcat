@@ -17,16 +17,16 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -47,8 +47,8 @@ public class TestFilterValve extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
 
-        Tomcat.addServlet(ctx, "ok", new OkServlet());
-        ctx.addServletMappingDecoded("/", "ok");
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
 
         FilterValve valve = new FilterValve();
         valve.setFilterClass(PassthroughFilter.class.getName());
@@ -57,11 +57,10 @@ public class TestFilterValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", res.toString());
+        Assert.assertEquals(HelloWorldServlet.RESPONSE_TEXT, res.toString());
     }
 
 
@@ -71,8 +70,8 @@ public class TestFilterValve extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
 
-        Tomcat.addServlet(ctx, "ok", new OkServlet());
-        ctx.addServletMappingDecoded("/", "ok");
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
 
         FilterValve valve = new FilterValve();
         valve.setFilterClass(BlockingFilter.class.getName());
@@ -81,14 +80,33 @@ public class TestFilterValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        res.setCharset(StandardCharsets.UTF_8);
         int rc = getUrl("http://localhost:" + getPort(), res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, rc);
     }
 
-
     @Test
+    public void testFilterWrappingRequestThrows() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMappingDecoded("/", "hello");
+
+        FilterValve valve = new FilterValve();
+        valve.setFilterClass(WrappingFilter.class.getName());
+        ctx.getPipeline().addValve(valve);
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort(), new ByteChunk(), null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+
+    @Test(expected = LifecycleException.class)
     public void testNullFilterClassThrowsOnStart() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -98,18 +116,11 @@ public class TestFilterValve extends TomcatBaseTest {
         // Do NOT set filterClassName
         ctx.getPipeline().addValve(valve);
 
-        boolean threw = false;
-        try {
-            tomcat.start();
-        } catch (LifecycleException e) {
-            threw = true;
-        }
-
-        Assert.assertTrue("Should throw LifecycleException for null filter class", threw);
+        tomcat.start();
     }
 
 
-    @Test
+    @Test(expected = LifecycleException.class)
     public void testInvalidFilterClassThrowsOnStart() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -119,26 +130,19 @@ public class TestFilterValve extends TomcatBaseTest {
         valve.setFilterClass("com.nonexistent.FakeFilter");
         ctx.getPipeline().addValve(valve);
 
-        boolean threw = false;
-        try {
-            tomcat.start();
-        } catch (LifecycleException e) {
-            threw = true;
-        }
-
-        Assert.assertTrue("Should throw LifecycleException for invalid filter class", threw);
+        tomcat.start();
     }
 
 
     @Test
-    public void testGetFilterNameReturnsNull() throws Exception {
+    public void testGetFilterNameReturnsNull() {
         FilterValve valve = new FilterValve();
         Assert.assertNull(valve.getFilterName());
     }
 
 
     @Test
-    public void testInitParams() throws Exception {
+    public void testInitParams() {
         FilterValve valve = new FilterValve();
 
         valve.addInitParam("key1", "value1");
@@ -148,7 +152,7 @@ public class TestFilterValve extends TomcatBaseTest {
         Assert.assertEquals("value2", valve.getInitParameter("key2"));
         Assert.assertNull(valve.getInitParameter("nonexistent"));
 
-        java.util.List<String> names = Collections.list(valve.getInitParameterNames());
+        List<String> names = Collections.list(valve.getInitParameterNames());
         Assert.assertEquals(2, names.size());
         Assert.assertTrue(names.contains("key1"));
         Assert.assertTrue(names.contains("key2"));
@@ -156,7 +160,7 @@ public class TestFilterValve extends TomcatBaseTest {
 
 
     @Test
-    public void testInitParamsEmpty() throws Exception {
+    public void testInitParamsEmpty() {
         FilterValve valve = new FilterValve();
 
         Assert.assertNull(valve.getInitParameter("anything"));
@@ -165,7 +169,7 @@ public class TestFilterValve extends TomcatBaseTest {
 
 
     @Test
-    public void testGetSetFilterClassName() throws Exception {
+    public void testGetSetFilterClassName() {
         FilterValve valve = new FilterValve();
 
         Assert.assertNull(valve.getFilterClassName());
@@ -173,9 +177,14 @@ public class TestFilterValve extends TomcatBaseTest {
         valve.setFilterClassName("com.example.MyFilter");
         Assert.assertEquals("com.example.MyFilter", valve.getFilterClassName());
 
-        // setFilterClass is an alias
         valve.setFilterClass("com.example.OtherFilter");
         Assert.assertEquals("com.example.OtherFilter", valve.getFilterClassName());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testGetServletContextThrowsBeforeStart() {
+        FilterValve valve = new FilterValve();
+        valve.getServletContext();
     }
 
 
@@ -186,35 +195,35 @@ public class TestFilterValve extends TomcatBaseTest {
 
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
-                FilterChain chain) throws IOException, ServletException {
+                             FilterChain chain) throws IOException, ServletException {
             chain.doFilter(request, response);
         }
     }
 
 
     /**
-     * A Filter that blocks the request by sending a 403 response without
-     * calling chain.doFilter().
+     * A Filter that blocks the request by sending a 403 response without calling chain.doFilter().
      */
     public static final class BlockingFilter implements Filter {
 
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
-                FilterChain chain) throws IOException, ServletException {
+                             FilterChain chain) throws IOException, ServletException {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
-
-    private static final class OkServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
+    /**
+     * A Filter that wraps the request before calling chain.doFilter(), which FilterValve explicitly forbids.
+     */
+    public static final class WrappingFilter implements Filter {
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.getWriter().print("OK");
+        public void doFilter(ServletRequest request, ServletResponse response,
+                             FilterChain chain) throws IOException, ServletException {
+            HttpServletRequestWrapper wrapped = new HttpServletRequestWrapper((HttpServletRequest) request);
+            chain.doFilter(wrapped, response);
         }
     }
+
 }
