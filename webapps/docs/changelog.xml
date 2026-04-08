@@ -120,6 +120,10 @@
         Failed precondition should make WebDAV DELETE fail. <pr>982</pr>
         submitted by Mahmoud Alarby. (remm)
       </fix>
+      <fix>
+        Align the escaping in <code>ExtendedAccessLogValve</code> with the other
+        <code>AccessLogValve</code> implementations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
