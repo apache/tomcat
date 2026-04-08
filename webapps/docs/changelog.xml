@@ -161,7 +161,7 @@
       </fix>
       <fix>
         Free private keys after use in FFM based connector configuration.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
