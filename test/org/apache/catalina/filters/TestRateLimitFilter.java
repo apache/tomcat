@@ -152,8 +152,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         int sleep;
 
         TestClient(RateLimitFilter filter, FilterChain filterChain, String ip, int requests, int rps) {
-            this.sleep = 1000 / rps;
             super(filter, filterChain, ip, requests);
+            this.sleep = 1000 / rps;
         }
 
         @Override
