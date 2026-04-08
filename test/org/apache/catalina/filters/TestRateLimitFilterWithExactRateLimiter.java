@@ -31,7 +31,8 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
-    private void testRateLimitWith1Clients(boolean exposeHeaders, boolean enforce) throws Exception {
+
+    private void testRateLimitWith4Clients(boolean exposeHeaders, boolean enforce) throws Exception {
 
         int bucketRequests = 40;
         int bucketDuration = 4;
@@ -45,10 +46,11 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
-        tomcat.start();
 
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
+
+        tomcat.start();
 
         ExactRateLimiter exactRateLimiter = (ExactRateLimiter) rateLimitFilter.rateLimiter;
 
@@ -111,22 +113,22 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
     @Test
     public void testExposeHeaderAndReferenceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(true, false);
+        testRateLimitWith4Clients(true, false);
     }
 
     @Test
     public void testUnexposeHeaderAndReferenceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(false, false);
+        testRateLimitWith4Clients(false, false);
     }
 
     @Test
     public void testExposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(true, true);
+        testRateLimitWith4Clients(true, true);
     }
 
     @Test
     public void testUnexposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(false, true);
+        testRateLimitWith4Clients(false, true);
     }
 
     private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) {
