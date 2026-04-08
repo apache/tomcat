@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -584,8 +585,8 @@ class Generator {
 
         // Static data for getImports()
         List<String> imports = pageInfo.getImports();
-        Set<String> packages = new HashSet<>();
-        Set<String> classes = new HashSet<>();
+        Set<String> packages = new LinkedHashSet<>();
+        Set<String> classes = new LinkedHashSet<>();
         for (String importName : imports) {
             String trimmed = importName.trim();
             if (trimmed.endsWith(".*")) {
