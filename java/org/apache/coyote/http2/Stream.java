@@ -50,6 +50,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
@@ -621,8 +622,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void writeTrailers() throws IOException {
-        Supplier<Map<String,String>> supplier = coyoteResponse.getTrailerFields();
-        if (supplier == null) {
+        Supplier<Map<String,String>> trailerFieldsSupplier = coyoteResponse.getTrailerFields();
+        if (trailerFieldsSupplier == null) {
             // No supplier was set, end of stream will already have been sent
             return;
         }
@@ -633,17 +634,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
          */
         MimeHeaders mimeHeaders = new MimeHeaders();
 
-        Map<String,String> headerMap = supplier.get();
-        if (headerMap == null) {
-            headerMap = Collections.emptyMap();
+        Map<String,String> trailerFields = trailerFieldsSupplier.get();
+        if (trailerFields == null) {
+            trailerFields = Collections.emptyMap();
         }
 
         // Copy the contents of the Map to the MimeHeaders
         // TODO: Is there benefit in refactoring this? Is MimeHeaders too
         // heavyweight? Can we reduce the copy/conversions?
-        for (Map.Entry<String,String> headerEntry : headerMap.entrySet()) {
-            MessageBytes mb = mimeHeaders.addValue(headerEntry.getKey());
-            mb.setString(headerEntry.getValue());
+        for (Map.Entry<String,String> trailerField : trailerFields.entrySet()) {
+            // Ignore disallowed headers
+            if (HeaderUtil.isHeaderDisallowedInTrailers(trailerField.getKey())) {
+                continue;
+            }
+
+            MessageBytes mb = mimeHeaders.addValue(trailerField.getKey());
+            mb.setString(trailerField.getValue());
         }
 
         handler.writeHeaders(this, 0, mimeHeaders, true, Constants.DEFAULT_HEADERS_FRAME_SIZE);
