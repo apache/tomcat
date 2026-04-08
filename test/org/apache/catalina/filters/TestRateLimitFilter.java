@@ -17,8 +17,6 @@
 package org.apache.catalina.filters;
 
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -47,10 +45,11 @@ public class TestRateLimitFilter extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
-        tomcat.start();
 
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
+
+        tomcat.start();
 
         FastRateLimiter fastRateLimiter = (FastRateLimiter) rateLimitFilter.rateLimiter;
 
@@ -127,7 +126,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         testRateLimitWith4Clients(false, true);
     }
 
-    private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
+    private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) {
 
         RateLimitFilter rateLimitFilter = new RateLimitFilter();
         filterDef.setFilterClass(RateLimitFilter.class.getName());
@@ -139,10 +138,6 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         filterMap.setFilterName(RateLimitFilter.class.getName());
         filterMap.addURLPatternDecoded("*");
         root.addFilterMap(filterMap);
-
-        FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);
-
-        rateLimitFilter.init(filterConfig);
 
         return rateLimitFilter;
     }
