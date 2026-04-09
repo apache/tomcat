@@ -1249,6 +1249,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    EVP_PKEY_free(privateKeyAddress);
                     X509_free(x509cert);
                     return false;
                 }
