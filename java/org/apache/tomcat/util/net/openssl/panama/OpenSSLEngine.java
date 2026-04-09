@@ -860,7 +860,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         byte[][] certificateChain = new byte[len][];
         try (var localArena = Arena.ofConfined()) {
-            OpenSSLLibrary.populateCertifcateChain(localArena, sk, certificateChain);
+            OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain);
             return certificateChain;
         }
     }
