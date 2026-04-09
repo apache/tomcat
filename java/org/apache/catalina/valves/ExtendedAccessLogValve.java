@@ -593,14 +593,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                                 if (request != null) {
                                     query = request.getQueryString();
                                 }
-                                if (query == null) {
-                                    buf.append('-');
-                                } else if (query.isEmpty()) {
-                                    // NO-OP
-                                    // Don't want to write "-" if the query string is present but empty
-                                } else {
-                                    escapeAndAppend(query, buf, true);
-                                }
+                                appendQueryString(query, buf, false, true, true);
                             }
                         };
                     }
@@ -610,14 +603,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                             if (request != null) {
                                 escapeAndAppend(request.getRequestURI(), buf);
-                                String query = request.getQueryString();
-                                if (query != null) {
-                                    buf.append('?');
-                                    // Don't want to write "-" if the query string is present but empty
-                                    if (!query.isEmpty()) {
-                                        buf.append(query);
-                                    }
-                                }
+                                appendQueryString(request.getQueryString(), buf, true, true, false);
                             } else {
                                 buf.append('-');
                             }
