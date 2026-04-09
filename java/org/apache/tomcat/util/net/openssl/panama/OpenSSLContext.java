@@ -809,7 +809,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
             byte[][] certificateChain = new byte[len][];
             try (var localArena = Arena.ofConfined()) {
-                OpenSSLLibrary.populateCertifcateChain(localArena, sk, certificateChain);
+                OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain);
                 MemorySegment cipher = SSL_get_current_cipher(ssl);
                 String authMethod = (MemorySegment.NULL.equals(cipher)) ? "UNKNOWN" :
                         getCipherAuthenticationMethod(SSL_CIPHER_get_auth_nid(cipher), SSL_CIPHER_get_kx_nid(cipher));

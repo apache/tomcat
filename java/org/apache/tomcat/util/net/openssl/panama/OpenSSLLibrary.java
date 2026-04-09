@@ -505,7 +505,7 @@ public class OpenSSLLibrary {
         return sslError;
     }
 
-    static void populateCertifcateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
+    static void populateCertificateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
             byte[][] certificateChain) {
         for (int i = 0; i < certificateChain.length; i++) {
             MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
