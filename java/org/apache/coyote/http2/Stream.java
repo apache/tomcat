@@ -406,31 +406,27 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":path"),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
-                }
-                if (value.isEmpty()) {
+                } else if (value.isEmpty()) {
                     headerException = new StreamException(
                             sm.getString("stream.header.noPath", getConnectionId(), getIdAsString()),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                    // No need for further processing. The stream will be reset.
-                    return;
-                }
-                int queryStart = value.indexOf('?');
-                String uri;
-                if (queryStart == -1) {
-                    uri = value;
                 } else {
-                    uri = value.substring(0, queryStart);
-                    String query = value.substring(queryStart + 1);
-                    coyoteRequest.queryString().setString(query);
+                    int queryStart = value.indexOf('?');
+                    String uri;
+                    if (queryStart == -1) {
+                        uri = value;
+                    } else {
+                        uri = value.substring(0, queryStart);
+                        String query = value.substring(queryStart + 1);
+                        coyoteRequest.queryString().setString(query);
+                    }
+                    // Bug 61120. Set the URI as bytes rather than String so:
+                    // - any path parameters are correctly processed
+                    // - the normalization security checks are performed that prevent
+                    // directory traversal attacks
+                    byte[] uriBytes = uri.getBytes(StandardCharsets.ISO_8859_1);
+                    coyoteRequest.requestURI().setBytes(uriBytes, 0, uriBytes.length);
                 }
-                // Bug 61120. Set the URI as bytes rather than String so:
-                // - any path parameters are correctly processed
-                // - the normalization security checks are performed that prevent
-                // directory traversal attacks
-                byte[] uriBytes = uri.getBytes(StandardCharsets.ISO_8859_1);
-                coyoteRequest.requestURI().setBytes(uriBytes, 0, uriBytes.length);
                 break;
             }
             case ":authority": {
@@ -498,9 +494,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.unknownPseudoHeader", getConnectionId(), getIdAsString(), name),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                }
-
-                if (headerState == HEADER_STATE_TRAILER) {
+                } else if (headerState == HEADER_STATE_TRAILER) {
                     // HTTP/2 headers are already always lower case
                     coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
                 } else {
