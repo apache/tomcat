@@ -860,19 +860,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         byte[][] certificateChain = new byte[len][];
         try (var localArena = Arena.ofConfined()) {
-            for (int i = 0; i < len; i++) {
-                MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
-                MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
-                int length = i2d_X509(x509, bufPointer);
-                if (length <= 0) {
-                    certificateChain[i] = new byte[0];
-                    continue;
-                }
-                MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-                certificateChain[i] = certificate;
-                OPENSSL_free(buf);
-            }
+            OpenSSLLibrary.populateCertifcateChain(localArena, sk, certificateChain);
             return certificateChain;
         }
     }
