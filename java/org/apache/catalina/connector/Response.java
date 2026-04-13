@@ -778,11 +778,13 @@ public class Response implements HttpServletResponse {
         for (int i = 0; i < n; i++) {
             result.add(headers.getName(i).toString());
         }
-        if (getCoyoteResponse().getContentType() != null) {
-            result.add("Content-Type");
-        }
-        if (getCoyoteResponse().getContentLengthLong() != -1) {
-            result.add("Content-Length");
+        if (!getCoyoteResponse().isCommitted()) {
+            if (getCoyoteResponse().getContentType() != null) {
+                result.add("Content-Type");
+            }
+            if (getCoyoteResponse().getContentLengthLong() != -1) {
+                result.add("Content-Length");
+            }
         }
         return result;
     }
