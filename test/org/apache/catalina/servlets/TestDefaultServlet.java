@@ -19,9 +19,12 @@ package org.apache.catalina.servlets;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,9 +33,13 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.junit.Assert;
 import org.junit.Test;
+import org.easymock.EasyMock;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -779,40 +786,31 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     @Test
     public void testDirectoryListingEscapesCurrentDirectoryName() throws Exception {
-        File appDir = new File(getTemporaryDirectory(), "listing-xss");
-        File webInf = new File(appDir, "WEB-INF");
-        File maliciousDir = new File(appDir, "<img src=x onerror=alert(1)>");
-        addDeleteOnTearDown(appDir);
+        DefaultServlet defaultServlet = new DefaultServlet();
 
-        if (!webInf.mkdirs() && !webInf.isDirectory()) {
-            Assert.fail("Unable to create directory [" + webInf + "]");
+        WebResourceRoot resourceRoot = EasyMock.createMock(WebResourceRoot.class);
+        WebResource resource = EasyMock.createMock(WebResource.class);
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+
+        EasyMock.expect(resource.getWebappPath()).andStubReturn("/<img src=x onerror=alert(1)>/child/");
+        EasyMock.expect(resourceRoot.listResources("/<img src=x onerror=alert(1)>/child/"))
+                .andReturn(new WebResource[0]);
+        EasyMock.expect(request.getLocales()).andStubReturn(Collections.enumeration(List.of(Locale.ENGLISH)));
+
+        EasyMock.replay(resourceRoot, resource, request);
+
+        defaultServlet.resources = resourceRoot;
+
+        String body;
+        try (InputStream is = defaultServlet.renderHtml(request, "", resource, null)) {
+            body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
-        if (!maliciousDir.mkdirs() && !maliciousDir.isDirectory()) {
-            Assert.fail("Unable to create directory [" + maliciousDir + "]");
-        }
 
-        File index = new File(maliciousDir, "index.txt");
-        try (FileOutputStream fos = new FileOutputStream(index);
-                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
-            w.write("owned\n");
-        }
+        EasyMock.verify(resourceRoot, resource, request);
 
-        Tomcat tomcat = getTomcatInstance();
-        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
-
-        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", new DefaultServlet());
-        defaultServlet.addInitParameter("listings", "true");
-        ctxt.addServletMappingDecoded("/", "default");
-
-        tomcat.start();
-
-        ByteChunk out = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/%3Cimg%20src=x%20onerror=alert(1)%3E/", out, null);
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-
-        String body = out.toString();
-        Assert.assertFalse(body.contains("<title>Directory Listing For [/<img src=x onerror=alert(1)>/]</title>"));
-        Assert.assertFalse(body.contains("<h1>Directory Listing For [/<img src=x onerror=alert(1)>/]"));
+        Assert.assertFalse(body.contains("<title>Directory Listing For [/<img src=x onerror=alert(1)>/child/]</title>"));
+        Assert.assertFalse(body.contains("<h1>Directory Listing For [/<img src=x onerror=alert(1)>/child/]"));
+        Assert.assertFalse(body.contains("Up To [/<img src=x onerror=alert(1)>/]"));
         Assert.assertTrue(body.contains("&lt;img src=x onerror=alert(1)&gt;"));
     }
 }
