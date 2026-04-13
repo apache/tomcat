@@ -26,12 +26,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.servlets.CGIServlet;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.ssi.SSIFilter;
 import org.apache.catalina.ssi.SSIServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -105,4 +108,78 @@ public class TestSecurity2019 extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertFalse("SSI printenv should not render unescaped HTML ", res.toString().contains("<h1>"));
     }
+
+    // https://www.cve.org/CVERecord?id=CVE-2019-0232
+    @Test
+    public void testCVE_2019_0232() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getTemporaryDirectory(), "cgitest");
+        Assert.assertTrue(appDir.mkdirs());
+        addDeleteOnTearDown(appDir);
+
+        File cgiDir = new File(appDir, "WEB-INF/cgi");
+        Assert.assertTrue(cgiDir.mkdirs());
+
+        File testScript;
+        File maliciousScript;
+
+        if (JrePlatform.IS_WINDOWS) {
+            testScript = new File(cgiDir, "test.bat");
+            try (FileWriter fw = new FileWriter(testScript)) {
+                fw.write("@echo off\r\n");
+                fw.write("echo Content-Type: text/plain\r\n");
+                fw.write("echo.\r\n");
+                fw.write("echo Query string: %QUERY_STRING%\r\n");
+            }
+
+            maliciousScript = new File(cgiDir, "malicious.bat");
+            try (FileWriter fw = new FileWriter(maliciousScript)) {
+                fw.write("@echo off\r\n");
+                fw.write("echo vulnerable > \"" + new File(appDir, "vulnerable").getAbsolutePath() + "\"\r\n");
+            }
+        } else {
+            testScript = new File(cgiDir, "test.sh");
+            try (FileWriter fw = new FileWriter(testScript)) {
+                fw.write("#!/bin/sh\n");
+                fw.write("echo \"Content-Type: text/plain\"\n");
+                fw.write("echo\n");
+                fw.write("echo \"Query string: $QUERY_STRING\"\n");
+            }
+
+            maliciousScript = new File(cgiDir, "malicious.sh");
+            try (FileWriter fw = new FileWriter(maliciousScript)) {
+                fw.write("#!/bin/sh\n");
+                fw.write("touch " + new File(appDir, "vulnerable").getAbsolutePath() + "\n");
+            }
+        }
+
+        Assert.assertTrue(testScript.setExecutable(true));
+        Assert.assertTrue(maliciousScript.setExecutable(true));
+
+        Context ctx = tomcat.addContext("", appDir.getAbsolutePath());
+        ctx.setPrivileged(true);
+
+        Wrapper cgi = Tomcat.addServlet(ctx, "cgi", new CGIServlet());
+        cgi.addInitParameter("cgiPathPrefix", "WEB-INF/cgi");
+        cgi.addInitParameter("executable", "");
+        cgi.addInitParameter("enableCmdLineArguments", "true");
+        ctx.addServletMappingDecoded("/cgi/*", "cgi");
+
+        tomcat.start();
+
+        String scriptName = JrePlatform.IS_WINDOWS ? "test.bat" : "test.sh";
+        String maliciousName = JrePlatform.IS_WINDOWS ? "malicious.bat" : "malicious.sh";
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/cgi/" + scriptName + "?firstName=Dimitris",
+                res, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(res.toString().contains("Query string:"));
+
+        res.recycle();
+        getUrl("http://localhost:" + getPort() + "/cgi/" + scriptName + "?&" + maliciousName, res, null);
+        Assert.assertFalse("CGI command injection succeeded", new File(appDir, "vulnerable").exists());
+    }
+
 }
