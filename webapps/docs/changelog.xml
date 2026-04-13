@@ -90,6 +90,9 @@
 
 <body>
 <!--
+  For guidance on writing changelog entries, see the "Changelog Entries"
+  section in CONTRIBUTING.md.
+
   Subsection ordering:
   General, Catalina, Coyote, Jasper, Cluster, WebSocket, Web applications,
   Extras, Tribes, jdbc-pool, Other
