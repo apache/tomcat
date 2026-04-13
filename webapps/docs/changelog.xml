@@ -203,6 +203,10 @@
         Align the escaping in <code>ExtendedAccessLogValve</code> with the other
         <code>AccessLogValve</code> implementations. (markt)
       </fix>
+      <fix>
+        <bug>70000</bug>: fix duplication of special headers in the response
+        after commit, following fix for <bug>69967</bug>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
