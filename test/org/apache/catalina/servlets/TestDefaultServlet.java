@@ -776,4 +776,43 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
     }
+
+    @Test
+    public void testDirectoryListingEscapesCurrentDirectoryName() throws Exception {
+        File appDir = new File(getTemporaryDirectory(), "listing-xss");
+        File webInf = new File(appDir, "WEB-INF");
+        File maliciousDir = new File(appDir, "<img src=x onerror=alert(1)>");
+        addDeleteOnTearDown(appDir);
+
+        if (!webInf.mkdirs() && !webInf.isDirectory()) {
+            Assert.fail("Unable to create directory [" + webInf + "]");
+        }
+        if (!maliciousDir.mkdirs() && !maliciousDir.isDirectory()) {
+            Assert.fail("Unable to create directory [" + maliciousDir + "]");
+        }
+
+        File index = new File(maliciousDir, "index.txt");
+        try (FileOutputStream fos = new FileOutputStream(index);
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
+            w.write("owned\n");
+        }
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", new DefaultServlet());
+        defaultServlet.addInitParameter("listings", "true");
+        ctxt.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        ByteChunk out = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/%3Cimg%20src=x%20onerror=alert(1)%3E/", out, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = out.toString();
+        Assert.assertFalse(body.contains("<title>Directory Listing For [/<img src=x onerror=alert(1)>/]</title>"));
+        Assert.assertFalse(body.contains("<h1>Directory Listing For [/<img src=x onerror=alert(1)>/]"));
+        Assert.assertTrue(body.contains("&lt;img src=x onerror=alert(1)&gt;"));
+    }
 }

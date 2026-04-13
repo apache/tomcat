@@ -1769,6 +1769,7 @@ public class DefaultServlet extends HttpServlet {
         StringManager sm = StringManager.getManager(DefaultServlet.class.getPackageName(), request.getLocales());
 
         String directoryWebappPath = resource.getWebappPath();
+        String escapedDirectoryWebappPath = Escape.htmlElementContent(directoryWebappPath);
         WebResource[] entries = resources.listResources(directoryWebappPath);
 
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
@@ -1779,7 +1780,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<html lang=\"").append(sm.getLocale().getLanguage()).append("\">\r\n");
         sb.append("<head>\r\n");
         sb.append("<title>");
-        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", escapedDirectoryWebappPath));
         sb.append("</title>\r\n");
         sb.append("<style>");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
@@ -1787,7 +1788,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</head>\r\n");
         sb.append("<body>\r\n");
         sb.append("<h1>");
-        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", escapedDirectoryWebappPath));
 
         // Render the link to our parent (if required)
         String parentDirectory = directoryWebappPath;
@@ -1808,7 +1809,7 @@ public class DefaultServlet extends HttpServlet {
             }
             sb.append("\">");
             sb.append("<b>");
-            sb.append(sm.getString("defaultServlet.directory.parent", parent));
+            sb.append(sm.getString("defaultServlet.directory.parent", Escape.htmlElementContent(parent)));
             sb.append("</b>");
             sb.append("</a>");
         }
