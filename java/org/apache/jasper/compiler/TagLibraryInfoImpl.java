@@ -133,7 +133,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 }
                 if (jar != null) {
                     if (path == null) {
-                        // JAR not in the web application so add it directly
+                        // JAR not in the web application so add it directly. Use the
+                        // stable taglib URI as the dependency key instead of the
+                        // absolute JAR URL to keep the generated servlet code
+                        // deterministic across build environments.
                         URL jarUrl = jar.getJarFileURL();
                         long lastMod;
                         URLConnection urlConn = null;
@@ -151,12 +154,19 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                                 }
                             }
                         }
-                        pageInfo.addDependant(jarUrl.toExternalForm(), Long.valueOf(lastMod));
+                        pageInfo.addDependant("uri:" + uriIn, Long.valueOf(lastMod));
                     }
-                    // Add TLD within the JAR to the dependency list
+                    // Add TLD within the JAR to the dependency list. For external
+                    // JARs (path == null) use a stable "uri:...!/entryName" key
+                    // instead of the absolute jar.getURL(entryName) to keep the
+                    // generated servlet code deterministic across build environments.
                     String entryName = tldResourcePath.getEntryName();
                     try {
-                        pageInfo.addDependant(jar.getURL(entryName), Long.valueOf(jar.getLastModified(entryName)));
+                        String tldKey = path != null
+                                ? jar.getURL(entryName)
+                                : "uri:" + uriIn + "!/" + entryName;
+                        pageInfo.addDependant(tldKey,
+                                Long.valueOf(jar.getLastModified(entryName)));
                     } catch (IOException ioe) {
                         throw new JasperException(ioe);
                     }
