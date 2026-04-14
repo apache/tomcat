@@ -37,6 +37,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
@@ -472,7 +473,40 @@ public abstract class Compiler {
                 String key = include.getKey();
                 URL includeUrl;
                 long includeLastModified;
-                if (key.startsWith("jar:jar:")) {
+                if (key.startsWith("uri:")) {
+                    // Key is a stable taglib URI used for TLDs in JARs outside
+                    // the web application (avoids baking absolute paths into the
+                    // generated code). Two forms exist:
+                    //   "uri:<taglib-uri>"           – the JAR file itself
+                    //   "uri:<taglib-uri>!/<entry>"  – a TLD entry within the JAR
+                    int bangSlash = key.indexOf("!/");
+                    String tagUri = bangSlash < 0
+                            ? key.substring(4)
+                            : key.substring(4, bangSlash);
+                    TldCache tldCache = ctxt.getOptions().getTldCache();
+                    TldResourcePath tldPath = tldCache.getTldResourcePath(tagUri);
+                    if (tldPath == null) {
+                        return true;
+                    }
+                    if (bangSlash < 0) {
+                        // JAR-level key: check the JAR file's last-modified
+                        URLConnection urlConn = tldPath.getUrl().openConnection();
+                        try {
+                            includeLastModified = urlConn.getLastModified();
+                        } finally {
+                            urlConn.getInputStream().close();
+                        }
+                    } else {
+                        // TLD-entry key: check the entry's last-modified within the JAR
+                        String entryName = key.substring(bangSlash + 2);
+                        try (Jar jar = tldPath.openJar()) {
+                            if (jar == null) {
+                                return true;
+                            }
+                            includeLastModified = jar.getLastModified(entryName);
+                        }
+                    }
+                } else if (key.startsWith("jar:jar:")) {
                     // Assume we constructed this correctly
                     int entryStart = key.lastIndexOf("!/");
                     String entry = key.substring(entryStart + 2);
