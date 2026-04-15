@@ -156,6 +156,12 @@
         that both Java and Windows are removing / have removed support for
         RC4-HMAC. The guide now uses AES256-SHA1. (markt)
       </fix>
+      <fix>
+        Add a new initialisation parameter for WebDAV,
+        <code>maxRequestBodySize</code> which limits the size of a WebDAV
+        request body for LOCK and PROPFIND. The default value is 4096 bytes.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
