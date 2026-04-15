@@ -175,6 +175,8 @@ import org.xml.sax.SAXException;
  *  &lt;/init-param&gt;
  * </pre>
  * <p>
+ * By default, WebDAV request bodies for LOCK and PROPFIND are limited to 4096 bytes. To change this limit, set the
+ * <code>maxRequestBodySize</code> <code>init-param</code> for the WebDAV servlet.
  *
  * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
  */
@@ -202,6 +204,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private static final int MAX_DEPTH = 3;
 
 
+    /*
+     * Default max request body size.
+     */
+    private static final int DEFAULT_MAX_REQUEST_BODY_SIZE = 4096;
+
+
     /**
      * Default namespace.
      */
@@ -215,6 +223,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             "\n  <D:lockentry><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>\n" +
                     "  <D:lockentry><D:lockscope><D:shared/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>\n";
 
+
     /**
      * Simple date format for the creation date ISO representation (partial).
      */
@@ -226,6 +235,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Lock scheme used.
      */
     protected static final String LOCK_SCHEME = "urn:uuid:";
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -245,6 +255,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Default depth in spec is infinite.
      */
     private int maxDepth = MAX_DEPTH;
+
+
+    private int maxRequestBodySize = DEFAULT_MAX_REQUEST_BODY_SIZE;
 
 
     /**
@@ -291,6 +304,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (getServletConfig().getInitParameter("maxDepth") != null) {
             maxDepth = Integer.parseInt(getServletConfig().getInitParameter("maxDepth"));
+        }
+
+        if (getServletConfig().getInitParameter("maxRequestBodySize") != null) {
+            maxRequestBodySize = Integer.parseInt(getServletConfig().getInitParameter("maxRequestBodySize"));
         }
 
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
@@ -829,12 +846,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
 
+        // Short-cut if client provided a content length
+        if (req.getContentLengthLong() > maxRequestBodySize) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+            return;
+        }
+
         byte[] body;
-        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+        try (InputStream is = req.getInputStream();
+                BoundedByteArrayOutputStream os = new BoundedByteArrayOutputStream(maxRequestBodySize)) {
             IOTools.flow(is, os);
             body = os.toByteArray();
         } catch (IOException ioe) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
             return;
         }
         if (body.length > 0) {
@@ -1389,12 +1416,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         Node lockInfoNode = null;
 
+        // Short-cut if client provided a content length
+        if (req.getContentLengthLong() > maxRequestBodySize) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+            return;
+        }
+
         byte[] body;
-        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+        try (InputStream is = req.getInputStream();
+                BoundedByteArrayOutputStream os = new BoundedByteArrayOutputStream(maxRequestBodySize)) {
             IOTools.flow(is, os);
             body = os.toByteArray();
         } catch (IOException ioe) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
             return;
         }
         if (body.length > 0) {
@@ -3020,6 +3057,34 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
+    static class BoundedByteArrayOutputStream extends ByteArrayOutputStream {
+
+        private final int sizeLimit;
+        private int size;
+
+        BoundedByteArrayOutputStream(int sizeLimit) {
+            super();
+            this.sizeLimit = sizeLimit;
+        }
+
+        @Override
+        public synchronized void write(int b) {
+            size++;
+            if (size > sizeLimit) {
+                throw new ArrayIndexOutOfBoundsException();
+            }
+            super.write(b);
+        }
+
+        @Override
+        public synchronized void write(byte[] b, int off, int len) {
+            size += len;
+            if (size > sizeLimit) {
+                throw new ArrayIndexOutOfBoundsException();
+            }
+            super.write(b, off, len);
+        }
+    }
 }
 
 
