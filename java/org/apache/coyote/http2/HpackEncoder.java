@@ -124,6 +124,22 @@ class HpackEncoder {
      * @return The state of the encoding process
      */
     State encode(MimeHeaders headers, ByteBuffer target) {
+        return encode(headers, target, true);
+    }
+
+    /**
+     * Encodes the headers into a buffer.
+     *
+     * @param headers        The headers to encode
+     * @param target         The buffer to which to write the encoded headers
+     * @param forceLowerCase Normally {@code true} to ensure that header field names are lower case as required for
+     *                           HTTP/2 but some tests may deliberately allow upper case characters to test Tomcat's
+     *                           handling of such invalid field header names.
+     *
+     * @return The state of the encoding process
+     */
+    State encode(MimeHeaders headers, ByteBuffer target, boolean forceLowerCase) {
+
         int it = headersIterator;
         if (headersIterator == -1) {
             handleTableSizeChange(target);
@@ -136,11 +152,10 @@ class HpackEncoder {
             }
         }
         while (it < currentHeaders.size()) {
-            /*
-             * Need to ensure header names are lower case from this point onwards as table lookups etc. are
-             * case-sensitive.
-             */
-            String headerName = headers.getName(it).toString().toLowerCase(Locale.ENGLISH);
+            String headerName = headers.getName(it).toString();
+            if (forceLowerCase) {
+                headerName = headerName.toLowerCase(Locale.US);
+            }
             boolean skip = false;
             if (firstPass) {
                 if (headerName.charAt(0) != ':') {

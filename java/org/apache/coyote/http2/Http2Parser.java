@@ -548,6 +548,8 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new ConnectionException(sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
                         Http2Error.COMPRESSION_ERROR, hpe);
+            } catch (IllegalArgumentException iae) {
+                throw new StreamException("Invalid headers", Http2Error.PROTOCOL_ERROR, streamId, iae);
             }
 
             // switches to write mode
