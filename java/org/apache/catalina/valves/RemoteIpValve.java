@@ -555,6 +555,10 @@ public class RemoteIpValve extends ValveBase {
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
+                if(!isValidRemoteIp(currentRemoteIp)) {
+                    // Ignore invalid remote ip header value
+                    continue;
+                }
                 remoteIp = currentRemoteIp;
                 if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
@@ -735,6 +739,18 @@ public class RemoteIpValve extends ValveBase {
             log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), uhe);
         }
         return false;
+    }
+
+    private boolean isValidRemoteIp(String value) {
+        // Valid chars of remote ip: 0123456789abcdeABCDE[]:
+        for (char c : value.toCharArray()) {
+            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'e') || (c >= 'A' && c <= 'E') || c == '[' || c == ']'
+                    || c == ':') {
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     /*
