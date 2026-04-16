@@ -34,6 +34,12 @@ class StreamException extends Http2Exception {
     }
 
 
+    StreamException(String msg, Http2Error error, int streamId, Throwable cause) {
+        super(msg, error, cause);
+        this.streamId = streamId;
+    }
+
+
     int getStreamId() {
         return streamId;
     }

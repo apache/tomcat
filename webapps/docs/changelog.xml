@@ -314,8 +314,13 @@
         connection close. (markt)
       </fix>
       <fix>
-        Refactor HTTP/2 HPACK encoding so field names are only converted to
-        lower case once during the encoding process. (markt)
+        Refactor HTTP/2 HPACK encoding so header field names are only converted
+        to lower case once during the encoding process. (markt)
+      </fix>
+      <fix>
+        Refactor HTTP/2 header field validation so it occurs earlier. Extend
+        validation to check for disallowed characters as well as upper case
+        characters. (markt)
       </fix>
       <fix>
         Add TLS 1.3 groups added in OpenSSL 4.0. (remm)
