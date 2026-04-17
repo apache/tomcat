@@ -136,8 +136,11 @@ class HpackEncoder {
             }
         }
         while (it < currentHeaders.size()) {
-            // FIXME: Review lowercase policy
-            String headerName = headers.getName(it).toString().toLowerCase(Locale.US);
+            /*
+             * Need to ensure header names are lower case from this point onwards as table lookups etc. are
+             * case-sensitive.
+             */
+            String headerName = headers.getName(it).toString().toLowerCase(Locale.ENGLISH);
             boolean skip = false;
             if (firstPass) {
                 if (headerName.charAt(0) != ':') {
@@ -211,23 +214,29 @@ class HpackEncoder {
         return State.COMPLETE;
     }
 
+    /*
+     * headerName must be lower case by the time this method is called.
+     *
+     * The exception to the above rule is test cases which may deliberately use some upper case characters to test how
+     * Tomcat responds to such invalid input.
+     */
     private void writeHuffmanEncodableName(ByteBuffer target, String headerName) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName)) {
-            if (HPackHuffman.encode(target, headerName, true)) {
+            if (HPackHuffman.encode(target, headerName)) {
                 return;
             }
         }
         target.put((byte) 0); // to use encodeInteger we need to place the first byte in the buffer.
         Hpack.encodeInteger(target, headerName.length(), 7);
         for (int j = 0; j < headerName.length(); ++j) {
-            target.put((byte) Hpack.toLower(headerName.charAt(j)));
+            target.put((byte) headerName.charAt(j));
         }
 
     }
 
     private void writeHuffmanEncodableValue(ByteBuffer target, String headerName, String val) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName, val)) {
-            if (!HPackHuffman.encode(target, val, false)) {
+            if (!HPackHuffman.encode(target, val)) {
                 writeValueString(target, val);
             }
         } else {
