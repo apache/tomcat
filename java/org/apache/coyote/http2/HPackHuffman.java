@@ -19,7 +19,6 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -425,28 +424,6 @@ public class HPackHuffman {
         }
         if (!eosBits) {
             throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
-        }
-    }
-
-
-    /**
-     * Encodes the given string into the buffer. If there is not enough space in the buffer, or the encoded version is
-     * bigger than the original it will return false and not modify the buffers position.
-     *
-     * @param buffer         The buffer to encode into
-     * @param toEncode       The string to encode
-     * @param forceLowercase If the string should be encoded in lower case
-     *
-     * @return true if encoding succeeded
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static boolean encode(ByteBuffer buffer, String toEncode, boolean forceLowercase) {
-        if (forceLowercase) {
-            return encode(buffer, toEncode.toLowerCase(Locale.ENGLISH));
-        } else {
-            return encode(buffer, toEncode);
         }
     }
 
