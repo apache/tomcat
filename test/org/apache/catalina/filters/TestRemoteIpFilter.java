@@ -559,6 +559,40 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvokeInvalidProxyInTheChain() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192.168.0.10/31");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 200.0.0.1, untrusted-proxy, invalid-proxy 01, 200.0.0.2");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
+        Assert.assertEquals("syntax invalid proxy should ignore, ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130,200.0.0.1",
+                actualXForwardedFor);
+
+        String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
+        Assert.assertEquals("syntax invalid proxy should ignore, ip/host after untrusted-proxy must appear in  x-forwarded-by", "200.0.0.2",
+                actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "untrusted-proxy", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "untrusted-proxy", actualRemoteHost);
+    }
+
+    @Test
     public void testInvokeXforwardedHost() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
