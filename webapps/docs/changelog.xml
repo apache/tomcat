@@ -170,6 +170,11 @@
         Free private keys after use in FFM based connector configuration.
         (markt)
       </fix>
+      <fix>
+        Correct an unlikely edge-case parsing bug in the HTTP/2 HPACK header
+        decoding that could result in a valid header triggering an unexpected
+        connection close. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
