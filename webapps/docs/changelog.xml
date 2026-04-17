@@ -210,6 +210,11 @@
         <bug>70000</bug>: fix duplication of special headers in the response
         after commit, following fix for <bug>69967</bug>. (remm)
       </fix>
+      <fix>
+        Fix remote ip/host header population in remote ip valve or filter,
+        ignore malformed header value. Those unexpected malformed remote ip/host
+        header value may mislead downstream components. Patch submitted by Chenjp.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
