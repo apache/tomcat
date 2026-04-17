@@ -443,7 +443,11 @@ public class HPackHuffman {
      */
     @Deprecated
     public static boolean encode(ByteBuffer buffer, String toEncode, boolean forceLowercase) {
-        return encode(buffer, toEncode.toLowerCase(Locale.ENGLISH));
+        if (forceLowercase) {
+            return encode(buffer, toEncode.toLowerCase(Locale.ENGLISH));
+        } else {
+            return encode(buffer, toEncode);
+        }
     }
 
 
