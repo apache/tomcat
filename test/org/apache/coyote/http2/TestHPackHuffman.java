@@ -31,7 +31,7 @@ public class TestHPackHuffman {
     public void testValueLeftBrace() throws Exception {
         ByteBuffer buf = ByteBuffer.allocate(10);
         String data = "x-value{";
-        HPackHuffman.encode(buf, data, false);
+        HPackHuffman.encode(buf, data);
 
         buf.flip();
         // Remove the header byte (in Tomcat this is parsed before the bytes are passed to the HPACK decoder)
