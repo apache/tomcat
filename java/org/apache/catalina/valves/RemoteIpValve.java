@@ -741,11 +741,20 @@ public class RemoteIpValve extends ValveBase {
         return false;
     }
 
-    private boolean isValidRemoteIp(String value) {
-        // Valid chars of remote ip: 0123456789abcdeABCDE[]:.-_
-        for (char c : value.toCharArray()) {
-            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '[' || c == ']'
-                    || c == ':' || c == '.' || c == '-' || c == '_') {
+    /**
+     * Check the remote ip value with a basic syntax formating.
+     * @param remoteIp the header value from request
+     * @return <code>false</code> if the remote ip is null, empty, or malformed. Otherwise returns <code>true</code>
+     */
+    private boolean isValidRemoteIp(String remoteIp) {
+        if (remoteIp == null || remoteIp.isBlank()) {
+            return false;
+        }
+        // acceptable regular chars: 0-9/A-Z/a-z
+        // acceptable special chars: []:.-
+        for (char c : remoteIp.toCharArray()) {
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '[' || c == ']'
+                    || c == ':' || c == '.' || c == '-') {
                 continue;
             } else {
                 return false;
