@@ -241,6 +241,11 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <fix>
+        Correct an unlikely edge-case parsing bug in the HTTP/2 HPACK header
+        decoding that could result in a valid header triggering an unexpected
+        connection close. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Avoid various edge cases if <code>Content-Length</code> is set via
