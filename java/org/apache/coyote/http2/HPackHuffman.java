@@ -19,6 +19,7 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -437,8 +438,25 @@ public class HPackHuffman {
      * @param forceLowercase If the string should be encoded in lower case
      *
      * @return true if encoding succeeded
+     *
+     * @deprecated Unused. This method will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static boolean encode(ByteBuffer buffer, String toEncode, boolean forceLowercase) {
+        return encode(buffer, toEncode.toLowerCase(Locale.ENGLISH));
+    }
+
+
+    /**
+     * Encodes the given string into the buffer. If there is not enough space in the buffer, or the encoded version is
+     * bigger than the original it will return false and not modify the buffers position.
+     *
+     * @param buffer         The buffer to encode into
+     * @param toEncode       The string to encode
+     *
+     * @return true if encoding succeeded
+     */
+    public static boolean encode(ByteBuffer buffer, String toEncode) {
         if (buffer.remaining() <= toEncode.length()) {
             return false;
         }
@@ -453,9 +471,6 @@ public class HPackHuffman {
                 throw new IllegalArgumentException(
                         sm.getString("hpack.invalidCharacter", Character.toString(c), Integer.valueOf(c)));
             }
-            if (forceLowercase) {
-                c = Hpack.toLower(c);
-            }
             HuffmanCode code = HUFFMAN_CODES[c];
             length += code.length;
         }
@@ -469,9 +484,6 @@ public class HPackHuffman {
         byte currentBufferByte = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
             char c = toEncode.charAt(i);
-            if (forceLowercase) {
-                c = Hpack.toLower(c);
-            }
             HuffmanCode code = HUFFMAN_CODES[c];
             if (code.length + bytePos <= 8) {
                 // it fits in the current byte

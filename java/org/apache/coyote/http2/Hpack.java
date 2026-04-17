@@ -217,7 +217,10 @@ final class Hpack {
         }
     }
 
-
+    /*
+     * Unused. Will be removed in Tomcat 12 onwards.
+     */
+    @Deprecated
     static char toLower(char c) {
         if (c >= 'A' && c <= 'Z') {
             return (char) (c + LOWER_DIFF);
@@ -225,7 +228,7 @@ final class Hpack {
         return c;
     }
 
+
     private Hpack() {
     }
-
 }

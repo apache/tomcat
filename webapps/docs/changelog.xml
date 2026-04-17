@@ -282,6 +282,10 @@
         decoding that could result in a valid header triggering an unexpected
         connection close. (markt)
       </fix>
+      <fix>
+        Refactor HTTP/2 HPACK encoding so field names are only converted to
+        lower case once during the encoding process. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
