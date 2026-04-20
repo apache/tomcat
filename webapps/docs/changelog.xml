@@ -210,6 +210,12 @@
         <bug>70000</bug>: fix duplication of special headers in the response
         after commit, following fix for <bug>69967</bug>. (remm)
       </fix>
+      <fix>
+        Correct the handling of URIs mapped to a security constraint that only
+        specifies the special <code>**</code> role for all authenticated users.
+        Requests without authentication were receiving 403 responses rather than
+        401 responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
