@@ -528,9 +528,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (constraints != null) {
             hasAuthConstraint = true;
             for (int i = 0; i < constraints.length && hasAuthConstraint; i++) {
-                if (!constraints[i].getAuthConstraint()) {
+                if (constraints[i].getAllRoles() || constraints[i].getAuthenticatedUsers()) {
+                    // NO-OP - has hasAuthConstraint
+                } else if (!constraints[i].getAuthConstraint()) {
                     hasAuthConstraint = false;
-                } else if (!constraints[i].getAllRoles() && !constraints[i].getAuthenticatedUsers()) {
+                } else {
                     String[] roles = constraints[i].findAuthRoles();
                     if (roles == null || roles.length == 0) {
                         hasAuthConstraint = false;
