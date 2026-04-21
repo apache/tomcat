@@ -192,6 +192,13 @@
       <fix>
         <bug>69993</bug>: Update the URL to the CDDL 1.0 license. (markt)
       </fix>
+      <add>
+        Add warning when OpenSSL binary is not found. (csutherl)
+      </add>
+      <add>
+        Add check for Tomcat Native library, and log warning when it's not found
+        to make it easier to see when it's not used by the suite. (csutherl)
+      </add>
     </changelog>
   </subsection>
 </section>
