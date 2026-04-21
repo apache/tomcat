@@ -216,6 +216,14 @@
         Requests without authentication were receiving 403 responses rather than
         401 responses. (markt)
       </fix>
+      <fix>
+        Fix a race condition in <code>StandardContext.getServletContext()</code>
+        that could cause the <code>jakarta.servlet.context.tempdir</code>
+        attribute to be lost during a context reload. Make the
+        <code>context</code> field volatile and use locking to
+        ensure only one <code>ApplicationContext</code> instance is created.
+        (dsoumis)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
