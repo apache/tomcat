@@ -2117,13 +2117,13 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
@@ -2154,6 +2154,48 @@
         </and>
       </or>
     </condition>
+    <echo message="OpenSSL is not available. OpenSSL-related tests will be skipped or may fail." level="warning" unless:set="test.openssl.exists"/>
+  </target>
+
+  <target name="test-tcnative-exists" description="Verifies tomcat-native library can be loaded">
+    <!-- Check if main classes are built -->
+    <available file="${test.run.classes}/org/apache/tomcat/jni/Library.class"
+               property="tomcat.classes.available"/>
+
+    <!-- If main classes don't exist, compile just what we need -->
+    <mkdir dir="${test.run.classes}" unless:set="tomcat.classes.available"/>
+    <javac srcdir="java" destdir="${test.run.classes}"
+           includes="org/apache/tomcat/jni/Library.java,org/apache/tomcat/jni/LibraryNotFoundError.java"
+           debug="${compile.debug}"
+           includeantruntime="false"
+           encoding="UTF-8"
+           unless:set="tomcat.classes.available">
+      <compilerarg line="-Xlint:-options"/>
+    </javac>
+
+    <!-- Compile the test class -->
+    <mkdir dir="${test.classes}"/>
+    <javac srcdir="test" destdir="${test.classes}"
+           includes="org/apache/tomcat/jni/TesterLibraryLoad.java"
+           debug="${compile.debug}"
+           includeantruntime="false"
+           encoding="UTF-8">
+      <classpath>
+        <pathelement location="${test.run.classes}"/>
+        <pathelement location="${junit.jar}"/>
+      </classpath>
+    </javac>
+
+    <!-- Run test - it will check both test.apr.loc and system library paths -->
+    <junit printsummary="no" fork="yes" showoutput="false" haltonfailure="false"
+           failureproperty="test.tcnative.error" logfailedtests="false">
+      <jvmarg value="${runtests.librarypath}"/>
+      <jvmarg value="${native.nativeaccess}"/>
+      <classpath refid="tomcat.test.classpath"/>
+      <test name="org.apache.tomcat.jni.TesterLibraryLoad"/>
+    </junit>
+
+    <echo message="Tomcat Native is not available. Tomcat Native (JNI) tests will be skipped." if:set="test.tcnative.error" level="warning"/>
   </target>
 
   <target name="test-httpd-exists" description="Checks for the httpd binary">
