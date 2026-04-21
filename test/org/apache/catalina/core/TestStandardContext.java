@@ -19,9 +19,13 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.FilterChain;
 import javax.servlet.GenericFilter;
@@ -1037,6 +1041,56 @@ public class TestStandardContext extends TomcatBaseTest {
         Assert.assertTrue(containerListenerOk);
         Assert.assertTrue(lifecycleListenerOk);
     }
+
+    @Test
+    public void testGetServletContextReturnsSameInstanceUnderConcurrency() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File appDir = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
+        if (!appDir.mkdirs() && !appDir.isDirectory()) {
+            Assert.fail("Unable to create appDir");
+        }
+
+        StandardContext standardContext = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+        tomcat.start();
+
+        // Null the context field to simulate the window during reload
+        standardContext.context = null;
+
+        int numThreads = 20;
+        CyclicBarrier barrier = new CyclicBarrier(numThreads);
+        List<Thread> threads = new ArrayList<>();
+        ServletContext[] results = new ServletContext[numThreads];
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        for (int numOfThread = 0; numOfThread < numThreads; numOfThread++) {
+            final int index = numOfThread;
+            Thread thread = new Thread(() -> {
+                try {
+                    barrier.await();
+                    results[index] = standardContext.getServletContext();
+                } catch (Throwable ex) {
+                    failure.set(ex);
+                }
+            });
+            thread.start();
+            threads.add(thread);
+        }
+
+        for (Thread thread : threads) {
+            thread.join(5000);
+        }
+
+        if (failure.get() != null) {
+            Assert.fail("Thread failed: " + failure.get());
+        }
+
+        ServletContext first = results[0];
+        Assert.assertNotNull(first);
+        for (int i = 1; i < numThreads; i++) {
+            Assert.assertSame(first, results[i]);
+        }
+    }
+
 
     private static boolean customWrapperClassOk = false;
 

@@ -280,7 +280,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The ServletContext implementation associated with this Context.
      */
-    protected ApplicationContext context = null;
+    protected volatile ApplicationContext context = null;
 
     /**
      * The wrapped version of the associated ServletContext that is presented to listeners that are required to have
@@ -2118,12 +2118,16 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public ServletContext getServletContext() {
-        // This method is called multiple times during context start which is single threaded
-        // so there is no concurrency issue
+        // Outer check avoids locking when context already exists and
+        // inner check prevents duplicate creation when multiple threads race past the outer check.
         if (context == null) {
-            context = new ApplicationContext(this);
-            if (altDDName != null) {
-                context.setAttribute(Globals.ALT_DD_ATTR, altDDName);
+            synchronized (this) {
+                if (context == null) {
+                    context = new ApplicationContext(this);
+                    if (altDDName != null) {
+                        context.setAttribute(Globals.ALT_DD_ATTR, altDDName);
+                    }
+                }
             }
         }
         return context.getFacade();
