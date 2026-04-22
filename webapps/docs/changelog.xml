@@ -185,6 +185,9 @@
         Refactor HTTP/2 HPACK encoding so field names are only converted to
         lower case once during the encoding process. (markt)
       </fix>
+      <fix>
+        Add TLS 1.3 groups added in OpenSSL 4.0. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

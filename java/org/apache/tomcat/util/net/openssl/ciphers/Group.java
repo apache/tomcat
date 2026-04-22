@@ -41,6 +41,9 @@ public enum Group {
     ffdhe6144(0x0103),
     ffdhe8192(0x0104),
 
+    // SM2 Curve
+    curveSM2(0x0029),
+
     // Post-Quantum Key Exchange
     MLKEM512(0x0200),
     MLKEM768(0x0201),
@@ -49,7 +52,8 @@ public enum Group {
     // Hybrid Key Exchange
     SecP256r1MLKEM768(0x11EB),
     X25519MLKEM768(0x11EC),
-    SecP384r1MLKEM1024(0x11ED);
+    SecP384r1MLKEM1024(0x11ED),
+    curveSM2MLKEM768(0x11EE);
 
     private final int id;
 
