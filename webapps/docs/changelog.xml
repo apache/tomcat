@@ -251,6 +251,10 @@
       <fix>
         Correct the handling of invalid users with DIGEST authentication. (markt)
       </fix>
+      <fix>
+        Ensure <code>RealmBase</code> finds all matching extension based
+        security constraints. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
