@@ -1288,7 +1288,7 @@ public class CoyoteAdapter implements Adapter {
                     byte b2 = bytes[pos + 2];
                     pos += 3;
                     int decoded = (HexUtils.getDec(b1) << 4) + HexUtils.getDec(b2);
-                    if (decoded < 20 || decoded == 0x7F || decoded == 0x2F) {
+                    if (decoded < 0x20 || decoded == 0x7F || decoded == 0x2F) {
                         return true;
                     }
                 } else {
