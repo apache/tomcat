@@ -73,7 +73,11 @@ public enum SignatureScheme {
     slhdsa_shake_192s(0x0919, Authentication.MLDSA),
     slhdsa_shake_192f(0x091a, Authentication.MLDSA),
     slhdsa_shake_256s(0x091b, Authentication.MLDSA),
-    slhdsa_shake_256f(0x091c, Authentication.MLDSA);
+    slhdsa_shake_256f(0x091c, Authentication.MLDSA),
+
+    // SM2 algorithms
+    // Note: Mapped to ML-DSA for now, since not confirmed to be working
+    sm2sig_sm3(0x0708, Authentication.MLDSA);
 
     private final int id;
     private final Authentication auth;
