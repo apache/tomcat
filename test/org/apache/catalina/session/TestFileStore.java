@@ -30,7 +30,7 @@ import org.apache.catalina.startup.ExpandWar;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
 
-public class FileStoreTest {
+public class TestFileStore {
 
     private static final String SESS_TEMPPATH = "SESS_TEMP";
     private static final File dir = new File(SESS_TEMPPATH);
