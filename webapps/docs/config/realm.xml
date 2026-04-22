@@ -1009,6 +1009,12 @@
        1000.</p>
       </attribute>
 
+      <attribute name="caseSensitive" required="false">
+       <p>The manner in which user names will be treated when making locking
+       decisions. Defaults to <code>false</code>, meaning user names will be
+       treated in a case insensitive manner.</p>
+      </attribute>
+
       <attribute name="failureCount" required="false">
        <p>The number of times in a row a user has to fail authentication to be
        locked out. Defaults to 5.</p>

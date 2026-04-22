@@ -162,6 +162,13 @@
         request body for LOCK and PROPFIND. The default value is 4096 bytes.
         (markt)
       </fix>
+      <add>
+        Add a new <code>caseSensitive</code> attribute to the
+        <code>LockOutRealm</code> that controls the manner in which user names
+        are treated when making locking decisions. The default is
+        <code>false</code>, meaning user names are treated in a case insensitive
+        manner. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
