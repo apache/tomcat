@@ -351,16 +351,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             // connectionReservation will always be smaller than or the same as
             // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-            if (frameSize < 0) {
-                log.error(sm.getString("upgradeHandler.sendfile.frameSize.negative", connectionId,
-                        sendfile.stream.getIdAsString(), Integer.toString(frameSize),
-                        Integer.toString(getMaxFrameSize()), Integer.toString(sendfile.connectionReservation),
-                        Integer.toString(sendfile.streamReservation), Long.toString(sendfile.left)));
-                throw new IllegalStateException(sm.getString("upgradeHandler.sendfile.frameSize.negative",
-                        connectionId, sendfile.stream.getIdAsString(), Integer.toString(frameSize),
-                        Integer.toString(getMaxFrameSize()), Integer.toString(sendfile.connectionReservation),
-                        Integer.toString(sendfile.streamReservation), Long.toString(sendfile.left)));
-            }
             boolean finished =
                     (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
