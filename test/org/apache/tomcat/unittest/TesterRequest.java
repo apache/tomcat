@@ -31,6 +31,7 @@ import javax.servlet.SessionTrackingMode;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.session.StandardSession;
+import org.apache.tomcat.util.buf.MessageBytes;
 
 public class TesterRequest extends Request {
 
@@ -80,6 +81,15 @@ public class TesterRequest extends Request {
     public String getRequestURI() {
         return "/level1/level2/foo.html";
     }
+
+
+    @Override
+    public MessageBytes getRequestPathMB() {
+        MessageBytes result = MessageBytes.newInstance();
+        result.setString(getRequestURI());
+        return result;
+    }
+
 
     @Override
     public String getDecodedRequestURI() {
