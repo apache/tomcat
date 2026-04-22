@@ -18,6 +18,7 @@ package org.apache.catalina.session;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -87,7 +88,9 @@ public class TestFileStore {
 
     @Test
     public void keys() throws Exception {
-        Assert.assertArrayEquals(new String[]{"tmp1", "tmp2"}, fileStore.keys());
+        String[] keys = fileStore.keys();
+        Arrays.sort(keys);
+        Assert.assertArrayEquals(new String[]{"tmp1", "tmp2"}, keys);
         fileStore.clear();
         Assert.assertArrayEquals(new String[]{}, fileStore.keys());
     }
