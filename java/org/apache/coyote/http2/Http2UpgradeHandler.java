@@ -820,7 +820,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         return hpackEncoder;
     }
 
-
+    /**
+     * Writes an HTTP/2 DATA frame to the HTTP/2 connection's socket wrapper.
+     *
+     * @param stream - The Stream that the data pertains to
+     * @param data - The data to write
+     * @param len - The number of bytes from "data" to write
+     * @param finished - If true, sets the END_OF_STREAM flag on the DATA frame,
+     * indicating that this will be the final write for this stream
+     *
+     * @throws IOException If an I/O error occurs while writing to the socket
+     */
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
@@ -1186,10 +1196,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             break;
                         }
 
-                        int share = (int) (s.getConnectionAllocationRequested() * remaining /
+                        // Cast to long during the intermediate calculation to avoid integer overflow in multiplication
+                        int share = (int) ((long) s.getConnectionAllocationRequested() * remaining /
                                 requestedAllocationForIncrementalStreams);
                         if (share == 0) {
                             share = 1;
+                        }
+                        if (share < 0) {
+                            log.error(sm.getString("upgradeHandler.allocation.share.negative", connectionId,
+                                    s.getIdAsString(), Integer.toString(share),
+                                    Integer.toString(s.getConnectionAllocationRequested()), Integer.toString(remaining),
+                                    Long.toString(requestedAllocationForIncrementalStreams),
+                                        Integer.toString(s.getUrgency())));
+                            throw new IllegalStateException(sm.getString("upgradeHandler.allocation.share.negative",
+                                    connectionId, s.getIdAsString(), Integer.toString(share),
+                                    Integer.toString(s.getConnectionAllocationRequested()), Integer.toString(remaining),
+                                    Long.toString(requestedAllocationForIncrementalStreams),
+                                        Integer.toString(s.getUrgency())));
                         }
                         allocate(s, share);
                         result.add(s);

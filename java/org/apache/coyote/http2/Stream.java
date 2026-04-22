@@ -1161,6 +1161,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                             buffer.compact();
                             return true;
                         }
+                        if (connectionReservation < 0) {
+                            log.error(sm.getString("stream.outputBuffer.reservation.negative", getConnectionId(),
+                                    getIdAsString(), Integer.toString(connectionReservation),
+                                    Integer.toString(streamReservation), Integer.toString(left),
+                                    Integer.toString(buffer.remaining()), Long.toString(handler.getWindowSize())));
+                            throw new IllegalStateException(sm.getString("stream.outputBuffer.reservation.negative",
+                                    getConnectionId(), getIdAsString(), Integer.toString(connectionReservation),
+                                    Integer.toString(streamReservation), Integer.toString(left),
+                                    Integer.toString(buffer.remaining()), Long.toString(handler.getWindowSize())));
+                        }
                         // Do the write
                         handler.writeBody(Stream.this, buffer, connectionReservation, !writeInProgress && closed &&
                                 left == connectionReservation && coyoteResponse.getTrailerFields() == null);
