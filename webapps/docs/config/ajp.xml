@@ -566,6 +566,7 @@
 
     <attribute name="secret" required="false">
       <p>Only requests from workers with this secret keyword will be accepted.
+      The secret keyword must consist only of standard ASCII characters.
       The default value is <code>null</code>. This attribute must be specified
       with a non-null, non-zero length value unless
       <strong>secretRequired</strong> is explicitly configured to be
