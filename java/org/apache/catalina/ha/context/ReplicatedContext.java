@@ -118,9 +118,13 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     @Override
     public ServletContext getServletContext() {
         if (context == null) {
-            context = new ReplApplContext(this);
-            if (getAltDDName() != null) {
-                context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
+            synchronized (this) {
+                if (context == null) {
+                    context = new ReplApplContext(this);
+                    if (getAltDDName() != null) {
+                        context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
+                    }
+                }
             }
         }
 
