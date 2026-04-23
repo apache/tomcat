@@ -338,6 +338,9 @@
         connection level window update to individual HTTP/2 streams. Based on
         <pr>996</pr> by Mike Tingey Jr. (markt)
       </fix>
+      <fix>
+        Switch AJP secret comparison to a constant time algorithm. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
