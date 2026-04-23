@@ -375,7 +375,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString(Method.POST);
-        headers.addValue(":scheme").setString("http");
+        if (getTomcatInstance().getConnector().getSecure()) {
+            headers.addValue(":scheme").setString("https");
+        } else {
+            headers.addValue(":scheme").setString("http");
+        }
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
         if (useExpectation) {
