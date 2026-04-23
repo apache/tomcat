@@ -55,7 +55,6 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
 
 
     @Test
-    @SuppressWarnings("unused")
     public void testRotateWithNewFileName() throws Exception {
         AccessLogValve valve = createValve("access", "%s");
         getTomcatInstance().start();
@@ -87,7 +86,6 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
 
 
     @Test
-    @SuppressWarnings("unused")
     public void testRenameOnRotate() throws Exception {
         AccessLogValve valve = createValve("access", "%s");
         valve.setRotatable(true);
