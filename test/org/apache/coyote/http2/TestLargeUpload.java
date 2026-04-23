@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -109,7 +110,11 @@ public class TestLargeUpload extends Http2TestBase {
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
 
-        done.await();
+        /*
+         * Should complete very quickly (sub-second). Use timeout in case something fails. Long time out as some CI
+         * systems occasionally have long pauses.
+         */
+        done.await(30, TimeUnit.SECONDS);
         Assert.assertEquals(Integer.valueOf(bodySize * bodyCount), Integer.valueOf(read));
 
     }
