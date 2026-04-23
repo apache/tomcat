@@ -224,11 +224,6 @@
         ensure only one <code>ApplicationContext</code> instance is created.
         (dsoumis)
       </fix>
-      <fix>
-        Fix the same race condition in
-        <code>ReplicatedContext.getServletContext()</code> that was fixed in
-        <code>StandardContext.getServletContext()</code>. (dsoumis)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
