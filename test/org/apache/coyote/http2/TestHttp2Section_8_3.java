@@ -36,17 +36,17 @@ public class TestHttp2Section_8_3 extends Http2TestBase {
 
     @Test
     public void testSchemeInconsistencyNonTLS() throws Exception {
-        testSchemeInconsistenct(false);
+        testSchemeInconsistency(false);
     }
 
 
     @Test
     public void testSchemeInconsistencyTLS() throws Exception {
-        testSchemeInconsistenct(true);
+        testSchemeInconsistency(true);
     }
 
 
-    private void testSchemeInconsistenct(boolean connectionUsesTls) throws Exception {
+    private void testSchemeInconsistency(boolean connectionUsesTls) throws Exception {
         // Start HTTP/2 over non-TLS connection
         http2Connect(connectionUsesTls);
 
