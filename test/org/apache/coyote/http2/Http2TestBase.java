@@ -224,7 +224,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             String url) {
         List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", Method.GET));
-        headers.add(new Header(":scheme", "http"));
+        if (getTomcatInstance().getConnector().getSecure()) {
+            headers.add(new Header(":scheme", "https"));
+        } else {
+            headers.add(new Header(":scheme", "http"));
+        }
         headers.add(new Header(":path", url));
         headers.add(new Header(":authority", "localhost:" + getPort()));
 
@@ -262,7 +266,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
         List<Header> headers = new ArrayList<>(3);
         headers.add(new Header(":method", Method.GET));
-        headers.add(new Header(":scheme", "http"));
+        if (getTomcatInstance().getConnector().getSecure()) {
+            headers.add(new Header(":scheme", "https"));
+        } else {
+            headers.add(new Header(":scheme", "http"));
+        }
         headers.add(new Header(":path", "/simple"));
 
         buildSimpleGetRequestPart1(frameHeader, headersPayload, headers, streamId);
@@ -455,7 +463,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildHeadRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, int streamId, String path) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString(Method.HEAD);
-        headers.addValue(":scheme").setString("http");
+        if (getTomcatInstance().getConnector().getSecure()) {
+            headers.addValue(":scheme").setString("https");
+        } else {
+            headers.addValue(":scheme").setString("http");
+        }
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
         hpackEncoder.encode(headers, headersPayload);
