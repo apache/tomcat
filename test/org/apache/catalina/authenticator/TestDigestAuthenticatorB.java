@@ -35,11 +35,9 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 @RunWith(Parameterized.class)
 public class TestDigestAuthenticatorB extends TomcatBaseTest {
@@ -55,8 +53,10 @@ public class TestDigestAuthenticatorB extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{index}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] { validRole, validUser, validPassword });
-        parameterSets.add(new Object[] { "**", validUser, validPassword });
+        parameterSets.add(new Object[] { validRole, validUser, validPassword, Boolean.TRUE });
+        parameterSets.add(new Object[] { "**", validUser, validPassword, Boolean.TRUE });
+        parameterSets.add(new Object[] { "**", validUser, "null", Boolean.FALSE });
+        parameterSets.add(new Object[] { "**", "invalid", "null", Boolean.FALSE });
         return parameterSets;
     }
 
@@ -68,6 +68,9 @@ public class TestDigestAuthenticatorB extends TomcatBaseTest {
 
     @Parameter(2)
     public String clientPassword;
+
+    @Parameter(3)
+    public boolean validCredentials;
 
 
     @Test
@@ -115,99 +118,18 @@ public class TestDigestAuthenticatorB extends TomcatBaseTest {
 
         // Second request should
         List<String> auth = new ArrayList<>();
-        auth.add(buildDigestResponse(clientUserName, clientPassword, targetURI, realmName, AuthDigest.SHA_256,
-                respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME), "00000001", clientNonce, DigestAuthenticator.QOP));
+        auth.add(TestDigestAuthenticatorAlgorithms.buildDigestResponse(clientUserName, clientPassword, targetURI,
+                realmName, AuthDigest.SHA_256, respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME), "00000001",
+                clientNonce, DigestAuthenticator.QOP));
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("authorization", auth);
         rc = getUrl("http://localhost:" + getPort() + targetURI, bc, reqHeaders, null);
 
-        Assert.assertEquals(200, rc);
-        Assert.assertEquals("OK", bc.toString());
-    }
-
-
-    protected static String getNonce(String authHeader) {
-        int start = authHeader.indexOf("nonce=\"") + 7;
-        int end = authHeader.indexOf('\"', start);
-        return authHeader.substring(start, end);
-    }
-
-
-    protected static String getOpaque(String authHeader) {
-        int start = authHeader.indexOf("opaque=\"") + 8;
-        int end = authHeader.indexOf('\"', start);
-        return authHeader.substring(start, end);
-    }
-
-
-    private static String buildDigestResponse(String user, String pwd, String uri, String realm, AuthDigest algorithm,
-            List<String> authHeaders, String nc, String cnonce, String qop) {
-
-        // Find auth header with correct algorithm
-        String nonce = null;
-        String opaque = null;
-        for (String authHeader : authHeaders) {
-            nonce = getNonce(authHeader);
-            opaque = getOpaque(authHeader);
-            if (authHeader.contains("algorithm=" + algorithm.getRfcName())) {
-                break;
-            }
-        }
-        if (nonce == null || opaque == null) {
-            Assert.fail();
-        }
-
-        String a1 = user + ":" + realm + ":" + pwd;
-        String a2 = "GET:" + uri;
-
-        String digestA1 = digest(algorithm.getJavaName(), a1);
-        String digestA2 = digest(algorithm.getJavaName(), a2);
-
-        String response;
-        if (qop == null) {
-            response = digestA1 + ":" + nonce + ":" + digestA2;
+        if (validCredentials) {
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
         } else {
-            response = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + digestA2;
+            Assert.assertEquals(401, rc);
         }
-
-        String digestResponse = digest(algorithm.getJavaName(), response);
-
-        StringBuilder auth = new StringBuilder();
-        auth.append("Digest username=\"");
-        auth.append(user);
-        auth.append("\", realm=\"");
-        auth.append(realm);
-        auth.append("\", algorithm=");
-        auth.append(algorithm.getRfcName());
-        auth.append(", nonce=\"");
-        auth.append(nonce);
-        auth.append("\", uri=\"");
-        auth.append(uri);
-        auth.append("\", opaque=\"");
-        auth.append(opaque);
-        auth.append("\", response=\"");
-        auth.append(digestResponse);
-        auth.append("\"");
-        if (qop != null) {
-            auth.append(", qop=");
-            auth.append(qop);
-            auth.append("");
-        }
-        if (nc != null) {
-            auth.append(", nc=");
-            auth.append(nc);
-        }
-        if (cnonce != null) {
-            auth.append(", cnonce=\"");
-            auth.append(cnonce);
-            auth.append("\"");
-        }
-
-        return auth.toString();
-    }
-
-
-    private static String digest(String algorithm, String input) {
-        return HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, input.getBytes()));
     }
 }

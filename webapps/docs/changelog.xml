@@ -169,6 +169,9 @@
         <code>false</code>, meaning user names are treated in a case insensitive
         manner. (markt)
       </add>
+      <fix>
+        Correct the handling of invalid users with DIGEST authentication. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
