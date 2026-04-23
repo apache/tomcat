@@ -18,7 +18,12 @@ package org.apache.catalina.ha.context;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +41,58 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestReplicatedContext extends TomcatBaseTest {
+
+    @Test
+    public void testGetServletContextReturnsSameInstanceUnderConcurrency() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Host host = tomcat.getHost();
+        if (host instanceof StandardHost) {
+            ((StandardHost) host).setContextClass(ReplicatedContext.class.getName());
+        }
+
+        File root = new File("test/webapp");
+        ReplicatedContext replicatedContext =
+                (ReplicatedContext) tomcat.addWebapp(host, "", root.getAbsolutePath());
+        tomcat.start();
+
+        // Null the context field to simulate the window during reload
+        replicatedContext.context = null;
+
+        int numThreads = 20;
+        CyclicBarrier barrier = new CyclicBarrier(numThreads);
+        List<Thread> threads = new ArrayList<>();
+        ServletContext[] results = new ServletContext[numThreads];
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        for (int i = 0; i < numThreads; i++) {
+            final int index = i;
+            Thread thread = new Thread(() -> {
+                try {
+                    barrier.await();
+                    results[index] = replicatedContext.getServletContext();
+                } catch (Throwable ex) {
+                    failure.set(ex);
+                }
+            });
+            thread.start();
+            threads.add(thread);
+        }
+
+        for (Thread thread : threads) {
+            thread.join(5000);
+        }
+
+        if (failure.get() != null) {
+            Assert.fail("Thread failed: " + failure.get());
+        }
+
+        ServletContext first = results[0];
+        Assert.assertNotNull(first);
+        for (int i = 1; i < numThreads; i++) {
+            Assert.assertSame(first, results[i]);
+        }
+    }
+
 
     @Test
     public void testBug57425() throws LifecycleException, IOException {
