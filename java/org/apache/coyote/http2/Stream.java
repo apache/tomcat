@@ -399,11 +399,15 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (coyoteRequest.scheme().isNull()) {
                     coyoteRequest.scheme().setString(value);
                     // Check scheme is consistent with TLS usage
-                    if ("https".equals(value) != handler.getProtocol().getHttp11Protocol().isSSLEnabled()) {
-                        headerException = new StreamException(
-                                sm.getString("stream.header.inconsistentScheme", getConnectionId(), getIdAsString(),
-                                value, Boolean.toString(handler.getProtocol().getHttp11Protocol().isSSLEnabled())),
-                                Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    if ("https".equals(value) != ((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol())
+                            .isSSLEnabled()) {
+                        headerException =
+                                new StreamException(
+                                        sm.getString("stream.header.inconsistentScheme", getConnectionId(),
+                                                getIdAsString(), value,
+                                                Boolean.toString(((AbstractHttp11Protocol<?>) handler.getProtocol()
+                                                        .getHttp11Protocol()).isSSLEnabled())),
+                                        Http2Error.PROTOCOL_ERROR, getIdAsInt());
                     }
                 } else {
                     headerException = new StreamException(
