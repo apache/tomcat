@@ -188,6 +188,10 @@
       <fix>
         Add TLS 1.3 groups added in OpenSSL 4.0. (remm)
       </fix>
+      <fix>
+        Add validation that the HTTP/2 <code>:scheme</code> pseudo-header is
+        consistent with the use (or not) of TLS. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
