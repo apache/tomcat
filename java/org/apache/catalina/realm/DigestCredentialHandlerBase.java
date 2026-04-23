@@ -25,6 +25,7 @@ import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConstantTime;
 
 /**
  * Base implementation for the Tomcat provided {@link CredentialHandler}s.
@@ -286,38 +287,12 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
      *                       here is only guaranteed to work with plain ASCII characters.
      *
      * @return <code>true</code> if the strings are equal to each other, <code>false</code> otherwise.
+     *
+     * @deprecated Use {@link ConstantTime#equals(String, String, boolean)}. This method will be removed in Tomcat 12.
      */
+    @Deprecated
     public static boolean equals(final String s1, final String s2, final boolean ignoreCase) {
-        if (s1 == s2) {
-            return true;
-        }
-        if (s1 == null || s2 == null) {
-            return false;
-        }
-
-        final int len1 = s1.length();
-        final int len2 = s2.length();
-
-        if (len2 == 0) {
-            return len1 == 0;
-        }
-
-        int result = 0;
-        result |= len1 - len2;
-
-        // time-constant comparison
-        for (int i = 0; i < len1; i++) {
-            // If i >= len2, index2 is 0; otherwise, i.
-            final int index2 = ((i - len2) >>> 31) * i;
-            char c1 = s1.charAt(i);
-            char c2 = s2.charAt(index2);
-            if (ignoreCase) {
-                c1 = Character.toLowerCase(c1);
-                c2 = Character.toLowerCase(c2);
-            }
-            result |= c1 ^ c2;
-        }
-        return result == 0;
+        return ConstantTime.equals(s1, s2, ignoreCase);
     }
 
     /**
@@ -333,8 +308,11 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
      * @param b2 The second array to compare.
      *
      * @return <code>true</code> if the arrays are equal to each other, <code>false</code> otherwise.
+     *
+     * @deprecated Use {@link ConstantTime#equals(byte[], byte[])}. This method will be removed in Tomcat 12.
      */
+    @Deprecated
     public static boolean equals(final byte[] b1, final byte[] b2) {
-        return MessageDigest.isEqual(b1, b2);
+        return ConstantTime.equals(b1, b2);
     }
 }
