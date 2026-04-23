@@ -558,9 +558,10 @@ public class CoyoteAdapter implements Adapter {
     protected boolean postParseRequest(org.apache.coyote.Request req, Request request, org.apache.coyote.Response res,
             Response response) throws IOException, ServletException {
 
-        // If the processor has set the scheme (AJP does this, HTTP does this if
-        // SSL is enabled) use this to set the secure flag as well. If the
-        // processor hasn't set it, use the settings from the connector
+        /*
+         * If the processor has set the scheme (AJP and HTTP/2 do this, HTTP/1.x does this if SSL is enabled), use this
+         * to set the secure flag as well. If the processor hasn't set it, use the settings from the connector.
+         */
         if (req.scheme().isNull()) {
             // Use connector scheme and secure configuration, (defaults to
             // "http" and false respectively)
