@@ -552,6 +552,6 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("host", "localhost:" + getPort()));
 
-        doInvalidPseudoHeaderTest(headers, "0-Goaway-[3]-[1]-");
+        doInvalidPseudoHeaderTest(headers, "3-RST-[1]\n");
     }
 }
