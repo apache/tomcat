@@ -61,4 +61,24 @@ public class TestHttp2Section_8_5 extends Http2TestBase {
 
         Assert.assertEquals("3-RST-[1]\n", output.getTrace());
     }
+
+
+    @Test
+    public void testConnectWithoutAuthority() throws Exception {
+        http2Connect();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", Method.CONNECT));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame();
+
+        Assert.assertEquals("3-RST-[1]\n", output.getTrace());
+    }
 }
