@@ -589,11 +589,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (coyoteRequest.getMethod() == null) {
             missingHeader = true;
         } else if (Method.CONNECT.equals(coyoteRequest.getMethod())) {
+            // CONNECT only
             if (!coyoteRequest.scheme().isNull() || !coyoteRequest.requestURI().isNull()) {
-                throw new StreamException(sm.getString("stream.header.invalidConnect",  getConnectionId(),
+                throw new StreamException(sm.getString("stream.header.invalidConnect", getConnectionId(),
                         getIdAsString()), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
-        } else if (!Method.CONNECT.equals(coyoteRequest.getMethod())) {
+            if (coyoteRequest.serverName().isNull()) {
+                missingHeader = true;
+            }
+        } else {
+            // All other methods
             if (coyoteRequest.scheme().isNull() || coyoteRequest.requestURI().isNull()) {
                 missingHeader = true;
             }
