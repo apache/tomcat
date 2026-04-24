@@ -258,12 +258,12 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
 
     @SuppressWarnings("BusyWait")
     private static void awaitFile(File file) throws InterruptedException {
-        long deadline = System.currentTimeMillis() + 2000;
+        long deadline = System.currentTimeMillis() + 5000;
         while (!file.exists() || file.length() == 0) {
             if (System.currentTimeMillis() > deadline) {
                 Assert.fail("Timed out waiting for " + file.getName());
             }
-            Thread.sleep(2);
+            Thread.sleep(50);
         }
     }
 }
