@@ -573,7 +573,6 @@ public class TestStreamProcessor extends Http2TestBase {
 
         List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", Method.CONNECT));
-        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":authority", "example.local"));
 
         byte[] headersFrameHeader = new byte[9];
