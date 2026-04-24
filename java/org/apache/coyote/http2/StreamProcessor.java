@@ -516,9 +516,9 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
             return false;
         }
 
-        // Scheme must adhere to RFC 3986
+        // Scheme must adhere to RFC 3986 - null scheme possible with CONNECT
         String scheme = request.scheme().toString();
-        if (!HttpParser.isScheme(scheme)) {
+        if (scheme != null && !HttpParser.isScheme(scheme)) {
             return false;
         }
 

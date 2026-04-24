@@ -582,12 +582,27 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    final boolean receivedEndOfHeaders() throws ConnectionException {
-        if (coyoteRequest.getMethod() == null || coyoteRequest.scheme().isNull() ||
-                !Method.CONNECT.equals(coyoteRequest.getMethod()) && coyoteRequest.requestURI().isNull()) {
-            throw new ConnectionException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
-                    Http2Error.PROTOCOL_ERROR);
+    final boolean receivedEndOfHeaders() throws StreamException {
+        boolean missingHeader = false;
+
+        if (coyoteRequest.getMethod() == null) {
+            missingHeader = true;
+        } else if (Method.CONNECT.equals(coyoteRequest.getMethod())) {
+            if (!coyoteRequest.scheme().isNull() || !coyoteRequest.requestURI().isNull()) {
+                throw new StreamException(sm.getString("stream.header.invalidConnect",  getConnectionId(),
+                        getIdAsString()), Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            }
+        } else if (!Method.CONNECT.equals(coyoteRequest.getMethod())) {
+            if (coyoteRequest.scheme().isNull() || coyoteRequest.requestURI().isNull()) {
+                missingHeader = true;
+            }
         }
+
+        if (missingHeader) {
+            throw new StreamException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
+        }
+
         // Cookie headers need to be concatenated into a single header
         // See RFC 7540 8.1.2.5
         // Can only do this once the headers are fully received
