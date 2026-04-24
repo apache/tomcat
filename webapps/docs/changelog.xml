@@ -307,6 +307,10 @@
         Add validation that the HTTP/2 <code>:scheme</code> pseudo-header is
         consistent with the use (or not) of TLS. (markt)
       </fix>
+      <fix>
+        Correct the  validation of pseudo headers and CONNECT requests to align
+        Tomcat's behaviour with RFC 9113, section 8.5. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
