@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -69,9 +70,34 @@ public abstract class Authenticator {
      * @return The generated authorization header value
      *
      * @throws AuthenticationException When an error occurs
+     *
+     * @deprecated Unused. Will be remove in Tomcat 12. Use
+     *                 {@link #getAuthorization(String, String, String, String, String, String)}
      */
-    public abstract String getAuthorization(String requestUri, String authenticateHeader, String userName,
-            String userPassword, String userRealm) throws AuthenticationException;
+    @Deprecated
+    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
+            String userRealm) throws AuthenticationException {
+        return getAuthorization(Method.GET, requestUri, authenticateHeader, userName, userPassword, userRealm);
+    }
+
+
+    /**
+     * Generate the authorization header value that will be sent to the server.
+     *
+     * @param method             The request method
+     * @param requestUri         The request URI
+     * @param authenticateHeader The server authentication header received
+     * @param userName           The username
+     * @param userPassword       The user password
+     * @param userRealm          The realm for which the provided username and password are valid. {@code null} to
+     *                               indicate all realms.
+     *
+     * @return The generated authorization header value
+     *
+     * @throws AuthenticationException When an error occurs
+     */
+    public abstract String getAuthorization(String method, String requestUri, String authenticateHeader,
+            String userName, String userPassword, String userRealm) throws AuthenticationException;
 
 
     /**

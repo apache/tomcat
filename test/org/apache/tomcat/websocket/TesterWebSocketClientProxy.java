@@ -58,11 +58,22 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
  *     ProxyVia On
  *     AllowCONNECT 0-65535
  *     <Proxy *>
- *         Order deny,allow
- *         Allow from all
  *         AuthType Basic
  *         AuthName "Proxy Password Required"
- *         AuthUserFile password.file
+ *         AuthUserFile "/etc/apache2/password.file"
+ *         Require valid-user
+ *     </Proxy>
+ * </VirtualHost>
+ *
+ * Listen 8890
+ * <VirtualHost *:8890>
+ *     ProxyRequests On
+ *     ProxyVia On
+ *     AllowCONNECT 0-65535
+ *     <Proxy *>
+ *         AuthType Digest
+ *         AuthName "Proxy Password Required"
+ *         AuthUserFile "/etc/apache2/password-digest.file"
  *         Require valid-user
  *     </Proxy>
  * </VirtualHost>
@@ -71,16 +82,20 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
  * # htpasswd -c password.file proxy
  * New Password: proxy-pass
  *
+ * # htdigest -c password-digest.file proxy
+ * New Password: proxy-pass
+ *
  */
 public class TesterWebSocketClientProxy extends WebSocketBaseTest {
 
     private static final String MESSAGE_STRING = "proxy-test-message";
 
-    private static final String PROXY_ADDRESS = "192.168.0.200";
+    private static final String PROXY_ADDRESS = "192.168.23.32";
     private static final String PROXY_PORT_NO_AUTH = "8888";
-    private static final String PROXY_PORT_AUTH = "8889";
+    private static final String PROXY_PORT_BASIC_AUTH = "8889";
+    private static final String PROXY_PORT_DIGEST_AUTH = "8890";
     // The IP address of the test instance that is reachable from the proxy
-    private static final String TOMCAT_ADDRESS = "192.168.0.100";
+    private static final String TOMCAT_ADDRESS = "192.168.23.12";
 
     private static final String TOMCAT_USER = "tomcat";
     private static final String TOMCAT_PASSWORD = "tomcat-pass";
@@ -91,35 +106,49 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
 
     @Test
     public void testConnectToServerViaProxyWithNoAuthentication() throws Exception {
-        doTestConnectToServerViaProxy(false, false);
+        doTestConnectToServerViaProxy(false, null);
     }
 
 
     @Test
     public void testConnectToServerViaProxyWithServerAuthentication() throws Exception {
-        doTestConnectToServerViaProxy(true, false);
+        doTestConnectToServerViaProxy(true, null);
     }
 
 
     @Test
-    public void testConnectToServerViaProxyWithProxyAuthentication() throws Exception {
-        doTestConnectToServerViaProxy(false, true);
+    public void testConnectToServerViaProxyWithProxyBasicAuthentication() throws Exception {
+        doTestConnectToServerViaProxy(false, "basic");
     }
 
 
     @Test
-    public void testConnectToServerViaProxyWithServerAndProxyAuthentication() throws Exception {
-        doTestConnectToServerViaProxy(true, true);
+    public void testConnectToServerViaProxyWithServerAndProxyBasicAuthentication() throws Exception {
+        doTestConnectToServerViaProxy(true, "basic");
     }
 
 
-    private void doTestConnectToServerViaProxy(boolean serverAuthentication, boolean proxyAuthentication)
+    @Test
+    public void testConnectToServerViaProxyWithProxyDigestAuthentication() throws Exception {
+        doTestConnectToServerViaProxy(false, "digest");
+    }
+
+
+    @Test
+    public void testConnectToServerViaProxyWithServerAndProxyDigestAuthentication() throws Exception {
+        doTestConnectToServerViaProxy(true, "digest");
+    }
+
+
+    private void doTestConnectToServerViaProxy(boolean serverAuthentication, String proxyAuthentication)
             throws Exception {
 
         // Configure the proxy
         System.setProperty("http.proxyHost", PROXY_ADDRESS);
-        if (proxyAuthentication) {
-            System.setProperty("http.proxyPort", PROXY_PORT_AUTH);
+        if ("basic".equalsIgnoreCase(proxyAuthentication)) {
+            System.setProperty("http.proxyPort", PROXY_PORT_BASIC_AUTH);
+        } else if ("digest".equalsIgnoreCase(proxyAuthentication)) {
+            System.setProperty("http.proxyPort", PROXY_PORT_DIGEST_AUTH);
         } else {
             System.setProperty("http.proxyPort", PROXY_PORT_NO_AUTH);
         }
@@ -166,7 +195,7 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
             clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_USER_NAME, TOMCAT_USER);
             clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD, TOMCAT_PASSWORD);
         }
-        if (proxyAuthentication) {
+        if (proxyAuthentication != null) {
             clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PROXY_USER_NAME, PROXY_USER);
             clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PROXY_PASSWORD, PROXY_PASSWORD);
         }
