@@ -28,6 +28,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.ConstantTime;
 
 /**
  * This credential handler supports the following forms of stored passwords:
@@ -110,7 +111,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
         if (getAlgorithm() == null) {
             // No digests, compare directly
-            return DigestCredentialHandlerBase.equals(inputCredentials, storedCredentials, false);
+            return ConstantTime.equals(inputCredentials, storedCredentials, false);
         } else {
             // Some directories and databases prefix the password with the hash
             // type. The string is in a format compatible with Base64.encode not
@@ -123,7 +124,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                         inputCredentials.getBytes(StandardCharsets.ISO_8859_1));
                 String base64UserDigest = Base64.getEncoder().encodeToString(userDigest);
 
-                return DigestCredentialHandlerBase.equals(base64UserDigest, base64ServerDigest, false);
+                return ConstantTime.equals(base64UserDigest, base64ServerDigest, false);
             } else if (storedCredentials.startsWith("{SSHA}")) {
                 // "{SSHA}<sha-1 digest:20><salt:n>"
                 // Need to convert the salt to bytes to apply it to the user's
