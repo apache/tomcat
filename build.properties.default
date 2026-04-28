@@ -198,7 +198,7 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-${tomcat-native-openssl.version}-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.11
+nsis.version=3.12
 nsis.checksum.enabled=true
 nsis.bin.checksum.algorithm=MD5|SHA-1
 nsis.bin.checksum.value=b7c063bee3afc8127dca0fd64c4e22ce|ef7ff767e5cbd9edd22add3a32c9b8f4500bb10d
