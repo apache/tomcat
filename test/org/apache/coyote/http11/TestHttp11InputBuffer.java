@@ -197,7 +197,11 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 continue;
             }
             if (i == '\n') {
-                // LF is the optional line terminator
+                // LF is no longer accepted as a line terminator
+                // (tolerantEol is now false). Treat as invalid control char.
+                doTestBug51557InvalidCharInValue((char) i);
+                tearDown();
+                setUp();
                 continue;
             }
             doTestBug51557InvalidCharInValue((char) i);

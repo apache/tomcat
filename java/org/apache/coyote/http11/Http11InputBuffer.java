@@ -152,7 +152,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
         parsingRequestLineQPos = -1;
 
         parsingHeader = true;
-        httpHeaderParser = new HttpHeaderParser(this, request.getMimeHeaders(), true);
+        httpHeaderParser = new HttpHeaderParser(this, request.getMimeHeaders(), false);
 
         swallowInput = true;
 

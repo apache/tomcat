@@ -81,9 +81,14 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 "GET /test?a=<b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, parameterSets);
 
-        // Standard HTTP/1.1 request using LF rather than CRLF
+        // Standard HTTP/1.1 request using LF rather than CRLF - reject for
+        // strict RFC 7230 compliance. While RFC 7230 Section 3.5 permits
+        // recipients to accept bare LF, accepting it by default creates a
+        // security risk (HTTP Header Injection / Request Smuggling) when
+        // Tomcat is deployed behind a reverse proxy that enforces strict
+        // CRLF parsing.
         addRequestWithSplits("GET /test HTTP/1.1" + LF + "Host: localhost:8080" + LF + "Connection: close" + LF + LF,
-                parameterSets);
+                Boolean.FALSE, parameterSets);
 
         // Invalid HTTP/1.1 request using CR rather than CRLF
         addRequestWithSplits("GET /test HTTP/1.1" + CR + "Host: localhost:8080" + CR + "Connection: close" + CR + CR,
