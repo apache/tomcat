@@ -176,12 +176,12 @@ tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 nsis.version=3.12
 nsis.checksum.enabled=true
 nsis.bin.checksum.algorithm=MD5|SHA-1
-nsis.bin.checksum.value=b7c063bee3afc8127dca0fd64c4e22ce|ef7ff767e5cbd9edd22add3a32c9b8f4500bb10d
+nsis.bin.checksum.value=757c22153dd8b90f5e297310d9966997|364fd795b0cafc1fbff3e966f103a8f8fc8fb7f1
 nsis.bin.home=${base.path}/nsis-${nsis.version}
 nsis.executable.windows=${nsis.bin.home}/makensis.exe
 nsis.bin.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 nsis.src.checksum.algorithm=MD5|SHA-1
-nsis.src.checksum.value=63bdc1b7676c96486532c98c0b4d2fb5|63ddba57fe46b1e0a4810ece2a7980f069c031b6
+nsis.src.checksum.value=8ec7c3e1228ac4eb96e5e421610b4aae|432e99150881c061c7e313eb1aac45763d951572
 nsis.src.home=${base.path}/nsis-${nsis.version}-src
 nsis.src.loc=${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
