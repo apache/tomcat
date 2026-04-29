@@ -374,16 +374,16 @@ derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
 
 # ----- Bouncy Castle, used by unit tests ----
-bouncycastle.version=1.83
+bouncycastle.version=1.84
 bouncycastle-provider.checksum.enabled=true
 bouncycastle-provider.checksum.algorithm=SHA-512
-bouncycastle-provider.checksum.value=e51cc843ca130ad4a15ff667360063bbb583af3f22e14193840a734da6665b470ba1855ce975f88a94ddd6419aa020d3a9966980bc1deb7514f92a7215d6e229
+bouncycastle-provider.checksum.value=4b7e5696830023bad1594d9f9766898f78018ec7d6ec34de23f2a6683b02803b92ffe8ab5d21f1a717eb4fafa8e22dcf3a4b6dd275bd86c7cb02609987fe92f5
 bouncycastle-pkix.checksum.enabled=true
 bouncycastle-pkix.checksum.algorithm=SHA-512
-bouncycastle-pkix.checksum.value=9c67d990a56a5c448f9bb9edbb8b99dc15971e16de7e6f10c3eab129a1389eef4882c5a5d910ac4ddc27d44f7bc9fa4054c7f56dc031154c131bccc50ebd67b9
+bouncycastle-pkix.checksum.value=01644d7e0c6041ea8c8629f6ad73f7206efa2797d954da1507dd43c5d262a161194ed84e960234cf5c53787033f1181aa4965e0d6ebfe82ca040de13ca307565
 bouncycastle-util.checksum.enabled=true
 bouncycastle-util.checksum.algorithm=SHA-512
-bouncycastle-util.checksum.value=e19831d4afc0a709fd57694f33bfe3a8e881cba287c34fb076a44ef436e56e6bdf49299ca9525028a4de9bf5fadeaa254654d0e527855f1f5659c5a7be538576
+bouncycastle-util.checksum.value=e001b244723fb3c4d1e06862bb857512015a92d7e18650ae3447a3d258274ec8ed37b8cba958397b00f8dd73463943e9a9489dd5dbddbe24b24cd6fae5ca8a62
 
 bouncycastle.home=${base.path}/bouncycastle-${bouncycastle.version}
 bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.jar
