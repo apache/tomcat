@@ -409,4 +409,69 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
                     new IllegalStateException("Root cause"));
         }
     }
+
+
+    @Test
+    public void testJsonErrorThrowableWithNullMessage() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        ((StandardHost) tomcat.getHost()).setErrorReportValveClass(JSON_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        // Throwable with null message
+        Tomcat.addServlet(ctx, "nullMsg", new ExceptionServlet(null));
+        ctx.addServletMappingDecoded("/", "nullMsg");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals("Exception Report", json.get("type"));
+        Assert.assertEquals(500, ((Number) json.get("status")).intValue());
+        // message should be empty since throwable.getMessage() is null
+        Assert.assertEquals("", json.get("message"));
+        Assert.assertNotNull(json.get("throwable"));
+    }
+
+
+    @Test
+    public void testJsonErrorWithSetPropertyAndGetProperty() {
+        JsonErrorReportValve valve = new JsonErrorReportValve();
+
+        // Inherited from ErrorReportValve
+        Assert.assertTrue(valve.setProperty("errorCode.404", "/error404.json"));
+        Assert.assertEquals("/error404.json", valve.getProperty("errorCode.404"));
+
+        Assert.assertTrue(valve.setProperty(
+                "exceptionType.java.lang.NullPointerException", "/npe.json"));
+        Assert.assertEquals("/npe.json", valve.getProperty(
+                "exceptionType.java.lang.NullPointerException"));
+
+        // Unknown property returns false/null
+        Assert.assertFalse(valve.setProperty("unknown.key", "value"));
+        Assert.assertNull(valve.getProperty("unknown.key"));
+    }
+
+
+    @Test
+    public void testJsonErrorShowReportShowServerInfoInherited() throws Exception {
+        JsonErrorReportValve valve = new JsonErrorReportValve();
+
+        // These are inherited from ErrorReportValve
+        Assert.assertTrue(valve.isShowReport());
+        valve.setShowReport(false);
+        Assert.assertFalse(valve.isShowReport());
+
+        Assert.assertTrue(valve.isShowServerInfo());
+        valve.setShowServerInfo(false);
+        Assert.assertFalse(valve.isShowServerInfo());
+    }
 }
