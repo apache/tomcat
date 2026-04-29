@@ -2189,14 +2189,10 @@
       </attribute>
 
       <attribute name="applyJava8u40Fix" required="false">
-        <p>A fix introduced in Java 8 update 40 (
-        <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a>)
-        onwards broke SPNEGO authentication for IE with Tomcat running on
-        Windows 2008 R2 servers. This option enables a work-around that allows
-        SPNEGO authentication to continue working. The work-around should not
-        impact other configurations so it is enabled by default. If necessary,
-        the workaround can be disabled by setting this attribute to
-        <code>false</code>.</p>
+        <p>This attribute is hard-coded to <code>false</code> as the work around
+        it enabled is no longer required. The attribute will be removed from
+        Tomcat 12 onwards. Any attempt to set the attribute will be ignored.
+        </p>
       </attribute>
 
       <attribute name="cache" required="false">
