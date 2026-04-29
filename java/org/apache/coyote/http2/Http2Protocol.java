@@ -30,6 +30,7 @@ import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.juli.logging.Log;
@@ -366,7 +367,7 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    public boolean useCompression(Request request, Response response) {
+    public OutputFilterFactory useCompression(Request request, Response response) {
         return http11Protocol.useCompression(request, response);
     }
 

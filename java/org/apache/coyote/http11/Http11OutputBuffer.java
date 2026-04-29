@@ -132,7 +132,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         newFilterLibrary[filterLibrary.length] = filter;
         filterLibrary = newFilterLibrary;
 
-        activeFilters = new OutputFilter[filterLibrary.length];
+        activeFilters = new OutputFilter[filterLibrary.length + 1];
     }
 
 

@@ -47,6 +47,7 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeApplicationBufferHandler;
 import org.apache.juli.logging.Log;
@@ -181,10 +182,6 @@ public class Http11Processor extends AbstractProcessor {
 
         // Create and add buffered input filter
         inputBuffer.addFilter(new BufferedInputFilter(protocol.getMaxSwallowSize()));
-
-        // Create and add the gzip filters.
-        // inputBuffer.addFilter(new GzipInputFilter());
-        outputBuffer.addFilter(new GzipOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
     }
@@ -885,9 +882,9 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-        boolean useCompression = false;
+        OutputFilterFactory compressionFactory = null;
         if (entityBody && sendfileData == null) {
-            useCompression = protocol.useCompression(request, response);
+            compressionFactory = protocol.useCompression(request, response);
         }
 
         MimeHeaders headers = response.getMimeHeaders();
@@ -933,8 +930,9 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        if (useCompression) {
-            outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
+        if (compressionFactory != null) {
+            // Add the negotiated compression filter
+            outputBuffer.addActiveFilter(compressionFactory.createFilter());
         }
 
         // Add date header unless application has already set one (e.g. in a

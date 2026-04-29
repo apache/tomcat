@@ -40,6 +40,8 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
@@ -59,6 +61,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractHttp11Protocol.class);
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
+    private final List<OutputFilterFactory> outputFilterFactories = new ArrayList<>();
+    private boolean outputFilterFactoryConfigured = false;
 
     private HttpParser httpParser = null;
 
@@ -339,7 +343,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
 
-
     public String getNoCompressionEncodings() {
         return compressionConfig.getNoCompressionEncodings();
     }
@@ -348,11 +351,43 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setNoCompressionEncodings(encodings);
     }
 
-
-    public boolean useCompression(Request request, Response response) {
-        return compressionConfig.useCompression(request, response);
+    /**
+     * Add an output filter factory. Called by Digester when parsing
+     * {@code <OutputFilterFactory>} elements in server.xml.
+     *
+     * @param factory The factory to add
+     */
+    public void addOutputFilterFactory(OutputFilterFactory factory) {
+        outputFilterFactories.add(factory);
+        outputFilterFactoryConfigured = true;
     }
 
+    /**
+     * Get the list of configured output filter factories.
+     * If none have been explicitly configured, a default
+     * {@link GzipOutputFilterFactory} is returned.
+     *
+     * @return The list of output filter factories, never null
+     */
+    public List<OutputFilterFactory> getOutputFilterFactories() {
+        if (!outputFilterFactoryConfigured && outputFilterFactories.isEmpty()) {
+            outputFilterFactories.add(new GzipOutputFilterFactory());
+        }
+        return outputFilterFactories;
+    }
+
+    /**
+     * Determin if compression should be used for this response.
+     *
+     * @param request   The request
+     * @param response  The response
+     *
+     * @return The factory to use for compression, or {@code null} if
+     *         compression should not be used
+     */
+    public OutputFilterFactory useCompression(Request request, Response response) {
+        return compressionConfig.useCompression(request, response, getOutputFilterFactories());
+    }
 
     private Pattern restrictedUserAgents = null;
 

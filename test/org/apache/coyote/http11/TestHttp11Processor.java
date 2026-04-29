@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.zip.Deflater;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
@@ -48,6 +49,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -2149,6 +2152,44 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
     }
 
+    @Test
+    public void testDefaultAutoRegistration() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        // No factory configured - getOutputFilterFactories should auto-register GzipOutputFilterFactory
+        List<OutputFilterFactory> factories = protocol.getOutputFilterFactories();
+        Assert.assertFalse(factories.isEmpty());
+        Assert.assertEquals(1, factories.size());
+        Assert.assertTrue(factories.get(0) instanceof GzipOutputFilterFactory);
+    }
+
+    @Test
+    public void testAddOutputFilterFactory() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        // Explicitly add a factory - should suppress default auto-registration
+        MockOutputFilterFactory mock = new MockOutputFilterFactory();
+        protocol.addOutputFilterFactory(mock);
+
+        List<OutputFilterFactory> factories = protocol.getOutputFilterFactories();
+        Assert.assertEquals(1, factories.size());
+        Assert.assertSame(mock, factories.get(0));
+    }
+
+    @Test
+    public void testAddMultipleOutputFilterFactories() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        GzipOutputFilterFactory gzip = new GzipOutputFilterFactory();
+        MockOutputFilterFactory mock = new MockOutputFilterFactory();
+        protocol.addOutputFilterFactory(gzip);
+        protocol.addOutputFilterFactory(mock);
+
+        List<OutputFilterFactory> factories = protocol.getOutputFilterFactories();
+        Assert.assertEquals(2, factories.size());
+        Assert.assertSame(gzip, factories.get(0));
+        Assert.assertSame(mock, factories.get(1));
+    }
 
     private static class EarlyHintsServlet extends HttpServlet {
 
@@ -2200,5 +2241,18 @@ public class TestHttp11Processor extends TomcatBaseTest {
         String newEncodings = protocol.getNoCompressionEncodings();
         Assert.assertTrue(newEncodings.contains("br"));
         Assert.assertFalse(newEncodings.contains("gzip"));
+    }
+
+    public static class MockOutputFilterFactory implements OutputFilterFactory {
+
+        @Override
+        public OutputFilter createFilter() {
+            return null;
+        }
+
+        @Override
+        public String getEncodingName() {
+            return "mock";
+        }
     }
 }
