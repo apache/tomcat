@@ -223,6 +223,9 @@
         Add check for Tomcat Native library, and log warning when it's not found
         to make it easier to see when it's not used by the suite. (csutherl)
       </add>
+      <update>
+        Update Byte Buddy to 1.18.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
