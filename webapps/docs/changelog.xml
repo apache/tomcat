@@ -224,6 +224,11 @@
         ensure only one <code>ApplicationContext</code> instance is created.
         (dsoumis)
       </fix>
+      <fix>
+        Update the Windows authentication (kerberos) documentation to reflect
+        that both Java and Windows are removing / have removed support for
+        RC4-HMAC. The guide now uses AES256-SHA1. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
