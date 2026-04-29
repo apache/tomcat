@@ -432,6 +432,9 @@
       <fix>
         <bug>69993</bug>: Update the URL to the CDDL 1.0 license. (markt)
       </fix>
+      <update>
+        Update Byte Buddy to 1.18.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
