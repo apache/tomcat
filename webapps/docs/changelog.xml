@@ -435,6 +435,9 @@
       <update>
         Update Byte Buddy to 1.18.8. (markt)
       </update>
+      <update>
+        Update Checkstyle to 13.4.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
