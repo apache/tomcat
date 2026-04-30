@@ -574,18 +574,31 @@ public class TagFileProcessor {
                 String tagFilePath = tagFileInfo.getPath();
                 if (tagFilePath.startsWith("/META-INF/")) {
                     // For tags in JARs, add the TLD and the tag as a dependency
-                    TldResourcePath tldResourcePath = compiler.getCompilationContext()
-                            .getTldResourcePath(tagFileInfo.getTagInfo().getTagLibrary().getURI());
-
+                    String tagLibraryUri = tagFileInfo.getTagInfo().getTagLibrary().getURI();
+                    TldResourcePath tldResourcePath =
+                            compiler.getCompilationContext().getTldResourcePath(tagLibraryUri);
+                    String tldWebAppPath = tldResourcePath.getWebappPath();
                     try (Jar jar = tldResourcePath.openJar()) {
 
                         if (jar != null) {
+                            /*
+                             * If the JAR is not in the web application path, use the stable Tag Library URI as the
+                             * dependency key to keep the generated code deterministic across build environments.
+                             */
+                            String tldKey;
+                            String tagKey;
+                            if (tldWebAppPath == null) {
+                                tldKey = "uri:" + tagLibraryUri + "!/" + tldResourcePath.getEntryName();
+                                tagKey = "uri:" + tagLibraryUri + "!/" + tagFilePath.substring(1);
+                            } else {
+                                tldKey = jar.getURL(tldResourcePath.getEntryName());
+                                tagKey = jar.getURL(tagFilePath.substring(1));
+                            }
                             // Add TLD
-                            pageInfo.addDependant(jar.getURL(tldResourcePath.getEntryName()),
+                            pageInfo.addDependant(tldKey,
                                     Long.valueOf(jar.getLastModified(tldResourcePath.getEntryName())));
                             // Add Tag
-                            pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
-                                    Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
+                            pageInfo.addDependant(tagKey, Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
                         } else {
                             pageInfo.addDependant(tagFilePath,
                                     compiler.getCompilationContext().getLastModified(tagFilePath));

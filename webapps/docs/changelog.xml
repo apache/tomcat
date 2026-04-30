@@ -278,6 +278,12 @@
         <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
         by Jan Luehe. (remm)
       </fix>
+      <fix>
+        <bug>70001</bug>: Ensure JSP compilation is reproducible when
+        dependencies exist for tag files and tag libraries located on the class
+        path but outside of the web application. <pr>992</pr> submitted by Jan
+        Luehe. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
