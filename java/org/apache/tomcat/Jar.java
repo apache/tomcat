@@ -19,6 +19,7 @@ package org.apache.tomcat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.jar.Manifest;
 
 /**
@@ -46,6 +47,31 @@ public interface Jar extends AutoCloseable {
      * @throws IOException if an I/O error occurs while processing the JAR file
      */
     InputStream getInputStream(String name) throws IOException;
+
+    /**
+     * Obtain the last modified time for the JAR.
+     *
+     * @return The time (in the same format as {@link System#currentTimeMillis()}) that the resource was last modified.
+     *             Returns -1 if the entry does not exist
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
+     */
+    default long getLastModified() throws IOException {
+        URL jarUrl = getJarFileURL();
+        URLConnection urlConn = null;
+        try {
+            urlConn = jarUrl.openConnection();
+            return urlConn.getLastModified();
+        } finally {
+            if (urlConn != null) {
+                try {
+                    urlConn.getInputStream().close();
+                } catch (IOException ignore) {
+                    // Ignore
+                }
+            }
+        }
+    }
 
     /**
      * Obtain the last modified time for the given resource in the JAR.
