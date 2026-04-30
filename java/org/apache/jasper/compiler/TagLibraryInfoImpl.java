@@ -23,7 +23,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -137,23 +136,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                         // stable taglib URI as the dependency key instead of the
                         // absolute JAR URL to keep the generated servlet code
                         // deterministic across build environments.
-                        URL jarUrl = jar.getJarFileURL();
-                        long lastMod;
-                        URLConnection urlConn = null;
-                        try {
-                            urlConn = jarUrl.openConnection();
-                            lastMod = urlConn.getLastModified();
-                        } catch (IOException ioe) {
-                            throw new JasperException(ioe);
-                        } finally {
-                            if (urlConn != null) {
-                                try {
-                                    urlConn.getInputStream().close();
-                                } catch (IOException ignore) {
-                                    // Ignore
-                                }
-                            }
-                        }
+                        long lastMod = jar.getLastModified();
                         pageInfo.addDependant("uri:" + uriIn, Long.valueOf(lastMod));
                     }
                     // Add TLD within the JAR to the dependency list. For external

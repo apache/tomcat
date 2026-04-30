@@ -488,21 +488,16 @@ public abstract class Compiler {
                     if (tldPath == null) {
                         return true;
                     }
-                    if (bangSlash < 0) {
-                        // JAR-level key: check the JAR file's last-modified
-                        URLConnection urlConn = tldPath.getUrl().openConnection();
-                        try {
-                            includeLastModified = urlConn.getLastModified();
-                        } finally {
-                            urlConn.getInputStream().close();
+                    try (Jar jar = tldPath.openJar()) {
+                        if (jar == null) {
+                            return true;
                         }
-                    } else {
-                        // TLD-entry key: check the entry's last-modified within the JAR
-                        String entryName = key.substring(bangSlash + 2);
-                        try (Jar jar = tldPath.openJar()) {
-                            if (jar == null) {
-                                return true;
-                            }
+                        if (bangSlash < 0) {
+                            // JAR-level key: check the JAR file's last-modified
+                            includeLastModified = jar.getLastModified();
+                        } else {
+                            // TLD-entry key: check the entry's last-modified within the JAR
+                            String entryName = key.substring(bangSlash + 2);
                             includeLastModified = jar.getLastModified(entryName);
                         }
                     }
