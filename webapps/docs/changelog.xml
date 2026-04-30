@@ -209,6 +209,11 @@
         Correct the  validation of pseudo headers and CONNECT requests to align
         Tomcat's behaviour with RFC 9113, section 8.5. (markt)
       </fix>
+      <fix>
+        Fix a potential integer overflow when allocating capacity from a
+        connection level window update to individual HTTP/2 streams. Based on
+        <pr>996</pr> by Mike Tingey Jr. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
