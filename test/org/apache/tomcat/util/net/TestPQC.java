@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -275,8 +276,12 @@ public class TestPQC extends TomcatBaseTest {
         tomcat.start();
 
         String openSSLPath = System.getProperty("tomcat.test.openssl.path");
-        if (openSSLPath == null || openSSLPath.isEmpty()) {
+        String openSSLLibPath = null;
+        if (openSSLPath == null || openSSLPath.length() == 0) {
             openSSLPath = "openssl";
+        } else {
+            openSSLLibPath = openSSLPath.substring(0, openSSLPath.lastIndexOf('/'));
+            openSSLLibPath = openSSLLibPath + "/../:" + openSSLLibPath + "/../lib:" + openSSLLibPath + "/../lib64";
         }
 
         List<String> cmd = new ArrayList<>();
@@ -299,6 +304,18 @@ public class TestPQC extends TomcatBaseTest {
         }
 
         ProcessBuilder pb = new ProcessBuilder(cmd);
+
+        if (openSSLLibPath != null) {
+            Map<String,String> env = pb.environment();
+            String libraryPath = env.get("LD_LIBRARY_PATH");
+            if (libraryPath == null) {
+                libraryPath = openSSLLibPath;
+            } else {
+                libraryPath = libraryPath + ":" + openSSLLibPath;
+            }
+            env.put("LD_LIBRARY_PATH", libraryPath);
+        }
+
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
