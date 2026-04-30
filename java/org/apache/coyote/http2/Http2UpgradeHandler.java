@@ -1189,7 +1189,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             break;
                         }
 
-                        int share = (int) (s.getConnectionAllocationRequested() * remaining /
+                        // Cast to long during the intermediate calculation to avoid integer overflow in multiplication
+                        int share = (int) ((long) s.getConnectionAllocationRequested() * remaining /
                                 requestedAllocationForIncrementalStreams);
                         if (share == 0) {
                             share = 1;
