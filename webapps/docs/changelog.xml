@@ -110,6 +110,12 @@
 <section name="Tomcat 9.0.118 (remm)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Enhance <code>version.sh</code> and <code>version.bat</code> to display
+        APR, Tomcat Native, and OpenSSL version information (both APR and FFM
+        implementations), along with version compatibility warnings and
+        third-party library version information. (csutherl)
+      </add>
       <scode>
         Refactor generation of the remote user element in the access log to
         remove unnecessary code. (markt)
