@@ -490,16 +490,9 @@ public class HPackHuffman {
         if (!eosBits) {
             throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
-        if (isFieldName) {
-            if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
-                throw new IllegalArgumentException(sm
-                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
-            }
-        } else {
-            if (!HttpParser.isFieldVChar(c)) {
-                throw new IllegalArgumentException(
-                        sm.getString("hpackhuffman.decode.illegalCharacterValue.end", Character.toString(c)));
-            }
+        if (!isFieldName && !HttpParser.isFieldVChar(c)) {
+            throw new IllegalArgumentException(
+                    sm.getString("hpackhuffman.decode.illegalCharacterValue.end", Character.toString(c)));
         }
     }
 
