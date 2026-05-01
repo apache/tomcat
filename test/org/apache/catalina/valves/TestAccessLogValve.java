@@ -90,6 +90,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
+        parameterSets.add(new Object[] {"pct-pct", TEXT_TYPE, "/", "%%", "%"});
         parameterSets.add(new Object[] {"pct-a", TEXT_TYPE, "/", "%a", LOCAL_IP_PATTERN});
         parameterSets.add(new Object[] {"pct-a", JSON_TYPE, "/", "%a", "\\{\"remoteAddr\":\"" + LOCAL_IP_PATTERN + "\"\\}"});
         parameterSets.add(new Object[] {"pct-A", TEXT_TYPE, "/", "%A", IP_PATTERN});

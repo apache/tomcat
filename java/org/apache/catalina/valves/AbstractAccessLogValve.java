@@ -1578,17 +1578,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.style = style;
         }
 
-        /**
-         * Creates a new ElapsedTimeElement that will log the time in the specified style.
-         *
-         * @param micros <code>true</code>, write time in microseconds - %D
-         * @param millis <code>true</code>, write time in milliseconds, if both arguments are <code>false</code>, write
-         *                   time in seconds - %T
-         */
-        public ElapsedTimeElement(boolean micros, boolean millis) {
-            this(micros ? Style.MICROSECONDS : millis ? Style.MILLISECONDS : Style.SECONDS);
-        }
-
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             style.append(buf, time);
@@ -2115,6 +2104,15 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         return switch (pattern) {
             case 'a' -> new RemoteAddrElement(name);
             case 'c' -> new CookieElement(name);
+            case 'D' ->
+                    switch (name) {
+                        case "ns" -> new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
+                        case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                        case "us" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                        case "s"  -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
+                        case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                        case null, default -> new StringElement("???" + name + "???");
+                    };
             case 'i' -> new HeaderElement(name);
             case 'L' -> new IdentifierElement(name);
             case 'o' -> new ResponseHeaderElement(name);
@@ -2133,8 +2131,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                         case "ns" -> new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
                         case "us" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
                         case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                        case "s"  -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
                         case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                        case null, default -> new ElapsedTimeElement(false, false);
+                        case null, default -> new StringElement("???" + name + "???");
                     };
             default -> new StringElement("???");
         };
@@ -2149,11 +2148,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     protected AccessLogElement createAccessLogElement(char pattern) {
         return switch (pattern) {
+            case '%' -> new StringElement("%");
             case 'a' -> new RemoteAddrElement();
             case 'A' -> new LocalAddrElement(ipv6Canonical);
             case 'b' -> new ByteSentElement(true);
             case 'B' -> new ByteSentElement(false);
-            case 'D' -> new ElapsedTimeElement(true, false);
+            case 'D' -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
             case 'F' -> new FirstByteTimeElement();
             case 'h' -> new HostElement();
             case 'H' -> new ProtocolElement();
@@ -2165,7 +2165,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 's' -> new HttpStatusCodeElement();
             case 'S' -> new SessionIdElement();
             case 't' -> new DateAndTimeElement();
-            case 'T' -> new ElapsedTimeElement(false, false);
+            case 'T' -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
             case 'u' -> new UserElement();
             case 'U' -> new RequestURIElement();
             case 'v' -> new LocalServerNameElement();
