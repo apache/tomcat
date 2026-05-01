@@ -106,8 +106,12 @@ public class TestLockoutRealm {
         // Should not be locked yet
         p = realm.authenticate(USER_NAME, PASSWORD);
         Assert.assertNotNull(p);
-        // Should be locked now
+
         p = realm.authenticate(USER_NAME, "wrong");
+        p = realm.authenticate(USER_NAME, "wrong");
+
+        // Both should be locked now
+        p = realm.authenticate(USER_NAME, PASSWORD);
         Assert.assertNull(p);
     }
 }
