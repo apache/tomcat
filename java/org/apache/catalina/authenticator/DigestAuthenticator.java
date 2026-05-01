@@ -43,6 +43,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.ConstantTime;
 
 
 /**
@@ -600,7 +601,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             byte[] buffer =
                     ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String digestServerIpTimeKey = HexUtils.toHexString(buffer);
-            if (!digestServerIpTimeKey.equals(digestclientIpTimeKey)) {
+            if (!ConstantTime.equals(digestServerIpTimeKey, digestclientIpTimeKey, true)) {
                 return false;
             }
 
