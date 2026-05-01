@@ -107,18 +107,18 @@ public class ConstantTime {
             return len1 == 0;
         }
 
-        boolean result = true;
-        result &= (len1 == len2);
+        int result = 0;
+        result |= len1 - len2;
 
         // time-constant comparison
         for (int i = 0; i < len1; i++) {
             // If i >= len2, index2 is 0; otherwise, i.
             final int index2 = ((i - len2) >>> 31) * i;
-            byte b = bytes[i];
+            byte b = bytes[bc.getStart() + i];
             char c = s.charAt(index2);
-            result &= (b == c);
+            result |= (b & 0xFF) ^ c;
         }
-        return result;
+        return result == 0;
     }
 
 
