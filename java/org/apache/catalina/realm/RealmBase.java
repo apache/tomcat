@@ -669,7 +669,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 }
 
                 boolean matched = false;
-                int pos = -1;
                 for (int k = 0; k < patterns.length && !matched; k++) {
                     String pattern = patterns[k];
                     if (pattern.startsWith("*.")) {
@@ -679,14 +678,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                                 uri.length() - dot == pattern.length() - 1) {
                             if (pattern.regionMatches(1, uri, dot, uri.length() - dot)) {
                                 matched = true;
-                                pos = j;
                             }
                         }
                     }
                 }
                 if (matched) {
                     found = true;
-                    if (collection[pos].findMethod(method)) {
+                    if (collection[j].findMethod(method)) {
                         if (results == null) {
                             results = new ArrayList<>();
                         }
