@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -273,46 +272,4 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
      * @return the logger for the CredentialHandler instance.
      */
     protected abstract Log getLog();
-
-    /**
-     * Implements String equality which always compares all characters in the string, without stopping early if any
-     * characters do not match.
-     * <p>
-     * <i>Note:</i> This implementation was adapted from {@link MessageDigest#isEqual} which we assume is as
-     * optimizer-defeating as possible.
-     *
-     * @param s1         The first string to compare.
-     * @param s2         The second string to compare.
-     * @param ignoreCase <code>true</code> if the strings should be compared without regard to case. Note that "true"
-     *                       here is only guaranteed to work with plain ASCII characters.
-     *
-     * @return <code>true</code> if the strings are equal to each other, <code>false</code> otherwise.
-     *
-     * @deprecated Use {@link ConstantTime#equals(String, String, boolean)}. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public static boolean equals(final String s1, final String s2, final boolean ignoreCase) {
-        return ConstantTime.equals(s1, s2, ignoreCase);
-    }
-
-    /**
-     * Implements byte-array equality which always compares all bytes in the array, without stopping early if any bytes
-     * do not match.
-     * <p>
-     * <i>Note:</i> Implementation note: this method delegates to {@link MessageDigest#isEqual} under the assumption
-     * that it provides a constant-time comparison of the bytes in the arrays. Java 7+ has such an implementation, but
-     * neither the Javadoc nor any specification requires it. Therefore, Tomcat should continue to use <i>this</i>
-     * method internally in case the JDK implementation changes so this method can be re-implemented properly.
-     *
-     * @param b1 The first array to compare.
-     * @param b2 The second array to compare.
-     *
-     * @return <code>true</code> if the arrays are equal to each other, <code>false</code> otherwise.
-     *
-     * @deprecated Use {@link ConstantTime#equals(byte[], byte[])}. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public static boolean equals(final byte[] b1, final byte[] b2) {
-        return ConstantTime.equals(b1, b2);
-    }
 }
