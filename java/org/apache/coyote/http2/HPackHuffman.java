@@ -367,23 +367,6 @@ public class HPackHuffman {
      * Decodes a huffman encoded string into the target StringBuilder. There must be enough space left in the buffer for
      * this method to succeed.
      *
-     * @param data   The byte buffer
-     * @param length The length of data from the buffer to decode
-     * @param target The target for the decompressed data
-     *
-     * @throws HpackException If the Huffman encoded value in HPACK headers did not end with EOS padding
-     *
-     * @deprecated Will be removed in Tomcat 12. Use {@link #decode(ByteBuffer, int, StringBuilder, boolean)}
-     */
-    @Deprecated
-    public static void decode(ByteBuffer data, int length, StringBuilder target) throws HpackException {
-        decode(data, length, target, false);
-    }
-
-    /**
-     * Decodes a huffman encoded string into the target StringBuilder. There must be enough space left in the buffer for
-     * this method to succeed.
-     *
      * @param data        The byte buffer
      * @param length      The length of data from the buffer to decode
      * @param target      The target for the decompressed data
