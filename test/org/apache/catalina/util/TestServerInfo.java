@@ -46,6 +46,8 @@ public class TestServerInfo {
 
     /**
      * Test that ServerInfo.main() outputs expected basic information.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testServerInfoOutput() throws Exception {
@@ -62,6 +64,8 @@ public class TestServerInfo {
 
     /**
      * Test isTomcatCoreJar() with Tomcat core JAR (Bundle-SymbolicName pattern).
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testIsTomcatCoreJarWithBundleSymbolicName() throws Exception {
@@ -74,6 +78,8 @@ public class TestServerInfo {
 
     /**
      * Test isTomcatCoreJar() with Catalina core JAR (Bundle-SymbolicName pattern).
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testIsTomcatCoreJarWithCatalinaSymbolicName() throws Exception {
@@ -86,6 +92,8 @@ public class TestServerInfo {
 
     /**
      * Test isTomcatCoreJar() with Jakarta API JAR (Bundle-SymbolicName pattern).
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testIsTomcatCoreJarWithJakartaSymbolicName() throws Exception {
@@ -98,6 +106,8 @@ public class TestServerInfo {
 
     /**
      * Test isTomcatCoreJar() with Tomcat core JAR (Implementation-Vendor fallback).
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testIsTomcatCoreJarWithImplementationVendor() throws Exception {
@@ -111,6 +121,8 @@ public class TestServerInfo {
 
     /**
      * Test isTomcatCoreJar() with third-party JAR.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testIsTomcatCoreJarWithThirdParty() throws Exception {
@@ -124,6 +136,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() with Bundle-Version.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionWithBundleVersion() throws Exception {
@@ -136,6 +150,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() with Implementation-Version.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionWithImplementationVersion() throws Exception {
@@ -148,6 +164,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() with Specification-Version.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionWithSpecificationVersion() throws Exception {
@@ -160,6 +178,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() priority: Bundle-Version takes precedence.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionPriority() throws Exception {
@@ -174,6 +194,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() with no version information.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionWithNoVersion() throws Exception {
@@ -185,6 +207,8 @@ public class TestServerInfo {
 
     /**
      * Test ServerInfo.main() output with APR/Tomcat Native when available.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testServerInfoOutputWithApr() throws Exception {
@@ -203,6 +227,8 @@ public class TestServerInfo {
 
     /**
      * Test ServerInfo.main() output with FFM OpenSSL when available.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testServerInfoOutputWithFFM() throws Exception {
@@ -221,6 +247,8 @@ public class TestServerInfo {
 
     /**
      * Test ServerInfo.main() output when neither APR nor FFM is available.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testServerInfoOutputWithoutNativeLibraries() throws Exception {
@@ -243,6 +271,8 @@ public class TestServerInfo {
 
     /**
      * Test that APR version info is displayed correctly.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testAprVersionInfo() throws Exception {
@@ -278,6 +308,8 @@ public class TestServerInfo {
     /**
      * Test that version warning is returned when APR is available but outdated.
      * This tests the real version check using the installed APR library.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testTomcatNativeVersionWarningWithRealVersion() throws Exception {
@@ -298,6 +330,8 @@ public class TestServerInfo {
 
     /**
      * Test that FFM OpenSSL version info is displayed correctly.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testFFMVersionInfo() throws Exception {
@@ -328,6 +362,8 @@ public class TestServerInfo {
     /**
      * Test that OpenSSLLibrary.getVersionString() returns the native version string.
      * This ensures FFM output format matches APR output format.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testOpenSSLLibraryVersionString() throws Exception {
@@ -351,6 +387,8 @@ public class TestServerInfo {
 
     /**
      * Test parseVersionFromFilename() with various filename patterns.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testParseVersionFromFilename() throws Exception {
@@ -379,6 +417,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() fallback to filename parsing when manifest has no version.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionFallbackToFilename() throws Exception {
@@ -391,6 +431,8 @@ public class TestServerInfo {
 
     /**
      * Test getJarVersion() prefers manifest version over filename.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testGetJarVersionPrefersManifest() throws Exception {
@@ -427,7 +469,7 @@ public class TestServerInfo {
     private boolean invokeIsTomcatCoreJar(File jarFile) throws Exception {
         Method method = ServerInfo.class.getDeclaredMethod("isTomcatCoreJar", File.class);
         method.setAccessible(true);
-        return (Boolean) method.invoke(null, jarFile);
+        return ((Boolean) method.invoke(null, jarFile)).booleanValue();
     }
 
     /**
@@ -475,6 +517,7 @@ public class TestServerInfo {
         customizer.accept(manifest);
 
         try (FileOutputStream fos = new FileOutputStream(jarFile);
+                @SuppressWarnings("unused")
                 JarOutputStream jos = new JarOutputStream(fos, manifest)) {
             // Empty JAR with just manifest
         }
