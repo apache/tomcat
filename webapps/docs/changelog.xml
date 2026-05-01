@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.21 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.22 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -199,62 +199,6 @@
         third-party library version information. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Refactor generation of the remote user element in the access log to
-        remove unnecessary code. (markt)
-      </scode>
-      <fix>
-        Fix a regression in the previous release that meant <code>?-</code>
-        could appear in the access log rather than <code>?</code> when the query
-        string was present but empty. (markt)
-      </fix>
-      <fix>
-        Align the escaping in <code>ExtendedAccessLogValve</code> with the other
-        <code>AccessLogValve</code> implementations. (markt)
-      </fix>
-      <fix>
-        <bug>70000</bug>: fix duplication of special headers in the response
-        after commit, following fix for <bug>69967</bug>. (remm)
-      </fix>
-      <fix>
-        Correct the handling of URIs mapped to a security constraint that only
-        specifies the special <code>**</code> role for all authenticated users.
-        Requests without authentication were receiving 403 responses rather than
-        401 responses. (markt)
-      </fix>
-      <fix>
-        Fix a race condition in <code>StandardContext.getServletContext()</code>
-        that could cause the <code>jakarta.servlet.context.tempdir</code>
-        attribute to be lost during a context reload. Make the
-        <code>context</code> field volatile and use locking to
-        ensure only one <code>ApplicationContext</code> instance is created.
-        (dsoumis)
-      </fix>
-      <fix>
-        Update the Windows authentication (kerberos) documentation to reflect
-        that both Java and Windows are removing / have removed support for
-        RC4-HMAC. The guide now uses AES256-SHA1. (markt)
-      </fix>
-      <fix>
-        Add a new initialisation parameter for WebDAV,
-        <code>maxRequestBodySize</code> which limits the size of a WebDAV
-        request body for LOCK and PROPFIND. The default value is 4096 bytes.
-        (markt)
-      </fix>
-      <add>
-        Add a new <code>caseSensitive</code> attribute to the
-        <code>LockOutRealm</code> that controls the manner in which user names
-        are treated when making locking decisions. The default is
-        <code>false</code>, meaning user names are treated in a case insensitive
-        manner. (markt)
-      </add>
-      <fix>
-        Correct the handling of invalid users with DIGEST authentication. (markt)
-      </fix>
-      <fix>
-        Ensure <code>RealmBase</code> finds all matching extension based
-        security constraints. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -287,74 +231,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Avoid various edge cases if <code>Content-Length</code> is set via
-        <code>setHeader(String,String)</code> or
-        <code>addHeader(String,String)</code> with an invalid value by always
-        clearing the previous value whether the new value is valid or not and
-        ignoring any invalid new value. (markt)
-      </fix>
-      <scode>
-        Refactor the calculation of the real index in the HPACK dynamic header
-        table implementation to reduce code duplication. (markt)
-      </scode>
-      <fix>
-        Fix various minor issues with some HTTP/2 stream error messages for
-        HTTP/2. (markt)
-      </fix>
-      <fix>
-        Consistently reject URIs containing <code>NULL</code> bytes when
-        normalizing. (markt)
-      </fix>
-      <fix>
-        Fix a few minor memory leaks on error paths reading TLS keys and
-        certificates when using FFM. (markt)
-      </fix>
-      <fix>
-        Refactor clean-up after HTTP/2 headers have been processed to aid GC
-        after a stream reset. (markt)
-      </fix>
-      <fix>
-        Align HTTP/2 trailer fields with HTTP/1.1 and filter out any fields
-        not permitted in trailers. (markt)
-      </fix>
-      <fix>
-        Free private keys after use in FFM based connector configuration.
-        (markt)
-      </fix>
-      <fix>
-        Correct an unlikely edge-case parsing bug in the HTTP/2 HPACK header
-        decoding that could result in a valid header triggering an unexpected
-        connection close. (markt)
-      </fix>
-      <fix>
-        Refactor HTTP/2 HPACK encoding so header field names are only converted
-        to lower case once during the encoding process. (markt)
-      </fix>
-      <fix>
-        Refactor HTTP/2 header field validation so it occurs earlier. Extend
-        validation to check for disallowed characters as well as upper case
-        characters. (markt)
-      </fix>
-      <fix>
-        Add TLS 1.3 groups added in OpenSSL 4.0. (remm)
-      </fix>
-      <fix>
-        Add validation that the HTTP/2 <code>:scheme</code> pseudo-header is
-        consistent with the use (or not) of TLS. (markt)
-      </fix>
-      <fix>
-        Correct the  validation of pseudo headers and CONNECT requests to align
-        Tomcat's behaviour with RFC 9113, section 8.5. (markt)
-      </fix>
-      <fix>
-        Fix a potential integer overflow when allocating capacity from a
-        connection level window update to individual HTTP/2 streams. Based on
-        <pr>996</pr> by Mike Tingey Jr. (markt)
-      </fix>
-      <fix>
-        Switch AJP secret comparison to a constant time algorithm. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -393,16 +269,6 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
-        by Jan Luehe. (remm)
-      </fix>
-      <fix>
-        <bug>70001</bug>: Ensure JSP compilation is reproducible when
-        dependencies exist for tag files and tag libraries located on the class
-        path but outside of the web application. <pr>992</pr> submitted by Jan
-        Luehe. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -443,10 +309,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix the initial connection to a WebSocket end point where the connection
-        is made via a proxy that requires DIGEST authentication. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -478,24 +340,6 @@
         to make it easier to see when it's not used by the suite. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69993</bug>: Update the URL to the CDDL 1.0 license. (markt)
-      </fix>
-      <update>
-        Update Byte Buddy to 1.18.8. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 13.4.1. (markt)
-      </update>
-      <update>
-        Update Bouncy Castle to 1.84. (markt)
-      </update>
-      <update>
-        Improvements to French translations. (remm)
-      </update>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
