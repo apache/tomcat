@@ -400,20 +400,20 @@ public class HPackHuffman {
                         c = (char) (val & LOW_MASK);
                         if (isFieldName) {
                             if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
-                                throw new IllegalArgumentException(
-                                        sm.getString("hpackhuffman.decode.illegalCharacterName"));
+                                throw new IllegalArgumentException(sm
+                                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
                             }
                         } else {
                             if (firstChar) {
                                 if (!HttpParser.isFieldVChar(c)) {
-                                    throw new IllegalArgumentException(
-                                            sm.getString("hpackhuffman.decode.illegalCharacterValue.start"));
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue.start", Character.toString(c)));
                                 }
                                 firstChar = false;
                             } else {
                                 if (!HttpParser.isFieldContent(c)) {
-                                    throw new IllegalArgumentException(
-                                            sm.getString("hpackhuffman.decode.illegalCharacterValue"));
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue", Character.toString(c)));
                                 }
                             }
                         }
@@ -439,20 +439,20 @@ public class HPackHuffman {
                         c = (char) ((val >> 16) & LOW_MASK);
                         if (isFieldName) {
                             if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
-                                throw new IllegalArgumentException(
-                                        sm.getString("hpackhuffman.decode.illegalCharacterName"));
+                                throw new IllegalArgumentException(sm
+                                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
                             }
                         } else {
                             if (firstChar) {
                                 if (!HttpParser.isFieldVChar(c)) {
-                                    throw new IllegalArgumentException(
-                                            sm.getString("hpackhuffman.decode.illegalCharacterValue.start"));
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue.start", Character.toString(c)));
                                 }
                                 firstChar = false;
                             } else {
                                 if (!HttpParser.isFieldContent(c)) {
-                                    throw new IllegalArgumentException(
-                                            sm.getString("hpackhuffman.decode.illegalCharacterValue"));
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue", Character.toString(c)));
                                 }
                             }
                         }
@@ -472,8 +472,16 @@ public class HPackHuffman {
         if (!eosBits) {
             throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
-        if (!HttpParser.isFieldVChar(c)) {
-            throw new IllegalArgumentException(sm.getString("hpackhuffman.decode.illegalCharacterValue.end"));
+        if (isFieldName) {
+            if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
+                throw new IllegalArgumentException(sm
+                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
+            }
+        } else {
+            if (!HttpParser.isFieldVChar(c)) {
+                throw new IllegalArgumentException(
+                        sm.getString("hpackhuffman.decode.illegalCharacterValue.end", Character.toString(c)));
+            }
         }
     }
 
