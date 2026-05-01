@@ -20,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Base64;
 
 import org.apache.juli.logging.Log;
@@ -147,7 +146,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
                         inputCredentials.getBytes(StandardCharsets.ISO_8859_1), serverSaltBytes);
 
-                return Arrays.equals(userDigestBytes, serverDigestBytes);
+                return ConstantTime.equals(userDigestBytes, serverDigestBytes);
             } else if (storedCredentials.indexOf('$') > -1) {
                 return matchesSaltIterationsEncoded(inputCredentials, storedCredentials);
             } else {
@@ -158,7 +157,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                     // Root cause should be logged by mutate()
                     return false;
                 }
-                return storedCredentials.equalsIgnoreCase(userDigest);
+                return ConstantTime.equals(storedCredentials, userDigest, true);
             }
         }
     }
