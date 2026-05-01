@@ -520,7 +520,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                                 case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
                                 case "s"  -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
                                 case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                                case null, default -> new StringElement("???");
+                                case null, default -> new StringElement("???" + nextToken + "???");
                             };
                         } else {
                             return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);

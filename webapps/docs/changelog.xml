@@ -248,6 +248,10 @@
         <code>false</code>, meaning user names are treated in a case insensitive
         manner. (markt)
       </add>
+      <add>
+        Add <code>%%</code> in AccessLogValve pattern. Align <code>%{xxx}D</code> modifiers with <code>%{xxx}T</code>.
+        Pull request #yyy provided by effhaa.
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -358,7 +362,7 @@
       </add>
       <add>
         Extend the existing <code>+=</code> operator in Jakarta Expression
-        Language to support merging <code>Map</code>Map and <code>Set</code>Set
+        Language to support merging <code>Map</code> and <code>Set</code>
         and concatenating <code>List</code>s. (markt)
       </add>
       <update>
@@ -494,4 +498,3 @@
 </section>
 </body>
 </document>
-
