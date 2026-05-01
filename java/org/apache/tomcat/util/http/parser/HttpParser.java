@@ -117,7 +117,7 @@ public class HttpParser {
             }
 
             // field-vchar is VCHAR / obs-text
-            if (i > 20 && i < 127 || i > 127) {
+            if (i > 32 && i < 127 || i > 127) {
                 IS_FIELD_VCHAR[i] = true;
             }
 
