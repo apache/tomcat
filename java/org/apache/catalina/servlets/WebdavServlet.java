@@ -852,22 +852,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
 
-        // Short-cut if client provided a content length
-        if (req.getContentLengthLong() > maxRequestBodySize) {
-            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
-            return;
-        }
-
-        byte[] body;
-        try (InputStream is = req.getInputStream();
-                BoundedByteArrayOutputStream os = new BoundedByteArrayOutputStream(maxRequestBodySize)) {
-            IOTools.flow(is, os);
-            body = os.toByteArray();
-        } catch (IOException ioe) {
-            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-            return;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+        byte[] body = readRequestBody(req, resp);
+        if (body == null) {
             return;
         }
         if (body.length > 0) {
@@ -1024,6 +1010,41 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.sendData();
 
+    }
+
+
+    /**
+     * Read request body
+     *
+     * @param req  The request
+     * @param resp The response
+     *
+     * @return {@code null} if the body could not be read and an error status code has been set, otherwise the request
+     *             body as a byte array
+     *
+     * @throws IOException if the reading the body fails and a response status code cannot be set
+     */
+    private byte[] readRequestBody(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // Short-cut if client provided a content length
+        if (req.getContentLengthLong() > maxRequestBodySize) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+            return null;
+        }
+
+        byte[] body;
+        try (InputStream is = req.getInputStream();
+                BoundedByteArrayOutputStream os = new BoundedByteArrayOutputStream(maxRequestBodySize)) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException ioe) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return null;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+            return null;
+        }
+
+        return body;
     }
 
 
@@ -1422,24 +1443,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         Node lockInfoNode = null;
 
-        // Short-cut if client provided a content length
-        if (req.getContentLengthLong() > maxRequestBodySize) {
-            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+        byte[] body = readRequestBody(req, resp);
+        if (body == null) {
             return;
         }
 
-        byte[] body;
-        try (InputStream is = req.getInputStream();
-                BoundedByteArrayOutputStream os = new BoundedByteArrayOutputStream(maxRequestBodySize)) {
-            IOTools.flow(is, os);
-            body = os.toByteArray();
-        } catch (IOException ioe) {
-            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-            return;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
-            return;
-        }
         if (body.length > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
@@ -3088,6 +3096,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 throw new ArrayIndexOutOfBoundsException();
             }
             super.write(b, off, len);
+        }
+
+        @Override
+        public synchronized void reset() {
+            size = 0;
+            super.reset();
         }
     }
 }
