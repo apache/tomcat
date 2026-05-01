@@ -61,6 +61,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.ConstantTime;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -424,7 +425,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     "digestA2:" + digestA2 + " Server digest:" + serverDigest);
         }
 
-        if (serverDigest.equals(clientDigest)) {
+        if (ConstantTime.equals(serverDigest, clientDigest, true)) {
             return getPrincipal(username);
         }
 
