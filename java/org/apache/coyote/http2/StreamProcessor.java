@@ -39,7 +39,9 @@ import org.apache.coyote.NonPipeliningProcessor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -208,10 +210,14 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         // Compression can't be used with sendfile
         // Need to check for compression (and set headers appropriately) before
         // adding headers below
-        if (noSendfile && protocol != null && protocol.useCompression(coyoteRequest, coyoteResponse)) {
+        if (noSendfile && protocol != null) {
             // Enable compression. Headers will have been set. Need to configure
             // output filter at this point.
-            stream.addOutputFilter(new GzipOutputFilter());
+            OutputFilterFactory factory = protocol.useCompression(coyoteRequest, coyoteResponse);
+
+            if (factory != null) {
+                stream.addOutputFilter(factory.createFilter());
+            }
         }
 
         // Check to see if a response body is present

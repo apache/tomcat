@@ -20,7 +20,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.zip.Deflater;
 
+import org.apache.coyote.http11.OutputFilter;
+import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,19 +98,21 @@ public class TestCompressionConfig {
             response.getMimeHeaders().addValue("ETag").setString(eTag);
         }
 
-        boolean useCompression = compressionConfig.useCompression(request, response);
-        Assert.assertEquals(compress, Boolean.valueOf(useCompression));
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory result = compressionConfig.useCompression(request, response, factories);
+        Assert.assertEquals(compress.booleanValue(), result != null);
 
         if (useTE.booleanValue()) {
             Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
-            if (useCompression) {
+            if (result != null) {
                 Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Transfer-Encoding"));
             } else {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
             }
         } else {
             Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
-            if (useCompression) {
+            if (result != null) {
                 Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Content-Encoding"));
             } else {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
@@ -126,4 +133,121 @@ public class TestCompressionConfig {
         Assert.assertTrue(newEncodings.contains("br"));
         Assert.assertFalse(newEncodings.contains("gzip"));
     }
+
+    @Test
+    public void testGzipOutputFilterFactoryJavaBeanProperties() {
+        GzipOutputFilterFactory factory = new GzipOutputFilterFactory();
+
+        Assert.assertEquals(-1, factory.getLevel());
+        Assert.assertEquals(GzipOutputFilter.DEFAULT_BUFFER_SIZE, factory.getBufferSize());
+        Assert.assertEquals("gzip", factory.getEncodingName());
+
+        factory.setLevel(6);
+        factory.setBufferSize(1024);
+
+        Assert.assertEquals(6, factory.getLevel());
+        Assert.assertEquals(1024, factory.getBufferSize());
+
+        OutputFilter filter = factory.createFilter();
+        Assert.assertNotNull(filter);
+        Assert.assertTrue(filter instanceof GzipOutputFilter);
+    }
+
+    @Test
+    public void testCompressionOff() {
+        CompressionConfig config = new CompressionConfig();
+        // Default compression is "off"
+
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("gzip");
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testAlreadyCompressedContentEncoding() {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("gzip");
+        // Response already has gzip Content-Encoding - should skip compression
+        response.getMimeHeaders().addValue("content-encoding").setString("gzip");
+
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testNegotiationViaAcceptEncoding() throws Exception {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        // Factories: gzip then deflate (server priority)
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory deflateFactory = new OutputFilterFactory() {
+            @Override
+            public OutputFilter createFilter() {
+                return new GzipOutputFilter();
+            }
+            @Override
+            public String getEncodingName() {
+                return "deflate";
+            }
+        };
+        factories.add(deflateFactory);
+
+        // Client prefers deflate over gzip
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("accept-encoding").setString("deflate;q=1.0, gzip;q=0.5");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNotNull(result);
+        Assert.assertEquals("deflate", result.getEncodingName());
+        Assert.assertEquals("deflate", response.getMimeHeaders().getHeader("Content-Encoding"));
+        Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
+    }
+
+    @Test
+    public void testNegotiationViaTE() throws Exception {
+        CompressionConfig config = new CompressionConfig();
+        config.setCompression("force");
+
+        // Factories: gzip then deflate (server priority)
+        List<OutputFilterFactory> factories = new ArrayList<>();
+        factories.add(new GzipOutputFilterFactory());
+        OutputFilterFactory deflateFactory = new OutputFilterFactory() {
+            @Override
+            public OutputFilter createFilter() {
+                return new GzipOutputFilter();
+            }
+            @Override
+            public String getEncodingName() {
+                return "deflate";
+            }
+        };
+        factories.add(deflateFactory);
+
+        // TE header should use Transfer-Encoding, not Content-Encoding
+        Request request = new Request();
+        Response response = new Response();
+        request.getMimeHeaders().addValue("TE").setString("deflate;q=1.0, gzip;q=0.5");
+
+        OutputFilterFactory result = config.useCompression(request, response, factories);
+        Assert.assertNotNull(result);
+        Assert.assertEquals("deflate", result.getEncodingName());
+        Assert.assertEquals("deflate", response.getMimeHeaders().getHeader("Transfer-Encoding"));
+        Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
+    }
+
+
 }

@@ -107,6 +107,9 @@ public final class Constants {
 
     /**
      * GZIP filter (output).
+     *
+     * @deprecated Compression filters are no longer part of the static filter library.
+     *             They are created dynamically by {@link org.apache.coyote.http11.filters.OutputFilterFactory}.
      */
     public static final int GZIP_FILTER = 3;
 
