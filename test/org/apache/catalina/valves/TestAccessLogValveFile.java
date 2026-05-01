@@ -22,11 +22,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.compat.JrePlatform;
 
 /**
  * Tests for {@link AccessLogValve} file I/O, rotation, encoding, and cleanup
@@ -145,6 +147,8 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
 
     @Test
     public void testCheckExists() throws Exception {
+        Assume.assumeFalse("This test cannot pass on Windows due to locking of open files.", JrePlatform.IS_WINDOWS);
+
         AccessLogValve valve = createValve("access_check", "%s");
         valve.setCheckExists(true);
         getTomcatInstance().start();
