@@ -95,4 +95,27 @@ public class TestWebdavBoundedByteArrayOutputStream {
             // Pass
         }
     }
+
+
+    @Test
+    public void testReset() throws IOException {
+        BoundedByteArrayOutputStream bbaos = new BoundedByteArrayOutputStream(TEST_LIMIT);
+
+        for (int i = 0; i < TEST_LIMIT; i++) {
+            bbaos.write(ONE_BYTE_ARRAY);
+        }
+
+        bbaos.reset();
+
+        for (int i = 0; i < TEST_LIMIT; i++) {
+            bbaos.write(ONE_BYTE_ARRAY);
+        }
+
+        try {
+            bbaos.write(ONE_BYTE_ARRAY);
+            Assert.fail("Writing 11th byte failed to trigger error");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Pass
+        }
+    }
 }
