@@ -61,6 +61,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.ConstantTime;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -416,7 +417,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     "digestA2:" + digestA2 + " Server digest:" + serverDigest);
         }
 
-        if (serverDigest.equals(clientDigest)) {
+        if (ConstantTime.equals(serverDigest, clientDigest, true)) {
             return getPrincipal(username);
         }
 
@@ -658,8 +659,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                         constraints[i].included(uri, method));
             }
 
-            boolean matched = false;
-            int pos = -1;
             for (int j = 0; j < collection.length; j++) {
                 String[] patterns = collection[j].findPatterns();
 
@@ -669,6 +668,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     continue;
                 }
 
+                boolean matched = false;
                 for (int k = 0; k < patterns.length && !matched; k++) {
                     String pattern = patterns[k];
                     if (pattern.startsWith("*.")) {
@@ -678,19 +678,18 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                                 uri.length() - dot == pattern.length() - 1) {
                             if (pattern.regionMatches(1, uri, dot, uri.length() - dot)) {
                                 matched = true;
-                                pos = j;
                             }
                         }
                     }
                 }
-            }
-            if (matched) {
-                found = true;
-                if (collection[pos].findMethod(method)) {
-                    if (results == null) {
-                        results = new ArrayList<>();
+                if (matched) {
+                    found = true;
+                    if (collection[j].findMethod(method)) {
+                        if (results == null) {
+                            results = new ArrayList<>();
+                        }
+                        results.add(constraints[i]);
                     }
-                    results.add(constraints[i]);
                 }
             }
         }
@@ -1121,12 +1120,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @return the digest for the specified user
      */
     protected String getDigest(String username, String realmName, String algorithm) {
-        if (hasMessageDigest(algorithm)) {
-            // Use pre-generated digest
-            return getPassword(username);
+        String password = getPassword(username);
+
+        // Short-cut null password case
+        if (password == null) {
+            return null;
         }
 
-        String digestValue = username + ":" + realmName + ":" + getPassword(username);
+        if (hasMessageDigest(algorithm)) {
+            // Use pre-generated digest
+            return password;
+        }
+
+        String digestValue = username + ":" + realmName + ":" + password;
 
         byte[] valueBytes;
         try {

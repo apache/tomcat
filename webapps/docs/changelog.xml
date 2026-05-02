@@ -107,7 +107,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 11.0.22 (markt)" rtext="in development">
+<section name="Tomcat 11.0.23 (markt)" rtext="in development">
+</section>
+<section name="Tomcat 11.0.22 (markt)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -169,6 +171,13 @@
         <code>false</code>, meaning user names are treated in a case insensitive
         manner. (markt)
       </add>
+      <fix>
+        Correct the handling of invalid users with DIGEST authentication. (markt)
+      </fix>
+      <fix>
+        Ensure <code>RealmBase</code> finds all matching extension based
+        security constraints. (markt)
+      </fix>
       <add>
         Add <code>%%</code> in AccessLogValve pattern. Align <code>%{xxx}D</code> modifiers with <code>%{xxx}T</code>.
         Pull request <pr>1003</pr> provided by effhaa.
