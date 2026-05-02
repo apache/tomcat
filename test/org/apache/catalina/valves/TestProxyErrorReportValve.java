@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -56,7 +57,15 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ProxyErrorReportValve valve = (ProxyErrorReportValve) host.getPipeline().getFirst();
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
         valve.setProperty("errorCode." + HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "http://localhost:" + getPort() + "/error-page");
 
@@ -82,7 +91,15 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ProxyErrorReportValve valve = (ProxyErrorReportValve) host.getPipeline().getFirst();
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
         valve.setUseRedirect(false);
         valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND,
                 "http://localhost:" + getPort() + "/error-page");
