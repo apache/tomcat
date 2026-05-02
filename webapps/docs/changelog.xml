@@ -250,7 +250,7 @@
       </add>
       <add>
         Add <code>%%</code> in AccessLogValve pattern. Align <code>%{xxx}D</code> modifiers with <code>%{xxx}T</code>.
-        Pull request #yyy provided by effhaa.
+        Pull request #1002 provided by effhaa.
       </add>
     </changelog>
   </subsection>
