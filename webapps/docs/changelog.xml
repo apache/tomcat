@@ -169,6 +169,10 @@
         <code>false</code>, meaning user names are treated in a case insensitive
         manner. (markt)
       </add>
+      <add>
+        Add <code>%%</code> in AccessLogValve pattern. Align <code>%{xxx}D</code> modifiers with <code>%{xxx}T</code>.
+        Pull request <pr>1003</pr> provided by effhaa.
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -5649,4 +5653,3 @@
 </section>
 </body>
 </document>
-
