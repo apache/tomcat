@@ -1628,17 +1628,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.style = style;
         }
 
-        /**
-         * Creates a new ElapsedTimeElement that will log the time in the specified style.
-         *
-         * @param micros <code>true</code>, write time in microseconds - %D
-         * @param millis <code>true</code>, write time in milliseconds, if both arguments are <code>false</code>, write
-         *                   time in seconds - %T
-         */
-        public ElapsedTimeElement(boolean micros, boolean millis) {
-            this(micros ? Style.MICROSECONDS : millis ? Style.MILLISECONDS : Style.SECONDS);
-        }
-
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             style.append(buf, time);
@@ -2198,7 +2187,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 } else if ("fracsec".equals(name)) {
                     return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
                 } else {
-                    return new ElapsedTimeElement(false, false);
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
                 }
             default:
                 return new StringElement("???");
@@ -2223,7 +2212,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 'B':
                 return new ByteSentElement(false);
             case 'D':
-                return new ElapsedTimeElement(true, false);
+                return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
             case 'F':
                 return new FirstByteTimeElement();
             case 'h':
@@ -2247,7 +2236,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 't':
                 return new DateAndTimeElement();
             case 'T':
-                return new ElapsedTimeElement(false, false);
+                return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
             case 'u':
                 return new UserElement();
             case 'U':

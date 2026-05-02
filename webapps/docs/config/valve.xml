@@ -287,7 +287,7 @@
     <li><b><code>%A</code></b> - Local IP address</li>
     <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
-    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%D</code></b> - Time taken to process the request, in microseconds</li>
     <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
     <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
