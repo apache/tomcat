@@ -194,21 +194,21 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
     }
 
 
-    protected static String getNonce(String authHeader) {
+    private static String getNonce(String authHeader) {
         int start = authHeader.indexOf("nonce=\"") + 7;
         int end = authHeader.indexOf('\"', start);
         return authHeader.substring(start, end);
     }
 
 
-    protected static String getOpaque(String authHeader) {
+    private static String getOpaque(String authHeader) {
         int start = authHeader.indexOf("opaque=\"") + 8;
         int end = authHeader.indexOf('\"', start);
         return authHeader.substring(start, end);
     }
 
 
-    private static String buildDigestResponse(String user, String pwd, String uri, String realm, AuthDigest algorithm,
+    static String buildDigestResponse(String user, String pwd, String uri, String realm, AuthDigest algorithm,
             List<String> authHeaders, String nc, String cnonce, String qop) {
 
         // Find auth header with correct algorithm
