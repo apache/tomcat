@@ -110,12 +110,14 @@ public class TestStandardJarScanner {
 
     @Test
     public void testScanManifestDefault() throws Exception {
+        Assume.assumeTrue("No StandardJarScanner.addClassPath() below Java 9", JreCompat.isJre9Available());
         Assert.assertTrue("Referenced JAR from manifest Class-Path should be scanned",
                 doTestScanManifest(true));
     }
 
     @Test
     public void testScanManifestDisabled() throws Exception {
+        Assume.assumeTrue("No StandardJarScanner.addClassPath() below Java 9", JreCompat.isJre9Available());
         Assert.assertFalse("Referenced JAR from manifest Class-Path should not be scanned",
                 doTestScanManifest(false));
     }
