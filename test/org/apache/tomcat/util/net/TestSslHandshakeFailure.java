@@ -23,8 +23,10 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -32,6 +34,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestSslHandshakeFailure extends TomcatBaseTest {
 
@@ -57,7 +60,7 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
     @Parameter(2)
     public String sslImplementationName;
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void testMissingClientCertificate() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -76,7 +79,16 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
         sc.init(null, TesterSupport.getTrustManagers(), null);
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-        getUrl("https://localhost:" + getPort() + "/");
+        try {
+            getUrl("https://localhost:" + getPort() + "/");
+            Assert.fail("SSLHandshakeException expected, but handshake did not fail");
+        } catch (SSLHandshakeException e) {
+        // Java 8 might throw SSLException instead of SSLHandshakeException
+        } catch (SSLException e) {
+            if (JreCompat.isJre9Available()) {
+                throw(e);
+            }
+        }
 
     }
 
