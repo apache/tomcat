@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.AfterClass;
@@ -33,6 +34,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.ocsp.TesterOcspResponder.OcspResponse;
 
 @RunWith(Parameterized.class)
@@ -103,6 +105,15 @@ public class TestOcspSoftFailInternalError extends OcspBaseTest {
                 Assert.fail("Handshake did not fail when expected to do so.");
             }
         } catch (SSLHandshakeException | SocketException e) {
+            if (!handshakeFailureExpected) {
+                System.out.println("ZZZ e: " + e);
+                Assert.fail("Handshake failed when not expected to do so.");
+            }
+        // Java 8 might throw SSLException instead of SSLHandshakeException
+        } catch (SSLException e) {
+            if (JreCompat.isJre9Available()) {
+                throw(e);
+            }
             if (!handshakeFailureExpected) {
                 Assert.fail("Handshake failed when not expected to do so.");
             }
