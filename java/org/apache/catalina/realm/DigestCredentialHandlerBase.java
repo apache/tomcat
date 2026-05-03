@@ -192,7 +192,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             return false;
         }
 
-        return DigestCredentialHandlerBase.equals(storedHexEncoded, inputHexEncoded, true);
+        return ConstantTime.equals(storedHexEncoded, inputHexEncoded, true);
     }
 
 
