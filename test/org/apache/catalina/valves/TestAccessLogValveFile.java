@@ -135,6 +135,9 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
 
         getUrl("http://localhost:" + getPort());
 
+        // Sporadic test failures if backgroundProcess is called
+        // directly after getUrl().
+        Thread.sleep(50);
         // Flush via backgroundProcess since buffered=true
         valve.backgroundProcess();
 
