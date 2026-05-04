@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -263,4 +264,146 @@ public class TestErrorReportValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testShowReportFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        // Must use sendError() — setStatus() alone commits the response before
+        // ErrorReportValve can write a body, so showReport would have nothing to suppress.
+        Tomcat.addServlet(ctx, "error404", new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                    throws ServletException, IOException {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        });
+        ctx.addServletMappingDecoded("/", "error404");
+
+        tomcat.start();
+
+        ErrorReportValve erv = findErrorReportValve(tomcat);
+        Assert.assertNotNull("ErrorReportValve should exist", erv);
+        erv.setShowReport(false);
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        String body = res.toString();
+        Assert.assertNotNull(body);
+        Assert.assertFalse("Report section should be suppressed when showReport=false",
+                body.contains(sm.getString("errorReportValve.description")));
+        Assert.assertFalse(erv.isShowReport());
+    }
+
+
+    @Test
+    public void testShowServerInfoFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error500", new ErrorServlet());
+        ctx.addServletMappingDecoded("/", "error500");
+
+        tomcat.start();
+
+        ErrorReportValve erv = findErrorReportValve(tomcat);
+        Assert.assertNotNull("ErrorReportValve should exist", erv);
+        erv.setShowServerInfo(false);
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        getUrl("http://localhost:" + getPort(), res, null);
+
+        String body = res.toString();
+        Assert.assertNotNull(body);
+        Assert.assertFalse("Server info should be hidden", body.contains("Apache Tomcat"));
+        Assert.assertFalse(erv.isShowServerInfo());
+    }
+
+
+    @Test
+    public void testSetPropertyErrorCode() {
+        ErrorReportValve valve = new ErrorReportValve();
+
+        Assert.assertTrue(valve.setProperty("errorCode.404", "/error404.html"));
+        Assert.assertEquals("/error404.html", valve.getProperty("errorCode.404"));
+    }
+
+
+    @Test
+    public void testSetPropertyExceptionType() {
+        ErrorReportValve valve = new ErrorReportValve();
+
+        Assert.assertTrue(valve.setProperty(
+                "exceptionType.java.lang.NullPointerException", "/npe.html"));
+        Assert.assertEquals("/npe.html", valve.getProperty(
+                "exceptionType.java.lang.NullPointerException"));
+    }
+
+
+    @Test
+    public void testGetPropertyNotFound() {
+        ErrorReportValve valve = new ErrorReportValve();
+
+        Assert.assertNull(valve.getProperty("errorCode.999"));
+        Assert.assertNull(valve.getProperty("exceptionType.com.example.Nope"));
+    }
+
+
+    @Test
+    public void testGetPropertyUnknownPrefix() {
+        ErrorReportValve valve = new ErrorReportValve();
+
+        Assert.assertFalse(valve.setProperty("unknownPrefix.something", "/x.html"));
+        Assert.assertNull(valve.getProperty("unknownPrefix.something"));
+    }
+
+
+    @Test
+    public void testExceptionWithRootCause() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "nestedError", new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                    throws ServletException, IOException {
+                Throwable root = new IllegalStateException("root cause");
+                Throwable wrapper = new RuntimeException("wrapper", root);
+                req.setAttribute(RequestDispatcher.ERROR_EXCEPTION, wrapper);
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        });
+        ctx.addServletMappingDecoded("/", "nestedError");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        String body = res.toString();
+        Assert.assertNotNull(body);
+        // Should contain root cause section
+        Assert.assertTrue(body.contains(sm.getString("errorReportValve.rootCause")));
+    }
+
+
+    private static ErrorReportValve findErrorReportValve(Tomcat tomcat) {
+        for (Valve v : tomcat.getHost().getPipeline().getValves()) {
+            if (v instanceof ErrorReportValve) {
+                return (ErrorReportValve) v;
+            }
+        }
+        return null;
+    }
 }
