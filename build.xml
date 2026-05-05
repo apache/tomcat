@@ -349,6 +349,7 @@
     <include name="**/*.license"/>
     <include name="**/*.manifest"/>
     <include name="**/*.md"/>
+    <include name="**/*.mdd"/>
     <include name="**/*.mdl"/>
     <include name="**/*.MF"/>
     <include name="**/*.notice"/>
