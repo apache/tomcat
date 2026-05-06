@@ -130,6 +130,12 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class DefaultServlet extends HttpServlet {
 
+    /**
+     * Default constructor.
+     */
+    public DefaultServlet() {
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -456,6 +462,13 @@ public class DefaultServlet extends HttpServlet {
         return getRelativePath(request, false);
     }
 
+    /**
+     * Get the relative path from the request, with option to allow empty path.
+     *
+     * @param request The HTTP servlet request
+     * @param allowEmptyPath Whether to allow an empty path
+     * @return the relative path
+     */
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         // IMPORTANT: DefaultServlet can be mapped to '/' or '/path/*' but always
         // serves resources from the web app root with context rooted paths.
@@ -503,11 +516,21 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    /**
+     * Check if directory listings are enabled.
+     *
+     * @return true if directory listings are enabled
+     */
     protected boolean isListings() {
         return listings;
     }
 
 
+    /**
+     * Check if read-only mode is enabled.
+     *
+     * @return true if read-only mode is enabled
+     */
     protected boolean isReadOnly() {
         return readOnly || resources.isReadOnly();
     }
@@ -592,6 +615,13 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    /**
+     * Send a method not allowed response to the client.
+     *
+     * @param req The HTTP servlet request
+     * @param resp The HTTP servlet response
+     * @throws IOException if an input/output error occurs
+     */
     protected void sendNotAllowed(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.addHeader("Allow", determineMethodsAllowed(req));
         resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -2760,6 +2790,12 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    /**
+     * Represents a compression format with an associated file extension and encoding.
+     *
+     * @param extension The file extension
+     * @param encoding The encoding type
+     */
     protected record CompressionFormat(String extension, String encoding) implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
@@ -2869,10 +2905,22 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
+        /**
+         * Get the comparator for the given order string.
+         *
+         * @param order The order string
+         * @return the comparator
+         */
         public Comparator<WebResource> getComparator(String order) {
             return getComparator(getOrder(order));
         }
 
+        /**
+         * Get the comparator for the given order.
+         *
+         * @param order The order specification
+         * @return the comparator
+         */
         public Comparator<WebResource> getComparator(Order order) {
             if (null == order) {
                 return defaultResourceComparator;
@@ -2968,22 +3016,57 @@ public class DefaultServlet extends HttpServlet {
             return Order.DEFAULT;
         }
 
+        /**
+         * Order specification for directory listing sorting.
+         */
         public static class Order {
             final char column;
             final boolean ascending;
 
+            /**
+             * Create a new Order.
+             *
+             * @param column The column identifier
+             * @param ascending Whether to sort in ascending order
+             */
             Order(char column, boolean ascending) {
                 this.column = column;
                 this.ascending = ascending;
             }
 
+            /**
+             * Sort by name descending.
+             */
             public static final Order NAME = new Order('N', false);
+
+            /**
+             * Sort by name ascending.
+             */
             public static final Order NAME_ASC = new Order('N', true);
+
+            /**
+             * Sort by size descending.
+             */
             public static final Order SIZE = new Order('S', false);
+
+            /**
+             * Sort by size ascending.
+             */
             public static final Order SIZE_ASC = new Order('S', true);
+
+            /**
+             * Sort by last modified descending.
+             */
             public static final Order LAST_MODIFIED = new Order('M', false);
+
+            /**
+             * Sort by last modified ascending.
+             */
             public static final Order LAST_MODIFIED_ASC = new Order('M', true);
 
+            /**
+             * Default sort order (name descending).
+             */
             public static final Order DEFAULT = NAME;
         }
     }

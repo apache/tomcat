@@ -272,10 +272,20 @@ public class FastRemovalDequeue<T> {
             this.next = null;
         }
 
+        /**
+         * Returns the content stored in this entry.
+         *
+         * @return the content object
+         */
         public final T getContent() {
             return content;
         }
 
+        /**
+         * Returns the content that was displaced when this entry was added to a full queue.
+         *
+         * @return the displaced content, or {@code null} if no content was displaced
+         */
         public final T getReplaced() {
             return replaced;
         }
@@ -284,6 +294,9 @@ public class FastRemovalDequeue<T> {
             this.replaced = replaced;
         }
 
+        /**
+         * Clears the displaced content reference.
+         */
         public final void clearReplaced() {
             this.replaced = null;
         }

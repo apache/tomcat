@@ -32,9 +32,15 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * JMX registry for managing MBean registration for a channel.
+ */
 public class JmxRegistry {
 
     private static final Log log = LogFactory.getLog(JmxRegistry.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(JmxRegistry.class);
     private static final ConcurrentHashMap<String,JmxRegistry> registryCache = new ConcurrentHashMap<>();
 
@@ -44,6 +50,12 @@ public class JmxRegistry {
     private JmxRegistry() {
     }
 
+    /**
+     * Get the JMX registry for the given channel.
+     *
+     * @param channel the channel
+     * @return the JMX registry, or {@code null} if JMX is not enabled
+     */
     public static JmxRegistry getRegistry(Channel channel) {
         if (channel == null || channel.getName() == null) {
             return null;
@@ -74,6 +86,12 @@ public class JmxRegistry {
         return registry;
     }
 
+    /**
+     * Remove the JMX registry for the given channel.
+     *
+     * @param channel the channel
+     * @param clear whether to clear the MBeans
+     */
     public static void removeRegistry(Channel channel, boolean clear) {
         JmxRegistry registry = registryCache.get(channel.getName());
         if (registry == null) {
@@ -104,6 +122,13 @@ public class JmxRegistry {
         return on;
     }
 
+    /**
+     * Register an MBean with the JMX server.
+     *
+     * @param keyprop the key property
+     * @param bean the MBean to register
+     * @return the registered object name, or {@code null} on failure
+     */
     public ObjectName registerJmx(String keyprop, Object bean) {
         if (mbserver == null) {
             return null;
@@ -129,6 +154,11 @@ public class JmxRegistry {
         return oName;
     }
 
+    /**
+     * Unregister an MBean from the JMX server.
+     *
+     * @param oname the object name to unregister
+     */
     public void unregisterJmx(ObjectName oname) {
         if (oname == null) {
             return;

@@ -21,11 +21,20 @@ package org.apache.tomcat.websocket.server;
  */
 public class Constants {
 
+    /**
+     * Servlet context init parameter name for binary buffer size.
+     */
     public static final String BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
             "org.apache.tomcat.websocket.binaryBufferSize";
+    /**
+     * Servlet context init parameter name for text buffer size.
+     */
     public static final String TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
             "org.apache.tomcat.websocket.textBufferSize";
 
+    /**
+     * Servlet context attribute name for the ServerContainer instance.
+     */
     public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE = "jakarta.websocket.server.ServerContainer";
 
 

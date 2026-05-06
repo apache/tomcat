@@ -136,6 +136,12 @@ public class HttpParser {
     private final boolean[] IS_QUERY_RELAXED = new boolean[ARRAY_SIZE];
 
 
+    /**
+     * Creates a new HTTP parser with optional relaxed character sets for path and query.
+     *
+     * @param relaxedPathChars    Additional characters to allow in the path, or {@code null}
+     * @param relaxedQueryChars   Additional characters to allow in the query, or {@code null}
+     */
     public HttpParser(String relaxedPathChars, String relaxedQueryChars) {
         for (int i = 0; i < ARRAY_SIZE; i++) {
             // Not valid for request target.
@@ -171,6 +177,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is not valid for a relaxed request target.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is not valid for a request target
+     */
     public boolean isNotRequestTargetRelaxed(int c) {
         // Fast for valid request target characters, slower for some incorrect
         // ones
@@ -182,6 +194,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is valid for a relaxed absolute path.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for an absolute path
+     */
     public boolean isAbsolutePathRelaxed(int c) {
         // Fast for valid user info characters, slower for some incorrect
         // ones
@@ -193,6 +211,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is valid for a relaxed query string.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for a query string
+     */
     public boolean isQueryRelaxed(int c) {
         // Fast for valid user info characters, slower for some incorrect
         // ones
@@ -204,6 +228,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Removes surrounding quotes from a string, handling escaped characters.
+     *
+     * @param input the string to unquote
+     * @return the unquoted string, or {@code null} if the input is invalid
+     */
     public static String unquote(String input) {
         if (input == null || input.length() < 2) {
             return input;
@@ -240,6 +270,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is a valid HTTP token character as per RFC 7230.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is a valid token character
+     */
     public static boolean isToken(int c) {
         // Fast for correct values, slower for incorrect ones
         try {
@@ -276,6 +312,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is a valid hexadecimal digit.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is a valid hex digit
+     */
     public static boolean isHex(int c) {
         // Fast for correct values, slower for some incorrect ones
         try {
@@ -286,11 +328,23 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is not valid for a request target.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is not valid for a request target
+     */
     public static boolean isNotRequestTarget(int c) {
         return DEFAULT.isNotRequestTargetRelaxed(c);
     }
 
 
+    /**
+     * Checks if the given character is valid for an HTTP protocol version string.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for an HTTP protocol version
+     */
     public static boolean isHttpProtocol(int c) {
         // Fast for valid HTTP protocol characters, slower for some incorrect
         // ones
@@ -302,6 +356,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is an alphabetic character.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is alphabetic
+     */
     public static boolean isAlpha(int c) {
         // Fast for valid alpha characters, slower for some incorrect
         // ones
@@ -313,6 +373,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is a numeric digit.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is a numeric digit
+     */
     public static boolean isNumeric(int c) {
         // Fast for valid numeric characters, slower for some incorrect
         // ones
@@ -324,6 +390,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is valid for a URI scheme as per RFC 3986.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for a URI scheme
+     */
     public static boolean isScheme(int c) {
         // Fast for valid scheme characters, slower for some incorrect
         // ones
@@ -367,6 +439,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is valid for a URI userinfo component as per RFC 3986.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for userinfo
+     */
     public static boolean isUserInfo(int c) {
         // Fast for valid user info characters, slower for some incorrect
         // ones
@@ -389,20 +467,44 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is whitespace (tab or space).
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is whitespace
+     */
     public static boolean isWhiteSpace(int c) {
         return c == 9 || c == 32;
     }
 
+    /**
+     * Checks if the given character is valid for an absolute path as per RFC 3986.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for an absolute path
+     */
     public static boolean isAbsolutePath(int c) {
         return DEFAULT.isAbsolutePathRelaxed(c);
     }
 
 
+    /**
+     * Checks if the given character is valid for a query string as per RFC 3986.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid for a query string
+     */
     public static boolean isQuery(int c) {
         return DEFAULT.isQueryRelaxed(c);
     }
 
 
+    /**
+     * Checks if the given character is a control character.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is a control character
+     */
     public static boolean isControl(int c) {
         // Fast for valid control characters, slower for some incorrect ones
         try {
@@ -413,6 +515,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is a valid field-vchar as per RFC 7230.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid field-vchar
+     */
     public static boolean isFieldVChar(int c) {
         // Fast for valid field-vchar characters, slower for some incorrect ones
         try {
@@ -423,6 +531,12 @@ public class HttpParser {
     }
 
 
+    /**
+     * Checks if the given character is valid field-content as per RFC 7230.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is valid field-content
+     */
     public static boolean isFieldContent(int c) {
         // Fast for valid field-content characters, slower for some incorrect ones
         try {

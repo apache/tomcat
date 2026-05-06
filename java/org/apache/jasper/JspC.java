@@ -89,6 +89,12 @@ import org.xml.sax.SAXException;
  */
 public class JspC extends Task implements Options {
 
+    /**
+     * Creates a new JspC instance.
+     */
+    public JspC() {
+    }
+
     static {
         // the Validator uses this to access the EL ExpressionFactory
         JspFactory.setDefaultFactory(new JspFactoryImpl());
@@ -97,48 +103,91 @@ public class JspC extends Task implements Options {
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
 
+    /** Command-line switch for enabling verbose output. */
     protected static final String SWITCH_VERBOSE = "-v";
+    /** Command-line switch for displaying help. */
     protected static final String SWITCH_HELP = "-help";
+    /** Command-line switch for setting the output directory. */
     protected static final String SWITCH_OUTPUT_DIR = "-d";
+    /** Command-line switch for setting the package name. */
     protected static final String SWITCH_PACKAGE_NAME = "-p";
+    /** Command-line switch for enabling/disabling caching. */
     protected static final String SWITCH_CACHE = "-cache";
+    /** Command-line switch for setting the generated class name. */
     protected static final String SWITCH_CLASS_NAME = "-c";
+    /** Command-line switch indicating the end of options. */
     protected static final String SWITCH_FULL_STOP = "--";
+    /** Command-line switch for compiling to class files. */
     protected static final String SWITCH_COMPILE = "-compile";
+    /** Command-line switch for failing on first error. */
     protected static final String SWITCH_FAIL_FAST = "-failFast";
+    /** Command-line switch for setting the Java source version. */
     protected static final String SWITCH_SOURCE = "-source";
+    /** Command-line switch for setting the Java target version. */
     protected static final String SWITCH_TARGET = "-target";
+    /** Command-line switch for setting the URI base. */
     protected static final String SWITCH_URI_BASE = "-uribase";
+    /** Command-line switch for setting the URI root. */
     protected static final String SWITCH_URI_ROOT = "-uriroot";
+    /** Command-line switch for setting the web application root. */
     protected static final String SWITCH_FILE_WEBAPP = "-webapp";
+    /** Command-line switch for generating a web.xml include file. */
     protected static final String SWITCH_WEBAPP_INC = "-webinc";
+    /** Command-line switch for generating a web-fragment.xml file. */
     protected static final String SWITCH_WEBAPP_FRG = "-webfrg";
+    /** Command-line switch for generating a complete web.xml file. */
     protected static final String SWITCH_WEBAPP_XML = "-webxml";
+    /** Command-line switch for setting the web.xml encoding. */
     protected static final String SWITCH_WEBAPP_XML_ENCODING = "-webxmlencoding";
+    /** Command-line switch for adding web.xml servlet mappings. */
     protected static final String SWITCH_ADD_WEBAPP_XML_MAPPINGS = "-addwebxmlmappings";
+    /** Command-line switch for using mapped file compilation. */
     protected static final String SWITCH_MAPPED = "-mapped";
+    /** Command-line switch for enabling X-Powered-By header. */
     protected static final String SWITCH_XPOWERED_BY = "-xpoweredBy";
+    /** Command-line switch for trimming whitespace in templates. */
     protected static final String SWITCH_TRIM_SPACES = "-trimSpaces";
+    /** Command-line switch for setting the classpath. */
     protected static final String SWITCH_CLASSPATH = "-classpath";
+    /** Command-line switch prefix for setting the exit code on error. */
     protected static final String SWITCH_DIE = "-die";
+    /** Command-line switch for enabling tag handler pooling. */
     protected static final String SWITCH_POOLING = "-poolingEnabled";
+    /** Command-line switch for setting the Java file encoding. */
     protected static final String SWITCH_ENCODING = "-javaEncoding";
+    /** Command-line switch for generating SMAP files. */
     protected static final String SWITCH_SMAP = "-smap";
+    /** Command-line switch for dumping SMAP files. */
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
+    /** Command-line switch for validating TLD files. */
     protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
+    /** Command-line switch for validating XML files. */
     protected static final String SWITCH_VALIDATE_XML = "-validateXml";
+    /** Command-line switch for disabling external entity blocking. */
     protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
+    /** Command-line switch for disabling strict quote escaping. */
     protected static final String SWITCH_NO_STRICT_QUOTE_ESCAPING = "-no-strictQuoteEscaping";
+    /** Command-line switch for enabling EL quoting in attributes. */
     protected static final String SWITCH_QUOTE_ATTRIBUTE_EL = "-quoteAttributeEL";
+    /** Command-line switch for disabling EL quoting in attributes. */
     protected static final String SWITCH_NO_QUOTE_ATTRIBUTE_EL = "-no-quoteAttributeEL";
+    /** Command-line switch for setting the thread count. */
     protected static final String SWITCH_THREAD_COUNT = "-threadCount";
+    /** Command-line switch for showing success messages. */
     protected static final String SHOW_SUCCESS = "-s";
+    /** Command-line switch for listing errors. */
     protected static final String LIST_ERRORS = "-l";
+    /** Web.xml generation level for include fragment. */
     protected static final int INC_WEBXML = 10;
+    /** Web.xml generation level for web-fragment. */
     protected static final int FRG_WEBXML = 15;
+    /** Web.xml generation level for complete web.xml. */
     protected static final int ALL_WEBXML = 20;
+    /** Default exit code level when a compilation error occurs. */
     protected static final int DEFAULT_DIE_LEVEL = 1;
+    /** Exit code level indicating no exit on error. */
     protected static final int NO_DIE_LEVEL = 0;
+    /** Set of XML elements before which generated content should be inserted. */
     protected static final Set<String> insertBefore = new HashSet<>();
 
     static {
@@ -159,38 +208,67 @@ public class JspC extends Task implements Options {
         insertBefore.add("<ejb-local-ref>");
     }
 
+    /** Classpath for compiling generated servlets. */
     protected String classPath = null;
+    /** ClassLoader used for JSP compilation. */
     protected ClassLoader loader = null;
+    /** Option for trimming whitespace in template text. */
     protected TrimSpacesOption trimSpaces = TrimSpacesOption.FALSE;
+    /** Flag to generate string literals as char arrays. */
     protected boolean genStringAsCharArray = false;
+    /** Flag to validate TLD files. */
     protected boolean validateTld;
+    /** Flag to validate XML files. */
     protected boolean validateXml;
+    /** Flag to block external entities during XML parsing. */
     protected boolean blockExternal = true;
+    /** Flag for strict quote escaping in attributes. */
     protected boolean strictQuoteEscaping = true;
+    /** Flag to quote EL expressions in attributes. */
     protected boolean quoteAttributeEL = true;
+    /** Flag to include X-Powered-By response header. */
     protected boolean xpoweredBy;
+    /** Flag to use mapped file compilation. */
     protected boolean mappedFile = false;
+    /** Flag to enable tag handler pooling. */
     protected boolean poolingEnabled = true;
+    /** Scratch directory for generated files. */
     protected File scratchDir;
 
+    /** Target package for generated servlet classes. */
     protected String targetPackage;
+    /** Target class name for a single generated servlet. */
     protected String targetClassName;
+    /** Base URI for the web application. */
     protected String uriBase;
+    /** Root directory of the web application. */
     protected String uriRoot;
+    /** Exit code level on compilation error. */
     protected int dieLevel;
+    /** Flag indicating help was requested. */
     protected boolean helpNeeded = false;
+    /** Flag to compile JSPs to class files. */
     protected boolean compile = false;
+    /** Flag to stop on first compilation error. */
     protected boolean failFast = false;
+    /** Flag to suppress SMAP file generation. */
     protected boolean smapSuppressed = true;
+    /** Flag to dump SMAP files. */
     protected boolean smapDumped = false;
+    /** Flag to enable tag handler caching. */
     protected boolean caching = true;
+    /** Cache for TagLibraryInfo objects. */
     protected final Map<String,TagLibraryInfo> cache = new HashMap<>();
 
+    /** Compiler implementation to use. */
     protected String compiler = null;
 
+    /** Target Java VM version for compilation. */
     protected String compilerTargetVM = "17";
+    /** Source Java version for compilation. */
     protected String compilerSourceVM = "17";
 
+    /** Flag to include debug information in compiled classes. */
     protected boolean classDebugInfo = true;
 
     /**
@@ -227,13 +305,20 @@ public class JspC extends Task implements Options {
     protected int threadCount = Runtime.getRuntime().availableProcessors();
 
     // Generation of web.xml fragments
+    /** Output file path for generated web.xml content. */
     protected String webxmlFile;
+    /** Level of web.xml generation (include, fragment, or complete). */
     protected int webxmlLevel;
+    /** Character encoding for generated web.xml files. */
     protected String webxmlEncoding = "UTF-8";
+    /** Flag to merge generated mappings into existing web.xml. */
     protected boolean addWebXmlMappings = false;
 
+    /** Writer for the generated web.xml output file. */
     protected Writer mapout;
+    /** Buffer for generated servlet declarations. */
     protected CharArrayWriter servletout;
+    /** Buffer for generated servlet-mapping declarations. */
     protected CharArrayWriter mappingout;
 
     /**
@@ -251,20 +336,35 @@ public class JspC extends Task implements Options {
      */
     protected TldCache tldCache = null;
 
+    /** JSP configuration parsed from web.xml. */
     protected JspConfig jspConfig = null;
+    /** Manager for tag plugin optimizations. */
     protected TagPluginManager tagPluginManager = null;
 
+    /** Scanner for TLD files in the web application. */
     protected TldScanner scanner = null;
 
+    /** Flag for verbose output. */
     protected boolean verbose = false;
+    /** Flag to list compilation errors. */
     protected boolean listErrors = false;
+    /** Flag to show success messages. */
     protected boolean showSuccess = false;
+    /** Current position in the command-line arguments array. */
     protected int argPos;
+    /** Flag indicating the full stop switch was encountered. */
     protected boolean fullstop = false;
+    /** Command-line arguments passed to JspC. */
     protected String[] args;
 
+    /** Configuration for non-standard tag optimizations. */
     protected String useNonstandardTagOptimizations;
 
+    /**
+     * Entry point for the JspC command-line tool.
+     *
+     * @param arg Command-line arguments
+     */
     public static void main(String[] arg) {
         if (arg.length == 0) {
             System.out.println(Localizer.getMessage("jspc.usage"));
@@ -432,6 +532,11 @@ public class JspC extends Task implements Options {
         return trimSpaces;
     }
 
+    /**
+     * Sets the option to control handling of template text that consists entirely of whitespace.
+     *
+     * @param trimSpaces New value
+     */
     public void setTrimSpaces(TrimSpacesOption trimSpaces) {
         this.trimSpaces = trimSpaces;
     }
@@ -445,8 +550,10 @@ public class JspC extends Task implements Options {
         this.trimSpaces = TrimSpacesOption.valueOf(ts);
     }
 
-    /*
-     * Backwards compatibility with 8.5.x
+    /**
+     * Sets the trim spaces option for backwards compatibility with 8.5.x.
+     *
+     * @param trimSpaces New value
      */
     public void setTrimSpaces(boolean trimSpaces) {
         if (trimSpaces) {
@@ -521,6 +628,11 @@ public class JspC extends Task implements Options {
         return mappedFile;
     }
 
+    /**
+     * Sets the option to use mapped file compilation.
+     *
+     * @param b New value
+     */
     public void setMappedFile(boolean b) {
         mappedFile = b;
     }
@@ -727,6 +839,11 @@ public class JspC extends Task implements Options {
         return fork;
     }
 
+    /**
+     * Sets the option to fork a separate process for compilation.
+     *
+     * @param fork New value
+     */
     public void setFork(boolean fork) {
         this.fork = fork;
     }
@@ -831,30 +948,65 @@ public class JspC extends Task implements Options {
         }
     }
 
+    /**
+     * Sets the option to validate TLD files.
+     *
+     * @param b New value
+     */
     public void setValidateTld(boolean b) {
         this.validateTld = b;
     }
 
+    /**
+     * Returns whether TLD validation is enabled.
+     *
+     * @return {@code true} if TLD validation is enabled
+     */
     public boolean isValidateTld() {
         return validateTld;
     }
 
+    /**
+     * Sets the option to validate XML files.
+     *
+     * @param b New value
+     */
     public void setValidateXml(boolean b) {
         this.validateXml = b;
     }
 
+    /**
+     * Returns whether XML validation is enabled.
+     *
+     * @return {@code true} if XML validation is enabled
+     */
     public boolean isValidateXml() {
         return validateXml;
     }
 
+    /**
+     * Sets the option to block external entities during XML parsing.
+     *
+     * @param b New value
+     */
     public void setBlockExternal(boolean b) {
         this.blockExternal = b;
     }
 
+    /**
+     * Returns whether external entity blocking is enabled.
+     *
+     * @return {@code true} if external entity blocking is enabled
+     */
     public boolean isBlockExternal() {
         return blockExternal;
     }
 
+    /**
+     * Sets the option for strict quote escaping in attributes.
+     *
+     * @param b New value
+     */
     public void setStrictQuoteEscaping(boolean b) {
         this.strictQuoteEscaping = b;
     }
@@ -864,6 +1016,11 @@ public class JspC extends Task implements Options {
         return strictQuoteEscaping;
     }
 
+    /**
+     * Sets the option to quote EL expressions in attributes.
+     *
+     * @param b New value
+     */
     public void setQuoteAttributeEL(boolean b) {
         quoteAttributeEL = b;
     }
@@ -873,10 +1030,21 @@ public class JspC extends Task implements Options {
         return quoteAttributeEL;
     }
 
+    /**
+     * Returns the number of threads to use for compilation.
+     *
+     * @return the thread count
+     */
     public int getThreadCount() {
         return threadCount;
     }
 
+    /**
+     * Sets the number of threads to use for compilation. Accepts an integer value or a
+     * multiplier suffix 'C' for cores (e.g., "2C" means twice the available processors).
+     *
+     * @param threadCount Thread count string
+     */
     public void setThreadCount(String threadCount) {
         if (threadCount == null) {
             return;
@@ -899,10 +1067,20 @@ public class JspC extends Task implements Options {
         this.threadCount = newThreadCount;
     }
 
+    /**
+     * Sets the option to list compilation errors.
+     *
+     * @param b New value
+     */
     public void setListErrors(boolean b) {
         listErrors = b;
     }
 
+    /**
+     * Sets the output directory for generated files.
+     *
+     * @param s Output directory path
+     */
     public void setOutputDir(String s) {
         if (s != null) {
             scratchDir = resolveFile(s).getAbsoluteFile();
@@ -1002,6 +1180,8 @@ public class JspC extends Task implements Options {
     }
 
     /**
+     * Returns whether an exception will be thrown in case of a compilation error.
+     *
      * @return <code>true</code> if an exception will be thrown in case of a compilation error.
      */
     public boolean getFailOnError() {
@@ -1196,6 +1376,13 @@ public class JspC extends Task implements Options {
         return result.toString();
     }
 
+    /**
+     * Processes a single JSP file, compiling it and generating the web.xml mapping.
+     *
+     * @param file Context-relative path to the JSP file
+     *
+     * @throws JasperException If a compilation error occurs
+     */
     protected void processFile(String file) throws JasperException {
 
         if (log.isDebugEnabled()) {
@@ -1452,6 +1639,11 @@ public class JspC extends Task implements Options {
 
     // ==================== protected utility methods ====================
 
+    /**
+     * Returns the next command-line argument.
+     *
+     * @return the next argument, or {@code null} if no more arguments
+     */
     protected String nextArg() {
         if ((argPos >= args.length) || (fullstop = SWITCH_FULL_STOP.equals(args[argPos]))) {
             return null;
@@ -1460,6 +1652,11 @@ public class JspC extends Task implements Options {
         }
     }
 
+    /**
+     * Returns the next file argument from the command-line.
+     *
+     * @return the next file argument, or {@code null} if no more arguments
+     */
     protected String nextFile() {
         if (fullstop) {
             argPos++;
@@ -1471,6 +1668,11 @@ public class JspC extends Task implements Options {
         }
     }
 
+    /**
+     * Initializes the web.xml output writers based on the configured generation level.
+     *
+     * @throws JasperException If an I/O error occurs
+     */
     protected void initWebXml() throws JasperException {
         try {
             if (webxmlLevel >= INC_WEBXML) {
@@ -1500,6 +1702,10 @@ public class JspC extends Task implements Options {
         }
     }
 
+    /**
+     * Writes the accumulated servlet declarations and mappings to the web.xml output,
+     * then closes the writer.
+     */
     protected void completeWebXml() {
         if (mapout != null) {
             try {
@@ -1520,6 +1726,12 @@ public class JspC extends Task implements Options {
     }
 
 
+    /**
+     * Initializes the TLD scanner for the given servlet context and class loader.
+     *
+     * @param context The servlet context
+     * @param classLoader The class loader to use
+     */
     protected void initTldScanner(JspCServletContext context, ClassLoader classLoader) {
         if (scanner != null) {
             return;
@@ -1530,12 +1742,31 @@ public class JspC extends Task implements Options {
     }
 
 
+    /**
+     * Creates a new TLD scanner instance.
+     *
+     * @param context The servlet context
+     * @param namespaceAware Whether to enable namespace awareness
+     * @param validate Whether to validate TLD files
+     * @param blockExternal Whether to block external entities
+     *
+     * @return the new TLD scanner
+     */
     protected TldScanner newTldScanner(JspCServletContext context, boolean namespaceAware, boolean validate,
             boolean blockExternal) {
         return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 
 
+    /**
+     * Initializes the servlet context, TLD scanner, TLD cache, runtime context,
+     * JSP config, and tag plugin manager for compilation.
+     *
+     * @param classLoader The class loader to use
+     *
+     * @throws IOException If an I/O error occurs
+     * @throws JasperException If a JSP error occurs
+     */
     protected void initServletContext(ClassLoader classLoader) throws IOException, JasperException {
         // TODO: should we use the Ant Project's log?
         PrintWriter log = new PrintWriter(System.out);
@@ -1733,10 +1964,18 @@ public class JspC extends Task implements Options {
         return useNonstandardTagOptimizations;
     }
 
-
+   /**
+     * Runnable task that processes a single JSP file.
+     */
     private class ProcessFile implements Callable<Void> {
+        /** The JSP file to process. */
         private final String file;
 
+        /**
+         * Creates a new ProcessFile task for the given file.
+         *
+         * @param file The JSP file to process
+         */
         private ProcessFile(String file) {
             this.file = file;
         }

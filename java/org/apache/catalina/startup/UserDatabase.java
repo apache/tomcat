@@ -30,13 +30,15 @@ public interface UserDatabase {
 
 
     /**
-     * @return the UserConfig listener with which we are associated.
+     * Return the UserConfig listener with which we are associated.
+     *
+     * @return the UserConfig listener
      */
     UserConfig getUserConfig();
 
 
     /**
-     * Set the UserConfig listener with which we are associated.
+     * Set the UserConfig listener with which this UserDatabase is associated.
      *
      * @param userConfig The new UserConfig listener
      */
@@ -47,15 +49,18 @@ public interface UserDatabase {
 
 
     /**
-     * @return an absolute pathname to the home directory for the specified user.
+     * Return an absolute pathname to the home directory for the specified user.
      *
      * @param user User for which a home directory should be retrieved
+     * @return the home directory path
      */
     String getHome(String user);
 
 
     /**
-     * @return an enumeration of the usernames defined on this server.
+     * Return an enumeration of the usernames defined on this server.
+     *
+     * @return the enumeration of usernames
      */
     Enumeration<String> getUsers();
 

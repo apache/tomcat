@@ -394,7 +394,9 @@ public interface WebResourceRoot extends Lifecycle {
     void deregisterTrackedResource(TrackedWebResource trackedResource);
 
     /**
-     * @return the list of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
+     * Get the list of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
+     *
+     * @return the list of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root
      */
     List<URL> getBaseUrls();
 

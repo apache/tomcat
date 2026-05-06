@@ -24,24 +24,74 @@ import java.nio.charset.StandardCharsets;
  */
 public final class Constants {
 
+    /**
+     * Default URI character encoding.
+     */
     public static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
+
+    /**
+     * Default body character encoding.
+     */
     public static final Charset DEFAULT_BODY_CHARSET = StandardCharsets.ISO_8859_1;
 
+    /**
+     * Maximum number of notes.
+     */
     public static final int MAX_NOTES = 32;
 
 
     // Request states
+
+    /**
+     * Request state: new request.
+     */
     public static final int STAGE_NEW = 0;
+
+    /**
+     * Request state: parsing request.
+     */
     public static final int STAGE_PARSE = 1;
+
+    /**
+     * Request state: preparing request.
+     */
     public static final int STAGE_PREPARE = 2;
+
+    /**
+     * Request state: servicing request.
+     */
     public static final int STAGE_SERVICE = 3;
+
+    /**
+     * Request state: end input.
+     */
     public static final int STAGE_ENDINPUT = 4;
+
+    /**
+     * Request state: end output.
+     */
     public static final int STAGE_ENDOUTPUT = 5;
+
+    /**
+     * Request state: keep-alive.
+     */
     public static final int STAGE_KEEPALIVE = 6;
+
+    /**
+     * Request state: ended.
+     */
     public static final int STAGE_ENDED = 7;
 
     // Default protocol settings
+
+    /**
+     * Default connection linger time.
+     */
     public static final int DEFAULT_CONNECTION_LINGER = -1;
+
+    /**
+     * Default TCP no-delay setting.
+     */
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
     /**
@@ -87,4 +137,11 @@ public final class Constants {
      * identifies for the connector the connection peer IP address.
      */
     public static final String PEER_ADDR_ATTRIBUTE = "org.apache.tomcat.peerAddr";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

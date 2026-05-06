@@ -23,6 +23,9 @@ import java.util.List;
  */
 public class Constants {
 
+    /**
+     * JSP specification version.
+     */
     public static final String SPEC_VERSION = "4.0";
 
     /**
@@ -74,4 +77,10 @@ public class Constants {
      */
     public static final String JSP_FACTORY_POOL_SIZE_INIT_PARAM = "org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE";
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

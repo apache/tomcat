@@ -27,6 +27,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class InterceptorSF extends StoreFactoryBase {
 
+    /**
+     * Constructs a new InterceptorSF.
+     */
+    public InterceptorSF() {
+    }
+
     private static final Log log = LogFactory.getLog(InterceptorSF.class);
 
     @Override

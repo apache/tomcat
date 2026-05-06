@@ -62,6 +62,13 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
  */
 public class FilterValve extends ValveBase implements FilterConfig {
     /**
+     * Creates a new FilterValve instance.
+     */
+    public FilterValve() {
+        // Default constructor
+    }
+
+    /**
      * The name of the Filter class that will be instantiated.
      */
     private String filterClassName;

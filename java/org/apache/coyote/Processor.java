@@ -52,11 +52,15 @@ public interface Processor {
     UpgradeToken getUpgradeToken();
 
     /**
+     * Checks if the Processor is processing an upgrade request.
+     *
      * @return {@code true} if the Processor is currently processing an upgrade request, otherwise {@code false}
      */
     boolean isUpgrade();
 
     /**
+     * Checks if the Processor is in async state.
+     *
      * @return {@code true} if the Processor state is async, otherwise {@code false}
      */
     boolean isAsync();
@@ -74,6 +78,8 @@ public interface Processor {
     void timeoutAsync(long now);
 
     /**
+     * Gets the request associated with this processor.
+     *
      * @return The request associated with this processor.
      */
     Request getRequest();

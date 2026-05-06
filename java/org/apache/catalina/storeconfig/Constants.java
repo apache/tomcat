@@ -16,8 +16,20 @@
  */
 package org.apache.catalina.storeconfig;
 
+/**
+ * Constants used by the storeconfig package.
+ */
 public class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.storeconfig";
 
 }

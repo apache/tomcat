@@ -35,7 +35,17 @@ public interface JarScanner {
      */
     void scan(JarScanType scanType, ServletContext context, JarScannerCallback callback);
 
+    /**
+     * Get the JAR scan filter currently in use.
+     *
+     * @return the JAR scan filter
+     */
     JarScanFilter getJarScanFilter();
 
+    /**
+     * Set the JAR scan filter to use.
+     *
+     * @param jarScanFilter the JAR scan filter
+     */
     void setJarScanFilter(JarScanFilter jarScanFilter);
 }

@@ -18,6 +18,14 @@ package org.apache.catalina;
 
 import java.util.concurrent.ExecutorService;
 
+/**
+ * Interface for a lifecycle-managed executor service within the Catalina container.
+ */
 public interface Executor extends ExecutorService, Lifecycle {
+    /**
+     * Returns the name of this executor.
+     *
+     * @return the executor name
+     */
     String getName();
 }

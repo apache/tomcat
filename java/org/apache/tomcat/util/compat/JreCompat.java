@@ -41,6 +41,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
+    /**
+     * Constructs a new JreCompat.
+     */
+    public JreCompat() {
+    }
+
     private static final Log log = LogFactory.getLog(JreCompat.class);
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
@@ -105,11 +111,21 @@ public class JreCompat {
     }
 
 
+    /**
+     * Get the current JreCompat instance.
+     *
+     * @return the JreCompat instance
+     */
     public static JreCompat getInstance() {
         return instance;
     }
 
 
+    /**
+     * Check if Graal is available.
+     *
+     * @return {@code true} if Graal is available
+     */
     public static boolean isGraalAvailable() {
         return graalAvailable;
     }
@@ -130,6 +146,11 @@ public class JreCompat {
     }
 
 
+    /**
+     * Check if JRE 22 is available.
+     *
+     * @return {@code true} if JRE 22 is available
+     */
     public static boolean isJre22Available() {
         return jre22Available;
     }

@@ -21,6 +21,9 @@ import java.io.InputStream;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.xml.sax.InputSource;
 
+/**
+ * Utility methods for working with {@link InputSource} instances.
+ */
 public final class InputSourceUtil {
 
     private InputSourceUtil() {
@@ -28,6 +31,11 @@ public final class InputSourceUtil {
     }
 
 
+    /**
+     * Close the byte stream associated with the given InputSource, if any.
+     *
+     * @param inputSource the InputSource to close
+     */
     public static void close(InputSource inputSource) {
         if (inputSource == null) {
             // Nothing to do

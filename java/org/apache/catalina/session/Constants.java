@@ -26,6 +26,12 @@ import org.apache.catalina.valves.CrawlerSessionManagerValve;
 public class Constants {
 
     /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
      * Set of session attribute names used internally by Tomcat that should always be removed from the session before it
      * is persisted, replicated or equivalent.
      */

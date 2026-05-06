@@ -54,7 +54,9 @@ public final class ConstantUtf8 extends Constant {
     }
 
     /**
-     * @return Data converted to string.
+     * Returns the UTF-8 string value stored in this constant pool entry.
+     *
+     * @return the string value
      */
     public String getBytes() {
         return value;

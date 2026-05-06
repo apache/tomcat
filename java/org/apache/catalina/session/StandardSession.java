@@ -1083,7 +1083,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
     // ------------------------------------------ HttpSession Protected Methods
 
     /**
-     * @return the <code>isValid</code> flag for this session without any expiration check.
+     * Returns the valid flag for this session without any expiration check.
+     *
+     * @return the <code>isValid</code> flag for this session without any expiration check
      */
     protected boolean isValidInternal() {
         return this.isValid;
@@ -1379,8 +1381,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
+     * Returns the names of all currently defined session attributes as an array of Strings. If there are no defined
+     * attributes, a zero-length array is returned.
+     *
      * @return the names of all currently defined session attributes as an array of Strings. If there are no defined
-     *             attributes, a zero-length array is returned.
+     *             attributes, a zero-length array is returned
      */
     protected String[] keys() {
 

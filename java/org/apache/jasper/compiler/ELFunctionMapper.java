@@ -38,6 +38,12 @@ public class ELFunctionMapper {
     private StringBuilder ss; // Contains declarations of the functions mappers.
 
     /**
+     * Creates a new ELFunctionMapper instance.
+     */
+    public ELFunctionMapper() {
+    }
+
+    /**
      * Creates the functions mappers for all EL expressions in the JSP page.
      *
      * @param page The current compilation unit.

@@ -26,6 +26,11 @@ public class DirectByteArrayOutputStream extends OutputStream {
 
     private final XByteBuffer buffer;
 
+    /**
+     * Construct a new DirectByteArrayOutputStream with the given initial size.
+     *
+     * @param size Initial size of the internal buffer
+     */
     public DirectByteArrayOutputStream(int size) {
         buffer = new XByteBuffer(size, false);
     }
@@ -35,14 +40,29 @@ public class DirectByteArrayOutputStream extends OutputStream {
         buffer.append((byte) b);
     }
 
+    /**
+     * Get the current number of bytes written to this stream.
+     *
+     * @return Number of bytes written
+     */
     public int size() {
         return buffer.getLength();
     }
 
+    /**
+     * Get the underlying byte array directly without copying.
+     *
+     * @return Direct byte array reference
+     */
     public byte[] getArrayDirect() {
         return buffer.getBytesDirect();
     }
 
+    /**
+     * Get a copy of the bytes written to this stream.
+     *
+     * @return Copy of the byte array
+     */
     public byte[] getArray() {
         return buffer.getBytes();
     }

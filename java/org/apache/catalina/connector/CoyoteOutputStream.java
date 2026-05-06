@@ -30,17 +30,28 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CoyoteOutputStream extends ServletOutputStream {
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(CoyoteOutputStream.class);
 
 
     // ----------------------------------------------------- Instance Variables
 
+    /**
+     * The underlying output buffer.
+     */
     protected OutputBuffer ob;
 
 
     // ----------------------------------------------------------- Constructors
 
 
+    /**
+     * Construct a new CoyoteOutputStream.
+     *
+     * @param ob The underlying output buffer
+     */
     protected CoyoteOutputStream(OutputBuffer ob) {
         this.ob = ob;
     }

@@ -95,11 +95,20 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBeanNotificationBroadcaster {
 
+    /**
+     * Default constructor.
+     */
+    public BaseModelMBean() {
+    }
+
     private static final Log log = LogFactory.getLog(BaseModelMBean.class);
     private static final StringManager sm = StringManager.getManager(BaseModelMBean.class);
 
     // ----------------------------------------------------- Instance Variables
 
+    /**
+     * The JMX ObjectName of this MBean.
+     */
     protected ObjectName oname = null;
 
     /**
@@ -126,6 +135,9 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     // TODO: move to ManagedBean
     static final Object[] NO_ARGS_PARAM = new Object[0];
 
+    /**
+     * The type of the managed resource.
+     */
     protected String resourceType = null;
 
     // key: operation val: invoke method
@@ -201,6 +213,11 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
     }
 
+    /**
+     * Sets the metadata for this MBean.
+     *
+     * @param managedBean the managed bean metadata
+     */
     public void setManagedBean(ManagedBean managedBean) {
         this.managedBean = managedBean;
     }
@@ -669,21 +686,38 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     }
 
 
+    /**
+     * Returns the type of the managed resource.
+     *
+     * @return the resource type
+     */
     public String getModelerType() {
         return resourceType;
     }
 
     /**
-     * @return the fully qualified Java class name of the managed object for this MBean
+     * Returns the fully qualified Java class name of the managed object for this MBean.
+     *
+     * @return the fully qualified Java class name
      */
     public String getClassName() {
         return getModelerType();
     }
 
+    /**
+     * Returns the JMX ObjectName of this MBean.
+     *
+     * @return the JMX ObjectName
+     */
     public ObjectName getJmxName() {
         return oname;
     }
 
+    /**
+     * Returns the string representation of the JMX ObjectName.
+     *
+     * @return the ObjectName string or null
+     */
     public String getObjectName() {
         if (oname != null) {
             return oname.toString();

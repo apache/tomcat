@@ -16,19 +16,49 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+/**
+ * Constants for web descriptor utilities.
+ */
 public class Constants {
 
+    /**
+     * Package name for web descriptor utilities.
+     */
     public static final String PACKAGE_NAME = Constants.class.getPackage().getName();
 
+    /**
+     * Default location of the web.xml deployment descriptor.
+     */
     public static final String WEB_XML_LOCATION = "/WEB-INF/web.xml";
 
     // -------------------------------------------------- Cookie attribute names
+    /**
+     * Cookie Comment attribute name.
+     */
     public static final String COOKIE_COMMENT_ATTR = "Comment";
+    /**
+     * Cookie Domain attribute name.
+     */
     public static final String COOKIE_DOMAIN_ATTR = "Domain";
+    /**
+     * Cookie Max-Age attribute name.
+     */
     public static final String COOKIE_MAX_AGE_ATTR = "Max-Age";
+    /**
+     * Cookie Path attribute name.
+     */
     public static final String COOKIE_PATH_ATTR = "Path";
+    /**
+     * Cookie Secure attribute name.
+     */
     public static final String COOKIE_SECURE_ATTR = "Secure";
+    /**
+     * Cookie HttpOnly attribute name.
+     */
     public static final String COOKIE_HTTP_ONLY_ATTR = "HttpOnly";
+    /**
+     * Cookie SameSite attribute name.
+     */
     public static final String COOKIE_SAME_SITE_ATTR = "SameSite";
     /**
      * The name of the attribute used to indicate a partitioned cookie as part of
@@ -37,4 +67,11 @@ public class Constants {
      * an RFC.
      */
     public static final String COOKIE_PARTITIONED_ATTR = "Partitioned";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

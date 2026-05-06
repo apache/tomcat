@@ -88,9 +88,10 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
     /**
+     * Get the regular expression used to identify crawlers based on the User-Agent header.
      * @see #setCrawlerUserAgents(String)
      *
-     * @return The current regular expression being used to match user agents.
+     * @return The current regular expression being used to match user agents
      */
     public String getCrawlerUserAgents() {
         return crawlerUserAgents;
@@ -113,9 +114,10 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
     /**
+     * Get the regular expression used to identify crawlers based on their IP address.
      * @see #setCrawlerIps(String)
      *
-     * @return The current regular expression being used to match IP addresses.
+     * @return The current regular expression being used to match IP addresses
      */
     public String getCrawlerIps() {
         return crawlerIps;
@@ -133,6 +135,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
     /**
+     * Get the session timeout for a crawler's session.
      * @see #setSessionInactiveInterval(int)
      *
      * @return The current timeout in seconds
@@ -142,26 +145,51 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
 
+    /**
+     * Get the map of client identifiers to session IDs.
+     *
+     * @return The map of client identifiers to session IDs
+     */
     public Map<String,String> getClientIpSessionId() {
         return clientIdSessionId;
     }
 
 
+    /**
+     * Determine whether the client identifier includes the host name.
+     *
+     * @return {@code true} if the client identifier includes the host name
+     */
     public boolean isHostAware() {
         return isHostAware;
     }
 
 
+    /**
+     * Set whether the client identifier should include the host name.
+     *
+     * @param isHostAware {@code true} if the client identifier should include the host name
+     */
     public void setHostAware(boolean isHostAware) {
         this.isHostAware = isHostAware;
     }
 
 
+    /**
+     * Determine whether the client identifier includes the context name.
+     *
+     * @return {@code true} if the client identifier includes the context name
+     */
     public boolean isContextAware() {
         return isContextAware;
     }
 
 
+    /**
+     * Set whether the client identifier should include the context name.
+     *
+     * @param isContextAware {@code true} if the client identifier should include the context name
+     */
     public void setContextAware(boolean isContextAware) {
         this.isContextAware = isContextAware;
     }

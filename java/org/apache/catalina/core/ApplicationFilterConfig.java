@@ -135,6 +135,8 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
     /**
+     * Returns the filter class name.
+     *
      * @return The class of the filter we are configuring.
      */
     public String getFilterClass() {
@@ -182,6 +184,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Returns an unmodifiable map of filter initialization parameters.
+     *
+     * @return the filter initialization parameter map
+     */
     public Map<String,String> getFilterInitParameterMap() {
         return Collections.unmodifiableMap(filterDef.getParameterMap());
     }

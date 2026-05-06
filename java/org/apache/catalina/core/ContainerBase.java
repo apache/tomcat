@@ -120,6 +120,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     private static final Log log = LogFactory.getLog(ContainerBase.class);
 
+    /**
+     * Constructs a new ContainerBase instance.
+     */
+    public ContainerBase() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -140,6 +146,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * The future allowing control of the background processor.
      */
     protected ScheduledFuture<?> backgroundProcessorFuture;
+    /**
+     * The future allowing control of the monitor thread.
+     */
     protected ScheduledFuture<?> monitorFuture;
 
     /**
@@ -233,6 +242,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * The number of threads available to process start and stop events for any children associated with this container.
      */
     private int startStopThreads = 1;
+    /**
+     * The executor used for threaded start and stop operations.
+     */
     protected ExecutorService startStopExecutor;
 
 
@@ -321,8 +333,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     }
 
 
-    /*
+    /**
      * Provide access to just the cluster component attached to this container.
+     *
+     * @return the cluster component directly attached to this container, or {@code null} if none
      */
     protected Cluster getClusterInternal() {
         Lock readLock = clusterLock.readLock();
@@ -480,6 +494,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     }
 
 
+    /**
+     * Returns the Realm directly attached to this container, without falling back to the parent.
+     *
+     * @return the realm component directly attached to this container, or {@code null} if none
+     */
     protected Realm getRealmInternal() {
         Lock l = realmLock.readLock();
         l.lock();
@@ -1030,6 +1049,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     }
 
 
+    /**
+     * Returns the ObjectNames of all child containers that are instances of ContainerBase.
+     *
+     * @return the ObjectNames of the managed child containers
+     */
     public ObjectName[] getChildren() {
         List<ObjectName> names;
         childrenLock.readLock().lock();
@@ -1099,7 +1123,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     // ------------------------------- ContainerBackgroundProcessor Inner Class
 
+    /**
+     * Monitor runnable that starts the background processor thread when the container is available.
+     */
     protected class ContainerBackgroundProcessorMonitor implements Runnable {
+        /**
+         * Constructs a new ContainerBackgroundProcessorMonitor instance.
+         */
+        protected ContainerBackgroundProcessorMonitor() {
+        }
+
         @Override
         public void run() {
             if (getState().isAvailable()) {
@@ -1113,12 +1146,22 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * delay.
      */
     protected class ContainerBackgroundProcessor implements Runnable {
+        /**
+         * Constructs a new ContainerBackgroundProcessor instance.
+         */
+        protected ContainerBackgroundProcessor() {
+        }
 
         @Override
         public void run() {
             processChildren(ContainerBase.this);
         }
 
+        /**
+         * Recursively processes the background processing for the given container and its children.
+         *
+         * @param container the container to process
+         */
         protected void processChildren(Container container) {
             ClassLoader originalClassLoader = null;
 

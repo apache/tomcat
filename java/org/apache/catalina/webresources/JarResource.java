@@ -29,6 +29,14 @@ public class JarResource extends AbstractSingleArchiveResource {
     private static final Log log = LogFactory.getLog(JarResource.class);
 
 
+    /**
+     * Constructs a new JarResource.
+     *
+     * @param archiveResourceSet the archive resource set
+     * @param webAppPath the web application path
+     * @param baseUrl the base URL
+     * @param jarEntry the JAR entry
+     */
     public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
             JarEntry jarEntry) {
         super(archiveResourceSet, webAppPath, "jar:" + baseUrl + "!/", jarEntry, baseUrl);

@@ -42,6 +42,15 @@ public class BeanRepository {
         beanTypes = new HashMap<>();
     }
 
+    /**
+     * Registers a scoped bean.
+     *
+     * @param n the UseBean node
+     * @param s the bean name
+     * @param type the bean type
+     * @param scope the bean scope
+     * @throws JasperException if the scope is invalid
+     */
     public void addBean(Node.UseBean n, String s, String type, String scope) throws JasperException {
 
         if (!(scope == null || scope.equals("page") || scope.equals("request") || scope.equals("session") ||
@@ -52,6 +61,13 @@ public class BeanRepository {
         beanTypes.put(s, type);
     }
 
+    /**
+     * Returns the class of a registered bean.
+     *
+     * @param bean the bean name
+     * @return the bean class
+     * @throws JasperException if the class cannot be loaded
+     */
     public Class<?> getBeanType(String bean) throws JasperException {
         Class<?> clazz;
         try {
@@ -62,6 +78,12 @@ public class BeanRepository {
         return clazz;
     }
 
+    /**
+     * Checks if a bean with the given name is registered.
+     *
+     * @param bean the bean name
+     * @return true if the bean is registered
+     */
     public boolean checkVariable(String bean) {
         return beanTypes.containsKey(bean);
     }

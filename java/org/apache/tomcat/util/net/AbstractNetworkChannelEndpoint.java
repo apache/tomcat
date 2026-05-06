@@ -22,11 +22,35 @@ import java.net.SocketAddress;
 import java.nio.channels.Channel;
 import java.nio.channels.NetworkChannel;
 
+/**
+ * Provides a base implementation for endpoints that use a {@link NetworkChannel}.
+ *
+ * @param <S> The channel type
+ * @param <U> The network channel type
+ */
 public abstract class AbstractNetworkChannelEndpoint<S extends Channel, U extends NetworkChannel>
         extends AbstractEndpoint<S,U> {
 
+    /**
+     * Constructs a new endpoint.
+     */
+    public AbstractNetworkChannelEndpoint() {
+    }
+
+    /**
+     * Returns the server socket used by this endpoint.
+     *
+     * @return the server socket
+     */
     protected abstract NetworkChannel getServerSocket();
 
+    /**
+     * Creates the channel to be used by this endpoint.
+     *
+     * @param buffer The buffer handler to use for the channel
+     *
+     * @return the created channel
+     */
     protected abstract S createChannel(SocketBufferHandler buffer);
 
 

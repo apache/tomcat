@@ -16,15 +16,30 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for managing a GzipInterceptor.
+ */
 public interface GzipInterceptorMBean {
 
     // Config
+    /**
+     * Returns the option flag used by this interceptor.
+     *
+     * @return The option flag value
+     */
     int getOptionFlag();
 
+    /**
+     * Sets the option flag used by this interceptor.
+     *
+     * @param optionFlag The new option flag value
+     */
     void setOptionFlag(int optionFlag);
 
     /**
-     * @return the minimum payload size for compression to be enabled.
+     * Returns the minimum payload size for compression to be enabled.
+     *
+     * @return The minimum payload size in bytes
      */
     int getCompressionMinSize();
 
@@ -37,7 +52,9 @@ public interface GzipInterceptorMBean {
     void setCompressionMinSize(int compressionMinSize);
 
     /**
-     * @return {@code true} if the interceptor is configured to collect statistics, otherwise {@code false}
+     * Returns whether the interceptor is configured to collect statistics.
+     *
+     * @return {@code true} if statistics collection is enabled, otherwise {@code false}
      */
     boolean getStatsEnabled();
 
@@ -49,8 +66,9 @@ public interface GzipInterceptorMBean {
     void setStatsEnabled(boolean statsEnabled);
 
     /**
-     * @return If statistics collection is enabled, the number of messages between statistics reports being written to
-     *             the log.
+     * Returns the number of messages between statistics reports being written to the log.
+     *
+     * @return The interval between statistics reports
      */
     int getInterval();
 
@@ -63,29 +81,90 @@ public interface GzipInterceptorMBean {
     void setInterval(int interval);
 
     // Stats
+    /**
+     * Returns the total message count.
+     *
+     * @return Total number of messages processed
+     */
     int getCount();
 
+    /**
+     * Returns the count of compressed transmitted messages.
+     *
+     * @return Number of compressed TX messages
+     */
     int getCountCompressedTX();
 
+    /**
+     * Returns the count of uncompressed transmitted messages.
+     *
+     * @return Number of uncompressed TX messages
+     */
     int getCountUncompressedTX();
 
+    /**
+     * Returns the count of compressed received messages.
+     *
+     * @return Number of compressed RX messages
+     */
     int getCountCompressedRX();
 
+    /**
+     * Returns the count of uncompressed received messages.
+     *
+     * @return Number of uncompressed RX messages
+     */
     int getCountUncompressedRX();
 
+    /**
+     * Returns the total transmitted data size in bytes.
+     *
+     * @return Total TX size in bytes
+     */
     long getSizeTX();
 
+    /**
+     * Returns the total compressed transmitted data size in bytes.
+     *
+     * @return Total compressed TX size in bytes
+     */
     long getCompressedSizeTX();
 
+    /**
+     * Returns the total uncompressed transmitted data size in bytes.
+     *
+     * @return Total uncompressed TX size in bytes
+     */
     long getUncompressedSizeTX();
 
+    /**
+     * Returns the total received data size in bytes.
+     *
+     * @return Total RX size in bytes
+     */
     long getSizeRX();
 
+    /**
+     * Returns the total compressed received data size in bytes.
+     *
+     * @return Total compressed RX size in bytes
+     */
     long getCompressedSizeRX();
 
+    /**
+     * Returns the total uncompressed received data size in bytes.
+     *
+     * @return Total uncompressed RX size in bytes
+     */
     long getUncompressedSizeRX();
 
+    /**
+     * Resets all statistics counters to zero.
+     */
     void reset();
 
+    /**
+     * Writes the current statistics report to the log.
+     */
     void report();
 }

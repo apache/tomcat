@@ -79,6 +79,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Construct a new DigestAuthenticator with caching disabled.
+     */
     public DigestAuthenticator() {
         super();
         setCache(false);
@@ -97,6 +100,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * The last timestamp used to generate a nonce. Each nonce should get a unique timestamp.
      */
     protected long lastTimestamp = 0;
+
+    /**
+     * Lock object used to ensure unique timestamps for nonce generation.
+     */
     protected final Object lastTimestampLock = new Object();
 
 
@@ -145,66 +152,122 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Get the window size to use to track seen nonce count values for a given nonce.
+     *
+     * @return Nonce count window size
+     */
     public int getNonceCountWindowSize() {
         return nonceCountWindowSize;
     }
 
-
+    /**
+     * Set the window size to use to track seen nonce count values for a given nonce.
+     *
+     * @param nonceCountWindowSize Nonce count window size
+     */
     public void setNonceCountWindowSize(int nonceCountWindowSize) {
         this.nonceCountWindowSize = nonceCountWindowSize;
     }
 
-
+    /**
+     * Get the maximum number of server nonces to keep in the cache.
+     *
+     * @return Nonce cache size
+     */
     public int getNonceCacheSize() {
         return nonceCacheSize;
     }
 
-
+    /**
+     * Set the maximum number of server nonces to keep in the cache.
+     *
+     * @param nonceCacheSize Nonce cache size
+     */
     public void setNonceCacheSize(int nonceCacheSize) {
         this.nonceCacheSize = nonceCacheSize;
     }
 
 
+    /**
+     * Get the private key used for nonce generation.
+     *
+     * @return Private key
+     */
     public String getKey() {
         return key;
     }
 
 
+    /**
+     * Set the private key used for nonce generation.
+     *
+     * @param key Private key
+     */
     public void setKey(String key) {
         this.key = key;
     }
 
-
+    /**
+     * Get how long server nonces are valid for in milliseconds.
+     *
+     * @return Nonce validity in milliseconds
+     */
     public long getNonceValidity() {
         return nonceValidity;
     }
 
-
+    /**
+     * Set how long server nonces are valid for in milliseconds.
+     *
+     * @param nonceValidity Nonce validity in milliseconds
+     */
     public void setNonceValidity(long nonceValidity) {
         this.nonceValidity = nonceValidity;
     }
 
-
+    /**
+     * Get the opaque string.
+     *
+     * @return Opaque string
+     */
     public String getOpaque() {
         return opaque;
     }
 
-
+    /**
+     * Set the opaque string.
+     *
+     * @param opaque Opaque string
+     */
     public void setOpaque(String opaque) {
         this.opaque = opaque;
     }
 
-
+    /**
+     * Get whether the URI should be validated as required by RFC2617.
+     *
+     * @return {@code true} if URI validation is enabled
+     */
     public boolean isValidateUri() {
         return validateUri;
     }
 
-
+    /**
+     * Set whether the URI should be validated as required by RFC2617.
+     *
+     * @param validateUri {@code true} to enable URI validation
+     */
     public void setValidateUri(boolean validateUri) {
         this.validateUri = validateUri;
     }
 
 
+    /**
+     * Get the configured authentication algorithms as a comma-separated list.
+     *
+     * @return Comma-separated list of algorithm names
+     */
     public String getAlgorithms() {
         StringBuilder result = new StringBuilder();
         StringUtils.join(algorithms, ',', AuthDigest::getRfcName, result);
@@ -212,6 +275,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
 
+    /**
+     * Set the configured authentication algorithms as a comma-separated list.
+     *
+     * @param algorithmsString Comma-separated list of algorithm names
+     */
     public void setAlgorithms(String algorithmsString) {
         String[] algorithmsArray = algorithmsString.split(",");
         List<AuthDigest> algorithms = new ArrayList<>();
@@ -458,6 +526,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
 
+    /**
+     * Holds the parsed and validated information from a Digest authentication request.
+     */
     public static class DigestInfo {
 
         private final String opaque;
@@ -481,6 +552,15 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private AuthDigest algorithm = null;
 
 
+        /**
+         * Create a new DigestInfo instance.
+         *
+         * @param opaque        Opaque string
+         * @param nonceValidity Nonce validity in milliseconds
+         * @param key           Private key
+         * @param nonces        Map of tracked nonces
+         * @param validateUri   Whether to validate the URI
+         */
         public DigestInfo(String opaque, long nonceValidity, String key, Map<String,NonceInfo> nonces,
                 boolean validateUri) {
             this.opaque = opaque;
@@ -491,11 +571,22 @@ public class DigestAuthenticator extends AuthenticatorBase {
         }
 
 
+        /**
+         * Get the authenticated user name.
+         *
+         * @return User name
+         */
         public String getUsername() {
             return userName;
         }
 
-
+        /**
+         * Parse the authorization header to extract digest credentials.
+         *
+         * @param request         HTTP request
+         * @param authorization   Authorization header value
+         * @return {@code true} if parsing succeeded
+         */
         public boolean parse(Request request, String authorization) {
             // Validate the authorization credentials format
             if (authorization == null) {
@@ -531,6 +622,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
             return true;
         }
 
+        /**
+         * Validate the parsed digest credentials against the request and configured algorithms.
+         *
+         * @param request     HTTP request
+         * @param algorithms  Configured authentication algorithms
+         * @return {@code true} if validation succeeded
+         */
         public boolean validate(Request request, List<AuthDigest> algorithms) {
             if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
                 return false;
@@ -650,10 +748,21 @@ public class DigestAuthenticator extends AuthenticatorBase {
             return algorithms.contains(algorithm);
         }
 
+        /**
+         * Check if the nonce has expired and is considered stale.
+         *
+         * @return {@code true} if the nonce is stale
+         */
         public boolean isNonceStale() {
             return nonceStale;
         }
 
+        /**
+         * Authenticate the user against the given realm using the parsed digest credentials.
+         *
+         * @param realm Realm to authenticate against
+         * @return Principal if authentication succeeded, {@code null} otherwise
+         */
         public Principal authenticate(Realm realm) {
             String a2 = method + ":" + uri;
 
@@ -667,18 +776,33 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     }
 
+    /**
+     * Tracks information about a server nonce, including timestamp and seen nonce counts.
+     */
     public static class NonceInfo {
         private final long timestamp;
         private final boolean[] seen;
         private final int offset;
         private int count = 0;
 
+        /**
+         * Create a new NonceInfo instance.
+         *
+         * @param currentTime      Current timestamp
+         * @param seenWindowSize   Size of the window for tracking seen nonce counts
+         */
         public NonceInfo(long currentTime, int seenWindowSize) {
             this.timestamp = currentTime;
             seen = new boolean[seenWindowSize];
             offset = seenWindowSize / 2;
         }
 
+        /**
+         * Validate the nonce count to detect replay attacks.
+         *
+         * @param nonceCount Nonce count from the client
+         * @return {@code true} if the nonce count is valid
+         */
         public synchronized boolean nonceCountValid(long nonceCount) {
             if ((count - offset) >= nonceCount || (nonceCount > count - offset + seen.length)) {
                 return false;
@@ -694,6 +818,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
         }
 
+        /**
+         * Get the timestamp when this nonce was created.
+         *
+         * @return Timestamp in milliseconds
+         */
         public long getTimestamp() {
             return timestamp;
         }
@@ -705,22 +834,49 @@ public class DigestAuthenticator extends AuthenticatorBase {
      */
     public enum AuthDigest {
 
+        /**
+         * MD5 digest algorithm.
+         */
         MD5("MD5", "MD5"),
+
+        /**
+         * SHA-256 digest algorithm.
+         */
         SHA_256("SHA-256", "SHA-256"),
+
+        /**
+         * SHA-512/256 digest algorithm.
+         */
         SHA_512_256("SHA-512/256", "SHA-512-256");
 
         private final String javaName;
         private final String rfcName;
 
+        /**
+         * Create a new AuthDigest instance.
+         *
+         * @param javaName Java standard algorithm name
+         * @param rfcName  RFC algorithm name
+         */
         AuthDigest(String javaName, String rfcName) {
             this.javaName = javaName;
             this.rfcName = rfcName;
         }
 
+        /**
+         * Get the Java standard name for this digest algorithm.
+         *
+         * @return Java algorithm name
+         */
         public String getJavaName() {
             return javaName;
         }
 
+        /**
+         * Get the RFC name for this digest algorithm.
+         *
+         * @return RFC algorithm name
+         */
         public String getRfcName() {
             return rfcName;
         }

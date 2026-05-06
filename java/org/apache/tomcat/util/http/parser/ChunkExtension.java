@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.res.StringManager;
 
-/*
+/**
  * Unlike other HTTP parsers, this is a stateless (state is held by the calling code), streaming parser as chunk headers
  * are read as part of the request body and it is not always possible to buffer then entire chunk header in memory.
  */
@@ -28,6 +28,16 @@ public class ChunkExtension {
 
     private static final StringManager sm = StringManager.getManager(ChunkExtension.class);
 
+    /**
+     * Parses the next byte of a chunk extension.
+     *
+     * @param b the byte to parse
+     * @param state the current parsing state
+     *
+     * @return the next parsing state
+     *
+     * @throws IOException if the byte is invalid for the current state
+     */
     public static State parse(byte b, State state) throws IOException {
 
         char c = (char) (0xFF & b);
@@ -117,14 +127,41 @@ public class ChunkExtension {
     }
 
 
+    /**
+     * Parsing states for chunk extension.
+     */
     public enum State {
+        /**
+         * State before the extension name.
+         */
         PRE_NAME,
+        /**
+         * Reading the extension name.
+         */
         NAME,
+        /**
+         * State after the extension name.
+         */
         POST_NAME,
+        /**
+         * At the equals sign between name and value.
+         */
         EQUALS,
+        /**
+         * Reading the extension value.
+         */
         VALUE,
+        /**
+         * Reading a quoted extension value.
+         */
         QUOTED_VALUE,
+        /**
+         * State after the extension value.
+         */
         POST_VALUE,
+        /**
+         * At the carriage return.
+         */
         CR
     }
 }

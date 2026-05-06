@@ -24,6 +24,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class HexUtils {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private HexUtils() {
+    }
+
     private static final StringManager sm = StringManager.getManager(HexUtils.class);
 
     // -------------------------------------------------------------- Constants
@@ -52,6 +58,13 @@ public final class HexUtils {
 
     // --------------------------------------------------------- Static Methods
 
+    /**
+     * Get the decimal value of the character at the given index.
+     *
+     * @param index the character index
+     *
+     * @return the decimal value, or -1 if the character is not a valid hex digit
+     */
     public static int getDec(int index) {
         // Fast for correct values, slower for incorrect ones
         try {
@@ -62,11 +75,25 @@ public final class HexUtils {
     }
 
 
+    /**
+     * Get the hexadecimal byte for the given index.
+     *
+     * @param index the index into the hex table
+     *
+     * @return the hexadecimal byte
+     */
     public static byte getHex(int index) {
         return HEX[index];
     }
 
 
+    /**
+     * Convert a character to a hexadecimal string representation.
+     *
+     * @param c the character to convert
+     *
+     * @return the hexadecimal string representation of the character
+     */
     public static String toHexString(char c) {
         // 2 bytes / 4 hex digits
         StringBuilder sb = new StringBuilder(4);
@@ -81,6 +108,13 @@ public final class HexUtils {
     }
 
 
+    /**
+     * Convert a byte array to a hexadecimal string representation.
+     *
+     * @param bytes the byte array to convert
+     *
+     * @return the hexadecimal string, or {@code null} if the input is {@code null}
+     */
     public static String toHexString(byte[] bytes) {
         if (null == bytes) {
             return null;
@@ -96,6 +130,16 @@ public final class HexUtils {
     }
 
 
+    /**
+     * Convert a hexadecimal string to a byte array.
+     *
+     * @param input the hexadecimal string to convert
+     *
+     * @return the byte array, or {@code null} if the input is {@code null}
+     *
+     * @throws IllegalArgumentException if the input has an odd number of characters
+     *                                  or contains non-hexadecimal characters
+     */
     public static byte[] fromHexString(String input) {
         if (input == null) {
             return null;

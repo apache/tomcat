@@ -35,7 +35,16 @@ import org.apache.catalina.Service;
  * listener on all contexts. This is an alternative to adding a Listener in context.xml with more flexibility.
  */
 public abstract class FrameworkListener implements LifecycleListener, ContainerListener {
+    /**
+     * Creates a new FrameworkListener instance.
+     */
+    public FrameworkListener() {
+        // Default constructor
+    }
 
+    /**
+     * Map of context to their associated lifecycle listeners.
+     */
     protected final ConcurrentHashMap<Context,LifecycleListener> contextListeners = new ConcurrentHashMap<>();
 
     /**
@@ -65,6 +74,11 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
+    /**
+     * Registers listeners on all engines of the given server.
+     *
+     * @param server The server to register listeners for
+     */
     protected void registerListenersForServer(Server server) {
         for (Service service : server.findServices()) {
             Engine engine = service.getContainer();
@@ -75,6 +89,11 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
+    /**
+     * Registers listeners on all hosts of the given engine.
+     *
+     * @param engine The engine to register listeners for
+     */
     protected void registerListenersForEngine(Engine engine) {
         for (Container hostContainer : engine.findChildren()) {
             Host host = (Host) hostContainer;
@@ -83,6 +102,11 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
+    /**
+     * Registers listeners on all contexts of the given host.
+     *
+     * @param host The host to register listeners for
+     */
     protected void registerListenersForHost(Host host) {
         for (Container contextContainer : host.findChildren()) {
             Context context = (Context) contextContainer;
@@ -90,12 +114,22 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
+    /**
+     * Creates and registers a lifecycle listener for the given context.
+     *
+     * @param context The context to register a listener for
+     */
     protected void registerContextListener(Context context) {
         LifecycleListener listener = createLifecycleListener(context);
         contextListeners.put(context, listener);
         context.addLifecycleListener(listener);
     }
 
+    /**
+     * Processes the addition of a child container by registering appropriate listeners.
+     *
+     * @param child The child container that was added
+     */
     protected void processContainerAddChild(Container child) {
         if (child instanceof Context) {
             registerContextListener((Context) child);
@@ -106,6 +140,11 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
+    /**
+     * Processes the removal of a child container by unregistering appropriate listeners.
+     *
+     * @param child The child container that was removed
+     */
     protected void processContainerRemoveChild(Container child) {
         if (child instanceof Context) {
             LifecycleListener listener = contextListeners.remove(child);

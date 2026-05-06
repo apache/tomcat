@@ -27,10 +27,20 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.RequestUtil;
 
+/**
+ * Abstract implementation of {@link org.apache.catalina.WebResourceSet} that is based on a directory
+ * on a file system.
+ */
 public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
+    /**
+     * The logger.
+     */
     private static final Log log = LogFactory.getLog(AbstractFileResourceSet.class);
 
+    /**
+     * An empty string array.
+     */
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private File fileBase;
@@ -39,10 +49,20 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     private boolean readOnly = false;
     private Boolean allowLinking;
 
+    /**
+     * Constructs a new abstract file resource set.
+     *
+     * @param internalPath The internal path
+     */
     protected AbstractFileResourceSet(String internalPath) {
         setInternalPath(internalPath);
     }
 
+    /**
+     * Returns the file base for this resource set.
+     *
+     * @return the file base
+     */
     protected final File getFileBase() {
         return fileBase;
     }
@@ -70,6 +90,13 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         return allowLinking.booleanValue();
     }
 
+    /**
+     * Return a File for the specified resource name.
+     *
+     * @param name     Name of the resource
+     * @param mustExist Whether the file must exist
+     * @return the file for the specified resource
+     */
     protected final File file(String name, boolean mustExist) {
 
         if (name.equals("/")) {
@@ -163,6 +190,13 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     }
 
 
+    /**
+     * Logs a message about an ignored symlink.
+     *
+     * @param contextPath The context path
+     * @param absPath     The absolute path
+     * @param canPath     The canonical path
+     */
     protected void logIgnoredSymlink(String contextPath, String absPath, String canPath) {
         // Log issues with configuration files at a higher level
         if (absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
@@ -265,5 +299,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     }
 
 
+    /**
+     * Checks the type of the specified file.
+     *
+     * @param file The file to check
+     * @throws IllegalArgumentException if the file is not of the expected type
+     */
     protected abstract void checkType(File file);
 }

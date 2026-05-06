@@ -57,7 +57,9 @@ public class JavaClass {
     }
 
     /**
-     * @return Access flags of the object aka. "modifiers".
+     * Get the access flags of this class.
+     *
+     * @return the access flags
      */
     public final int getAccessFlags() {
         return accessFlags;
@@ -104,7 +106,9 @@ public class JavaClass {
     }
 
     /**
-     * @return Class name.
+     * Get the name of this class.
+     *
+     * @return the class name
      */
     public String getClassName() {
         return className;
@@ -112,7 +116,9 @@ public class JavaClass {
 
 
     /**
-     * @return Names of implemented interfaces.
+     * Get the names of the interfaces implemented by this class.
+     *
+     * @return the interface names
      */
     public String[] getInterfaceNames() {
         return interfaceNames;

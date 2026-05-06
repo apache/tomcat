@@ -23,6 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Handles the access control on the JNDI contexts.
  */
 public class ContextAccessController {
+    /**
+     * Constructs a new ContextAccessController instance.
+     */
+    public ContextAccessController() {
+    }
 
     // -------------------------------------------------------------- Variables
 

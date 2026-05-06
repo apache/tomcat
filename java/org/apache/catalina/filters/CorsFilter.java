@@ -83,6 +83,12 @@ public class CorsFilter extends GenericFilter {
 
     private transient Log log = LogFactory.getLog(CorsFilter.class); // must not be static
 
+    /**
+     * Default constructor.
+     */
+    public CorsFilter() {
+    }
+
 
     /**
      * A {@link Collection} of origins consisting of zero or more origins that are allowed access to the resource.

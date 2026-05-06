@@ -102,6 +102,12 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     protected long byteCount = 0;
 
 
+    /**
+     * Constructs a new Http11OutputBuffer.
+     *
+     * @param response the Coyote response
+     * @param headerBufferSize the maximum size of the header buffer
+     */
     protected Http11OutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
@@ -274,11 +280,21 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     }
 
 
+    /**
+     * Initialize the output buffer with the socket wrapper.
+     *
+     * @param socketWrapper the socket wrapper
+     */
     public void init(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
     }
 
 
+    /**
+     * Send a 100-continue acknowledgment to the client.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void sendAck() throws IOException {
         // It possible that the protocol configuration is changed between the
         // request being received and the first read of the body. That could lead
@@ -303,6 +319,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         writeHeaders();
     }
 
+    /**
+     * Write the buffered headers to the socket.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected void writeHeaders() throws IOException {
         if (headerBuffer.position() > 0) {
             // Sending the response header buffer
@@ -492,6 +513,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     }
 
 
+    /**
+     * Check if the socket is ready for writing.
+     *
+     * @return {@code true} if the socket is ready for writing
+     */
     protected final boolean isReady() {
         boolean result = !hasDataToWrite();
         if (!result) {
@@ -501,11 +527,19 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     }
 
 
+    /**
+     * Check if there is data waiting to be written to the socket.
+     *
+     * @return {@code true} if there is data waiting to be written
+     */
     public boolean hasDataToWrite() {
         return socketWrapper.hasDataToWrite();
     }
 
 
+    /**
+     * Register interest in write events on the socket.
+     */
     public void registerWriteInterest() {
         socketWrapper.registerWriteInterest();
     }
@@ -527,6 +561,12 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      * This class is an output buffer which will write data to a socket.
      */
     protected class SocketOutputBuffer implements HttpOutputBuffer {
+
+        /**
+         * Constructs a new SocketOutputBuffer.
+         */
+        public SocketOutputBuffer() {
+        }
 
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {

@@ -32,6 +32,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
 
+    /**
+     * Creates a new ConnectorMBean instance.
+     */
+    public ConnectorMBean() {
+        super();
+    }
+
     private static final StringManager sm = StringManager.getManager(ConnectorMBean.class);
 
     @Override

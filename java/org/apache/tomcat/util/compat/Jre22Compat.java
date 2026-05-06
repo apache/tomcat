@@ -20,7 +20,16 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * JRE 22 compatibility implementation.
+ */
 public class Jre22Compat extends Jre21Compat {
+
+    /**
+     * Constructs a new Jre22Compat.
+     */
+    public Jre22Compat() {
+    }
 
     private static final Log log = LogFactory.getLog(Jre22Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre22Compat.class);

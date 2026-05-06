@@ -40,6 +40,11 @@ public class BackgroundProcessManager {
     }
 
 
+    /**
+     * Returns the singleton instance of the BackgroundProcessManager.
+     *
+     * @return the singleton instance
+     */
     public static BackgroundProcessManager getInstance() {
         return instance;
     }
@@ -53,6 +58,11 @@ public class BackgroundProcessManager {
     }
 
 
+    /**
+     * Registers a background process for periodic execution.
+     *
+     * @param process the background process to register
+     */
     public void register(BackgroundProcess process) {
         synchronized (processesLock) {
             if (processes.isEmpty()) {
@@ -66,6 +76,11 @@ public class BackgroundProcessManager {
     }
 
 
+    /**
+     * Unregisters a previously registered background process.
+     *
+     * @param process the background process to unregister
+     */
     public void unregister(BackgroundProcess process) {
         synchronized (processesLock) {
             processes.remove(process);

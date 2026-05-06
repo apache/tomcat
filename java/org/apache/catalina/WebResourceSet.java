@@ -79,6 +79,11 @@ public interface WebResourceSet extends Lifecycle {
      */
     boolean write(String path, InputStream is, boolean overwrite);
 
+    /**
+     * Sets the root for this resource set.
+     *
+     * @param root The root
+     */
     void setRoot(WebResourceRoot root);
 
     /**
@@ -91,6 +96,11 @@ public interface WebResourceSet extends Lifecycle {
      */
     boolean getClassLoaderOnly();
 
+    /**
+     * Sets whether this resource set is class loader only.
+     *
+     * @param classLoaderOnly <code>true</code> if this resource set is class loader only
+     */
     void setClassLoaderOnly(boolean classLoaderOnly);
 
     /**
@@ -103,6 +113,11 @@ public interface WebResourceSet extends Lifecycle {
      */
     boolean getStaticOnly();
 
+    /**
+     * Sets whether this resource set is static only.
+     *
+     * @param staticOnly <code>true</code> if this resource set is static only
+     */
     void setStaticOnly(boolean staticOnly);
 
     /**

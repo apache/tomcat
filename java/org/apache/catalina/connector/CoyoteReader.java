@@ -36,15 +36,26 @@ public class CoyoteReader extends BufferedReader {
     // ----------------------------------------------------- Instance Variables
 
 
+    /**
+     * The underlying input buffer.
+     */
     protected InputBuffer ib;
 
 
+    /**
+     * Buffer used for reading lines.
+     */
     protected char[] lineBuffer = null;
 
 
     // ----------------------------------------------------------- Constructors
 
 
+    /**
+     * Construct a new CoyoteReader.
+     *
+     * @param ib The underlying input buffer
+     */
     public CoyoteReader(InputBuffer ib) {
         super(ib, 1);
         this.ib = ib;

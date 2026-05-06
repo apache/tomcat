@@ -258,6 +258,12 @@ public class AjpProcessor extends AbstractProcessor {
 
     // ------------------------------------------------------------ Constructor
 
+    /**
+     * Constructs a new AjpProcessor.
+     *
+     * @param protocol The AJP protocol
+     * @param adapter The adapter for this processor
+     */
     public AjpProcessor(AbstractAjpProtocol<?> protocol, Adapter adapter) {
         super(adapter);
         this.protocol = protocol;
@@ -1248,6 +1254,13 @@ public class AjpProcessor extends AbstractProcessor {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
+        /**
+         * Constructs a new SocketInputBuffer.
+         */
+        SocketInputBuffer() {
+            // No-op
+        }
+
         @Override
         public int doRead(ApplicationBufferHandler handler) throws IOException {
 
@@ -1282,6 +1295,13 @@ public class AjpProcessor extends AbstractProcessor {
      * This class is an output buffer which will write data to an output stream.
      */
     protected class SocketOutputBuffer implements OutputBuffer {
+
+        /**
+         * Constructs a new SocketOutputBuffer.
+         */
+        SocketOutputBuffer() {
+            // No-op
+        }
 
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {

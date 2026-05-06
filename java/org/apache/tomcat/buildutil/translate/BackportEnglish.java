@@ -30,6 +30,13 @@ public class BackportEnglish extends BackportBase {
     private static final Set<String> keysToExclude = new HashSet<>();
 
 
+    /**
+     * Entry point for the English back-port tool.
+     *
+     * @param args command line arguments; a single argument specifying the target directory
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String... args) throws IOException {
         // Exclude keys known to be different between all versions
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jsp.error.jsproot.version.invalid");
@@ -45,6 +52,13 @@ public class BackportEnglish extends BackportBase {
     }
 
 
+    /**
+     * Constructs a BackportEnglish instance.
+     *
+     * @param args command line arguments; a single argument specifying the target directory
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected BackportEnglish(String[] args) throws IOException {
         super(args);
     }

@@ -32,8 +32,20 @@ import org.apache.tomcat.util.security.ConstantTime;
  */
 public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
+    /**
+     * Construct a new DigestCredentialHandlerBase.
+     */
+    public DigestCredentialHandlerBase() {
+    }
+
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(DigestCredentialHandlerBase.class);
 
+    /**
+     * Default salt length in bytes.
+     */
     public static final int DEFAULT_SALT_LENGTH = 32;
 
     private int iterations = getDefaultIterations();
@@ -44,6 +56,9 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the number of iterations of the associated algorithm that will be used when creating a new stored
+     * credential for a given input credential.
+     *
      * @return the number of iterations of the associated algorithm that will be used when creating a new stored
      *             credential for a given input credential.
      */
@@ -64,6 +79,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the salt length that will be used when creating a new stored credential for a given input credential.
+     *
      * @return the salt length that will be used when creating a new stored credential for a given input credential.
      */
     public int getSaltLength() {
@@ -206,6 +223,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the default salt length used by the {@link CredentialHandler}.
+     *
      * @return the default salt length used by the {@link CredentialHandler}.
      */
     protected int getDefaultSaltLength() {
@@ -258,18 +277,24 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the algorithm used to convert input credentials to stored credentials.
+     *
      * @return the algorithm used to convert input credentials to stored credentials.
      */
     public abstract String getAlgorithm();
 
 
     /**
+     * Get the default number of iterations used by the {@link CredentialHandler}.
+     *
      * @return the default number of iterations used by the {@link CredentialHandler}.
      */
     protected abstract int getDefaultIterations();
 
 
     /**
+     * Get the logger for the CredentialHandler instance.
+     *
      * @return the logger for the CredentialHandler instance.
      */
     protected abstract Log getLog();

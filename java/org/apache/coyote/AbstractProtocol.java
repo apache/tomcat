@@ -52,6 +52,11 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Abstract base class for protocol handlers.
+ *
+ * @param <S> the type of the socket
+ */
 public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegistration {
 
     /**
@@ -78,15 +83,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     private final AbstractEndpoint<S,?> endpoint;
 
 
+    /** The handler. */
     private Handler<S> handler;
 
 
+    /** Set of processors currently waiting for async processing. */
     private final Set<Processor> waitingProcessors = ConcurrentHashMap.newKeySet();
 
     /**
      * Controller for the timeout scheduling.
      */
     private ScheduledFuture<?> timeoutFuture = null;
+    /** Scheduled future for the periodic monitor task. */
     private ScheduledFuture<?> monitorFuture;
 
     /**
@@ -292,11 +300,21 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Gets the utility executor for this protocol handler.
+     *
+     * @return The utility executor
+     */
     @Override
     public ScheduledExecutorService getUtilityExecutor() {
         return endpoint.getUtilityExecutor();
     }
 
+    /**
+     * Sets the utility executor for this protocol handler.
+     *
+     * @param utilityExecutor The utility executor
+     */
     @Override
     public void setUtilityExecutor(ScheduledExecutorService utilityExecutor) {
         endpoint.setUtilityExecutor(utilityExecutor);
@@ -630,6 +648,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    /**
+     * Gets the internal name for this protocol instance.
+     *
+     * @return The internal name
+     */
     private String getNameInternal() {
         StringBuilder name = new StringBuilder(getNamePrefix());
         name.append('-');
@@ -797,8 +820,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ----------------------------------------------------- JMX related methods
 
+    /** The domain for JMX. */
     protected String domain;
+    /** The JMX object name. */
     protected ObjectName oname;
+    /** The MBean server. */
     protected MBeanServer mserver;
 
     /**
@@ -973,6 +999,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
     }
 
+    /**
+     * Stops the async timeout scheduler.
+     */
     protected void stopAsyncTimeout() {
         if (timeoutFuture != null) {
             timeoutFuture.cancel(false);
@@ -1115,8 +1144,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ------------------------------------------- Connection handler base class
 
+    /**
+     * Connection handler base class.
+     *
+     * @param <S> the type of the socket
+     */
     protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
 
+        /** The protocol handler. */
         private final AbstractProtocol<S> proto;
         private final RequestGroupInfo global = new RequestGroupInfo();
         private final AtomicLong registerCount = new AtomicLong(0);
@@ -1583,9 +1618,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
     }
 
+    /**
+     * Pool of recycled processors.
+     */
     protected static class RecycledProcessors extends SynchronizedStack<Processor> {
 
+        /** The connection handler. */
         private final transient ConnectionHandler<?> handler;
+        /** The current size of the pool. */
         protected final AtomicInteger size = new AtomicInteger(0);
 
         /**

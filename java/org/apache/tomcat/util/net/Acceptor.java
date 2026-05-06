@@ -24,6 +24,11 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Acceptor thread that accepts incoming connections.
+ *
+ * @param <U> the type of the socket
+ */
 public class Acceptor<U> implements Runnable {
 
     private static final Log log = LogFactory.getLog(Acceptor.class);
@@ -40,14 +45,27 @@ public class Acceptor<U> implements Runnable {
      */
     private volatile boolean stopCalled = false;
     private final CountDownLatch stopLatch = new CountDownLatch(1);
+    /**
+     * Current state of the acceptor.
+     */
     protected volatile AcceptorState state = AcceptorState.NEW;
 
 
+    /**
+     * Constructs a new Acceptor.
+     *
+     * @param endpoint The endpoint associated with this acceptor
+     */
     public Acceptor(AbstractEndpoint<?,U> endpoint) {
         this.endpoint = endpoint;
     }
 
 
+    /**
+     * Returns the current state of the acceptor.
+     *
+     * @return The current acceptor state
+     */
     public final AcceptorState getState() {
         return state;
     }
@@ -162,6 +180,11 @@ public class Acceptor<U> implements Runnable {
     }
 
 
+    /**
+     * Stops the acceptor, optionally waiting for it to finish.
+     *
+     * @param waitMilliseconds The number of milliseconds to wait for the acceptor to stop
+     */
     public void stopMillis(int waitMilliseconds) {
         stopCalled = true;
         if (waitMilliseconds > 0) {
@@ -207,10 +230,25 @@ public class Acceptor<U> implements Runnable {
     }
 
 
+    /**
+     * States of the acceptor lifecycle.
+     */
     public enum AcceptorState {
+        /**
+         * Acceptor has been created but not yet started.
+         */
         NEW,
+        /**
+         * Acceptor is actively accepting connections.
+         */
         RUNNING,
+        /**
+         * Acceptor is paused and not accepting new connections.
+         */
         PAUSED,
+        /**
+         * Acceptor has stopped and ended.
+         */
         ENDED
     }
 }

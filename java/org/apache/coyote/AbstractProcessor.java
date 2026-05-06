@@ -46,12 +46,15 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
+    /** The string manager for this class. */
     private static final StringManager sm = StringManager.getManager(AbstractProcessor.class);
 
-    // Used to avoid useless B2C conversion on the host name.
+    /** Used to avoid useless B2C conversion on the host name. */
     private char[] hostNameC = new char[0];
 
+    /** The adapter for this processor. */
     protected final Adapter adapter;
+    /** State machine for async processing. */
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
     /*
@@ -62,9 +65,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * generation. This prevents the response mix-up.
      */
     private volatile long asyncTimeoutGeneration = 0;
+    /** The request being processed. */
     protected final Request request;
+    /** The response being processed. */
     protected final Response response;
+    /** The socket wrapper for this processor. */
     protected volatile SocketWrapperBase<?> socketWrapper = null;
+    /** SSL support for this connection. */
     protected volatile SSLSupport sslSupport;
 
 
@@ -73,13 +80,26 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      */
     private ErrorState errorState = ErrorState.NONE;
 
+    /** User data helper for logging. */
     protected final UserDataHelper userDataHelper;
 
+    /**
+     * Creates a new processor with the given adapter.
+     *
+     * @param adapter The adapter for this processor
+     */
     public AbstractProcessor(Adapter adapter) {
         this(adapter, new Request(), new Response());
     }
 
 
+    /**
+     * Constructs a new processor with the given adapter, request, and response.
+     *
+     * @param adapter The adapter for this processor
+     * @param coyoteRequest The coyote request
+     * @param coyoteResponse The coyote response
+     */
     protected AbstractProcessor(Adapter adapter, Request coyoteRequest, Response coyoteResponse) {
         this.adapter = adapter;
         asyncStateMachine = new AsyncStateMachine(this);
@@ -125,6 +145,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Gets the current error state.
+     *
+     * @return the current error state
+     */
     protected ErrorState getErrorState() {
         return errorState;
     }
@@ -157,6 +182,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
+     * Get the socket wrapper being used.
+     *
      * @return the socket wrapper being used.
      */
     protected final SocketWrapperBase<?> getSocketWrapper() {
@@ -272,6 +299,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Parses the Host header value and populates the server name and port.
+     *
+     * @param valueMB The MessageBytes containing the Host header value
+     */
     protected void parseHost(MessageBytes valueMB) {
         if (valueMB == null || valueMB.isNull()) {
             populateHost();
@@ -708,11 +740,21 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Sets the async timeout.
+     *
+     * @param timeout The timeout in milliseconds
+     */
     public void setAsyncTimeout(long timeout) {
         asyncTimeout = timeout;
     }
 
 
+    /**
+     * Gets the async timeout.
+     *
+     * @return the async timeout in milliseconds
+     */
     public long getAsyncTimeout() {
         return asyncTimeout;
     }
@@ -749,6 +791,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void ack(ContinueResponseTiming continueResponseTiming);
 
 
+    /**
+     * Process early hints (103 Early Hints).
+     *
+     * @throws IOException IO exception during processing
+     */
     protected abstract void earlyHints() throws IOException;
 
 
@@ -871,6 +918,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Processes a socket event.
+     *
+     * @param event The socket event to process
+     * @param dispatch {@code true} to dispatch to a container thread
+     */
     protected void processSocketEvent(SocketEvent event, boolean dispatch) {
         SocketWrapperBase<?> socketWrapper = getSocketWrapper();
         if (socketWrapper != null) {
@@ -879,6 +932,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Checks if the processor is ready for reading.
+     *
+     * @return {@code true} if there is data available or read interest is registered
+     */
     protected boolean isReadyForRead() {
         if (available(true) > 0) {
             return true;
@@ -893,6 +951,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
+     * Checks if the request body has been fully read.
+     *
      * @return {@code true} if it is known that the request body has been fully read
      */
     protected abstract boolean isRequestBodyFullyRead();
@@ -906,11 +966,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
+     * Checks if the processor is ready for writing.
+     *
      * @return {@code true} if bytes can be written without blocking
      */
     protected abstract boolean isReadyForWrite();
 
 
+    /**
+     * Executes any pending non-blocking dispatches.
+     */
     protected void executeDispatches() {
         SocketWrapperBase<?> socketWrapper = getSocketWrapper();
         Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
@@ -985,6 +1050,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * Checks if trailer fields are ready.
+     *
+     * @return {@code true} if trailer fields are ready
+     */
     protected abstract boolean isTrailerFieldsReady();
 
 

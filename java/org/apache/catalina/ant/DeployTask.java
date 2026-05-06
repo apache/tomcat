@@ -36,6 +36,13 @@ import org.apache.tools.ant.BuildException;
  */
 public class DeployTask extends AbstractCatalinaCommandTask {
 
+    /**
+     * Default constructor.
+     */
+    public DeployTask() {
+        super();
+    }
+
     private static final Pattern PROTOCOL_PATTERN = Pattern.compile("\\w{3,5}\\:");
 
     /**
@@ -43,10 +50,20 @@ public class DeployTask extends AbstractCatalinaCommandTask {
      */
     protected String config = null;
 
+    /**
+     * Get the context configuration file URL.
+     *
+     * @return Context configuration file URL
+     */
     public String getConfig() {
         return this.config;
     }
 
+    /**
+     * Set the context configuration file URL.
+     *
+     * @param config Context configuration file URL
+     */
     public void setConfig(String config) {
         this.config = config;
     }
@@ -57,10 +74,20 @@ public class DeployTask extends AbstractCatalinaCommandTask {
      */
     protected String localWar = null;
 
+    /**
+     * Get the local WAR file path.
+     *
+     * @return Local WAR file path
+     */
     public String getLocalWar() {
         return this.localWar;
     }
 
+    /**
+     * Set the local WAR file path.
+     *
+     * @param localWar Local WAR file path
+     */
     public void setLocalWar(String localWar) {
         this.localWar = localWar;
     }
@@ -71,10 +98,20 @@ public class DeployTask extends AbstractCatalinaCommandTask {
      */
     protected String tag = null;
 
+    /**
+     * Get the deployment tag.
+     *
+     * @return Deployment tag
+     */
     public String getTag() {
         return this.tag;
     }
 
+    /**
+     * Set the deployment tag.
+     *
+     * @param tag Deployment tag
+     */
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -85,10 +122,20 @@ public class DeployTask extends AbstractCatalinaCommandTask {
      */
     protected boolean update = false;
 
+    /**
+     * Check if existing webapps should be updated.
+     *
+     * @return {@code true} if existing webapps should be updated
+     */
     public boolean getUpdate() {
         return this.update;
     }
 
+    /**
+     * Set whether to update existing webapps.
+     *
+     * @param update {@code true} to update existing webapps
+     */
     public void setUpdate(boolean update) {
         this.update = update;
     }
@@ -99,10 +146,20 @@ public class DeployTask extends AbstractCatalinaCommandTask {
      */
     protected String war = null;
 
+    /**
+     * Get the WAR file URL.
+     *
+     * @return WAR file URL
+     */
     public String getWar() {
         return this.war;
     }
 
+    /**
+     * Set the WAR file URL.
+     *
+     * @param war WAR file URL
+     */
     public void setWar(String war) {
         this.war = war;
     }

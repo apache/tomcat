@@ -29,6 +29,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class Authenticator {
 
+    /**
+     * Constructs an Authenticator instance.
+     */
+    protected Authenticator() {
+        // NOP
+    }
+
     private static final StringManager sm = StringManager.getManager(Authenticator.class);
 
     private static final Pattern pattern = Pattern.compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
@@ -110,6 +117,13 @@ public abstract class Authenticator {
     }
 
 
+    /**
+     * Validates that the user name is not {@code null}.
+     *
+     * @param userName the user name to validate
+     *
+     * @throws AuthenticationException if the user name is {@code null}
+     */
     protected void validateUsername(String userName) throws AuthenticationException {
         if (userName == null) {
             throw new AuthenticationException(sm.getString("authenticator.nullUserName"));
@@ -117,6 +131,13 @@ public abstract class Authenticator {
     }
 
 
+    /**
+     * Validates that the password is not {@code null}.
+     *
+     * @param password the password to validate
+     *
+     * @throws AuthenticationException if the password is {@code null}
+     */
     protected void validatePassword(String password) throws AuthenticationException {
         if (password == null) {
             throw new AuthenticationException(sm.getString("authenticator.nullPassword"));
@@ -124,6 +145,14 @@ public abstract class Authenticator {
     }
 
 
+    /**
+     * Validates that the configured user realm matches the server realm.
+     *
+     * @param userRealm the user-configured realm, or {@code null} to accept any realm
+     * @param serverRealm the realm from the server's authentication challenge
+     *
+     * @throws AuthenticationException if the realms do not match
+     */
     protected void validateRealm(String userRealm, String serverRealm) throws AuthenticationException {
         if (userRealm == null) {
             return;

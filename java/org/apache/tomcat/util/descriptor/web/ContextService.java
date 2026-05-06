@@ -32,6 +32,12 @@ public class ContextService extends ResourceBase {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextService.
+     */
+    public ContextService() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -40,10 +46,20 @@ public class ContextService extends ResourceBase {
      */
     private String displayname = null;
 
+    /**
+     * Returns the WebService reference display name.
+     *
+     * @return the display name
+     */
     public String getDisplayname() {
         return this.displayname;
     }
 
+    /**
+     * Sets the WebService reference display name.
+     *
+     * @param displayname the display name
+     */
     public void setDisplayname(String displayname) {
         this.displayname = displayname;
     }
@@ -53,10 +69,20 @@ public class ContextService extends ResourceBase {
      */
     private String largeIcon = null;
 
+    /**
+     * Returns the large icon for this WebService.
+     *
+     * @return the large icon path
+     */
     public String getLargeIcon() {
         return this.largeIcon;
     }
 
+    /**
+     * Sets the large icon for this WebService.
+     *
+     * @param largeIcon the large icon path
+     */
     public void setLargeIcon(String largeIcon) {
         this.largeIcon = largeIcon;
     }
@@ -66,10 +92,20 @@ public class ContextService extends ResourceBase {
      */
     private String smallIcon = null;
 
+    /**
+     * Returns the small icon for this WebService.
+     *
+     * @return the small icon path
+     */
     public String getSmallIcon() {
         return this.smallIcon;
     }
 
+    /**
+     * Sets the small icon for this WebService.
+     *
+     * @param smallIcon the small icon path
+     */
     public void setSmallIcon(String smallIcon) {
         this.smallIcon = smallIcon;
     }
@@ -79,10 +115,20 @@ public class ContextService extends ResourceBase {
      */
     private String serviceInterface = null;
 
+    /**
+     * Returns the JAX-WS Service interface class name.
+     *
+     * @return the service interface class name
+     */
     public String getInterface() {
         return serviceInterface;
     }
 
+    /**
+     * Sets the JAX-WS Service interface class name.
+     *
+     * @param serviceInterface the service interface class name
+     */
     public void setInterface(String serviceInterface) {
         this.serviceInterface = serviceInterface;
     }
@@ -92,10 +138,20 @@ public class ContextService extends ResourceBase {
      */
     private String wsdlfile = null;
 
+    /**
+     * Returns the location of the web service WSDL description.
+     *
+     * @return the WSDL file location
+     */
     public String getWsdlfile() {
         return this.wsdlfile;
     }
 
+    /**
+     * Sets the location of the web service WSDL description.
+     *
+     * @param wsdlfile the WSDL file location
+     */
     public void setWsdlfile(String wsdlfile) {
         this.wsdlfile = wsdlfile;
     }
@@ -106,10 +162,20 @@ public class ContextService extends ResourceBase {
      */
     private String jaxrpcmappingfile = null;
 
+    /**
+     * Returns the JAX-RPC mapping file.
+     *
+     * @return the JAX-RPC mapping file path
+     */
     public String getJaxrpcmappingfile() {
         return this.jaxrpcmappingfile;
     }
 
+    /**
+     * Sets the JAX-RPC mapping file.
+     *
+     * @param jaxrpcmappingfile the JAX-RPC mapping file path
+     */
     public void setJaxrpcmappingfile(String jaxrpcmappingfile) {
         this.jaxrpcmappingfile = jaxrpcmappingfile;
     }
@@ -125,34 +191,76 @@ public class ContextService extends ResourceBase {
      */
     private String[] serviceqname = new String[2];
 
+    /**
+     * Returns the WSDL service QName array.
+     *
+     * @return the service QName array
+     */
     public String[] getServiceqname() {
         return this.serviceqname;
     }
 
+    /**
+     * Returns the WSDL service QName at the given index.
+     *
+     * @param i the index
+     * @return the service QName component
+     */
     public String getServiceqname(int i) {
         return this.serviceqname[i];
     }
 
+    /**
+     * Returns the namespace URI of the WSDL service QName.
+     *
+     * @return the namespace URI
+     */
     public String getServiceqnameNamespaceURI() {
         return this.serviceqname[0];
     }
 
+    /**
+     * Returns the local part of the WSDL service QName.
+     *
+     * @return the local part
+     */
     public String getServiceqnameLocalpart() {
         return this.serviceqname[1];
     }
 
+    /**
+     * Sets the WSDL service QName array.
+     *
+     * @param serviceqname the service QName array
+     */
     public void setServiceqname(String[] serviceqname) {
         this.serviceqname = serviceqname;
     }
 
+    /**
+     * Sets the WSDL service QName at the given index.
+     *
+     * @param serviceqname the service QName component
+     * @param i the index
+     */
     public void setServiceqname(String serviceqname, int i) {
         this.serviceqname[i] = serviceqname;
     }
 
+    /**
+     * Sets the namespace URI of the WSDL service QName.
+     *
+     * @param namespaceuri the namespace URI
+     */
     public void setServiceqnameNamespaceURI(String namespaceuri) {
         this.serviceqname[0] = namespaceuri;
     }
 
+    /**
+     * Sets the local part of the WSDL service QName.
+     *
+     * @param localpart the local part
+     */
     public void setServiceqnameLocalpart(String localpart) {
         this.serviceqname[1] = localpart;
     }
@@ -161,16 +269,28 @@ public class ContextService extends ResourceBase {
      * Declares a client dependency on the container to resolving a Service Endpoint Interface to a WSDL port. It
      * optionally associates the Service Endpoint Interface with a particular port-component.
      *
-     * @return the endpoint names
+     * @return the endpoint names iterator
      */
     public Iterator<String> getServiceendpoints() {
         return this.listProperties();
     }
 
+    /**
+     * Returns the port link for the given service endpoint.
+     *
+     * @param serviceendpoint the service endpoint name
+     * @return the port link
+     */
     public String getPortlink(String serviceendpoint) {
         return (String) this.getProperty(serviceendpoint);
     }
 
+    /**
+     * Adds a port component mapping for the given service endpoint.
+     *
+     * @param serviceendpoint the service endpoint name
+     * @param portlink the port link
+     */
     public void addPortcomponent(String serviceendpoint, String portlink) {
         if (portlink == null) {
             portlink = "";
@@ -183,14 +303,30 @@ public class ContextService extends ResourceBase {
      */
     private final Map<String,ContextHandler> handlers = new HashMap<>();
 
+    /**
+     * Returns an iterator over the handler names.
+     *
+     * @return iterator of handler names
+     */
     public Iterator<String> getHandlers() {
         return handlers.keySet().iterator();
     }
 
+    /**
+     * Returns the handler with the given name.
+     *
+     * @param handlername the handler name
+     * @return the handler
+     */
     public ContextHandler getHandler(String handlername) {
         return handlers.get(handlername);
     }
 
+    /**
+     * Adds a handler for this service reference.
+     *
+     * @param handler the handler to add
+     */
     public void addHandler(ContextHandler handler) {
         handlers.put(handler.getName(), handler);
     }

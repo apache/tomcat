@@ -35,6 +35,15 @@ public class JarWarResource extends AbstractArchiveResource {
 
     private final String archivePath;
 
+    /**
+     * Constructs a new JarWarResource.
+     *
+     * @param archiveResourceSet the archive resource set
+     * @param webAppPath the web application path
+     * @param baseUrl the base URL
+     * @param jarEntry the JAR entry
+     * @param archivePath the path to the archive within the WAR
+     */
     public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
             JarEntry jarEntry, String archivePath) {
 

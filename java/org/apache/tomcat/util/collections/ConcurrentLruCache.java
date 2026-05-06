@@ -20,16 +20,33 @@ import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * A thread-safe LRU (Least Recently Used) cache with a configurable size limit.
+ * Entries beyond the limit are evicted in LRU order.
+ *
+ * @param <T> the type of entries stored in the cache
+ */
 public class ConcurrentLruCache<T> {
 
     private volatile LimitedLinkedHashMap<T,T> map;
     private final Object lock = new Object();
 
+    /**
+     * Creates a new LRU cache with the specified size limit.
+     *
+     * @param limit the maximum number of entries in the cache
+     */
     public ConcurrentLruCache(int limit) {
         setLimit(limit);
     }
 
 
+    /**
+     * Adds an entry to the cache. If the cache is at its limit, the least
+     * recently used entry will be evicted.
+     *
+     * @param entry the entry to add
+     */
     public void add(T entry) {
         if (map == null) {
             return;
@@ -43,6 +60,13 @@ public class ConcurrentLruCache<T> {
     }
 
 
+    /**
+     * Checks whether the cache contains the given entry. Accessing an entry
+     * through this method updates its recency.
+     *
+     * @param entry the entry to check
+     * @return {@code true} if the entry is in the cache
+     */
     public boolean contains(T entry) {
         if (map == null) {
             return false;
@@ -56,6 +80,9 @@ public class ConcurrentLruCache<T> {
     }
 
 
+    /**
+     * Removes all entries from the cache.
+     */
     public void clear() {
         if (map == null) {
             return;
@@ -69,6 +96,13 @@ public class ConcurrentLruCache<T> {
     }
 
 
+    /**
+     * Sets the maximum number of entries in the cache. If the new limit is
+     * smaller than the current size, the least recently used entries will be evicted.
+     * A limit of 0 or less disables the cache.
+     *
+     * @param limit the new maximum number of entries
+     */
     public void setLimit(int limit) {
         synchronized (lock) {
             if (limit > 0) {
@@ -84,6 +118,11 @@ public class ConcurrentLruCache<T> {
     }
 
 
+    /**
+     * Returns the current maximum number of entries allowed in the cache.
+     *
+     * @return the cache limit, or -1 if the cache is disabled
+     */
     public int getLimit() {
         synchronized (lock) {
             if (map == null) {

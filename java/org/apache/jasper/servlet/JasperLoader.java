@@ -29,6 +29,13 @@ public class JasperLoader extends URLClassLoader {
 
     private final String packageName;
 
+    /**
+     * Constructs a new JasperLoader.
+     *
+     * @param urls the URLs to load classes from
+     * @param parent the parent class loader
+     * @param packageName the package name
+     */
     public JasperLoader(URL[] urls, ClassLoader parent, String packageName) {
         super(urls, parent);
         this.packageName = packageName;

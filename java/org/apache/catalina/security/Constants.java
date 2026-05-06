@@ -16,9 +16,24 @@
  */
 package org.apache.catalina.security;
 
+/**
+ * Constants used by the security package.
+ */
 public class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String PACKAGE = "org.apache.catalina.security";
 
+    /**
+     * The CRLF sequence used for HTTP header line endings.
+     */
     public static final String CRLF = "\r\n";
 }

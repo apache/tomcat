@@ -35,6 +35,13 @@ public class JarFactory {
     }
 
 
+    /**
+     * Create a new {@link Jar} instance for the given URL.
+     *
+     * @param url the URL of the JAR file
+     * @return the new Jar instance
+     * @throws IOException if an I/O error occurs
+     */
     public static Jar newInstance(URL url) throws IOException {
         String urlString = url.toString();
         if (urlString.startsWith("jar:file:")) {
@@ -54,6 +61,14 @@ public class JarFactory {
     }
 
 
+    /**
+     * Get a JAR entry URL for the given base URL and entry name.
+     *
+     * @param baseUrl the base URL of the JAR
+     * @param entryName the name of the entry
+     * @return the URL for the JAR entry
+     * @throws IOException if an I/O error occurs
+     */
     public static URL getJarEntryURL(URL baseUrl, String entryName) throws IOException {
 
         String baseExternal = baseUrl.toExternalForm();

@@ -30,6 +30,12 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
  */
 public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironment> {
 
+    /**
+     * Default constructor for ContextEnvironmentMBean.
+     */
+    public ContextEnvironmentMBean() {
+    }
+
     @Override
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {

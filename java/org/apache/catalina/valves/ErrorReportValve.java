@@ -59,6 +59,9 @@ public class ErrorReportValve extends ValveBase {
 
     // ------------------------------------------------------ Constructor
 
+    /**
+     * Default constructor for ErrorReportValve.
+     */
     public ErrorReportValve() {
         super(true);
     }
@@ -399,6 +402,11 @@ public class ErrorReportValve extends ValveBase {
         this.showReport = showReport;
     }
 
+    /**
+     * Returns whether full error reports are enabled.
+     *
+     * @return {@code true} if full error data is shown
+     */
     public boolean isShowReport() {
         return showReport;
     }
@@ -412,11 +420,25 @@ public class ErrorReportValve extends ValveBase {
         this.showServerInfo = showServerInfo;
     }
 
+    /**
+     * Returns whether server info is shown on error pages.
+     *
+     * @return {@code true} if server info is shown
+     */
     public boolean isShowServerInfo() {
         return showServerInfo;
     }
 
 
+    /**
+     * Sets a property for error page configuration. Properties starting with
+     * "errorCode." or "exceptionType." are used to configure error pages.
+     *
+     * @param name  The property name
+     * @param value The property value
+     *
+     * @return {@code true} if the property was recognized and set
+     */
     public boolean setProperty(String name, String value) {
         if (name.startsWith("errorCode.")) {
             int code = Integer.parseInt(name.substring(10));
@@ -436,6 +458,13 @@ public class ErrorReportValve extends ValveBase {
         return false;
     }
 
+    /**
+     * Gets a property for error page configuration.
+     *
+     * @param name The property name
+     *
+     * @return The property value, or {@code null} if not found
+     */
     public String getProperty(String name) {
         String result;
         if (name.startsWith("errorCode.")) {

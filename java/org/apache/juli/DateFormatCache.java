@@ -44,6 +44,10 @@ import java.util.TimeZone;
  */
 public class DateFormatCache {
 
+    /**
+     * Pattern character used to replace 'S' (milliseconds) in format strings
+     * to make timestamps cacheable.
+     */
     public static final char MSEC_PATTERN = '#';
 
     /* Timestamp format */
@@ -78,6 +82,13 @@ public class DateFormatCache {
         return result.toString();
     }
 
+    /**
+     * Create a new DateFormatCache.
+     *
+     * @param size The number of cached entries
+     * @param format The timestamp format string
+     * @param parent The parent cache for building a cache hierarchy
+     */
     public DateFormatCache(int size, String format, DateFormatCache parent) {
         cacheSize = size;
         this.format = tidyFormat(format);
@@ -90,10 +101,21 @@ public class DateFormatCache {
         cache = new Cache(parentCache);
     }
 
+    /**
+     * Get the formatted timestamp for the given time.
+     *
+     * @param time The time in milliseconds
+     * @return the formatted timestamp string
+     */
     public String getFormat(long time) {
         return cache.getFormat(time);
     }
 
+    /**
+     * Get the time format string used by this cache.
+     *
+     * @return the time format string
+     */
     public String getTimeFormat() {
         return format;
     }

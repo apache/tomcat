@@ -20,9 +20,14 @@ import java.io.Serializable;
 
 import org.apache.catalina.tribes.Member;
 
+/**
+ * Interface for messages exchanged between cluster nodes.
+ */
 public interface ClusterMessage extends Serializable {
     /**
-     * @return the member associated with the message
+     * Returns the member associated with this message.
+     *
+     * @return the member address
      */
     Member getAddress();
 
@@ -34,12 +39,16 @@ public interface ClusterMessage extends Serializable {
     void setAddress(Member member);
 
     /**
-     * @return the unique id of the message
+     * Returns the unique identifier for this message.
+     *
+     * @return the unique ID
      */
     String getUniqueId();
 
     /**
-     * @return the message timestamp
+     * Returns the timestamp of this message.
+     *
+     * @return the timestamp in milliseconds
      */
     long getTimestamp();
 

@@ -51,7 +51,13 @@ public class ChunkedOutputFilter implements OutputFilter {
     protected final ByteBuffer chunkHeader = ByteBuffer.allocate(10);
 
 
+    /**
+     * The last chunk buffer.
+     */
     protected final ByteBuffer lastChunk = ByteBuffer.wrap(LAST_CHUNK_BYTES);
+    /**
+     * The CRLF chunk buffer.
+     */
     protected final ByteBuffer crlfChunk = ByteBuffer.wrap(CRLF_BYTES);
     /**
      * End chunk.
@@ -62,6 +68,9 @@ public class ChunkedOutputFilter implements OutputFilter {
     private Response response;
 
 
+    /**
+     * Creates a new ChunkedOutputFilter.
+     */
     public ChunkedOutputFilter() {
         chunkHeader.put(8, (byte) '\r');
         chunkHeader.put(9, (byte) '\n');

@@ -104,6 +104,13 @@ import org.apache.juli.logging.LogFactory;
  */
 
 public class DNSMembershipProvider extends CloudMembershipProvider {
+    /**
+     * Construct a new DNSMembershipProvider.
+     */
+    public DNSMembershipProvider() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(DNSMembershipProvider.class);
 
     private String dnsServiceName;

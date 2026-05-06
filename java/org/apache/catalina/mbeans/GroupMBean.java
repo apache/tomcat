@@ -37,6 +37,12 @@ import org.apache.tomcat.util.res.StringManager;
  * </p>
  */
 public class GroupMBean extends BaseModelMBean {
+    /**
+     * Default constructor for GroupMBean.
+     */
+    public GroupMBean() {
+        super();
+    }
 
     private static final StringManager sm = StringManager.getManager(GroupMBean.class);
 
@@ -53,7 +59,9 @@ public class GroupMBean extends BaseModelMBean {
 
 
     /**
-     * @return the MBean Names of all authorized roles for this group.
+     * Returns the MBean ObjectNames of all authorized roles for this group.
+     *
+     * @return Array of MBean ObjectName strings for all roles
      */
     public String[] getRoles() {
 
@@ -75,7 +83,9 @@ public class GroupMBean extends BaseModelMBean {
 
 
     /**
-     * @return the MBean Names of all users that are members of this group.
+     * Returns the MBean ObjectNames of all users that are members of this group.
+     *
+     * @return Array of MBean ObjectName strings for all users
      */
     public String[] getUsers() {
 

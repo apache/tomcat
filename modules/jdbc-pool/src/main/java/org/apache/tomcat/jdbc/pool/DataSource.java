@@ -58,6 +58,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
 //===============================================================================
 //  JMX Operations - Register the actual pool itself under the tomcat.jdbc domain
 //===============================================================================
+    /**
+     * The JMX ObjectName for the connection pool MBean.
+     */
     protected volatile ObjectName oname = null;
 
     /**
@@ -140,7 +143,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     *
+     * Unregisters the ConnectionPoolMBean from JMX.
      */
     protected void unregisterJmx() {
         JmxUtil.unregisterJmx(oname);

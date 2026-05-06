@@ -31,8 +31,18 @@ import java.nio.charset.Charset;
  */
 public class CharsetHolder {
 
+    /**
+     * An empty holder with no charset set.
+     */
     public static final CharsetHolder EMPTY = new CharsetHolder(null, null);
 
+    /**
+     * Creates a CharsetHolder from the given charset name.
+     *
+     * @param name the charset name
+     *
+     * @return the holder
+     */
     public static CharsetHolder getInstance(String name) {
         if (name == null) {
             return EMPTY;
@@ -49,6 +59,13 @@ public class CharsetHolder {
     }
 
 
+    /**
+     * Creates a CharsetHolder from the given Charset.
+     *
+     * @param encoding the charset
+     *
+     * @return the holder
+     */
     public static CharsetHolder getInstance(Charset encoding) {
         if (encoding == null) {
             return EMPTY;
@@ -68,6 +85,11 @@ public class CharsetHolder {
     }
 
 
+    /**
+     * Returns the charset name.
+     *
+     * @return the charset name
+     */
     public String getName() {
         return name;
     }

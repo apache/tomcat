@@ -24,6 +24,12 @@ package org.apache.tomcat.util.net;
  */
 public class IPv6Utils {
 
+    /**
+     * Constructs a new IPv6Utils.
+     */
+    private IPv6Utils() {
+    }
+
     private static final int MAX_NUMBER_OF_GROUPS = 8;
     private static final int MAX_GROUP_LENGTH = 4;
 
