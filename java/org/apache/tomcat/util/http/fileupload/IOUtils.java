@@ -54,6 +54,12 @@ import java.io.OutputStream;
  * Origin of code: Excalibur.
  */
 public class IOUtils {
+
+    /**
+     * Constructs a new IOUtils. This constructor is package-private to prevent external instantiation.
+     */
+    IOUtils() {
+    }
     // NOTE: This class is focused on InputStream, OutputStream, Reader and
     // Writer. Each method should take at least one of these as a parameter,
     // or return one of them.

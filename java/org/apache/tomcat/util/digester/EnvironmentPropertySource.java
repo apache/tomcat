@@ -58,6 +58,13 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class EnvironmentPropertySource implements IntrospectionUtils.PropertySource {
 
+    /**
+     * Default constructor for EnvironmentPropertySource.
+     */
+    public EnvironmentPropertySource() {
+        // NO-OP
+    }
+
     @Override
     public String getProperty(String key) {
         return System.getenv(key);

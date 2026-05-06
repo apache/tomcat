@@ -33,6 +33,12 @@ import org.apache.naming.StringManager;
  */
 public abstract class FactoryBase implements ObjectFactory {
 
+    /**
+     * Creates a new FactoryBase instance.
+     */
+    public FactoryBase() {
+    }
+
     private static final StringManager sm = StringManager.getManager(FactoryBase.class);
 
     @Override

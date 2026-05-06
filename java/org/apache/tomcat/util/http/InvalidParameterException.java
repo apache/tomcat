@@ -95,6 +95,11 @@ public class InvalidParameterException extends IllegalStateException {
     }
 
 
+    /**
+     * Get the HTTP error code associated with this exception.
+     *
+     * @return the HTTP error code
+     */
     public int getErrorCode() {
         return errorCode;
     }

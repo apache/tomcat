@@ -16,23 +16,52 @@
  */
 package org.apache.catalina.ant.jmx;
 
+/**
+ * Represents a single argument for JMX operations.
+ */
 public class Arg {
+
+    /**
+     * Constructs a new Arg.
+     */
+    public Arg() {
+    }
 
     private String type;
     private String value;
 
+    /**
+     * Sets the argument type.
+     *
+     * @param type the argument type
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Sets the argument value.
+     *
+     * @param value the argument value
+     */
     public void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * Returns the argument value.
+     *
+     * @return the argument value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Returns the argument type.
+     *
+     * @return the argument type
+     */
     public String getType() {
         return type;
     }

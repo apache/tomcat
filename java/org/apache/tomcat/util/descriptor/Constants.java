@@ -16,7 +16,20 @@
  */
 package org.apache.tomcat.util.descriptor;
 
+/**
+ * Constants for descriptor utilities.
+ */
 public class Constants {
 
+    /**
+     * Package name for descriptor utilities.
+     */
     public static final String PACKAGE_NAME = Constants.class.getPackage().getName();
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

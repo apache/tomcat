@@ -25,9 +25,27 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Utility class for JMX registration of JDBC pool components.
+ */
 public class JmxUtil {
+
+    /**
+     * Constructs a new JmxUtil.
+     */
+    private JmxUtil() {
+    }
+
     private static final Log log = LogFactory.getLog(JmxUtil.class);
 
+    /**
+     * Register an object as an MBean.
+     *
+     * @param base the base object name
+     * @param keyprop the key property
+     * @param obj the object to register
+     * @return the registered object name, or {@code null} on failure
+     */
     public static ObjectName registerJmx(ObjectName base, String keyprop, Object obj) {
         ObjectName oname = null;
         try {
@@ -41,6 +59,11 @@ public class JmxUtil {
         return oname;
     }
 
+    /**
+     * Unregister an MBean.
+     *
+     * @param oname the object name to unregister
+     */
     public static void unregisterJmx(ObjectName oname) {
         if (oname ==null) {
             return;

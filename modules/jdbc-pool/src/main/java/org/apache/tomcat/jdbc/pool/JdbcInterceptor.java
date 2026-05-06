@@ -199,8 +199,9 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
 
     /**
-     * @return true if the compare method uses the Object.equals(Object) method
-     *         false if comparison is done on a reference level
+     * True if the compare method uses the Object.equals(Object) method,
+     * false if comparison is done on a reference level.
+     * @return true if equals is used for comparisons
      */
     public boolean isUseEquals() {
         return useEquals;

@@ -23,6 +23,13 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class ExactRateLimiter extends RateLimiterBase {
 
+    /**
+     * Default constructor for ExactRateLimiter.
+     */
+    public ExactRateLimiter() {
+        // NO-OP
+    }
+
     @Override
     protected String getDefaultPolicyName() {
         return "exact";

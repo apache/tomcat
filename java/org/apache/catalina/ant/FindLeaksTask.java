@@ -22,6 +22,12 @@ import org.apache.tools.ant.BuildException;
  * Ant task that implements the <code>/findleaks</code> command, supported by the Tomcat manager application.
  */
 public class FindLeaksTask extends AbstractCatalinaTask {
+    /**
+     * Creates a new FindLeaksTask instance.
+     */
+    public FindLeaksTask() {
+        // Default constructor
+    }
 
     private boolean statusLine = true;
 

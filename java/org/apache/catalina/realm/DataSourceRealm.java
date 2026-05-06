@@ -37,6 +37,12 @@ import org.apache.naming.ContextBindings;
  */
 public class DataSourceRealm extends RealmBase {
 
+    /**
+     * Default constructor.
+     */
+    public DataSourceRealm() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -105,7 +111,9 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * @return the name of the JNDI JDBC DataSource.
+     * Return the name of the JNDI JDBC DataSource.
+     *
+     * @return the name of the JNDI JDBC DataSource
      */
     public String getDataSourceName() {
         return dataSourceName;
@@ -121,7 +129,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return if the datasource will be looked up in the webapp JNDI Context.
+     * Return whether the datasource will be looked up in the webapp JNDI Context.
+     *
+     * @return true if the datasource is looked up in the webapp JNDI Context
      */
     public boolean getLocalDataSource() {
         return localDataSource;
@@ -137,7 +147,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the column in the user role table that names a role.
+     * Return the column in the user role table that names a role.
+     *
+     * @return the column name
      */
     public String getRoleNameCol() {
         return roleNameCol;
@@ -153,7 +165,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the column in the user table that holds the user's credentials.
+     * Return the column in the user table that holds the user's credentials.
+     *
+     * @return the column name
      */
     public String getUserCredCol() {
         return userCredCol;
@@ -169,7 +183,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the column in the user table that holds the user's name.
+     * Return the column in the user table that holds the user's name.
+     *
+     * @return the column name
      */
     public String getUserNameCol() {
         return userNameCol;
@@ -185,7 +201,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the table that holds the relation between user's and roles.
+     * Return the table that holds the relation between user's and roles.
+     *
+     * @return the table name
      */
     public String getUserRoleTable() {
         return userRoleTable;
@@ -201,7 +219,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the table that holds user data
+     * Return the table that holds user data.
+     *
+     * @return the table name
      */
     public String getUserTable() {
         return userTable;

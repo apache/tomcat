@@ -29,6 +29,12 @@ import org.apache.catalina.Group;
  */
 public abstract class AbstractGroup implements Group {
 
+    /**
+     * Constructs an AbstractGroup with default settings.
+     */
+    public AbstractGroup() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 

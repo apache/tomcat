@@ -92,10 +92,18 @@ public class ELContextImpl extends ELContext {
 
     private VariableMapper variableMapper;
 
+    /**
+     * Create a new ELContextImpl with the default resolver.
+     */
     public ELContextImpl() {
         this(getDefaultResolver());
     }
 
+    /**
+     * Create a new ELContextImpl with the given resolver.
+     *
+     * @param resolver The EL resolver to use
+     */
     public ELContextImpl(ELResolver resolver) {
         this.resolver = resolver;
     }
@@ -118,14 +126,29 @@ public class ELContextImpl extends ELContext {
         return this.variableMapper;
     }
 
+    /**
+     * Set the function mapper.
+     *
+     * @param functionMapper The function mapper
+     */
     public void setFunctionMapper(FunctionMapper functionMapper) {
         this.functionMapper = functionMapper;
     }
 
+    /**
+     * Set the variable mapper.
+     *
+     * @param variableMapper The variable mapper
+     */
     public void setVariableMapper(VariableMapper variableMapper) {
         this.variableMapper = variableMapper;
     }
 
+    /**
+     * Get the default EL resolver.
+     *
+     * @return The default EL resolver
+     */
     public static ELResolver getDefaultResolver() {
         return DefaultResolver;
     }

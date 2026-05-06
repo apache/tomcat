@@ -138,6 +138,11 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      */
     protected final String[] roles;
 
+    /**
+     * Returns the set of roles associated with this user.
+     *
+     * @return A cloned array of role names
+     */
     public String[] getRoles() {
         return this.roles.clone();
     }
@@ -170,6 +175,11 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         return this.gssCredential;
     }
 
+    /**
+     * Sets the user's delegated credentials.
+     *
+     * @param gssCredential The new GSSCredential
+     */
     protected void setGssCredential(GSSCredential gssCredential) {
         this.gssCredential = gssCredential;
     }

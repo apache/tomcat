@@ -111,6 +111,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     protected static final String REALM_NAME = "Authentication required";
 
+    /**
+     * Returns the realm name for the given context.
+     *
+     * @param context the context
+     * @return the realm name
+     */
     protected static String getRealmName(Context context) {
         if (context == null) {
             // Very unlikely
@@ -132,6 +138,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     // ------------------------------------------------------ Constructor
 
+    /**
+     * Constructs an AuthenticatorBase with post-work enabled.
+     */
     public AuthenticatorBase() {
         super(true);
     }
@@ -212,6 +221,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     protected boolean sendAuthInfoResponseHeaders = false;
 
+    /**
+     * Generator for SSO session identifiers.
+     */
     protected SessionIdGeneratorBase sessionIdGenerator = null;
 
     /**
@@ -230,27 +242,57 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Returns the SSO re-authentication mode.
+     *
+     * @return the SSO re-authentication mode
+     */
     public String getSsoReauthenticationMode() {
         return ssoReauthenticationMode.name().toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Sets the SSO re-authentication mode.
+     *
+     * @param ssoReauthenticationMode the SSO re-authentication mode
+     */
     public void setSsoReauthenticationMode(String ssoReauthenticationMode) {
         this.ssoReauthenticationMode =
                 SsoReauthenticationMode.valueOf(ssoReauthenticationMode.trim().toUpperCase(Locale.ENGLISH));
     }
 
+    /**
+     * Returns the CORS preflight handling mode.
+     *
+     * @return the CORS preflight handling mode
+     */
     public String getAllowCorsPreflight() {
         return allowCorsPreflight.name().toLowerCase(Locale.ENGLISH);
     }
 
+    /**
+     * Sets the CORS preflight handling mode.
+     *
+     * @param allowCorsPreflight the CORS preflight handling mode
+     */
     public void setAllowCorsPreflight(String allowCorsPreflight) {
         this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
     }
 
+    /**
+     * Returns whether a session should always be used once a user is authenticated.
+     *
+     * @return {@code true} if a session should always be used
+     */
     public boolean getAlwaysUseSession() {
         return alwaysUseSession;
     }
 
+    /**
+     * Sets whether a session should always be used once a user is authenticated.
+     *
+     * @param alwaysUseSession {@code true} if a session should always be used
+     */
     public void setAlwaysUseSession(boolean alwaysUseSession) {
         this.alwaysUseSession = alwaysUseSession;
     }
@@ -614,6 +656,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
+    /**
+     * Determines whether a CORS preflight request should bypass authentication.
+     *
+     * @param request the request to check
+     * @return {@code true} if the CORS preflight request should bypass authentication
+     */
     protected boolean allowCorsPreflightBypass(Request request) {
         boolean allowBypass = false;
 
@@ -1179,6 +1227,13 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
+    /**
+     * Changes the session ID for the given session.
+     *
+     * @param request the request being processed
+     * @param session the session whose ID should be changed
+     * @return the new session ID
+     */
     protected String changeSessionID(Request request, Session session) {
         String oldId = null;
         if (log.isDebugEnabled()) {
@@ -1342,23 +1397,58 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
+    /**
+     * Holds the state for a JASPIC authentication interaction.
+     */
     private static class JaspicState {
         public MessageInfo messageInfo = null;
         public ServerAuthContext serverAuthContext = null;
     }
 
 
+    /**
+     * Defines the modes for handling CORS preflight requests in the authenticator.
+     */
     protected enum AllowCorsPreflight {
+        /**
+         * Never allow CORS preflight bypass.
+         */
         NEVER,
+
+        /**
+         * Allow CORS preflight bypass only when a CORS filter is configured.
+         */
         FILTER,
+
+        /**
+         * Always allow CORS preflight bypass.
+         */
         ALWAYS
     }
 
 
+    /**
+     * Defines the modes for SSO re-authentication behavior.
+     */
     protected enum SsoReauthenticationMode {
+        /**
+         * Use the default re-authentication mode determined by the SSO valve configuration.
+         */
         DEFAULT,
+
+        /**
+         * Re-authenticate using the cached principal.
+         */
         PRINCIPAL,
+
+        /**
+         * Re-authenticate using cached user name and password.
+         */
         PASSWORD,
+
+        /**
+         * Always require full re-authentication.
+         */
         FULL
     }
 }

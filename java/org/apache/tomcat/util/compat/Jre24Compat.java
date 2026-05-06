@@ -23,7 +23,16 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * JRE 24 compatibility implementation.
+ */
 public class Jre24Compat extends Jre22Compat {
+
+    /**
+     * Constructs a new Jre24Compat.
+     */
+    public Jre24Compat() {
+    }
 
     private static final Log log = LogFactory.getLog(Jre24Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre24Compat.class);

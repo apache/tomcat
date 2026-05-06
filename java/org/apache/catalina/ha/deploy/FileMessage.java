@@ -38,37 +38,80 @@ public class FileMessage extends ClusterMessageBase {
     private final String fileName;
     private final String contextName;
 
+    /**
+     * Creates a new FileMessage for transferring a file.
+     *
+     * @param source The member that is the source of this message
+     * @param fileName The name of the file being transferred
+     * @param contextName The name of the context associated with this file
+     */
     public FileMessage(Member source, String fileName, String contextName) {
         this.address = source;
         this.fileName = fileName;
         this.contextName = contextName;
     }
 
+    /**
+     * Returns the message number within the file transfer sequence.
+     *
+     * @return The message number
+     */
     public int getMessageNumber() {
         return messageNumber;
     }
 
+    /**
+     * Sets the message number within the file transfer sequence.
+     *
+     * @param messageNumber The message number
+     */
     public void setMessageNumber(int messageNumber) {
         this.messageNumber = messageNumber;
     }
 
+    /**
+     * Returns the total number of messages in the file transfer.
+     *
+     * @return The total number of messages
+     */
     public long getTotalNrOfMsgs() {
         return totalNrOfMsgs;
     }
 
+    /**
+     * Sets the total number of messages in the file transfer.
+     *
+     * @param totalNrOfMsgs The total number of messages
+     */
     public void setTotalNrOfMsgs(long totalNrOfMsgs) {
         this.totalNrOfMsgs = totalNrOfMsgs;
     }
 
+    /**
+     * Returns the data payload of this message.
+     *
+     * @return The data byte array
+     */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     * Sets the data payload and its length for this message.
+     *
+     * @param data The data byte array
+     * @param length The length of valid data in the array
+     */
     public void setData(byte[] data, int length) {
         this.data = data;
         this.dataLength = length;
     }
 
+    /**
+     * Returns the length of the valid data in the data array.
+     *
+     * @return The data length
+     */
     public int getDataLength() {
         return dataLength;
     }
@@ -79,10 +122,20 @@ public class FileMessage extends ClusterMessageBase {
     }
 
 
+    /**
+     * Returns the name of the file being transferred.
+     *
+     * @return The file name
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * Returns the context name associated with this file transfer.
+     *
+     * @return The context name
+     */
     public String getContextName() {
         return contextName;
     }

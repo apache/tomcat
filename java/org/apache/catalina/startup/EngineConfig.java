@@ -32,6 +32,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class EngineConfig implements LifecycleListener {
 
+    /**
+     * Default constructor for EngineConfig.
+     */
+    public EngineConfig() {
+        // NO-OP
+    }
+
 
     private static final Log log = LogFactory.getLog(EngineConfig.class);
 

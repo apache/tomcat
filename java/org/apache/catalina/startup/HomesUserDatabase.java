@@ -23,10 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Concrete implementation of the <code>UserDatabase</code> interface considers all directories in a directory whose
- * pathname is specified to our constructor to be "home" directories for those users.
+ * Concrete implementation of the {@code UserDatabase} interface that considers all directories in a specified base
+ * directory to be "home" directories for those users.
  */
 public final class HomesUserDatabase implements UserDatabase {
+
+    /**
+     * Constructs a new HomesUserDatabase.
+     */
+    public HomesUserDatabase() {
+    }
 
     /**
      * The set of home directories for all defined users, keyed by username.

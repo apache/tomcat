@@ -26,18 +26,37 @@ public class HeadersTooLargeException extends IllegalStateException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Construct an exception with no detail message.
+     */
     public HeadersTooLargeException() {
         super();
     }
 
+    /**
+     * Construct an exception with the specified detail message and cause.
+     *
+     * @param message The detail message
+     * @param cause   The cause
+     */
     public HeadersTooLargeException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public HeadersTooLargeException(String s) {
-        super(s);
+    /**
+     * Construct an exception with the specified detail message.
+     *
+     * @param message The detail message
+     */
+    public HeadersTooLargeException(String message) {
+        super(message);
     }
 
+    /**
+     * Construct an exception with the specified cause.
+     *
+     * @param cause The cause
+     */
     public HeadersTooLargeException(Throwable cause) {
         super(cause);
     }

@@ -17,21 +17,75 @@
 package org.apache.catalina.manager;
 
 
+/**
+ * Constants used by the manager web application.
+ */
 public class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.manager";
 
+    /**
+     * The HTML rel attribute value for external links.
+     */
     public static final String REL_EXTERNAL = "rel=\"noopener noreferrer\"";
 
+    /**
+     * The copyright date range for the manager application.
+     */
     public static final String COPYRIGHT_DATE_RANGE;
+
+    /**
+     * The plain text copyright notice for the manager application.
+     */
     public static final String COPYRIGHT_NOTICE;
+
+    /**
+     * The HTML-encoded copyright notice for the manager application.
+     */
     public static final String HTML_COPYRIGHT_NOTICE;
+
+    /**
+     * The HTML header section template for manager pages.
+     */
     public static final String HTML_HEADER_SECTION;
+
+    /**
+     * The HTML body header section template for manager pages.
+     */
     public static final String BODY_HEADER_SECTION;
+
+    /**
+     * The HTML message section template for manager pages.
+     */
     public static final String MESSAGE_SECTION;
+
+    /**
+     * The HTML manager section template for manager pages.
+     */
     public static final String MANAGER_SECTION;
+
+    /**
+     * The HTML server header section template for manager pages.
+     */
     public static final String SERVER_HEADER_SECTION;
+
+    /**
+     * The HTML server row section template for manager pages.
+     */
     public static final String SERVER_ROW_SECTION;
+
+    /**
+     * The HTML tail section template for manager pages.
+     */
     public static final String HTML_TAIL_SECTION;
 
     static {
@@ -147,9 +201,18 @@ public class Constants {
         //@formatter:on
     }
 
+    /**
+     * The character set used by the manager application.
+     */
     public static final String CHARSET = "utf-8";
 
+    /**
+     * The XML declaration used in manager responses.
+     */
     public static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"" + CHARSET + "\"?>";
 
+    /**
+     * The XML stylesheet processing instruction used in manager responses.
+     */
     public static final String XML_STYLE = "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
 }

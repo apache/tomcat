@@ -85,6 +85,12 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class ExtendedAccessLogValve extends AccessLogValve {
 
+    /**
+     * Creates a new ExtendedAccessLogValve instance.
+     */
+    public ExtendedAccessLogValve() {
+    }
+
     private static final Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
 
     // -------------------------------------------------------- Private Methods
@@ -135,7 +141,16 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     // ------------------------------------------------------ Lifecycle Methods
 
 
+    /**
+     * Log element that outputs the date in yyyy-MM-dd format for GMT.
+     */
     protected static class DateElement implements AccessLogElement {
+        /**
+         * Creates a new DateElement instance.
+         */
+        public DateElement() {
+        }
+
         // Milliseconds in 24 hours
         private static final long INTERVAL = (1000 * 60 * 60 * 24);
 
@@ -155,7 +170,16 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs the time in HH:mm:ss format.
+     */
     protected static class TimeElement implements AccessLogElement {
+        /**
+         * Creates a new TimeElement instance.
+         */
+        public TimeElement() {
+        }
+
         // Milliseconds in a second
         private static final long INTERVAL = 1000;
 
@@ -175,9 +199,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a specific request header value.
+     */
     protected static class RequestHeaderElement implements AccessLogElement {
         private final String header;
 
+        /**
+         * Creates a new RequestHeaderElement for the specified header.
+         *
+         * @param header the name of the request header
+         */
         public RequestHeaderElement(String header) {
             this.header = header;
         }
@@ -188,9 +220,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a specific response header value.
+     */
     protected static class ResponseHeaderElement implements AccessLogElement {
         private final String header;
 
+        /**
+         * Creates a new ResponseHeaderElement for the specified header.
+         *
+         * @param header the name of the response header
+         */
         public ResponseHeaderElement(String header) {
             this.header = header;
         }
@@ -201,9 +241,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a servlet context attribute value.
+     */
     protected static class ServletContextElement implements AccessLogElement {
         private final String attribute;
 
+        /**
+         * Creates a new ServletContextElement for the specified attribute.
+         *
+         * @param attribute the name of the servlet context attribute
+         */
         public ServletContextElement(String attribute) {
             this.attribute = attribute;
         }
@@ -214,9 +262,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs the value(s) of a named cookie.
+     */
     protected static class CookieElement implements AccessLogElement {
         private final String name;
 
+        /**
+         * Creates a new CookieElement for the specified cookie name.
+         *
+         * @param name the name of the cookie
+         */
         public CookieElement(String name) {
             this.name = name;
         }
@@ -250,6 +306,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     protected static class ResponseAllHeaderElement implements AccessLogElement {
         private final String header;
 
+        /**
+         * Creates a new ResponseAllHeaderElement for the specified header.
+         *
+         * @param header the name of the response header
+         */
         public ResponseAllHeaderElement(String header) {
             this.header = header;
         }
@@ -279,9 +340,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a servlet request attribute value.
+     */
     protected static class RequestAttributeElement implements AccessLogElement {
         private final String attribute;
 
+        /**
+         * Creates a new RequestAttributeElement for the specified attribute.
+         *
+         * @param attribute the name of the request attribute
+         */
         public RequestAttributeElement(String attribute) {
             this.attribute = attribute;
         }
@@ -292,9 +361,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a session attribute value.
+     */
     protected static class SessionAttributeElement implements AccessLogElement {
         private final String attribute;
 
+        /**
+         * Creates a new SessionAttributeElement for the specified attribute.
+         *
+         * @param attribute the name of the session attribute
+         */
         public SessionAttributeElement(String attribute) {
             this.attribute = attribute;
         }
@@ -311,9 +388,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Log element that outputs a URL-encoded request parameter value.
+     */
     protected static class RequestParameterElement implements AccessLogElement {
         private final String parameter;
 
+        /**
+         * Creates a new RequestParameterElement for the specified parameter.
+         *
+         * @param parameter the name of the request parameter
+         */
         public RequestParameterElement(String parameter) {
             this.parameter = parameter;
         }
@@ -340,6 +425,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Tokenizer for parsing the log pattern string.
+     */
     protected static class PatternTokenizer {
         private final StringReader sr;
         private StringBuilder buf = new StringBuilder();
@@ -347,18 +435,39 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         private boolean subToken;
         private boolean parameter;
 
+        /**
+         * Creates a new tokenizer for the given pattern string.
+         *
+         * @param str the pattern string to tokenize
+         */
         public PatternTokenizer(String str) {
             sr = new StringReader(str);
         }
 
+        /**
+         * Returns whether the last token was followed by a sub-token indicator.
+         *
+         * @return {@code true} if the last token had a sub-token
+         */
         public boolean hasSubToken() {
             return subToken;
         }
 
+        /**
+         * Returns whether the last token was followed by a parameter indicator.
+         *
+         * @return {@code true} if the last token had a parameter
+         */
         public boolean hasParameter() {
             return parameter;
         }
 
+        /**
+         * Returns the next token from the pattern string.
+         *
+         * @return the next token, or {@code null} if no more tokens are available
+         * @throws IOException if an I/O error occurs
+         */
         public String getToken() throws IOException {
             if (ended) {
                 return null;
@@ -401,6 +510,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
         }
 
+        /**
+         * Returns the parameter value from the most recent parameter token.
+         *
+         * @return the parameter value, or {@code null} if no parameter is available
+         * @throws IOException if an I/O error occurs
+         */
         public String getParameter() throws IOException {
             String result;
             if (!parameter) {
@@ -420,6 +535,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             return null;
         }
 
+        /**
+         * Returns any whitespace following the current position.
+         *
+         * @return the whitespace characters, or an empty string if none
+         * @throws IOException if an I/O error occurs
+         */
         public String getWhiteSpaces() throws IOException {
             if (isEnded()) {
                 return "";
@@ -442,10 +563,21 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             return whiteSpaces.toString();
         }
 
+        /**
+         * Returns whether the tokenizer has reached the end of the pattern string.
+         *
+         * @return {@code true} if the end has been reached
+         */
         public boolean isEnded() {
             return ended;
         }
 
+        /**
+         * Returns the remaining unparsed portion of the pattern string.
+         *
+         * @return the remaining characters in the pattern
+         * @throws IOException if an I/O error occurs
+         */
         public String getRemains() throws IOException {
             StringBuilder remains = new StringBuilder();
             for (int c = sr.read(); c != -1; c = sr.read()) {
@@ -503,6 +635,14 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Returns the appropriate log element for the given token.
+     *
+     * @param token     the pattern token
+     * @param tokenizer the pattern tokenizer
+     * @return the log element, or {@code null} if the token is unrecognized
+     * @throws IOException if an I/O error occurs while reading the pattern
+     */
     protected AccessLogElement getLogElement(String token, PatternTokenizer tokenizer) throws IOException {
         switch (token) {
             case "date" -> {
@@ -581,6 +721,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         return null;
     }
 
+    /**
+     * Returns the appropriate log element for a client-to-server token.
+     *
+     * @param tokenizer the pattern tokenizer
+     * @return the log element, or {@code null} if unrecognized
+     * @throws IOException if an I/O error occurs while reading the pattern
+     */
     protected AccessLogElement getClientToServerElement(PatternTokenizer tokenizer) throws IOException {
         if (tokenizer.hasSubToken()) {
             String token = tokenizer.getToken();
@@ -623,6 +770,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         return null;
     }
 
+    /**
+     * Returns the appropriate log element for a server-to-client token.
+     *
+     * @param tokenizer the pattern tokenizer
+     * @return the log element, or {@code null} if unrecognized
+     * @throws IOException if an I/O error occurs while reading the pattern
+     */
     protected AccessLogElement getServerToClientElement(PatternTokenizer tokenizer) throws IOException {
         if (tokenizer.hasSubToken()) {
             String token = tokenizer.getToken();
@@ -643,6 +797,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         return null;
     }
 
+    /**
+     * Returns the appropriate log element for a proxy token.
+     *
+     * @param tokenizer the pattern tokenizer
+     * @return the log element, or {@code null} if unrecognized
+     * @throws IOException if an I/O error occurs while reading the pattern
+     */
     protected AccessLogElement getProxyElement(PatternTokenizer tokenizer) throws IOException {
         if (tokenizer.hasSubToken()) {
             tokenizer.getToken();
@@ -655,6 +816,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         return null;
     }
 
+    /**
+     * Returns the appropriate log element for an x-parameter token.
+     *
+     * @param tokenizer the pattern tokenizer
+     * @return the log element, or {@code null} if unrecognized
+     * @throws IOException if an I/O error occurs while reading the pattern
+     */
     protected AccessLogElement getXParameterElement(PatternTokenizer tokenizer) throws IOException {
         if (!tokenizer.hasSubToken()) {
             log.error(sm.getString("extendedAccessLogValve.badXParam"));
@@ -703,6 +871,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
+    /**
+     * Returns the appropriate log element for a servlet request method parameter.
+     *
+     * @param parameter the parameter name mapping to a request method
+     * @return the log element, or {@code null} if the parameter is unrecognized
+     */
     protected AccessLogElement getServletRequestElement(String parameter) {
         switch (parameter) {
             case "authType" -> {

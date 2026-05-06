@@ -21,11 +21,20 @@ import jakarta.servlet.ServletConfig;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.InstanceManager;
 
+/**
+ * Factory for obtaining {@link InstanceManager} instances from a JSP {@link ServletConfig}.
+ */
 public class InstanceManagerFactory {
 
     private InstanceManagerFactory() {
     }
 
+    /**
+     * Get the InstanceManager from the given ServletConfig.
+     *
+     * @param config the ServletConfig
+     * @return the InstanceManager
+     */
     public static InstanceManager getInstanceManager(ServletConfig config) {
         InstanceManager instanceManager =
                 (InstanceManager) config.getServletContext().getAttribute(InstanceManager.class.getName());

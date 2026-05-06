@@ -24,8 +24,20 @@ import java.util.Set;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Utility class for Huffman encoding and decoding used in HPACK compression for HTTP/2 headers.
+ */
 public class HPackHuffman {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private HPackHuffman() {
+    }
+
+    /**
+     * String manager for error messages.
+     */
     protected static final StringManager sm = StringManager.getManager(HPackHuffman.class);
 
     private static final HuffmanCode[] HUFFMAN_CODES;
@@ -573,6 +585,9 @@ public class HPackHuffman {
         return true;
     }
 
+    /**
+     * Represents a Huffman code with a value and bit length.
+     */
     protected static class HuffmanCode {
         /**
          * The value of the least significant bits of the code
@@ -583,15 +598,31 @@ public class HPackHuffman {
          */
         int length;
 
+        /**
+         * Creates a new Huffman code.
+         *
+         * @param value the code value
+         * @param length the code length in bits
+         */
         public HuffmanCode(int value, int length) {
             this.value = value;
             this.length = length;
         }
 
+        /**
+         * Returns the code value.
+         *
+         * @return the code value
+         */
         public int getValue() {
             return value;
         }
 
+        /**
+         * Returns the code length in bits.
+         *
+         * @return the code length in bits
+         */
         public int getLength() {
             return length;
         }

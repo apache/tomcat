@@ -21,7 +21,11 @@ import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
 
+/** Rule that applies port offset to connectors during server configuration parsing. */
 public class AddPortOffsetRule extends Rule {
+
+    /** Constructs a new AddPortOffsetRule. */
+    public AddPortOffsetRule() {}
 
     // Set portOffset on all the connectors based on portOffset in the Server
     @Override

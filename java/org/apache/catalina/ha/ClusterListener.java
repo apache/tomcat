@@ -33,20 +33,36 @@ public abstract class ClusterListener implements ChannelListener {
 
     // --Instance Variables--------------------------------------
 
+    /**
+     * The cluster associated with this listener.
+     */
     protected CatalinaCluster cluster = null;
 
     // --Constructor---------------------------------------------
 
+    /**
+     * Default constructor for ClusterListener.
+     */
     public ClusterListener() {
         // NO-OP
     }
 
     // --Instance Getters/Setters--------------------------------
 
+    /**
+     * Returns the cluster associated with this listener.
+     *
+     * @return the cluster
+     */
     public CatalinaCluster getCluster() {
         return cluster;
     }
 
+    /**
+     * Sets the cluster associated with this listener.
+     *
+     * @param cluster the cluster
+     */
     public void setCluster(CatalinaCluster cluster) {
         if (log.isTraceEnabled()) {
             if (cluster != null) {

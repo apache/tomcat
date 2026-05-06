@@ -28,6 +28,12 @@ public class ContextEjb extends ResourceBase {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextEjb.
+     */
+    public ContextEjb() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -36,10 +42,20 @@ public class ContextEjb extends ResourceBase {
      */
     private String home = null;
 
+    /**
+     * Returns the name of the EJB home implementation class.
+     *
+     * @return the EJB home class name
+     */
     public String getHome() {
         return this.home;
     }
 
+    /**
+     * Sets the name of the EJB home implementation class.
+     *
+     * @param home the EJB home class name
+     */
     public void setHome(String home) {
         this.home = home;
     }
@@ -50,10 +66,20 @@ public class ContextEjb extends ResourceBase {
      */
     private String link = null;
 
+    /**
+     * Returns the link to a Jakarta EE EJB definition.
+     *
+     * @return the EJB link
+     */
     public String getLink() {
         return this.link;
     }
 
+    /**
+     * Sets the link to a Jakarta EE EJB definition.
+     *
+     * @param link the EJB link
+     */
     public void setLink(String link) {
         this.link = link;
     }
@@ -63,10 +89,20 @@ public class ContextEjb extends ResourceBase {
      */
     private String remote = null;
 
+    /**
+     * Returns the name of the EJB remote implementation class.
+     *
+     * @return the EJB remote class name
+     */
     public String getRemote() {
         return this.remote;
     }
 
+    /**
+     * Sets the name of the EJB remote implementation class.
+     *
+     * @param remote the EJB remote class name
+     */
     public void setRemote(String remote) {
         this.remote = remote;
     }

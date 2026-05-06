@@ -22,16 +22,31 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+/**
+ * Base implementation of {@link CookieProcessor}.
+ */
 public abstract class CookieProcessorBase implements CookieProcessor {
+
+    /**
+     * Default constructor.
+     */
+    public CookieProcessorBase() {
+    }
 
     private static final String COOKIE_DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
+    /**
+     * Thread-local date format for cookie dates.
+     */
     protected static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT = ThreadLocal.withInitial(() -> {
         DateFormat df = new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         return df;
     });
 
+    /**
+     * A date far in the past used to expire cookies.
+     */
     protected static final String ANCIENT_DATE;
 
     static {
@@ -45,25 +60,50 @@ public abstract class CookieProcessorBase implements CookieProcessor {
     private CookiesWithoutEquals cookiesWithoutEquals = CookiesWithoutEquals.IGNORE;
 
 
+    /**
+     * Get the current cookiesWithoutEquals setting as a string.
+     *
+     * @return The cookiesWithoutEquals value
+     */
     public String getCookiesWithoutEquals() {
         return cookiesWithoutEquals.getValue();
     }
 
 
+    /**
+     * Get the current cookiesWithoutEquals setting as an enum.
+     *
+     * @return The cookiesWithoutEquals value
+     */
     protected CookiesWithoutEquals getCookiesWithoutEqualsInternal() {
         return cookiesWithoutEquals;
     }
 
 
+    /**
+     * Set the cookiesWithoutEquals setting.
+     *
+     * @param cookiesWithoutEquals The new cookiesWithoutEquals value
+     */
     public void setCookiesWithoutEquals(String cookiesWithoutEquals) {
         this.cookiesWithoutEquals = CookiesWithoutEquals.fromString(cookiesWithoutEquals);
     }
 
 
+    /**
+     * Get the current sameSiteCookies setting.
+     *
+     * @return The sameSiteCookies value
+     */
     public SameSiteCookies getSameSiteCookies() {
         return sameSiteCookies;
     }
 
+    /**
+     * Set the sameSiteCookies setting.
+     *
+     * @param sameSiteCookies The new sameSiteCookies value
+     */
     public void setSameSiteCookies(String sameSiteCookies) {
         this.sameSiteCookies = SameSiteCookies.fromString(sameSiteCookies);
     }

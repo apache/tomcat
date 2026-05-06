@@ -29,6 +29,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXGetTask extends AbstractCatalinaTask {
 
+    /**
+     * Constructs a new JMXGetTask.
+     */
+    public JMXGetTask() {
+    }
+
     // Properties
 
     /**

@@ -24,6 +24,15 @@ package org.apache.catalina.users;
  */
 public final class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.users";
 
 }

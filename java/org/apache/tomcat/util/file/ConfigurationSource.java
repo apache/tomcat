@@ -35,6 +35,10 @@ import org.apache.tomcat.util.buf.UriUtil;
  */
 public interface ConfigurationSource {
 
+    /**
+     * The default implementation that resolves resources relative to the
+     * current working directory.
+     */
     ConfigurationSource DEFAULT = new ConfigurationSource() {
         private final File userDir = new File(System.getProperty("user.dir"));
         private final URI userDirUri = userDir.toURI();
@@ -87,19 +91,42 @@ public interface ConfigurationSource {
         private final InputStream inputStream;
         private final URI uri;
 
+        /**
+     * Creates a new resource with the given input stream and URI.
+     *
+     * @param inputStream the input stream for the resource content
+     * @param uri the URI identifying the resource location
+     */
         public Resource(InputStream inputStream, URI uri) {
             this.inputStream = inputStream;
             this.uri = uri;
         }
 
+        /**
+     * Returns the input stream for reading the resource content.
+     *
+     * @return the input stream
+     */
         public InputStream getInputStream() {
             return inputStream;
         }
 
+        /**
+     * Returns the URI that identifies the resource location.
+     *
+     * @return the resource URI
+     */
         public URI getURI() {
             return uri;
         }
 
+        /**
+     * Returns the last modified time of the resource in milliseconds since the epoch.
+     *
+     * @return the last modified time in milliseconds
+     * @throws MalformedURLException if the resource URI cannot be converted to a URL
+     * @throws IOException if an I/O error occurs while fetching the last modified time
+     */
         public long getLastModified() throws MalformedURLException, IOException {
             URLConnection connection = null;
             try {

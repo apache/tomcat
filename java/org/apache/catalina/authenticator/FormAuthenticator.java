@@ -48,6 +48,12 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * Specification.
  */
 public class FormAuthenticator extends AuthenticatorBase {
+    /**
+     * Creates a new FormAuthenticator instance.
+     */
+    public FormAuthenticator() {
+        // Default constructor
+    }
 
     private final Log log = LogFactory.getLog(FormAuthenticator.class); // must not be static
 
@@ -491,6 +497,13 @@ public class FormAuthenticator extends AuthenticatorBase {
     }
 
 
+    /**
+     * Checks if the given request matches the saved request from a previous form authentication flow.
+     *
+     * @param request The request to check
+     *
+     * @return {@code true} if the request matches the saved one
+     */
     protected boolean matchRequest(Request request) {
         return matchRequest(request, true);
     }

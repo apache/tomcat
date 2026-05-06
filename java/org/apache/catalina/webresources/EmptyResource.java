@@ -26,16 +26,33 @@ import java.util.jar.Manifest;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 
+/**
+ * A {@link WebResource} implementation that represents a non-existent resource.
+ * All methods return values indicating the resource does not exist.
+ */
 public class EmptyResource implements WebResource {
 
     private final WebResourceRoot root;
     private final String webAppPath;
     private final File file;
 
+    /**
+     * Creates a new empty resource for the given path.
+     *
+     * @param root the web resource root
+     * @param webAppPath the path within the web application
+     */
     public EmptyResource(WebResourceRoot root, String webAppPath) {
         this(root, webAppPath, null);
     }
 
+    /**
+     * Creates a new empty resource for the given path and file.
+     *
+     * @param root the web resource root
+     * @param webAppPath the path within the web application
+     * @param file the associated file, may be {@code null}
+     */
     public EmptyResource(WebResourceRoot root, String webAppPath, File file) {
         this.root = root;
         this.webAppPath = webAppPath;

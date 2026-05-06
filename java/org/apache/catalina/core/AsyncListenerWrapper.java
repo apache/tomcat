@@ -23,48 +23,94 @@ import jakarta.servlet.AsyncListener;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
+/**
+ * Wrapper for an {@link AsyncListener} that supports custom request and response objects
+ * for event customization.
+ */
 public class AsyncListenerWrapper {
 
     private AsyncListener listener = null;
     private ServletRequest servletRequest = null;
     private ServletResponse servletResponse = null;
 
+    /**
+     * Default constructor.
+     */
+    public AsyncListenerWrapper() {
+    }
 
+    /**
+     * Fires the onStartAsync event on the wrapped listener.
+     *
+     * @param event The async event
+     * @throws IOException if an I/O error occurs
+     */
     public void fireOnStartAsync(AsyncEvent event) throws IOException {
         listener.onStartAsync(customizeEvent(event));
     }
 
-
+    /**
+     * Fires the onComplete event on the wrapped listener.
+     *
+     * @param event The async event
+     * @throws IOException if an I/O error occurs
+     */
     public void fireOnComplete(AsyncEvent event) throws IOException {
         listener.onComplete(customizeEvent(event));
     }
 
-
+    /**
+     * Fires the onTimeout event on the wrapped listener.
+     *
+     * @param event The async event
+     * @throws IOException if an I/O error occurs
+     */
     public void fireOnTimeout(AsyncEvent event) throws IOException {
         listener.onTimeout(customizeEvent(event));
     }
 
-
+    /**
+     * Fires the onError event on the wrapped listener.
+     *
+     * @param event The async event
+     * @throws IOException if an I/O error occurs
+     */
     public void fireOnError(AsyncEvent event) throws IOException {
         listener.onError(customizeEvent(event));
     }
 
-
+    /**
+     * Returns the wrapped async listener.
+     *
+     * @return the async listener
+     */
     public AsyncListener getListener() {
         return listener;
     }
 
-
+    /**
+     * Sets the async listener to wrap.
+     *
+     * @param listener the async listener
+     */
     public void setListener(AsyncListener listener) {
         this.listener = listener;
     }
 
-
+    /**
+     * Sets the custom servlet request to use for events.
+     *
+     * @param servletRequest the servlet request
+     */
     public void setServletRequest(ServletRequest servletRequest) {
         this.servletRequest = servletRequest;
     }
 
-
+    /**
+     * Sets the custom servlet response to use for events.
+     *
+     * @param servletResponse the servlet response
+     */
     public void setServletResponse(ServletResponse servletResponse) {
         this.servletResponse = servletResponse;
     }

@@ -19,7 +19,16 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin implementation for the JSTL &lt;c:forEach&gt; tag.
+ */
 public final class ForEach implements TagPlugin {
+    /**
+     * Creates a new ForEach tag plugin instance.
+     */
+    public ForEach() {
+        // Default constructor
+    }
 
     private boolean hasVar, hasBegin, hasEnd, hasStep;
 

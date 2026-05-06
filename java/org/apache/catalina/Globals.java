@@ -20,12 +20,24 @@ package org.apache.catalina;
  * Global constants that are applicable to multiple packages within Catalina.
  */
 public final class Globals {
+    /**
+     * Default constructor for Globals.
+     */
+    public Globals() {
+        super();
+    }
 
     // ------------------------------------------------- Request attribute names
 
+    /**
+     * Request attribute name indicating async is supported.
+     */
     public static final String ASYNC_SUPPORTED_ATTR = "org.apache.catalina.ASYNC_SUPPORTED";
 
 
+    /**
+     * Request attribute name for the GSS credential.
+     */
     public static final String GSS_CREDENTIAL_ATTR = "org.apache.catalina.realm.GSS_CREDENTIAL";
 
 
@@ -230,5 +242,8 @@ public final class Globals {
 
     // ----------------------------------------- Specification related constants
 
+    /**
+     * Content type for form URL encoding.
+     */
     public static final String CONTENT_TYPE_FORM_URL_ENCODING = "application/x-www-form-urlencoded";
 }

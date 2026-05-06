@@ -40,6 +40,11 @@ public class AjpMessage {
     protected static final StringManager sm = StringManager.getManager(AjpMessage.class);
 
 
+    /**
+     * Constructs a new AjpMessage with the specified packet size.
+     *
+     * @param packetSize The size of the packet buffer
+     */
     public AjpMessage(int packetSize) {
         buf = new byte[packetSize];
     }
@@ -248,6 +253,11 @@ public class AjpMessage {
     }
 
 
+    /**
+     * Peek at the next integer without advancing the read position.
+     *
+     * @return The integer value at the current read position
+     */
     public int peekInt() {
         validatePos(pos + 2);
         int b1 = buf[pos] & 0xFF;
@@ -256,6 +266,11 @@ public class AjpMessage {
     }
 
 
+    /**
+     * Read a single byte from the packet and advance the read position.
+     *
+     * @return The byte value read from the message
+     */
     public byte getByte() {
         byte res = buf[pos++];
         validatePos(pos);
@@ -263,10 +278,20 @@ public class AjpMessage {
     }
 
 
+    /**
+     * Read a null-terminated string of bytes from the packet.
+     *
+     * @param mb The MessageBytes to populate with the read bytes
+     */
     public void getBytes(MessageBytes mb) {
         doGetBytes(mb, true);
     }
 
+    /**
+     * Read a non-terminated string of bytes from the packet.
+     *
+     * @param mb The MessageBytes to populate with the read bytes
+     */
     public void getBodyBytes(MessageBytes mb) {
         doGetBytes(mb, false);
     }
@@ -310,6 +335,13 @@ public class AjpMessage {
     }
 
 
+    /**
+     * Process the AJP message header, validating the message signature.
+     *
+     * @param toContainer {@code true} if the message is from the web server to the container,
+     *                          {@code false} if from the container to the web server
+     * @return The length of the payload, or -1 if the message signature is invalid
+     */
     public int processHeader(boolean toContainer) {
         pos = 0;
         int mark = getInt();
@@ -357,6 +389,14 @@ public class AjpMessage {
     // ------------------------------------------------------ Protected Methods
 
 
+    /**
+     * Generate a hex dump line for debugging.
+     *
+     * @param buf   The byte buffer
+     * @param start The starting offset
+     * @param len   The current message length
+     * @return A string representation of the hex dump line
+     */
     protected static String hexLine(byte[] buf, int start, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < start + 16; i++) {
@@ -378,6 +418,12 @@ public class AjpMessage {
     }
 
 
+    /**
+     * Convert an integer to a two-character hex string.
+     *
+     * @param x the integer to convert
+     * @return the hex string
+     */
     protected static String hex(int x) {
         String h = Integer.toHexString(x);
         if (h.length() == 1) {

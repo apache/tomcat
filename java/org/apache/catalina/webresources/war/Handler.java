@@ -21,7 +21,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
+/**
+ * URL stream handler for WAR file URLs.
+ */
 public class Handler extends URLStreamHandler {
+
+    /**
+     * Constructs a new Handler.
+     */
+    public Handler() {
+    }
 
     @Override
     protected URLConnection openConnection(URL u) throws IOException {

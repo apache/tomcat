@@ -37,7 +37,13 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
     // -------------------------------------------------------------- Constants
 
+    /**
+     * The name of the identity transfer encoding.
+     */
     protected static final String ENCODING_NAME = "identity";
+    /**
+     * The identity transfer encoding as a ByteChunk.
+     */
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
@@ -77,6 +83,11 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     private final int maxSwallowSize;
 
 
+    /**
+     * Creates a new identity input filter.
+     *
+     * @param maxSwallowSize the maximum number of bytes to swallow
+     */
     public IdentityInputFilter(int maxSwallowSize) {
         this.maxSwallowSize = maxSwallowSize;
     }

@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+/**
+ * Represents an enum constant element value in a Java annotation.
+ */
 public class EnumElementValue extends ElementValue {
     private final int valueIdx;
 

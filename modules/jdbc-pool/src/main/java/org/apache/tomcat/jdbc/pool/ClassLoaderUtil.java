@@ -20,12 +20,31 @@ package org.apache.tomcat.jdbc.pool;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Utility class for loading classes using multiple class loaders.
+ */
 public class ClassLoaderUtil {
     private static final Log log = LogFactory.getLog(ClassLoaderUtil.class);
 
     private static final boolean onlyAttemptFirstLoader =
             Boolean.getBoolean("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader");
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private ClassLoaderUtil() {
+    }
+
+    /**
+     * Attempts to load the specified class using the given class loaders in order.
+     *
+     * @param className the fully qualified class name
+     * @param classLoaders the class loaders to attempt, in order
+     *
+     * @return the loaded class
+     *
+     * @throws ClassNotFoundException if the class cannot be found by any of the loaders
+     */
     public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
         ClassNotFoundException last = null;
         StringBuilder errorMsg = null;

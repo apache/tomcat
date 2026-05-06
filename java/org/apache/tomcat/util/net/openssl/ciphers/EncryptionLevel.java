@@ -16,12 +16,22 @@
  */
 package org.apache.tomcat.util.net.openssl.ciphers;
 
+/**
+ * Enumerates the encryption strength levels used in OpenSSL cipher suite configuration.
+ */
 public enum EncryptionLevel {
+    /** Strong ciphers with no export restrictions. */
     STRONG_NONE,
+    /** Export-grade 40-bit encryption. */
     EXP40,
+    /** Export-grade 56-bit encryption. */
     EXP56,
+    /** Low strength encryption. */
     LOW,
+    /** Medium strength encryption. */
     MEDIUM,
+    /** High strength encryption. */
     HIGH,
+    /** FIPS-approved encryption only. */
     FIPS
 }

@@ -34,6 +34,9 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     private ChannelInterceptor previous;
     private Channel channel;
     // default value, always process
+    /**
+     * The option flag used to determine if this interceptor should process a message.
+     */
     protected int optionFlag = 0;
 
     /**
@@ -41,10 +44,20 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     private ObjectName oname = null;
 
+    /**
+     * Creates a new ChannelInterceptorBase.
+     */
     public ChannelInterceptorBase() {
 
     }
 
+    /**
+     * Checks if it is OK to process a message with the given flags.
+     *
+     * @param messageFlags the message flags
+     *
+     * @return true if the interceptor should process the message
+     */
     public boolean okToProcess(int messageFlags) {
         if (this.optionFlag == 0) {
             return true;

@@ -22,18 +22,31 @@ package org.apache.catalina.ssi;
  * JDK but customized for SSI conditional expression parsing.
  */
 public class ExpressionTokenizer {
+    /** Token type for a string literal. */
     public static final int TOKEN_STRING = 0;
+    /** Token type for the AND operator. */
     public static final int TOKEN_AND = 1;
+    /** Token type for the OR operator. */
     public static final int TOKEN_OR = 2;
+    /** Token type for the NOT operator. */
     public static final int TOKEN_NOT = 3;
+    /** Token type for the equality operator. */
     public static final int TOKEN_EQ = 4;
+    /** Token type for the not-equal operator. */
     public static final int TOKEN_NOT_EQ = 5;
+    /** Token type for a right brace. */
     public static final int TOKEN_RBRACE = 6;
+    /** Token type for a left brace. */
     public static final int TOKEN_LBRACE = 7;
+    /** Token type for the greater-than-or-equal operator. */
     public static final int TOKEN_GE = 8;
+    /** Token type for the less-than-or-equal operator. */
     public static final int TOKEN_LE = 9;
+    /** Token type for the greater-than operator. */
     public static final int TOKEN_GT = 10;
+    /** Token type for the less-than operator. */
     public static final int TOKEN_LT = 11;
+    /** Token type indicating end of expression. */
     public static final int TOKEN_END = 12;
     private final char[] expr;
     private String tokenVal = null;
@@ -53,7 +66,9 @@ public class ExpressionTokenizer {
 
 
     /**
-     * @return <code>true</code> if there are more tokens.
+     * Checks if there are more tokens available.
+     *
+     * @return {@code true} if there are more tokens
      */
     public boolean hasMoreTokens() {
         return index < length;
@@ -61,13 +76,21 @@ public class ExpressionTokenizer {
 
 
     /**
-     * @return the current index for error reporting purposes.
+     * Returns the current index in the expression.
+     *
+     * @return the current index for error reporting purposes
      */
     public int getIndex() {
         return index;
     }
 
 
+    /**
+     * Checks if the given character is a meta character used for tokenization.
+     *
+     * @param c the character to check
+     * @return {@code true} if the character is whitespace or an operator character
+     */
     protected boolean isMetaChar(char c) {
         return Character.isWhitespace(c) || c == '(' || c == ')' || c == '!' || c == '<' || c == '>' || c == '|' ||
                 c == '&' || c == '=';
@@ -75,7 +98,9 @@ public class ExpressionTokenizer {
 
 
     /**
-     * @return the next token type and initializes any state variables accordingly.
+     * Parses the next token from the expression.
+     *
+     * @return the next token type constant
      */
     public int nextToken() {
         // Skip any leading white space
@@ -183,7 +208,9 @@ public class ExpressionTokenizer {
 
 
     /**
-     * @return the String value of the token if it was type TOKEN_STRING. Otherwise null is returned.
+     * Returns the string value of the most recently parsed token.
+     *
+     * @return the string value if the token was of type TOKEN_STRING, otherwise {@code null}
      */
     public String getTokenValue() {
         return tokenVal;

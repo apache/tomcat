@@ -16,10 +16,21 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Interface for objects that need periodic background processing.
+ */
 public interface BackgroundProcess {
 
+    /**
+     * Performs background processing.
+     */
     void backgroundProcess();
 
+    /**
+     * Sets the period, in seconds, between invocations of {@link #backgroundProcess()}.
+     *
+     * @param period the period in seconds
+     */
     void setProcessPeriod(int period);
 
     /**

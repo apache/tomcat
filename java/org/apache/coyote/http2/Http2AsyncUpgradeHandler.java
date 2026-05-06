@@ -40,6 +40,9 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
+/**
+ * Asynchronous HTTP/2 upgrade handler that uses non-blocking I/O for all operations.
+ */
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     private static final ByteBuffer[] BYTEBUFFER_ARRAY = new ByteBuffer[0];
@@ -52,6 +55,14 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     private final AtomicReference<Throwable> error = new AtomicReference<>();
     private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
+    /**
+     * Creates a new async HTTP/2 upgrade handler.
+     *
+     * @param protocol the HTTP/2 protocol handler
+     * @param adapter the adapter to pass requests to
+     * @param coyoteRequest the initial HTTP/1.1 request
+     * @param socketWrapper the socket wrapper for the connection
+     */
     public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest,
             SocketWrapperBase<?> socketWrapper) {
         super(protocol, adapter, coyoteRequest, socketWrapper);
@@ -385,7 +396,16 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         }
     }
 
+    /**
+     * Completion handler for asynchronous sendfile operations.
+     */
     protected class SendfileCompletionHandler implements CompletionHandler<Long,SendfileData> {
+        /**
+         * Constructs a new SendfileCompletionHandler.
+         */
+        public SendfileCompletionHandler() {
+        }
+
         @Override
         public void completed(Long nBytes, SendfileData sendfile) {
             CompletionState completionState = null;
@@ -476,7 +496,16 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         }
     }
 
+    /**
+     * Asynchronous ping manager for HTTP/2 connections.
+     */
     protected class AsyncPingManager extends PingManager {
+        /**
+         * Constructs a new AsyncPingManager.
+         */
+        public AsyncPingManager() {
+        }
+
         @Override
         public void sendPing(boolean force) throws IOException {
             if (initiateDisabled) {

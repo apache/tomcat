@@ -58,8 +58,14 @@ public class Connector extends LifecycleMBeanBase {
     private static final Log log = LogFactory.getLog(Connector.class);
 
 
+    /**
+     * Name used for the internal executor when no external executor is configured.
+     */
     public static final String INTERNAL_EXECUTOR_NAME = "Internal";
 
+    /**
+     * Flag that indicates whether the APR status class is present in the classpath.
+     */
     private static final boolean aprStatusPresent;
 
     static {
@@ -87,6 +93,11 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Create a new Connector instance with the specified protocol.
+     *
+     * @param protocol The protocol to use
+     */
     public Connector(String protocol) {
         configuredProtocol = protocol;
         ProtocolHandler p = null;
@@ -107,6 +118,11 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Create a new Connector instance with the specified protocol handler.
+     *
+     * @param protocolHandler The protocol handler to use
+     */
     public Connector(ProtocolHandler protocolHandler) {
         protocolHandlerClassName = protocolHandler.getClass().getName();
         configuredProtocol = protocolHandlerClassName;
@@ -342,7 +358,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the <code>Service</code> with which we are associated (if any).
+     * Returns the <code>Service</code> with which this connector is associated.
+     * @return the associated <code>Service</code>, or {@code null} if not associated
      */
     public Service getService() {
         return this.service;
@@ -360,7 +377,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return <code>true</code> if backslash characters are allowed in URLs. Default value is <code>false</code>.
+     * Returns whether backslash characters are allowed in URLs.
+     * @return {@code true} if backslash characters are allowed in URLs, default is {@code false}
      */
     public boolean getAllowBackslash() {
         return allowBackslash;
@@ -378,7 +396,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return <code>true</code> if the TRACE method is allowed. Default value is <code>false</code>.
+     * Returns whether the TRACE HTTP method is allowed.
+     * @return {@code true} if the TRACE method is allowed, default is {@code false}
      */
     public boolean getAllowTrace() {
         return this.allowTrace;
@@ -396,7 +415,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the default timeout for async requests in ms.
+     * Returns the default timeout for async requests.
+     * @return the default timeout in milliseconds
      */
     public long getAsyncTimeout() {
         return asyncTimeout;
@@ -414,7 +434,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return <code>true</code> if the object facades are discarded.
+     * Returns whether the object facades are discarded.
+     * @return {@code true} if the object facades are discarded
      */
     public boolean getDiscardFacades() {
         return discardFacades;
@@ -432,7 +453,9 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the "enable DNS lookups" flag.
+     * Return the "enable DNS lookups" flag.
+     *
+     * @return the "enable DNS lookups" flag
      */
     public boolean getEnableLookups() {
         return this.enableLookups;
@@ -449,8 +472,9 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-    /**
-     * @return <code>true</code> if a default character encoding will be set when calling Response.getWriter()
+   /**
+     * Returns whether the encoding must be enforced when calling getWriter().
+     * @return {@code true} if the encoding must be enforced when calling getWriter()
      */
     public boolean getEnforceEncodingInGetWriter() {
         return enforceEncodingInGetWriter;
@@ -467,19 +491,28 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Returns the maximum number of cookies that will be accepted in a request.
+     * @return the maximum cookie count
+     */
     public int getMaxCookieCount() {
         return maxCookieCount;
     }
 
 
+    /**
+     * Sets the maximum number of cookies that will be accepted in a request.
+     * @param maxCookieCount the new maximum cookie count
+     */
     public void setMaxCookieCount(int maxCookieCount) {
         this.maxCookieCount = maxCookieCount;
     }
 
 
     /**
-     * @return the maximum number of parameters (GET plus POST) that will be automatically parsed by the container. A
-     *             value of less than 0 means no limit.
+     * Returns the maximum number of parameters (GET plus POST) that will be automatically parsed by the container.
+     * A value of less than 0 means no limit.
+     * @return the maximum parameter count
      */
     public int getMaxParameterCount() {
         return maxParameterCount;
@@ -497,28 +530,45 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Returns the maximum number of parts that will be accepted in a multipart request.
+     * @return the maximum part count
+     */
     public int getMaxPartCount() {
         return maxPartCount;
     }
 
 
+    /**
+     * Sets the maximum number of parts that will be accepted in a multipart request.
+     * @param maxPartCount the new maximum part count
+     */
     public void setMaxPartCount(int maxPartCount) {
         this.maxPartCount = maxPartCount;
     }
 
 
+    /**
+     * Returns the maximum size of the headers for each part in a multipart request.
+     * @return the maximum part header size
+     */
     public int getMaxPartHeaderSize() {
         return maxPartHeaderSize;
     }
 
 
+    /**
+     * Sets the maximum size of the headers for each part in a multipart request.
+     * @param maxPartHeaderSize the new maximum part header size
+     */
     public void setMaxPartHeaderSize(int maxPartHeaderSize) {
         this.maxPartHeaderSize = maxPartHeaderSize;
     }
 
 
     /**
-     * @return the maximum size of a POST which will be automatically parsed by the container.
+     * Returns the maximum size of a POST which will be automatically parsed by the container.
+     * @return the maximum POST size in bytes
      */
     public int getMaxPostSize() {
         return maxPostSize;
@@ -536,7 +586,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the maximum size of a POST which will be saved by the container during authentication.
+     * Returns the maximum size of a POST which will be saved by the container during authentication.
+     * @return the maximum saved POST size in bytes
      */
     public int getMaxSavePostSize() {
         return maxSavePostSize;
@@ -556,7 +607,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the HTTP methods which will support body parameters parsing
+     * Returns the HTTP methods which will support body parameters parsing.
+     * @return the comma-separated list of HTTP methods
      */
     public String getParseBodyMethods() {
         return this.parseBodyMethods;
@@ -585,14 +637,20 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Checks whether the given HTTP method is configured to allow body parameter parsing.
+     * @param method the HTTP method name to check
+     * @return {@code true} if the method is in the parse body methods set
+     */
     protected boolean isParseBodyMethod(String method) {
         return parseBodyMethodsSet.contains(method);
     }
 
 
     /**
-     * @return the port number on which this connector is configured to listen for requests. The special value of 0
-     *             means select a random free port when the socket is bound.
+     * Returns the port number on which this connector is configured to listen for requests.
+     * The special value of 0 means select a random free port when the socket is bound.
+     * @return the configured port number
      */
     public int getPort() {
         // Try shortcut that should work for nearly all uses first as it does
@@ -620,6 +678,10 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Returns the port offset to be applied to the configured port.
+     * @return the port offset value
+     */
     public int getPortOffset() {
         // Try shortcut that should work for nearly all uses first as it does
         // not use reflection and is therefore faster.
@@ -636,11 +698,19 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Sets the port offset to be applied to the configured port.
+     * @param portOffset the new port offset value
+     */
     public void setPortOffset(int portOffset) {
         setProperty("portOffset", String.valueOf(portOffset));
     }
 
 
+    /**
+     * Returns the effective port number after applying the port offset.
+     * @return the port number with offset applied
+     */
     public int getPortWithOffset() {
         int port = getPort();
         // Zero is a special case and negative values are invalid
@@ -652,8 +722,10 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the port number on which this connector is listening to requests. If the special value for
-     *             {@link #getPort} of zero is used then this method will report the actual port bound.
+     * Returns the port number on which this connector is actually listening.
+     * If the special value for {@link #getPort} of zero is used then this method
+     * will report the actual port bound.
+     * @return the actual local port number
      */
     public int getLocalPort() {
         return ((Integer) getProperty("localPort")).intValue();
@@ -661,7 +733,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the Coyote protocol handler in use.
+     * Returns the Coyote protocol handler in use.
+     * @return the protocol string
      */
     public String getProtocol() {
         return configuredProtocol;
@@ -669,7 +742,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the class name of the Coyote protocol handler in use.
+     * Returns the class name of the Coyote protocol handler in use.
+     * @return the protocol handler class name
      */
     public String getProtocolHandlerClassName() {
         return this.protocolHandlerClassName;
@@ -677,7 +751,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the protocol handler associated with the connector.
+     * Returns the protocol handler associated with the connector.
+     * @return the protocol handler instance
      */
     public ProtocolHandler getProtocolHandler() {
         return this.protocolHandler;
@@ -685,7 +760,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the proxy server name for this Connector.
+     * Returns the proxy server name for this Connector.
+     * @return the proxy server name
      */
     public String getProxyName() {
         return this.proxyName;
@@ -708,7 +784,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the proxy server port for this Connector.
+     * Returns the proxy server port for this Connector.
+     * @return the proxy server port
      */
     public int getProxyPort() {
         return this.proxyPort;
@@ -726,8 +803,9 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the port number to which a request should be redirected if it comes in on a non-SSL port and is subject
-     *             to a security constraint with a transport guarantee that requires SSL.
+     * Returns the port number to which a request should be redirected if it comes in on a non-SSL port
+     * and is subject to a security constraint with a transport guarantee that requires SSL.
+     * @return the redirect port number
      */
     public int getRedirectPort() {
         return this.redirectPort;
@@ -744,13 +822,18 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Returns the redirect port with the port offset applied.
+     * @return the redirect port with offset
+     */
     public int getRedirectPortWithOffset() {
         return getRedirectPort() + getPortOffset();
     }
 
 
     /**
-     * @return the scheme that will be assigned to requests received through this connector. Default value is "http".
+     * Returns the scheme that will be assigned to requests received through this connector.
+     * @return the scheme, default value is "http"
      */
     public String getScheme() {
         return this.scheme;
@@ -768,8 +851,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the secure connection flag that will be assigned to requests received through this connector. Default
-     *             value is "false".
+     * Returns the secure connection flag that will be assigned to requests received through this connector.
+     * @return the secure flag, default value is {@code false}
      */
     public boolean getSecure() {
         return this.secure;
@@ -788,7 +871,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the name of character encoding to be used for the URI using the original case.
+     * Returns the name of character encoding to be used for the URI using the original case.
+     * @return the URI encoding name
      */
     public String getURIEncoding() {
         return uriCharset.name();
@@ -796,7 +880,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return The Charset to use to convert raw URI bytes (after %nn decoding) to characters. This will never be null
+     * Returns the Charset to use to convert raw URI bytes (after %nn decoding) to characters.
+     * @return the URI charset, never null
      */
     public Charset getURICharset() {
         return uriCharset;
@@ -822,7 +907,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * @return the true if the entity body encoding should be used for the URI.
+     * Returns whether the entity body encoding should be used for the URI.
+     * @return {@code true} if the entity body encoding should be used for the URI
      */
     public boolean getUseBodyEncodingForURI() {
         return this.useBodyEncodingForURI;
@@ -881,6 +967,10 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Returns the name of the executor associated with this connector.
+     * @return the executor name, or {@link #INTERNAL_EXECUTOR_NAME} if using the internal executor
+     */
     public String getExecutorName() {
         Object obj = protocolHandler.getExecutor();
         if (obj instanceof org.apache.catalina.Executor) {
@@ -890,61 +980,109 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Adds an SSL host configuration to this connector.
+     * @param sslHostConfig the SSL host configuration to add
+     */
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         protocolHandler.addSslHostConfig(sslHostConfig);
     }
 
 
+    /**
+     * Returns the SSL host configurations for this connector.
+     * @return array of SSL host configurations
+     */
     public SSLHostConfig[] findSslHostConfigs() {
         return protocolHandler.findSslHostConfigs();
     }
 
 
+    /**
+     * Adds an upgrade protocol to this connector.
+     * @param upgradeProtocol the upgrade protocol to add
+     */
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         protocolHandler.addUpgradeProtocol(upgradeProtocol);
     }
 
 
+    /**
+     * Returns the registered upgrade protocols for this connector.
+     * @return array of upgrade protocols
+     */
     public UpgradeProtocol[] findUpgradeProtocols() {
         return protocolHandler.findUpgradeProtocols();
     }
 
 
+    /**
+     * Returns the handling mode for encoded reverse solidus (backslash) characters.
+     * @return the encoded reverse solidus handling mode as a string
+     */
     public String getEncodedReverseSolidusHandling() {
         return encodedReverseSolidusHandling.getValue();
     }
 
 
+    /**
+     * Sets the handling mode for encoded reverse solidus (backslash) characters.
+     * @param encodedReverseSolidusHandling the handling mode value
+     */
     public void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
         this.encodedReverseSolidusHandling = EncodedSolidusHandling.fromString(encodedReverseSolidusHandling);
     }
 
 
+    /**
+     * Returns the internal handling mode for encoded reverse solidus (backslash) characters.
+     * @return the encoded reverse solidus handling enum
+     */
     public EncodedSolidusHandling getEncodedReverseSolidusHandlingInternal() {
         return encodedReverseSolidusHandling;
     }
 
 
+    /**
+     * Returns the handling mode for encoded solidus (forward slash) characters.
+     * @return the encoded solidus handling mode as a string
+     */
     public String getEncodedSolidusHandling() {
         return encodedSolidusHandling.getValue();
     }
 
 
+    /**
+     * Sets the handling mode for encoded solidus (forward slash) characters.
+     * @param encodedSolidusHandling the handling mode value
+     */
     public void setEncodedSolidusHandling(String encodedSolidusHandling) {
         this.encodedSolidusHandling = EncodedSolidusHandling.fromString(encodedSolidusHandling);
     }
 
 
+    /**
+     * Returns the internal handling mode for encoded solidus (forward slash) characters.
+     * @return the encoded solidus handling enum
+     */
     public EncodedSolidusHandling getEncodedSolidusHandlingInternal() {
         return encodedSolidusHandling;
     }
 
 
+    /**
+     * Returns whether suspicious URIs should be rejected.
+     * @return {@code true} if suspicious URIs should be rejected
+     */
     public boolean getRejectSuspiciousURIs() {
         return rejectSuspiciousURIs;
     }
 
 
+    /**
+     * Sets whether suspicious URIs should be rejected.
+     * @param rejectSuspiciousURIs {@code true} to reject suspicious URIs
+     */
     public void setRejectSuspiciousURIs(boolean rejectSuspiciousURIs) {
         this.rejectSuspiciousURIs = rejectSuspiciousURIs;
     }
@@ -987,6 +1125,13 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
+    /**
+     * Create the key properties for the ObjectName of a registered MBean.
+     *
+     * @param type The component type
+     *
+     * @return the key properties string for the ObjectName
+     */
     protected String createObjectNameKeyProperties(String type) {
 
         Object addressObj = getProperty("address");

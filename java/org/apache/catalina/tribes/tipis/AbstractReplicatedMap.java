@@ -61,8 +61,10 @@ public abstract class AbstractReplicatedMap<K, V>
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** The string manager for packaging specific messages. */
     protected static final StringManager sm = StringManager.getManager(AbstractReplicatedMap.class);
 
+    /** The logger instance. */
     private final Log log = LogFactory.getLog(AbstractReplicatedMap.class); // must not be static
 
     /**
@@ -79,10 +81,21 @@ public abstract class AbstractReplicatedMap<K, V>
     // ------------------------------------------------------------------------------
     // INSTANCE VARIABLES
     // ------------------------------------------------------------------------------
+    /** The underlying concurrent map storing entries. */
     protected final ConcurrentMap<K,MapEntry<K,V>> innerMap;
 
+    /**
+     * Gets the state message type.
+     *
+     * @return the state message type
+     */
     protected abstract int getStateMessageType();
 
+    /**
+     * Gets the replicate message type.
+     *
+     * @return the replicate message type
+     */
     protected abstract int getReplicateMessageType();
 
 
@@ -152,7 +165,16 @@ public abstract class AbstractReplicatedMap<K, V>
     // map owner interface
     // ------------------------------------------------------------------------------
 
+    /**
+     * Interface for the owner of this replicated map.
+     */
     public interface MapOwner {
+        /**
+         * Called when an object becomes primary on this node.
+         *
+         * @param key The key of the object
+         * @param value The value of the object
+         */
         void objectMadePrimary(Object key, Object value);
     }
 
@@ -367,6 +389,9 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Breaks down the map, removing all entries and closing channels.
+     */
     public void breakdown() {
         this.state = State.DESTROYED;
         if (this.rpcChannel != null) {
@@ -392,11 +417,23 @@ public abstract class AbstractReplicatedMap<K, V>
         this.externalLoaders = null;
     }
 
+    /**
+     * Returns the hash code for this map based on the map context name.
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Arrays.hashCode(this.mapContextName);
     }
 
+    /**
+     * Checks if this map is equal to another object.
+     *
+     * @param o the object to compare
+     *
+     * @return {@code true} if the maps have the same context name
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof AbstractReplicatedMap)) {
@@ -413,16 +450,35 @@ public abstract class AbstractReplicatedMap<K, V>
     // ------------------------------------------------------------------------------
     // GROUP COM INTERFACES
     // ------------------------------------------------------------------------------
+    /**
+     * Gets the map members from the given map.
+     *
+     * @param members The member map
+     *
+     * @return an array of members
+     */
     public Member[] getMapMembers(HashMap<Member,Long> members) {
         return members.keySet().toArray(new Member[0]);
     }
 
+    /**
+     * Gets the current map members.
+     *
+     * @return an array of members
+     */
     public Member[] getMapMembers() {
         synchronized (mapMembers) {
             return getMapMembers(mapMembers);
         }
     }
 
+    /**
+     * Gets the map members excluding the given members.
+     *
+     * @param exclude Members to exclude from the result
+     *
+     * @return an array of members excluding the specified ones
+     */
     public Member[] getMapMembersExcl(Member[] exclude) {
         if (exclude == null) {
             return null;
@@ -525,6 +581,9 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Transfers the current state from another map in the cluster.
+     */
     public void transferState() {
         try {
             Member[] members = getMapMembers();
@@ -554,6 +613,14 @@ public abstract class AbstractReplicatedMap<K, V>
         this.state = State.STATETRANSFERRED;
     }
 
+    /**
+     * Handles a reply request message.
+     *
+     * @param msg    The message
+     * @param sender The sender
+     *
+     * @return the reply message or {@code null}
+     */
     @Override
     public Serializable replyRequest(Serializable msg, final Member sender) {
         if (!(msg instanceof MapMessage mapmsg)) {
@@ -615,6 +682,12 @@ public abstract class AbstractReplicatedMap<K, V>
 
     }
 
+    /**
+     * Handles a left over membership message.
+     *
+     * @param msg    The message
+     * @param sender The sender
+     */
     @Override
     public void leftOver(Serializable msg, Member sender) {
         // left over membership messages
@@ -648,6 +721,12 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Handles a received message.
+     *
+     * @param msg    The message
+     * @param sender The sender
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void messageReceived(Serializable msg, Member sender) {
@@ -771,6 +850,14 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Accepts or rejects a message based on the map context.
+     *
+     * @param msg    The message
+     * @param sender The sender
+     *
+     * @return {@code true} if the message is accepted
+     */
     @Override
     public boolean accept(Serializable msg, Member sender) {
         boolean result = false;
@@ -786,6 +873,11 @@ public abstract class AbstractReplicatedMap<K, V>
         return result;
     }
 
+    /**
+     * Adds a member to this map.
+     *
+     * @param member The member to add
+     */
     public void mapMemberAdded(Member member) {
         if (member.equals(getChannel().getLocalMember(false))) {
             return;
@@ -827,6 +919,14 @@ public abstract class AbstractReplicatedMap<K, V>
         } // end if
     }
 
+    /**
+     * Checks if a member is in the given set.
+     *
+     * @param m  The member to check
+     * @param set The set to check against
+     *
+     * @return {@code true} if the member is in the set
+     */
     public boolean inSet(Member m, Member[] set) {
         if (set == null) {
             return false;
@@ -841,6 +941,14 @@ public abstract class AbstractReplicatedMap<K, V>
         return result;
     }
 
+    /**
+     * Excludes members from the given set.
+     *
+     * @param mbrs The members to exclude
+     * @param set  The set to exclude from
+     *
+     * @return The resulting set after exclusion
+     */
     public Member[] excludeFromSet(Member[] mbrs, Member[] set) {
         List<Member> result = new ArrayList<>();
         for (Member member : set) {
@@ -858,11 +966,21 @@ public abstract class AbstractReplicatedMap<K, V>
         return result.toArray(new Member[0]);
     }
 
+    /**
+     * Called when a member is added to the channel.
+     *
+     * @param member The member that was added
+     */
     @Override
     public void memberAdded(Member member) {
         // do nothing
     }
 
+    /**
+     * Called when a member disappears from the channel.
+     *
+     * @param member The member that disappeared
+     */
     @Override
     public void memberDisappeared(Member member) {
         synchronized (mapMembers) {
@@ -939,6 +1057,11 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Gets the next backup index using round-robin rotation.
+     *
+     * @return The next backup index, or -1 if no members exist
+     */
     public int getNextBackupIndex() {
         synchronized (mapMembers) {
             int size = mapMembers.size();
@@ -954,6 +1077,11 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
+    /**
+     * Gets the next backup node using round-robin rotation.
+     *
+     * @return The next backup node, or {@code null} if no members exist
+     */
     public Member getNextBackupNode() {
         Member[] members = getMapMembers();
         int node = getNextBackupIndex();
@@ -978,6 +1106,9 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     protected abstract Member[] publishEntryInfo(Object key, Object value) throws ChannelException;
 
+    /**
+     * Sends a heartbeat to all members in the cluster.
+     */
     @Override
     public void heartbeat() {
         try {
@@ -989,15 +1120,30 @@ public abstract class AbstractReplicatedMap<K, V>
         }
     }
 
-    // ------------------------------------------------------------------------------
+   // ------------------------------------------------------------------------------
     // METHODS TO OVERRIDE
     // ------------------------------------------------------------------------------
 
+    /**
+     * Removes the entry for the specified key from the map.
+     *
+     * @param key The key to remove
+     *
+     * @return The previous value associated with the key, or {@code null}
+     */
     @Override
     public V remove(Object key) {
         return remove(key, true);
     }
 
+    /**
+     * Removes the entry for the specified key from the map.
+     *
+     * @param key    The key to remove
+     * @param notify Whether to notify other members
+     *
+     * @return The previous value associated with the key, or {@code null}
+     */
     public V remove(Object key, boolean notify) {
         MapEntry<K,V> entry = innerMap.remove(key);
 
@@ -1013,6 +1159,13 @@ public abstract class AbstractReplicatedMap<K, V>
         return entry != null ? entry.getValue() : null;
     }
 
+    /**
+     * Gets the internal map entry for a key.
+     *
+     * @param key The key
+     *
+     * @return the internal map entry, or {@code null} if not found
+     */
     public MapEntry<K,V> getInternal(Object key) {
         return innerMap.get(key);
     }
@@ -1136,11 +1289,28 @@ public abstract class AbstractReplicatedMap<K, V>
         return innerMap.containsKey(key);
     }
 
+    /**
+     * Puts a key-value pair into the map.
+     *
+     * @param key   The key
+     * @param value The value
+     *
+     * @return The previous value associated with the key, or {@code null}
+     */
     @Override
     public V put(K key, V value) {
         return put(key, value, true);
     }
 
+    /**
+     * Puts a key-value pair into the map.
+     *
+     * @param key    The key
+     * @param value  The value
+     * @param notify Whether to notify other members
+     *
+     * @return The previous value associated with the key, or {@code null}
+     */
     public V put(K key, V value, boolean notify) {
         MapEntry<K,V> entry = new MapEntry<>(key, value);
         entry.setBackup(false);
@@ -1167,6 +1337,11 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
 
+    /**
+     * Copies all mappings from the specified map to this map.
+     *
+     * @param m The map whose mappings are to be copied
+     */
     @Override
     public void putAll(Map<? extends K,? extends V> m) {
         for (Entry<? extends K,? extends V> value : m.entrySet()) {
@@ -1181,6 +1356,11 @@ public abstract class AbstractReplicatedMap<K, V>
         clear(true);
     }
 
+    /**
+     * Clears entries from the map.
+     *
+     * @param notify Whether to notify other members
+     */
     public void clear(boolean notify) {
         if (notify) {
             // only delete active keys
@@ -1214,14 +1394,29 @@ public abstract class AbstractReplicatedMap<K, V>
         return innerMap.entrySet();
     }
 
+    /**
+     * Gets the complete set of keys in the map.
+     *
+     * @return The complete set of keys
+     */
     public Set<K> keySetFull() {
         return innerMap.keySet();
     }
 
+    /**
+     * Gets the complete size of the map.
+     *
+     * @return The complete size of the map
+     */
     public int sizeFull() {
         return innerMap.size();
     }
 
+    /**
+     * Returns a set view of the mappings contained in this map.
+     *
+     * @return a set view of the mappings
+     */
     @Override
     public Set<Map.Entry<K,V>> entrySet() {
         LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<>(innerMap.size());
@@ -1234,6 +1429,11 @@ public abstract class AbstractReplicatedMap<K, V>
         return Collections.unmodifiableSet(set);
     }
 
+    /**
+     * Returns a set view of the keys contained in this map.
+     *
+     * @return a set view of the keys
+     */
     @Override
     public Set<K> keySet() {
         // todo implement
@@ -1251,6 +1451,11 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
 
+    /**
+     * Returns the number of active entries in this map.
+     *
+     * @return the number of active entries
+     */
     @Override
     public int size() {
         // todo, implement a counter variable instead
@@ -1267,11 +1472,21 @@ public abstract class AbstractReplicatedMap<K, V>
         return counter;
     }
 
+    /**
+     * Checks if this map is empty.
+     *
+     * @return {@code true} if the map is empty
+     */
     @Override
     public boolean isEmpty() {
         return size() == 0;
     }
 
+    /**
+     * Returns a collection view of the values contained in this map.
+     *
+     * @return a collection view of the values
+     */
     @Override
     public Collection<V> values() {
         List<V> values = new ArrayList<>();
@@ -1288,90 +1503,201 @@ public abstract class AbstractReplicatedMap<K, V>
     // ------------------------------------------------------------------------------
     // Map Entry class
     // ------------------------------------------------------------------------------
+    /**
+     * Represents an entry in the replicated map, including metadata about its role (primary, backup, proxy).
+     *
+     * @param <K> The type of keys maintained by this map
+     * @param <V> The type of mapped values
+     */
     public static class MapEntry<K, V> implements Map.Entry<K,V> {
+        /** Whether this entry is a backup. */
         private boolean backup;
+        /** Whether this entry is a proxy. */
         private boolean proxy;
+        /** Whether this entry is a copy. */
         private boolean copy;
+        /** The backup nodes for this entry. */
         private Member[] backupNodes;
+        /** The primary member for this entry. */
         private Member primary;
+        /** The key for this entry. */
         private K key;
+        /** The value for this entry. */
         private V value;
 
+        /**
+         * Creates a new map entry with the specified key and value.
+         *
+         * @param key   The key
+         * @param value The value
+         */
         public MapEntry(K key, V value) {
             setKey(key);
             setValue(value);
 
         }
 
+        /**
+         * Checks if the key is serializable.
+         *
+         * @return {@code true} if the key is serializable or null
+         */
         public boolean isKeySerializable() {
             return (key == null) || (key instanceof Serializable);
         }
 
+        /**
+         * Checks if the value is serializable.
+         *
+         * @return {@code true} if the value is serializable or null
+         */
         public boolean isValueSerializable() {
             return (value == null) || (value instanceof Serializable);
         }
 
+        /**
+         * Checks if both the key and value are serializable.
+         *
+         * @return {@code true} if both key and value are serializable
+         */
         public boolean isSerializable() {
             return isKeySerializable() && isValueSerializable();
         }
 
+        /**
+         * Checks if this entry is a backup.
+         *
+         * @return {@code true} if this entry is a backup
+         */
         public boolean isBackup() {
             return backup;
         }
 
+        /**
+         * Sets whether this entry is a backup.
+         *
+         * @param backup {@code true} if this entry is a backup
+         */
         public void setBackup(boolean backup) {
             this.backup = backup;
         }
 
+        /**
+         * Checks if this entry is a proxy.
+         *
+         * @return {@code true} if this entry is a proxy
+         */
         public boolean isProxy() {
             return proxy;
         }
 
+        /**
+         * Checks if this entry is primary.
+         *
+         * @return {@code true} if this entry is primary
+         */
         public boolean isPrimary() {
             return (!proxy && !backup && !copy);
         }
 
+        /**
+         * Checks if this entry is active.
+         *
+         * @return {@code true} if this entry is active
+         */
         public boolean isActive() {
             return !proxy;
         }
 
+        /**
+         * Sets whether this entry is a proxy.
+         *
+         * @param proxy {@code true} if this entry is a proxy
+         */
         public void setProxy(boolean proxy) {
             this.proxy = proxy;
         }
 
+        /**
+         * Checks if this entry is a copy.
+         *
+         * @return {@code true} if this entry is a copy
+         */
         public boolean isCopy() {
             return copy;
         }
 
+        /**
+         * Sets whether this entry is a copy.
+         *
+         * @param copy {@code true} if this entry is a copy
+         */
         public void setCopy(boolean copy) {
             this.copy = copy;
         }
 
+        /**
+         * Checks if this entry is diffable.
+         *
+         * @return {@code true} if this entry is diffable
+         */
         public boolean isDiffable() {
             return (value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isDiffable();
         }
 
+        /**
+         * Sets the backup nodes for this entry.
+         *
+         * @param nodes The backup nodes
+         */
         public void setBackupNodes(Member[] nodes) {
             this.backupNodes = nodes;
         }
 
+        /**
+         * Gets the backup nodes for this entry.
+         *
+         * @return The backup nodes
+         */
         public Member[] getBackupNodes() {
             return backupNodes;
         }
 
+        /**
+         * Sets the primary member for this entry.
+         *
+         * @param m The primary member
+         */
         public void setPrimary(Member m) {
             primary = m;
         }
 
+        /**
+         * Gets the primary member for this entry.
+         *
+         * @return The primary member
+         */
         public Member getPrimary() {
             return primary;
         }
 
+        /**
+         * Gets the value for this entry.
+         *
+         * @return The value
+         */
         @Override
         public V getValue() {
             return value;
         }
 
+        /**
+         * Sets the value for this entry.
+         *
+         * @param value The new value
+         *
+         * @return The previous value
+         */
         @Override
         public V setValue(V value) {
             V old = this.value;
@@ -1379,11 +1705,23 @@ public abstract class AbstractReplicatedMap<K, V>
             return old;
         }
 
+        /**
+         * Gets the key for this entry.
+         *
+         * @return The key
+         */
         @Override
         public K getKey() {
             return key;
         }
 
+        /**
+         * Sets the key for this entry.
+         *
+         * @param key The new key
+         *
+         * @return The previous key
+         */
         public K setKey(K key) {
             K old = this.key;
             this.key = key;
@@ -1430,6 +1768,11 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
 
+        /**
+         * Returns a string representation of this map entry.
+         *
+         * @return a string representation of this map entry
+         */
         @Override
         public String toString() {
             return "MapEntry[key:" + getKey() + "; " + "value:" + getValue() + "; " + "primary:" + isPrimary() + "; " +
@@ -1442,40 +1785,76 @@ public abstract class AbstractReplicatedMap<K, V>
     // map message to send to and from other maps
     // ------------------------------------------------------------------------------
 
+    /**
+     * Represents a message sent between replicated map instances.
+     */
     public static class MapMessage implements Serializable, Cloneable {
         @Serial
         private static final long serialVersionUID = 1L;
+        /** Message type: backup. */
         public static final int MSG_BACKUP = 1;
+        /** Message type: retrieve backup. */
         public static final int MSG_RETRIEVE_BACKUP = 2;
+        /** Message type: proxy. */
         public static final int MSG_PROXY = 3;
+        /** Message type: remove. */
         public static final int MSG_REMOVE = 4;
+        /** Message type: state. */
         public static final int MSG_STATE = 5;
+        /** Message type: start. */
         public static final int MSG_START = 6;
+        /** Message type: stop. */
         public static final int MSG_STOP = 7;
+        /** Message type: init. */
         public static final int MSG_INIT = 8;
+        /** Message type: copy. */
         public static final int MSG_COPY = 9;
+        /** Message type: state copy. */
         public static final int MSG_STATE_COPY = 10;
+        /** Message type: access. */
         public static final int MSG_ACCESS = 11;
+        /** Message type: notify map member. */
         public static final int MSG_NOTIFY_MAPMEMBER = 12;
+        /** Message type: ping. */
         public static final int MSG_PING = 13;
 
+        /** The map identifier. */
         private final byte[] mapId;
+        /** The message type. */
         private final int msgtype;
+        /** Whether this is a diff message. */
         private final boolean diff;
+        /** The key for this message. */
         private transient Serializable key;
+        /** The value for this message. */
         private transient Serializable value;
+        /** The serialized value data. */
         private byte[] valuedata;
+        /** The serialized key data. */
         private byte[] keydata;
+        /** The diff value data. */
         private final byte[] diffvalue;
+        /** The backup nodes. */
         private final Member[] nodes;
+        /** The primary member. */
         private Member primary;
 
+        /**
+         * Returns a string representation of this map message.
+         *
+         * @return a string representation of this map message
+         */
         @Override
         public String toString() {
             return "MapMessage[context=" + new String(mapId) + "; type=" + getTypeDesc() + "; key=" + key + "; value=" +
                     value + ']';
         }
 
+        /**
+         * Gets a description of the message type.
+         *
+         * @return A string description of the message type
+         */
         public String getTypeDesc() {
             return switch (msgtype) {
                 case MSG_BACKUP -> "MSG_BACKUP";
@@ -1495,6 +1874,18 @@ public abstract class AbstractReplicatedMap<K, V>
             };
         }
 
+        /**
+         * Creates a new map message with the specified parameters.
+         *
+         * @param mapId    The map identifier
+         * @param msgtype  The message type
+         * @param diff     Whether this is a diff message
+         * @param key      The key
+         * @param value    The value
+         * @param diffvalue The serialized diff value
+         * @param primary  The primary member
+         * @param nodes    The backup nodes
+         */
         public MapMessage(byte[] mapId, int msgtype, boolean diff, Serializable key, Serializable value,
                 byte[] diffvalue, Member primary, Member[] nodes) {
             this.mapId = mapId;
@@ -1509,19 +1900,42 @@ public abstract class AbstractReplicatedMap<K, V>
             setKey(key);
         }
 
+        /**
+         * Deserializes the key and value using the given class loaders.
+         *
+         * @param cls The class loaders to use for deserialization
+         *
+         * @throws IOException            If deserialization fails
+         * @throws ClassNotFoundException If a class is not found
+         */
         public void deserialize(ClassLoader[] cls) throws IOException, ClassNotFoundException {
             key(cls);
             value(cls);
         }
 
+        /**
+         * Gets the message type.
+         *
+         * @return the message type
+         */
         public int getMsgType() {
             return msgtype;
         }
 
+        /**
+         * Checks if this is a diff message.
+         *
+         * @return {@code true} if this is a diff message
+         */
         public boolean isDiff() {
             return diff;
         }
 
+        /**
+         * Gets the key for this message.
+         *
+         * @return The key
+         */
         public Serializable getKey() {
             try {
                 return key(null);
@@ -1530,6 +1944,16 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
 
+        /**
+         * Deserializes the key using the given class loaders.
+         *
+         * @param cls The class loaders to use for deserialization
+         *
+         * @return The deserialized key
+         *
+         * @throws IOException            If deserialization fails
+         * @throws ClassNotFoundException If the key class is not found
+         */
         public Serializable key(ClassLoader[] cls) throws IOException, ClassNotFoundException {
             if (key != null) {
                 return key;
@@ -1542,10 +1966,20 @@ public abstract class AbstractReplicatedMap<K, V>
             return key;
         }
 
+        /**
+         * Gets the serialized key data.
+         *
+         * @return The serialized key data
+         */
         public byte[] getKeyData() {
             return keydata;
         }
 
+        /**
+         * Gets the value for this message.
+         *
+         * @return The value
+         */
         public Serializable getValue() {
             try {
                 return value(null);
@@ -1554,6 +1988,16 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
 
+        /**
+         * Deserializes the value using the given class loaders.
+         *
+         * @param cls The class loaders to use for deserialization
+         *
+         * @return The deserialized value
+         *
+         * @throws IOException            If deserialization fails
+         * @throws ClassNotFoundException If the value class is not found
+         */
         public Serializable value(ClassLoader[] cls) throws IOException, ClassNotFoundException {
             if (value != null) {
                 return value;
@@ -1566,30 +2010,65 @@ public abstract class AbstractReplicatedMap<K, V>
             return value;
         }
 
+        /**
+         * Gets the serialized value data.
+         *
+         * @return The serialized value data
+         */
         public byte[] getValueData() {
             return valuedata;
         }
 
+        /**
+         * Gets the diff value data.
+         *
+         * @return The diff value data
+         */
         public byte[] getDiffValue() {
             return diffvalue;
         }
 
+        /**
+         * Gets the backup nodes.
+         *
+         * @return The backup nodes
+         */
         public Member[] getBackupNodes() {
             return nodes;
         }
 
+        /**
+         * Gets the primary member.
+         *
+         * @return The primary member
+         */
         public Member getPrimary() {
             return primary;
         }
 
+        /**
+         * Sets the primary member.
+         *
+         * @param m The primary member
+         */
         private void setPrimary(Member m) {
             primary = m;
         }
 
+        /**
+         * Gets the map identifier.
+         *
+         * @return the map identifier
+         */
         public byte[] getMapId() {
             return mapId;
         }
 
+        /**
+         * Sets the value for this message.
+         *
+         * @param value The value
+         */
         public void setValue(Serializable value) {
             try {
                 if (value != null) {
@@ -1601,6 +2080,11 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
 
+        /**
+         * Sets the key for this message.
+         *
+         * @param key The key
+         */
         public void setKey(Serializable key) {
             try {
                 if (key != null) {
@@ -1612,6 +2096,11 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
 
+        /**
+         * Creates a shallow copy of this map message.
+         *
+         * @return a shallow copy of this map message
+         */
         @Override
         public MapMessage clone() {
             try {
@@ -1624,74 +2113,162 @@ public abstract class AbstractReplicatedMap<K, V>
     } // MapMessage
 
 
+    /**
+     * Gets the channel used for communication.
+     *
+     * @return the channel
+     */
     public Channel getChannel() {
         return channel;
     }
 
+    /**
+     * Gets the map context name.
+     *
+     * @return the map context name as bytes
+     */
     public byte[] getMapContextName() {
         return mapContextName;
     }
 
+    /**
+     * Gets the RPC channel.
+     *
+     * @return the RPC channel
+     */
     public RpcChannel getRpcChannel() {
         return rpcChannel;
     }
 
+    /**
+     * Gets the RPC timeout.
+     *
+     * @return the RPC timeout in milliseconds
+     */
     public long getRpcTimeout() {
         return rpcTimeout;
     }
 
+    /**
+     * Gets the state mutex object.
+     *
+     * @return the state mutex
+     */
     public Object getStateMutex() {
         return stateMutex;
     }
 
+    /**
+     * Checks if state has been transferred.
+     *
+     * @return {@code true} if state has been transferred
+     */
     public boolean isStateTransferred() {
         return stateTransferred;
     }
 
+    /**
+     * Gets the map owner.
+     *
+     * @return the map owner
+     */
     public MapOwner getMapOwner() {
         return mapOwner;
     }
 
+    /**
+     * Gets the external class loaders.
+     *
+     * @return the external class loaders
+     */
     public ClassLoader[] getExternalLoaders() {
         return externalLoaders;
     }
 
+    /**
+     * Gets the channel send options.
+     *
+     * @return the channel send options
+     */
     public int getChannelSendOptions() {
         return channelSendOptions;
     }
 
+    /**
+     * Gets the access timeout.
+     *
+     * @return the access timeout in milliseconds
+     */
     public long getAccessTimeout() {
         return accessTimeout;
     }
 
+    /**
+     * Sets the map owner.
+     *
+     * @param mapOwner The map owner
+     */
     public void setMapOwner(MapOwner mapOwner) {
         this.mapOwner = mapOwner;
     }
 
+    /**
+     * Sets the external class loaders.
+     *
+     * @param externalLoaders The external class loaders
+     */
     public void setExternalLoaders(ClassLoader[] externalLoaders) {
         this.externalLoaders = externalLoaders;
     }
 
+    /**
+     * Sets the channel send options.
+     *
+     * @param channelSendOptions The channel send options
+     */
     public void setChannelSendOptions(int channelSendOptions) {
         this.channelSendOptions = channelSendOptions;
     }
 
+    /**
+     * Sets the access timeout.
+     *
+     * @param accessTimeout The access timeout in milliseconds
+     */
     public void setAccessTimeout(long accessTimeout) {
         this.accessTimeout = accessTimeout;
     }
 
+    /**
+     * Represents the state of this replicated map.
+     */
     private enum State {
+        /** The map has been created but not yet initialized. */
         NEW(false),
+        /** The map has received state from another map but is not yet ready. */
         STATETRANSFERRED(false),
+        /** The map is initialized and ready for messaging. */
         INITIALIZED(true),
+        /** The map has been destroyed. */
         DESTROYED(false);
 
+        /** Whether this state accepts messages. */
         private final boolean available;
 
+        /**
+         * Creates a new state with the specified availability.
+         *
+         * @param available whether this state accepts messages
+         */
         State(boolean available) {
             this.available = available;
         }
 
+        /**
+         * Checks if this state accepts messages.
+         *
+         * @return {@code true} if this state accepts messages
+         */
         public boolean isAvailable() {
             return available;
         }

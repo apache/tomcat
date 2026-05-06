@@ -28,6 +28,13 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
  */
 public class ErrorPageSupport {
 
+    /**
+     * Default constructor for ErrorPageSupport.
+     */
+    public ErrorPageSupport() {
+        // NO-OP
+    }
+
     // Fully qualified class name to error page
     private final Map<String,ErrorPage> exceptionPages = new ConcurrentHashMap<>();
 
@@ -35,6 +42,11 @@ public class ErrorPageSupport {
     private final Map<Integer,ErrorPage> statusPages = new ConcurrentHashMap<>();
 
 
+    /**
+     * Adds an error page to the support.
+     *
+     * @param errorPage The error page to add
+     */
     public void add(ErrorPage errorPage) {
         String exceptionType = errorPage.getExceptionType();
         if (exceptionType == null) {
@@ -45,6 +57,11 @@ public class ErrorPageSupport {
     }
 
 
+    /**
+     * Removes an error page from the support.
+     *
+     * @param errorPage The error page to remove
+     */
     public void remove(ErrorPage errorPage) {
         String exceptionType = errorPage.getExceptionType();
         if (exceptionType == null) {
@@ -55,6 +72,13 @@ public class ErrorPageSupport {
     }
 
 
+    /**
+     * Finds the ErrorPage, if any, for the given HTTP status code.
+     *
+     * @param statusCode The HTTP status code
+     *
+     * @return The ErrorPage for the status code, or {@code null} if none is configured
+     */
     public ErrorPage find(int statusCode) {
         return statusPages.get(Integer.valueOf(statusCode));
     }
@@ -72,6 +96,14 @@ public class ErrorPageSupport {
     }
 
 
+    /**
+     * Find the ErrorPage, if any, for the given exception type, searching up the
+     * exception's class hierarchy.
+     *
+     * @param exceptionType The exception instance
+     *
+     * @return The ErrorPage for the exception type, or {@code null} if none is configured
+     */
     public ErrorPage find(Throwable exceptionType) {
         if (exceptionType == null) {
             return null;
@@ -93,6 +125,11 @@ public class ErrorPageSupport {
     }
 
 
+    /**
+     * Returns all configured error pages.
+     *
+     * @return Array of all configured error pages
+     */
     public ErrorPage[] findAll() {
         Set<ErrorPage> errorPages = new HashSet<>();
         errorPages.addAll(exceptionPages.values());

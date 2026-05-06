@@ -29,6 +29,12 @@ import org.apache.catalina.Role;
  */
 public abstract class AbstractRole implements Role {
 
+    /**
+     * Constructs a new AbstractRole.
+     */
+    public AbstractRole() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 

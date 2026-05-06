@@ -40,6 +40,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      */
     protected long threshold = 1000; //don't report queries less than this
 
+    /**
+     * Constructs a new {@code AbstractQueryReport} with the default threshold.
+     */
     public AbstractQueryReport() {
         super();
     }
@@ -177,9 +180,24 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *
      */
     protected class StatementProxy implements InvocationHandler {
+        /**
+         * Indicates whether the proxy has been closed.
+         */
         protected boolean closed = false;
+        /**
+         * The underlying statement or connection being proxied.
+         */
         protected Object delegate;
+        /**
+         * The SQL query being executed.
+         */
         protected final String query;
+        /**
+         * Constructs a new {@code StatementProxy}.
+         *
+         * @param parent The underlying statement or connection
+         * @param query The SQL query being executed
+         */
         public StatementProxy(Object parent, String query) {
             this.delegate = parent;
             this.query = query;

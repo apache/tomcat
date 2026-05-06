@@ -37,7 +37,15 @@ abstract class AbstractStream {
     private final String idAsString;
 
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
+
+    /**
+     * Lock for window allocation operations.
+     */
     protected final Lock windowAllocationLock = new ReentrantLock();
+
+    /**
+     * Condition signaled when window allocation is available.
+     */
     protected final Condition windowAllocationAvailable = windowAllocationLock.newCondition();
 
     private volatile int connectionAllocationRequested = 0;

@@ -27,8 +27,20 @@ import java.util.Properties;
  */
 public class Export {
 
+    /**
+     * Creates a new Export instance.
+     */
+    public Export() {
+    }
+
     private static final Map<String,Properties> translations = new HashMap<>();
 
+    /**
+     * Entry point for generating translation property files.
+     *
+     * @param args command line arguments (unused)
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String... args) throws IOException {
         File root = new File(".");
         for (String dir : Constants.SEARCH_DIRS) {

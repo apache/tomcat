@@ -18,5 +18,11 @@ package org.apache.tomcat.websocket;
 
 import jakarta.websocket.Decoder;
 
+/**
+ * Entry that maps a class to its corresponding WebSocket decoder class.
+ *
+ * @param clazz The class being decoded
+ * @param decoderClazz The decoder class to use
+ */
 public record DecoderEntry(Class<?> clazz, Class<? extends Decoder> decoderClazz) {
 }
