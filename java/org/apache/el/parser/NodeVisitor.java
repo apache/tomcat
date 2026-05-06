@@ -16,7 +16,15 @@
  */
 package org.apache.el.parser;
 
+/**
+ * Visitor interface for traversing EL expression AST nodes.
+ */
 public interface NodeVisitor {
-
+    /**
+     * Visits the given node.
+     *
+     * @param node the node to visit
+     * @throws Exception if an error occurs during visitation
+     */
     void visit(Node node) throws Exception;
 }

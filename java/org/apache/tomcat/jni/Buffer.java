@@ -23,6 +23,9 @@ import java.nio.ByteBuffer;
  */
 public class Buffer {
 
+    /** Utility class - do not instantiate. */
+    private Buffer() { }
+
     /**
      * Allocate a new ByteBuffer from memory
      *

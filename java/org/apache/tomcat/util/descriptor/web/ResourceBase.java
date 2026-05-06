@@ -98,9 +98,10 @@ public class ResourceBase implements Serializable, Injectable {
     private final Map<String,Object> properties = new HashMap<>();
 
     /**
-     * @param name The property name
+     * Returns the value of the specified property.
      *
-     * @return a configured property.
+     * @param name The property name
+     * @return the configured property value
      */
     public Object getProperty(String name) {
         return properties.get(name);

@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.core;
 
+/**
+ * Constants used by the core Catalina package.
+ */
 public class Constants {
 
     /**
@@ -23,8 +26,24 @@ public class Constants {
      */
     @Deprecated
     public static final String Package = "org.apache.catalina.core";
+
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The major version of the Servlet specification implemented by this container.
+     */
     public static final int MAJOR_VERSION = 4;
+    /**
+     * The minor version of the Servlet specification implemented by this container.
+     */
     public static final int MINOR_VERSION = 0;
 
+    /**
+     * The fully qualified class name of the JSP servlet.
+     */
     public static final String JSP_SERVLET_CLASS = "org.apache.jasper.servlet.JspServlet";
 }

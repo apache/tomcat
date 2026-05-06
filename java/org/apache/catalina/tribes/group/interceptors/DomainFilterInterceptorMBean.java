@@ -16,14 +16,37 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for the DomainFilterInterceptor.
+ */
 public interface DomainFilterInterceptorMBean {
 
+    /**
+     * Get the option flag.
+     *
+     * @return the option flag
+     */
     int getOptionFlag();
 
+    /**
+     * Get the domain filter.
+     *
+     * @return the domain byte array
+     */
     byte[] getDomain();
 
+    /**
+     * Get the log interval.
+     *
+     * @return the log interval
+     */
     int getLogInterval();
 
+    /**
+     * Set the log interval.
+     *
+     * @param logInterval The new log interval
+     */
     void setLogInterval(int logInterval);
 
 }

@@ -18,29 +18,57 @@ package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.io.ListenCallback;
 
+/**
+ * Abstract base class for receive tasks in the Catalina Tribes framework.
+ */
 public abstract class AbstractRxTask implements Runnable {
 
+    /** Option flag for using direct buffers. */
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
 
+    /** The callback. */
     private ListenCallback callback;
+    /** The task pool. */
     private RxTaskPool pool;
     @Deprecated
     private boolean doRun = true;
+    /** The options. */
     private int options;
+    /** Whether to use the buffer pool. */
     protected boolean useBufferPool = true;
 
+    /**
+     * Constructs a new AbstractRxTask.
+     *
+     * @param callback The callback
+     */
     public AbstractRxTask(ListenCallback callback) {
         this.callback = callback;
     }
 
+    /**
+     * Sets the task pool.
+     *
+     * @param pool The task pool
+     */
     public void setTaskPool(RxTaskPool pool) {
         this.pool = pool;
     }
 
+    /**
+     * Sets the options.
+     *
+     * @param options The options
+     */
     public void setOptions(int options) {
         this.options = options;
     }
 
+    /**
+     * Sets the callback.
+     *
+     * @param callback The callback
+     */
     public void setCallback(ListenCallback callback) {
         this.callback = callback;
     }
@@ -57,14 +85,29 @@ public abstract class AbstractRxTask implements Runnable {
         this.doRun = doRun;
     }
 
+    /**
+     * Gets the task pool.
+     *
+     * @return The task pool
+     */
     public RxTaskPool getTaskPool() {
         return pool;
     }
 
+    /**
+     * Gets the options.
+     *
+     * @return The options
+     */
     public int getOptions() {
         return options;
     }
 
+    /**
+     * Gets the callback.
+     *
+     * @return The callback
+     */
     public ListenCallback getCallback() {
         return callback;
     }
@@ -81,14 +124,27 @@ public abstract class AbstractRxTask implements Runnable {
         return doRun;
     }
 
+    /**
+     * Closes this task.
+     */
     public void close() {
         doRun = false;
     }
 
+    /**
+     * Sets whether to use the buffer pool.
+     *
+     * @param usebufpool {@code true} to use the buffer pool
+     */
     public void setUseBufferPool(boolean usebufpool) {
         useBufferPool = usebufpool;
     }
 
+    /**
+     * Gets whether the buffer pool is being used.
+     *
+     * @return {@code true} if the buffer pool is being used
+     */
     public boolean getUseBufferPool() {
         return useBufferPool;
     }

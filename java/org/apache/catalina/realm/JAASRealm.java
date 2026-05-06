@@ -119,6 +119,12 @@ public class JAASRealm extends RealmBase {
 
     private static final Log log = LogFactory.getLog(JAASRealm.class);
 
+    /**
+     * Constructs a new JAASRealm.
+     */
+    public JAASRealm() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -153,7 +159,14 @@ public class JAASRealm extends RealmBase {
      */
     protected String configFile;
 
+    /**
+     * The loaded JAAS Configuration instance.
+     */
     protected volatile Configuration jaasConfiguration;
+
+    /**
+     * Flag indicating whether the JAAS configuration has been loaded.
+     */
     protected volatile boolean jaasConfigurationLoaded = false;
 
     /**
@@ -167,7 +180,9 @@ public class JAASRealm extends RealmBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the path of the JAAS configuration file.
+     * Get the path of the JAAS configuration file.
+     *
+     * @return the path of the JAAS configuration file
      */
     public String getConfigFile() {
         return configFile;
@@ -192,7 +207,9 @@ public class JAASRealm extends RealmBase {
     }
 
     /**
-     * @return the application name.
+     * Get the JAAS application name.
+     *
+     * @return the application name
      */
     public String getAppName() {
         return appName;
@@ -231,6 +248,11 @@ public class JAASRealm extends RealmBase {
      */
     protected String roleClassNames = null;
 
+    /**
+     * Get the comma-delimited list of role class names.
+     *
+     * @return the role class names
+     */
     public String getRoleClassNames() {
         return this.roleClassNames;
     }
@@ -288,6 +310,11 @@ public class JAASRealm extends RealmBase {
      */
     protected String userClassNames = null;
 
+    /**
+     * Get the comma-delimited list of user class names.
+     *
+     * @return the user class names
+     */
     public String getUserClassNames() {
         return this.userClassNames;
     }

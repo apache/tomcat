@@ -19,38 +19,74 @@ package org.apache.tomcat.util.modeler;
 import javax.management.MBeanAttributeInfo;
 
 /**
- * <p>
  * Internal configuration information for an <code>Attribute</code> descriptor.
- * </p>
  */
 public class AttributeInfo extends FeatureInfo {
+
     private static final long serialVersionUID = -2511626862303972143L;
 
+    /**
+     * Constructs a new AttributeInfo instance.
+     */
+    public AttributeInfo() {
+    }
+
     // ----------------------------------------------------- Instance Variables
+    /**
+     * Human-readable display name for this attribute.
+     */
     protected String displayName = null;
 
     // Information about the method to use
+    /**
+     * Name of the getter method for this attribute.
+     */
     protected String getMethod = null;
+
+    /**
+     * Name of the setter method for this attribute.
+     */
     protected String setMethod = null;
+
+    /**
+     * Whether this attribute can be read by management applications.
+     */
     protected boolean readable = true;
+
+    /**
+     * Whether this attribute can be written by management applications.
+     */
     protected boolean writeable = true;
+
+    /**
+     * Whether this is a boolean attribute with an "is" getter.
+     */
     protected boolean is = false;
 
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the display name of this attribute.
+     * Returns the display name of this attribute.
+     *
+     * @return the display name of this attribute
      */
     public String getDisplayName() {
         return this.displayName;
     }
 
+    /**
+     * Sets the display name of this attribute.
+     *
+     * @param displayName the display name
+     */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
     /**
-     * @return the name of the property getter method, if non-standard.
+     * Returns the name of the property getter method, generating a default if not explicitly set.
+     *
+     * @return the name of the property getter method
      */
     public String getGetMethod() {
         if (getMethod == null) {
@@ -59,6 +95,11 @@ public class AttributeInfo extends FeatureInfo {
         return this.getMethod;
     }
 
+    /**
+     * Sets the name of the property getter method.
+     *
+     * @param getMethod the getter method name
+     */
     public void setGetMethod(String getMethod) {
         this.getMethod = getMethod;
     }
@@ -72,6 +113,11 @@ public class AttributeInfo extends FeatureInfo {
         return this.is;
     }
 
+    /**
+     * Sets whether this is a boolean attribute with an "is" getter.
+     *
+     * @param is {@code true} if this is a boolean attribute with an "is" getter
+     */
     public void setIs(boolean is) {
         this.is = is;
     }
@@ -86,13 +132,20 @@ public class AttributeInfo extends FeatureInfo {
         return this.readable;
     }
 
+    /**
+     * Sets whether this attribute is readable by management applications.
+     *
+     * @param readable {@code true} if readable
+     */
     public void setReadable(boolean readable) {
         this.readable = readable;
     }
 
 
     /**
-     * @return the name of the property setter method, if non-standard.
+     * Returns the name of the property setter method, generating a default if not explicitly set.
+     *
+     * @return the name of the property setter method
      */
     public String getSetMethod() {
         if (setMethod == null) {
@@ -101,6 +154,11 @@ public class AttributeInfo extends FeatureInfo {
         return this.setMethod;
     }
 
+    /**
+     * Sets the name of the property setter method.
+     *
+     * @param setMethod the setter method name
+     */
     public void setSetMethod(String setMethod) {
         this.setMethod = setMethod;
     }
@@ -114,6 +172,11 @@ public class AttributeInfo extends FeatureInfo {
         return this.writeable;
     }
 
+    /**
+     * Sets whether this attribute is writable by management applications.
+     *
+     * @param writeable {@code true} if writable
+     */
     public void setWriteable(boolean writeable) {
         this.writeable = writeable;
     }

@@ -34,9 +34,13 @@ import javax.management.NotificationListener;
 
 public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
+    /**
+     * Default constructor.
+     */
+    public BaseNotificationBroadcaster() {
+    }
 
     // ----------------------------------------------------------- Constructors
-
 
     // ----------------------------------------------------- Instance Variables
 

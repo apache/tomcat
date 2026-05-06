@@ -69,10 +69,24 @@ import org.apache.tomcat.util.threads.VirtualThreadExecutor;
  */
 public abstract class AbstractEndpoint<S, U> {
 
+    /**
+     * Construct and return an endpoint.
+     */
+    public AbstractEndpoint() {
+    }
+
     // -------------------------------------------------------------- Constants
 
+    /**
+     * String manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(AbstractEndpoint.class);
 
+    /**
+     * Interface for handlers used by an endpoint.
+     *
+     * @param <S> The type of the socket wrapper
+     */
     public interface Handler<S> {
 
         /**
@@ -81,14 +95,41 @@ public abstract class AbstractEndpoint<S, U> {
         enum SocketState {
             // TODO Add a new state to the AsyncStateMachine and remove
             // ASYNC_END (if possible)
+            /**
+             * The socket is open and ready for processing.
+             */
             OPEN,
+            /**
+             * The socket has been closed.
+             */
             CLOSED,
+            /**
+             * The connection is long-running (e.g., keep-alive).
+             */
             LONG,
+            /**
+             * The asynchronous processing phase has ended.
+             */
             ASYNC_END,
+            /**
+             * Send file processing is in progress.
+             */
             SENDFILE,
+            /**
+             * The connection is being upgraded (e.g., WebSocket upgrade).
+             */
             UPGRADING,
+            /**
+             * The connection has been upgraded.
+             */
             UPGRADED,
+            /**
+             * Asynchronous I/O is in progress.
+             */
             ASYNC_IO,
+            /**
+             * The socket has been suspended.
+             */
             SUSPENDED
         }
 
@@ -144,10 +185,25 @@ public abstract class AbstractEndpoint<S, U> {
         void recycle();
     }
 
+    /**
+     * Enum representing the possible states of the bind operation.
+     */
     protected enum BindState {
+        /**
+         * The endpoint has not been bound to a port.
+         */
         UNBOUND(false, false),
+        /**
+         * The endpoint was bound during initialization.
+         */
         BOUND_ON_INIT(true, true),
+        /**
+         * The endpoint was bound during start.
+         */
         BOUND_ON_START(true, true),
+        /**
+         * The socket was closed on stop (bind on start mode).
+         */
         SOCKET_CLOSED_ON_STOP(false, true);
 
         private final boolean bound;
@@ -158,16 +214,33 @@ public abstract class AbstractEndpoint<S, U> {
             this.wasBound = wasBound;
         }
 
+        /**
+         * Check if the endpoint is currently bound.
+         *
+         * @return True if the endpoint is currently bound
+         */
         public boolean isBound() {
             return bound;
         }
 
+        /**
+         * Check if the endpoint was previously bound.
+         *
+         * @return True if the endpoint was previously bound
+         */
         public boolean wasBound() {
             return wasBound;
         }
     }
 
 
+    /**
+     * Convert a timeout value to a positive timeout suitable for use with socket operations.
+     *
+     * @param timeout The timeout value in milliseconds. If less than or equal to 0, returns {@code Long.MAX_VALUE}.
+     *
+     * @return The timeout value, or {@code Long.MAX_VALUE} if the input is less than or equal to 0
+     */
     public static long toTimeout(long timeout) {
         // Many calls can't do infinite timeout so use Long.MAX_VALUE if timeout is <= 0
         return (timeout > 0) ? timeout : Long.MAX_VALUE;
@@ -202,6 +275,11 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected final SocketProperties socketProperties = new SocketProperties();
 
+    /**
+     * Get the socket properties.
+     *
+     * @return The socket properties
+     */
     public SocketProperties getSocketProperties() {
         return socketProperties;
     }
@@ -216,6 +294,9 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected SynchronizedStack<SocketProcessorBase<S>> processorCache;
 
+    /**
+     * The ObjectName for JMX registration.
+     */
     private ObjectName oname = null;
 
     /**
@@ -236,29 +317,52 @@ public abstract class AbstractEndpoint<S, U> {
 
     private boolean strictSni = true;
 
+    /**
+     * Get the strict SNI check flag.
+     *
+     * @return True if strict SNI checking is enabled
+     */
     public boolean getStrictSni() {
         return strictSni;
     }
 
+    /**
+     * Set the strict SNI check flag.
+     *
+     * @param strictSni True to enable strict SNI checking
+     */
     public void setStrictSni(boolean strictSni) {
         this.strictSni = strictSni;
     }
 
 
+    /**
+     * The host name for the default SSL configuration for this endpoint - always in lower case.
+     */
     private String defaultSSLHostConfigName = SSLHostConfig.DEFAULT_SSL_HOST_NAME;
 
     /**
+     * Get the host name for the default SSL configuration for this endpoint - always in lower case.
+     *
      * @return The host name for the default SSL configuration for this endpoint - always in lower case.
      */
     public String getDefaultSSLHostConfigName() {
         return defaultSSLHostConfigName;
     }
 
+    /**
+     * Set the host name for the default SSL configuration.
+     *
+     * @param defaultSSLHostConfigName The default SSL host configuration name
+     */
     public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
         this.defaultSSLHostConfigName = defaultSSLHostConfigName.toLowerCase(Locale.ENGLISH);
     }
 
 
+    /**
+     * Map of SSL host configurations keyed by host name.
+     */
     protected ConcurrentMap<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
 
     /**
@@ -374,6 +478,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Find all SSL host configurations.
+     *
+     * @return An array of all SSL host configurations
+     */
     public SSLHostConfig[] findSslHostConfigs() {
         return sslHostConfigs.values().toArray(new SSLHostConfig[0]);
     }
@@ -391,6 +500,11 @@ public abstract class AbstractEndpoint<S, U> {
     protected abstract void setDefaultSslHostConfig(SSLHostConfig sslHostConfig);
 
 
+    /**
+     * Log information about the given certificate.
+     *
+     * @param certificate The certificate to log information about
+     */
     protected void logCertificate(SSLHostConfigCertificate certificate) {
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
 
@@ -442,6 +556,13 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Generate debug information about a certificate.
+     *
+     * @param certificate The certificate to generate debug info for
+     *
+     * @return A string containing certificate debug information
+     */
     protected String generateCertificateDebug(X509Certificate certificate) {
         StringBuilder sb = new StringBuilder();
         sb.append("\n[");
@@ -471,6 +592,11 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Destroy the SSL configuration.
+     *
+     * @throws java.lang.Exception If an error occurs while destroying SSL
+     */
     protected void destroySsl() throws Exception {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
@@ -560,10 +686,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private boolean useSendfile = true;
 
+    /**
+     * Get the sendfile flag.
+     *
+     * @return True if sendfile is enabled
+     */
     public boolean getUseSendfile() {
         return useSendfile;
     }
 
+    /**
+     * Set the sendfile flag.
+     *
+     * @param useSendfile True to enable sendfile
+     */
     public void setUseSendfile(boolean useSendfile) {
         this.useSendfile = useSendfile;
     }
@@ -575,10 +711,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private long executorTerminationTimeoutMillis = 5000;
 
+    /**
+     * Get the executor termination timeout.
+     *
+     * @return The executor termination timeout in milliseconds
+     */
     public long getExecutorTerminationTimeoutMillis() {
         return executorTerminationTimeoutMillis;
     }
 
+    /**
+     * Set the executor termination timeout.
+     *
+     * @param executorTerminationTimeoutMillis The timeout in milliseconds
+     */
     public void setExecutorTerminationTimeoutMillis(long executorTerminationTimeoutMillis) {
         this.executorTerminationTimeoutMillis = executorTerminationTimeoutMillis;
     }
@@ -625,17 +771,35 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected int acceptorThreadPriority = Thread.NORM_PRIORITY;
 
+    /**
+     * Set the acceptor thread priority.
+     *
+     * @param acceptorThreadPriority The thread priority
+     */
     public void setAcceptorThreadPriority(int acceptorThreadPriority) {
         this.acceptorThreadPriority = acceptorThreadPriority;
     }
 
+    /**
+     * Get the acceptor thread priority.
+     *
+     * @return The acceptor thread priority
+     */
     public int getAcceptorThreadPriority() {
         return acceptorThreadPriority;
     }
 
 
+    /**
+     * The maximum number of connections.
+     */
     private int maxConnections = 8 * 1024;
 
+    /**
+     * Set the maximum number of connections.
+     *
+     * @param maxCon The maximum number of connections (-1 for unlimited)
+     */
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
         LimitLatch latch = this.connectionLimitLatch;
@@ -651,6 +815,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Get the maximum number of connections.
+     *
+     * @return The maximum number of connections
+     */
     public int getMaxConnections() {
         return this.maxConnections;
     }
@@ -679,22 +848,45 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private Executor executor = null;
 
+    /**
+     * Set the external executor.
+     *
+     * @param executor The external executor (null to use internal executor)
+     */
     public void setExecutor(Executor executor) {
         this.executor = executor;
         this.internalExecutor = (executor == null);
     }
 
+    /**
+     * Get the external executor.
+     *
+     * @return The external executor, or null if none is configured
+     */
     public Executor getExecutor() {
         return executor;
     }
 
 
+    /**
+     * Flag to indicate whether virtual threads should be used.
+     */
     private boolean useVirtualThreads = false;
 
+    /**
+     * Set whether virtual threads should be used.
+     *
+     * @param useVirtualThreads True to use virtual threads
+     */
     public void setUseVirtualThreads(boolean useVirtualThreads) {
         this.useVirtualThreads = useVirtualThreads;
     }
 
+    /**
+     * Get whether virtual threads are enabled.
+     *
+     * @return True if virtual threads are enabled
+     */
     public boolean getUseVirtualThreads() {
         return useVirtualThreads;
     }
@@ -705,10 +897,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private ScheduledExecutorService utilityExecutor = null;
 
+    /**
+     * Set the utility executor.
+     *
+     * @param utilityExecutor The utility executor
+     */
     public void setUtilityExecutor(ScheduledExecutorService utilityExecutor) {
         this.utilityExecutor = utilityExecutor;
     }
 
+    /**
+     * Get the utility executor.
+     *
+     * @return The utility executor
+     */
     public ScheduledExecutorService getUtilityExecutor() {
         if (utilityExecutor == null) {
             getLog().warn(sm.getString("endpoint.warn.noUtilityExecutor"));
@@ -723,10 +925,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int port = -1;
 
+    /**
+     * Get the server socket port.
+     *
+     * @return The server socket port
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Set the server socket port.
+     *
+     * @param port The server socket port
+     */
     public void setPort(int port) {
         this.port = port;
     }
@@ -734,10 +946,20 @@ public abstract class AbstractEndpoint<S, U> {
 
     private int portOffset = 0;
 
+    /**
+     * Get the port offset.
+     *
+     * @return The port offset
+     */
     public int getPortOffset() {
         return portOffset;
     }
 
+    /**
+     * Set the port offset.
+     *
+     * @param portOffset The port offset (must be >= 0)
+     */
     public void setPortOffset(int portOffset) {
         if (portOffset < 0) {
             throw new IllegalArgumentException(
@@ -747,6 +969,11 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Get the port with offset applied.
+     *
+     * @return The port with offset, or the port if port &lt;= 0
+     */
     public int getPortWithOffset() {
         // Zero is a special case and negative values are invalid
         int port = getPort();
@@ -757,6 +984,11 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Get the local port the server socket is bound to.
+     *
+     * @return The local port or -1 if not bound
+     */
     public final int getLocalPort() {
         try {
             InetSocketAddress localAddress = getLocalAddress();
@@ -775,10 +1007,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private InetAddress address;
 
+    /**
+     * Get the bind address.
+     *
+     * @return The bind address
+     */
     public InetAddress getAddress() {
         return address;
     }
 
+    /**
+     * Set the bind address.
+     *
+     * @param address The bind address
+     */
     public void setAddress(InetAddress address) {
         this.address = address;
     }
@@ -803,12 +1045,22 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int acceptCount = 100;
 
+    /**
+     * Set the accept count.
+     *
+     * @param acceptCount The accept count (must be > 0)
+     */
     public void setAcceptCount(int acceptCount) {
         if (acceptCount > 0) {
             this.acceptCount = acceptCount;
         }
     }
 
+    /**
+     * Get the accept count.
+     *
+     * @return The accept count
+     */
     public int getAcceptCount() {
         return acceptCount;
     }
@@ -820,16 +1072,31 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private boolean bindOnInit = true;
 
+    /**
+     * Get the bind on init flag.
+     *
+     * @return True if the endpoint binds on init, false if it binds on start
+     */
     public boolean getBindOnInit() {
         return bindOnInit;
     }
 
+    /**
+     * Set the bind on init flag.
+     *
+     * @param b True to bind on init, false to bind on start
+     */
     public void setBindOnInit(boolean b) {
         this.bindOnInit = b;
     }
 
     private volatile BindState bindState = BindState.UNBOUND;
 
+    /**
+     * Get the current bind state.
+     *
+     * @return The current bind state
+     */
     protected BindState getBindState() {
         return bindState;
     }
@@ -839,6 +1106,11 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private Integer keepAliveTimeout = null;
 
+    /**
+     * Get the keepalive timeout.
+     *
+     * @return The keepalive timeout in milliseconds
+     */
     public int getKeepAliveTimeout() {
         if (keepAliveTimeout == null) {
             return getConnectionTimeout();
@@ -847,6 +1119,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Set the keepalive timeout.
+     *
+     * @param keepAliveTimeout The keepalive timeout in milliseconds
+     */
     public void setKeepAliveTimeout(int keepAliveTimeout) {
         this.keepAliveTimeout = Integer.valueOf(keepAliveTimeout);
     }
@@ -861,6 +1138,11 @@ public abstract class AbstractEndpoint<S, U> {
         return socketProperties.getTcpNoDelay();
     }
 
+    /**
+     * Set the TCP no delay flag.
+     *
+     * @param tcpNoDelay True to enable TCP no delay
+     */
     public void setTcpNoDelay(boolean tcpNoDelay) {
         socketProperties.setTcpNoDelay(tcpNoDelay);
     }
@@ -875,6 +1157,11 @@ public abstract class AbstractEndpoint<S, U> {
         return socketProperties.getSoLingerTime();
     }
 
+    /**
+     * Set the connection linger time.
+     *
+     * @param connectionLinger The socket linger time in seconds
+     */
     public void setConnectionLinger(int connectionLinger) {
         socketProperties.setSoLingerTime(connectionLinger);
         socketProperties.setSoLingerOn(connectionLinger >= 0);
@@ -890,19 +1177,34 @@ public abstract class AbstractEndpoint<S, U> {
         return socketProperties.getSoTimeout();
     }
 
+    /**
+     * Set the connection timeout.
+     *
+     * @param soTimeout The socket timeout in milliseconds
+     */
     public void setConnectionTimeout(int soTimeout) {
         socketProperties.setSoTimeout(soTimeout);
     }
 
     /**
-     * SSL engine.
+     * SSL enabled flag.
      */
     private boolean SSLEnabled = false;
 
+    /**
+     * Check if SSL is enabled.
+     *
+     * @return True if SSL is enabled
+     */
     public boolean isSSLEnabled() {
         return SSLEnabled;
     }
 
+    /**
+     * Set the SSL enabled flag.
+     *
+     * @param SSLEnabled True to enable SSL
+     */
     public void setSSLEnabled(boolean SSLEnabled) {
         this.SSLEnabled = SSLEnabled;
     }
@@ -916,8 +1218,16 @@ public abstract class AbstractEndpoint<S, U> {
      */
     public abstract boolean isAlpnSupported();
 
+    /**
+     * Minimum number of spare threads.
+     */
     private int minSpareThreads = 10;
 
+    /**
+     * Set the minimum number of spare threads.
+     *
+     * @param minSpareThreads The minimum number of spare threads
+     */
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
         Executor executor = this.executor;
@@ -930,6 +1240,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Get the minimum number of spare threads.
+     *
+     * @return The minimum number of spare threads
+     */
     public int getMinSpareThreads() {
         return Math.min(getMinSpareThreadsInternal(), getMaxThreads());
     }
@@ -948,6 +1263,11 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int maxThreads = 200;
 
+    /**
+     * Set the maximum number of worker threads.
+     *
+     * @param maxThreads The maximum number of worker threads
+     */
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         Executor executor = this.executor;
@@ -960,6 +1280,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Get the maximum number of worker threads.
+     *
+     * @return The maximum number of worker threads, or -1 if no internal executor is used
+     */
     public int getMaxThreads() {
         if (internalExecutor) {
             return maxThreads;
@@ -974,10 +1299,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int maxQueueSize = Integer.MAX_VALUE;
 
+    /**
+     * Set the maximum task queue size.
+     *
+     * @param maxQueueSize The maximum queue size
+     */
     public void setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
     }
 
+    /**
+     * Get the maximum queue size.
+     *
+     * @return The maximum queue size
+     */
     public int getMaxQueueSize() {
         if (internalExecutor) {
             return maxQueueSize;
@@ -993,6 +1328,11 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int threadsMaxIdleTime = 60000;
 
+    /**
+     * Set the maximum idle time for threads in the internal thread pool.
+     *
+     * @param threadsMaxIdleTime The maximum idle time in milliseconds
+     */
     public void setThreadsMaxIdleTime(int threadsMaxIdleTime) {
         this.threadsMaxIdleTime = threadsMaxIdleTime;
         Executor executor = this.executor;
@@ -1005,6 +1345,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Get the maximum idle time for threads in the internal thread pool.
+     *
+     * @return The maximum idle time in milliseconds, or -1 if no internal executor is used
+     */
     public int getThreadsMaxIdleTime() {
         if (internalExecutor) {
             return threadsMaxIdleTime;
@@ -1018,11 +1363,21 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected int threadPriority = Thread.NORM_PRIORITY;
 
+    /**
+     * Set the priority of the worker threads.
+     *
+     * @param threadPriority The thread priority
+     */
     public void setThreadPriority(int threadPriority) {
         // Can't change this once the executor has started
         this.threadPriority = threadPriority;
     }
 
+    /**
+     * Get the priority of the worker threads.
+     *
+     * @return The thread priority, or -1 if no internal executor is used
+     */
     public int getThreadPriority() {
         if (internalExecutor) {
             return threadPriority;
@@ -1037,6 +1392,11 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private int maxKeepAliveRequests = 100; // as in Apache HTTPD server
 
+    /**
+     * Get the maximum number of keep alive requests.
+     *
+     * @return The maximum number of keep alive requests
+     */
     public int getMaxKeepAliveRequests() {
         // Disable keep-alive if the server socket is not bound
         if (bindState.isBound()) {
@@ -1046,6 +1406,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Set the maximum number of keep alive requests.
+     *
+     * @param maxKeepAliveRequests The maximum number of keep alive requests
+     */
     public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
         this.maxKeepAliveRequests = maxKeepAliveRequests;
     }
@@ -1056,10 +1421,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private String name = "TP";
 
+    /**
+     * Set the name of the thread pool.
+     *
+     * @param name The name of the thread pool
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Get the name of the thread pool.
+     *
+     * @return The name of the thread pool
+     */
     public String getName() {
         return name;
     }
@@ -1070,10 +1445,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private String domain;
 
+    /**
+     * Set the domain for JMX registration.
+     *
+     * @param domain The JMX domain
+     */
     public void setDomain(String domain) {
         this.domain = domain;
     }
 
+    /**
+     * Get the JMX domain.
+     *
+     * @return The JMX domain, or null if not set
+     */
     public String getDomain() {
         return domain;
     }
@@ -1085,10 +1470,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private boolean daemon = true;
 
+    /**
+     * Set whether the threads should be daemon threads.
+     *
+     * @param b True to use daemon threads
+     */
     public void setDaemon(boolean b) {
         daemon = b;
     }
 
+    /**
+     * Check if the threads are daemon threads.
+     *
+     * @return True if the threads are daemon threads
+     */
     public boolean getDaemon() {
         return daemon;
     }
@@ -1099,10 +1494,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private boolean useAsyncIO = true;
 
+    /**
+     * Set whether asynchronous IO is enabled.
+     *
+     * @param useAsyncIO True to enable asynchronous IO
+     */
     public void setUseAsyncIO(boolean useAsyncIO) {
         this.useAsyncIO = useAsyncIO;
     }
 
+    /**
+     * Check if asynchronous IO is enabled.
+     *
+     * @return True if asynchronous IO is enabled
+     */
     public boolean getUseAsyncIO() {
         return useAsyncIO;
     }
@@ -1122,12 +1527,25 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * List of protocols that can be negotiated (e.g. ALPN).
+     */
     protected final List<String> negotiableProtocols = new ArrayList<>();
 
+    /**
+     * Add a protocol that can be negotiated (e.g. ALPN).
+     *
+     * @param negotiableProtocol The protocol to add
+     */
     public void addNegotiatedProtocol(String negotiableProtocol) {
         negotiableProtocols.add(negotiableProtocol);
     }
 
+    /**
+     * Check if there are any negotiable protocols configured.
+     *
+     * @return True if there are negotiable protocols
+     */
     public boolean hasNegotiableProtocols() {
         return (!negotiableProtocols.isEmpty());
     }
@@ -1138,10 +1556,20 @@ public abstract class AbstractEndpoint<S, U> {
      */
     private Handler<S> handler = null;
 
+    /**
+     * Set the handler for this endpoint.
+     *
+     * @param handler The handler to set
+     */
     public void setHandler(Handler<S> handler) {
         this.handler = handler;
     }
 
+    /**
+     * Get the handler.
+     *
+     * @return The handler
+     */
     public Handler<S> getHandler() {
         return handler;
     }
@@ -1184,6 +1612,14 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Set the specified property.
+     *
+     * @param name The name of the property
+     * @param value The value of the property
+     *
+     * @return True if the property was set successfully
+     */
     public boolean setProperty(String name, String value) {
         setAttribute(name, value);
         final String socketName = "socket.";
@@ -1199,6 +1635,13 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Get the value of the specified property.
+     *
+     * @param name The name of the property
+     *
+     * @return The value of the property, or null if not found
+     */
     public String getProperty(String name) {
         String value = (String) getAttribute(name);
         final String socketName = "socket.";
@@ -1255,15 +1698,28 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Check if the endpoint is running.
+     *
+     * @return True if the endpoint is running
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Check if the endpoint is paused.
+     *
+     * @return True if the endpoint is paused
+     */
     public boolean isPaused() {
         return paused;
     }
 
 
+    /**
+     * Create the internal executor.
+     */
     public void createExecutor() {
         internalExecutor = true;
         if (getUseVirtualThreads()) {
@@ -1278,6 +1734,9 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Shutdown the internal executor.
+     */
     public void shutdownExecutor() {
         Executor executor = this.executor;
         if (executor != null && internalExecutor) {
@@ -1474,6 +1933,14 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Create a socket processor for the given socket wrapper.
+     *
+     * @param socketWrapper The socket wrapper to process
+     * @param event The socket event
+     *
+     * @return The socket processor
+     */
     protected abstract SocketProcessorBase<S> createSocketProcessor(SocketWrapperBase<S> socketWrapper,
             SocketEvent event);
 
@@ -1486,12 +1953,27 @@ public abstract class AbstractEndpoint<S, U> {
      * prevent invalid state transitions.
      */
 
+    /**
+     * Bind the endpoint to its port and address.
+     *
+     * @throws Exception If an error occurs during binding
+     */
     public abstract void bind() throws Exception;
 
     public abstract void unbind() throws Exception;
 
+    /**
+     * Start the endpoint internal components.
+     *
+     * @throws Exception If an error occurs during startup
+     */
     public abstract void startInternal() throws Exception;
 
+    /**
+     * Stop the endpoint internal components.
+     *
+     * @throws Exception If an error occurs during shutdown
+     */
     public abstract void stopInternal() throws Exception;
 
 
@@ -1508,6 +1990,11 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Initialize the endpoint.
+     *
+     * @throws Exception If an error occurs during initialization
+     */
     public final void init() throws Exception {
         if (bindOnInit) {
             bindWithCleanup();
@@ -1578,6 +2065,11 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Start the endpoint.
+     *
+     * @throws Exception If an error occurs during startup
+     */
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
             bindWithCleanup();
@@ -1587,6 +2079,9 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Start the acceptor thread.
+     */
     protected void startAcceptorThread() {
         acceptor = new Acceptor<>(this);
         String threadName = getName() + "-Acceptor";
@@ -1619,6 +2114,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Stop the endpoint.
+     *
+     * @throws Exception If an error occurs during shutdown
+     */
     public final void stop() throws Exception {
         stopInternal();
         if (bindState == BindState.BOUND_ON_START || bindState == BindState.SOCKET_CLOSED_ON_STOP) {
@@ -1627,6 +2127,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Destroy the endpoint and release all resources.
+     *
+     * @throws java.lang.Exception If an error occurs while destroying the endpoint
+     */
     public final void destroy() throws Exception {
         if (bindState == BindState.BOUND_ON_INIT) {
             unbind();
@@ -1641,12 +2146,27 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
+    /**
+     * Get the logger for this endpoint.
+     *
+     * @return The logger
+     */
     protected abstract Log getLog();
 
+    /**
+     * Get the logger for certificate-related messages.
+     *
+     * @return The logger (defaults to {@link #getLog()})
+     */
     protected Log getLogCertificate() {
         return getLog();
     }
 
+    /**
+     * Initialize the connection latch if it has not already been created.
+     *
+     * @return The connection latch, or null if connection counting is disabled
+     */
     protected LimitLatch initializeConnectionLatch() {
         if (maxConnections == -1) {
             return null;
@@ -1665,6 +2185,11 @@ public abstract class AbstractEndpoint<S, U> {
         connectionLimitLatch = null;
     }
 
+    /**
+     * Count up or await a connection slot.
+     *
+     * @throws InterruptedException If thrown during thread interruption
+     */
     protected void countUpOrAwaitConnection() throws InterruptedException {
         if (maxConnections == -1) {
             return;
@@ -1675,6 +2200,11 @@ public abstract class AbstractEndpoint<S, U> {
         }
     }
 
+    /**
+     * Count down a connection.
+     *
+     * @return The number of connections remaining, or -1 if connection counting is disabled
+     */
     protected long countDownConnection() {
         if (maxConnections == -1) {
             return -1;
@@ -1749,8 +2279,22 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected abstract void doCloseServerSocket() throws IOException;
 
+    /**
+     * Accept a connection from the server socket.
+     *
+     * @return The accepted socket
+     *
+     * @throws Exception If an error occurs during accept
+     */
     protected abstract U serverSocketAccept() throws Exception;
 
+    /**
+     * Set the socket options for the given accepted socket.
+     *
+     * @param socket The accepted socket
+     *
+     * @return True if the socket options were set successfully
+     */
     protected abstract boolean setSocketOptions(U socket);
 
     /**

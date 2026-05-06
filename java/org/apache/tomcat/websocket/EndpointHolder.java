@@ -23,6 +23,9 @@ import javax.websocket.Endpoint;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Holds a reference to a WebSocket endpoint instance.
+ */
 public class EndpointHolder implements ClientEndpointHolder {
 
     private static final StringManager sm = StringManager.getManager(EndpointHolder.class);
@@ -30,6 +33,11 @@ public class EndpointHolder implements ClientEndpointHolder {
     private final Endpoint endpoint;
 
 
+    /**
+     * Creates a new holder for the specified endpoint instance.
+     *
+     * @param endpoint The endpoint instance to hold
+     */
     public EndpointHolder(Endpoint endpoint) {
         this.endpoint = endpoint;
     }

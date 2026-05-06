@@ -36,6 +36,11 @@ import java.sql.SQLException;
  * <code>true</code> argument.
  */
 public class DisposableConnectionFacade extends JdbcInterceptor {
+    /**
+     * Construct a DisposableConnectionFacade that wraps the given interceptor.
+     *
+     * @param interceptor The next interceptor in the chain
+     */
     protected DisposableConnectionFacade(JdbcInterceptor interceptor) {
         setUseEquals(interceptor.isUseEquals());
         setNext(interceptor);

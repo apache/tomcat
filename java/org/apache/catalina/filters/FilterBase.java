@@ -27,12 +27,27 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for filters that provides generic initialisation and a simple no-op destruction.
- */
+     * Base class for filters that provides generic initialisation and a simple no-op destruction.
+     */
 public abstract class FilterBase implements Filter {
 
+    /**
+     * Default constructor for FilterBase.
+     */
+    public FilterBase() {
+        // Default constructor
+    }
+
+    /**
+     * StringManager for internationalized strings.
+     */
     protected static final StringManager sm = StringManager.getManager(FilterBase.class);
 
+    /**
+     * Returns the logger for this filter.
+     *
+     * @return the logger
+     */
     protected abstract Log getLogger();
 
 

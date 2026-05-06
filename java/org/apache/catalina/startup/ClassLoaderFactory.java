@@ -48,8 +48,14 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class ClassLoaderFactory {
 
-
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
+
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private ClassLoaderFactory() {
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -287,13 +293,31 @@ public final class ClassLoaderFactory {
     }
 
 
+    /**
+     * Defines the types of repositories that can be used with a class loader.
+     */
     public enum RepositoryType {
+        /**
+         * Repository is a directory.
+         */
         DIR,
+        /**
+         * Repository is a glob pattern directory.
+         */
         GLOB,
+        /**
+         * Repository is a JAR file.
+         */
         JAR,
+        /**
+         * Repository is a URL.
+         */
         URL
     }
 
+    /**
+     * Represents a repository location and its type.
+     */
     public static class Repository {
         private final String location;
         private final RepositoryType type;

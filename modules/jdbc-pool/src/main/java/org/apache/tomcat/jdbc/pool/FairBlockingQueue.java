@@ -413,15 +413,33 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Non cancellable Future used to check and see if a connection has been made available
     //------------------------------------------------------------------
+    /**
+     * A non-cancellable future used to check if a connection has been made available.
+     *
+     * @param <T> the type of the item
+     */
     protected class ItemFuture<T> implements Future<T> {
+        /** The item directly available in the future. */
         protected volatile T item = null;
+        /** The latch used to wait for an item. */
         protected volatile ExchangeCountDownLatch<T> latch = null;
+        /** Whether this future has been cancelled. */
         protected volatile boolean canceled = false;
 
+        /**
+         * Creates an ItemFuture with the given item already available.
+         *
+         * @param item the item
+         */
         public ItemFuture(T item) {
             this.item = item;
         }
 
+        /**
+         * Creates an ItemFuture that waits on the given latch.
+         *
+         * @param latch the latch to wait on
+         */
         public ItemFuture(ExchangeCountDownLatch<T> latch) {
             this.latch = latch;
         }
@@ -474,14 +492,35 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Count down latch that can be used to exchange information
     //------------------------------------------------------------------
+    /**
+     * A count down latch that can be used to exchange information.
+     *
+     * @param <T> the type of the item to exchange
+     */
     protected class ExchangeCountDownLatch<T> extends CountDownLatch {
+        /** The item to exchange. */
         protected volatile T item;
+        /**
+         * Creates a new ExchangeCountDownLatch with the given count.
+         *
+         * @param i the count
+         */
         public ExchangeCountDownLatch(int i) {
             super(i);
         }
+        /**
+         * Returns the exchanged item.
+         *
+         * @return the item
+         */
         public T getItem() {
             return item;
         }
+        /**
+         * Sets the item to be exchanged.
+         *
+         * @param item the item
+         */
         public void setItem(T item) {
             this.item = item;
         }
@@ -490,11 +529,17 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Iterator safe from concurrent modification exceptions
     //------------------------------------------------------------------
+    /**
+     * Iterator safe from concurrent modification exceptions.
+     */
     protected class FairIterator implements Iterator<E> {
         E[] elements = null;
         int index;
         E element = null;
 
+        /**
+         * Creates a new FairIterator with a snapshot of the current queue contents.
+         */
         @SuppressWarnings("unchecked") // Can't create arrays of generic types
         public FairIterator() {
             final ReentrantLock lock = FairBlockingQueue.this.lock;

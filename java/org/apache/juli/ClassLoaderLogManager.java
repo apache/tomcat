@@ -52,6 +52,9 @@ public class ClassLoaderLogManager extends LogManager {
 
     private static ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
+    /**
+     * System property name used to enable debug output.
+     */
     public static final String DEBUG_PROPERTY = ClassLoaderLogManager.class.getName() + ".debug";
 
     static {
@@ -78,6 +81,9 @@ public class ClassLoaderLogManager extends LogManager {
 
     // ------------------------------------------------------------Constructors
 
+    /**
+     * Creates a new ClassLoaderLogManager instance and registers a shutdown hook.
+     */
     public ClassLoaderLogManager() {
         super();
         try {
@@ -115,11 +121,21 @@ public class ClassLoaderLogManager extends LogManager {
     // ------------------------------------------------------------- Properties
 
 
+    /**
+     * Returns whether the shutdown hook is used to perform clean-up on JVM shutdown.
+     *
+     * @return {@code true} if the shutdown hook is enabled
+     */
     public boolean isUseShutdownHook() {
         return useShutdownHook;
     }
 
 
+    /**
+     * Sets whether the shutdown hook is used to perform clean-up on JVM shutdown.
+     *
+     * @param useShutdownHook {@code true} to enable the shutdown hook
+     */
     public void setUseShutdownHook(boolean useShutdownHook) {
         this.useShutdownHook = useShutdownHook;
     }
@@ -678,11 +694,23 @@ public class ClassLoaderLogManager extends LogManager {
 
     // ---------------------------------------------------- LogNode Inner Class
 
+    /**
+     * Represents a node in the logger hierarchy tree.
+     */
     protected static final class LogNode {
+        /**
+         * The logger associated with this node.
+         */
         Logger logger;
 
+        /**
+         * Child nodes in the hierarchy.
+         */
         final Map<String,LogNode> children = new HashMap<>();
 
+        /**
+         * Parent node in the hierarchy.
+         */
         final LogNode parent;
 
         LogNode(final LogNode parent, final Logger logger) {
@@ -745,6 +773,9 @@ public class ClassLoaderLogManager extends LogManager {
     // -------------------------------------------- ClassLoaderInfo Inner Class
 
 
+    /**
+     * Holds the logging configuration information for a specific class loader.
+     */
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
         final Map<String,Logger> loggers = new ConcurrentHashMap<>();
@@ -765,6 +796,9 @@ public class ClassLoaderLogManager extends LogManager {
      * This class is needed to instantiate the root of each per classloader hierarchy.
      */
     protected static class RootLogger extends Logger {
+        /**
+         * Creates a new root logger with an empty name and no parent.
+         */
         public RootLogger() {
             super("", null);
         }

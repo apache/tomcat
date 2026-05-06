@@ -16,12 +16,34 @@
  */
 package org.apache.tomcat.buildutil.translate;
 
+/**
+ * Constants for the translation build utility.
+ */
 public class Constants {
 
+    /**
+     * Prefix for localization string files.
+     */
     public static final String L10N_PREFIX = "LocalStrings";
+    /**
+     * Suffix for localization properties files.
+     */
     public static final String L10N_SUFFIX = ".properties";
 
+    /**
+     * Directory for storing translation settings.
+     */
     public static final String STORAGE_DIR = ".settings/translations";
 
+    /**
+     * Marker to indicate the end of a package.
+     */
     public static final String END_PACKAGE_MARKER = ".zzz.";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

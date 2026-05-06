@@ -35,6 +35,9 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new instance of an HTTP JSP servlet.
+     */
     protected HttpJspBase() {
     }
 
@@ -66,6 +69,9 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     public void jspInit() {
     }
 
+    /**
+     * Sub-classes may override this method to perform initialization. Called from {@link #init(jakarta.servlet.ServletConfig)}.
+     */
     public void _jspInit() {
     }
 
@@ -73,6 +79,9 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     public void jspDestroy() {
     }
 
+    /**
+     * Sub-classes may override this method to perform cleanup. Called from {@link #destroy()}.
+     */
     protected void _jspDestroy() {
     }
 

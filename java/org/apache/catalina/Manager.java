@@ -56,6 +56,8 @@ public interface Manager {
 
 
     /**
+     * Returns the session id generator for this manager.
+     *
      * @return the session id generator
      */
     SessionIdGenerator getSessionIdGenerator();

@@ -23,6 +23,9 @@ import java.util.Locale;
  * take place.
  */
 public final class ContextName {
+    /**
+     * The name used for the root context.
+     */
     public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
     private static final char FWD_SLASH_REPLACEMENT = '#';
@@ -133,22 +136,47 @@ public final class ContextName {
         this.baseName = tmp.toString();
     }
 
+    /**
+     * Returns the base name of this context.
+     *
+     * @return the base name
+     */
     public String getBaseName() {
         return baseName;
     }
 
+    /**
+     * Returns the path of this context.
+     *
+     * @return the context path
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Returns the version of this context.
+     *
+     * @return the context version
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Returns the name of this context.
+     *
+     * @return the context name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the display name of this context.
+     *
+     * @return the display name
+     */
     public String getDisplayName() {
         StringBuilder tmp = new StringBuilder();
         if ("".equals(path)) {

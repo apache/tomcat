@@ -83,11 +83,20 @@ public final class FileStore extends StoreBase {
      */
     private static final String threadName = "FileStore";
 
+    /**
+     * Default constructor for FileStore.
+     */
+    public FileStore() {
+        // Default constructor
+    }
+
 
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return The directory path for this Store.
+     * Returns the directory path where session files are stored.
+     *
+     * @return The directory path for this Store
      */
     public String getDirectory() {
         return directory;
@@ -108,7 +117,9 @@ public final class FileStore extends StoreBase {
 
 
     /**
-     * @return The thread name for this Store.
+     * Returns the name used for the background thread that processes this store.
+     *
+     * @return The thread name for this Store
      */
     public String getThreadName() {
         return threadName;

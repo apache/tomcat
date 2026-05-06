@@ -415,6 +415,12 @@ import org.apache.tomcat.util.http.Method;
 public class ExpiresFilter extends FilterBase {
 
     /**
+     * Creates a new ExpiresFilter instance.
+     */
+    public ExpiresFilter() {
+    }
+
+    /**
      * Duration composed of an {@link #amount} and a {@link #unit}
      */
     protected static class Duration {
@@ -429,10 +435,20 @@ public class ExpiresFilter extends FilterBase {
             this.unit = unit;
         }
 
+        /**
+         * Returns the magnitude of this duration.
+         *
+         * @return the amount
+         */
         public int getAmount() {
             return amount;
         }
 
+        /**
+         * Returns the unit of this duration.
+         *
+         * @return the unit
+         */
         public DurationUnit getUnit() {
             return unit;
         }
@@ -447,12 +463,19 @@ public class ExpiresFilter extends FilterBase {
      * Duration unit
      */
     public enum DurationUnit {
+        /** Day duration unit. */
         DAY(Calendar.DAY_OF_YEAR),
+        /** Hour duration unit. */
         HOUR(Calendar.HOUR),
+        /** Minute duration unit. */
         MINUTE(Calendar.MINUTE),
+        /** Month duration unit. */
         MONTH(Calendar.MONTH),
+        /** Second duration unit. */
         SECOND(Calendar.SECOND),
+        /** Week duration unit. */
         WEEK(Calendar.WEEK_OF_YEAR),
+        /** Year duration unit. */
         YEAR(Calendar.YEAR);
 
         private final int calendarField;
@@ -461,6 +484,11 @@ public class ExpiresFilter extends FilterBase {
             this.calendarField = calendarField;
         }
 
+        /**
+         * Returns the calendar field corresponding to this duration unit.
+         *
+         * @return the calendar field value
+         */
         public int getCalendardField() {
             return calendarField;
         }
@@ -492,10 +520,20 @@ public class ExpiresFilter extends FilterBase {
             this.durations = durations;
         }
 
+        /**
+         * Returns the list of durations for this configuration.
+         *
+         * @return the list of durations
+         */
         public List<Duration> getDurations() {
             return durations;
         }
 
+        /**
+         * Returns the starting point for this configuration.
+         *
+         * @return the starting point
+         */
         public StartingPoint getStartingPoint() {
             return startingPoint;
         }
@@ -512,7 +550,9 @@ public class ExpiresFilter extends FilterBase {
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
     public enum StartingPoint {
+        /** Expiration relative to the access time. */
         ACCESS_TIME,
+        /** Expiration relative to the last modification time. */
         LAST_MODIFICATION_TIME
     }
 
@@ -552,6 +592,12 @@ public class ExpiresFilter extends FilterBase {
          */
         private boolean writeResponseBodyStarted;
 
+        /**
+         * Creates a new XHttpServletResponse wrapping the given response.
+         *
+         * @param request  the HTTP servlet request
+         * @param response the HTTP servlet response to wrap
+         */
         public XHttpServletResponse(HttpServletRequest request, HttpServletResponse response) {
             super(response);
             this.request = request;
@@ -578,10 +624,20 @@ public class ExpiresFilter extends FilterBase {
             }
         }
 
+        /**
+         * Returns the Cache-Control header value.
+         *
+         * @return the Cache-Control header value, or {@code null} if not set
+         */
         public String getCacheControlHeader() {
             return cacheControlHeader;
         }
 
+        /**
+         * Returns the Last-Modified header value as a timestamp.
+         *
+         * @return the Last-Modified header timestamp
+         */
         public long getLastModifiedHeader() {
             return lastModifiedHeader;
         }
@@ -602,10 +658,20 @@ public class ExpiresFilter extends FilterBase {
             return printWriter;
         }
 
+        /**
+         * Checks if the Last-Modified header has been set.
+         *
+         * @return {@code true} if the Last-Modified header has been set
+         */
         public boolean isLastModifiedHeaderSet() {
             return lastModifiedHeaderSet;
         }
 
+        /**
+         * Checks if writing the response body has started.
+         *
+         * @return {@code true} if writing the response body has started
+         */
         public boolean isWriteResponseBodyStarted() {
             return writeResponseBodyStarted;
         }
@@ -635,6 +701,11 @@ public class ExpiresFilter extends FilterBase {
             }
         }
 
+        /**
+         * Sets whether writing the response body has started.
+         *
+         * @param writeResponseBodyStarted {@code true} if writing has started
+         */
         public void setWriteResponseBodyStarted(boolean writeResponseBodyStarted) {
             this.writeResponseBodyStarted = writeResponseBodyStarted;
         }
@@ -650,6 +721,13 @@ public class ExpiresFilter extends FilterBase {
 
         private final XHttpServletResponse response;
 
+        /**
+         * Creates a new XPrintWriter wrapping the given writer.
+         *
+         * @param out      the PrintWriter to wrap
+         * @param request  the HTTP servlet request
+         * @param response the wrapped HTTP servlet response
+         */
         public XPrintWriter(PrintWriter out, HttpServletRequest request, XHttpServletResponse response) {
             super(out);
             this.out = out;
@@ -863,6 +941,13 @@ public class ExpiresFilter extends FilterBase {
 
         private final ServletOutputStream servletOutputStream;
 
+        /**
+         * Creates a new XServletOutputStream wrapping the given stream.
+         *
+         * @param servletOutputStream the ServletOutputStream to wrap
+         * @param request             the HTTP servlet request
+         * @param response            the wrapped HTTP servlet response
+         */
         public XServletOutputStream(ServletOutputStream servletOutputStream, HttpServletRequest request,
                 XHttpServletResponse response) {
             super();
@@ -1104,28 +1189,34 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
+     * Checks if the given string is null or empty.
+     *
      * @param str The String to check
      *
-     * @return {@code true} if the given {@code str} is {@code null} or has a zero characters length.
+     * @return {@code true} if the given {@code str} is {@code null} or has a zero characters length
      */
     protected static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
 
     /**
+     * Checks if the given string is not null and not empty.
+     *
      * @param str The String to check
      *
-     * @return {@code true} if the given {@code str} has at least one character (can be a whitespace).
+     * @return {@code true} if the given {@code str} has at least one character (can be a whitespace)
      */
     protected static boolean isNotEmpty(String str) {
         return !isEmpty(str);
     }
 
     /**
-     * @return {@code true} if the given {@code string} starts with the given {@code prefix} ignoring case.
+     * Checks if the given string starts with the given prefix, ignoring case.
      *
      * @param string can be {@code null}
      * @param prefix can be {@code null}
+     *
+     * @return {@code true} if the given {@code string} starts with the given {@code prefix} ignoring case
      */
     protected static boolean startsWithIgnoreCase(String string, String prefix) {
         if (string == null || prefix == null) {
@@ -1139,12 +1230,14 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * @return the subset of the given {@code str} that is before the first occurrence of the given {@code separator}.
-     *             Return {@code null} if the given {@code str} or the given {@code separator} is null. Return and empty
-     *             string if the {@code separator} is empty.
+     * Returns the subset of the given string that is before the first occurrence of the given separator.
+     * Returns {@code null} if the given {@code str} or the given {@code separator} is null. Returns an empty
+     * string if the {@code separator} is empty.
      *
      * @param str       can be {@code null}
      * @param separator can be {@code null}
+     *
+     * @return the subset before the separator, or {@code null} if either argument is null
      */
     protected static String substringBefore(String str, String separator) {
         if (str == null || str.isEmpty() || separator == null) {
@@ -1203,14 +1296,29 @@ public class ExpiresFilter extends FilterBase {
         }
     }
 
+    /**
+     * Returns the default expiration configuration.
+     *
+     * @return the default expiration configuration, or {@code null} if none
+     */
     public ExpiresConfiguration getDefaultExpiresConfiguration() {
         return defaultExpiresConfiguration;
     }
 
+    /**
+     * Returns the excluded response status codes as a comma-delimited string.
+     *
+     * @return the excluded status codes
+     */
     public String getExcludedResponseStatusCodes() {
         return intsToCommaDelimitedString(excludedResponseStatusCodes);
     }
 
+    /**
+     * Returns the excluded response status codes as an integer array.
+     *
+     * @return the excluded status codes as integers
+     */
     public int[] getExcludedResponseStatusCodesAsInts() {
         return excludedResponseStatusCodes;
     }
@@ -1372,6 +1480,11 @@ public class ExpiresFilter extends FilterBase {
         return calendar.getTime();
     }
 
+    /**
+     * Returns the map of expiration configurations by content type.
+     *
+     * @return the map of content type to expiration configuration
+     */
     public Map<String,ExpiresConfiguration> getExpiresConfigurationByContentType() {
         return expiresConfigurationByContentType;
     }
@@ -1610,14 +1723,29 @@ public class ExpiresFilter extends FilterBase {
         return new ExpiresConfiguration(startingPoint, durations);
     }
 
+    /**
+     * Sets the default expiration configuration.
+     *
+     * @param defaultExpiresConfiguration The default expiration configuration
+     */
     public void setDefaultExpiresConfiguration(ExpiresConfiguration defaultExpiresConfiguration) {
         this.defaultExpiresConfiguration = defaultExpiresConfiguration;
     }
 
+    /**
+     * Sets the excluded response status codes.
+     *
+     * @param excludedResponseStatusCodes The status codes to exclude
+     */
     public void setExcludedResponseStatusCodes(int[] excludedResponseStatusCodes) {
         this.excludedResponseStatusCodes = excludedResponseStatusCodes;
     }
 
+    /**
+     * Sets the expiration configurations by content type.
+     *
+     * @param expiresConfigurationByContentType The map of content type to expiration configuration
+     */
     public void setExpiresConfigurationByContentType(
             Map<String,ExpiresConfiguration> expiresConfigurationByContentType) {
         this.expiresConfigurationByContentType = expiresConfigurationByContentType;

@@ -27,6 +27,12 @@ import org.apache.tomcat.JarScanner;
 public class JarScannerSF extends StoreFactoryBase {
 
     /**
+     * Constructs a new JarScannerSF.
+     */
+    public JarScannerSF() {
+    }
+
+    /**
      * Store the specified JarScanner properties and children (JarScannerFilter)
      * <p>
      * {@inheritDoc}

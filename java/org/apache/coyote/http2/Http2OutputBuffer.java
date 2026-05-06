@@ -24,6 +24,10 @@ import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http2.Stream.StreamOutputBuffer;
 
+/**
+ * HTTP/2 output buffer that wraps a chain of {@link OutputFilter} instances and delegates to a
+ * {@link StreamOutputBuffer}.
+ */
 public class Http2OutputBuffer implements HttpOutputBuffer {
 
     private final Response coyoteResponse;
@@ -43,6 +47,12 @@ public class Http2OutputBuffer implements HttpOutputBuffer {
     }
 
 
+    /**
+     * Creates the output buffer.
+     *
+     * @param coyoteResponse       The Coyote response
+     * @param streamOutputBuffer   The underlying stream output buffer
+     */
     public Http2OutputBuffer(Response coyoteResponse, StreamOutputBuffer streamOutputBuffer) {
         this.coyoteResponse = coyoteResponse;
         this.next = streamOutputBuffer;

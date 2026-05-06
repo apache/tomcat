@@ -205,12 +205,23 @@ public final class EmbeddedServletOptions implements Options {
         return settings.getProperty(name);
     }
 
+    /**
+     * Sets the value of the named property in the underlying settings.
+     *
+     * @param name the property name
+     * @param value the property value
+     */
     public void setProperty(String name, String value) {
         if (name != null && value != null) {
             settings.setProperty(name, value);
         }
     }
 
+    /**
+     * Sets whether quoting rules from JSP.1.6 are applied to EL expressions in attributes.
+     *
+     * @param b {@code true} to enable quoting rules
+     */
     public void setQuoteAttributeEL(boolean b) {
         this.quoteAttributeEL = b;
     }
@@ -331,6 +342,11 @@ public final class EmbeddedServletOptions implements Options {
         return errorOnUseBeanInvalidClassAttribute;
     }
 
+    /**
+     * Sets whether to error on invalid class attribute in jsp:useBean.
+     *
+     * @param b {@code true} to enable error checking
+     */
     public void setErrorOnUseBeanInvalidClassAttribute(boolean b) {
         errorOnUseBeanInvalidClassAttribute = b;
     }
@@ -340,6 +356,11 @@ public final class EmbeddedServletOptions implements Options {
         return tldCache;
     }
 
+    /**
+     * Sets the TLD cache instance.
+     *
+     * @param tldCache the TLD cache to use
+     */
     public void setTldCache(TldCache tldCache) {
         this.tldCache = tldCache;
     }

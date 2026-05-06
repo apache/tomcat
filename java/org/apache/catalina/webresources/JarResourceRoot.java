@@ -29,6 +29,9 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Represents a JAR file as a resource root within a web application.
+ */
 public class JarResourceRoot extends AbstractResource {
 
     private static final Log log = LogFactory.getLog(JarResourceRoot.class);
@@ -37,6 +40,14 @@ public class JarResourceRoot extends AbstractResource {
     private final String baseUrl;
     private final String name;
 
+    /**
+     * Constructs a new JarResourceRoot.
+     *
+     * @param root the resource root
+     * @param base the base file
+     * @param baseUrl the base URL
+     * @param webAppPath the web application path
+     */
     public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath) {
         super(root, webAppPath);
         // Validate the webAppPath before going any further

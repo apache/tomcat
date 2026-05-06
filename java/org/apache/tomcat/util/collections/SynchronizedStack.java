@@ -54,6 +54,13 @@ public class SynchronizedStack<T> {
     }
 
 
+    /**
+     * Pushes an object onto the stack.
+     *
+     * @param obj The object to push
+     *
+     * @return {@code true} if the object was pushed, {@code false} if the stack is full
+     */
     public synchronized boolean push(T obj) {
         index++;
         if (index == size) {
@@ -68,6 +75,11 @@ public class SynchronizedStack<T> {
         return true;
     }
 
+    /**
+     * Pops an object from the stack.
+     *
+     * @return the object at the top of the stack, or {@code null} if the stack is empty
+     */
     @SuppressWarnings("unchecked")
     public synchronized T pop() {
         if (index == -1) {
@@ -78,6 +90,9 @@ public class SynchronizedStack<T> {
         return result;
     }
 
+    /**
+     * Clears all objects from the stack.
+     */
     public synchronized void clear() {
         if (index > -1) {
             for (int i = 0; i < index + 1; i++) {

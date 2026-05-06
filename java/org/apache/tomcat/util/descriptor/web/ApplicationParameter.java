@@ -28,6 +28,12 @@ public class ApplicationParameter implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs a new ApplicationParameter.
+     */
+    public ApplicationParameter() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -36,10 +42,20 @@ public class ApplicationParameter implements Serializable {
      */
     private String description = null;
 
+    /**
+     * Returns the description of this parameter.
+     *
+     * @return the description of this parameter
+     */
     public String getDescription() {
         return this.description;
     }
 
+    /**
+     * Sets the description of this parameter.
+     *
+     * @param description the description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
@@ -50,10 +66,20 @@ public class ApplicationParameter implements Serializable {
      */
     private String name = null;
 
+    /**
+     * Returns the name of this parameter.
+     *
+     * @return the name of this parameter
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Sets the name of this parameter.
+     *
+     * @param name the name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -64,10 +90,20 @@ public class ApplicationParameter implements Serializable {
      */
     private boolean override = true;
 
+    /**
+     * Returns whether overrides are allowed.
+     *
+     * @return whether overrides are allowed
+     */
     public boolean getOverride() {
         return this.override;
     }
 
+    /**
+     * Sets whether overrides are allowed.
+     *
+     * @param override whether overrides are allowed
+     */
     public void setOverride(boolean override) {
         this.override = override;
     }
@@ -78,10 +114,20 @@ public class ApplicationParameter implements Serializable {
      */
     private String value = null;
 
+    /**
+     * Returns the value of this parameter.
+     *
+     * @return the value of this parameter
+     */
     public String getValue() {
         return this.value;
     }
 
+    /**
+     * Sets the value of this parameter.
+     *
+     * @param value the value
+     */
     public void setValue(String value) {
         this.value = value;
     }

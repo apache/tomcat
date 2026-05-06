@@ -43,14 +43,28 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 public class DataSourceProxy implements PoolConfiguration {
     private static final Log log = LogFactory.getLog(DataSourceProxy.class);
 
+    /**
+     * The underlying connection pool.
+     */
     protected volatile ConnectionPool pool = null;
 
+    /**
+     * The pool configuration properties.
+     */
     protected volatile PoolConfiguration poolProperties = null;
 
+    /**
+     * Construct a DataSourceProxy with default pool properties.
+     */
     public DataSourceProxy() {
         this(new PoolProperties());
     }
 
+    /**
+     * Construct a DataSourceProxy with the given pool configuration.
+     *
+     * @param poolProperties The pool configuration properties
+     */
     public DataSourceProxy(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
           throw new NullPointerException("PoolConfiguration cannot be null.");
@@ -59,6 +73,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+   /**
+     * Check if this proxy wraps an instance of the given interface.
+     * This implementation always returns false.
+     *
+     * @param iface The interface to check
+     * @return false
+     * @throws SQLException never thrown
+     */
     @SuppressWarnings("unused") // Has to match signature in DataSource
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         // we are not a wrapper of anything
@@ -66,6 +88,15 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+   /**
+      * Unwrap the proxy to the given interface.
+      * This implementation always returns null.
+      *
+      * @param <T> The interface type
+      * @param iface The interface to unwrap to
+      * @return null
+      * @throws SQLException never thrown
+      */
     @SuppressWarnings("unused") // Has to match signature in DataSource
     public <T> T unwrap(Class<T> iface) throws SQLException {
         //we can't unwrap anything
@@ -91,6 +122,11 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
+   /**
+     * Return the pool configuration properties.
+     *
+     * @return the pool configuration
+     */
     public PoolConfiguration getPoolProperties() {
         return poolProperties;
     }
@@ -211,6 +247,11 @@ public class DataSourceProxy implements PoolConfiguration {
         return (javax.sql.PooledConnection) getConnection();
     }
 
+   /**
+     * Return the underlying connection pool, creating it if necessary.
+     *
+     * @return the connection pool or null if creation failed
+     */
     public ConnectionPool getPool() {
         try {
             return createPool();
@@ -221,9 +262,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+   /**
+     * Close the connection pool, returning connections to the database.
+     */
     public void close() {
         close(false);
     }
+    /**
+     * Close the connection pool.
+     *
+     * @param all if true close all connections, otherwise only idle ones
+     */
     public void close(boolean all) {
         try {
             if (pool != null) {
@@ -238,6 +287,11 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
+   /**
+     * Return the current number of connections in the pool.
+     *
+     * @return the pool size
+     */
     public int getPoolSize() {
         final ConnectionPool p = pool;
         if (p == null) {
@@ -265,6 +319,11 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+   /**
+     * Set the pool configuration properties directly.
+     *
+     * @param poolProperties The new pool configuration
+     */
     public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;
     }
@@ -598,6 +657,8 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
+     * Returns the number of connections currently in use by the application.
+     *
      * @return number of connections in use by the application
      */
     public int getActive() {
@@ -609,15 +670,16 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * @return number of connections in use by the application
-     * {@link DataSource#getActive()}
+     * Returns the number of connections currently in use by the application.
+     * @return number of active connections
      */
     public int getNumActive() {
         return getActive();
     }
 
     /**
-     * @return number of threads waiting for a connection
+     * Returns the number of threads currently waiting for a connection from the pool.
+     * @return number of waiting threads
      */
     public int getWaitCount() {
         try {
@@ -628,7 +690,8 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * @return the current size of the pool
+     * Returns the current total number of connections in the pool.
+     * @return current pool size
      */
     public int getSize() {
         try {
@@ -1160,6 +1223,9 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setUseStatementFacade(useStatementFacade);
     }
 
+   /**
+     * Purge all connections from the pool.
+     */
     public void purge()  {
         try {
             createPool().purge();
@@ -1168,6 +1234,9 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
+   /**
+     * Enable purging of connections on return to the pool.
+     */
     public void purgeOnReturn() {
         try {
             createPool().purgeOnReturn();

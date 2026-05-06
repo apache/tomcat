@@ -22,11 +22,26 @@ import javax.el.FunctionMapper;
 
 import org.apache.el.util.MessageFactory;
 
+/**
+ * Factory that wraps a target FunctionMapper, capturing all function mappings
+ * so that an immutable snapshot can be created.
+ */
 public class FunctionMapperFactory extends FunctionMapper {
 
+    /**
+     * The memento that stores captured function mappings.
+     */
     protected FunctionMapperImpl memento = null;
+    /**
+     * The target function mapper being wrapped.
+     */
     protected final FunctionMapper target;
 
+    /**
+     * Creates a new factory wrapping the given function mapper.
+     *
+     * @param mapper The target function mapper to wrap
+     */
     public FunctionMapperFactory(FunctionMapper mapper) {
         if (mapper == null) {
             throw new NullPointerException(MessageFactory.get("error.noFunctionMapperTarget"));
@@ -57,6 +72,11 @@ public class FunctionMapperFactory extends FunctionMapper {
     }
 
 
+    /**
+     * Creates an immutable snapshot of all function mappings captured so far.
+     *
+     * @return The captured function mappings as a FunctionMapper
+     */
     public FunctionMapper create() {
         return this.memento;
     }

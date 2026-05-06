@@ -89,6 +89,16 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     private final PageContext rootJspCtxt;
 
+    /**
+     * Creates a new JspContextWrapper instance.
+     *
+     * @param jspTag the JSP tag
+     * @param jspContext the invoking JSP context
+     * @param nestedVars the list of NESTED scripting variables
+     * @param atBeginVars the list of AT_BEGIN scripting variables
+     * @param atEndVars the list of AT_END scripting variables
+     * @param aliases the variable name aliases
+     */
     public JspContextWrapper(JspTag jspTag, JspContext jspContext, ArrayList<String> nestedVars,
             ArrayList<String> atBeginVars, ArrayList<String> atEndVars, Map<String,String> aliases) {
         this.jspTag = jspTag;

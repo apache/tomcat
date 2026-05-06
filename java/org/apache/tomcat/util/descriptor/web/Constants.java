@@ -16,10 +16,19 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+/**
+ * Constants for web descriptor utilities.
+ */
 public class Constants {
 
+    /**
+     * Package name for web descriptor utilities.
+     */
     public static final String PACKAGE_NAME = Constants.class.getPackage().getName();
 
+    /**
+     * Default location of the web.xml deployment descriptor.
+     */
     public static final String WEB_XML_LOCATION = "/WEB-INF/web.xml";
 
 }

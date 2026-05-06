@@ -49,7 +49,19 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * HTTP/2 protocol handler. Implements the {@link UpgradeProtocol} interface to allow HTTP/2 to be used as an
+ * upgrade from HTTP/1.1 or via ALPN.
+ */
 public class Http2Protocol implements UpgradeProtocol {
+
+    /**
+     * Creates a new instance of the HTTP/2 protocol handler.
+     */
+    public Http2Protocol() {
+        super();
+    }
+
 
     private static final Log log = LogFactory.getLog(Http2Protocol.class);
     private static final StringManager sm = StringManager.getManager(Http2Protocol.class);
@@ -196,91 +208,181 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Returns the read timeout in milliseconds.
+     *
+     * @return the read timeout
+     */
     public long getReadTimeout() {
         return readTimeout;
     }
 
 
+    /**
+     * Sets the read timeout in milliseconds.
+     *
+     * @param readTimeout the read timeout
+     */
     public void setReadTimeout(long readTimeout) {
         this.readTimeout = readTimeout;
     }
 
 
+    /**
+     * Returns the write timeout in milliseconds.
+     *
+     * @return the write timeout
+     */
     public long getWriteTimeout() {
         return writeTimeout;
     }
 
 
+    /**
+     * Sets the write timeout in milliseconds.
+     *
+     * @param writeTimeout the write timeout
+     */
     public void setWriteTimeout(long writeTimeout) {
         this.writeTimeout = writeTimeout;
     }
 
 
+    /**
+     * Returns the keep-alive timeout in milliseconds.
+     *
+     * @return the keep-alive timeout
+     */
     public long getKeepAliveTimeout() {
         return keepAliveTimeout;
     }
 
 
+    /**
+     * Sets the keep-alive timeout in milliseconds.
+     *
+     * @param keepAliveTimeout the keep-alive timeout
+     */
     public void setKeepAliveTimeout(long keepAliveTimeout) {
         this.keepAliveTimeout = keepAliveTimeout;
     }
 
 
+    /**
+     * Returns the stream-level read timeout in milliseconds.
+     *
+     * @return the stream read timeout
+     */
     public long getStreamReadTimeout() {
         return streamReadTimeout;
     }
 
 
+    /**
+     * Sets the stream-level read timeout in milliseconds.
+     *
+     * @param streamReadTimeout the stream read timeout
+     */
     public void setStreamReadTimeout(long streamReadTimeout) {
         this.streamReadTimeout = streamReadTimeout;
     }
 
 
+    /**
+     * Returns the stream-level write timeout in milliseconds.
+     *
+     * @return the stream write timeout
+     */
     public long getStreamWriteTimeout() {
         return streamWriteTimeout;
     }
 
 
+    /**
+     * Sets the stream-level write timeout in milliseconds.
+     *
+     * @param streamWriteTimeout the stream write timeout
+     */
     public void setStreamWriteTimeout(long streamWriteTimeout) {
         this.streamWriteTimeout = streamWriteTimeout;
     }
 
 
+    /**
+     * Returns the maximum number of concurrent streams.
+     *
+     * @return the maximum concurrent streams
+     */
     public long getMaxConcurrentStreams() {
         return maxConcurrentStreams;
     }
 
 
+    /**
+     * Sets the maximum number of concurrent streams.
+     *
+     * @param maxConcurrentStreams the maximum concurrent streams
+     */
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         this.maxConcurrentStreams = maxConcurrentStreams;
     }
 
 
+    /**
+     * Returns the maximum number of concurrently executing streams.
+     *
+     * @return the maximum concurrent stream execution count
+     */
     public int getMaxConcurrentStreamExecution() {
         return maxConcurrentStreamExecution;
     }
 
 
+    /**
+     * Sets the maximum number of concurrently executing streams.
+     *
+     * @param maxConcurrentStreamExecution the maximum concurrent stream execution count
+     */
     public void setMaxConcurrentStreamExecution(int maxConcurrentStreamExecution) {
         this.maxConcurrentStreamExecution = maxConcurrentStreamExecution;
     }
 
 
+    /**
+     * Returns the initial window size advertised to the client.
+     *
+     * @return the initial window size
+     */
     public int getInitialWindowSize() {
         return initialWindowSize;
     }
 
 
+    /**
+     * Sets the initial window size advertised to the client.
+     *
+     * @param initialWindowSize the initial window size
+     */
     public void setInitialWindowSize(int initialWindowSize) {
         this.initialWindowSize = initialWindowSize;
     }
 
 
+    /**
+     * Returns whether sendfile is enabled.
+     *
+     * @return {@code true} if sendfile is enabled
+     */
     public boolean getUseSendfile() {
         return useSendfile;
     }
 
 
+    /**
+     * Enables or disables sendfile.
+     *
+     * @param useSendfile {@code true} to enable sendfile
+     */
     public void setUseSendfile(boolean useSendfile) {
         this.useSendfile = useSendfile;
     }
@@ -320,11 +422,21 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Sets the maximum number of headers allowed per request.
+     *
+     * @param maxHeaderCount the maximum header count
+     */
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
     }
 
 
+    /**
+     * Returns the maximum number of headers allowed per request.
+     *
+     * @return the maximum header count
+     */
     public int getMaxHeaderCount() {
         return maxHeaderCount;
     }
@@ -340,11 +452,21 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Sets the maximum number of trailer headers allowed per request.
+     *
+     * @param maxTrailerCount the maximum trailer count
+     */
     public void setMaxTrailerCount(int maxTrailerCount) {
         this.maxTrailerCount = maxTrailerCount;
     }
 
 
+    /**
+     * Returns the maximum number of trailer headers allowed per request.
+     *
+     * @return the maximum trailer count
+     */
     public int getMaxTrailerCount() {
         return maxTrailerCount;
     }
@@ -360,61 +482,121 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Returns the overhead count factor used for overhead frame tracking.
+     *
+     * @return the overhead count factor
+     */
     public int getOverheadCountFactor() {
         return overheadCountFactor;
     }
 
 
+    /**
+     * Sets the overhead count factor used for overhead frame tracking.
+     *
+     * @param overheadCountFactor the overhead count factor
+     */
     public void setOverheadCountFactor(int overheadCountFactor) {
         this.overheadCountFactor = overheadCountFactor;
     }
 
 
+    /**
+     * Returns the overhead reset factor used for RST frame tracking.
+     *
+     * @return the overhead reset factor
+     */
     public int getOverheadResetFactor() {
         return overheadResetFactor;
     }
 
 
+    /**
+     * Sets the overhead reset factor used for RST frame tracking.
+     *
+     * @param overheadResetFactor the overhead reset factor
+     */
     public void setOverheadResetFactor(int overheadResetFactor) {
         this.overheadResetFactor = Math.max(overheadResetFactor, 0);
     }
 
 
+    /**
+     * Returns the payload size threshold for CONTINUATION frame overhead tracking.
+     *
+     * @return the continuation threshold
+     */
     public int getOverheadContinuationThreshold() {
         return overheadContinuationThreshold;
     }
 
 
+    /**
+     * Sets the payload size threshold for CONTINUATION frame overhead tracking.
+     *
+     * @param overheadContinuationThreshold the continuation threshold
+     */
     public void setOverheadContinuationThreshold(int overheadContinuationThreshold) {
         this.overheadContinuationThreshold = overheadContinuationThreshold;
     }
 
 
+    /**
+     * Returns the payload size threshold for DATA frame overhead tracking.
+     *
+     * @return the data threshold
+     */
     public int getOverheadDataThreshold() {
         return overheadDataThreshold;
     }
 
 
+    /**
+     * Sets the payload size threshold for DATA frame overhead tracking.
+     *
+     * @param overheadDataThreshold the data threshold
+     */
     public void setOverheadDataThreshold(int overheadDataThreshold) {
         this.overheadDataThreshold = overheadDataThreshold;
     }
 
 
+    /**
+     * Returns the payload size threshold for WINDOW_UPDATE frame overhead tracking.
+     *
+     * @return the window update threshold
+     */
     public int getOverheadWindowUpdateThreshold() {
         return overheadWindowUpdateThreshold;
     }
 
 
+    /**
+     * Sets the payload size threshold for WINDOW_UPDATE frame overhead tracking.
+     *
+     * @param overheadWindowUpdateThreshold the window update threshold
+     */
     public void setOverheadWindowUpdateThreshold(int overheadWindowUpdateThreshold) {
         this.overheadWindowUpdateThreshold = overheadWindowUpdateThreshold;
     }
 
 
+    /**
+     * Disables or enables the periodic PING frames used to keep the connection alive.
+     *
+     * @param initiatePingDisabled {@code true} to disable periodic PING frames
+     */
     public void setInitiatePingDisabled(boolean initiatePingDisabled) {
         this.initiatePingDisabled = initiatePingDisabled;
     }
 
 
+    /**
+     * Returns whether periodic PING frames are disabled.
+     *
+     * @return {@code true} if periodic PING frames are disabled
+     */
     public boolean getInitiatePingDisabled() {
         return initiatePingDisabled;
     }
@@ -479,16 +661,34 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Determines whether compression should be used for the given request/response pair.
+     *
+     * @param request  The request
+     * @param response The response
+     *
+     * @return {@code true} if compression should be used
+     */
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
     }
 
 
+    /**
+     * Returns the timing for 100-continue responses.
+     *
+     * @return the continue response timing
+     */
     public ContinueResponseTiming getContinueResponseTimingInternal() {
         return http11Protocol.getContinueResponseTimingInternal();
     }
 
 
+    /**
+     * Returns the parent HTTP/1.1 protocol handler.
+     *
+     * @return the HTTP/1.1 protocol handler
+     */
     public AbstractProtocol<?> getHttp11Protocol() {
         return this.http11Protocol;
     }
@@ -511,6 +711,11 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Returns the name of the upgrade protocol (h2 for SSL, h2c for plain).
+     *
+     * @return the upgrade protocol name
+     */
     public String getUpgradeProtocolName() {
         if (http11Protocol.isSSLEnabled()) {
             return ALPN_NAME;
@@ -520,26 +725,51 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    /**
+     * Returns the global request group info for JMX statistics.
+     *
+     * @return the global request group info
+     */
     public RequestGroupInfo getGlobal() {
         return global;
     }
 
 
+    /**
+     * Returns whether requests and responses are discarded after processing.
+     *
+     * @return {@code true} if requests and responses are discarded
+     */
     public boolean getDiscardRequestsAndResponses() {
         return discardRequestsAndResponses;
     }
 
 
+    /**
+     * Sets whether requests and responses should be discarded after processing.
+     *
+     * @param discardRequestsAndResponses {@code true} to discard requests and responses
+     */
     public void setDiscardRequestsAndResponses(boolean discardRequestsAndResponses) {
         this.discardRequestsAndResponses = discardRequestsAndResponses;
     }
 
 
+    /**
+     * Returns the drain timeout in nanoseconds.
+     *
+     * @return the drain timeout
+     */
     public long getDrainTimeout() {
         return drainTimeout;
     }
 
 
+    /**
+     * Sets the drain timeout in nanoseconds.
+     *
+     * @param drainTimeout the drain timeout
+     */
     public void setDrainTimeout(long drainTimeout) {
         this.drainTimeout = drainTimeout;
     }

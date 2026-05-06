@@ -49,10 +49,17 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of {@link AsyncContext} that manages the lifecycle of an asynchronous
+ * request processing operation.
+ */
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
 
+    /**
+     * String manager for localized log messages.
+     */
     protected static final StringManager sm = StringManager.getManager(AsyncContextImpl.class);
 
     /*
@@ -76,6 +83,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
+    /**
+     * Constructs an AsyncContextImpl for the given request.
+     *
+     * @param request The request associated with this async context
+     */
     public AsyncContextImpl(Request request) {
         this.request = request;
         if (log.isTraceEnabled()) {
@@ -117,6 +129,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    /**
+     * Fires the timeout event for this async context.
+     *
+     * @return {@code true} if the timeout was handled successfully
+     */
     public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
@@ -267,6 +284,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return listener;
     }
 
+    /**
+     * Recycles this async context, resetting all internal state for reuse.
+     */
     public void recycle() {
         if (log.isTraceEnabled()) {
             logDebug("recycle    ");
@@ -288,6 +308,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         servletResponse = null;
     }
 
+    /**
+     * Checks whether async processing has been started for this context.
+     *
+     * @return {@code true} if async processing has started
+     */
     public boolean isStarted() {
         AtomicBoolean result = new AtomicBoolean(false);
         Request request = this.request;
@@ -296,6 +321,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return result.get();
     }
 
+    /**
+     * Initializes this async context with the given parameters and fires onStartAsync events.
+     *
+     * @param context The context for this async operation
+     * @param request The servlet request
+     * @param response The servlet response
+     * @param originalRequestResponse {@code true} if the request/response are the original ones
+     */
     public void setStarted(Context context, ServletRequest request, ServletResponse response,
             boolean originalRequestResponse) {
 
@@ -331,6 +364,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return hasOriginalRequestAndResponse;
     }
 
+    /**
+     * Performs the internal dispatch for the pending async dispatch operation.
+     *
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void doInternalDispatch() throws ServletException, IOException {
         if (log.isTraceEnabled()) {
             logDebug("intDispatch");
@@ -390,6 +429,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    /**
+     * Sets the error state and optionally fires onError events to all registered listeners.
+     *
+     * @param t The throwable that caused the error, or {@code null}
+     * @param fireOnError {@code true} if onError should be fired to listeners
+     */
     public void setErrorState(Throwable t, boolean fireOnError) {
         if (!hasErrorProcessingStarted.compareAndSet(false, true)) {
             // Skip duplicate error processing

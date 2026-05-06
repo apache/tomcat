@@ -17,45 +17,109 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 
+/**
+ * JMX MBean interface for monitoring and managing a JDBC connection pool.
+ */
 public interface ConnectionPoolMBean extends PoolConfiguration  {
 
     //=================================================================
     //       POOL STATS
     //=================================================================
 
+    /**
+     * Returns the total number of connections in the pool.
+     * @return total connection count
+     */
     int getSize();
 
+    /**
+     * Returns the number of idle connections in the pool.
+     * @return idle connection count
+     */
     int getIdle();
 
+    /**
+     * Returns the number of active (in-use) connections.
+     * @return active connection count
+     */
     int getActive();
 
+    /**
+     * Returns the number of idle connections in the pool.
+     * @return idle connection count
+     */
     int getNumIdle();
 
+    /**
+     * Returns the number of active (in-use) connections.
+     * @return active connection count
+     */
     int getNumActive();
 
+    /**
+     * Returns the number of threads waiting for a connection.
+     * @return wait count
+     */
     int getWaitCount();
 
+    /**
+     * Returns the total number of connections borrowed since pool creation.
+     * @return borrowed count
+     */
     long getBorrowedCount();
 
+    /**
+     * Returns the total number of connections returned since pool creation.
+     * @return returned count
+     */
     long getReturnedCount();
 
+    /**
+     * Returns the total number of connections created since pool creation.
+     * @return created count
+     */
     long getCreatedCount();
 
+    /**
+     * Returns the total number of connections released since pool creation.
+     * @return released count
+     */
     long getReleasedCount();
 
+    /**
+     * Returns the total number of reconnections since pool creation.
+     * @return reconnected count
+     */
     long getReconnectedCount();
 
+    /**
+     * Returns the total number of connections removed due to abandonment.
+     * @return abandoned count
+     */
     long getRemoveAbandonedCount();
 
+    /**
+     * Returns the total number of idle connections released by the pool cleaner.
+     * @return released idle count
+     */
     long getReleasedIdleCount();
 
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================
+    /**
+     * Checks and cleans up idle connections in the pool.
+     */
     void checkIdle();
 
+    /**
+     * Checks for and removes abandoned connections from the pool.
+     */
     void checkAbandoned();
 
+    /**
+     * Validates all idle connections in the pool.
+     */
     void testIdle();
 
     /**

@@ -147,6 +147,8 @@ public class SingleSignOn extends ValveBase {
 
 
     /**
+     * Returns the cookie name that will be used for the SSO cookie.
+     *
      * @return the cookie name
      */
     public String getCookieName() {
@@ -596,6 +598,13 @@ public class SingleSignOn extends ValveBase {
     }
 
 
+    /**
+     * Returns a session listener for the specified SSO identifier.
+     *
+     * @param ssoId the SSO identifier
+     *
+     * @return the session listener
+     */
     protected SessionListener getSessionListener(String ssoId) {
         return new SingleSignOnListener(ssoId);
     }

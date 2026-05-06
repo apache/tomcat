@@ -43,6 +43,12 @@ public class ApplicationPart implements Part {
     private final FileItem fileItem;
     private final File location;
 
+    /**
+     * Constructs a new ApplicationPart.
+     *
+     * @param fileItem the underlying FileItem
+     * @param location the file location
+     */
     public ApplicationPart(FileItem fileItem, File location) {
         this.fileItem = fileItem;
         this.location = location;
@@ -120,6 +126,14 @@ public class ApplicationPart implements Part {
         }
     }
 
+    /**
+     * Returns the part content as a string with the given encoding.
+     *
+     * @param encoding the character encoding
+     * @return the part content as a string
+     * @throws UnsupportedEncodingException if the encoding is not supported
+     * @throws IOException if an I/O error occurs
+     */
     public String getString(String encoding) throws UnsupportedEncodingException, IOException {
         return fileItem.getString(encoding);
     }

@@ -68,6 +68,9 @@ import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Processor for HTTP/1.1 requests and responses.
+ */
 public class Http11Processor extends AbstractProcessor {
 
     private static final Log log = LogFactory.getLog(Http11Processor.class);
@@ -153,6 +156,12 @@ public class Http11Processor extends AbstractProcessor {
     private final HttpParser httpParser;
 
 
+    /**
+     * Creates a new HTTP/1.1 processor.
+     *
+     * @param protocol the protocol handler
+     * @param adapter the adapter to pass requests to
+     */
     @SuppressWarnings("deprecation")
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);

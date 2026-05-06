@@ -21,14 +21,30 @@ import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Abstract {@link org.apache.catalina.WebResource} implementation for resources within a single archive (e.g., a JAR file).
+ */
 public abstract class AbstractSingleArchiveResource extends AbstractArchiveResource {
 
+    /**
+     * Constructs a new AbstractSingleArchiveResource.
+     *
+     * @param archiveResourceSet The archive resource set
+     * @param webAppPath         The web app path
+     * @param baseUrl            The base URL
+     * @param jarEntry           The JAR entry
+     * @param codeBaseUrl        The code base URL
+     */
     protected AbstractSingleArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet, webAppPath, baseUrl, jarEntry, codeBaseUrl);
     }
 
-
+    /**
+     * Gets the JAR input stream wrapper for this resource.
+     *
+     * @return the JAR input stream wrapper, or {@code null} if an error occurs
+     */
     @Override
     protected JarInputStreamWrapper getJarInputStreamWrapper() {
         JarFile jarFile = null;

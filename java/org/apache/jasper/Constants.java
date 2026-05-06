@@ -25,8 +25,6 @@ import java.util.List;
  */
 public class Constants {
 
-    public static final String SPEC_VERSION = "2.3";
-
     /**
      * The base class of the generated servlets.
      */
@@ -39,6 +37,11 @@ public class Constants {
      */
     public static final String SERVICE_METHOD_NAME =
             System.getProperty("org.apache.jasper.Constants.SERVICE_METHOD_NAME", "_jspService");
+
+    /**
+     * JSP specification version.
+     */
+    public static final String SPEC_VERSION = "2.3";
 
     /**
      * These classes/packages are automatically imported by the generated code.
@@ -141,4 +144,11 @@ public class Constants {
      * This must be kept in sync with org.apache.catalina.Globals
      */
     public static final String XML_BLOCK_EXTERNAL_INIT_PARAM = "org.apache.jasper.XML_BLOCK_EXTERNAL";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

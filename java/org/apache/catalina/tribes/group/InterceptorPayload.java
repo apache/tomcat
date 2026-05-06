@@ -18,13 +18,32 @@ package org.apache.catalina.tribes.group;
 
 import org.apache.catalina.tribes.ErrorHandler;
 
+/**
+ * Payload object used to pass an {@link ErrorHandler} to interceptors.
+ */
 public class InterceptorPayload {
     private ErrorHandler errorHandler;
 
+    /**
+     * Constructs a new InterceptorPayload.
+     */
+    public InterceptorPayload() {
+    }
+
+    /**
+     * Get the error handler.
+     *
+     * @return the error handler
+     */
     public ErrorHandler getErrorHandler() {
         return errorHandler;
     }
 
+    /**
+     * Set the error handler.
+     *
+     * @param errorHandler the error handler to set
+     */
     public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }

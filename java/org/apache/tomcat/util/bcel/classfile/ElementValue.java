@@ -47,19 +47,61 @@ import org.apache.tomcat.util.bcel.Const;
  */
 public abstract class ElementValue {
 
+    /**
+     * Tag for a String element value.
+     */
     public static final byte STRING = 's';
+    /**
+     * Tag for an enum constant element value.
+     */
     public static final byte ENUM_CONSTANT = 'e';
+    /**
+     * Tag for a class element value.
+     */
     public static final byte CLASS = 'c';
+    /**
+     * Tag for an annotation element value.
+     */
     public static final byte ANNOTATION = '@';
+    /**
+     * Tag for an array element value.
+     */
     public static final byte ARRAY = '[';
+    /**
+     * Tag for an int primitive element value.
+     */
     public static final byte PRIMITIVE_INT = 'I';
+    /**
+     * Tag for a byte primitive element value.
+     */
     public static final byte PRIMITIVE_BYTE = 'B';
+    /**
+     * Tag for a char primitive element value.
+     */
     public static final byte PRIMITIVE_CHAR = 'C';
+    /**
+     * Tag for a double primitive element value.
+     */
     public static final byte PRIMITIVE_DOUBLE = 'D';
+    /**
+     * Tag for a float primitive element value.
+     */
     public static final byte PRIMITIVE_FLOAT = 'F';
+    /**
+     * Tag for a long primitive element value.
+     */
     public static final byte PRIMITIVE_LONG = 'J';
+    /**
+     * Tag for a short primitive element value.
+     */
     public static final byte PRIMITIVE_SHORT = 'S';
+    /**
+     * Tag for a boolean primitive element value.
+     */
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
+    /**
+     * Empty array of ElementValue instances.
+     */
     static final ElementValue[] EMPTY_ARRAY = {};
 
     /**
@@ -148,5 +190,10 @@ public abstract class ElementValue {
         return type;
     }
 
+    /**
+     * Returns a string representation of this element value.
+     *
+     * @return the string representation
+     */
     public abstract String stringifyValue();
 }

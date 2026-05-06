@@ -71,6 +71,15 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class FailedContext extends LifecycleMBeanBase implements Context {
 
+    /**
+     * Creates a new FailedContext instance.
+     */
+    public FailedContext() {
+    }
+
+    /**
+     * StringManager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
@@ -1166,6 +1175,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
         return false;
     }
 
+    /**
+     * Adds a valve to this context. This is a no-op for a failed context.
+     *
+     * @param valve the valve to add
+     */
     @SuppressWarnings("unused")
     public synchronized void addValve(Valve valve) {
         // NO-OP
@@ -1408,10 +1422,20 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
         return -1;
     }
 
+    /**
+     * Returns the startup time. For a failed context, always returns -1.
+     *
+     * @return -1
+     */
     public long getStartupTime() {
         return -1;
     }
 
+    /**
+     * Returns the TLD scan time. For a failed context, always returns -1.
+     *
+     * @return -1
+     */
     public long getTldScanTime() {
         return -1;
     }

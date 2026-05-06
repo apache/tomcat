@@ -23,6 +23,11 @@ public class JasperException extends javax.servlet.ServletException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a JasperException with the specified reason.
+     *
+     * @param reason the exception message
+     */
     public JasperException(String reason) {
         super(reason);
     }

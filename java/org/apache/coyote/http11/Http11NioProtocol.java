@@ -30,11 +30,19 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
 
 
+    /**
+     * Constructs a new Http11NioProtocol with a default NIO endpoint.
+     */
     public Http11NioProtocol() {
         this(new NioEndpoint());
     }
 
 
+    /**
+     * Constructs a new Http11NioProtocol with the specified endpoint.
+     *
+     * @param endpoint the NIO endpoint to use
+     */
     public Http11NioProtocol(NioEndpoint endpoint) {
         super(endpoint);
     }
@@ -71,18 +79,38 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         return 1;
     }
 
+    /**
+     * Sets the selector timeout for the NIO endpoint.
+     *
+     * @param timeout the selector timeout in milliseconds
+     */
     public void setSelectorTimeout(long timeout) {
         ((NioEndpoint) getEndpoint()).setSelectorTimeout(timeout);
     }
 
+    /**
+     * Gets the selector timeout for the NIO endpoint.
+     *
+     * @return the selector timeout in milliseconds
+     */
     public long getSelectorTimeout() {
         return ((NioEndpoint) getEndpoint()).getSelectorTimeout();
     }
 
+    /**
+     * Sets the poller thread priority for the NIO endpoint.
+     *
+     * @param threadPriority the poller thread priority
+     */
     public void setPollerThreadPriority(int threadPriority) {
         ((NioEndpoint) getEndpoint()).setPollerThreadPriority(threadPriority);
     }
 
+    /**
+     * Gets the poller thread priority for the NIO endpoint.
+     *
+     * @return the poller thread priority
+     */
     public int getPollerThreadPriority() {
         return ((NioEndpoint) getEndpoint()).getPollerThreadPriority();
     }

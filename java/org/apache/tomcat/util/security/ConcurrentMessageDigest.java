@@ -66,23 +66,58 @@ public class ConcurrentMessageDigest {
         }
     }
 
+    /**
+     * Computes the MD5 digest of the given input byte arrays.
+     *
+     * @param input the byte arrays to digest
+     * @return the MD5 digest
+     */
     public static byte[] digestMD5(byte[]... input) {
         return digest(MD5, input);
     }
 
+    /**
+     * Computes the SHA-1 digest of the given input byte arrays.
+     *
+     * @param input the byte arrays to digest
+     * @return the SHA-1 digest
+     */
     public static byte[] digestSHA1(byte[]... input) {
         return digest(SHA1, input);
     }
 
+    /**
+     * Computes the SHA-256 digest of the given input byte arrays.
+     *
+     * @param input the byte arrays to digest
+     * @return the SHA-256 digest
+     */
     public static byte[] digestSHA256(byte[]... input) {
         return digest(SHA256, input);
     }
 
+    /**
+     * Computes the digest of the given input byte arrays using the specified algorithm.
+     *
+     * @param algorithm the message digest algorithm name
+     * @param input the byte arrays to digest
+     * @return the digest
+     */
     public static byte[] digest(String algorithm, byte[]... input) {
         return digest(algorithm, 1, input);
     }
 
 
+    /**
+     * Computes the digest of the given input byte arrays using the specified algorithm
+     * and number of iterations. Multiple iterations are performed by re-digesting the
+     * result of the previous iteration.
+     *
+     * @param algorithm the message digest algorithm name
+     * @param iterations the number of times to apply the digest
+     * @param input the byte arrays to digest
+     * @return the digest
+     */
     public static byte[] digest(String algorithm, int iterations, byte[]... input) {
 
         Queue<MessageDigest> queue = queues.get(algorithm);

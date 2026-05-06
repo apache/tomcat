@@ -35,7 +35,9 @@ public interface MembershipService {
     void setProperties(java.util.Properties properties);
 
     /**
-     * @return the properties for the configuration used.
+     * Returns the properties used to configure the membership service.
+     *
+     * @return the properties for the configuration used
      */
     java.util.Properties getProperties();
 
@@ -70,6 +72,8 @@ public interface MembershipService {
     void stop(int level);
 
     /**
+     * Checks whether the membership group contains any members.
+     *
      * @return true if the group contains members
      */
     boolean hasMembers();
@@ -84,7 +88,9 @@ public interface MembershipService {
     Member getMember(Member mbr);
 
     /**
-     * @return an array of all the members in the cluster.
+     * Returns all members currently in the cluster.
+     *
+     * @return an array of all the members in the cluster
      */
     Member[] getMembers();
 
@@ -98,6 +104,8 @@ public interface MembershipService {
     Member getLocalMember(boolean incAliveTime);
 
     /**
+     * Returns the names of all members in the cluster.
+     *
      * @return all members by name
      */
     String[] getMembersByName();

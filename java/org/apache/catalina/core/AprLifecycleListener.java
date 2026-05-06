@@ -78,10 +78,15 @@ public class AprLifecycleListener implements LifecycleListener {
     private static int tcnPatch = 0;
     private static int tcnVersion = 0;
 
+    /** SSL engine configuration. */
     protected static String SSLEngine = "on"; // default on
+    /** FIPS mode configuration. */
     protected static String FIPSMode = "off"; // default off, valid only when SSLEngine="on"
+    /** SSL random seed source. */
     protected static String SSLRandomSeed = "builtin";
+    /** Indicates whether SSL has been initialized. */
     protected static boolean sslInitialized = false;
+    /** Indicates whether FIPS mode is currently active. */
     protected static boolean fipsModeActive = false;
 
     /**
@@ -106,6 +111,11 @@ public class AprLifecycleListener implements LifecycleListener {
     private boolean instanceInitialized = false;
 
 
+    /**
+     * Checks APR availability, initializing if necessary.
+     *
+     * @return {@code true} if APR is available
+     */
     public static boolean isAprAvailable() {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
         if (org.apache.tomcat.jni.AprStatus.isInstanceCreated()) {
@@ -206,6 +216,7 @@ public class AprLifecycleListener implements LifecycleListener {
         }
     }
 
+    /** Constructs a new AprLifecycleListener. */
     public AprLifecycleListener() {
         org.apache.tomcat.jni.AprStatus.setInstanceCreated(true);
     }
@@ -478,10 +489,20 @@ public class AprLifecycleListener implements LifecycleListener {
         log.info(sm.getString("aprListener.initializedOpenSSL", SSL.versionString()));
     }
 
+    /**
+     * Returns the SSL engine configuration.
+     *
+     * @return the SSL engine configuration
+     */
     public String getSSLEngine() {
         return SSLEngine;
     }
 
+    /**
+     * Sets the SSL engine configuration.
+     *
+     * @param SSLEngine the SSL engine configuration
+     */
     public void setSSLEngine(String SSLEngine) {
         if (!SSLEngine.equals(AprLifecycleListener.SSLEngine)) {
             // Ensure that the SSLEngine is consistent with that used for SSL init
@@ -493,10 +514,20 @@ public class AprLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Returns the SSL random seed source.
+     *
+     * @return the SSL random seed source
+     */
     public String getSSLRandomSeed() {
         return SSLRandomSeed;
     }
 
+    /**
+     * Sets the SSL random seed source.
+     *
+     * @param SSLRandomSeed the SSL random seed source
+     */
     public void setSSLRandomSeed(String SSLRandomSeed) {
         if (!SSLRandomSeed.equals(AprLifecycleListener.SSLRandomSeed)) {
             // Ensure that the random seed is consistent with that used for SSL init
@@ -508,10 +539,20 @@ public class AprLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Returns the FIPS mode configuration.
+     *
+     * @return the FIPS mode configuration
+     */
     public String getFIPSMode() {
         return FIPSMode;
     }
 
+    /**
+     * Sets the FIPS mode configuration.
+     *
+     * @param FIPSMode the FIPS mode configuration
+     */
     public void setFIPSMode(String FIPSMode) {
         if (!FIPSMode.equals(AprLifecycleListener.FIPSMode)) {
             // Ensure that the FIPS mode is consistent with that used for SSL init
@@ -523,6 +564,11 @@ public class AprLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Returns whether FIPS mode is currently active.
+     *
+     * @return {@code true} if FIPS mode is active
+     */
     public boolean isFIPSModeActive() {
         return fipsModeActive;
     }
@@ -537,16 +583,31 @@ public class AprLifecycleListener implements LifecycleListener {
         return org.apache.tomcat.jni.AprStatus.getUseAprConnector();
     }
 
+    /**
+     * Configures whether to use OpenSSL.
+     *
+     * @param useOpenSSL {@code true} to use OpenSSL
+     */
     public void setUseOpenSSL(boolean useOpenSSL) {
         if (useOpenSSL != org.apache.tomcat.jni.AprStatus.getUseOpenSSL()) {
             org.apache.tomcat.jni.AprStatus.setUseOpenSSL(useOpenSSL);
         }
     }
 
+    /**
+     * Returns whether OpenSSL is in use.
+     *
+     * @return {@code true} if OpenSSL is in use
+     */
     public static boolean getUseOpenSSL() {
         return org.apache.tomcat.jni.AprStatus.getUseOpenSSL();
     }
 
+    /**
+     * Returns whether an APR instance has been created.
+     *
+     * @return {@code true} if an APR instance has been created
+     */
     public static boolean isInstanceCreated() {
         return org.apache.tomcat.jni.AprStatus.isInstanceCreated();
     }

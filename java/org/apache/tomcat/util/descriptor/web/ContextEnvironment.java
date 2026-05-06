@@ -25,6 +25,11 @@ public class ContextEnvironment extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextEnvironment.
+     */
+    public ContextEnvironment() {
+    }
 
     // ------------------------------------------------------------- Properties
 
@@ -34,10 +39,20 @@ public class ContextEnvironment extends ResourceBase {
      */
     private boolean override = true;
 
+    /**
+     * Returns whether this environment entry allows overrides by the application deployment descriptor.
+     *
+     * @return true if overrides are allowed
+     */
     public boolean getOverride() {
         return this.override;
     }
 
+    /**
+     * Sets whether this environment entry allows overrides by the application deployment descriptor.
+     *
+     * @param override true if overrides are allowed
+     */
     public void setOverride(boolean override) {
         this.override = override;
     }
@@ -48,10 +63,20 @@ public class ContextEnvironment extends ResourceBase {
      */
     private String value = null;
 
+    /**
+     * Returns the value of this environment entry.
+     *
+     * @return the environment entry value
+     */
     public String getValue() {
         return this.value;
     }
 
+    /**
+     * Sets the value of this environment entry.
+     *
+     * @param value the environment entry value
+     */
     public void setValue(String value) {
         this.value = value;
     }

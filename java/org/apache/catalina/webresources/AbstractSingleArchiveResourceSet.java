@@ -44,6 +44,14 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
     }
 
 
+    /**
+     * Constructs a new {@code AbstractSingleArchiveResourceSet}.
+     *
+     * @param root         The root
+     * @param webAppMount  The web app mount
+     * @param base         The base
+     * @param internalPath The internal path
+     */
     public AbstractSingleArchiveResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath)
             throws IllegalArgumentException {
         setRoot(root);

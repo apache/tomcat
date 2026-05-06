@@ -55,6 +55,11 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     private final int maxSwallowSize;
 
 
+    /**
+     * Creates a buffered input filter.
+     *
+     * @param maxSwallowSize maximum bytes to swallow
+     */
     public BufferedInputFilter(int maxSwallowSize) {
         this.maxSwallowSize = maxSwallowSize;
     }

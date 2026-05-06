@@ -142,6 +142,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Constructs a new Http11InputBuffer.
+     *
+     * @param request the Coyote request
+     * @param headerBufferSize the maximum size of the header buffer
+     * @param rejectIllegalHeader if illegal headers should be rejected
+     * @param httpParser the HTTP parser to use
+     */
     public Http11InputBuffer(Request request, int headerBufferSize, boolean rejectIllegalHeader,
             HttpParser httpParser) {
 

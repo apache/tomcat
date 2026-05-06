@@ -38,6 +38,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of {@link AuthConfigFactory} for the JASPIC authentication framework.
+ */
 public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private final Log log = LogFactory.getLog(AuthConfigFactoryImpl.class); // must not be static
@@ -59,6 +62,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     private final Map<String,RegistrationContextImpl> defaultRegistration = new ConcurrentHashMap<>(1);
 
 
+    /**
+     * Constructs a new AuthConfigFactoryImpl and loads any persistent registrations.
+     */
     public AuthConfigFactoryImpl() {
         loadPersistentRegistrations();
     }

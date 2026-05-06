@@ -21,6 +21,9 @@ import java.nio.charset.Charset;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Interface for processing HTTP cookies.
+ */
 public interface CookieProcessor {
 
     /**

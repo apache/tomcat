@@ -118,6 +118,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Constructs a new JAASMemoryLoginModule.
+     */
     public JAASMemoryLoginModule() {
         if (log.isTraceEnabled()) {
             log.trace("MEMORY LOGIN MODULE");

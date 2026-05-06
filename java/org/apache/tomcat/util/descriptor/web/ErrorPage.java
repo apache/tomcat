@@ -26,6 +26,13 @@ import org.apache.tomcat.util.buf.UDecoder;
  */
 public class ErrorPage extends XmlEncodingBase implements Serializable {
 
+    /**
+     * Default constructor for ErrorPage.
+     */
+    public ErrorPage() {
+        // NO-OP
+    }
+
     private static final long serialVersionUID = 2L;
 
 
@@ -54,7 +61,9 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * @return the error code.
+     * Returns the error code for which this error page is active.
+     *
+     * @return the error code
      */
     public int getErrorCode() {
         return this.errorCode;
@@ -87,7 +96,9 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * @return the exception type.
+     * Returns the exception type for which this error page is active.
+     *
+     * @return the fully qualified exception type name, or {@code null} if none
      */
     public String getExceptionType() {
         return this.exceptionType;
@@ -105,7 +116,9 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * @return the location.
+     * Returns the context-relative location to handle this error or exception.
+     *
+     * @return the location
      */
     public String getLocation() {
         return this.location;
@@ -144,6 +157,12 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * Returns the name of this error page, which is either the exception type or
+     * the error code.
+     *
+     * @return the error page name
+     */
     public String getName() {
         if (exceptionType == null) {
             return Integer.toString(errorCode);

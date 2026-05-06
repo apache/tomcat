@@ -21,8 +21,25 @@ import javax.websocket.Endpoint;
 
 import org.apache.tomcat.InstanceManager;
 
+/**
+ * Holds a client endpoint and provides access to its class name and instance.
+ */
 public interface ClientEndpointHolder {
+    /**
+     * Returns the fully qualified class name of the endpoint.
+     *
+     * @return the class name
+     */
     String getClassName();
 
+    /**
+     * Returns an instance of the endpoint using the given instance manager.
+     *
+     * @param instanceManager the instance manager to create the endpoint
+     *
+     * @return the endpoint instance
+     *
+     * @throws DeploymentException if the endpoint cannot be instantiated
+     */
     Endpoint getInstance(InstanceManager instanceManager) throws DeploymentException;
 }

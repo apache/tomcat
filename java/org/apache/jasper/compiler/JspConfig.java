@@ -50,6 +50,11 @@ public class JspConfig {
     private static final String defaultErrorOnUndeclaredNamespace = "false";
     private JspProperty defaultJspProperty;
 
+    /**
+     * Creates a new JspConfig instance for the given servlet context.
+     *
+     * @param ctxt the servlet context
+     */
     public JspConfig(ServletContext ctxt) {
         this.ctxt = ctxt;
     }
@@ -388,30 +393,58 @@ public class JspConfig {
         return false;
     }
 
+    /**
+     * Represents a JSP property group with a path, extension, and associated JSP property.
+     */
     public static class JspPropertyGroup {
         private final String path;
         private final String extension;
         private final JspProperty jspProperty;
 
+        /**
+         * Creates a new JspPropertyGroup instance.
+         *
+         * @param path the URL path component
+         * @param extension the file extension component
+         * @param jspProperty the JSP property configuration
+         */
         JspPropertyGroup(String path, String extension, JspProperty jspProperty) {
             this.path = path;
             this.extension = extension;
             this.jspProperty = jspProperty;
         }
 
+        /**
+         * Returns the URL path component of this property group.
+         *
+         * @return the path, or null if not set
+         */
         public String getPath() {
             return path;
         }
 
+        /**
+         * Returns the file extension component of this property group.
+         *
+         * @return the extension, or null if not set
+         */
         public String getExtension() {
             return extension;
         }
 
+        /**
+         * Returns the JSP property configuration for this property group.
+         *
+         * @return the JSP property
+         */
         public JspProperty getJspProperty() {
             return jspProperty;
         }
     }
 
+    /**
+     * Represents the JSP property configuration values for a JSP page or group of pages.
+     */
     public static class JspProperty {
 
         private final String isXml;
@@ -444,46 +477,101 @@ public class JspConfig {
             this.errorOnUndeclaredNamespace = errorOnUndeclaredNamespace;
         }
 
+        /**
+         * Returns whether the page is XML.
+         *
+         * @return the isXml value, or null if not set
+         */
         public String isXml() {
             return isXml;
         }
 
+        /**
+         * Returns whether EL is ignored.
+         *
+         * @return the elIgnored value, or null if not set
+         */
         public String isELIgnored() {
             return elIgnored;
         }
 
+        /**
+         * Returns whether scripting is invalid.
+         *
+         * @return the scriptingInvalid value, or null if not set
+         */
         public String isScriptingInvalid() {
             return scriptingInvalid;
         }
 
+        /**
+         * Returns the page encoding.
+         *
+         * @return the page encoding, or null if not set
+         */
         public String getPageEncoding() {
             return pageEncoding;
         }
 
+        /**
+         * Returns the collection of include prelude files.
+         *
+         * @return the include preludes, or null if not set
+         */
         public Collection<String> getIncludePrelude() {
             return includePrelude;
         }
 
+        /**
+         * Returns the collection of include coda files.
+         *
+         * @return the include codas, or null if not set
+         */
         public Collection<String> getIncludeCoda() {
             return includeCoda;
         }
 
+        /**
+         * Returns whether deferred syntax is allowed as literal.
+         *
+         * @return the deferred syntax allowed as literal value
+         */
         public String isDeferedSyntaxAllowedAsLiteral() {
             return deferedSyntaxAllowedAsLiteral;
         }
 
+        /**
+         * Returns whether to trim directive whitespaces.
+         *
+         * @return the trim directive whitespaces value, or null if not set
+         */
         public String isTrimDirectiveWhitespaces() {
             return trimDirectiveWhitespaces;
         }
 
+        /**
+         * Returns the default content type.
+         *
+         * @return the default content type, or null if not set
+         */
         public String getDefaultContentType() {
             return defaultContentType;
         }
 
+        /**
+         * Returns the buffer size configuration.
+         *
+         * @return the buffer value, or null if not set
+         */
         public String getBuffer() {
             return buffer;
         }
 
+        /**
+         * Returns whether to error on undeclared namespace.
+         *
+         * @return the errorOnUndeclaredNamespace value
+         */
         public String isErrorOnUndeclaredNamespace() {
             return errorOnUndeclaredNamespace;
         }

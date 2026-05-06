@@ -67,11 +67,31 @@ public class FileResource extends AbstractResource {
     private final WebResourceLockSet lockSet;
     private final String lockKey;
 
+   /**
+     * Creates a FileResource without locking support.
+     *
+     * @param root The web resource root
+     * @param webAppPath The web application path
+     * @param resource The underlying file
+     * @param readOnly Whether the resource is read-only
+     * @param manifest The JAR manifest, or null if not applicable
+     */
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest) {
         this(root, webAppPath, resource, readOnly, manifest, null, null);
     }
 
 
+    /**
+     * Creates a FileResource with optional locking support.
+     *
+     * @param root The web resource root
+     * @param webAppPath The web application path
+     * @param resource The underlying file
+     * @param readOnly Whether the resource is read-only
+     * @param manifest The JAR manifest, or null if not applicable
+     * @param lockSet The lock set for concurrent access control, or null if locking is not required
+     * @param lockKey The path used for locking, or null if locking is not required
+     */
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest,
             WebResourceLockSet lockSet, String lockKey) {
         super(root, webAppPath);

@@ -31,8 +31,18 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class DigestAuthenticator extends Authenticator {
 
+    /**
+     * Construct a new DigestAuthenticator.
+     */
+    public DigestAuthenticator() {
+        super();
+    }
+
     private static final StringManager sm = StringManager.getManager(DigestAuthenticator.class);
 
+    /**
+     * Name of the DIGEST authentication scheme.
+     */
     public static final String schemeName = "digest";
     private static final Object cnonceGeneratorLock = new Object();
     private static volatile SecureRandom cnonceGenerator;

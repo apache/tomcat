@@ -41,6 +41,13 @@ public class JspFactoryImpl extends JspFactory {
     private static final int POOL_SIZE =
             Integer.parseInt(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE", "8"));
 
+    /**
+     * Creates a new JspFactoryImpl instance with default pool size settings.
+     */
+    public JspFactoryImpl() {
+        super();
+    }
+
     private final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
 
     @Override

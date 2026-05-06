@@ -21,16 +21,29 @@ import javax.servlet.http.MappingMatch;
 
 import org.apache.catalina.mapper.MappingData;
 
+/**
+ * Holds servlet mapping data for a single request.
+ */
 public class ApplicationMapping {
 
     private final MappingData mappingData;
 
     private volatile HttpServletMapping mapping = null;
 
+    /**
+     * Constructs a new ApplicationMapping.
+     *
+     * @param mappingData the mapping data
+     */
     public ApplicationMapping(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
+    /**
+     * Returns the HttpServletMapping for this request.
+     *
+     * @return the servlet mapping
+     */
     public HttpServletMapping getHttpServletMapping() {
         if (mapping == null) {
             String servletName;
@@ -76,6 +89,9 @@ public class ApplicationMapping {
         return mapping;
     }
 
+    /**
+     * Recycles this mapping for reuse.
+     */
     public void recycle() {
         mapping = null;
     }

@@ -16,22 +16,65 @@
  */
 package org.apache.catalina.authenticator;
 
+/**
+ * Constants used by the authentication framework.
+ */
 public class Constants {
+
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
     // Authentication methods for login configuration
     // Servlet spec schemes are defined in HttpServletRequest
     // Vendor specific schemes
+    /**
+     * Vendor specific SPNEGO authentication method.
+     */
     public static final String SPNEGO_METHOD = "SPNEGO";
 
     // Form based authentication constants
+    /**
+     * The URI for the form-based authentication login action.
+     */
     public static final String FORM_ACTION = "/j_security_check";
+
+    /**
+     * The parameter name for the form-based authentication password.
+     */
     public static final String FORM_PASSWORD = "j_password";
+
+    /**
+     * The parameter name for the form-based authentication username.
+     */
     public static final String FORM_USERNAME = "j_username";
 
     // SPNEGO authentication constants
+    /**
+     * The system property for the Kerberos 5 configuration file path.
+     */
     public static final String KRB5_CONF_PROPERTY = "java.security.krb5.conf";
+
+    /**
+     * The default Kerberos 5 configuration file path.
+     */
     public static final String DEFAULT_KRB5_CONF = "conf/krb5.ini";
+
+    /**
+     * The system property for the JAAS login configuration file path.
+     */
     public static final String JAAS_CONF_PROPERTY = "java.security.auth.login.config";
+
+    /**
+     * The default JAAS login configuration file path.
+     */
     public static final String DEFAULT_JAAS_CONF = "conf/jaas.conf";
+
+    /**
+     * The default JAAS login module name.
+     */
     public static final String DEFAULT_LOGIN_MODULE_NAME = "com.sun.security.jgss.krb5.accept";
 
     // Cookie name for single sign on support
@@ -46,6 +89,9 @@ public class Constants {
      */
     public static final String REQ_SSOID_NOTE = "org.apache.catalina.request.SSOID";
 
+    /**
+     * The notes key for the JASPIC subject associated with the current request.
+     */
     public static final String REQ_JASPIC_SUBJECT_NOTE = "org.apache.catalina.authenticator.jaspic.SUBJECT";
 
 

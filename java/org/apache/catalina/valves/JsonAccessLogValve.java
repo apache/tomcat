@@ -73,6 +73,12 @@ import org.apache.tomcat.util.json.JSONFilter;
  */
 public class JsonAccessLogValve extends AccessLogValve {
 
+    /**
+     * Constructs a new JsonAccessLogValve.
+     */
+    public JsonAccessLogValve() {
+    }
+
     private static final Map<Character,String> PATTERNS;
     static {
         Map<Character,String> pattern2AttributeName = new HashMap<>();
@@ -118,6 +124,11 @@ public class JsonAccessLogValve extends AccessLogValve {
     protected static class CharElement implements AccessLogElement {
         private final char ch;
 
+        /**
+         * Constructs a new CharElement.
+         *
+         * @param ch the character to write
+         */
         public CharElement(char ch) {
             this.ch = ch;
         }

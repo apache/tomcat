@@ -779,10 +779,31 @@ class Http2Parser {
          */
         boolean fill(boolean block, byte[] data, int offset, int length) throws IOException;
 
+        /**
+         * Convenience overload that fills the entire byte array.
+         *
+         * @param block  Should the first read into the provided buffer be a blocking read or not
+         * @param data   Buffer to fill
+         *
+         * @return {@code true} if the buffer was filled otherwise {@code false}
+         *
+         * @throws IOException If an I/O occurred while obtaining data with which to fill the buffer
+         */
         default boolean fill(boolean block, byte[] data) throws IOException {
             return fill(block, data, 0, data.length);
         }
 
+        /**
+         * Convenience overload that fills a {@link ByteBuffer}.
+         *
+         * @param block  Should the first read into the provided buffer be a blocking read or not
+         * @param data   Buffer to fill
+         * @param len    Number of bytes to read
+         *
+         * @return {@code true} if the buffer was filled otherwise {@code false}
+         *
+         * @throws IOException If an I/O occurred while obtaining data with which to fill the buffer
+         */
         default boolean fill(boolean block, ByteBuffer data, int len) throws IOException {
             boolean result = fill(block, data.array(), data.arrayOffset() + data.position(), len);
             if (result) {

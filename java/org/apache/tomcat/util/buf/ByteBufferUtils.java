@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.ByteBuffer;
 
+/** Utility methods for working with {@link java.nio.ByteBuffer} instances. */
 public class ByteBufferUtils {
 
     private ByteBufferUtils() {

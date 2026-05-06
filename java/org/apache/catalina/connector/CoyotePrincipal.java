@@ -30,6 +30,11 @@ public class CoyotePrincipal implements Principal, Serializable {
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Construct a new CoyotePrincipal.
+     *
+     * @param name The name of the principal
+     */
     public CoyotePrincipal(String name) {
 
         this.name = name;

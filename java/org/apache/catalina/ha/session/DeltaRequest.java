@@ -38,6 +38,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class DeltaRequest implements Externalizable {
 
+    /**
+     * The logger for this class.
+     */
     public static final Log log = LogFactory.getLog(DeltaRequest.class);
 
     /**
@@ -45,21 +48,74 @@ public class DeltaRequest implements Externalizable {
      */
     protected static final StringManager sm = StringManager.getManager(DeltaRequest.class);
 
+    /**
+     * Action type for session attributes.
+     */
     public static final int TYPE_ATTRIBUTE = 0;
+
+    /**
+     * Action type for session principal.
+     */
     public static final int TYPE_PRINCIPAL = 1;
+
+    /**
+     * Action type for session new flag.
+     */
     public static final int TYPE_ISNEW = 2;
+
+    /**
+     * Action type for session max inactive interval.
+     */
     public static final int TYPE_MAXINTERVAL = 3;
+
+    /**
+     * Action type for session authentication type.
+     */
     public static final int TYPE_AUTHTYPE = 4;
+
+    /**
+     * Action type for session listener.
+     */
     public static final int TYPE_LISTENER = 5;
+
+    /**
+     * Action type for session note.
+     */
     public static final int TYPE_NOTE = 6;
 
+    /**
+     * Action to set a value.
+     */
     public static final int ACTION_SET = 0;
+
+    /**
+     * Action to remove a value.
+     */
     public static final int ACTION_REMOVE = 1;
 
+    /**
+     * Name used for principal actions.
+     */
     public static final String NAME_PRINCIPAL = "__SET__PRINCIPAL__";
+
+    /**
+     * Name used for max inactive interval actions.
+     */
     public static final String NAME_MAXINTERVAL = "__SET__MAXINTERVAL__";
+
+    /**
+     * Name used for new flag actions.
+     */
     public static final String NAME_ISNEW = "__SET__ISNEW__";
+
+    /**
+     * Name used for auth type actions.
+     */
     public static final String NAME_AUTHTYPE = "__SET__AUTHTYPE__";
+
+    /**
+     * Name used for listener actions.
+     */
     public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
@@ -68,10 +124,19 @@ public class DeltaRequest implements Externalizable {
 
     private boolean recordAllActions = false;
 
+    /**
+     * Default constructor required by {@link java.io.Externalizable}.
+     */
     public DeltaRequest() {
 
     }
 
+    /**
+     * Construct a new DeltaRequest.
+     *
+     * @param sessionId         Session identifier
+     * @param recordAllActions  Record all actions, including duplicates
+     */
     public DeltaRequest(String sessionId, boolean recordAllActions) {
         this.recordAllActions = recordAllActions;
         if (sessionId != null) {
@@ -80,24 +145,51 @@ public class DeltaRequest implements Externalizable {
     }
 
 
+    /**
+     * Record a set attribute action.
+     *
+     * @param name  Attribute name
+     * @param value Attribute value
+     */
     public void setAttribute(String name, Object value) {
         int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
         addAction(TYPE_ATTRIBUTE, action, name, value);
     }
 
+    /**
+     * Record a remove attribute action.
+     *
+     * @param name Attribute name
+     */
     public void removeAttribute(String name) {
         addAction(TYPE_ATTRIBUTE, ACTION_REMOVE, name, null);
     }
 
+    /**
+     * Record a set note action.
+     *
+     * @param name  Note name
+     * @param value Note value
+     */
     public void setNote(String name, Object value) {
         int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
         addAction(TYPE_NOTE, action, name, value);
     }
 
+    /**
+     * Record a remove note action.
+     *
+     * @param name Note name
+     */
     public void removeNote(String name) {
         addAction(TYPE_NOTE, ACTION_REMOVE, name, null);
     }
 
+    /**
+     * Record a set max inactive interval action.
+     *
+     * @param interval Max inactive interval in seconds
+     */
     public void setMaxInactiveInterval(int interval) {
         addAction(TYPE_MAXINTERVAL, ACTION_SET, NAME_MAXINTERVAL, Integer.valueOf(interval));
     }
@@ -125,23 +217,51 @@ public class DeltaRequest implements Externalizable {
         addAction(TYPE_PRINCIPAL, action, NAME_PRINCIPAL, gp);
     }
 
+    /**
+     * Record a set new action.
+     *
+     * @param n New flag value
+     */
     public void setNew(boolean n) {
         addAction(TYPE_ISNEW, ACTION_SET, NAME_ISNEW, Boolean.valueOf(n));
     }
 
+    /**
+     * Record a set auth type action.
+     *
+     * @param authType Authentication type
+     */
     public void setAuthType(String authType) {
         int action = (authType == null) ? ACTION_REMOVE : ACTION_SET;
         addAction(TYPE_AUTHTYPE, action, NAME_AUTHTYPE, authType);
     }
 
+    /**
+     * Record an add session listener action.
+     *
+     * @param listener Session listener to add
+     */
     public void addSessionListener(SessionListener listener) {
         addAction(TYPE_LISTENER, ACTION_SET, NAME_LISTENER, listener);
     }
 
+    /**
+     * Record a remove session listener action.
+     *
+     * @param listener Session listener to remove
+     */
     public void removeSessionListener(SessionListener listener) {
         addAction(TYPE_LISTENER, ACTION_REMOVE, NAME_LISTENER, listener);
     }
 
+    /**
+     * Add an action to the list of actions to be executed.
+     *
+     * @param type    Action type
+     * @param action  Action (set or remove)
+     * @param name    Attribute or property name
+     * @param value   Attribute or property value
+     */
     protected void addAction(int type, int action, String name, Object value) {
         AttributeInfo info;
         if (!this.actionPool.isEmpty()) {
@@ -168,6 +288,12 @@ public class DeltaRequest implements Externalizable {
         actions.addLast(info);
     }
 
+    /**
+     * Execute all recorded actions on the given session.
+     *
+     * @param session           Target session
+     * @param notifyListeners   Whether to notify session listeners
+     */
     public void execute(DeltaSession session, boolean notifyListeners) {
         if (!this.sessionId.equals(session.getId())) {
             throw new IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
@@ -245,6 +371,9 @@ public class DeltaRequest implements Externalizable {
         reset();
     }
 
+    /**
+     * Reset this request, returning all action objects to the pool.
+     */
     public void reset() {
         while (!actions.isEmpty()) {
             try {
@@ -257,10 +386,20 @@ public class DeltaRequest implements Externalizable {
         }
     }
 
+    /**
+     * Get the session identifier.
+     *
+     * @return Session identifier
+     */
     public String getSessionId() {
         return sessionId;
     }
 
+    /**
+     * Set the session identifier.
+     *
+     * @param sessionId Session identifier
+     */
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
         if (sessionId == null) {
@@ -269,10 +408,18 @@ public class DeltaRequest implements Externalizable {
         }
     }
 
+    /**
+     * Get the number of actions recorded.
+     *
+     * @return Number of actions
+     */
     public int getSize() {
         return actions.size();
     }
 
+    /**
+     * Clear all actions and the action pool.
+     */
     public void clear() {
         actions.clear();
         actionPool.clear();

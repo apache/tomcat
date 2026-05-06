@@ -62,6 +62,12 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private final AtomicBoolean writing = new AtomicBoolean(false);
     private final AtomicBoolean reading = new AtomicBoolean(false);
 
+    /**
+     * Constructs a new secure wrapper for the given channel and SSL engine.
+     *
+     * @param socketChannel the underlying {@link AsynchronousSocketChannel}
+     * @param sslEngine the SSL engine for encryption
+     */
     public AsyncChannelWrapperSecure(AsynchronousSocketChannel socketChannel, SSLEngine sslEngine) {
         this.socketChannel = socketChannel;
         this.sslEngine = sslEngine;

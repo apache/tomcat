@@ -46,6 +46,13 @@ public class JarFileUrlJar implements Jar {
     private Set<String> entryNamesSeen;
     private JarEntry entry = null;
 
+    /**
+     * Constructs a new JarFileUrlJar.
+     *
+     * @param url the URL of the JAR file
+     * @param startsWithJar whether the URL starts with "jar:"
+     * @throws IOException if an I/O error occurs
+     */
     public JarFileUrlJar(URL url, boolean startsWithJar) throws IOException {
         if (startsWithJar) {
             // jar:file:...

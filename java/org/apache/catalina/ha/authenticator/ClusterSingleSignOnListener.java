@@ -28,6 +28,11 @@ public class ClusterSingleSignOnListener extends SingleSignOnListener implements
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new ClusterSingleSignOnListener for the specified SSO identifier.
+     *
+     * @param ssoId the SSO identifier
+     */
     public ClusterSingleSignOnListener(String ssoId) {
         super(ssoId);
     }

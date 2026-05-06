@@ -20,23 +20,52 @@ import java.util.Locale;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Enumerates the possible handling strategies for encoded solidus characters (%2F) in URI paths.
+ */
 public enum EncodedSolidusHandling {
+    /**
+     * Decode the encoded solidus back to a forward slash character.
+     */
     DECODE("decode"),
+    /**
+     * Reject the request containing an encoded solidus.
+     */
     REJECT("reject"),
+    /**
+     * Pass the encoded solidus through without modification.
+     */
     PASS_THROUGH("passthrough");
 
     private static final StringManager sm = StringManager.getManager(EncodedSolidusHandling.class);
 
     private final String value;
 
+    /**
+     * Creates a new handling strategy with the given string value.
+     *
+     * @param value the string representation of this handling strategy
+     */
     EncodedSolidusHandling(String value) {
         this.value = value;
     }
 
+    /**
+     * Returns the string value for this handling strategy.
+     *
+     * @return the string value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Converts a string to the corresponding handling strategy.
+     *
+     * @param from the string to convert
+     * @return the matching handling strategy
+     * @throws IllegalStateException if the string does not match any known strategy
+     */
     public static EncodedSolidusHandling fromString(String from) {
         String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
 

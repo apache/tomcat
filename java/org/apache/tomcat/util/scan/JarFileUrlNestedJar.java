@@ -31,6 +31,12 @@ public class JarFileUrlNestedJar extends AbstractInputStreamJar {
     private final JarFile warFile;
     private final JarEntry jarEntry;
 
+    /**
+     * Constructs a new JarFileUrlNestedJar.
+     *
+     * @param url the URL of the nested JAR file
+     * @throws IOException if an I/O error occurs
+     */
     public JarFileUrlNestedJar(URL url) throws IOException {
         super(url);
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();

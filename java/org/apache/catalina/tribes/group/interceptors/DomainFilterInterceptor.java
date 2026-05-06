@@ -32,11 +32,30 @@ import org.apache.juli.logging.LogFactory;
  */
 public class DomainFilterInterceptor extends ChannelInterceptorBase implements DomainFilterInterceptorMBean {
 
+    /**
+     * Construct a new DomainFilterInterceptor.
+     */
+    public DomainFilterInterceptor() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(DomainFilterInterceptor.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(DomainFilterInterceptor.class);
+    /**
+     * The membership store for tracking members in the filtered domain.
+     */
     protected volatile Membership membership = null;
 
+    /**
+     * The domain filter byte array.
+     */
     protected byte[] domain = new byte[0];
+    /**
+     * The interval for logging rejected messages.
+     */
     protected int logInterval = 100;
     private final AtomicInteger logCounter = new AtomicInteger(logInterval);
 
@@ -123,6 +142,9 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase implements D
     }
 
 
+    /**
+     * Initialize the membership store if not already set.
+     */
     protected synchronized void setupMembership() {
         if (membership == null) {
             membership = new Membership(super.getLocalMember(true));
@@ -135,10 +157,20 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase implements D
         return domain;
     }
 
+    /**
+     * Set the domain filter as a byte array.
+     *
+     * @param domain The domain byte array
+     */
     public void setDomain(byte[] domain) {
         this.domain = domain;
     }
 
+    /**
+     * Set the domain filter as a String.
+     *
+     * @param domain The domain string, either in "{...}" format or plain text
+     */
     public void setDomain(String domain) {
         if (domain == null) {
             return;

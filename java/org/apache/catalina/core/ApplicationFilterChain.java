@@ -43,6 +43,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class ApplicationFilterChain implements FilterChain {
 
+    /** Constructs a new ApplicationFilterChain. */
+    ApplicationFilterChain() {}
+
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
     private static final ThreadLocal<ServletRequest> lastServicedRequest;
     private static final ThreadLocal<ServletResponse> lastServicedResponse;
@@ -60,6 +63,7 @@ public final class ApplicationFilterChain implements FilterChain {
     // -------------------------------------------------------------- Constants
 
 
+    /** Default increment for filter array growth. */
     public static final int INCREMENT = 10;
 
 

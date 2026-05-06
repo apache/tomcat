@@ -29,6 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FastHttpDateFormat {
 
+    /**
+     * Private constructor to prevent instantiation. This is a utility class with only static methods.
+     */
+    private FastHttpDateFormat() {
+    }
+
 
     // -------------------------------------------------------------- Variables
 

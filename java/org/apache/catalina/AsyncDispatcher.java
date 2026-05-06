@@ -22,6 +22,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+/**
+ * Interface for performing asynchronous dispatch operations within the container.
+ */
 public interface AsyncDispatcher {
 
     /**

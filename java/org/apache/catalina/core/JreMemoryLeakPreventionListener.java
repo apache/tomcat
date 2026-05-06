@@ -58,6 +58,12 @@ import org.w3c.dom.ls.DOMImplementationLS;
  */
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
+    /**
+     * Constructs a new JreMemoryLeakPreventionListener.
+     */
+    public JreMemoryLeakPreventionListener() {
+    }
+
     private static final Log log = LogFactory.getLog(JreMemoryLeakPreventionListener.class);
     private static final StringManager sm = StringManager.getManager(JreMemoryLeakPreventionListener.class);
 
@@ -70,10 +76,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      */
     private boolean appContextProtection = false;
 
+    /**
+     * Get the app context protection flag.
+     *
+     * @return the app context protection flag
+     */
     public boolean isAppContextProtection() {
         return appContextProtection;
     }
 
+    /**
+     * Set the app context protection flag.
+     *
+     * @param appContextProtection the flag to set
+     */
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
     }
@@ -131,10 +147,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      */
     private boolean urlCacheProtection = true;
 
+    /**
+     * Get the URL cache protection flag.
+     *
+     * @return the URL cache protection flag
+     */
     public boolean isUrlCacheProtection() {
         return urlCacheProtection;
     }
 
+    /**
+     * Set the URL cache protection flag.
+     *
+     * @param urlCacheProtection the flag to set
+     */
     public void setUrlCacheProtection(boolean urlCacheProtection) {
         this.urlCacheProtection = urlCacheProtection;
     }
@@ -179,10 +205,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      */
     private boolean driverManagerProtection = true;
 
+    /**
+     * Get the DriverManager protection flag.
+     *
+     * @return the DriverManager protection flag
+     */
     public boolean isDriverManagerProtection() {
         return driverManagerProtection;
     }
 
+    /**
+     * Set the DriverManager protection flag.
+     *
+     * @param driverManagerProtection the flag to set
+     */
     public void setDriverManagerProtection(boolean driverManagerProtection) {
         this.driverManagerProtection = driverManagerProtection;
     }
@@ -210,10 +246,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      */
     private String classesToInitialize = null;
 
+    /**
+     * Get the classes to initialize.
+     *
+     * @return the classes to initialize
+     */
     public String getClassesToInitialize() {
         return classesToInitialize;
     }
 
+    /**
+     * Set the classes to initialize.
+     *
+     * @param classesToInitialize the classes to initialize
+     */
     public void setClassesToInitialize(String classesToInitialize) {
         this.classesToInitialize = classesToInitialize;
     }
@@ -224,10 +270,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      */
     private boolean initSeedGenerator = false;
 
+    /**
+     * Get the init seed generator flag.
+     *
+     * @return the init seed generator flag
+     */
     public boolean getInitSeedGenerator() {
         return this.initSeedGenerator;
     }
 
+    /**
+     * Set the init seed generator flag.
+     *
+     * @param initSeedGenerator the flag to set
+     */
     public void setInitSeedGenerator(boolean initSeedGenerator) {
         this.initSeedGenerator = initSeedGenerator;
     }

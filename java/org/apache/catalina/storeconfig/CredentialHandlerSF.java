@@ -28,6 +28,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class CredentialHandlerSF extends StoreFactoryBase {
 
+    /**
+     * Default constructor.
+     */
+    public CredentialHandlerSF() {
+    }
+
     private static final Log log = LogFactory.getLog(CredentialHandlerSF.class);
 
     @Override

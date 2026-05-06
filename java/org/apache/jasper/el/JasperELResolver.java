@@ -51,6 +51,12 @@ public class JasperELResolver extends CompositeELResolver {
     private volatile ELResolver[] resolvers;
     private final int appResolversSize;
 
+    /**
+     * Constructs a new JasperELResolver.
+     *
+     * @param appResolvers the application-provided resolvers
+     * @param streamResolver the stream resolver
+     */
     public JasperELResolver(List<ELResolver> appResolvers, ELResolver streamResolver) {
         appResolversSize = appResolvers.size();
         resolvers = new ELResolver[appResolversSize + STANDARD_RESOLVERS_COUNT];
@@ -184,6 +190,12 @@ public class JasperELResolver extends CompositeELResolver {
      * configuration.
      */
     public static class GraalBeanELResolver extends ELResolver {
+
+        /**
+         * Constructs a new GraalBeanELResolver.
+         */
+        public GraalBeanELResolver() {
+        }
 
         @Override
         public Object getValue(ELContext context, Object base, Object property) {

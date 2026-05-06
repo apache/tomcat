@@ -51,6 +51,9 @@ import org.apache.tomcat.dbcp.dbcp2.Utils;
  */
 public class BasicManagedDataSource extends BasicDataSource {
 
+    /** Default constructor. */
+    public BasicManagedDataSource() { }
+
     /** Transaction Registry */
     private TransactionRegistry transactionRegistry;
 

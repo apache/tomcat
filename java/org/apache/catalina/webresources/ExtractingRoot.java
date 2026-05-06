@@ -36,6 +36,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ExtractingRoot extends StandardRoot {
 
+    /**
+     * Creates a new ExtractingRoot instance.
+     */
+    public ExtractingRoot() {
+    }
+
     private static final StringManager sm = StringManager.getManager(ExtractingRoot.class);
 
     private static final String APPLICATION_JARS_DIR = "application-jars";

@@ -69,6 +69,9 @@ public class CoyoteAdapter implements Adapter {
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY = EnumSet.of(SessionTrackingMode.SSL);
 
+    /**
+     * The note index used to store the Request and Response objects on the coyote request and response.
+     */
     public static final int ADAPTER_NOTES = 1;
 
     protected static final boolean ALLOW_BACKSLASH = Boolean

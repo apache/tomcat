@@ -178,6 +178,9 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     }
 
 
+    /**
+     * Process archive entries for multi-release JAR support.
+     */
     protected void processArchivesEntriesForMultiRelease() {
 
         int targetVersion = JreCompat.getInstance().jarFileRuntimeMajorVersion();

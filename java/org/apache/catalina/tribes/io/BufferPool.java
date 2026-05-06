@@ -21,13 +21,17 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/** Pool for reusing byte buffers in Tribes messaging. */
 public class BufferPool {
     private static final Log log = LogFactory.getLog(BufferPool.class);
 
+    /** Default maximum pool size in bytes (100 MiB). */
     public static final int DEFAULT_POOL_SIZE = 100 * 1024 * 1024; // 100 MiB
 
+    /** String manager for internationalized messages. */
     protected static final StringManager sm = StringManager.getManager(BufferPool.class);
 
+    /** Singleton instance of the buffer pool. */
     protected static volatile BufferPool instance = null;
     protected final BufferPoolAPI pool;
 
@@ -56,6 +60,11 @@ public class BufferPool {
     }
 
 
+    /**
+     * Returns the singleton buffer pool instance.
+     *
+     * @return the buffer pool
+     */
     public static BufferPool getBufferPool() {
         if (instance == null) {
             synchronized (BufferPool.class) {

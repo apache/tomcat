@@ -221,11 +221,29 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      */
     void setChannel(Channel channel);
 
+    /**
+     * Event fired by an interceptor.
+     */
     interface InterceptorEvent {
+        /**
+         * Returns the event type.
+         *
+         * @return the event type
+         */
         int getEventType();
 
+        /**
+         * Returns the event type description.
+         *
+         * @return the event type description
+         */
         String getEventTypeDesc();
 
+        /**
+         * Returns the interceptor that fired the event.
+         *
+         * @return the interceptor
+         */
         ChannelInterceptor getInterceptor();
     }
 }

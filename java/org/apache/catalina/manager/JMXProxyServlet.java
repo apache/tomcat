@@ -45,6 +45,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JMXProxyServlet extends HttpServlet {
 
+    /**
+     * Constructs a new JMXProxyServlet.
+     */
+    public JMXProxyServlet() {
+    }
+
     private static final long serialVersionUID = 1L;
 
     // Constant for "no parameters" when invoking a JMX operation
@@ -58,6 +64,9 @@ public class JMXProxyServlet extends HttpServlet {
      * MBean server.
      */
     protected transient MBeanServer mBeanServer = null;
+    /**
+     * The MBean registry.
+     */
     protected transient Registry registry;
 
 
@@ -115,6 +124,14 @@ public class JMXProxyServlet extends HttpServlet {
     }
 
 
+    /**
+     * Get an MBean attribute value.
+     *
+     * @param writer the output writer
+     * @param onameStr the MBean object name
+     * @param att the attribute name
+     * @param key the key for composite data, or {@code null}
+     */
     public void getAttribute(PrintWriter writer, String onameStr, String att, String key) {
         try {
             ObjectName oname = new ObjectName(onameStr);
@@ -152,6 +169,14 @@ public class JMXProxyServlet extends HttpServlet {
     }
 
 
+    /**
+     * Set an MBean attribute value.
+     *
+     * @param writer the output writer
+     * @param onameStr the MBean object name
+     * @param att the attribute name
+     * @param val the attribute value
+     */
     public void setAttribute(PrintWriter writer, String onameStr, String att, String val) {
         try {
             setAttributeInternal(onameStr, att, val);
@@ -163,6 +188,12 @@ public class JMXProxyServlet extends HttpServlet {
     }
 
 
+    /**
+     * List MBeans matching the query.
+     *
+     * @param writer the output writer
+     * @param qry the query string
+     */
     public void listBeans(PrintWriter writer, String qry) {
 
         Set<ObjectName> names;

@@ -85,8 +85,18 @@ public class Digester extends DefaultHandler2 {
 
     // ---------------------------------------------------------- Static Fields
 
+    /**
+     * Configured property sources for property replacement.
+     */
     protected static IntrospectionUtils.PropertySource[] propertySources;
+
+    /**
+     * Flag indicating whether property sources have been set.
+     */
     private static boolean propertySourcesSet = false;
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(Digester.class);
 
     static {
@@ -122,6 +132,11 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
+    /**
+     * Set a single property source for property replacement.
+     *
+     * @param propertySource Property source to set
+     */
     public static void setPropertySource(IntrospectionUtils.PropertySource propertySource) {
         if (!propertySourcesSet) {
             propertySources = new IntrospectionUtils.PropertySource[1];
@@ -130,6 +145,11 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
+    /**
+     * Set property sources for property replacement.
+     *
+     * @param propertySources Property sources to set
+     */
     public static void setPropertySource(IntrospectionUtils.PropertySource[] propertySources) {
         if (!propertySourcesSet) {
             Digester.propertySources = propertySources;
@@ -139,30 +159,65 @@ public class Digester extends DefaultHandler2 {
 
     private static final HashSet<String> generatedClasses = new HashSet<>();
 
+    /**
+     * Add a generated class name to the tracking set.
+     *
+     * @param className Name of the generated class
+     */
     public static void addGeneratedClass(String className) {
         generatedClasses.add(className);
     }
 
+    /**
+     * Get the names of all generated classes.
+     *
+     * @return Array of generated class names
+     */
     public static String[] getGeneratedClasses() {
         return generatedClasses.toArray(new String[0]);
     }
 
+    /**
+     * Interface for loading generated code by class name.
+     */
     public interface GeneratedCodeLoader {
+        /**
+         * Load generated code for the specified class.
+         *
+         * @param className Name of the class to load
+         * @return Loaded class object
+         */
         Object loadGeneratedCode(String className);
     }
 
     private static GeneratedCodeLoader generatedCodeLoader;
 
+    /**
+     * Check if a generated code loader has been set.
+     *
+     * @return {@code true} if a loader has been set
+     */
     public static boolean isGeneratedCodeLoaderSet() {
         return generatedCodeLoader != null;
     }
 
+    /**
+     * Set the generated code loader. Can only be set once.
+     *
+     * @param generatedCodeLoader Generated code loader to set
+     */
     public static void setGeneratedCodeLoader(GeneratedCodeLoader generatedCodeLoader) {
         if (Digester.generatedCodeLoader == null) {
             Digester.generatedCodeLoader = generatedCodeLoader;
         }
     }
 
+    /**
+     * Load a generated class using the configured loader.
+     *
+     * @param className Name of the class to load
+     * @return Loaded class object, or {@code null} if no loader is set
+     */
     public static Object loadGeneratedClass(String className) {
         if (generatedCodeLoader != null) {
             return generatedCodeLoader.loadGeneratedCode(className);
@@ -355,6 +410,9 @@ public class Digester extends DefaultHandler2 {
      */
     protected StringBuilder code = null;
 
+    /**
+     * Construct a new Digester with default configuration.
+     */
     public Digester() {
         propertySourcesSet = true;
         ArrayList<IntrospectionUtils.PropertySource> sourcesList = new ArrayList<>();
@@ -374,6 +432,9 @@ public class Digester extends DefaultHandler2 {
     }
 
 
+    /**
+     * Replace property placeholders in all system properties using the configured property sources.
+     */
     public static void replaceSystemProperties() {
         Log log = LogFactory.getLog(Digester.class);
         if (propertySources != null) {
@@ -396,25 +457,50 @@ public class Digester extends DefaultHandler2 {
     }
 
 
+    /**
+     * Start collecting generated code into the internal code buffer.
+     */
     public void startGeneratingCode() {
         code = new StringBuilder();
     }
 
+    /**
+     * Stop collecting generated code and clear the known objects.
+     */
     public void endGeneratingCode() {
         code = null;
         known.clear();
     }
 
+    /**
+     * Get the generated code buffer.
+     *
+     * @return Generated code buffer, or {@code null} if not generating
+     */
     public StringBuilder getGeneratedCode() {
         return code;
     }
 
+    /**
+     * List of known objects for code generation purposes.
+     */
     protected ArrayList<Object> known = new ArrayList<>();
 
+    /**
+     * Mark an object as known for code generation purposes.
+     *
+     * @param object Object to mark as known
+     */
     public void setKnown(Object object) {
         known.add(object);
     }
 
+    /**
+     * Generate a variable name for the given object for use in generated code.
+     *
+     * @param object Object to generate a variable name for
+     * @return Generated variable name
+     */
     public String toVariableName(Object object) {
         boolean found = false;
         int pos = 0;
@@ -494,6 +580,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the current depth of the element stack.
+     *
      * @return the current depth of the element stack.
      */
     public int getCount() {
@@ -502,6 +590,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the name of the XML element that is currently being processed.
+     *
      * @return the name of the XML element that is currently being processed.
      */
     public String getCurrentElementName() {
@@ -515,6 +605,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the error handler for this Digester.
+     *
      * @return the error handler for this Digester.
      */
     public ErrorHandler getErrorHandler() {
@@ -589,6 +681,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the current Logger associated with this instance of the Digester.
+     *
      * @return the current Logger associated with this instance of the Digester
      */
     public Log getLogger() {
@@ -635,6 +729,8 @@ public class Digester extends DefaultHandler2 {
     }
 
     /**
+     * Return the current rule match path.
+     *
      * @return the current rule match path
      */
     public String getMatch() {
@@ -645,6 +741,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the "namespace aware" flag for parsers we create.
+     *
      * @return the "namespace aware" flag for parsers we create.
      */
     public boolean getNamespaceAware() {
@@ -673,6 +771,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the public identifier of the DTD we are currently parsing under, if any.
+     *
      * @return the public identifier of the DTD we are currently parsing under, if any.
      */
     public String getPublicId() {
@@ -681,6 +781,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the SAXParser we will use to parse the input stream.
+     *
      * @return the SAXParser we will use to parse the input stream. If there is a problem creating the parser, return
      *             <code>null</code>.
      */
@@ -749,6 +851,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return a boolean to indicate if the context classloader should be used.
+     *
      * @return a boolean to indicate if the context classloader should be used.
      */
     public boolean getUseContextClassLoader() {
@@ -771,6 +875,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the validating parser flag.
+     *
      * @return the validating parser flag.
      */
     public boolean getValidating() {
@@ -789,6 +895,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the rules validation flag.
+     *
      * @return the rules validation flag.
      */
     public boolean getRulesValidation() {
@@ -807,6 +915,8 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
+     * Return the fake attributes list.
+     *
      * @return the fake attributes list.
      */
     public Map<Class<?>,List<String>> getFakeAttributes() {
@@ -1726,6 +1836,12 @@ public class Digester extends DefaultHandler2 {
     }
 
 
+    /**
+     * Add a "set properties" rule that excludes the specified attribute names.
+     *
+     * @param pattern  Element matching pattern
+     * @param excludes Attribute names to exclude from property setting
+     */
     public void addSetProperties(String pattern, String[] excludes) {
 
         addRule(pattern, new SetPropertiesRule(excludes));
@@ -1757,6 +1873,9 @@ public class Digester extends DefaultHandler2 {
     }
 
 
+    /**
+     * Reset the Digester to its initial state, clearing the root object, error handler, and all internal state.
+     */
     public void reset() {
         root = null;
         setErrorHandler(null);

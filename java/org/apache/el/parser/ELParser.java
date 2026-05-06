@@ -9,6 +9,15 @@ import javax.el.ELException;
 public class ELParser/* @bgen(jjtree) */ implements ELParserTreeConstants, ELParserConstants {/* @bgen(jjtree) */
     protected JJTELParserState jjtree = new JJTELParserState();
 
+    /**
+     * Parses an EL expression string into an AST node.
+     *
+     * @param ref the EL expression string to parse
+     *
+     * @return the root AST node of the parsed expression
+     *
+     * @throws ELException if the expression cannot be parsed
+     */
     public static Node parse(String ref) throws ELException {
         try {
             return new ELParser(new StringReader(ref)).CompositeExpression();
@@ -498,7 +507,7 @@ public class ELParser/* @bgen(jjtree) */ implements ELParserTreeConstants, ELPar
         }
     }
 
-    /*
+    /**
      * Possible invocation of lambda expression. Invocations must be bracketed but being bracketed does not mean it is
      * an invocation.
      */

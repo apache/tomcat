@@ -54,6 +54,9 @@ import org.apache.tomcat.util.res.StringManager;
 public class DeltaManager extends ClusterManagerBase {
 
     // ---------------------------------------------------- Security Classes
+    /**
+     * The log instance for this class.
+     */
     public final Log log = LogFactory.getLog(DeltaManager.class);
 
     /**
@@ -65,6 +68,9 @@ public class DeltaManager extends ClusterManagerBase {
 
     // ----------------------------------------------------- Instance Variables
 
+    /**
+     * The name of this manager.
+     */
     protected String name = null;
 
     private boolean expireSessionsOnShutdown = false;
@@ -110,6 +116,9 @@ public class DeltaManager extends ClusterManagerBase {
 
 
     // ------------------------------------------------------------- Constructor
+    /**
+     * Default constructor.
+     */
     public DeltaManager() {
         super();
     }
@@ -126,128 +135,164 @@ public class DeltaManager extends ClusterManagerBase {
         return name;
     }
 
-    /**
-     * @return Returns the counterSend_EVT_GET_ALL_SESSIONS.
+  /**
+     * Get the send counter for EVT_GET_ALL_SESSIONS events.
+     *
+     * @return the counterSend_EVT_GET_ALL_SESSIONS value.
      */
     public long getCounterSend_EVT_GET_ALL_SESSIONS() {
         return counterSend_EVT_GET_ALL_SESSIONS.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_SESSION_ACCESSED.
+  /**
+     * Get the send counter for EVT_SESSION_ACCESSED events.
+     *
+     * @return the counterSend_EVT_SESSION_ACCESSED value.
      */
     public long getCounterSend_EVT_SESSION_ACCESSED() {
         return counterSend_EVT_SESSION_ACCESSED.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_SESSION_CREATED.
+  /**
+     * Get the send counter for EVT_SESSION_CREATED events.
+     *
+     * @return the counterSend_EVT_SESSION_CREATED value.
      */
     public long getCounterSend_EVT_SESSION_CREATED() {
         return counterSend_EVT_SESSION_CREATED.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_SESSION_DELTA.
+  /**
+     * Get the send counter for EVT_SESSION_DELTA events.
+     *
+     * @return the counterSend_EVT_SESSION_DELTA value.
      */
     public long getCounterSend_EVT_SESSION_DELTA() {
         return counterSend_EVT_SESSION_DELTA.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_SESSION_EXPIRED.
+  /**
+     * Get the send counter for EVT_SESSION_EXPIRED events.
+     *
+     * @return the counterSend_EVT_SESSION_EXPIRED value.
      */
     public long getCounterSend_EVT_SESSION_EXPIRED() {
         return counterSend_EVT_SESSION_EXPIRED.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_ALL_SESSION_DATA.
+  /**
+     * Get the send counter for EVT_ALL_SESSION_DATA events.
+     *
+     * @return the counterSend_EVT_ALL_SESSION_DATA value.
      */
     public long getCounterSend_EVT_ALL_SESSION_DATA() {
         return counterSend_EVT_ALL_SESSION_DATA.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.
+  /**
+     * Get the send counter for EVT_ALL_SESSION_TRANSFERCOMPLETE events.
+     *
+     * @return the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE value.
      */
     public int getCounterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
         return counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
-    /**
-     * @return Returns the counterSend_EVT_CHANGE_SESSION_ID.
+  /**
+     * Get the send counter for EVT_CHANGE_SESSION_ID events.
+     *
+     * @return the counterSend_EVT_CHANGE_SESSION_ID value.
      */
     public long getCounterSend_EVT_CHANGE_SESSION_ID() {
         return counterSend_EVT_CHANGE_SESSION_ID.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_DATA.
+  /**
+     * Get the receive counter for EVT_ALL_SESSION_DATA events.
+     *
+     * @return the counterReceive_EVT_ALL_SESSION_DATA value.
      */
     public long getCounterReceive_EVT_ALL_SESSION_DATA() {
         return counterReceive_EVT_ALL_SESSION_DATA.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_GET_ALL_SESSIONS.
+  /**
+     * Get the receive counter for EVT_GET_ALL_SESSIONS events.
+     *
+     * @return the counterReceive_EVT_GET_ALL_SESSIONS value.
      */
     public long getCounterReceive_EVT_GET_ALL_SESSIONS() {
         return counterReceive_EVT_GET_ALL_SESSIONS.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_SESSION_ACCESSED.
+ /**
+     * Get the receive counter for EVT_SESSION_ACCESSED events.
+     *
+     * @return the counterReceive_EVT_SESSION_ACCESSED value.
      */
     public long getCounterReceive_EVT_SESSION_ACCESSED() {
         return counterReceive_EVT_SESSION_ACCESSED.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_SESSION_CREATED.
+ /**
+     * Get the receive counter for EVT_SESSION_CREATED events.
+     *
+     * @return the counterReceive_EVT_SESSION_CREATED value.
      */
     public long getCounterReceive_EVT_SESSION_CREATED() {
         return counterReceive_EVT_SESSION_CREATED.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_SESSION_DELTA.
+ /**
+     * Get the receive counter for EVT_SESSION_DELTA events.
+     *
+     * @return the counterReceive_EVT_SESSION_DELTA value.
      */
     public long getCounterReceive_EVT_SESSION_DELTA() {
         return counterReceive_EVT_SESSION_DELTA.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_SESSION_EXPIRED.
+ /**
+     * Get the receive counter for EVT_SESSION_EXPIRED events.
+     *
+     * @return the counterReceive_EVT_SESSION_EXPIRED value.
      */
     public long getCounterReceive_EVT_SESSION_EXPIRED() {
         return counterReceive_EVT_SESSION_EXPIRED.get();
     }
 
 
-    /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.
+ /**
+     * Get the receive counter for EVT_ALL_SESSION_TRANSFERCOMPLETE events.
+     *
+     * @return the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE value.
      */
     public int getCounterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
         return counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_CHANGE_SESSION_ID.
+ /**
+     * Get the receive counter for EVT_CHANGE_SESSION_ID events.
+     *
+     * @return the counterReceive_EVT_CHANGE_SESSION_ID value.
      */
     public long getCounterReceive_EVT_CHANGE_SESSION_ID() {
         return counterReceive_EVT_CHANGE_SESSION_ID.get();
     }
 
-    /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.
+ /**
+     * Get the receive counter for EVT_ALL_SESSION_NOCONTEXTMANAGER events.
+     *
+     * @return the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER value.
      */
     public long getCounterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER() {
         return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.get();
     }
 
-    /**
-     * @return Returns the sessionReplaceCounter.
+ /**
+     * Get the session replace counter.
+     *
+     * @return the sessionReplaceCounter value.
      */
     public long getSessionReplaceCounter() {
         return sessionReplaceCounter.get();
@@ -270,27 +315,38 @@ public class DeltaManager extends ClusterManagerBase {
         return counterNoStateTransferred.get();
     }
 
+    /**
+     * Get the current size of the received message queue.
+     *
+     * @return the queue size
+     */
     public int getReceivedQueueSize() {
         synchronized (receivedMessageQueue) {
             return receivedMessageQueue.size();
         }
     }
 
-    /**
-     * @return Returns the stateTransferTimeout.
+ /**
+     * Get the state transfer timeout value.
+     *
+     * @return the stateTransferTimeout value.
      */
     public int getStateTransferTimeout() {
         return stateTransferTimeout;
     }
 
-    /**
-     * @param timeoutAllSession The timeout
+  /**
+     * Set the state transfer timeout.
+     *
+     * @param timeoutAllSession The timeout value
      */
     public void setStateTransferTimeout(int timeoutAllSession) {
         this.stateTransferTimeout = timeoutAllSession;
     }
 
-    /**
+  /**
+     * Check if the state transfer is complete.
+     *
      * @return <code>true</code> if the state transfer is complete.
      *
      * @deprecated Use {@link #getStateTransferred()}. Will be removed in Tomcat 10 onwards.
@@ -328,110 +384,164 @@ public class DeltaManager extends ClusterManagerBase {
         this.stateTransferred = stateTransferred;
     }
 
+    /**
+     * Check if a no-context-manager signal has been received.
+     *
+     * @return true if no context manager received
+     */
     public boolean isNoContextManagerReceived() {
         return noContextManagerReceived;
     }
 
+    /**
+     * Set whether a no-context-manager signal has been received.
+     *
+     * @param noContextManagerReceived The flag value
+     */
     public void setNoContextManagerReceived(boolean noContextManagerReceived) {
         this.noContextManagerReceived = noContextManagerReceived;
     }
 
-    /**
-     * @return the sendAllSessionsWaitTime in msec
+  /**
+     * Get the wait time for sending all sessions.
+     *
+     * @return the sendAllSessionsWaitTime in milliseconds
      */
     public int getSendAllSessionsWaitTime() {
         return sendAllSessionsWaitTime;
     }
 
-    /**
-     * @param sendAllSessionsWaitTime The sendAllSessionsWaitTime to set at msec.
+ /**
+     * Set the wait time for sending all sessions.
+     *
+     * @param sendAllSessionsWaitTime The wait time in milliseconds
      */
     public void setSendAllSessionsWaitTime(int sendAllSessionsWaitTime) {
         this.sendAllSessionsWaitTime = sendAllSessionsWaitTime;
     }
 
-    /**
-     * @return the stateTimestampDrop.
+ /**
+     * Check if state timestamp drop is enabled.
+     *
+     * @return the stateTimestampDrop flag
      */
     public boolean isStateTimestampDrop() {
         return stateTimestampDrop;
     }
 
-    /**
+ /**
+     * Set the state timestamp drop flag.
+     *
      * @param isTimestampDrop The new flag value
      */
     public void setStateTimestampDrop(boolean isTimestampDrop) {
         this.stateTimestampDrop = isTimestampDrop;
     }
 
-    /**
-     * @return the sendAllSessions.
+ /**
+     * Check if sending all sessions is enabled.
+     *
+     * @return the sendAllSessions flag
      */
     public boolean isSendAllSessions() {
         return sendAllSessions;
     }
 
-    /**
-     * @param sendAllSessions The sendAllSessions to set.
+ /**
+     * Set whether to send all sessions during replication.
+     *
+     * @param sendAllSessions The flag value
      */
     public void setSendAllSessions(boolean sendAllSessions) {
         this.sendAllSessions = sendAllSessions;
     }
 
-    /**
-     * @return the sendAllSessionsSize.
+ /**
+     * Get the batch size for sending all sessions.
+     *
+     * @return the sendAllSessionsSize value
      */
     public int getSendAllSessionsSize() {
         return sendAllSessionsSize;
     }
 
-    /**
-     * @param sendAllSessionsSize The sendAllSessionsSize to set.
+ /**
+     * Set the batch size for sending all sessions.
+     *
+     * @param sendAllSessionsSize The batch size value
      */
     public void setSendAllSessionsSize(int sendAllSessionsSize) {
         this.sendAllSessionsSize = sendAllSessionsSize;
     }
 
-    /**
-     * @return the notifySessionListenersOnReplication.
+ /**
+     * Check if session listeners are notified on replication.
+     *
+     * @return the notifySessionListenersOnReplication flag
      */
     public boolean isNotifySessionListenersOnReplication() {
         return notifySessionListenersOnReplication;
     }
 
-    /**
-     * @param notifyListenersCreateSessionOnReplication The notifySessionListenersOnReplication to set.
+ /**
+     * Set whether to notify session listeners on replication.
+     *
+     * @param notifyListenersCreateSessionOnReplication The flag value
      */
     public void setNotifySessionListenersOnReplication(boolean notifyListenersCreateSessionOnReplication) {
         this.notifySessionListenersOnReplication = notifyListenersCreateSessionOnReplication;
     }
 
 
+    /**
+     * Check if sessions should be expired on shutdown.
+     *
+     * @return true if sessions are expired on shutdown
+     */
     public boolean isExpireSessionsOnShutdown() {
         return expireSessionsOnShutdown;
     }
 
+    /**
+     * Set whether to expire sessions on shutdown.
+     *
+     * @param expireSessionsOnShutdown The flag value
+     */
     public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown) {
         this.expireSessionsOnShutdown = expireSessionsOnShutdown;
     }
 
+    /**
+     * Check if container listeners are notified on replication.
+     *
+     * @return true if container listeners are notified on replication
+     */
     public boolean isNotifyContainerListenersOnReplication() {
         return notifyContainerListenersOnReplication;
     }
 
+    /**
+     * Set whether to notify container listeners on replication.
+     *
+     * @param notifyContainerListenersOnReplication The flag value
+     */
     public void setNotifyContainerListenersOnReplication(boolean notifyContainerListenersOnReplication) {
         this.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
     }
 
-    /**
-     * @return the enableStatistics
+/**
+     * Check if statistics collection is enabled.
+     *
+     * @return the enableStatistics flag
      */
     public boolean getEnableStatistics() {
         return this.enableStatistics;
     }
 
-    /**
-     * @param enableStatistics the enableStatistics to set
+/**
+     * Set whether statistics collection is enabled.
+     *
+     * @param enableStatistics The flag value
      */
     public void setEnableStatistics(boolean enableStatistics) {
         this.enableStatistics = enableStatistics;
@@ -557,6 +667,13 @@ public class DeltaManager extends ClusterManagerBase {
         return newId;
     }
 
+    /**
+     * Change the session ID and optionally notify cluster members.
+     *
+     * @param session The session whose ID should be changed
+     * @param newId The new session ID
+     * @param notify Whether to notify cluster members of the change
+     */
     protected void changeSessionId(Session session, String newId, boolean notify) {
         String orgSessionID = session.getId();
         super.changeSessionId(session, newId);
@@ -565,6 +682,12 @@ public class DeltaManager extends ClusterManagerBase {
         }
     }
 
+    /**
+     * Send a session ID change notification to cluster members.
+     *
+     * @param newSessionID The new session ID
+     * @param orgSessionID The original session ID
+     */
     protected void sendChangeSessionId(String newSessionID, String orgSessionID) {
         if (cluster.getMembers().length > 0) {
             try {

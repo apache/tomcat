@@ -81,6 +81,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HostManagerServlet extends HttpServlet implements ContainerServlet {
 
+    /**
+     * Constructs a new HostManagerServlet.
+     */
+    public HostManagerServlet() {
+    }
+
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables

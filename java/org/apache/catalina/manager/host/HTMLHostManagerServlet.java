@@ -50,6 +50,12 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class HTMLHostManagerServlet extends HostManagerServlet {
 
+    /**
+     * Constructs a new HTMLHostManagerServlet.
+     */
+    public HTMLHostManagerServlet() {
+    }
+
     private static final long serialVersionUID = 1L;
 
 

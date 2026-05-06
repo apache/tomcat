@@ -875,6 +875,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write thread name - %I.
      */
     protected static class ThreadNameElement implements AccessLogElement {
+
+        /**
+         * Constructs a new ThreadNameElement.
+         */
+        ThreadNameElement() {
+        }
+
         /**
          * Adds the thread name element to the buffer.
          *
@@ -1003,10 +1010,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
-    /**
+   /**
      * Write remote host name - %h.
      */
     protected class HostElement implements AccessLogElement, CachedElement {
+
+        /**
+         * Constructs a new HostElement.
+         */
+        HostElement() {
+        }
+
         /**
          * Adds the host element to the buffer.
          *
@@ -1049,6 +1063,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write remote logical username from identd (always returns '-') - %l.
      */
     protected static class LogicalUserNameElement implements AccessLogElement {
+
+        /**
+         * Constructs a new LogicalUserNameElement.
+         */
+        LogicalUserNameElement() {
+        }
+
         /**
          * Adds the logical user name element to the buffer.
          *
@@ -1067,6 +1088,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write request protocol - %H.
      */
     protected class ProtocolElement implements AccessLogElement {
+
+        /**
+         * Constructs a new ProtocolElement.
+         */
+        ProtocolElement() {
+        }
+
         /**
          * Adds the protocol element to the buffer.
          *
@@ -1094,6 +1122,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write remote user that was authenticated (if any), else '-' - %u.
      */
     protected static class UserElement implements AccessLogElement {
+
+        /**
+         * Constructs a new UserElement.
+         */
+        UserElement() {
+        }
+
         /**
          * Adds the user element to the buffer.
          *
@@ -1312,6 +1347,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write first line of the request (method and request URI) - %r.
      */
     protected static class RequestElement implements AccessLogElement {
+
+        /**
+         * Constructs a new RequestElement.
+         */
+        RequestElement() {
+        }
+
         /**
          * Adds the request element to the buffer.
          *
@@ -1345,6 +1387,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write HTTP status code of the response - %s.
      */
     protected static class HttpStatusCodeElement implements AccessLogElement {
+
+        /**
+         * Constructs a new HttpStatusCodeElement.
+         */
+        HttpStatusCodeElement() {
+        }
+
         /**
          * Adds the HTTP status code element to the buffer.
          *
@@ -1487,6 +1536,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write request method (GET, POST, etc.) - %m.
      */
     protected static class MethodElement implements AccessLogElement {
+
+        /**
+         * Constructs a new MethodElement.
+         */
+        MethodElement() {
+        }
+
         /**
          * Adds the method element to the buffer.
          *
@@ -1537,6 +1593,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write time until first byte is written (commit time) in millis - %F.
      */
     protected static class FirstByteTimeElement implements AccessLogElement {
+
+        /**
+         * Constructs a new FirstByteTimeElement.
+         */
+        FirstByteTimeElement() {
+        }
+
         /**
          * Adds the first byte time element to the buffer.
          *
@@ -1561,6 +1624,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write query string (prepended with a '?' if it exists) - %q.
      */
     protected static class QueryElement implements AccessLogElement {
+
+        /**
+         * Constructs a new QueryElement.
+         */
+        QueryElement() {
+        }
+
         /**
          * Adds the query element to the buffer.
          *
@@ -1579,6 +1649,15 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
+    /**
+     * Appends the query string to the buffer with optional formatting.
+     *
+     * @param query                     The query string to append
+     * @param buf                       The buffer to which the query string should be appended
+     * @param appendDelim               Whether to prepend a '?' delimiter
+     * @param escapeQuoteAsDouble       Whether to escape quotes as double quotes
+     * @param writeDashOnNull          Whether to write "-" when query is null
+     */
     protected static void appendQueryString(String query, CharArrayWriter buf,
             boolean appendDelim, boolean escapeQuoteAsDouble, boolean writeDashOnNull) {
         if (query != null) {
@@ -1598,6 +1677,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write user session ID - %S.
      */
     protected static class SessionIdElement implements AccessLogElement {
+
+        /**
+         * Constructs a new SessionIdElement.
+         */
+        SessionIdElement() {
+        }
+
         /**
          * Adds the session ID element to the buffer.
          *
@@ -1625,6 +1711,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write requested URL path - %U.
      */
     protected static class RequestURIElement implements AccessLogElement {
+
+        /**
+         * Constructs a new RequestURIElement.
+         */
+        RequestURIElement() {
+        }
+
         /**
          * Adds the request URI element to the buffer.
          *
@@ -1647,6 +1740,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write local server name - %v.
      */
     protected class LocalServerNameElement implements AccessLogElement {
+
+        /**
+         * Constructs a new LocalServerNameElement.
+         */
+        LocalServerNameElement() {
+        }
+
         /**
          * Adds the local server name element to the buffer.
          *
@@ -1881,6 +1981,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Write connection status when response is completed - %X.
      */
     protected static class ConnectionStatusElement implements AccessLogElement {
+
+        /**
+         * Constructs a new ConnectionStatusElement.
+         */
+        ConnectionStatusElement() {
+        }
+
         /**
          * Adds the connection status element to the buffer.
          *

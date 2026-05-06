@@ -70,32 +70,75 @@ import org.apache.tomcat.util.res.StringManager;
  */
 class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler, Input, Output {
 
+    /**
+     * Logger for this class.
+     */
     protected static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
+
+    /**
+     * String manager for error messages.
+     */
     protected static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
 
     private static final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
+    /**
+     * Flag indicating the end of a stream.
+     */
     protected static final int FLAG_END_OF_STREAM = 1;
+
+    /**
+     * Flag indicating the end of headers.
+     */
     protected static final int FLAG_END_OF_HEADERS = 4;
 
+    /**
+     * PING frame with zero payload length and zero stream ID.
+     */
     protected static final byte[] PING = { 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+    /**
+     * PING ACK frame with zero payload length and zero stream ID.
+     */
     protected static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
+    /**
+     * SETTINGS ACK frame with zero payload length and zero stream ID.
+     */
     protected static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
+    /**
+     * GOAWAY frame header with zero stream ID.
+     */
     protected static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
 
+    /**
+     * Default header sink for HPACK decoding.
+     */
     protected static final HeaderSink HEADER_SINK = new HeaderSink();
 
+    /**
+     * Helper for user data logging with rate limiting.
+     */
     protected static final UserDataHelper userDataHelper = new UserDataHelper(log);
 
+    /**
+     * Unique identifier for this connection.
+     */
     protected final String connectionId;
 
+    /**
+     * The HTTP/2 protocol configuration.
+     */
     protected final Http2Protocol protocol;
     private final Adapter adapter;
+
+    /**
+     * The socket wrapper for the underlying connection.
+     */
     protected volatile SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
 
@@ -120,6 +163,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private HpackEncoder hpackEncoder;
 
     private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
+
+    /**
+     * Count of currently active remote-initiated streams.
+     */
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
     private volatile int maxProcessedStreamId;
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
@@ -188,6 +235,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Creates the ping manager instance for this connection.
+     *
+     * @return the ping manager
+     */
     protected PingManager getPingManager() {
         return new PingManager();
     }
@@ -269,6 +321,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         processConnection(webConnection, stream);
     }
 
+    /**
+     * Process the connection initialization, sending initial ping and processing the first stream.
+     *
+     * @param webConnection the web connection, may be null for direct HTTP/2
+     * @param stream the initial stream
+     */
     protected void processConnection(WebConnection webConnection, Stream stream) {
         // Send a ping to get an idea of round trip time as early as possible
         try {
@@ -282,11 +340,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
+    /**
+     * Creates the HTTP/2 parser for this connection.
+     *
+     * @param connectionId the connection identifier
+     *
+     * @return the HTTP/2 parser
+     */
     protected Http2Parser getParser(String connectionId) {
         return new Http2Parser(connectionId, this, this);
     }
 
 
+    /**
+     * Process a stream on a container thread.
+     *
+     * @param stream the stream to process
+     */
     protected void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
@@ -294,6 +364,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Decrements the active remote stream count and updates the connection timeout accordingly.
+     *
+     * @param stream the stream that is being closed
+     */
     protected void decrementActiveRemoteStreamCount(Stream stream) {
         if (stream != null) {
             setConnectionTimeoutForStreamCount(stream.decrementAndGetActiveRemoteStreamCount());
@@ -464,8 +539,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Sets the connection timeout based on the current number of active streams.
+     * When no streams are active, uses the keep-alive timeout. Otherwise keeps the connection open.
+     *
+     * @param streamCount the current number of active streams
      */
     protected void setConnectionTimeoutForStreamCount(int streamCount) {
         if (streamCount == 0) {
@@ -672,6 +750,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     /**
+     * Creates a WINDOW_UPDATE frame if the initial window size exceeds the default.
+     *
      * @return The WINDOW_UPDATE frame if one is required or an empty array if no WINDOW_UPDATE is required.
      */
     protected byte[] createWindowUpdateForSettings() {
@@ -693,6 +773,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Write a GOAWAY frame to signal the peer that no more streams will be accepted.
+     *
+     * @param maxStreamId the maximum stream ID processed
+     * @param errorCode the error code
+     * @param debugMsg optional debug message
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected void writeGoAwayFrame(int maxStreamId, long errorCode, byte[] debugMsg) throws IOException {
         byte[] fixedPayload = new byte[8];
         ByteUtil.set31Bits(fixedPayload, 0, maxStreamId);
@@ -736,9 +825,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
+     * Write headers for a stream without synchronizing on socketWrapper.
      * Separate method to allow Http2AsyncUpgradeHandler to call this code without synchronizing on socketWrapper since
      * it doesn't need to.
+     *
+     * @param stream the stream to write headers for
+     * @param mimeHeaders the headers to write
+     * @param endOfStream whether this is the end of the stream
+     * @param payloadSize the initial payload size for the header frame
+     *
+     * @return the header frame buffers
+     *
+     * @throws IOException if an I/O error occurs
      */
     protected HeaderFrameBuffers doWriteHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
@@ -806,11 +905,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         return headerFrameBuffers;
     }
 
+    /**
+     * Creates header frame buffers for writing headers.
+     *
+     * @param initialPayloadSize the initial payload size
+     *
+     * @return the header frame buffers
+     */
     protected HeaderFrameBuffers getHeaderFrameBuffers(int initialPayloadSize) {
         return new DefaultHeaderFrameBuffers(initialPayloadSize);
     }
 
 
+    /**
+     * Gets the HPACK encoder for this connection, creating it if necessary.
+     *
+     * @return the HPACK encoder
+     */
     protected HpackEncoder getHpackEncoder() {
         if (hpackEncoder == null) {
             hpackEncoder = new HpackEncoder();
@@ -857,6 +968,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Handle the end of stream for a given stream, updating active stream counts.
+     *
+     * @param stream the stream that has ended
+     */
     protected void sentEndOfStream(Stream stream) {
         stream.sentEndOfStream();
         if (!stream.isActive()) {
@@ -865,12 +981,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Handles an I/O error on the socket underlying the HTTP/2 connection when it is triggered by application code
      * (usually reading the request or writing the response). Such I/O errors are fatal so the connection is closed. The
      * exception is re-thrown to make the client code aware of the problem.
      *
      * Note: We can not rely on this exception reaching the socket processor since the application code may swallow it.
+     *
+     * @param ioe the I/O exception
+     *
+     * @throws IOException the same I/O exception is re-thrown after closing the connection
      */
     protected void handleAppInitiatedIOException(IOException ioe) throws IOException {
         close();
@@ -929,6 +1049,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Process pending writes, flushing the socket and potentially sending a ping.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected void processWrites() throws IOException {
         Lock lock = socketWrapper.getLock();
         lock.lock();
@@ -1978,6 +2103,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
 
+        /**
+         * Handle a received PING frame.
+         *
+         * @param payload the PING payload
+         * @param ack whether this is a PING ACK
+         *
+         * @throws IOException if an I/O error occurs
+         */
         public void receivePing(byte[] payload, boolean ack) throws IOException {
             if (ack) {
                 // Extract the sequence from the payload
