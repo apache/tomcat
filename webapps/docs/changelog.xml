@@ -199,6 +199,10 @@
         third-party library version information. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Add support for literal <code>'%'</code> characters in access log
+        output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

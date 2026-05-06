@@ -2138,6 +2138,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     protected AccessLogElement createAccessLogElement(char pattern) {
         return switch (pattern) {
+            case '%' -> new StringElement("%");
             case 'a' -> new RemoteAddrElement();
             case 'A' -> new LocalAddrElement(ipv6Canonical);
             case 'b' -> new ByteSentElement(true);

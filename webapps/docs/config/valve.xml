@@ -282,6 +282,7 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
+    <li><b><code>%%</code></b> - Literal '%' character</li>
     <li><b><code>%a</code></b> - Remote IP address.
         See also <code>%{xxx}a</code> below.</li>
     <li><b><code>%A</code></b> - Local IP address</li>
