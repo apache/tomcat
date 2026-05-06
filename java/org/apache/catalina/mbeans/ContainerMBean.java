@@ -35,7 +35,16 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
 
+/**
+ * MBean wrapper for ContainerBase instances, providing JMX management operations for child containers,
+ * valves, and lifecycle listeners.
+ */
 public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
+    /**
+     * Constructs a new ContainerMBean instance.
+     */
+    public ContainerMBean() {
+    }
 
     /**
      * Add a new child Container to those associated with this Container, if supported. Won't start the child yet. Has

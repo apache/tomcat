@@ -43,7 +43,9 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
 
 
     /**
-     * @return the byte array.
+     * Returns the underlying byte array.
+     *
+     * @return the byte array
      */
     public byte[] toByteArray() {
         return buf.toByteArray();

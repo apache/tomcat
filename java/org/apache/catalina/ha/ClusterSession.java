@@ -20,6 +20,9 @@ import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Session;
 
+/**
+ * Interface for a cluster-aware session that extends both {@link Session} and {@link HttpSession}.
+ */
 public interface ClusterSession extends Session, HttpSession {
     /**
      * returns true if this session is the primary session, if that is the case, the manager can expire it upon timeout.

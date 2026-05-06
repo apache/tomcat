@@ -142,6 +142,12 @@ public class JNDIRealm extends RealmBase {
      */
     public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
+    /**
+     * Constructs a new JNDIRealm.
+     */
+    public JNDIRealm() {
+    }
+
     private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
 
 
@@ -402,18 +408,30 @@ public class JNDIRealm extends RealmBase {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Get the forceDnHexEscape flag.
+     *
+     * @return the forceDnHexEscape flag
+     */
     public boolean getForceDnHexEscape() {
         return forceDnHexEscape;
     }
 
 
+    /**
+     * Set the forceDnHexEscape flag.
+     *
+     * @param forceDnHexEscape The new forceDnHexEscape flag
+     */
     public void setForceDnHexEscape(boolean forceDnHexEscape) {
         this.forceDnHexEscape = forceDnHexEscape;
     }
 
 
     /**
-     * @return the type of authentication to use.
+     * Get the type of authentication to use.
+     *
+     * @return the type of authentication to use
      */
     public String getAuthentication() {
         return authentication;
@@ -431,7 +449,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the connection username for this Realm.
+     * Get the connection username for this Realm.
+     *
+     * @return the connection username for this Realm
      */
     public String getConnectionName() {
         return this.connectionName;
@@ -449,7 +469,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the connection password for this Realm.
+     * Get the connection password for this Realm.
+     *
+     * @return the connection password for this Realm
      */
     public String getConnectionPassword() {
         return this.connectionPassword;
@@ -467,7 +489,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the connection URL for this Realm.
+     * Get the connection URL for this Realm.
+     *
+     * @return the connection URL for this Realm
      */
     public String getConnectionURL() {
         return this.connectionURL;
@@ -485,7 +509,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the JNDI context factory for this Realm.
+     * Get the JNDI context factory for this Realm.
+     *
+     * @return the JNDI context factory for this Realm
      */
     public String getContextFactory() {
         return this.contextFactory;
@@ -503,7 +529,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the derefAliases setting to be used.
+     * Get the derefAliases setting to be used.
+     *
+     * @return the derefAliases setting to be used
      */
     public String getDerefAliases() {
         return derefAliases;
@@ -521,7 +549,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the protocol to be used.
+     * Get the protocol to be used.
+     *
+     * @return the protocol to be used
      */
     public String getProtocol() {
         return protocol;
@@ -539,6 +569,8 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Get the current settings for handling PartialResultExceptions.
+     *
      * @return the current settings for handling PartialResultExceptions
      */
     public boolean getAdCompat() {
@@ -557,7 +589,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the current settings for handling JNDI referrals.
+     * Get the current settings for handling JNDI referrals.
+     *
+     * @return the current settings for handling JNDI referrals
      */
     public String getReferrals() {
         return referrals;
@@ -576,7 +610,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the base element for user searches.
+     * Get the base element for user searches.
+     *
+     * @return the base element for user searches
      */
     public String getUserBase() {
         return this.userBase;
@@ -594,7 +630,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the message format pattern for selecting users in this Realm.
+     * Get the message format pattern for selecting users in this Realm.
+     *
+     * @return the message format pattern for selecting users in this Realm
      */
     public String getUserSearch() {
         return this.userSearch;
@@ -612,18 +650,30 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Get the userSearchAsUser flag.
+     *
+     * @return the userSearchAsUser flag
+     */
     public boolean isUserSearchAsUser() {
         return userSearchAsUser;
     }
 
 
+    /**
+     * Set the userSearchAsUser flag.
+     *
+     * @param userSearchAsUser The new userSearchAsUser flag
+     */
     public void setUserSearchAsUser(boolean userSearchAsUser) {
         this.userSearchAsUser = userSearchAsUser;
     }
 
 
     /**
-     * @return the "search subtree for users" flag.
+     * Get the "search subtree for users" flag.
+     *
+     * @return the "search subtree for users" flag
      */
     public boolean getUserSubtree() {
         return this.userSubtree;
@@ -641,7 +691,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the user role name attribute name for this Realm.
+     * Get the user role name attribute name for this Realm.
+     *
+     * @return the user role name attribute name for this Realm
      */
     public String getUserRoleName() {
         return userRoleName;
@@ -659,7 +711,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the base element for role searches.
+     * Get the base element for role searches.
+     *
+     * @return the base element for role searches
      */
     public String getRoleBase() {
         return this.roleBase;
@@ -678,7 +732,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the role name attribute name for this Realm.
+     * Get the role name attribute name for this Realm.
+     *
+     * @return the role name attribute name for this Realm
      */
     public String getRoleName() {
         return this.roleName;
@@ -696,7 +752,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the message format pattern for selecting roles in this Realm.
+     * Get the message format pattern for selecting roles in this Realm.
+     *
+     * @return the message format pattern for selecting roles in this Realm
      */
     public String getRoleSearch() {
         return this.roleSearch;
@@ -714,18 +772,30 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Get the roleSearchAsUser flag.
+     *
+     * @return the roleSearchAsUser flag
+     */
     public boolean isRoleSearchAsUser() {
         return roleSearchAsUser;
     }
 
 
+    /**
+     * Set the roleSearchAsUser flag.
+     *
+     * @param roleSearchAsUser The new roleSearchAsUser flag
+     */
     public void setRoleSearchAsUser(boolean roleSearchAsUser) {
         this.roleSearchAsUser = roleSearchAsUser;
     }
 
 
     /**
-     * @return the "search subtree for roles" flag.
+     * Get the "search subtree for roles" flag.
+     *
+     * @return the "search subtree for roles" flag
      */
     public boolean getRoleSubtree() {
         return this.roleSubtree;
@@ -743,7 +813,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the "The nested group search flag" flag.
+     * Get the nested group search flag.
+     *
+     * @return the nested group search flag
      */
     public boolean getRoleNested() {
         return this.roleNested;
@@ -761,7 +833,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the password attribute used to retrieve the user password.
+     * Get the password attribute used to retrieve the user password.
+     *
+     * @return the password attribute used to retrieve the user password
      */
     public String getUserPassword() {
         return this.userPassword;
@@ -778,17 +852,29 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Get the user role attribute name.
+     *
+     * @return the user role attribute name
+     */
     public String getUserRoleAttribute() {
         return userRoleAttribute;
     }
 
 
+    /**
+     * Set the user role attribute name.
+     *
+     * @param userRoleAttribute The new user role attribute name
+     */
     public void setUserRoleAttribute(String userRoleAttribute) {
         this.userRoleAttribute = userRoleAttribute;
     }
 
     /**
-     * @return the message format pattern for selecting users in this Realm.
+     * Get the message format pattern for selecting users in this Realm.
+     *
+     * @return the message format pattern for selecting users in this Realm
      */
     public String getUserPattern() {
         return this.userPattern;
@@ -835,6 +921,8 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Get the common role.
+     *
      * @return the common role
      */
     public String getCommonRole() {
@@ -853,7 +941,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the connection timeout.
+     * Get the connection timeout.
+     *
+     * @return the connection timeout
      */
     public String getConnectionTimeout() {
         return connectionTimeout;
@@ -871,7 +961,9 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * @return the read timeout.
+     * Get the read timeout.
+     *
+     * @return the read timeout
      */
     public String getReadTimeout() {
         return readTimeout;
@@ -888,47 +980,89 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Get the size limit.
+     *
+     * @return the size limit
+     */
     public long getSizeLimit() {
         return sizeLimit;
     }
 
 
+    /**
+     * Set the size limit.
+     *
+     * @param sizeLimit The new size limit
+     */
     public void setSizeLimit(long sizeLimit) {
         this.sizeLimit = sizeLimit;
     }
 
 
+    /**
+     * Get the time limit.
+     *
+     * @return the time limit
+     */
     public int getTimeLimit() {
         return timeLimit;
     }
 
 
+    /**
+     * Set the time limit.
+     *
+     * @param timeLimit The new time limit
+     */
     public void setTimeLimit(int timeLimit) {
         this.timeLimit = timeLimit;
     }
 
 
+    /**
+     * Get the useDelegatedCredential flag.
+     *
+     * @return the useDelegatedCredential flag
+     */
     public boolean isUseDelegatedCredential() {
         return useDelegatedCredential;
     }
 
 
+    /**
+     * Set the useDelegatedCredential flag.
+     *
+     * @param useDelegatedCredential The new useDelegatedCredential flag
+     */
     public void setUseDelegatedCredential(boolean useDelegatedCredential) {
         this.useDelegatedCredential = useDelegatedCredential;
     }
 
 
+    /**
+     * Get the SPNEGO delegation quality of protection.
+     *
+     * @return the SPNEGO delegation quality of protection
+     */
     public String getSpnegoDelegationQop() {
         return spnegoDelegationQop;
     }
 
 
+    /**
+     * Set the SPNEGO delegation quality of protection.
+     *
+     * @param spnegoDelegationQop The new SPNEGO delegation quality of protection
+     */
     public void setSpnegoDelegationQop(String spnegoDelegationQop) {
         this.spnegoDelegationQop = spnegoDelegationQop;
     }
 
 
     /**
+     * Get the flag whether to use StartTLS for connections to the ldap server.
+     *
      * @return flag whether to use StartTLS for connections to the ldap server
      */
     public boolean getUseStartTls() {
@@ -979,6 +1113,8 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Get the connection pool size.
+     *
      * @return the connection pool size, or the default value 1 if pooling is disabled
      */
     public int getConnectionPoolSize() {
@@ -997,8 +1133,10 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Get the name of the {@link HostnameVerifier} class used for connections using StartTLS.
+     *
      * @return name of the {@link HostnameVerifier} class used for connections using StartTLS, or the empty string, if
-     *             the default verifier should be used.
+     *             the default verifier should be used
      */
     public String getHostnameVerifierClassName() {
         if (this.hostnameVerifier == null) {
@@ -1024,8 +1162,10 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Get the {@link HostnameVerifier} to use for peer certificate verification when opening connections using StartTLS.
+     *
      * @return the {@link HostnameVerifier} to use for peer certificate verification when opening connections using
-     *             StartTLS.
+     *             StartTLS
      */
     public HostnameVerifier getHostnameVerifier() {
         if (this.hostnameVerifier != null) {
@@ -2326,6 +2466,13 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Get the principal for the given username.
+     *
+     * @param username the username
+     * @param gssCredential the GSS credential
+     * @return the principal
+     */
     protected Principal getPrincipal(String username, GSSCredential gssCredential) {
 
         JNDIConnection connection = null;
@@ -2975,6 +3122,12 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    /**
+     * Convert escape sequences in the input string to hex escape sequences.
+     *
+     * @param input the input string
+     * @return the converted string
+     */
     protected static String convertToHexEscape(String input) {
         if (input.indexOf('\\') == -1) {
             // No escaping present. Return original.
@@ -3064,6 +3217,15 @@ public class JNDIRealm extends RealmBase {
         private final List<String> roles;
         private final String userRoleId;
 
+        /**
+         * Constructs a new User.
+         *
+         * @param username the username
+         * @param dn the distinguished name
+         * @param password the password
+         * @param roles the list of roles
+         * @param userRoleId the user role ID
+         */
         public User(String username, String dn, String password, List<String> roles, String userRoleId) {
             this.username = username;
             this.dn = dn;
@@ -3076,22 +3238,47 @@ public class JNDIRealm extends RealmBase {
             this.userRoleId = userRoleId;
         }
 
+        /**
+         * Get the username.
+         *
+         * @return the username
+         */
         public String getUserName() {
             return username;
         }
 
+        /**
+         * Get the distinguished name.
+         *
+         * @return the distinguished name
+         */
         public String getDN() {
             return dn;
         }
 
+        /**
+         * Get the password.
+         *
+         * @return the password
+         */
         public String getPassword() {
             return password;
         }
 
+        /**
+         * Get the roles.
+         *
+         * @return the list of roles
+         */
         public List<String> getRoles() {
             return roles;
         }
 
+        /**
+         * Get the user role ID.
+         *
+         * @return the user role ID
+         */
         public String getUserRoleId() {
             return userRoleId;
         }
@@ -3129,6 +3316,14 @@ public class JNDIRealm extends RealmBase {
         public volatile DirContext context = null;
 
 
+        /**
+         * Constructs a new JNDIConnection.
+         *
+         * @param userSearch the user search pattern
+         * @param userPatternArray the user pattern array
+         * @param roleBase the role base
+         * @param roleSearch the role search pattern
+         */
         public JNDIConnection(String userSearch, String[] userPatternArray, String roleBase, String roleSearch) {
             if (userSearch == null) {
                 userSearchFormat = null;

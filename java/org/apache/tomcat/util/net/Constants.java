@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+/**
+ * Constants for network utilities.
+ */
 public class Constants {
 
     /**
@@ -27,16 +30,50 @@ public class Constants {
      * JSSE and OpenSSL protocol names
      */
     public static final String SSL_PROTO_ALL = "all";
+    /**
+     * TLS protocol identifier.
+     */
     public static final String SSL_PROTO_TLS = "TLS";
+    /**
+     * TLS 1.3 protocol identifier.
+     */
     public static final String SSL_PROTO_TLSv1_3 = "TLSv1.3";
+    /**
+     * TLS 1.2 protocol identifier.
+     */
     public static final String SSL_PROTO_TLSv1_2 = "TLSv1.2";
+    /**
+     * TLS 1.1 protocol identifier.
+     */
     public static final String SSL_PROTO_TLSv1_1 = "TLSv1.1";
     // Two different forms for TLS 1.0
+    /**
+     * TLS 1.0 protocol identifier (with dot notation).
+     */
     public static final String SSL_PROTO_TLSv1_0 = "TLSv1.0";
+    /**
+     * TLS 1.0 protocol identifier (without dot notation).
+     */
     public static final String SSL_PROTO_TLSv1 = "TLSv1";
+    /**
+     * SSL 3.0 protocol identifier.
+     */
     public static final String SSL_PROTO_SSLv3 = "SSLv3";
+    /**
+     * SSL 2.0 protocol identifier.
+     */
     public static final String SSL_PROTO_SSLv2 = "SSLv2";
+    /**
+     * SSL 2.0 Hello protocol identifier.
+     */
     public static final String SSL_PROTO_SSLv2Hello = "SSLv2Hello";
 
     public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

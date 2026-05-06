@@ -444,7 +444,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the login configuration descriptor for this web application.
+     * Returns the login configuration descriptor for this web application.
+     *
+     * @return the login configuration, or {@code null} if not configured
      */
     LoginConfig getLoginConfig();
 
@@ -458,7 +460,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the naming resources associated with this web application.
+     * Returns the naming resources associated with this web application.
+     *
+     * @return the naming resources, or {@code null} if not configured
      */
     NamingResourcesImpl getNamingResources();
 
@@ -472,7 +476,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the context path for this web application.
+     * Returns the context path for this web application.
+     *
+     * @return the context path
      */
     String getPath();
 
@@ -486,7 +492,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the public identifier of the deployment descriptor DTD that is currently being parsed.
+     * Returns the public identifier of the deployment descriptor DTD that is currently being parsed.
+     *
+     * @return the public identifier
      */
     String getPublicId();
 
@@ -500,7 +508,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the reloadable flag for this web application.
+     * Returns whether automatic reloading is enabled for this web application.
+     *
+     * @return {@code true} if the web application is reloadable
      */
     boolean getReloadable();
 
@@ -514,7 +524,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the override flag for this web application.
+     * Returns whether the container's default web.xml should be overridden by this web application's web.xml.
+     *
+     * @return {@code true} if the web application's web.xml overrides the default
      */
     boolean getOverride();
 
@@ -528,7 +540,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the privileged flag for this web application.
+     * Returns whether this web application is privileged and can access container internals.
+     *
+     * @return {@code true} if the web application is privileged
      */
     boolean getPrivileged();
 
@@ -542,13 +556,17 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the Servlet context for which this Context is a facade.
+     * Returns the ServletContext instance for which this Context acts as a facade.
+     *
+     * @return the ServletContext instance, or {@code null} if not yet initialized
      */
     ServletContext getServletContext();
 
 
     /**
-     * @return the default session timeout (in minutes) for this web application.
+     * Returns the default session timeout in minutes for this web application.
+     *
+     * @return the session timeout in minutes
      */
     int getSessionTimeout();
 
@@ -578,7 +596,9 @@ public interface Context extends Container, ContextBind {
     void setSwallowAbortedUploads(boolean swallowAbortedUploads);
 
     /**
-     * @return the value of the swallowOutput flag.
+     * Returns whether stdout and stderr are redirected to the logger during servlet execution.
+     *
+     * @return {@code true} if output is swallowed and redirected to the logger
      */
     boolean getSwallowOutput();
 
@@ -593,7 +613,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the Java class name of the Wrapper implementation used for servlets registered in this Context.
+     * Returns the Java class name of the Wrapper implementation used for servlets in this Context.
+     *
+     * @return the Wrapper implementation class name
      */
     String getWrapperClass();
 
@@ -689,8 +711,9 @@ public interface Context extends Container, ContextBind {
     void setJarScanner(JarScanner jarScanner);
 
     /**
-     * @return the {@link Authenticator} that is used by this context. This is always non-{@code null} for a started
-     *             Context
+     * Returns the Authenticator used by this context for handling authentication.
+     *
+     * @return the Authenticator instance, always non-null for a started context
      */
     Authenticator getAuthenticator();
 
@@ -709,7 +732,9 @@ public interface Context extends Container, ContextBind {
     boolean getLogEffectiveWebXml();
 
     /**
-     * @return the instance manager associated with this context.
+     * Returns the instance manager associated with this context.
+     *
+     * @return the instance manager associated with this context
      */
     InstanceManager getInstanceManager();
 
@@ -742,6 +767,8 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Returns the value of the parallel annotation scanning flag.
+     *
      * @return the value of the parallel annotation scanning flag. If true, it will dispatch scanning to the utility
      *             executor.
      *
@@ -944,28 +971,36 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the array of application listener class names configured for this application.
+     * Returns the array of application listener class names configured for this application.
+     *
+     * @return the array of application listener class names configured for this application
      */
     String[] findApplicationListeners();
 
 
     /**
-     * @return the array of application parameters for this application.
+     * Returns the array of application parameters for this application.
+     *
+     * @return the array of application parameters for this application
      */
     ApplicationParameter[] findApplicationParameters();
 
 
     /**
+     * Returns the array of security constraints for this web application.
+     *
      * @return the array of security constraints for this web application. If there are none, a zero-length array is
-     *             returned.
+     *             returned
      */
     SecurityConstraint[] findConstraints();
 
 
     /**
-     * @return the error page entry for the specified HTTP error code, if any; otherwise return <code>null</code>.
+     * Returns the error page entry for the specified HTTP error code.
      *
      * @param errorCode Error code to look up
+     *
+     * @return the error page entry for the specified HTTP error code, if any; otherwise return <code>null</code>
      */
     ErrorPage findErrorPage(int errorCode);
 
@@ -983,57 +1018,73 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the array of defined error pages for all specified error codes and exception types.
+     * Returns the array of defined error pages for all specified error codes and exception types.
+     *
+     * @return the array of defined error pages for all specified error codes and exception types
      */
     ErrorPage[] findErrorPages();
 
 
     /**
-     * @return the filter definition for the specified filter name, if any; otherwise return <code>null</code>.
+     * Returns the filter definition for the specified filter name.
      *
      * @param filterName Filter name to look up
+     *
+     * @return the filter definition for the specified filter name, if any; otherwise return <code>null</code>
      */
     FilterDef findFilterDef(String filterName);
 
 
     /**
-     * @return the array of defined filters for this Context.
+     * Returns the array of defined filters for this Context.
+     *
+     * @return the array of defined filters for this Context
      */
     FilterDef[] findFilterDefs();
 
 
     /**
-     * @return the array of filter mappings for this Context.
+     * Returns the array of filter mappings for this Context.
+     *
+     * @return the array of filter mappings for this Context
      */
     FilterMap[] findFilterMaps();
 
 
     /**
-     * @return the MIME type to which the specified extension is mapped, if any; otherwise return <code>null</code>.
+     * Returns the MIME type to which the specified extension is mapped.
      *
      * @param extension Extension to map to a MIME type
+     *
+     * @return the MIME type to which the specified extension is mapped, if any; otherwise return <code>null</code>
      */
     String findMimeMapping(String extension);
 
 
     /**
-     * @return the extensions for which MIME mappings are defined. If there are none, a zero-length array is returned.
+     * Returns the extensions for which MIME mappings are defined.
+     *
+     * @return the extensions for which MIME mappings are defined. If there are none, a zero-length array is returned
      */
     String[] findMimeMappings();
 
 
     /**
-     * @return the value for the specified context initialization parameter name, if any; otherwise return
-     *             <code>null</code>.
+     * Returns the value for the specified context initialization parameter name.
      *
      * @param name Name of the parameter to return
+     *
+     * @return the value for the specified context initialization parameter name, if any; otherwise return
+     *             <code>null</code>
      */
     String findParameter(String name);
 
 
     /**
+     * Returns the names of all defined context initialization parameters for this Context.
+     *
      * @return the names of all defined context initialization parameters for this Context. If no parameters are
-     *             defined, a zero-length array is returned.
+     *             defined, a zero-length array is returned
      */
     String[] findParameters();
 
@@ -1050,38 +1101,48 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return <code>true</code> if the specified security role is defined for this application; otherwise return
-     *             <code>false</code>.
+     * Checks if the specified security role is defined for this application.
      *
      * @param role Security role to verify
+     *
+     * @return <code>true</code> if the specified security role is defined for this application; otherwise return
+     *             <code>false</code>
      */
     boolean findSecurityRole(String role);
 
 
     /**
+     * Returns the security roles defined for this application.
+     *
      * @return the security roles defined for this application. If none have been defined, a zero-length array is
-     *             returned.
+     *             returned
      */
     String[] findSecurityRoles();
 
 
     /**
-     * @return the servlet name mapped by the specified pattern (if any); otherwise return <code>null</code>.
+     * Returns the servlet name mapped by the specified pattern.
      *
      * @param pattern Pattern for which a mapping is requested
+     *
+     * @return the servlet name mapped by the specified pattern (if any); otherwise return <code>null</code>
      */
     String findServletMapping(String pattern);
 
 
     /**
+     * Returns the patterns of all defined servlet mappings for this Context.
+     *
      * @return the patterns of all defined servlet mappings for this Context. If no mappings are defined, a zero-length
-     *             array is returned.
+     *             array is returned
      */
     String[] findServletMappings();
 
 
     /**
-     * @return the associated ThreadBindingListener.
+     * Returns the associated ThreadBindingListener.
+     *
+     * @return the associated ThreadBindingListener
      */
     ThreadBindingListener getThreadBindingListener();
 
@@ -1096,36 +1157,46 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Returns the array of watched resources for this Context.
+     *
      * @return the array of watched resources for this Context. If none are defined, a zero length array will be
-     *             returned.
+     *             returned
      */
     String[] findWatchedResources();
 
 
     /**
-     * @return <code>true</code> if the specified welcome file is defined for this Context; otherwise return
-     *             <code>false</code>.
+     * Checks if the specified welcome file is defined for this Context.
      *
      * @param name the welcome file to verify
+     *
+     * @return <code>true</code> if the specified welcome file is defined for this Context; otherwise return
+     *             <code>false</code>
      */
     boolean findWelcomeFile(String name);
 
 
     /**
+     * Returns the array of welcome files defined for this Context.
+     *
      * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is
-     *             returned.
+     *             returned
      */
     String[] findWelcomeFiles();
 
 
     /**
-     * @return the array of LifecycleListener classes that will be added to newly created Wrappers automatically.
+     * Returns the array of LifecycleListener classes that will be added to newly created Wrappers automatically.
+     *
+     * @return the array of LifecycleListener classes that will be added to newly created Wrappers automatically
      */
     String[] findWrapperLifecycles();
 
 
     /**
-     * @return the array of ContainerListener classes that will be added to newly created Wrappers automatically.
+     * Returns the array of ContainerListener classes that will be added to newly created Wrappers automatically.
+     *
+     * @return the array of ContainerListener classes that will be added to newly created Wrappers automatically
      */
     String[] findWrapperListeners();
 
@@ -1278,15 +1349,19 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the real path for a given virtual path, if possible; otherwise return <code>null</code>.
+     * Returns the real path for a given virtual path.
      *
      * @param path The path to the desired resource
+     *
+     * @return the real path for a given virtual path, if possible; otherwise return <code>null</code>
      */
     String getRealPath(String path);
 
 
     /**
-     * @return the effective major version of the Servlet spec used by this context.
+     * Returns the effective major version of the Servlet spec used by this context.
+     *
+     * @return the effective major version of the Servlet spec used by this context
      */
     int getEffectiveMajorVersion();
 
@@ -1300,7 +1375,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the effective minor version of the Servlet spec used by this context.
+     * Returns the effective minor version of the Servlet spec used by this context.
+     *
+     * @return the effective minor version of the Servlet spec used by this context
      */
     int getEffectiveMinorVersion();
 
@@ -1314,7 +1391,9 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the JSP configuration for this context. Will be null if there is no JSP configuration.
+     * Returns the JSP configuration for this context.
+     *
+     * @return the JSP configuration for this context. Will be null if there is no JSP configuration
      */
     JspConfigDescriptor getJspConfigDescriptor();
 
@@ -1389,7 +1468,9 @@ public interface Context extends Container, ContextBind {
     boolean isResourceOnlyServlet(String servletName);
 
     /**
-     * @return the base name to use for WARs, directories or context.xml files for this context.
+     * Returns the base name to use for WARs, directories or context.xml files for this context.
+     *
+     * @return the base name to use for WARs, directories or context.xml files for this context
      */
     String getBaseName();
 
@@ -1402,8 +1483,10 @@ public interface Context extends Container, ContextBind {
     void setWebappVersion(String webappVersion);
 
     /**
-     * @return The version of this web application, used to differentiate different versions of the same web application
-     *             when using parallel deployment. If not specified, defaults to the empty string.
+     * Returns the version of this web application, used to differentiate different versions of the same web application
+     * when using parallel deployment.
+     *
+     * @return the version of this web application. If not specified, defaults to the empty string
      */
     String getWebappVersion();
 
@@ -1415,7 +1498,9 @@ public interface Context extends Container, ContextBind {
     void setFireRequestListenersOnForwards(boolean enable);
 
     /**
-     * @return whether or not requests listeners will be fired on forwards for this Context.
+     * Returns whether or not request listeners will be fired on forwards for this Context.
+     *
+     * @return whether or not request listeners will be fired on forwards for this Context
      */
     boolean getFireRequestListenersOnForwards();
 
@@ -1428,8 +1513,11 @@ public interface Context extends Container, ContextBind {
     void setPreemptiveAuthentication(boolean enable);
 
     /**
-     * @return if a user presents authentication credentials, will the context will process them when the request is for
-     *             a non-protected resource.
+     * Returns whether the context will process authentication credentials when the request is for a non-protected
+     * resource.
+     *
+     * @return {@code true} if a user presents authentication credentials, the context will process them when the
+     *             request is for a non-protected resource
      */
     boolean getPreemptiveAuthentication();
 
@@ -1441,12 +1529,16 @@ public interface Context extends Container, ContextBind {
     void setSendRedirectBody(boolean enable);
 
     /**
-     * @return if the context is configured to include a response body as part of a redirect response.
+     * Returns whether the context is configured to include a response body as part of a redirect response.
+     *
+     * @return {@code true} if the context is configured to include a response body as part of a redirect response
      */
     boolean getSendRedirectBody();
 
     /**
-     * @return the Loader with which this Context is associated.
+     * Returns the Loader with which this Context is associated.
+     *
+     * @return the Loader with which this Context is associated
      */
     Loader getLoader();
 
@@ -1458,7 +1550,9 @@ public interface Context extends Container, ContextBind {
     void setLoader(Loader loader);
 
     /**
-     * @return the Resources with which this Context is associated.
+     * Returns the Resources with which this Context is associated.
+     *
+     * @return the Resources with which this Context is associated
      */
     WebResourceRoot getResources();
 
@@ -1470,8 +1564,10 @@ public interface Context extends Container, ContextBind {
     void setResources(WebResourceRoot resources);
 
     /**
+     * Returns the Manager with which this Context is associated.
+     *
      * @return the Manager with which this Context is associated. If there is no associated Manager, return
-     *             <code>null</code>.
+     *             <code>null</code>
      */
     Manager getManager();
 
@@ -1492,8 +1588,11 @@ public interface Context extends Container, ContextBind {
     void setAddWebinfClassesResources(boolean addWebinfClassesResources);
 
     /**
+     * Returns the flag that indicates if /WEB-INF/classes should be treated like an exploded JAR and JAR resources made
+     * available as if they were in a JAR.
+     *
      * @return the flag that indicates if /WEB-INF/classes should be treated like an exploded JAR and JAR resources made
-     *             available as if they were in a JAR.
+     *             available as if they were in a JAR
      */
     boolean getAddWebinfClassesResources();
 
@@ -1576,7 +1675,9 @@ public interface Context extends Container, ContextBind {
     Map<String,String> findPreDestroyMethods();
 
     /**
-     * @return the token necessary for operations on the associated JNDI naming context.
+     * Returns the token necessary for operations on the associated JNDI naming context.
+     *
+     * @return the token necessary for operations on the associated JNDI naming context
      */
     Object getNamingToken();
 
@@ -1590,7 +1691,9 @@ public interface Context extends Container, ContextBind {
     void setCookieProcessor(CookieProcessor cookieProcessor);
 
     /**
-     * @return the {@link CookieProcessor} that will be used to process cookies for this Context.
+     * Returns the {@link CookieProcessor} that will be used to process cookies for this Context.
+     *
+     * @return the {@link CookieProcessor} that will be used to process cookies for this Context
      */
     CookieProcessor getCookieProcessor();
 
@@ -1739,9 +1842,14 @@ public interface Context extends Container, ContextBind {
     boolean getAllowMultipleLeadingForwardSlashInPath();
 
 
+    /**
+     * Increment the count of in-progress async requests.
+     */
     void incrementInProgressAsyncCount();
 
-
+    /**
+     * Decrement the count of in-progress async requests.
+     */
     void decrementInProgressAsyncCount();
 
 

@@ -33,6 +33,8 @@ import java.util.jar.Manifest;
 public interface Jar extends AutoCloseable {
 
     /**
+     * Returns the URL for accessing the JAR file.
+     *
      * @return The URL for accessing the JAR file.
      */
     URL getJarFileURL();

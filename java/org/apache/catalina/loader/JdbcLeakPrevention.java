@@ -34,6 +34,18 @@ import java.util.Set;
  */
 public class JdbcLeakPrevention {
 
+    /**
+     * Constructs a new JdbcLeakPrevention.
+     */
+    public JdbcLeakPrevention() {
+    }
+
+    /**
+     * Clear JDBC driver registrations to prevent memory leaks.
+     *
+     * @return the list of driver names that were deregistered
+     * @throws SQLException if a database access error occurs
+     */
     public List<String> clearJdbcDriverRegistrations() throws SQLException {
         List<String> driverNames = new ArrayList<>();
 

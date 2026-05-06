@@ -66,6 +66,12 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class HTMLManagerServlet extends ManagerServlet {
 
+    /**
+     * Constructs a new HTMLManagerServlet.
+     */
+    public HTMLManagerServlet() {
+    }
+
     private static final long serialVersionUID = 1L;
 
     static final String APPLICATION_MESSAGE = "message";
@@ -200,6 +206,14 @@ public class HTMLManagerServlet extends ManagerServlet {
     }
 
 
+    /**
+     * Upload a WAR file for deployment.
+     *
+     * @param request the HTTP servlet request
+     * @param smClient internationalized strings
+     *
+     * @return message string describing the result of the upload
+     */
     protected String upload(HttpServletRequest request, StringManager smClient) {
         String message = "";
 
@@ -695,6 +709,14 @@ public class HTMLManagerServlet extends ManagerServlet {
     }
 
 
+    /**
+     * Reload SSL configuration for the specified host.
+     *
+     * @param tlsHostName the TLS host name
+     * @param smClient internationalized strings
+     *
+     * @return message string describing the result
+     */
     protected String sslReload(String tlsHostName, StringManager smClient) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -705,6 +727,16 @@ public class HTMLManagerServlet extends ManagerServlet {
     }
 
 
+    /**
+     * Display SSL connector cipher information.
+     *
+     * @param request the HTTP servlet request
+     * @param response the HTTP servlet response
+     * @param smClient internationalized strings
+     *
+     * @throws ServletException a servlet error occurred
+     * @throws IOException an I/O error occurred
+     */
     protected void sslConnectorCiphers(HttpServletRequest request, HttpServletResponse response, StringManager smClient)
             throws ServletException, IOException {
         request.setAttribute("cipherList", getConnectorCiphers(smClient));
@@ -712,6 +744,16 @@ public class HTMLManagerServlet extends ManagerServlet {
     }
 
 
+    /**
+     * Display SSL connector certificate information.
+     *
+     * @param request the HTTP servlet request
+     * @param response the HTTP servlet response
+     * @param smClient internationalized strings
+     *
+     * @throws ServletException a servlet error occurred
+     * @throws IOException an I/O error occurred
+     */
     protected void sslConnectorCerts(HttpServletRequest request, HttpServletResponse response, StringManager smClient)
             throws ServletException, IOException {
         request.setAttribute("certList", getConnectorCerts(smClient));
@@ -719,6 +761,16 @@ public class HTMLManagerServlet extends ManagerServlet {
     }
 
 
+    /**
+     * Display SSL connector trusted certificate information.
+     *
+     * @param request the HTTP servlet request
+     * @param response the HTTP servlet response
+     * @param smClient internationalized strings
+     *
+     * @throws ServletException a servlet error occurred
+     * @throws IOException an I/O error occurred
+     */
     protected void sslConnectorTrustedCerts(HttpServletRequest request, HttpServletResponse response,
             StringManager smClient) throws ServletException, IOException {
         request.setAttribute("trustedCertList", getConnectorTrustedCerts(smClient));
@@ -806,6 +858,14 @@ public class HTMLManagerServlet extends ManagerServlet {
         displaySessionsListPage(cn, req, resp, smClient);
     }
 
+    /**
+     * Get all sessions for the specified context.
+     *
+     * @param cn the context name
+     * @param smClient internationalized strings
+     *
+     * @return list of sessions for the context
+     */
     protected List<Session> getSessionsForName(ContextName cn, StringManager smClient) {
         if (cn == null || !(cn.getPath().startsWith("/") || cn.getPath().isEmpty())) {
             String path = null;
@@ -838,6 +898,15 @@ public class HTMLManagerServlet extends ManagerServlet {
         return sessions;
     }
 
+    /**
+     * Get a specific session by ID for the specified context.
+     *
+     * @param cn the context name
+     * @param id the session ID
+     * @param smClient internationalized strings
+     *
+     * @return the session, or {@code null} if not found
+     */
     protected Session getSessionForNameAndId(ContextName cn, String id, StringManager smClient) {
 
         List<Session> sessions = getSessionsForName(cn, smClient);
@@ -996,6 +1065,13 @@ public class HTMLManagerServlet extends ManagerServlet {
         return wasPresent;
     }
 
+    /**
+     * Get a comparator for sessions based on the specified sort criteria.
+     *
+     * @param sortBy the sort criteria
+     *
+     * @return the comparator, or {@code null} if the sort criteria is not recognized
+     */
     protected Comparator<Session> getComparator(String sortBy) {
         if ("CreationTime".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(Session::getCreationTime);

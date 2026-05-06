@@ -26,6 +26,10 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class AbstractChunk implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(AbstractChunk.class);
 
     /*
@@ -33,17 +37,46 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
      * MAX_VALUE - 2. Comments in the JRE source code for ArrayList and other classes indicate that it may be as low as
      * MAX_VALUE - 8 on some systems.
      */
+    /**
+     * The maximum size of an array.
+     */
     public static final int ARRAY_MAX_SIZE = Integer.MAX_VALUE - 8;
 
+    /**
+     * The cached hash code.
+     */
     private int hashCode = 0;
+
+    /**
+     * Indicates whether the hash code has been computed.
+     */
     protected boolean hasHashCode = false;
 
+    /**
+     * Indicates whether the chunk has been initialized.
+     */
     protected boolean isSet;
 
+    /**
+     * The limit on the amount of data in the buffer.
+     */
     private int limit = -1;
 
+    /**
+     * The start position of the data in the buffer.
+     */
     protected int start;
+
+    /**
+     * The end position of the data in the buffer.
+     */
     protected int end;
+
+    /**
+     * Constructs a new AbstractChunk.
+     */
+    protected AbstractChunk() {
+    }
 
 
     /**
@@ -59,6 +92,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the maximum amount of data in the buffer.
+     *
      * @return the maximum amount of data in the buffer, and -1 if it has not been set
      */
     public int getLimit() {
@@ -66,6 +101,11 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     }
 
 
+    /**
+     * Returns the internal limit for the buffer.
+     *
+     * @return the internal limit
+     */
     protected int getLimitInternal() {
         if (limit > 0) {
             return limit;
@@ -76,6 +116,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the start position of the data in the buffer.
+     *
      * @return the start position of the data in the buffer
      */
     public int getStart() {
@@ -97,6 +139,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the end position of the data in the buffer.
+     *
      * @return the end position of the data in the buffer
      */
     public int getEnd() {
@@ -141,6 +185,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the length of the data in the buffer.
+     *
      * @return the length of the data in the buffer
      */
     public int getLength() {
@@ -149,6 +195,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns whether the buffer contains no data.
+     *
      * @return {@code true} if the buffer contains no data
      */
     public boolean isNull() {
@@ -218,6 +266,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the hash code for this buffer.
+     *
      * @return the hash code for this buffer
      */
     public int hash() {
@@ -230,6 +280,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * Returns the element at the specified index in the buffer.
+     *
      * @param index the element location in the buffer
      *
      * @return the element

@@ -38,6 +38,18 @@ import javax.sql.DataSource;
  */
 public class DataSourceLinkFactory extends ResourceLinkFactory {
 
+    /**
+     * Default constructor.
+     */
+    public DataSourceLinkFactory() {
+        super();
+    }
+
+    /**
+     * Set the global JNDI context used for lookups.
+     *
+     * @param newGlobalContext The new global context
+     */
     public static void setGlobalContext(Context newGlobalContext) {
         ResourceLinkFactory.setGlobalContext(newGlobalContext);
     }
@@ -61,6 +73,16 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         return result;
     }
 
+    /**
+     * Wrap a DataSource with a handler that injects the configured username and password
+     * when {@code getConnection()} is called.
+     *
+     * @param datasource The DataSource to wrap
+     * @param username The username to inject
+     * @param password The password to inject
+     * @return the wrapped DataSource proxy
+     * @throws NamingException if wrapping fails
+     */
     protected Object wrapDataSource(Object datasource, String username, String password) throws NamingException {
         try {
             DataSourceHandler handler = new DataSourceHandler((DataSource) datasource, username, password);
@@ -100,6 +122,14 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         private final String password;
         private final Method getConnection;
 
+        /**
+         * Construct a DataSourceHandler for the given DataSource and credentials.
+         *
+         * @param ds The DataSource to wrap
+         * @param username The username to use on getConnection
+         * @param password The password to use on getConnection
+         * @throws Exception if the getConnection method cannot be found
+         */
         public DataSourceHandler(DataSource ds, String username, String password) throws Exception {
             this.ds = ds;
             this.username = username;
@@ -127,6 +157,13 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             }
         }
 
+        /**
+         * Unwrap the proxy and return the underlying DataSource if the requested interface matches.
+         *
+         * @param iface The interface to unwrap to
+         * @return the underlying DataSource
+         * @throws SQLException if the interface does not match DataSource
+         */
         public Object unwrap(Class<?> iface) throws SQLException {
             if (iface == DataSource.class) {
                 return ds;

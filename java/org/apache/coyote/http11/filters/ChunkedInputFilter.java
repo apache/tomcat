@@ -49,7 +49,13 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     // -------------------------------------------------------------- Constants
 
+    /**
+     * The encoding name for chunked transfer encoding.
+     */
     protected static final String ENCODING_NAME = "chunked";
+    /**
+     * The encoding byte chunk for chunked transfer encoding.
+     */
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
@@ -114,6 +120,15 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Creates a new ChunkedInputFilter.
+     *
+     * @param request the HTTP request
+     * @param maxTrailerSize the maximum trailer size
+     * @param allowedTrailerHeaders the set of allowed trailer headers
+     * @param maxExtensionSize the maximum extension size
+     * @param maxSwallowSize the maximum swallow size
+     */
     public ChunkedInputFilter(final Request request, int maxTrailerSize, Set<String> allowedTrailerHeaders,
             int maxExtensionSize, int maxSwallowSize) {
         this.request = request;

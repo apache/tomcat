@@ -42,7 +42,21 @@ import org.apache.tomcat.util.net.SocketProperties;
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
+    /**
+     * Creates a new ConnectorStoreAppender instance.
+     */
+    public ConnectorStoreAppender() {
+        super();
+    }
+
+    /**
+     * Map of attribute name replacements for connector properties.
+     */
     protected static final HashMap<String,String> replacements = new HashMap<>();
+
+    /**
+     * Set of attribute names that belong to the internal executor.
+     */
     protected static final Set<String> internalExecutorAttributes = new HashSet<>();
     static {
         replacements.put("timeout", "connectionUploadTimeout");
@@ -249,6 +263,10 @@ public class ConnectorStoreAppender extends StoreAppender {
         return isPrint;
     }
 
+    /**
+     * Returns the canonical catalina base directory.
+     * @return the catalina base file path
+     */
     protected File getCatalinaBase() {
 
         File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
@@ -260,6 +278,12 @@ public class ConnectorStoreAppender extends StoreAppender {
         return file;
     }
 
+    /**
+     * Returns the canonical JK home base directory.
+     * @param jkHome the JK home path
+     * @param appBase the application base directory
+     * @return the canonical JK home file path
+     */
     protected File getJkHomeBase(String jkHome, File appBase) {
 
         File jkHomeBase;

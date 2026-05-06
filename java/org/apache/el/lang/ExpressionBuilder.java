@@ -44,6 +44,9 @@ import org.apache.el.util.ConcurrentCache;
 import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
+/**
+ * Builds compiled EL expressions from parsed AST nodes.
+ */
 public final class ExpressionBuilder implements NodeVisitor {
 
     private static final SynchronizedStack<ELParser> parserCache = new SynchronizedStack<>();
@@ -70,6 +73,13 @@ public final class ExpressionBuilder implements NodeVisitor {
 
     private final String expression;
 
+    /**
+     * Creates a new ExpressionBuilder for the given expression and context.
+     *
+     * @param expression the EL expression string
+     * @param ctx the EL context
+     * @throws ELException if the expression is invalid
+     */
     public ExpressionBuilder(String expression, ELContext ctx) throws ELException {
         this.expression = expression;
 
@@ -84,6 +94,13 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
+    /**
+     * Creates a parsed AST node for the given expression string.
+     *
+     * @param expr the expression string to parse
+     * @return the parsed AST node
+     * @throws ELException if parsing fails
+     */
     public static Node createNode(String expr) throws ELException {
         return createNodeInternal(expr);
     }
@@ -213,11 +230,26 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
+    /**
+     * Creates a ValueExpression from the parsed expression.
+     *
+     * @param expectedType the expected type of the expression result
+     * @return the value expression
+     * @throws ELException if expression building fails
+     */
     public ValueExpression createValueExpression(Class<?> expectedType) throws ELException {
         Node n = this.build();
         return new ValueExpressionImpl(this.expression, n, this.fnMapper, this.varMapper, expectedType);
     }
 
+    /**
+     * Creates a MethodExpression from the parsed expression.
+     *
+     * @param expectedReturnType the expected return type
+     * @param expectedParamTypes the expected parameter types
+     * @return the method expression
+     * @throws ELException if expression building fails
+     */
     public MethodExpression createMethodExpression(Class<?> expectedReturnType, Class<?>[] expectedParamTypes)
             throws ELException {
         Node n = this.build();

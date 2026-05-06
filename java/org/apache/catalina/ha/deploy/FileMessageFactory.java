@@ -330,10 +330,21 @@ public class FileMessageFactory {
         }
     }
 
+    /**
+     * Returns the file associated with this factory.
+     *
+     * @return The file
+     */
     public File getFile() {
         return file;
     }
 
+    /**
+     * Checks if this factory instance is still valid based on the maximum valid time.
+     * If the instance has been idle longer than maxValidTime, it will be cleaned up.
+     *
+     * @return True if the factory is still valid, false if it has expired
+     */
     public boolean isValid() {
         if (maxValidTime > 0) {
             long timeNow = System.currentTimeMillis();
@@ -353,10 +364,20 @@ public class FileMessageFactory {
         return true;
     }
 
+    /**
+     * Returns the maximum time in seconds that this factory instance is allowed to exist from last modification.
+     *
+     * @return The maximum valid time in seconds
+     */
     public int getMaxValidTime() {
         return maxValidTime;
     }
 
+    /**
+     * Sets the maximum time in seconds that this factory instance is allowed to exist from last modification.
+     *
+     * @param maxValidTime The maximum valid time in seconds
+     */
     public void setMaxValidTime(int maxValidTime) {
         this.maxValidTime = maxValidTime;
     }

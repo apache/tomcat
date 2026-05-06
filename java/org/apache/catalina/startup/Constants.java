@@ -23,15 +23,55 @@ package org.apache.catalina.startup;
  */
 public final class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.startup";
 
+    /**
+     * The path to the application context XML file.
+     */
     public static final String ApplicationContextXml = "META-INF/context.xml";
+
+    /**
+     * The path to the application web.xml file.
+     */
     public static final String ApplicationWebXml = "/WEB-INF/web.xml";
+
+    /**
+     * The path to the Tomcat web.xml file.
+     */
     public static final String TomcatWebXml = "/WEB-INF/tomcat-web.xml";
+
+    /**
+     * The path to the default context XML file.
+     */
     public static final String DefaultContextXml = "conf/context.xml";
+
+    /**
+     * The path to the default web.xml file.
+     */
     public static final String DefaultWebXml = "conf/web.xml";
+
+    /**
+     * The path to the host context XML file.
+     */
     public static final String HostContextXml = "context.xml.default";
+
+    /**
+     * The path to the host web.xml file.
+     */
     public static final String HostWebXml = "web.xml.default";
+
+    /**
+     * The path to the WAR tracker file.
+     */
     public static final String WarTracker = "/META-INF/war-tracker";
 
     /**

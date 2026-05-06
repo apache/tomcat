@@ -65,7 +65,9 @@ public interface Session {
 
 
     /**
-     * @return the authentication type used to authenticate our cached Principal, if any.
+     * Returns the authentication type used to authenticate the cached Principal, if any.
+     *
+     * @return the authentication type
      */
     String getAuthType();
 
@@ -79,13 +81,17 @@ public interface Session {
 
 
     /**
-     * @return the creation time for this session.
+     * Returns the creation time for this session.
+     *
+     * @return the creation time in milliseconds since midnight, January 1, 1970 GMT
      */
     long getCreationTime();
 
 
     /**
-     * @return the creation time for this session, bypassing the session validity checks.
+     * Returns the creation time for this session, bypassing the session validity checks.
+     *
+     * @return the creation time in milliseconds since midnight, January 1, 1970 GMT
      */
     long getCreationTimeInternal();
 
@@ -100,13 +106,17 @@ public interface Session {
 
 
     /**
-     * @return the session identifier for this session.
+     * Returns the session identifier for this session.
+     *
+     * @return the session identifier
      */
     String getId();
 
 
     /**
-     * @return the session identifier for this session.
+     * Returns the session identifier for this session, bypassing validity checks.
+     *
+     * @return the session identifier
      */
     String getIdInternal();
 
@@ -131,49 +141,63 @@ public interface Session {
 
 
     /**
-     * @return the last time the client sent a request associated with this session, as the number of milliseconds since
-     *             midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a
-     *             value associated with the session, do not affect the access time. This one gets updated whenever a
-     *             request starts.
+     * Returns the last time the client sent a request associated with this session, as the number of milliseconds since
+     * midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a
+     * value associated with the session, do not affect the access time. This one gets updated whenever a
+     * request starts.
+     *
+     * @return the last access time in milliseconds
      */
     long getThisAccessedTime();
 
     /**
-     * @return the last client access time without invalidation check
+     * Returns the last client access time without invalidation check.
+     *
+     * @return the last access time in milliseconds
      *
      * @see #getThisAccessedTime()
      */
     long getThisAccessedTimeInternal();
 
     /**
-     * @return the last time the client sent a request associated with this session, as the number of milliseconds since
-     *             midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a
-     *             value associated with the session, do not affect the access time. This one gets updated whenever a
-     *             request finishes.
+     * Returns the last time the client sent a request associated with this session, as the number of milliseconds since
+     * midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a
+     * value associated with the session, do not affect the access time. This one gets updated whenever a
+     * request finishes.
+     *
+     * @return the last access time in milliseconds
      */
     long getLastAccessedTime();
 
     /**
-     * @return the last client access time without invalidation check
+     * Returns the last client access time without invalidation check.
+     *
+     * @return the last access time in milliseconds
      *
      * @see #getLastAccessedTime()
      */
     long getLastAccessedTimeInternal();
 
     /**
-     * @return the idle time (in milliseconds) from last client access time.
+     * Returns the idle time from last client access time.
+     *
+     * @return the idle time in milliseconds
      */
     long getIdleTime();
 
     /**
-     * @return the idle time from last client access time without invalidation check
+     * Returns the idle time from last client access time without invalidation check.
+     *
+     * @return the idle time in milliseconds
      *
      * @see #getIdleTime()
      */
     long getIdleTimeInternal();
 
     /**
-     * @return the Manager within which this Session is valid.
+     * Returns the Manager within which this Session is valid.
+     *
+     * @return the manager
      */
     Manager getManager();
 
@@ -187,8 +211,10 @@ public interface Session {
 
 
     /**
-     * @return the maximum time interval, in seconds, between client requests before the servlet container will
-     *             invalidate the session. A negative time indicates that the session should never time out.
+     * Returns the maximum time interval, in seconds, between client requests before the servlet container will
+     * invalidate the session. A negative time indicates that the session should never time out.
+     *
+     * @return the maximum inactive interval in seconds
      */
     int getMaxInactiveInterval();
 
@@ -211,10 +237,12 @@ public interface Session {
 
 
     /**
-     * @return the authenticated Principal that is associated with this Session. This provides an
-     *             <code>Authenticator</code> with a means to cache a previously authenticated Principal, and avoid
-     *             potentially expensive <code>Realm.authenticate()</code> calls on every request. If there is no
-     *             current associated Principal, return <code>null</code>.
+     * Returns the authenticated Principal that is associated with this Session. This provides an
+     * <code>Authenticator</code> with a means to cache a previously authenticated Principal, and avoid
+     * potentially expensive <code>Realm.authenticate()</code> calls on every request. If there is no
+     * current associated Principal, return <code>null</code>.
+     *
+     * @return the authenticated principal, or {@code null} if none
      */
     Principal getPrincipal();
 
@@ -230,7 +258,9 @@ public interface Session {
 
 
     /**
-     * @return the <code>HttpSession</code> for which this object is the facade.
+     * Returns the <code>HttpSession</code> for which this object is the facade.
+     *
+     * @return the HTTP session
      */
     HttpSession getSession();
 
@@ -244,7 +274,9 @@ public interface Session {
 
 
     /**
-     * @return <code>true</code> if the session is still valid
+     * Returns whether the session is still valid.
+     *
+     * @return {@code true} if the session is valid
      */
     boolean isValid();
 
@@ -281,16 +313,20 @@ public interface Session {
 
 
     /**
-     * @return the object bound with the specified name to the internal notes for this session, or <code>null</code> if
-     *             no such binding exists.
+     * Returns the object bound with the specified name to the internal notes for this session, or <code>null</code> if
+     * no such binding exists.
      *
      * @param name Name of the note to be returned
+     *
+     * @return the note object, or {@code null} if not found
      */
     Object getNote(String name);
 
 
     /**
-     * @return an Iterator containing the String names of all notes bindings that exist for this session.
+     * Returns an Iterator containing the String names of all notes bindings that exist for this session.
+     *
+     * @return the iterator of note names
      */
     Iterator<String> getNoteNames();
 

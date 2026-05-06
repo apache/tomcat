@@ -34,6 +34,11 @@ import javax.naming.NamingException;
  * The objects are typically Catalina Server or Context objects.
  */
 public class ContextBindings {
+    /**
+     * Constructs a new ContextBindings instance.
+     */
+    public ContextBindings() {
+    }
 
     // -------------------------------------------------------------- Variables
 

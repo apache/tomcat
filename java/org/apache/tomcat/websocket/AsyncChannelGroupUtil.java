@@ -47,6 +47,11 @@ public class AsyncChannelGroupUtil {
     }
 
 
+    /**
+     * Registers a user of the shared {@link AsynchronousChannelGroup}, creating it if necessary.
+     *
+     * @return the shared {@link AsynchronousChannelGroup}
+     */
     public static AsynchronousChannelGroup register() {
         synchronized (lock) {
             if (usageCount == 0) {
@@ -58,6 +63,9 @@ public class AsyncChannelGroupUtil {
     }
 
 
+    /**
+     * Unregisters a user of the shared {@link AsynchronousChannelGroup}, shutting it down if no users remain.
+     */
     public static void unregister() {
         synchronized (lock) {
             usageCount--;

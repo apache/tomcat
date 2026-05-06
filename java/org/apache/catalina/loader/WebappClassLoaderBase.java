@@ -421,7 +421,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * @return the context name for this class loader.
+     * Get the context name for this class loader.
+     *
+     * @return the context name
      */
     public String getContextName() {
         if (resources == null) {
@@ -520,7 +522,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * @return the clearReferencesStopThreads flag for this Context.
+     * Get the clearReferencesStopThreads flag for this Context.
+     *
+     * @return the clearReferencesStopThreads flag
      */
     public boolean getClearReferencesStopThreads() {
         return this.clearReferencesStopThreads;
@@ -538,7 +542,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * @return the clearReferencesStopTimerThreads flag for this Context.
+     * Get the clearReferencesStopTimerThreads flag for this Context.
+     *
+     * @return the clearReferencesStopTimerThreads flag
      */
     public boolean getClearReferencesStopTimerThreads() {
         return this.clearReferencesStopTimerThreads;
@@ -556,7 +562,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * @return the clearReferencesLogFactoryRelease flag for this Context.
+     * Get the clearReferencesLogFactoryRelease flag for this Context.
+     *
+     * @return the clearReferencesLogFactoryRelease flag
      */
     public boolean getClearReferencesLogFactoryRelease() {
         return this.clearReferencesLogFactoryRelease;
@@ -574,7 +582,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * @return the clearReferencesHttpClientKeepAliveThread flag for this Context.
+     * Get the clearReferencesHttpClientKeepAliveThread flag for this Context.
+     *
+     * @return the clearReferencesHttpClientKeepAliveThread flag
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
         return this.clearReferencesHttpClientKeepAliveThread;

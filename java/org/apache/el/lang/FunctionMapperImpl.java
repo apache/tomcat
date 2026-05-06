@@ -29,11 +29,24 @@ import jakarta.el.FunctionMapper;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
+/**
+ * Thread-safe implementation of FunctionMapper that supports externalization.
+ */
 public class FunctionMapperImpl extends FunctionMapper implements Externalizable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Map of function keys to their Function instances.
+     */
     protected ConcurrentMap<String,Function> functions = new ConcurrentHashMap<>();
+
+    /**
+     * Creates a new empty function mapper.
+     */
+    public FunctionMapperImpl() {
+        // Default constructor required by Externalizable
+    }
 
     @Override
     public Method resolveFunction(String prefix, String localName) {
@@ -66,15 +79,43 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
         this.functions = (ConcurrentMap<String,Function>) in.readObject();
     }
 
+    /**
+     * Represents a mapped EL function with serialization support.
+     */
     public static class Function implements Externalizable {
 
+        /**
+         * The resolved method, transient as it cannot be serialized directly.
+         */
         protected transient Method m;
+        /**
+         * The declaring class name of the method.
+         */
         protected String owner;
+        /**
+         * The method name.
+         */
         protected String name;
+        /**
+         * The parameter type names of the method.
+         */
         protected String[] types;
+        /**
+         * The function namespace prefix.
+         */
         protected String prefix;
+        /**
+         * The local function name.
+         */
         protected String localName;
 
+        /**
+         * Creates a new function mapping for the given method.
+         *
+         * @param prefix The namespace prefix
+         * @param localName The local function name
+         * @param m The method to map
+         */
         public Function(String prefix, String localName, Method m) {
             if (localName == null) {
                 throw new NullPointerException(MessageFactory.get("error.nullLocalName"));
@@ -87,6 +128,9 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
             this.m = m;
         }
 
+        /**
+         * Default constructor required by Externalizable for deserialization.
+         */
         public Function() {
             // for serialization
         }
@@ -119,6 +163,11 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
             this.types = (String[]) in.readObject();
         }
 
+        /**
+         * Gets the resolved method, lazily loading it from serialized data if needed.
+         *
+         * @return The resolved method, or {@code null} if it could not be resolved
+         */
         public Method getMethod() {
             if (this.m == null) {
                 try {

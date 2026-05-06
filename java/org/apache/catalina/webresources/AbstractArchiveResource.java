@@ -43,7 +43,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-    /*
+    /**
      * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
      * from the JRE and it has been confirmed that the JRE no longer depends on code base.
      *
@@ -267,6 +267,11 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         return getJarInputStreamWrapper();
     }
 
+    /**
+     * Returns a wrapper for the input stream of this resource.
+     *
+     * @return a wrapper for the input stream of this resource
+     */
     protected abstract JarInputStreamWrapper getJarInputStreamWrapper();
 
     /**

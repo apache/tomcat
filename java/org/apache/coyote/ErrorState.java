@@ -16,6 +16,9 @@
  */
 package org.apache.coyote;
 
+/**
+ * Enumeration of possible error states for a Coyote connection or request/response.
+ */
 public enum ErrorState {
 
     /**
@@ -57,6 +60,11 @@ public enum ErrorState {
         this.connectionIoAllowed = connectionIoAllowed;
     }
 
+    /**
+     * Returns whether this error state represents an error condition.
+     *
+     * @return {@code true} if in an error state
+     */
     public boolean isError() {
         return error;
     }
@@ -76,10 +84,20 @@ public enum ErrorState {
         }
     }
 
+    /**
+     * Returns whether I/O operations are still allowed in this error state.
+     *
+     * @return {@code true} if I/O is allowed
+     */
     public boolean isIoAllowed() {
         return ioAllowed;
     }
 
+    /**
+     * Returns whether connection-level I/O operations are still allowed in this error state.
+     *
+     * @return {@code true} if connection I/O is allowed
+     */
     public boolean isConnectionIoAllowed() {
         return connectionIoAllowed;
     }

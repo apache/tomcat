@@ -82,7 +82,13 @@ import java.util.regex.Pattern;
 public class FileHandler extends Handler {
 
 
+    /**
+     * Default value for the maximum number of days to keep log files. A value of -1 means unlimited.
+     */
     public static final int DEFAULT_MAX_DAYS = -1;
+    /**
+     * Default value for the log buffer size. A value of -1 forces a flush on each write.
+     */
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
 
@@ -92,21 +98,49 @@ public class FileHandler extends Handler {
     // ------------------------------------------------------------ Constructor
 
 
+    /**
+     * Default constructor. Uses LogManager properties for all configuration.
+     */
     public FileHandler() {
         this(null, null, null);
     }
 
 
+    /**
+     * Constructor with directory, prefix, and suffix.
+     *
+     * @param directory The directory where log files are created
+     * @param prefix The leading part of the log file name
+     * @param suffix The trailing part of the log file name
+     */
     public FileHandler(String directory, String prefix, String suffix) {
         this(directory, prefix, suffix, null);
     }
 
 
+    /**
+     * Constructor with directory, prefix, suffix, and maxDays.
+     *
+     * @param directory The directory where log files are created
+     * @param prefix The leading part of the log file name
+     * @param suffix The trailing part of the log file name
+     * @param maxDays The maximum number of days to keep log files
+     */
     public FileHandler(String directory, String prefix, String suffix, Integer maxDays) {
         this(directory, prefix, suffix, maxDays, null, null);
     }
 
 
+    /**
+     * Constructor with all configuration options.
+     *
+     * @param directory The directory where log files are created
+     * @param prefix The leading part of the log file name
+     * @param suffix The trailing part of the log file name
+     * @param maxDays The maximum number of days to keep log files
+     * @param rotatable Whether the log file is rotatable
+     * @param bufferSize The log buffer size
+     */
     public FileHandler(String directory, String prefix, String suffix, Integer maxDays, Boolean rotatable,
             Integer bufferSize) {
         this.directory = directory;
@@ -268,6 +302,9 @@ public class FileHandler extends Handler {
         closeWriter();
     }
 
+    /**
+     * Close the currently open log file writer.
+     */
     protected void closeWriter() {
 
         writerLock.writeLock().lock();
@@ -420,6 +457,9 @@ public class FileHandler extends Handler {
         openWriter();
     }
 
+    /**
+     * Open the writer for the current log file.
+     */
     protected void openWriter() {
 
         // Create the directory if necessary
@@ -521,12 +561,20 @@ public class FileHandler extends Handler {
         }
     }
 
+    /**
+     * Thread factory for creating log file cleanup threads.
+     */
     protected static final class ThreadFactory implements java.util.concurrent.ThreadFactory {
         private final String namePrefix;
         private final boolean isSecurityEnabled;
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
 
+        /**
+         * Creates a new ThreadFactory with the given name prefix.
+         *
+         * @param namePrefix The name prefix for threads created by this factory
+         */
         public ThreadFactory(final String namePrefix) {
             this.namePrefix = namePrefix;
             SecurityManager s = System.getSecurityManager();

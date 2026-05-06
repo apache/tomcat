@@ -39,26 +39,36 @@ public interface Options {
     boolean getErrorOnUseBeanInvalidClassAttribute();
 
     /**
+     * Returns whether the generated Java source files should be kept after compilation.
+     *
      * @return <code>true</code> to keep the generated source
      */
     boolean getKeepGenerated();
 
     /**
+     * Returns whether tag handler pooling is enabled for improved performance.
+     *
      * @return <code>true</code> if tag handler pooling is enabled, <code>false</code> otherwise.
      */
     boolean isPoolingEnabled();
 
     /**
+     * Returns whether HTML mapped Servlets are supported.
+     *
      * @return <code>true</code> if HTML mapped Servlets are supported.
      */
     boolean getMappedFile();
 
     /**
+     * Returns whether debug information is included in compiled classes.
+     *
      * @return <code>true</code> if debug information in included in compiled classes.
      */
     boolean getClassDebugInfo();
 
     /**
+     * Returns the interval in seconds at which the background compile thread checks for modified JSP files.
+     *
      * @return background compile thread check interval in seconds
      */
     int getCheckInterval();
@@ -72,11 +82,15 @@ public interface Options {
     boolean getDevelopment();
 
     /**
+     * Returns whether a source fragment should be included in exception messages for debugging.
+     *
      * @return <code>true</code> to include a source fragment in exception messages.
      */
     boolean getDisplaySourceFragment();
 
     /**
+     * Returns whether generation of SMAP (Source Map for Debugging) information is suppressed.
+     *
      * @return <code>true</code> to suppress generation of SMAP info for JSR45 debugging.
      */
     boolean isSmapSuppressed();
@@ -89,6 +103,8 @@ public interface Options {
     boolean isSmapDumped();
 
     /**
+     * Returns the option for trimming whitespace-only template text.
+     *
      * @return {@link TrimSpacesOption#TRUE} to remove template text that consists only of whitespace from the output
      *             completely, {@link TrimSpacesOption#SINGLE} to replace such template text with a single space,
      *             {@link TrimSpacesOption#FALSE} to leave such template text unchanged or
@@ -98,11 +114,15 @@ public interface Options {
     TrimSpacesOption getTrimSpaces();
 
     /**
+     * Returns the scratch directory used as the work folder for temporary compilation files.
+     *
      * @return the work folder
      */
     File getScratchDir();
 
     /**
+     * Returns the classpath used by the compiler when compiling generated Servlets.
+     *
      * @return the classpath used to compile generated Servlets
      */
     String getClassPath();
@@ -119,16 +139,22 @@ public interface Options {
     String getCompiler();
 
     /**
+     * Returns the target Java VM version for the compiler, such as 1.8.
+     *
      * @return the compiler target VM, e.g. 1.8.
      */
     String getCompilerTargetVM();
 
     /**
+     * Returns the source Java VM version for the compiler, such as 1.8.
+     *
      * @return the compiler source VM, e.g. 1.8.
      */
     String getCompilerSourceVM();
 
     /**
+     * Returns the fully qualified class name of the Jasper Java compiler implementation to use.
+     *
      * @return Jasper Java compiler class to use.
      */
     String getCompilerClassName();
@@ -143,6 +169,8 @@ public interface Options {
     TldCache getTldCache();
 
     /**
+     * Returns the Java platform character encoding used when generating the JSP page servlet source.
+     *
      * @return Java platform encoding to generate the JSP page servlet.
      */
     String getJavaEncoding();
@@ -157,16 +185,22 @@ public interface Options {
     boolean getFork();
 
     /**
+     * Returns the JSP configuration information as specified in the web.xml deployment descriptor.
+     *
      * @return JSP configuration information specified in web.xml.
      */
     JspConfig getJspConfig();
 
     /**
+     * Returns whether the X-Powered-By response header should be generated in HTTP responses.
+     *
      * @return <code>true</code> to generate a X-Powered-By response header.
      */
     boolean isXpoweredBy();
 
     /**
+     * Returns the Tag Plugin Manager used for applying tag plugins during JSP compilation.
+     *
      * @return a Tag Plugin Manager
      */
     TagPluginManager getTagPluginManager();
@@ -179,18 +213,24 @@ public interface Options {
     boolean genStringAsCharArray();
 
     /**
-     * @return modification test interval.
+     * Returns the interval in seconds between modification tests for JSP files.
+     *
+     * @return modification test interval in seconds.
      */
     int getModificationTestInterval();
 
 
     /**
+     * Returns whether the JSP engine should attempt re-compilation when an initial compilation fails.
+     *
      * @return <code>true</code> if re-compile will occur on a failure.
      */
     boolean getRecompileOnFail();
 
     /**
-     * @return <code>true</code> is caching is enabled (used for precompilation).
+     * Returns whether caching is enabled for compiled JSP pages, used for precompilation scenarios.
+     *
+     * @return <code>true</code> if caching is enabled (used for precompilation).
      */
     boolean isCaching();
 
@@ -215,24 +255,32 @@ public interface Options {
     int getMaxLoadedJsps();
 
     /**
+     * Returns the idle timeout for JSP unloading.
+     *
      * @return the idle time in seconds after which a JSP is unloaded. If unset or less or equal than 0, no jsps are
      *             unloaded.
      */
     int getJspIdleTimeout();
 
     /**
+     * Returns whether strict quote escaping is enabled for scriplet expressions.
+     *
      * @return {@code true} if the quote escaping required by section JSP.1.6 of the JSP specification should be applied
      *             to scriplet expression.
      */
     boolean getStrictQuoteEscaping();
 
     /**
+     * Returns whether quoting rules from JSP.1.6 are applied to EL expressions in attributes.
+     *
      * @return {@code true} if EL expressions used within attributes should have the quoting rules in JSP.1.6 applied to
      *             the expression.
      */
     boolean getQuoteAttributeEL();
 
     /**
+     * Returns the variable name used in the generated JSP servlet code to reference the EL expression factory.
+     *
      * @return the name of the variable that will be used in the generated JSP code for the expression factory
      */
     default String getVariableForExpressionFactory() {
@@ -240,6 +288,8 @@ public interface Options {
     }
 
     /**
+     * Returns the variable name used in the generated JSP servlet code to reference the instance manager.
+     *
      * @return the name of the variable that will be used in the generated JSP code for the instance manager
      */
     default String getVariableForInstanceManager() {
@@ -247,6 +297,8 @@ public interface Options {
     }
 
     /**
+     * Returns whether tag pooling is allowed on JSP pages that use the extends directive.
+     *
      * @return {@code true} if tag pooling is disabled with page that uses extends.
      */
     default boolean getPoolTagsWithExtends() {
@@ -254,6 +306,9 @@ public interface Options {
     }
 
     /**
+     * Returns whether strict enforcement of the JSP.5.3 requirement is applied, requiring objects used in
+     * jsp:getProperty to be previously introduced to the JSP processor.
+     *
      * @return {@code true} if the requirement to have the object used in jsp:getProperty action to be previously
      *             "introduced" to the JSP processor (see JSP.5.3) is enforced.
      */
@@ -262,6 +317,8 @@ public interface Options {
     }
 
     /**
+     * Returns whether strict whitespace handling rules are applied during JSP compilation.
+     *
      * @return {@code true} if the strict white space rules are applied.
      */
     default boolean getStrictWhitespace() {
@@ -269,6 +326,8 @@ public interface Options {
     }
 
     /**
+     * Returns the default base class for generated JSP servlets.
+     *
      * @return the default base class for generated JSP Servlets
      */
     default String getJspServletBase() {
@@ -286,6 +345,8 @@ public interface Options {
     }
 
     /**
+     * Returns the ServletContext attribute name used for the classpath.
+     *
      * @return ServletContext attribute for classpath. This is tomcat specific. Other servlet engines may choose to
      *             support this attribute if they want to have this JSP engine running on them.
      */
@@ -294,6 +355,8 @@ public interface Options {
     }
 
     /**
+     * Returns the query parameter name that triggers JSP pre-compilation.
+     *
      * @return The query parameter that causes the JSP engine to just pregenerated the servlet but not invoke it.
      */
     default String getJspPrecompilationQueryParameter() {
@@ -301,6 +364,8 @@ public interface Options {
     }
 
     /**
+     * Returns the default package name for compiled JSP pages.
+     *
      * @return The default package name for compiled jsp pages.
      */
     default String getGeneratedJspPackageName() {
@@ -308,6 +373,8 @@ public interface Options {
     }
 
     /**
+     * Returns the default package name for tag handlers generated from tag files.
+     *
      * @return The default package name for tag handlers generated from tag files.
      */
     default String getGeneratedTagFilePackageName() {
@@ -315,6 +382,8 @@ public interface Options {
     }
 
     /**
+     * Returns the prefix used for generated temporary variable names.
+     *
      * @return Prefix to use for generated temporary variable names
      */
     default String getTempVariableNamePrefix() {
@@ -322,6 +391,8 @@ public interface Options {
     }
 
     /**
+     * Returns whether the container instance manager is used to create tag bean instances.
+     *
      * @return {@code true} if the container instance manager will be used to create the bean instances
      */
     default boolean getUseInstanceManagerForTags() {

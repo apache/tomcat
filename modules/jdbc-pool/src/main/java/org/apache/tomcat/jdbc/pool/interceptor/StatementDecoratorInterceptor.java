@@ -154,6 +154,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Class to measure query execute time.
+     *
+     * @param <T> The type of Statement being proxied.
      */
     protected class StatementProxy<T extends Statement> implements InvocationHandler {
 

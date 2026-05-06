@@ -179,8 +179,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     // ------------------------------------------------------------- Properties
 
     /**
+     * Returns the HTTP status code used when the container needs to issue an HTTP redirect to meet the requirements of
+     * a configured transport guarantee.
+     *
      * @return The HTTP status code used when the container needs to issue an HTTP redirect to meet the requirements of
-     *             a configured transport guarantee.
+     *             a configured transport guarantee
      */
     public int getTransportGuaranteeRedirectStatus() {
         return transportGuaranteeRedirectStatus;
@@ -298,7 +301,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * @return the comma separated names of user attributes to additionally query from realm
+     * Returns the comma separated names of user attributes to additionally query from the realm. These will be
+     * provided to the user through the created Principal's <i>attributes</i> map.
+     *
+     * @return The comma separated names of user attributes to additionally query from the realm
      */
     public String getUserAttributes() {
         return userAttributes;

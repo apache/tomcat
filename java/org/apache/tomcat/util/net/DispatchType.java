@@ -22,8 +22,17 @@ package org.apache.tomcat.util.net;
  */
 public enum DispatchType {
 
+    /**
+     * Dispatch type for non-blocking read operations.
+     */
     NON_BLOCKING_READ(SocketEvent.OPEN_READ),
+    /**
+     * Dispatch type for non-blocking write operations.
+     */
     NON_BLOCKING_WRITE(SocketEvent.OPEN_WRITE),
+    /**
+     * Dispatch type for non-blocking error operations.
+     */
     NON_BLOCKING_ERROR(SocketEvent.ERROR);
 
     private final SocketEvent status;
@@ -32,6 +41,11 @@ public enum DispatchType {
         this.status = status;
     }
 
+    /**
+     * Get the socket event status associated with this dispatch type.
+     *
+     * @return Socket event status
+     */
     public SocketEvent getSocketStatus() {
         return status;
     }

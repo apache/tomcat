@@ -52,6 +52,9 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
     private ELResolver resolver;
 
+    /**
+     * Constructs a new JspApplicationContextImpl instance.
+     */
     public JspApplicationContextImpl() {
 
     }
@@ -64,6 +67,13 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         this.contextListeners.add(listener);
     }
 
+    /**
+     * Returns the JspApplicationContextImpl singleton for the given ServletContext.
+     * Creates a new instance if one does not yet exist.
+     *
+     * @param context The ServletContext
+     * @return The JspApplicationContextImpl instance
+     */
     public static JspApplicationContextImpl getInstance(ServletContext context) {
         if (context == null) {
             throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
@@ -76,6 +86,12 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         return impl;
     }
 
+    /**
+     * Creates an ELContext for the given JspContext.
+     *
+     * @param context The JspContext
+     * @return The created ELContextImpl
+     */
     public ELContextImpl createELContext(JspContext context) {
         if (context == null) {
             throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
@@ -97,6 +113,11 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         return ctx;
     }
 
+    /**
+     * Notifies all registered ELContextListeners that a new ELContext has been created.
+     *
+     * @param elContext The newly created ELContext
+     */
     protected void fireListeners(ELContext elContext) {
         ELContextEvent event = new ELContextEvent(elContext);
         for (ELContextListener contextListener : this.contextListeners) {

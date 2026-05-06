@@ -36,6 +36,13 @@ import org.apache.jasper.Constants;
  */
 public class JspFactoryImpl extends JspFactory {
 
+    /**
+     * Creates a new JspFactoryImpl instance with default pool size settings.
+     */
+    public JspFactoryImpl() {
+        super();
+    }
+
     private final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
     private int poolSize = -1;
 

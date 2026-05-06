@@ -18,10 +18,19 @@ package org.apache.jasper.el;
 
 import jakarta.el.MethodNotFoundException;
 
+/**
+ * Exception wrapper that adds a JSP-specific mark to a MethodNotFoundException for better error tracking.
+ */
 public class JspMethodNotFoundException extends MethodNotFoundException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new JspMethodNotFoundException wrapping the given exception with a mark prefix.
+     *
+     * @param mark the mark prefix to prepend to the error message
+     * @param e the underlying MethodNotFoundException
+     */
     public JspMethodNotFoundException(String mark, MethodNotFoundException e) {
         super(mark + " " + e.getMessage(), e.getCause());
     }

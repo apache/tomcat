@@ -62,6 +62,12 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
+    /**
+     * Constructs a new JDTCompiler.
+     */
+    public JDTCompiler() {
+    }
+
     private final Log log = LogFactory.getLog(JDTCompiler.class); // must not be static
 
     @Override

@@ -37,7 +37,16 @@ import org.apache.tomcat.util.http.parser.TE;
 import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+     * Configuration for HTTP response compression settings.
+     */
 public class CompressionConfig {
+
+    /**
+     * Creates a new compression configuration with default settings.
+     */
+    public CompressionConfig() {
+    }
 
     private static final Log log = LogFactory.getLog(CompressionConfig.class);
     private static final StringManager sm = StringManager.getManager(CompressionConfig.class);
@@ -52,6 +61,11 @@ public class CompressionConfig {
             new HashSet<>(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"));
 
 
+    /**
+     * Returns the list of content encodings that indicate already-compressed content.
+     *
+     * @return comma-separated list of encoding names
+     */
     public String getNoCompressionEncodings() {
         return String.join(",", noCompressionEncodings);
     }
@@ -123,6 +137,11 @@ public class CompressionConfig {
     }
 
 
+    /**
+     * Returns the internal numeric compression level.
+     *
+     * @return 0 for off, 1 for on, 2 for force
+     */
     public int getCompressionLevel() {
         return compressionLevel;
     }
@@ -142,6 +161,12 @@ public class CompressionConfig {
     }
 
 
+    /**
+     * Returns the compiled regular expression pattern for user agents that should not
+     * receive compressed responses.
+     *
+     * @return the compiled pattern, or {@code null} if not configured
+     */
     public Pattern getNoCompressionUserAgentsPattern() {
         return noCompressionUserAgents;
     }
@@ -163,17 +188,32 @@ public class CompressionConfig {
     }
 
 
+    /**
+     * Returns the comma-separated list of MIME types eligible for compression.
+     *
+     * @return comma-separated MIME type string
+     */
     public String getCompressibleMimeType() {
         return compressibleMimeType;
     }
 
 
+    /**
+     * Sets the comma-separated list of MIME types eligible for compression.
+     *
+     * @param valueS comma-separated MIME type string
+     */
     public void setCompressibleMimeType(String valueS) {
         compressibleMimeType = valueS;
         compressibleMimeTypes = null;
     }
 
 
+    /**
+     * Returns the array of MIME types eligible for compression.
+     *
+     * @return array of MIME type strings
+     */
     public String[] getCompressibleMimeTypes() {
         String[] result = compressibleMimeTypes;
         if (result != null) {
@@ -193,6 +233,11 @@ public class CompressionConfig {
     }
 
 
+    /**
+     * Returns the minimum response size in bytes required before compression is applied.
+     *
+     * @return the minimum size in bytes
+     */
     public int getCompressionMinSize() {
         return compressionMinSize;
     }

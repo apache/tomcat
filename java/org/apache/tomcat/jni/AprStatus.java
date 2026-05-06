@@ -29,39 +29,87 @@ public class AprStatus {
     private static volatile int openSSLVersion = 0;
     private static ReentrantReadWriteLock statusLock = new ReentrantReadWriteLock();
 
+    /**
+     * Prevents instantiation.
+     */
+    private AprStatus() {
+    }
+
+    /**
+     * Returns whether APR has been initialized.
+     *
+     * @return {@code true} if APR has been initialized
+     */
     public static boolean isAprInitialized() {
         return aprInitialized;
     }
 
+    /**
+     * Returns whether APR is available.
+     *
+     * @return {@code true} if APR is available
+     */
     public static boolean isAprAvailable() {
         return aprAvailable;
     }
 
+    /**
+     * Returns whether OpenSSL is in use.
+     *
+     * @return {@code true} if OpenSSL is in use
+     */
     public static boolean getUseOpenSSL() {
         return useOpenSSL;
     }
 
+    /**
+     * Returns whether an APR instance has been created.
+     *
+     * @return {@code true} if an APR instance has been created
+     */
     public static boolean isInstanceCreated() {
         return instanceCreated;
     }
 
+    /**
+     * Sets the APR initialized status.
+     *
+     * @param aprInitialized the APR initialized status to set
+     */
     public static void setAprInitialized(boolean aprInitialized) {
         AprStatus.aprInitialized = aprInitialized;
     }
 
+    /**
+     * Sets the APR available status.
+     *
+     * @param aprAvailable the APR available status to set
+     */
     public static void setAprAvailable(boolean aprAvailable) {
         AprStatus.aprAvailable = aprAvailable;
     }
 
+    /**
+     * Sets whether to use OpenSSL.
+     *
+     * @param useOpenSSL the use OpenSSL status to set
+     */
     public static void setUseOpenSSL(boolean useOpenSSL) {
         AprStatus.useOpenSSL = useOpenSSL;
     }
 
+    /**
+     * Sets the instance created status.
+     *
+     * @param instanceCreated the instance created status to set
+     */
     public static void setInstanceCreated(boolean instanceCreated) {
         AprStatus.instanceCreated = instanceCreated;
     }
 
     /**
+     * Returns the OpenSSL version.
+     *
      * @return the openSSLVersion
      */
     public static int getOpenSSLVersion() {
@@ -69,6 +117,8 @@ public class AprStatus {
     }
 
     /**
+     * Sets the OpenSSL version.
+     *
      * @param openSSLVersion the openSSLVersion to set
      */
     public static void setOpenSSLVersion(int openSSLVersion) {

@@ -40,6 +40,12 @@ import org.apache.tools.ant.Project;
  */
 public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
+    /**
+     * Construct a new instance of this task.
+     */
+    protected AbstractCatalinaTask() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -55,10 +61,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected String charset = "ISO-8859-1";
 
+    /**
+     * Returns the charset used during URL encoding.
+     *
+     * @return the charset
+     */
     public String getCharset() {
         return charset;
     }
 
+    /**
+     * Sets the charset used during URL encoding.
+     *
+     * @param charset the charset to set
+     */
     public void setCharset(String charset) {
         this.charset = charset;
     }
@@ -69,10 +85,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected String password = null;
 
+    /**
+     * Returns the login password for the Manager application.
+     *
+     * @return the password
+     */
     public String getPassword() {
         return this.password;
     }
 
+    /**
+     * Sets the login password for the Manager application.
+     *
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
@@ -83,10 +109,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected String url = "http://localhost:8080/manager/text";
 
+    /**
+     * Returns the URL of the Manager application to be used.
+     *
+     * @return the url
+     */
     public String getUrl() {
         return this.url;
     }
 
+    /**
+     * Sets the URL of the Manager application to be used.
+     *
+     * @param url the url to set
+     */
     public void setUrl(String url) {
         this.url = url;
     }
@@ -97,10 +133,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected String username = null;
 
+    /**
+     * Returns the login username for the Manager application.
+     *
+     * @return the username
+     */
     public String getUsername() {
         return this.username;
     }
 
+    /**
+     * Sets the login username for the Manager application.
+     *
+     * @param username the username to set
+     */
     public void setUsername(String username) {
         this.username = username;
     }
@@ -117,10 +163,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected boolean ignoreResponseConstraint = false;
 
+    /**
+     * Returns whether the constraint on the first line of the response message is ignored.
+     *
+     * @return true if the constraint is ignored
+     */
     public boolean isIgnoreResponseConstraint() {
         return ignoreResponseConstraint;
     }
 
+    /**
+     * Sets whether the constraint on the first line of the response message is ignored.
+     *
+     * @param ignoreResponseConstraint true to ignore the constraint
+     */
     public void setIgnoreResponseConstraint(boolean ignoreResponseConstraint) {
         this.ignoreResponseConstraint = ignoreResponseConstraint;
     }

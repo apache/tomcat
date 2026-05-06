@@ -18,10 +18,19 @@ package org.apache.jasper.el;
 
 import jakarta.el.ELException;
 
+/**
+ * Exception wrapper that adds a JSP-specific mark to an ELException for better error tracking.
+ */
 public class JspELException extends ELException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new JspELException wrapping the given ELException with a mark prefix.
+     *
+     * @param mark the mark prefix to prepend to the error message
+     * @param e the underlying ELException
+     */
     public JspELException(String mark, ELException e) {
         super(mark + " " + e.getMessage(), e.getCause());
     }

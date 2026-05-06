@@ -44,6 +44,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class Bootstrap {
 
+    /**
+     * Default constructor.
+     */
+    private Bootstrap() {
+    }
+
     private static final Log log = LogFactory.getLog(Bootstrap.class);
 
     /**
@@ -408,6 +414,12 @@ public final class Bootstrap {
         method.invoke(catalinaDaemon, paramValues);
     }
 
+    /**
+     * Returns whether the daemon should block after starting.
+     *
+     * @return true if the daemon should await
+     * @throws Exception if reflection fails
+     */
     public boolean getAwait() throws Exception {
         Class<?>[] paramTypes = new Class[0];
         Object[] paramValues = new Object[0];

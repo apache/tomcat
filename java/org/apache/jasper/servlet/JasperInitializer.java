@@ -40,6 +40,12 @@ import org.xml.sax.SAXException;
  */
 public class JasperInitializer implements ServletContainerInitializer {
 
+    /**
+     * Constructs a new JasperInitializer.
+     */
+    public JasperInitializer() {
+    }
+
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private final Log log = LogFactory.getLog(JasperInitializer.class); // must not be static
 
@@ -107,6 +113,15 @@ public class JasperInitializer implements ServletContainerInitializer {
 
     }
 
+    /**
+     * Create a new TldScanner instance.
+     *
+     * @param context the servlet context
+     * @param namespaceAware whether to be namespace aware
+     * @param validate whether to validate
+     * @param blockExternal whether to block external entities
+     * @return the new TldScanner
+     */
     protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate,
             boolean blockExternal) {
         return new TldScanner(context, namespaceAware, validate, blockExternal);

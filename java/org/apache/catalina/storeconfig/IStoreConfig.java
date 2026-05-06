@@ -23,6 +23,9 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 
+/**
+ * Interface for storing Catalina configuration to XML.
+ */
 public interface IStoreConfig {
 
     /**

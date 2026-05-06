@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.http2;
 
+/**
+ * HTTP/2 protocol constants.
+ */
 public class Constants {
 
     /**
@@ -27,18 +30,49 @@ public class Constants {
     public static final int DEFAULT_WEIGHT = 16;
 
     // Parsing
+    /**
+     * Default header read buffer size.
+     */
     static final int DEFAULT_HEADER_READ_BUFFER_SIZE = 1024;
 
     // Header frame size
     // TODO: Is 1k the optimal value?
+    /**
+     * Default headers frame size.
+     */
     static final int DEFAULT_HEADERS_FRAME_SIZE = 1024;
     // TODO: Is 64 too big? Just the status header with compression
+    /**
+     * Default headers ACK frame size.
+     */
     static final int DEFAULT_HEADERS_ACK_FRAME_SIZE = 64;
 
     // Limits
+    /**
+     * Default maximum cookie count.
+     */
     static final int DEFAULT_MAX_COOKIE_COUNT = 200;
+    /**
+     * Default maximum header count.
+     */
     static final int DEFAULT_MAX_HEADER_COUNT = 100;
+    /**
+     * Default maximum header size.
+     */
     static final int DEFAULT_MAX_HEADER_SIZE = 8 * 1024;
+    /**
+     * Default maximum trailer count.
+     */
     static final int DEFAULT_MAX_TRAILER_COUNT = 100;
+    /**
+     * Default maximum trailer size.
+     */
     static final int DEFAULT_MAX_TRAILER_SIZE = 8 * 1024;
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

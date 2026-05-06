@@ -403,6 +403,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
+     * Returns the fully qualified name of this manager's implementation class.
+     *
      * @return The name of the implementation class.
      */
     public String getClassName() {
@@ -434,6 +436,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
+     * Returns the descriptive short name of this Manager implementation.
+     *
      * @return The descriptive short name of this Manager implementation.
      */
     public String getName() {
@@ -441,6 +445,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
     /**
+     * Returns the secure random number generator class name.
+     *
      * @return The secure random number generator class name.
      */
     public String getSecureRandomClass() {
@@ -463,6 +469,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
+     * Returns the secure random number generator algorithm name.
+     *
      * @return The secure random number generator algorithm name.
      */
     public String getSecureRandomAlgorithm() {
@@ -481,6 +489,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
+     * Returns the secure random number generator provider name.
+     *
      * @return The secure random number generator provider name.
      */
     public String getSecureRandomProvider() {
@@ -525,6 +535,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
     /**
+     * Returns the frequency of session expiration and related manager checks.
+     *
      * @return The frequency of manager checks.
      */
     public int getProcessExpiresFrequency() {
@@ -966,6 +978,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
+     * Returns the maximum number of active Sessions allowed, or -1 for no limit.
+     *
      * @return The maximum number of active Sessions allowed, or -1 for no limit.
      */
     public int getMaxActiveSessions() {

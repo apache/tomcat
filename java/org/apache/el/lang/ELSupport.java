@@ -187,9 +187,20 @@ public class ELSupport {
         }
     }
 
-    /*
-     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might be a
-     * neater / better solution, but I couldn't find it.
+    /**
+     * Coerces an object to an Enum value of the specified type.
+     * <p>
+     * If the object is null or an empty string, null is returned. If the object is already
+     * an instance of the target enum type, it is returned directly. Otherwise, the object
+     * must be a String matching one of the enum constant names.
+     *
+     * @param ctx the EL context
+     * @param obj the object to coerce
+     * @param type the target enum type
+     *
+     * @return the coerced enum value, or null if the object is null or empty
+     *
+     * @throws ELException if the object cannot be coerced to the target enum type
      */
     @SuppressWarnings("unchecked")
     public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
@@ -302,6 +313,16 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", obj, objType, Character.class));
     }
 
+    /**
+     * Coerces a Number to the specified numeric type.
+     *
+     * @param number the number to coerce
+     * @param type the target numeric type
+     *
+     * @return the coerced number
+     *
+     * @throws ELException if the number cannot be coerced to the target type
+     */
     protected static Number coerceToNumber(final Number number, final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             return Long.valueOf(number.longValue());
@@ -346,6 +367,20 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", number, number.getClass(), type));
     }
 
+    /**
+     * Coerces an object to a Number of the specified type.
+     * <p>
+     * Supports coercion from String, Number, and Character types. If the object is null
+     * and the target type is not primitive, null is returned (unless COERCE_TO_ZERO is set).
+     *
+     * @param ctx the EL context
+     * @param obj the object to coerce
+     * @param type the target numeric type
+     *
+     * @return the coerced number, or null if the object is null and the target is not primitive
+     *
+     * @throws ELException if the object cannot be coerced to the target type
+     */
     public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type) throws ELException {
 
         if (ctx != null) {
@@ -383,6 +418,16 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), type));
     }
 
+    /**
+     * Coerces a String to a Number of the specified type.
+     *
+     * @param val the string value to parse
+     * @param type the target numeric type
+     *
+     * @return the coerced number
+     *
+     * @throws ELException if the string cannot be parsed as the target type
+     */
     protected static Number coerceToNumber(final String val, final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             try {
@@ -485,6 +530,23 @@ public class ELSupport {
         }
     }
 
+    /**
+     * Coerces an object to the specified target type.
+     * <p>
+     * Supports coercion to String, Number, Character, Boolean, Enum, Instant, Date, arrays,
+     * and functional interfaces. Uses the ELResolver's convertToType method first if a context
+     * is provided.
+     *
+     * @param ctx the EL context
+     * @param obj the object to coerce
+     * @param type the target type
+     *
+     * @param <T> the target type
+     *
+     * @return the coerced object, or null if the object is null and the target is not primitive
+     *
+     * @throws ELException if the object cannot be coerced to the target type
+     */
     public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type) throws ELException {
 
         if (ctx != null) {
@@ -634,24 +696,63 @@ public class ELSupport {
     }
 
 
+    /**
+     * Checks if either operand is a BigDecimal.
+     *
+     * @param obj0 the first operand
+     * @param obj1 the second operand
+     *
+     * @return true if either operand is a BigDecimal
+     */
     public static boolean isBigDecimalOp(final Object obj0, final Object obj1) {
         return (obj0 instanceof BigDecimal || obj1 instanceof BigDecimal);
     }
 
+    /**
+     * Checks if either operand is a BigInteger.
+     *
+     * @param obj0 the first operand
+     * @param obj1 the second operand
+     *
+     * @return true if either operand is a BigInteger
+     */
     public static boolean isBigIntegerOp(final Object obj0, final Object obj1) {
         return (obj0 instanceof BigInteger || obj1 instanceof BigInteger);
     }
 
+    /**
+     * Checks if either operand is a Double or Float.
+     *
+     * @param obj0 the first operand
+     * @param obj1 the second operand
+     *
+     * @return true if either operand is a Double or Float
+     */
     public static boolean isDoubleOp(final Object obj0, final Object obj1) {
         return (obj0 instanceof Double || obj1 instanceof Double || obj0 instanceof Float || obj1 instanceof Float);
     }
 
+    /**
+     * Checks if either operand is a Long, Integer, Character, Short, or Byte.
+     *
+     * @param obj0 the first operand
+     * @param obj1 the second operand
+     *
+     * @return true if either operand is a Long-compatible type
+     */
     public static boolean isLongOp(final Object obj0, final Object obj1) {
         return (obj0 instanceof Long || obj1 instanceof Long || obj0 instanceof Integer || obj1 instanceof Integer ||
                 obj0 instanceof Character || obj1 instanceof Character || obj0 instanceof Short ||
                 obj1 instanceof Short || obj0 instanceof Byte || obj1 instanceof Byte);
     }
 
+    /**
+     * Checks if a string represents a floating-point number by looking for 'E', 'e', or '.' characters.
+     *
+     * @param str the string to check
+     *
+     * @return true if the string contains floating-point notation
+     */
     public static boolean isStringFloat(final String str) {
         int len = str.length();
         if (len > 1) {

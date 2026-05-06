@@ -18,7 +18,16 @@ package org.apache.tomcat.util.compat;
 
 import java.util.Locale;
 
+/**
+ * Provides flags for detecting the JVM vendor.
+ */
 public class JreVendor {
+
+    /**
+     * Constructs a new JreVendor instance. This class cannot be instantiated.
+     */
+    public JreVendor() {
+    }
 
     static {
         /*
@@ -41,7 +50,13 @@ public class JreVendor {
         }
     }
 
+    /**
+     * {@code true} if the current JVM is an Oracle or Sun JVM.
+     */
     public static final boolean IS_ORACLE_JVM;
 
+    /**
+     * {@code true} if the current JVM is an IBM JVM.
+     */
     public static final boolean IS_IBM_JVM;
 }

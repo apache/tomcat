@@ -21,7 +21,16 @@ import java.util.TimeZone;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
+/**
+ * Ant task that forces the default time zone to UTC.
+ */
 public class ForceUtcTimeZone extends Task {
+    /**
+     * Creates a new ForceUtcTimeZone instance.
+     */
+    public ForceUtcTimeZone() {
+        // Default constructor
+    }
 
     @Override
     public void execute() throws BuildException {

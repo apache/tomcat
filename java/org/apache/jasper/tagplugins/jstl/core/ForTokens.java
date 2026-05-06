@@ -19,7 +19,16 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin implementation for the JSTL &lt;c:forTokens&gt; tag.
+ */
 public class ForTokens implements TagPlugin {
+    /**
+     * Creates a new ForTokens tag plugin instance.
+     */
+    public ForTokens() {
+        // Default constructor
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

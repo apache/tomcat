@@ -35,6 +35,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class Introspection {
 
+    /**
+     * Constructs a new Introspection.
+     */
+    private Introspection() {
+    }
+
     private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 

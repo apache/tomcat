@@ -17,13 +17,31 @@
 package org.apache.catalina.manager.host;
 
 
+/**
+ * Constants used by the host manager web application.
+ */
 public class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.manager.host";
 
+    /**
+     * The HTML rel attribute value for external links.
+     */
     public static final String REL_EXTERNAL = org.apache.catalina.manager.Constants.REL_EXTERNAL;
 
     //@formatter:off
+    /**
+     * The HTML message section template for host manager pages.
+     */
     public static final String MESSAGE_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         " <tr>\n" +
@@ -35,6 +53,9 @@ public class Constants {
         "<br>\n" +
         "\n";
 
+    /**
+     * The HTML manager section template for host manager pages.
+     */
     public static final String MANAGER_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
@@ -50,6 +71,9 @@ public class Constants {
         "<br>\n" +
         "\n";
 
+    /**
+     * The HTML server header section template for host manager pages.
+     */
     public static final String SERVER_HEADER_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
@@ -64,6 +88,9 @@ public class Constants {
         " <td class=\"header-center\"><small>{6}</small></td>\n" +
         "</tr>\n";
 
+    /**
+     * The HTML server row section template for host manager pages.
+     */
     public static final String SERVER_ROW_SECTION =
         "<tr>\n" +
         " <td class=\"row-center\"><small>{0}</small></td>\n" +
@@ -77,6 +104,9 @@ public class Constants {
         "<br>\n" +
         "\n";
 
+    /**
+     * The HTML tail section template for host manager pages.
+     */
     public static final String HTML_TAIL_SECTION =
         "<hr size=\"1\" noshade=\"noshade\">\n" +
         "<center><font size=\"-1\" color=\"#525D76\">\n" +
@@ -87,6 +117,9 @@ public class Constants {
         "</html>";
     //@formatter:on
 
+    /**
+     * The character set used by the host manager application.
+     */
     public static final String CHARSET = "utf-8";
 }
 

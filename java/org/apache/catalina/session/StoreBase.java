@@ -64,7 +64,9 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the name for this Store, used for logging.
+     * Return the name for this Store, used for logging.
+     *
+     * @return the store name
      */
     public String getStoreName() {
         return storeName;

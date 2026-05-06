@@ -37,27 +37,69 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Abstract base class for cloud-based membership providers.
+ */
 public abstract class CloudMembershipProvider extends MembershipProviderBase implements Heartbeat, ChannelListener {
     private static final Log log = LogFactory.getLog(CloudMembershipProvider.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(CloudMembershipProvider.class);
 
+    /**
+     * Prefix for custom environment variables.
+     */
     protected static final String CUSTOM_ENV_PREFIX = "OPENSHIFT_KUBE_PING_";
 
+    /**
+     * The URL for the cloud membership service.
+     */
     protected String url;
+    /**
+     * The provider for cloud API streams.
+     */
     protected StreamProvider streamProvider;
+    /**
+     * Connection timeout in milliseconds.
+     */
     protected int connectionTimeout;
+    /**
+     * Read timeout in milliseconds.
+     */
     protected int readTimeout;
 
+    /**
+     * The time when this provider started.
+     */
     protected Instant startTime;
+    /**
+     * MD5 message digest for hashing operations.
+     */
     protected MessageDigest md5;
 
+    /**
+     * HTTP headers for cloud API requests.
+     */
     protected Map<String,String> headers = new HashMap<>();
 
+    /**
+     * The local IP address.
+     */
     protected String localIp;
+    /**
+     * The local port number.
+     */
     protected int port;
 
+    /**
+     * Member expiration time in milliseconds.
+     */
     protected long expirationTime = 5000;
 
+    /**
+     * Creates a new CloudMembershipProvider and initializes the MD5 digest.
+     */
     public CloudMembershipProvider() {
         try {
             md5 = MessageDigest.getInstance("md5");

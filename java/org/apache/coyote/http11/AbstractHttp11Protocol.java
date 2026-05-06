@@ -53,14 +53,27 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation of the HTTP/1.1 and HTTP/1.0 protocols.
+ *
+ * @param <S> The socket type
+ */
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
+    /**
+     * The StringManager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(AbstractHttp11Protocol.class);
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
     private HttpParser httpParser = null;
 
+    /**
+     * Construct a specific instance of this protocol handler.
+     *
+     * @param endpoint Endpoint on which to accept connections
+     */
     public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
@@ -126,6 +139,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * Get the HttpParser used to parse relaxed characters.
+     *
+     * @return the HttpParser
+     */
     public HttpParser getHttpParser() {
         return httpParser;
     }
@@ -136,14 +154,29 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private ContinueResponseTiming continueResponseTiming = ContinueResponseTiming.IMMEDIATELY;
 
+    /**
+     * Get the setting for how responses to 100-Continue requests will be sent.
+     *
+     * @return The current continue response timing setting
+     */
     public String getContinueResponseTiming() {
         return continueResponseTiming.toString();
     }
 
+    /**
+     * Set the setting for how responses to 100-Continue requests will be sent.
+     *
+     * @param continueResponseTiming The new continue response timing setting
+     */
     public void setContinueResponseTiming(String continueResponseTiming) {
         this.continueResponseTiming = ContinueResponseTiming.fromString(continueResponseTiming);
     }
 
+    /**
+     * Get the continue response timing setting as an enum value.
+     *
+     * @return The continue response timing
+     */
     public ContinueResponseTiming getContinueResponseTimingInternal() {
         return continueResponseTiming;
     }
@@ -151,10 +184,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private boolean useKeepAliveResponseHeader = true;
 
+    /**
+     * Get the flag that controls whether the Keep-Alive response header will be used.
+     *
+     * @return {@code true} if the Keep-Alive response header will be used
+     */
     public boolean getUseKeepAliveResponseHeader() {
         return useKeepAliveResponseHeader;
     }
 
+    /**
+     * Set the flag that controls whether the Keep-Alive response header will be used.
+     *
+     * @param useKeepAliveResponseHeader {@code true} if the Keep-Alive response header should be used
+     */
     public void setUseKeepAliveResponseHeader(boolean useKeepAliveResponseHeader) {
         this.useKeepAliveResponseHeader = useKeepAliveResponseHeader;
     }
@@ -162,10 +205,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private String relaxedPathChars = null;
 
+    /**
+     * Get the set of characters allowed in a URL path.
+     *
+     * @return The allowed path characters
+     */
     public String getRelaxedPathChars() {
         return relaxedPathChars;
     }
 
+    /**
+     * Set the set of characters allowed in a URL path.
+     *
+     * @param relaxedPathChars The allowed path characters
+     */
     public void setRelaxedPathChars(String relaxedPathChars) {
         this.relaxedPathChars = relaxedPathChars;
     }
@@ -173,10 +226,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private String relaxedQueryChars = null;
 
+    /**
+     * Get the set of characters allowed in a URL query string.
+     *
+     * @return The allowed query characters
+     */
     public String getRelaxedQueryChars() {
         return relaxedQueryChars;
     }
 
+    /**
+     * Set the set of characters allowed in a URL query string.
+     *
+     * @param relaxedQueryChars The allowed query characters
+     */
     public void setRelaxedQueryChars(String relaxedQueryChars) {
         this.relaxedQueryChars = relaxedQueryChars;
     }
@@ -273,10 +336,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxHttpHeaderSize = 8 * 1024;
 
+    /**
+     * Get the maximum size of the HTTP message header.
+     *
+     * @return The maximum size of the HTTP message header in bytes
+     */
     public int getMaxHttpHeaderSize() {
         return maxHttpHeaderSize;
     }
 
+    /**
+     * Set the maximum size of the HTTP message header.
+     *
+     * @param valueI The maximum size of the HTTP message header in bytes
+     */
     public void setMaxHttpHeaderSize(int valueI) {
         maxHttpHeaderSize = valueI;
     }
@@ -287,10 +360,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxHttpRequestHeaderSize = -1;
 
+    /**
+     * Get the maximum size of the HTTP request message header.
+     *
+     * @return The maximum size of the HTTP request message header in bytes
+     */
     public int getMaxHttpRequestHeaderSize() {
         return maxHttpRequestHeaderSize == -1 ? getMaxHttpHeaderSize() : maxHttpRequestHeaderSize;
     }
 
+    /**
+     * Set the maximum size of the HTTP request message header.
+     *
+     * @param valueI The maximum size of the HTTP request message header in bytes
+     */
     public void setMaxHttpRequestHeaderSize(int valueI) {
         maxHttpRequestHeaderSize = valueI;
     }
@@ -301,10 +384,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxHttpResponseHeaderSize = -1;
 
+    /**
+     * Get the maximum size of the HTTP response message header.
+     *
+     * @return The maximum size of the HTTP response message header in bytes
+     */
     public int getMaxHttpResponseHeaderSize() {
         return maxHttpResponseHeaderSize == -1 ? getMaxHttpHeaderSize() : maxHttpResponseHeaderSize;
     }
 
+    /**
+     * Set the maximum size of the HTTP response message header.
+     *
+     * @param valueI The maximum size of the HTTP response message header in bytes
+     */
     public void setMaxHttpResponseHeaderSize(int valueI) {
         maxHttpResponseHeaderSize = valueI;
     }
@@ -354,63 +447,135 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * Set the compression setting.
+     *
+     * @param compression The compression setting
+     */
     public void setCompression(String compression) {
         compressionConfig.setCompression(compression);
     }
 
+    /**
+     * Get the compression setting.
+     *
+     * @return The compression setting
+     */
     public String getCompression() {
         return compressionConfig.getCompression();
     }
 
+    /**
+     * Get the compression level.
+     *
+     * @return The compression level
+     */
     protected int getCompressionLevel() {
         return compressionConfig.getCompressionLevel();
     }
 
 
+    /**
+     * Get the list of user agents that should not use compression.
+     *
+     * @return The user agents that should not use compression
+     */
     public String getNoCompressionUserAgents() {
         return compressionConfig.getNoCompressionUserAgents();
     }
 
+    /**
+     * Get the pattern of user agents that should not use compression.
+     *
+     * @return The pattern of user agents that should not use compression
+     */
     protected Pattern getNoCompressionUserAgentsPattern() {
         return compressionConfig.getNoCompressionUserAgentsPattern();
     }
 
+    /**
+     * Set the list of user agents that should not use compression.
+     *
+     * @param noCompressionUserAgents The user agents that should not use compression
+     */
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
         compressionConfig.setNoCompressionUserAgents(noCompressionUserAgents);
     }
 
 
+    /**
+     * Get the MIME types that may be subject to compression.
+     *
+     * @return The MIME types that may be subject to compression
+     */
     public String getCompressibleMimeType() {
         return compressionConfig.getCompressibleMimeType();
     }
 
+    /**
+     * Set the MIME types that may be subject to compression.
+     *
+     * @param valueS The MIME types that may be subject to compression
+     */
     public void setCompressibleMimeType(String valueS) {
         compressionConfig.setCompressibleMimeType(valueS);
     }
 
+    /**
+     * Get the MIME types that may be subject to compression as an array.
+     *
+     * @return The MIME types that may be subject to compression
+     */
     public String[] getCompressibleMimeTypes() {
         return compressionConfig.getCompressibleMimeTypes();
     }
 
 
+    /**
+     * Get the minimum response size for compression to be applied.
+     *
+     * @return The minimum response size in bytes
+     */
     public int getCompressionMinSize() {
         return compressionConfig.getCompressionMinSize();
     }
 
+    /**
+     * Set the minimum response size for compression to be applied.
+     *
+     * @param compressionMinSize The minimum response size in bytes
+     */
     public void setCompressionMinSize(int compressionMinSize) {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
 
 
+    /**
+     * Get the content encodings that should not be used.
+     *
+     * @return The content encodings that should not be used
+     */
     public String getNoCompressionEncodings() {
         return compressionConfig.getNoCompressionEncodings();
     }
 
+    /**
+     * Set the content encodings that should not be used.
+     *
+     * @param encodings The content encodings that should not be used
+     */
     public void setNoCompressionEncodings(String encodings) {
         compressionConfig.setNoCompressionEncodings(encodings);
     }
 
 
+    /**
+     * Check if compression should be used for the specified request/response.
+     *
+     * @param request The HTTP request
+     * @param response The HTTP response
+     * @return {@code true} if compression should be used
+     */
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
     }
@@ -432,6 +597,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
     }
 
+    /**
+     * Get the pattern of user agents that should be restricted to HTTP/1.0.
+     *
+     * @return The pattern of user agents that should be restricted to HTTP/1.0
+     */
     protected Pattern getRestrictedUserAgentsPattern() {
         return restrictedUserAgents;
     }
@@ -454,6 +624,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private String server;
 
+    /**
+     * Get the value of the Server response header.
+     *
+     * @return The value of the Server response header
+     */
     public String getServer() {
         return server;
     }
@@ -480,6 +655,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         return serverRemoveAppProvidedValues;
     }
 
+    /**
+     * Set whether application provider values for the HTTP Server header should be removed.
+     *
+     * @param serverRemoveAppProvidedValues {@code true} if application provided values should be removed
+     */
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
         this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
     }
@@ -490,10 +670,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxTrailerSize = 8192;
 
+    /**
+     * Get the maximum size of trailing headers.
+     *
+     * @return The maximum size of trailing headers in bytes
+     */
     public int getMaxTrailerSize() {
         return maxTrailerSize;
     }
 
+    /**
+     * Set the maximum size of trailing headers.
+     *
+     * @param maxTrailerSize The maximum size of trailing headers in bytes
+     */
     public void setMaxTrailerSize(int maxTrailerSize) {
         this.maxTrailerSize = maxTrailerSize;
     }
@@ -504,10 +694,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxExtensionSize = 8192;
 
+    /**
+     * Get the maximum size of extension information in chunked encoding.
+     *
+     * @return The maximum size of extension information in bytes
+     */
     public int getMaxExtensionSize() {
         return maxExtensionSize;
     }
 
+    /**
+     * Set the maximum size of extension information in chunked encoding.
+     *
+     * @param maxExtensionSize The maximum size of extension information in bytes
+     */
     public void setMaxExtensionSize(int maxExtensionSize) {
         this.maxExtensionSize = maxExtensionSize;
     }
@@ -518,10 +718,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private int maxSwallowSize = 2 * 1024 * 1024;
 
+    /**
+     * Get the maximum amount of request body to swallow.
+     *
+     * @return The maximum amount of request body to swallow in bytes
+     */
     public int getMaxSwallowSize() {
         return maxSwallowSize;
     }
 
+    /**
+     * Set the maximum amount of request body to swallow.
+     *
+     * @param maxSwallowSize The maximum amount of request body to swallow in bytes
+     */
     public void setMaxSwallowSize(int maxSwallowSize) {
         this.maxSwallowSize = maxSwallowSize;
     }
@@ -533,10 +743,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private boolean secure;
 
+    /**
+     * Get the flag indicating if this protocol is treated as secure.
+     *
+     * @return {@code true} if this protocol is treated as secure
+     */
     public boolean getSecure() {
         return secure;
     }
 
+    /**
+     * Set the flag indicating if this protocol is treated as secure.
+     *
+     * @param b {@code true} if this protocol is treated as secure
+     */
     public void setSecure(boolean b) {
         secure = b;
     }
@@ -548,6 +768,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private final Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
 
+    /**
+     * Set the names of headers that are allowed to be sent via a trailer when using chunked encoding.
+     *
+     * @param commaSeparatedHeaders Comma separated list of header names
+     */
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.
@@ -566,14 +791,30 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
     }
 
+    /**
+     * Get the set of allowed trailer header names.
+     *
+     * @return The set of allowed trailer header names
+     */
     protected Set<String> getAllowedTrailerHeadersInternal() {
         return allowedTrailerHeaders;
     }
 
+    /**
+     * Check if a header name is in the set of allowed trailer headers.
+     *
+     * @param headerName The header name to check
+     * @return {@code true} if the header is allowed as a trailer header
+     */
     public boolean isTrailerHeaderAllowed(String headerName) {
         return allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH));
     }
 
+    /**
+     * Get the list of allowed trailer headers as a comma-separated string.
+     *
+     * @return The allowed trailer headers as a comma-separated string
+     */
     public String getAllowedTrailerHeaders() {
         // Chances of a change during execution of this line are small enough
         // that a sync is unnecessary.
@@ -581,12 +822,22 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         return StringUtils.join(copy);
     }
 
+    /**
+     * Add a header name to the set of allowed trailer headers.
+     *
+     * @param header The header name to add
+     */
     public void addAllowedTrailerHeader(String header) {
         if (header != null) {
             allowedTrailerHeaders.add(header.trim().toLowerCase(Locale.ENGLISH));
         }
     }
 
+    /**
+     * Remove a header name from the set of allowed trailer headers.
+     *
+     * @param header The header name to remove
+     */
     public void removeAllowedTrailerHeader(String header) {
         if (header != null) {
             allowedTrailerHeaders.remove(header.trim().toLowerCase(Locale.ENGLISH));
@@ -671,6 +922,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private final Map<String,UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
 
+    /**
+     * Get the upgrade group info for the specified upgrade protocol.
+     *
+     * @param upgradeProtocol The upgrade protocol name
+     * @return The upgrade group info for the specified protocol
+     */
     public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
         if (upgradeProtocol == null) {
             return null;
@@ -700,6 +957,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * Get the ObjectName for the MBean of the specified upgrade protocol.
+     *
+     * @param upgradeProtocol The upgrade protocol name
+     * @return The ObjectName for the upgrade protocol MBean, or {@code null}
+     */
     public ObjectName getONameForUpgrade(String upgradeProtocol) {
         ObjectName oname = null;
         ObjectName parentRgOname = getGlobalRequestProcessorMBeanName();
@@ -724,27 +987,49 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ passed through to the EndPoint
 
+    /**
+     * Check if SSL is enabled on this connector.
+     *
+     * @return {@code true} if SSL is enabled
+     */
     public boolean isSSLEnabled() {
         return getEndpoint().isSSLEnabled();
     }
 
+    /**
+     * Set whether SSL is enabled on this connector.
+     *
+     * @param SSLEnabled {@code true} if SSL is enabled
+     */
     public void setSSLEnabled(boolean SSLEnabled) {
         getEndpoint().setSSLEnabled(SSLEnabled);
     }
 
 
+    /**
+     * Check if sendfile is enabled for this connector.
+     *
+     * @return {@code true} if sendfile is enabled
+     */
     public boolean getUseSendfile() {
         return getEndpoint().getUseSendfile();
     }
 
+    /**
+     * Set whether sendfile is enabled for this connector.
+     *
+     * @param useSendfile {@code true} if sendfile is enabled
+     */
     public void setUseSendfile(boolean useSendfile) {
         getEndpoint().setUseSendfile(useSendfile);
     }
 
 
     /**
-     * @return The maximum number of requests which can be performed over a keep-alive connection. The default is the
-     *             same as for Apache HTTP Server (100).
+     * Get the maximum number of requests which can be performed over a keep-alive connection.
+     * The default is the same as for Apache HTTP Server (100).
+     *
+     * @return The maximum number of requests which can be performed over a keep-alive connection
      */
     public int getMaxKeepAliveRequests() {
         return getEndpoint().getMaxKeepAliveRequests();
@@ -764,10 +1049,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ----------------------------------------------- HTTPS specific properties
     // ------------------------------------------ passed through to the EndPoint
 
+    /**
+     * Get the default SSL host configuration name.
+     *
+     * @return The default SSL host configuration name
+     */
     public String getDefaultSSLHostConfigName() {
         return getEndpoint().getDefaultSSLHostConfigName();
     }
 
+    /**
+     * Set the default SSL host configuration name.
+     *
+     * @param defaultSSLHostConfigName The default SSL host configuration name
+     */
     public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
         getEndpoint().setDefaultSSLHostConfigName(defaultSSLHostConfigName);
     }
@@ -791,11 +1086,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * Reload all SSL host configurations.
+     */
     public void reloadSslHostConfigs() {
         getEndpoint().reloadSslHostConfigs();
     }
 
 
+    /**
+     * Reload the SSL host configuration for the specified host.
+     *
+     * @param hostName The host name to reload
+     */
     public void reloadSslHostConfig(String hostName) {
         getEndpoint().reloadSslHostConfig(hostName);
     }

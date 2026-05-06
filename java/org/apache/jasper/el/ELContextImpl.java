@@ -101,6 +101,11 @@ public class ELContextImpl extends ELContext {
         this(getDefaultResolver(factory));
     }
 
+    /**
+     * Create a new ELContextImpl with the given resolver.
+     *
+     * @param resolver The EL resolver to use
+     */
     public ELContextImpl(ELResolver resolver) {
         this.resolver = resolver;
     }
@@ -123,10 +128,20 @@ public class ELContextImpl extends ELContext {
         return this.variableMapper;
     }
 
+    /**
+     * Set the function mapper.
+     *
+     * @param functionMapper The function mapper
+     */
     public void setFunctionMapper(FunctionMapper functionMapper) {
         this.functionMapper = functionMapper;
     }
 
+    /**
+     * Set the variable mapper.
+     *
+     * @param variableMapper The variable mapper
+     */
     public void setVariableMapper(VariableMapper variableMapper) {
         this.variableMapper = variableMapper;
     }

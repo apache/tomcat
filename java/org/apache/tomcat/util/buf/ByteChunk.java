@@ -121,6 +121,11 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Creates a ByteChunk with the specified initial buffer size.
+     *
+     * @param initial initial buffer size
+     */
     public ByteChunk(int initial) {
         allocate(initial, -1);
     }
@@ -153,6 +158,12 @@ public final class ByteChunk extends AbstractChunk {
 
     // -------------------- Setup --------------------
 
+    /**
+     * Allocates a buffer with the specified initial size and optional limit.
+     *
+     * @param initial initial size
+     * @param limit maximum size or -1 for unlimited
+     */
     public void allocate(int initial, int limit) {
         if (buff == null || buff.length < initial) {
             buff = new byte[initial];
@@ -181,11 +192,21 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Sets the character set for this chunk.
+     *
+     * @param charset the character set
+     */
     public void setCharset(Charset charset) {
         this.charset = charset;
     }
 
 
+    /**
+     * Returns the character set for this chunk.
+     *
+     * @return the character set
+     */
     public Charset getCharset() {
         if (charset == null) {
             charset = DEFAULT_CHARSET;
@@ -195,7 +216,9 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * @return the buffer.
+     * Returns the underlying byte array.
+     *
+     * @return the buffer
      */
     public byte[] getBytes() {
         return getBuffer();
@@ -203,7 +226,9 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * @return the buffer.
+     * Returns the underlying byte array.
+     *
+     * @return the buffer
      */
     public byte[] getBuffer() {
         return buff;
@@ -233,6 +258,13 @@ public final class ByteChunk extends AbstractChunk {
 
     // -------------------- Adding data to the buffer --------------------
 
+    /**
+     * Appends a single byte to this chunk.
+     *
+     * @param b the byte to append
+     *
+     * @throws IOException if writing fails
+     */
     public void append(byte b) throws IOException {
         makeSpace(1);
         int limit = getLimitInternal();
@@ -245,6 +277,13 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Appends the contents of another ByteChunk.
+     *
+     * @param src the source chunk
+     *
+     * @throws IOException if writing fails
+     */
     public void append(ByteChunk src) throws IOException {
         append(src.getBytes(), src.getStart(), src.getLength());
     }
@@ -369,6 +408,13 @@ public final class ByteChunk extends AbstractChunk {
 
     // -------------------- Removing data from the buffer --------------------
 
+    /**
+     * Reads and removes the next byte from this chunk.
+     *
+     * @return the byte value (0-255) or -1 if end of data
+     *
+     * @throws IOException if reading from input channel fails
+     */
     public int subtract() throws IOException {
         if (checkEof()) {
             return -1;
@@ -376,6 +422,13 @@ public final class ByteChunk extends AbstractChunk {
         return buff[start++] & 0xFF;
     }
 
+    /**
+     * Reads and removes the next byte from this chunk.
+     *
+     * @return the byte value or -1 if end of data
+     *
+     * @throws IOException if reading from input channel fails
+     */
     public byte subtractB() throws IOException {
         if (checkEof()) {
             return -1;
@@ -384,6 +437,17 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Reads bytes into the specified array.
+     *
+     * @param dest destination array
+     * @param off offset
+     * @param len maximum length
+     *
+     * @return number of bytes read or -1 if end of data
+     *
+     * @throws IOException if reading from input channel fails
+     */
     public int subtract(byte[] dest, int off, int len) throws IOException {
         if (checkEof()) {
             return -1;
@@ -509,6 +573,16 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Converts the byte chunk to a String using the configured charset.
+     *
+     * @param malformedInputAction action for malformed input
+     * @param unmappableCharacterAction action for unmappable characters
+     *
+     * @return the string representation
+     *
+     * @throws CharacterCodingException if conversion fails
+     */
     public String toString(CodingErrorAction malformedInputAction, CodingErrorAction unmappableCharacterAction)
             throws CharacterCodingException {
         if (isNull()) {
@@ -568,6 +642,11 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Parses the byte chunk content as a long integer.
+     *
+     * @return the parsed long value
+     */
     public long getLong() {
         return Ascii.parseLong(buff, start, end - start);
     }
@@ -634,11 +713,27 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Compares this chunk to another ByteChunk.
+     *
+     * @param bb the ByteChunk to compare
+     *
+     * @return true if equal
+     */
     public boolean equals(ByteChunk bb) {
         return equals(bb.getBytes(), bb.getStart(), bb.getLength());
     }
 
 
+    /**
+     * Compares this chunk to a byte array region.
+     *
+     * @param b2 the byte array
+     * @param off2 offset
+     * @param len2 length
+     *
+     * @return true if equal
+     */
     public boolean equals(byte[] b2, int off2, int len2) {
         byte[] b1 = buff;
         if (b1 == null && b2 == null) {
@@ -661,6 +756,15 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Compares this chunk to a byte array region, ignoring case.
+     *
+     * @param b2 the byte array
+     * @param off2 offset
+     * @param len2 length
+     *
+     * @return true if equal
+     */
     public boolean equalsIgnoreCase(byte[] b2, int off2, int len2) {
         byte[] b1 = buff;
         if (b1 == null && b2 == null) {
@@ -683,6 +787,13 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Compares this chunk to a CharChunk.
+     *
+     * @param cc the CharChunk to compare
+     *
+     * @return true if equal
+     */
     public boolean equals(CharChunk cc) {
         return equals(cc.getChars(), cc.getStart(), cc.getLength());
     }
@@ -883,10 +994,18 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Exception thrown when a byte chunk buffer overflows.
+     */
     public static class BufferOverflowException extends IOException {
 
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Constructs an exception with the specified message.
+         *
+         * @param message the detail message
+         */
         public BufferOverflowException(String message) {
             super(message);
         }

@@ -18,6 +18,9 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
 
+/**
+ * Represents a target for dependency injection. Defines the class and field/method to inject into.
+ */
 public class InjectionTarget implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -26,27 +29,56 @@ public class InjectionTarget implements Serializable {
     private String targetName;
 
 
+    /**
+     * Creates a new injection target with no initial values.
+     */
     public InjectionTarget() {
         // NOOP
     }
 
+    /**
+     * Creates a new injection target with the specified class and name.
+     *
+     * @param targetClass the target class name
+     * @param targetName the target field or method name
+     */
     public InjectionTarget(String targetClass, String targetName) {
         this.targetClass = targetClass;
         this.targetName = targetName;
     }
 
+    /**
+     * Returns the target class name.
+     *
+     * @return the target class name
+     */
     public String getTargetClass() {
         return targetClass;
     }
 
+    /**
+     * Sets the target class name.
+     *
+     * @param targetClass the target class name
+     */
     public void setTargetClass(String targetClass) {
         this.targetClass = targetClass;
     }
 
+    /**
+     * Returns the target field or method name.
+     *
+     * @return the target name
+     */
     public String getTargetName() {
         return targetName;
     }
 
+    /**
+     * Sets the target field or method name.
+     *
+     * @param targetName the target name
+     */
     public void setTargetName(String targetName) {
         this.targetName = targetName;
     }

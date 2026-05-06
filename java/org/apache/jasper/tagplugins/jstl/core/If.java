@@ -19,7 +19,16 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin for the JSTL {@code <c:if>} tag. Generates optimized Java source for conditional execution.
+ */
 public final class If implements TagPlugin {
+
+    /**
+     * Creates a new instance of the If tag plugin.
+     */
+    public If() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

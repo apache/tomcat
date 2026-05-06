@@ -30,6 +30,12 @@ public class ContextTransaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public ContextTransaction() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -39,9 +45,11 @@ public class ContextTransaction implements Serializable {
     private final Map<String,Object> properties = new HashMap<>();
 
     /**
+     * Get a configured property.
+     *
      * @param name The property name
      *
-     * @return a configured property.
+     * @return The configured property value
      */
     public Object getProperty(String name) {
         return properties.get(name);

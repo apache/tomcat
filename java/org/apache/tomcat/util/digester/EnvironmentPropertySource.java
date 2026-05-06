@@ -61,6 +61,13 @@ import org.apache.tomcat.util.security.PermissionCheck;
  */
 public class EnvironmentPropertySource implements IntrospectionUtils.SecurePropertySource {
 
+    /**
+     * Default constructor for EnvironmentPropertySource.
+     */
+    public EnvironmentPropertySource() {
+        // NO-OP
+    }
+
     @Override
     public String getProperty(String key) {
         return null;

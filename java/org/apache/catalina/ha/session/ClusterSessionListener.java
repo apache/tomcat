@@ -35,6 +35,9 @@ public class ClusterSessionListener extends ClusterListener {
 
     // --Constructor---------------------------------------------
 
+    /**
+     * Default constructor for ClusterSessionListener.
+     */
     public ClusterSessionListener() {
         // NO-OP
     }

@@ -36,6 +36,13 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class DataSourceUserDatabaseMBean extends BaseModelMBean {
 
+    /**
+     * Default constructor.
+     */
+    public DataSourceUserDatabaseMBean() {
+    }
+
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -52,7 +59,9 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
 
     // ------------------------------------------------------------- Attributes
 
-    /**
+  /**
+     * Get the names of all groups defined in this database.
+     *
      * @return the names of all groups defined in this database.
      */
     public String[] getGroups() {
@@ -67,7 +76,9 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     }
 
 
-    /**
+  /**
+     * Get the names of all roles defined in this database.
+     *
      * @return the names of all roles defined in this database.
      */
     public String[] getRoles() {
@@ -82,7 +93,9 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     }
 
 
-    /**
+  /**
+     * Get the names of all users defined in this database.
+     *
      * @return the names of all users defined in this database.
      */
     public String[] getUsers() {

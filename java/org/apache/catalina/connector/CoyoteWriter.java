@@ -33,13 +33,25 @@ public class CoyoteWriter extends PrintWriter {
     // ----------------------------------------------------- Instance Variables
 
 
+    /**
+     * The underlying output buffer.
+     */
     protected OutputBuffer ob;
+
+    /**
+     * Flag indicating whether an error has occurred.
+     */
     protected boolean error = false;
 
 
     // ----------------------------------------------------------- Constructors
 
 
+    /**
+     * Construct a new CoyoteWriter.
+     *
+     * @param ob The underlying output buffer
+     */
     public CoyoteWriter(OutputBuffer ob) {
         super(ob);
         this.ob = ob;

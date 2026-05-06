@@ -529,6 +529,12 @@ public class ConnectionPool {
         closed = false;
     }
 
+    /**
+     * Validates and corrects pool configuration values. Ensures that maxActive,
+     * initialSize, minIdle, maxIdle, and related values are consistent.
+     *
+     * @param properties the pool configuration to validate and correct
+     */
     public void checkPoolConfiguration(PoolConfiguration properties) {
         //make sure the pool is properly configured
         if (properties.getMaxActive()<1) {
@@ -558,6 +564,11 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Starts the pool cleaner (evicter) thread if pool sweeper is enabled.
+     *
+     * @param properties the pool configuration containing sweeper settings
+     */
     public void initializePoolCleaner(PoolConfiguration properties) {
         //if the evictor thread is supposed to run, start it now
         if (properties.isPoolSweeperEnabled()) {
@@ -566,6 +577,9 @@ public class ConnectionPool {
         } //end if
     }
 
+    /**
+     * Stops the pool cleaner (evicter) thread if it is currently running.
+     */
     public void terminatePoolCleaner() {
         if (poolCleaner!= null) {
             poolCleaner.stopRunning();
@@ -1136,6 +1150,13 @@ public class ConnectionPool {
         checkIdle(false);
     }
 
+    /**
+     * Iterates through the idle connections and resizes the idle pool based on
+     * pool configuration parameters. If ignoreMinSize is true, idle connections
+     * may be removed even if the pool is below minIdle.
+     *
+     * @param ignoreMinSize if true, ignore the minIdle setting when evicting
+     */
     public void checkIdle(boolean ignoreMinSize) {
 
         try {
@@ -1180,6 +1201,14 @@ public class ConnectionPool {
     }
 
 
+    /**
+     * Determines whether an idle connection should be released from the pool.
+     *
+     * @param now the current time in milliseconds
+     * @param con the pooled connection to evaluate
+     * @param time the timestamp when the connection last became idle
+     * @return {@code true} if the connection should be released
+     */
     protected boolean shouldReleaseIdle(long now, PooledConnection con, long time) {
         if (con.getConnectionVersion() < getPoolVersion()) {
           return true;
@@ -1432,10 +1461,19 @@ public class ConnectionPool {
         SQLException cause = null;
         AtomicBoolean cancelled = new AtomicBoolean(false);
         volatile PooledConnection pc = null;
+        /**
+         * Creates a ConnectionFuture backed by an async pooled connection future.
+         * @param pcf the future for the pooled connection
+         */
         public ConnectionFuture(Future<PooledConnection> pcf) {
             this.pcFuture = pcf;
         }
 
+        /**
+         * Creates a ConnectionFuture backed by an already available pooled connection.
+         * @param pc the pooled connection
+         * @throws SQLException if connection setup fails
+         */
         public ConnectionFuture(PooledConnection pc) throws SQLException {
             this.pc = pc;
             result = ConnectionPool.this.setupConnection(pc);
@@ -1583,23 +1621,57 @@ public class ConnectionPool {
     }
 
     // Testing use only
+    /**
+     * Returns an unmodifiable set of all registered pool cleaner tasks.
+     *
+     * @return the set of pool cleaner timer tasks
+     */
     public static synchronized Set<TimerTask> getPoolCleaners() {
         return Collections.<TimerTask>unmodifiableSet(cleaners);
     }
 
+    /**
+     * Returns the current pool version counter. This counter is incremented
+     * when connections are purged, allowing pooled connections to detect
+     * that they should be discarded.
+     *
+     * @return the current pool version
+     */
     public long getPoolVersion() {
         return poolVersion.get();
     }
 
     // Testing use only
+    /**
+     * Returns the shared timer used for scheduling pool cleaner tasks.
+     *
+     * @return the pool cleaner timer, or {@code null} if no cleaners are registered
+     */
     public static synchronized Timer getPoolTimer() {
         return poolCleanTimer;
     }
 
+    /**
+     * A scheduled task that periodically checks for abandoned connections,
+     * validates idle connections, and resizes the idle pool according to
+     * the pool's configuration.
+     */
     protected static class PoolCleaner extends TimerTask {
+        /**
+         * Weak reference to the connection pool being monitored.
+         */
         protected WeakReference<ConnectionPool> pool;
+
+        /**
+         * Sleep interval in milliseconds between cleaner runs.
+         */
         protected long sleepTime;
 
+        /**
+         * Creates a new pool cleaner task.
+         * @param pool the connection pool to clean
+         * @param sleepTime the interval in milliseconds between cleanups
+         */
         PoolCleaner(ConnectionPool pool, long sleepTime) {
             this.pool = new WeakReference<>(pool);
             this.sleepTime = sleepTime;
@@ -1637,10 +1709,16 @@ public class ConnectionPool {
             }
         }
 
+        /**
+         * Starts the pool cleaner by registering it with the shared timer.
+         */
         public void start() {
             registerCleaner(this);
         }
 
+        /**
+         * Stops the pool cleaner by unregistering it from the shared timer.
+         */
         public void stopRunning() {
             unregisterCleaner(this);
         }

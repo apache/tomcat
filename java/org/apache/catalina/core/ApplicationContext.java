@@ -1174,6 +1174,12 @@ public class ApplicationContext implements ServletContext {
 
 
     // -------------------------------------------------------- Package Methods
+
+    /**
+     * Returns the underlying StandardContext.
+     *
+     * @return the StandardContext
+     */
     protected StandardContext getContext() {
         return this.context;
     }
@@ -1196,6 +1202,8 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
+     * Returns the ServletContext facade.
+     *
      * @return the facade associated with this ApplicationContext.
      */
     protected ServletContext getFacade() {
@@ -1215,6 +1223,11 @@ public class ApplicationContext implements ServletContext {
     }
 
 
+    /**
+     * Sets whether new ServletContextListeners are allowed.
+     *
+     * @param allowed {@code true} to allow new listeners
+     */
     protected void setNewServletContextListenerAllowed(boolean allowed) {
         this.newServletContextListenerAllowed = allowed;
     }

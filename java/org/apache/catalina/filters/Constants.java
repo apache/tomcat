@@ -24,6 +24,12 @@ import org.apache.tomcat.util.http.Method;
 public final class Constants {
 
     /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
      * The session attribute key under which the CSRF nonce cache will be stored.
      */
     public static final String CSRF_NONCE_SESSION_ATTR_NAME = "org.apache.catalina.filters.CSRF_NONCE";
@@ -46,10 +52,19 @@ public final class Constants {
     @Deprecated
     public static final String METHOD_GET = Method.GET;
 
+    /**
+     * The HTTP header name used to carry the CSRF nonce in REST requests.
+     */
     public static final String CSRF_REST_NONCE_HEADER_NAME = "X-CSRF-Token";
 
+    /**
+     * The fetch mode value for the CSRF REST nonce header.
+     */
     public static final String CSRF_REST_NONCE_HEADER_FETCH_VALUE = "Fetch";
 
+    /**
+     * The required mode value for the CSRF REST nonce header.
+     */
     public static final String CSRF_REST_NONCE_HEADER_REQUIRED_VALUE = "Required";
 
     /**

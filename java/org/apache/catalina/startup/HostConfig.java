@@ -75,10 +75,16 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Startup event listener for a <b>Host</b> that configures the properties of that Host, and the associated defined
+ * Startup event listener for a {@link Host} that configures the properties of that Host, and the associated defined
  * contexts.
  */
 public class HostConfig implements LifecycleListener {
+
+    /**
+     * Constructs a new HostConfig.
+     */
+    public HostConfig() {
+    }
 
     private static final Log log = LogFactory.getLog(HostConfig.class);
 
@@ -158,7 +164,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the Context implementation class name.
+     * Get the Context implementation class name.
+     *
+     * @return the Context implementation class name
      */
     public String getContextClass() {
         return this.contextClass;
@@ -184,7 +192,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the deploy XML config file flag for this component.
+     * Get the deploy XML config file flag for this component.
+     *
+     * @return the deploy XML flag
      */
     public boolean isDeployXML() {
         return this.deployXML;
@@ -229,7 +239,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the copy XML config file flag for this component.
+     * Get the copy XML config file flag for this component.
+     *
+     * @return the copy XML flag
      */
     public boolean isCopyXML() {
         return this.copyXML;
@@ -249,7 +261,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the unpack WARs flag.
+     * Get the unpack WARs flag.
+     *
+     * @return the unpack WARs flag
      */
     public boolean isUnpackWARs() {
         return this.unpackWARs;
@@ -379,6 +393,14 @@ public class HostConfig implements LifecycleListener {
         return digester;
     }
 
+    /**
+     * Return the canonical file for the given path. If the path is relative, it is resolved against the
+     * Catalina base directory.
+     *
+     * @param path the path to canonicalize
+     *
+     * @return the canonical file
+     */
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
         if (!file.isAbsolute()) {
@@ -1163,6 +1185,9 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Migrate legacy Java EE applications from the legacy appBase to the current appBase.
+     */
     protected void migrateLegacyApps() {
         File appBase = host.getAppBaseFile();
         File legacyAppBase = host.getLegacyAppBaseFile();
@@ -1215,6 +1240,12 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Migrate a single legacy Java EE application from source to destination using the Migration utility.
+     *
+     * @param source      the source file
+     * @param destination the destination file
+     */
     protected void migrateLegacyApp(File source, File destination) {
         File tempNew = null;
         File tempOld;
@@ -1304,6 +1335,12 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Add global redeploy resources to the deployed application. These include the host-level context.xml
+     * and the default context.xml files that trigger redeployment when modified.
+     *
+     * @param app the deployed application
+     */
     protected void addGlobalRedeployResources(DeployedApplication app) {
         // Redeploy resources processing is hard-coded to never delete this file
         File hostContextXml = new File(getConfigBaseName(), Constants.HostContextXml);
@@ -1579,6 +1616,9 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Perform actions before the Host starts, including creating required directories.
+     */
     public void beforeStart() {
         if (host.getCreateDirs()) {
             File[] dirs = new File[] { host.getAppBaseFile(), host.getConfigBaseFile() };
@@ -1818,6 +1858,12 @@ public class HostConfig implements LifecycleListener {
      * This class represents the state of a deployed application, as well as the monitored resources.
      */
     protected static class DeployedApplication {
+        /**
+         * Constructs a new DeployedApplication.
+         *
+         * @param name the application context path
+         * @param hasDescriptor whether the application has a context.xml descriptor
+         */
         public DeployedApplication(String name, boolean hasDescriptor) {
             this.name = name;
             this.hasDescriptor = hasDescriptor;

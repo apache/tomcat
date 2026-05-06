@@ -37,6 +37,12 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Default constructor.
+     */
+    public BasicAuthenticator() {
+    }
+
     private final Log log = LogFactory.getLog(BasicAuthenticator.class); // must not be static
 
     private Charset charset = StandardCharsets.ISO_8859_1;
@@ -44,11 +50,21 @@ public class BasicAuthenticator extends AuthenticatorBase {
     private boolean trimCredentials = false;
 
 
+    /**
+     * Returns the character set used for encoding credentials.
+     *
+     * @return the character set name
+     */
     public String getCharset() {
         return charsetString;
     }
 
 
+    /**
+     * Sets the character set used for encoding credentials.
+     *
+     * @param charsetString the character set name
+     */
     public void setCharset(String charsetString) {
         // Only acceptable options are null, "" or "UTF-8" (case-insensitive)
         if (charsetString == null || charsetString.isEmpty()) {

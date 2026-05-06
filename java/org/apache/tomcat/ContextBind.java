@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat;
 
+/**
+ * Defines methods for binding and unbinding the current thread's context class loader to a web application class
+ * loader.
+ */
 public interface ContextBind {
 
     /**

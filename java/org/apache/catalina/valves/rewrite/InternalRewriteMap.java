@@ -23,8 +23,23 @@ import java.util.Locale;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.UDecoder;
 
+/**
+ * Utility class providing built-in rewrite map implementations.
+ */
 public class InternalRewriteMap {
 
+    /**
+     * Constructs a new InternalRewriteMap.
+     */
+    private InternalRewriteMap() {
+    }
+
+    /**
+     * Get a built-in RewriteMap by name.
+     *
+     * @param name the map name (toupper, tolower, escape, unescape)
+     * @return the RewriteMap implementation, or {@code null} if not found
+     */
     public static RewriteMap toMap(String name) {
         if ("toupper".equals(name)) {
             return new UpperCase();
@@ -39,7 +54,16 @@ public class InternalRewriteMap {
         }
     }
 
+    /**
+     * RewriteMap that converts strings to lower case.
+     */
     public static class LowerCase implements RewriteMap {
+
+        /**
+         * Constructs a new LowerCase rewrite map.
+         */
+        public LowerCase() {
+        }
 
         private Locale locale = Locale.getDefault();
 
@@ -59,7 +83,16 @@ public class InternalRewriteMap {
 
     }
 
+    /**
+     * RewriteMap that converts strings to upper case.
+     */
     public static class UpperCase implements RewriteMap {
+
+        /**
+         * Constructs a new UpperCase rewrite map.
+         */
+        public UpperCase() {
+        }
 
         private Locale locale = Locale.getDefault();
 
@@ -79,7 +112,16 @@ public class InternalRewriteMap {
 
     }
 
+    /**
+     * RewriteMap that URL-encodes strings.
+     */
     public static class Escape implements RewriteMap {
+
+        /**
+         * Constructs a new Escape rewrite map.
+         */
+        public Escape() {
+        }
 
         private Charset charset = StandardCharsets.UTF_8;
 
@@ -99,7 +141,16 @@ public class InternalRewriteMap {
 
     }
 
+    /**
+     * RewriteMap that URL-decodes strings.
+     */
     public static class Unescape implements RewriteMap {
+
+        /**
+         * Constructs a new Unescape rewrite map.
+         */
+        public Unescape() {
+        }
 
         private Charset charset = StandardCharsets.UTF_8;
 
