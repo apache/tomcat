@@ -151,6 +151,7 @@ public class JsonAccessLogValve extends AccessLogValve {
         for (Character pattern : SUB_OBJECT_PATTERNS.keySet()) {
             subTypeLists.put(pattern, new ArrayList<>());
         }
+        boolean hasSimple = false;
         boolean hasSub = false;
         List<AccessLogElement> logElements = new ArrayList<>(Arrays.asList(super.createLogElements()));
         ListIterator<AccessLogElement> lit = logElements.listIterator();
@@ -162,10 +163,10 @@ public class JsonAccessLogValve extends AccessLogValve {
                 lit.remove();
                 continue;
             }
-            // Remove items which should be written as
-            // Json objects and add them later in correct order
             JsonWrappedElement wrappedLogElement = (JsonWrappedElement) logElement;
             AccessLogElement ale = wrappedLogElement.getDelegate();
+            // Remove items which should be written as
+            // Json objects and add them later in correct order
             if (ale instanceof HeaderElement) {
                 subTypeLists.get(Character.valueOf('i')).add(wrappedLogElement);
                 lit.remove();
@@ -186,6 +187,7 @@ public class JsonAccessLogValve extends AccessLogValve {
                 lit.remove();
             } else {
                 // Keep the simple items and add separator
+                hasSimple = true;
                 lit.add(new CharElement(','));
             }
         }
@@ -195,11 +197,14 @@ public class JsonAccessLogValve extends AccessLogValve {
                 hasSub = true;
             }
         }
-        // remove last comma (or possibly "},")
-        lit.previous();
-        lit.remove();
-        // Last item was a sub object, close it
+        if (hasSimple || hasSub) {
+            // remove last comma (or possibly "},")
+            lit.previous();
+            lit.remove();
+        }
+        // Add closing }
         if (hasSub) {
+            // Last item was a sub object, close it as well
             lit.add(new StringElement("}}"));
         } else {
             lit.add(new CharElement('}'));
@@ -210,13 +215,23 @@ public class JsonAccessLogValve extends AccessLogValve {
     @Override
     protected AccessLogElement createAccessLogElement(String name, char pattern) {
         AccessLogElement ale = super.createAccessLogElement(name, pattern);
-        return new JsonWrappedElement(pattern, name, true, ale);
+        if ('%' == pattern) {
+            // Uses a pattern but is literal text so no need to wrap.
+            return ale;
+        } else {
+            return new JsonWrappedElement(pattern, name, true, ale);
+        }
     }
 
     @Override
     protected AccessLogElement createAccessLogElement(char pattern) {
         AccessLogElement ale = super.createAccessLogElement(pattern);
-        return new JsonWrappedElement(pattern, true, ale);
+        if ('%' == pattern) {
+            // Uses a pattern but is literal text so no need to wrap.
+            return ale;
+        } else {
+            return new JsonWrappedElement(pattern, true, ale);
+        }
     }
 
     private static class JsonWrappedElement implements AccessLogElement, CachedElement {

@@ -108,6 +108,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.56 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for literal <code>'%'</code> characters in access log
+        output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.55 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
@@ -118,66 +126,6 @@
         implementations), along with version compatibility warnings and
         third-party library version information. (csutherl)
       </add>
-      <scode>
-        Refactor generation of the remote user element in the access log to
-        remove unnecessary code. (markt)
-      </scode>
-      <fix>
-        Fix a regression in the previous release that meant <code>?-</code>
-        could appear in the access log rather than <code>?</code> when the query
-        string was present but empty. (markt)
-      </fix>
-      <fix>
-        Failed precondition should make WebDAV DELETE fail. <pr>982</pr>
-        submitted by Mahmoud Alarby. (remm)
-      </fix>
-      <fix>
-        Align the escaping in <code>ExtendedAccessLogValve</code> with the other
-        <code>AccessLogValve</code> implementations. (markt)
-      </fix>
-      <fix>
-        <bug>70000</bug>: fix duplication of special headers in the response
-        after commit, following fix for <bug>69967</bug>. (remm)
-      </fix>
-      <fix>
-        Correct the handling of URIs mapped to a security constraint that only
-        specifies the special <code>**</code> role for all authenticated users.
-        Requests without authentication were receiving 403 responses rather than
-        401 responses. (markt)
-      </fix>
-      <fix>
-        Fix a race condition in <code>StandardContext.getServletContext()</code>
-        that could cause the <code>jakarta.servlet.context.tempdir</code>
-        attribute to be lost during a context reload. Make the
-        <code>context</code> field volatile and use locking to
-        ensure only one <code>ApplicationContext</code> instance is created.
-        (dsoumis)
-      </fix>
-      <fix>
-        Update the Windows authentication (kerberos) documentation to reflect
-        that both Java and Windows are removing / have removed support for
-        RC4-HMAC. The guide now uses AES256-SHA1. (markt)
-      </fix>
-      <fix>
-        Add a new initialisation parameter for WebDAV,
-        <code>maxRequestBodySize</code> which limits the size of a WebDAV
-        request body for LOCK and PROPFIND. The default value is 4096 bytes.
-        (markt)
-      </fix>
-      <add>
-        Add a new <code>caseSensitive</code> attribute to the
-        <code>LockOutRealm</code> that controls the manner in which user names
-        are treated when making locking decisions. The default is
-        <code>false</code>, meaning user names are treated in a case insensitive
-        manner. (markt)
-      </add>
-      <fix>
-        Correct the handling of invalid users with DIGEST authentication. (markt)
-      </fix>
-      <fix>
-        Ensure <code>RealmBase</code> finds all matching extension based
-        security constraints. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
