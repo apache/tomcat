@@ -19,9 +19,23 @@ package org.apache.tomcat.websocket;
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 
+/**
+ * WebSocket container provider for Tomcat.
+ */
 @aQute.bnd.annotation.spi.ServiceProvider(value = ContainerProvider.class)
 public class WsContainerProvider extends ContainerProvider {
 
+    /**
+     * Constructs a new WsContainerProvider.
+     */
+    public WsContainerProvider() {
+    }
+
+    /**
+     * Returns the WebSocket container.
+     *
+     * @return the WebSocket container
+     */
     @Override
     protected WebSocketContainer getContainer() {
         return new WsWebSocketContainer();

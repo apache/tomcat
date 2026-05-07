@@ -53,11 +53,23 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation of a WebSocket remote endpoint.
+ */
 public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(WsRemoteEndpointImplBase.class);
 
     protected static final SendResult SENDRESULT_OK = new SendResult();
+
+    /**
+     * Default constructor.
+     */
+    public WsRemoteEndpointImplBase() {
+    }
 
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class); // must not be static
 
@@ -66,6 +78,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final IntermediateMessageHandler intermediateMessageHandler = new IntermediateMessageHandler(this);
 
     private Transformation transformation = null;
+    /**
+     * Semaphore to ensure only one message part is being processed at a time.
+     */
     protected final Semaphore messagePartInProgress = new Semaphore(1);
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
@@ -88,16 +103,28 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final List<EncoderEntry> encoderEntries = new ArrayList<>();
 
 
+    /**
+     * Sets the transformation for this endpoint.
+     * @param transformation the transformation to use
+     */
     protected void setTransformation(Transformation transformation) {
         this.transformation = transformation;
     }
 
 
+    /**
+     * Returns the send timeout in milliseconds.
+     * @return the send timeout
+     */
     public long getSendTimeout() {
         return sendTimeout;
     }
 
 
+    /**
+     * Sets the send timeout in milliseconds.
+     * @param timeout the send timeout
+     */
     public void setSendTimeout(long timeout) {
         this.sendTimeout = timeout;
     }
@@ -125,6 +152,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends binary data to the remote endpoint.
+     * @param data the binary data
+     * @throws IOException if a send error occurs
+     */
     public void sendBytes(ByteBuffer data) throws IOException {
         if (data == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -135,6 +167,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends binary data asynchronously, returning a Future for completion tracking.
+     * @param data the binary data
+     * @return a Future that completes when the send is done
+     */
     public Future<Void> sendBytesByFuture(ByteBuffer data) {
         FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendBytesByCompletion(data, f2sh);
@@ -142,6 +179,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends binary data asynchronously with a completion handler.
+     * @param data the binary data
+     * @param handler the completion handler
+     */
     public void sendBytesByCompletion(ByteBuffer data, SendHandler handler) {
         if (data == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -155,6 +197,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends a partial binary message fragment.
+     * @param partialByte the binary data fragment
+     * @param last whether this is the last fragment
+     * @throws IOException if a send error occurs
+     */
     public void sendPartialBytes(ByteBuffer partialByte, boolean last) throws IOException {
         if (partialByte == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -183,6 +231,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends a text message to the remote endpoint.
+     * @param text the text data
+     * @throws IOException if a send error occurs
+     */
     public void sendString(String text) throws IOException {
         if (text == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -192,6 +245,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends a text message asynchronously, returning a Future for completion tracking.
+     * @param text the text data
+     * @return a Future that completes when the send is done
+     */
     public Future<Void> sendStringByFuture(String text) {
         FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendStringByCompletion(text, f2sh);
@@ -199,6 +257,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends a text message asynchronously with a completion handler.
+     * @param text the text data
+     * @param handler the completion handler
+     */
     public void sendStringByCompletion(String text, SendHandler handler) {
         if (text == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -214,6 +277,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends a partial text message fragment.
+     * @param fragment the text fragment
+     * @param isLast whether this is the last fragment
+     * @throws IOException if a send error occurs
+     */
     public void sendPartialString(String fragment, boolean isLast) throws IOException {
         if (fragment == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -223,12 +292,20 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Returns an OutputStream for sending binary data.
+     * @return the output stream
+     */
     public OutputStream getSendStream() {
         stateMachine.streamStart();
         return new WsOutputStream(this);
     }
 
 
+    /**
+     * Returns a Writer for sending text data.
+     * @return the writer
+     */
     public Writer getSendWriter() {
         stateMachine.writeStart();
         return new WsWriter(this);
@@ -592,6 +669,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends an object to the remote endpoint using the appropriate encoder.
+     * @param obj the object to send
+     * @throws IOException if a send error occurs
+     * @throws EncodeException if encoding fails
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void sendObject(Object obj) throws IOException, EncodeException {
         if (obj == null) {
@@ -633,6 +716,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends an object asynchronously, returning a Future for completion tracking.
+     * @param obj the object to send
+     * @return a Future that completes when the send is done
+     */
     public Future<Void> sendObjectByFuture(Object obj) {
         FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendObjectByCompletion(obj, f2sh);
@@ -640,6 +728,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sends an object asynchronously with a completion handler.
+     * @param obj the object to send
+     * @param completion the completion handler
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
 
@@ -693,11 +786,20 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Sets the WebSocket session for this endpoint.
+     * @param wsSession the session
+     */
     protected void setSession(WsSession wsSession) {
         this.wsSession = wsSession;
     }
 
 
+    /**
+     * Initializes the encoders for this endpoint from the given endpoint configuration.
+     * @param endpointConfig the endpoint configuration
+     * @throws DeploymentException if an encoder cannot be initialized
+     */
     protected void setEncoders(EndpointConfig endpointConfig) throws DeploymentException {
         encoderEntries.clear();
         for (Class<? extends Encoder> encoderClazz : endpointConfig.getEncoders()) {
@@ -730,6 +832,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Closes all encoders associated with this endpoint.
+     */
     public final void close() {
         InstanceManager instanceManager = wsSession.getInstanceManager();
         for (EncoderEntry entry : encoderEntries) {
@@ -749,12 +854,29 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    /**
+     * Writes data to the underlying connection.
+     * @param handler the send handler
+     * @param blockingWriteTimeoutExpiry the timeout expiry time
+     * @param data the data buffers to write
+     */
     protected abstract void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... data);
 
+    /**
+     * Checks if frames should be masked.
+     * @return true if masking is required
+     */
     protected abstract boolean isMasked();
 
+    /**
+     * Performs the actual close operation on the underlying connection.
+     */
     protected abstract void doClose();
 
+    /**
+     * Returns the lock used for thread-safe operations.
+     * @return the reentrant lock
+     */
     protected abstract Lock getLock();
 
 

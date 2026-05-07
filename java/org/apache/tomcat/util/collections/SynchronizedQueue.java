@@ -25,22 +25,54 @@ package org.apache.tomcat.util.collections;
  */
 public class SynchronizedQueue<T> {
 
+    /**
+     * The default initial capacity for a new queue.
+     */
     public static final int DEFAULT_SIZE = 128;
 
+    /**
+     * The internal array backing the queue.
+     */
     private Object[] queue;
+
+    /**
+     * The current capacity of the internal array.
+     */
     private int size;
+
+    /**
+     * The index of the next insertion position.
+     */
     private int insert = 0;
+
+    /**
+     * The index of the next removal position.
+     */
     private int remove = 0;
 
+    /**
+     * Constructs a new SynchronizedQueue with the default initial capacity.
+     */
     public SynchronizedQueue() {
         this(DEFAULT_SIZE);
     }
 
+    /**
+     * Constructs a new SynchronizedQueue with the specified initial capacity.
+     *
+     * @param initialSize the initial capacity
+     */
     public SynchronizedQueue(int initialSize) {
         queue = new Object[initialSize];
         size = initialSize;
     }
 
+    /**
+     * Adds the specified element to the tail of this queue.
+     *
+     * @param t the element to add
+     * @return true (as specified by {@link java.util.Queue#offer})
+     */
     public synchronized boolean offer(T t) {
         queue[insert++] = t;
 
@@ -55,6 +87,12 @@ public class SynchronizedQueue<T> {
         return true;
     }
 
+    /**
+     * Retrieves and removes the head of this queue, or returns null
+     * if this queue is empty.
+     *
+     * @return the head of this queue, or null if empty
+     */
     public synchronized T poll() {
         if (insert == remove) {
             // empty
@@ -87,6 +125,11 @@ public class SynchronizedQueue<T> {
         size = newSize;
     }
 
+    /**
+     * Returns the number of elements in this queue.
+     *
+     * @return the number of elements
+     */
     public synchronized int size() {
         int result = insert - remove;
         if (result < 0) {
@@ -95,6 +138,9 @@ public class SynchronizedQueue<T> {
         return result;
     }
 
+    /**
+     * Removes all elements from this queue.
+     */
     public synchronized void clear() {
         queue = new Object[size];
         insert = 0;

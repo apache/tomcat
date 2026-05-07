@@ -277,6 +277,11 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
     }
 
 
+    /**
+     * Returns the loader repositories as an array of URLs.
+     *
+     * @return array of repository URLs
+     */
     public String[] getLoaderRepositories() {
         if (classLoader == null) {
             return new String[0];
@@ -289,6 +294,11 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
         return result;
     }
 
+    /**
+     * Returns the loader repositories as a colon-separated string.
+     *
+     * @return colon-separated repository URLs
+     */
     public String getLoaderRepositoriesString() {
         String[] repositories = getLoaderRepositories();
         StringBuilder sb = new StringBuilder();

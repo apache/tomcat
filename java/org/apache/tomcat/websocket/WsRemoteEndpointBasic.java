@@ -24,6 +24,9 @@ import java.nio.ByteBuffer;
 import javax.websocket.EncodeException;
 import javax.websocket.RemoteEndpoint;
 
+/**
+ * Synchronous (basic) remote endpoint for sending WebSocket messages.
+ */
 public class WsRemoteEndpointBasic extends WsRemoteEndpointBase implements RemoteEndpoint.Basic {
 
     WsRemoteEndpointBasic(WsRemoteEndpointImplBase base) {

@@ -30,6 +30,12 @@ import org.apache.catalina.core.StandardService;
 public class StandardServiceSF extends StoreFactoryBase {
 
     /**
+     * Default constructor.
+     */
+    public StandardServiceSF() {
+    }
+
+    /**
      * Store the specified service element children.
      * <p>
      * {@inheritDoc}

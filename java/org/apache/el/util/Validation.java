@@ -19,6 +19,9 @@ package org.apache.el.util;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+/**
+ * Utility class for validation operations related to EL identifiers.
+ */
 public class Validation {
 
     // Java keywords, boolean literals & the null literal in alphabetical order

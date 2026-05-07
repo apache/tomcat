@@ -19,6 +19,9 @@ package org.apache.catalina.ha.deploy;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Member;
 
+/**
+ * Cluster message that indicates an application has been undeployed.
+ */
 public class UndeployMessage implements ClusterMessage {
     private static final long serialVersionUID = 2L;
 
@@ -27,6 +30,14 @@ public class UndeployMessage implements ClusterMessage {
     private final String uniqueId;
     private final String contextName;
 
+    /**
+     * Creates a new UndeployMessage.
+     *
+     * @param address the sender address
+     * @param timestamp the message timestamp
+     * @param uniqueId the unique message identifier
+     * @param contextName the context being undeployed
+     */
     public UndeployMessage(Member address, long timestamp, String uniqueId, String contextName) {
         this.address = address;
         this.timestamp = timestamp;
@@ -59,6 +70,11 @@ public class UndeployMessage implements ClusterMessage {
         return uniqueId;
     }
 
+    /**
+     * Returns the name of the context being undeployed.
+     *
+     * @return the context name
+     */
     public String getContextName() {
         return contextName;
     }

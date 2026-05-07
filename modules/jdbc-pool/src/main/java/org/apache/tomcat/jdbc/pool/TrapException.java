@@ -30,6 +30,9 @@ import java.sql.SQLException;
 public class TrapException extends JdbcInterceptor {
 
 
+    /**
+     * Constructs a new TrapException interceptor.
+     */
     public TrapException() {
     }
 
@@ -62,6 +65,14 @@ public class TrapException extends JdbcInterceptor {
 
     }
 
+    /**
+     * Checks if the given exception class is declared in the throws clause of the specified method.
+     *
+     * @param m    The method to check
+     * @param clazz The exception class to look for
+     *
+     * @return {@code true} if the exception is declared, {@code false} otherwise
+     */
     public boolean isDeclaredException(Method m, Class<?> clazz) {
         for (Class<?> cl : m.getExceptionTypes()) {
             if (cl.equals(clazz) || cl.isAssignableFrom(clazz)) {

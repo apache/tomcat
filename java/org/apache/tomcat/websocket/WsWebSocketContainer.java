@@ -76,7 +76,16 @@ import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.KeyStoreUtil;
 
+/**
+ * Client-side WebSocket container implementation.
+ */
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
+
+    /**
+     * Default constructor.
+     */
+    public WsWebSocketContainer() {
+    }
 
     private static final StringManager sm = StringManager.getManager(WsWebSocketContainer.class);
     private static final Random RANDOM = new Random();
@@ -105,6 +114,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     private InstanceManager instanceManager;
 
+    /**
+     * Returns the instance manager for the given class loader.
+     * @param classLoader the class loader
+     * @return the instance manager
+     */
     protected InstanceManager getInstanceManager(ClassLoader classLoader) {
         if (instanceManager != null) {
             return instanceManager;
@@ -584,6 +598,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return ByteBuffer.wrap(bytes);
     }
 
+    /**
+     * Registers a WebSocket session.
+     * @param key the session key
+     * @param wsSession the session to register
+     */
     protected void registerSession(Object key, WsSession wsSession) {
 
         if (!wsSession.isOpen()) {
@@ -600,6 +619,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
+    /**
+     * Unregisters a WebSocket session.
+     * @param key the session key
+     * @param wsSession the session to unregister
+     */
     protected void unregisterSession(Object key, WsSession wsSession) {
 
         synchronized (endPointSessionMapLock) {

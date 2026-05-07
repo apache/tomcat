@@ -44,8 +44,19 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class StatusTransformer {
 
+    /**
+     * Default constructor.
+     */
+    public StatusTransformer() {
+    }
+
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Sets the response content type based on the output mode.
+     * @param response the HTTP response
+     * @param mode 0 for HTML, 1 for XML, 2 for JSON
+     */
     public static void setContentType(HttpServletResponse response, int mode) {
         if (mode == 0) {
             response.setContentType("text/html;charset=" + Constants.CHARSET);
@@ -106,6 +117,12 @@ public class StatusTransformer {
     }
 
 
+    /**
+     * Writes the page heading section.
+     * @param writer the output writer
+     * @param args formatting arguments
+     * @param mode output mode (0=HTML)
+     */
     public static void writePageHeading(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
             writer.print(MessageFormat.format(Constants.SERVER_HEADER_SECTION, args));
@@ -113,6 +130,12 @@ public class StatusTransformer {
     }
 
 
+    /**
+     * Writes the server information row.
+     * @param writer the output writer
+     * @param args formatting arguments
+     * @param mode output mode (0=HTML)
+     */
     public static void writeServerInfo(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
             writer.print(MessageFormat.format(Constants.SERVER_ROW_SECTION, args));
@@ -120,6 +143,11 @@ public class StatusTransformer {
     }
 
 
+    /**
+     * Writes the page footer.
+     * @param writer the output writer
+     * @param mode output mode (0=HTML, 1=XML, 2=JSON)
+     */
     public static void writeFooter(PrintWriter writer, int mode) {
         if (mode == 0) {
             // HTML Tail Section

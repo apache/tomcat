@@ -25,6 +25,10 @@ public class StopPooledThreadException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new StopPooledThreadException.
+     * @param msg the detail message
+     */
     public StopPooledThreadException(String msg) {
         super(msg, null, false, false);
     }

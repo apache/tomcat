@@ -22,6 +22,9 @@ import java.util.concurrent.Future;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 
+/**
+ * Asynchronous remote endpoint for sending WebSocket messages.
+ */
 public class WsRemoteEndpointAsync extends WsRemoteEndpointBase implements RemoteEndpoint.Async {
 
     WsRemoteEndpointAsync(WsRemoteEndpointImplBase base) {

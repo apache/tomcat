@@ -21,6 +21,9 @@ import java.util.List;
 
 import javax.websocket.Extension;
 
+/**
+ * Implementation of WebSocket extension.
+ */
 public class WsExtension implements Extension {
 
     private final String name;

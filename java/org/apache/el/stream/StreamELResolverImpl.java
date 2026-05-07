@@ -25,7 +25,17 @@ import java.util.NoSuchElementException;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 
+/**
+ * EL resolver that provides stream operations on arrays and collections
+ * through the {@code .stream} method.
+ */
 public class StreamELResolverImpl extends ELResolver {
+
+    /**
+     * Constructs a new StreamELResolverImpl.
+     */
+    public StreamELResolverImpl() {
+    }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {

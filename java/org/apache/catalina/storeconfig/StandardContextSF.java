@@ -59,6 +59,12 @@ public class StandardContextSF extends StoreFactoryBase {
     private static final Log log = LogFactory.getLog(StandardContextSF.class);
 
     /**
+     * Constructs a new StandardContextSF instance for storing Context elements in server.xml.
+     */
+    public StandardContextSF() {
+    }
+
+    /**
      * Store a Context as Separate file as configFile value from context exists. filename can be relative to
      * catalina.base.
      *

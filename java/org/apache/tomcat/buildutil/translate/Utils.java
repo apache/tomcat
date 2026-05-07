@@ -28,6 +28,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for translation operations.
+ */
 public class Utils {
 
     private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^( )", Pattern.MULTILINE);

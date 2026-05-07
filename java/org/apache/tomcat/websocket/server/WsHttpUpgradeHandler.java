@@ -72,6 +72,9 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private WsSession wsSession;
 
 
+    /**
+     * Default constructor.
+     */
     public WsHttpUpgradeHandler() {
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -83,6 +86,18 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     }
 
 
+    /**
+     * Performs initialization before the WebSocket handshake is completed.
+     *
+     * @param serverEndpointConfig the endpoint configuration
+     * @param wsc the WebSocket server container
+     * @param handshakeRequest the handshake request
+     * @param negotiatedExtensionsPhase2 negotiated extensions
+     * @param subProtocol the negotiated sub-protocol
+     * @param transformation the data transformation
+     * @param pathParameters the path parameters
+     * @param secure whether the connection is secure
+     */
     public void preInit(ServerEndpointConfig serverEndpointConfig, WsServerContainer wsc,
             WsHandshakeRequest handshakeRequest, List<Extension> negotiatedExtensionsPhase2, String subProtocol,
             Transformation transformation, Map<String,String> pathParameters, boolean secure) {

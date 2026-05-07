@@ -24,12 +24,29 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+/**
+ * Stream provider that authenticates using a bearer token.
+ */
 public class TokenStreamProvider extends AbstractStreamProvider {
 
+    /**
+     * The bearer token for authentication.
+     */
     private String token;
+
+    /**
+     * The SSL socket factory.
+     */
     private final SSLSocketFactory factory;
 
 
+    /**
+     * Creates a new TokenStreamProvider.
+     *
+     * @param token the bearer token
+     * @param caCertFile the CA certificate file path
+     * @throws Exception if initialization fails
+     */
     TokenStreamProvider(String token, String caCertFile) throws Exception {
         this.token = token;
         TrustManager[] trustManagers = configureCaCert(caCertFile);
@@ -45,6 +62,11 @@ public class TokenStreamProvider extends AbstractStreamProvider {
     }
 
 
+    /**
+     * Sets the bearer token for authentication.
+     *
+     * @param token the bearer token
+     */
     protected void setToken(String token) {
         this.token = token;
     }

@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Possible results of a WebSocket frame transformation operation.
+ */
 public enum TransformationResult {
     /**
      * The end of the available data was reached before the WebSocket frame was completely read.

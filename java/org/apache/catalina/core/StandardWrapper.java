@@ -71,6 +71,9 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     private final Log log = LogFactory.getLog(StandardWrapper.class); // must not be static
 
+    /**
+     * Default servlet methods supported by this wrapper.
+     */
     protected static final String[] DEFAULT_SERVLET_METHODS = new String[] { "GET", "HEAD", "POST" };
 
     // ----------------------------------------------------------- Constructors
@@ -237,7 +240,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     // To support jmx attributes
     StandardWrapperValve swValve;
+    /**
+     * Time taken to load the servlet.
+     */
     protected long loadTime = 0;
+    /**
+     * Time taken to load the servlet class.
+     */
     protected int classLoadTime = 0;
 
     /**
@@ -351,6 +360,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
     /**
+     * Returns the load-on-startup value that was parsed.
+     *
      * @return the load-on-startup value that was parsed
      */
     public String getLoadOnStartupString() {
@@ -1228,14 +1239,29 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         return getName();
     }
 
+    /**
+     * Returns the total processing time for all requests.
+     *
+     * @return the total processing time in milliseconds
+     */
     public long getProcessingTime() {
         return swValve.getProcessingTime();
     }
 
+    /**
+     * Returns the maximum processing time for a single request.
+     *
+     * @return the maximum processing time in milliseconds
+     */
     public long getMaxTime() {
         return swValve.getMaxTime();
     }
 
+    /**
+     * Returns the minimum processing time for a single request.
+     *
+     * @return the minimum processing time in milliseconds
+     */
     public long getMinTime() {
         return swValve.getMinTime();
     }
@@ -1256,10 +1282,20 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         swValve.incrementErrorCount();
     }
 
+    /**
+     * Returns the time taken to load the servlet.
+     *
+     * @return the load time in milliseconds
+     */
     public long getLoadTime() {
         return loadTime;
     }
 
+    /**
+     * Returns the time taken to load the servlet class.
+     *
+     * @return the class load time in milliseconds
+     */
     public int getClassLoadTime() {
         return classLoadTime;
     }
@@ -1300,6 +1336,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     // -------------------------------------------------------- protected Methods
 
 
+    /**
+     * Recursively collects all declared methods from the given class and its superclasses,
+     * stopping at HttpServlet.
+     *
+     * @param c the class to inspect
+     * @return array of all declared methods, or null if c is HttpServlet
+     */
     protected Method[] getAllDeclaredMethods(Class<?> c) {
 
         if (c.equals(javax.servlet.http.HttpServlet.class)) {
@@ -1470,6 +1513,9 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         broadcaster.removeNotificationListener(listener, filter, object);
     }
 
+    /**
+     * Cache for notification info.
+     */
     protected MBeanNotificationInfo[] notificationInfo;
 
     @Override

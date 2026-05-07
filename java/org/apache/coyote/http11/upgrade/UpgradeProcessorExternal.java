@@ -30,15 +30,36 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Upgrade processor for external (Servlet-based) upgrade handlers.
+ */
 public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     private static final Log log = LogFactory.getLog(UpgradeProcessorExternal.class);
     private static final StringManager sm = StringManager.getManager(UpgradeProcessorExternal.class);
 
+    /**
+     * The input stream for the upgraded connection.
+     */
     private final UpgradeServletInputStream upgradeServletInputStream;
+
+    /**
+     * The output stream for the upgraded connection.
+     */
     private final UpgradeServletOutputStream upgradeServletOutputStream;
+
+    /**
+     * Statistics for this upgraded connection.
+     */
     private final UpgradeInfo upgradeInfo;
 
+    /**
+     * Constructs a new UpgradeProcessorExternal.
+     *
+     * @param wrapper the socket wrapper
+     * @param upgradeToken the upgrade token
+     * @param upgradeGroupInfo the group info for statistics
+     */
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
             UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);

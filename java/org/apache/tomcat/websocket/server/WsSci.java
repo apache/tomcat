@@ -40,6 +40,12 @@ import org.apache.tomcat.util.compat.JreCompat;
 @HandlesTypes({ ServerEndpoint.class, ServerApplicationConfig.class, Endpoint.class })
 public class WsSci implements ServletContainerInitializer {
 
+    /**
+     * Default constructor.
+     */
+    public WsSci() {
+    }
+
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx) throws ServletException {
 

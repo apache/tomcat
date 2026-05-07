@@ -38,6 +38,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class StoreBase extends LifecycleBase implements Store {
 
+    /**
+     * Default constructor.
+     */
+    public StoreBase() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**

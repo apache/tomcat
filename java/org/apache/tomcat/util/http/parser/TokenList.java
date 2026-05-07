@@ -23,6 +23,9 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 
+/**
+ * Utility class for parsing and manipulating HTTP token lists.
+ */
 public class TokenList {
 
     private TokenList() {

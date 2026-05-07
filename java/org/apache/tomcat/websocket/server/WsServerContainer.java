@@ -336,6 +336,11 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
+    /**
+     * Finds the endpoint configuration that matches the given path.
+     * @param path the URI path to match
+     * @return the mapping result, or null if no match is found
+     */
     public WsMappingResult findMapping(String path) {
 
         // Prevent registering additional endpoints once the first attempt has
@@ -402,6 +407,10 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
+    /**
+     * Returns the write timeout handler.
+     * @return the write timeout handler
+     */
     protected WsWriteTimeout getTimeout() {
         return wsWriteTimeout;
     }
@@ -460,6 +469,10 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
+    /**
+     * Closes all WebSocket sessions associated with the given authenticated HTTP session.
+     * @param httpSessionId the HTTP session ID
+     */
     public void closeAuthenticatedSession(String httpSessionId) {
         Set<WsSession> wsSessions = authenticatedSessions.remove(httpSessionId);
 

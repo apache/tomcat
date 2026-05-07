@@ -34,6 +34,12 @@ import org.apache.catalina.ha.ClusterValve;
 public class StandardEngineSF extends StoreFactoryBase {
 
     /**
+     * Constructs a new StandardEngineSF instance for storing Engine elements in server.xml.
+     */
+    public StandardEngineSF() {
+    }
+
+    /**
      * Store the specified Engine properties.
      * <p>
      * {@inheritDoc}

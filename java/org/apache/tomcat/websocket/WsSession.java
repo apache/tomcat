@@ -59,6 +59,9 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator;
 
+/**
+ * Implementation of a WebSocket session.
+ */
 public class WsSession implements Session {
 
     private final Log log = LogFactory.getLog(WsSession.class); // must not be static
@@ -367,6 +370,10 @@ public class WsSession implements Session {
     }
 
 
+    /**
+     * Returns the instance manager for this session.
+     * @return the instance manager
+     */
     public InstanceManager getInstanceManager() {
         return webSocketContainer.getInstanceManager(applicationClassLoader);
     }
@@ -544,6 +551,10 @@ public class WsSession implements Session {
     }
 
 
+    /**
+     * Checks if the session is closed.
+     * @return true if the session is closed
+     */
     public boolean isClosed() {
         return state.get() == State.CLOSED;
     }
@@ -754,8 +765,9 @@ public class WsSession implements Session {
     }
 
 
-    /*
-     * Returns the session close timeout in milliseconds
+    /**
+     * Returns the session close timeout in milliseconds.
+     * @return the session close timeout
      */
     protected long getSessionCloseTimeout() {
         long result = 0;
@@ -786,6 +798,9 @@ public class WsSession implements Session {
     }
 
 
+    /**
+     * Checks if the session close timeout has expired and closes the connection if so.
+     */
     protected void checkCloseTimeout() {
         // Skip the check if no session close timeout has been set.
         if (sessionCloseTimeoutExpiry != null) {
@@ -1021,6 +1036,10 @@ public class WsSession implements Session {
     }
 
 
+    /**
+     * Returns the user principal for this session.
+     * @return the user principal
+     */
     public Principal getUserPrincipalInternal() {
         return userPrincipal;
     }
@@ -1046,41 +1065,70 @@ public class WsSession implements Session {
     }
 
 
+    /**
+     * Returns the local endpoint for this session.
+     * @return the local endpoint
+     */
     public Endpoint getLocal() {
         return localEndpoint;
     }
 
 
+    /**
+     * Returns the HTTP session ID associated with this WebSocket session.
+     * @return the HTTP session ID, or null if not associated
+     */
     public String getHttpSessionId() {
         return httpSessionId;
     }
 
 
+    /**
+     * Returns the text message handler for this session.
+     * @return the text message handler
+     */
     protected MessageHandler getTextMessageHandler() {
         return textMessageHandler;
     }
 
 
+    /**
+     * Returns the binary message handler for this session.
+     * @return the binary message handler
+     */
     protected MessageHandler getBinaryMessageHandler() {
         return binaryMessageHandler;
     }
 
 
+    /**
+     * Returns the pong message handler for this session.
+     * @return the pong message handler
+     */
     protected MessageHandler.Whole<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
     }
 
 
+    /**
+     * Updates the last active read timestamp to the current time.
+     */
     protected void updateLastActiveRead() {
         lastActiveRead = System.currentTimeMillis();
     }
 
 
+    /**
+     * Updates the last active write timestamp to the current time.
+     */
     protected void updateLastActiveWrite() {
         lastActiveWrite = System.currentTimeMillis();
     }
 
 
+    /**
+     * Checks if this session has expired based on idle timeout settings.
+     */
     protected void checkExpiration() {
         // Local copies to ensure consistent behaviour during method execution
         long timeout = maxIdleTimeout;

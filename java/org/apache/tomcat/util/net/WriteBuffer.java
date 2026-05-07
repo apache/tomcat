@@ -37,6 +37,11 @@ public class WriteBuffer {
 
     private final LinkedBlockingDeque<ByteBufferHolder> buffers = new LinkedBlockingDeque<>();
 
+    /**
+     * Constructs a new WriteBuffer.
+     *
+     * @param bufferSize The size of internal buffers
+     */
     public WriteBuffer(int bufferSize) {
         this.bufferSize = bufferSize;
     }
@@ -51,6 +56,11 @@ public class WriteBuffer {
     }
 
 
+    /**
+     * Adds data from a ByteBuffer to this write buffer.
+     *
+     * @param from The source ByteBuffer
+     */
     public void add(ByteBuffer from) {
         ByteBufferHolder holder = getByteBufferHolder(from.remaining());
         holder.getBuf().put(from);
@@ -68,6 +78,11 @@ public class WriteBuffer {
     }
 
 
+    /**
+     * Returns whether this write buffer is empty.
+     *
+     * @return {@code true} if empty
+     */
     public boolean isEmpty() {
         return buffers.isEmpty();
     }
@@ -117,6 +132,16 @@ public class WriteBuffer {
     }
 
 
+    /**
+     * Writes data from this buffer to the given sink.
+     *
+     * @param sink     The sink to write to
+     * @param blocking Whether to use blocking writes
+     *
+     * @return {@code true} if data is left unwritten, {@code false} otherwise
+     *
+     * @throws IOException If an I/O error occurs
+     */
     public boolean write(Sink sink, boolean blocking) throws IOException {
         Iterator<ByteBufferHolder> bufIter = buffers.iterator();
         boolean dataLeft = false;
@@ -136,6 +161,16 @@ public class WriteBuffer {
      * Interface implemented by clients of the WriteBuffer to enable data to be written back out from the buffer.
      */
     public interface Sink {
+        /**
+         * Writes data from a ByteBuffer to the underlying output.
+         *
+         * @param buffer The buffer to write from
+         * @param block  Whether to use blocking writes
+         *
+         * @return {@code true} if data is left unwritten, {@code false} otherwise
+         *
+         * @throws IOException If an I/O error occurs
+         */
         boolean writeFromBuffer(ByteBuffer buffer, boolean block) throws IOException;
     }
 }

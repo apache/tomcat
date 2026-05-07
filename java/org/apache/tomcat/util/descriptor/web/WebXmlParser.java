@@ -29,6 +29,9 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Parser for web.xml and web-fragment.xml deployment descriptors.
+ */
 public class WebXmlParser {
 
     private final Log log = LogFactory.getLog(WebXmlParser.class); // must not be static
@@ -51,6 +54,13 @@ public class WebXmlParser {
     private final WebRuleSet webFragmentRuleSet;
 
 
+    /**
+     * Constructs a new WebXmlParser.
+     *
+     * @param namespaceAware  Whether the parser is namespace aware
+     * @param validation      Whether validation is enabled
+     * @param blockExternal   Whether external entities are blocked
+     */
     public WebXmlParser(boolean namespaceAware, boolean validation, boolean blockExternal) {
         webRuleSet = new WebRuleSet(false);
         webDigester = DigesterFactory.newDigester(validation, namespaceAware, webRuleSet, blockExternal);
@@ -83,6 +93,15 @@ public class WebXmlParser {
     }
 
 
+    /**
+     * Parses a web descriptor from an InputSource.
+     *
+     * @param source   The input source
+     * @param dest     The WebXml instance to populate
+     * @param fragment Whether this is a web-fragment
+     *
+     * @return {@code true} if parsing was successful
+     */
     public boolean parseWebXml(InputSource source, WebXml dest, boolean fragment) {
 
         if (source == null) {

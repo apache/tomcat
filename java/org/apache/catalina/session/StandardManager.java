@@ -54,6 +54,13 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class StandardManager extends ManagerBase {
 
+    /**
+     * Construct a new {@code StandardManager} instance.
+     */
+    public StandardManager() {
+        // NO-OP
+    }
+
     private final Log log = LogFactory.getLog(StandardManager.class); // must not be static
 
     // ---------------------------------------------------- Security Classes
@@ -112,6 +119,8 @@ public class StandardManager extends ManagerBase {
 
 
     /**
+     * Return the session persistence pathname, if any.
+     *
      * @return The session persistence pathname, if any.
      */
     public String getPathname() {

@@ -33,24 +33,49 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Channel interceptor that manages static membership for a cluster.
+ */
 public class StaticMembershipInterceptor extends ChannelInterceptorBase implements StaticMembershipInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(StaticMembershipInterceptor.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(StaticMembershipInterceptor.class);
 
+    /**
+     * Payload sent when a member starts.
+     */
     protected static final byte[] MEMBER_START = new byte[] { 76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77,
             101, 109, 98, 101, 114, 32, 78, 111, 116, 105, 102, 105, 99, 97, 116, 105, 111, 110, 32, 68, 97, 116, 97 };
 
+    /**
+     * Payload sent when a member shuts down.
+     */
     protected static final byte[] MEMBER_STOP = new byte[] { 76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77,
             101, 109, 98, 101, 114, 32, 83, 104, 117, 116, 100, 111, 119, 110, 32, 68, 97, 116, 97 };
 
+    /**
+     * List of static members configured for this interceptor.
+     */
     protected final ArrayList<Member> members = new ArrayList<>();
+    /**
+     * The local member for this interceptor.
+     */
     protected Member localMember = null;
 
+    /**
+     * Default constructor.
+     */
     public StaticMembershipInterceptor() {
         super();
     }
 
+    /**
+     * Adds a static member to the membership list.
+     * @param member the member to add
+     */
     public void addStaticMember(Member member) {
         synchronized (members) {
             if (!members.contains(member)) {
@@ -59,12 +84,20 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         }
     }
 
+    /**
+     * Removes a static member from the membership list.
+     * @param member the member to remove
+     */
     public void removeStaticMember(Member member) {
         synchronized (members) {
             members.remove(member);
         }
     }
 
+    /**
+     * Sets the local member for this interceptor.
+     * @param member the local member
+     */
     public void setLocalMember(Member member) {
         this.localMember = member;
         localMember.setLocal(true);
@@ -197,6 +230,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         super.stop(svc);
     }
 
+    /**
+     * Sends a local member start message to the given members.
+     * @param members the members to notify
+     */
     protected void sendLocalMember(Member[] members) {
         try {
             sendMemberMessage(members, MEMBER_START);
@@ -205,6 +242,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         }
     }
 
+    /**
+     * Sends a shutdown message to the given members.
+     * @param members the members to notify
+     */
     protected void sendShutdown(Member[] members) {
         try {
             sendMemberMessage(members, MEMBER_STOP);
@@ -213,6 +254,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         }
     }
 
+    /**
+     * Returns the first (bottom-most) interceptor in the chain.
+     * @return the first channel interceptor
+     */
     protected ChannelInterceptor getfirstInterceptor() {
         ChannelInterceptor result;
         ChannelInterceptor now = this;
@@ -223,6 +268,12 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         return result;
     }
 
+    /**
+     * Sends a member message to the given members.
+     * @param members the members to send to
+     * @param message the message payload
+     * @throws ChannelException if sending fails
+     */
     protected void sendMemberMessage(Member[] members, byte[] message) throws ChannelException {
         if (members == null || members.length == 0) {
             return;

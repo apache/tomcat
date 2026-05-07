@@ -27,19 +27,53 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  */
 public class UpgradeGroupInfo extends BaseModelMBean {
 
+    /**
+     * Constructs a new UpgradeGroupInfo.
+     */
+    public UpgradeGroupInfo() {
+    }
+
+    /**
+     * The set of active upgrade connections.
+     */
     private final Set<UpgradeInfo> upgradeInfos = (new ConcurrentHashMap<UpgradeInfo,Boolean>()).keySet(Boolean.TRUE);
 
+    /**
+     * Bytes received from completed connections.
+     */
     private final LongAdder deadBytesReceived = new LongAdder();
+
+    /**
+     * Bytes sent to completed connections.
+     */
     private final LongAdder deadBytesSent = new LongAdder();
+
+    /**
+     * Messages received from completed connections.
+     */
     private final LongAdder deadMsgsReceived = new LongAdder();
+
+    /**
+     * Messages sent to completed connections.
+     */
     private final LongAdder deadMsgsSent = new LongAdder();
 
 
+    /**
+     * Adds an active upgrade connection to this group.
+     *
+     * @param ui the upgrade connection
+     */
     public void addUpgradeInfo(UpgradeInfo ui) {
         upgradeInfos.add(ui);
     }
 
 
+    /**
+     * Removes an upgrade connection from this group.
+     *
+     * @param ui the upgrade connection to remove
+     */
     public void removeUpgradeInfo(UpgradeInfo ui) {
         if (ui != null) {
             deadBytesReceived.add(ui.getBytesReceived());
@@ -52,6 +86,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
 
 
+    /**
+     * Returns the total bytes received across all connections.
+     *
+     * @return the total bytes received
+     */
     public long getBytesReceived() {
         long bytes = deadBytesReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
@@ -60,6 +99,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
         return bytes;
     }
 
+    /**
+     * Resets the bytes received counter.
+     *
+     * @param bytesReceived the new value (ignored, used for MBean reset)
+     */
     public void setBytesReceived(long bytesReceived) {
         deadBytesReceived.reset();
         if (bytesReceived != 0) {
@@ -71,6 +115,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
 
 
+    /**
+     * Returns the total bytes sent across all connections.
+     *
+     * @return the total bytes sent
+     */
     public long getBytesSent() {
         long bytes = deadBytesSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
@@ -79,6 +128,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
         return bytes;
     }
 
+    /**
+     * Resets the bytes sent counter.
+     *
+     * @param bytesSent the new value (ignored, used for MBean reset)
+     */
     public void setBytesSent(long bytesSent) {
         deadBytesSent.reset();
         if (bytesSent != 0) {
@@ -90,6 +144,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
 
 
+    /**
+     * Returns the total messages received across all connections.
+     *
+     * @return the total messages received
+     */
     public long getMsgsReceived() {
         long msgs = deadMsgsReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
@@ -98,6 +157,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
         return msgs;
     }
 
+    /**
+     * Resets the messages received counter.
+     *
+     * @param msgsReceived the new value (ignored, used for MBean reset)
+     */
     public void setMsgsReceived(long msgsReceived) {
         deadMsgsReceived.reset();
         if (msgsReceived != 0) {
@@ -109,6 +173,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
 
 
+    /**
+     * Returns the total messages sent across all connections.
+     *
+     * @return the total messages sent
+     */
     public long getMsgsSent() {
         long msgs = deadMsgsSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
@@ -117,6 +186,11 @@ public class UpgradeGroupInfo extends BaseModelMBean {
         return msgs;
     }
 
+    /**
+     * Resets the messages sent counter.
+     *
+     * @param msgsSent the new value (ignored, used for MBean reset)
+     */
     public void setMsgsSent(long msgsSent) {
         deadMsgsSent.reset();
         if (msgsSent != 0) {
@@ -128,6 +202,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
 
 
+    /**
+     * Resets all counters to zero.
+     */
     public void resetCounters() {
         setBytesReceived(0);
         setBytesSent(0);

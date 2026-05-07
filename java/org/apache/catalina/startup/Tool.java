@@ -63,6 +63,11 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class Tool {
 
+    /**
+     * Constructs a new Tool. This utility class should not be instantiated.
+     */
+    public Tool() {
+    }
 
     private static final Log log = LogFactory.getLog(Tool.class);
 

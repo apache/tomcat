@@ -20,25 +20,65 @@ import java.util.Properties;
 
 import org.apache.catalina.tribes.Member;
 
+/**
+ * MBean interface for the static membership service.
+ */
 public interface StaticMembershipServiceMBean {
 
     // Attributes
+    /**
+     * Returns the member expiration time in milliseconds.
+     * @return the expiration time
+     */
     long getExpirationTime();
 
+    /**
+     * Returns the connection timeout in milliseconds.
+     * @return the connection timeout
+     */
     int getConnectTimeout();
 
+    /**
+     * Returns the RPC timeout in milliseconds.
+     * @return the RPC timeout
+     */
     long getRpcTimeout();
 
+    /**
+     * Returns whether a background ping thread is in use.
+     * @return true if a background thread is used
+     */
     boolean getUseThread();
 
+    /**
+     * Returns the ping interval in milliseconds.
+     * @return the ping interval
+     */
     long getPingInterval();
 
     // Operation
+    /**
+     * Returns the configuration properties.
+     * @return the properties
+     */
     Properties getProperties();
 
+    /**
+     * Checks if there are any members in the cluster.
+     * @return true if there are members
+     */
     boolean hasMembers();
 
+    /**
+     * Returns the names of all cluster members.
+     * @return array of member names
+     */
     String[] getMembersByName();
 
+    /**
+     * Finds a member by name.
+     * @param name the member name
+     * @return the member, or null if not found
+     */
     Member findMemberByName(String name);
 }

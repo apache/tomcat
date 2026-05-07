@@ -61,6 +61,12 @@ public class StandardJarScanner implements JarScanner {
     private final Log log = LogFactory.getLog(StandardJarScanner.class); // must not be static
 
     /**
+     * Constructs a new StandardJarScanner instance.
+     */
+    public StandardJarScanner() {
+    }
+
+    /**
      * The string resources for this package.
      */
     private static final StringManager sm = StringManager.getManager(Constants.Package);
@@ -84,10 +90,20 @@ public class StandardJarScanner implements JarScanner {
      */
     private boolean scanClassPath = true;
 
+    /**
+     * Returns whether classpath scanning is enabled.
+     *
+     * @return true if classpath scanning is enabled
+     */
     public boolean isScanClassPath() {
         return scanClassPath;
     }
 
+    /**
+     * Sets whether classpath scanning is enabled.
+     *
+     * @param scanClassPath true to enable classpath scanning
+     */
     public void setScanClassPath(boolean scanClassPath) {
         this.scanClassPath = scanClassPath;
     }
@@ -97,10 +113,20 @@ public class StandardJarScanner implements JarScanner {
      */
     private boolean scanManifest = true;
 
+    /**
+     * Returns whether manifest scanning is enabled.
+     *
+     * @return true if manifest scanning is enabled
+     */
     public boolean isScanManifest() {
         return scanManifest;
     }
 
+    /**
+     * Sets whether manifest scanning is enabled.
+     *
+     * @param scanManifest true to enable manifest scanning
+     */
     public void setScanManifest(boolean scanManifest) {
         this.scanManifest = scanManifest;
     }
@@ -110,10 +136,20 @@ public class StandardJarScanner implements JarScanner {
      */
     private boolean scanAllFiles = false;
 
+    /**
+     * Returns whether scanning all files for JARs is enabled.
+     *
+     * @return true if scanning all files is enabled
+     */
     public boolean isScanAllFiles() {
         return scanAllFiles;
     }
 
+    /**
+     * Sets whether scanning all files for JARs is enabled.
+     *
+     * @param scanAllFiles true to enable scanning all files
+     */
     public void setScanAllFiles(boolean scanAllFiles) {
         this.scanAllFiles = scanAllFiles;
     }
@@ -123,10 +159,20 @@ public class StandardJarScanner implements JarScanner {
      */
     private boolean scanAllDirectories = true;
 
+    /**
+     * Returns whether scanning all directories for exploded JARs is enabled.
+     *
+     * @return true if scanning all directories is enabled
+     */
     public boolean isScanAllDirectories() {
         return scanAllDirectories;
     }
 
+    /**
+     * Sets whether scanning all directories for exploded JARs is enabled.
+     *
+     * @param scanAllDirectories true to enable scanning all directories
+     */
     public void setScanAllDirectories(boolean scanAllDirectories) {
         this.scanAllDirectories = scanAllDirectories;
     }
@@ -137,10 +183,20 @@ public class StandardJarScanner implements JarScanner {
      */
     private boolean scanBootstrapClassPath = false;
 
+    /**
+     * Returns whether scanning the bootstrap classpath is enabled.
+     *
+     * @return true if scanning the bootstrap classpath is enabled
+     */
     public boolean isScanBootstrapClassPath() {
         return scanBootstrapClassPath;
     }
 
+    /**
+     * Sets whether scanning the bootstrap classpath is enabled.
+     *
+     * @param scanBootstrapClassPath true to enable scanning the bootstrap classpath
+     */
     public void setScanBootstrapClassPath(boolean scanBootstrapClassPath) {
         this.scanBootstrapClassPath = scanBootstrapClassPath;
     }
@@ -243,6 +299,14 @@ public class StandardJarScanner implements JarScanner {
     }
 
 
+    /**
+     * Scans the class path for JAR files.
+     *
+     * @param scanType the type of scan to perform
+     * @param context the servlet context
+     * @param callback the callback handler for found JARs
+     * @param processedURLs the set of already processed URLs
+     */
     protected void doScanClassPath(JarScanType scanType, ServletContext context, JarScannerCallback callback,
             Set<URL> processedURLs) {
         if (log.isTraceEnabled()) {
@@ -291,6 +355,15 @@ public class StandardJarScanner implements JarScanner {
     }
 
 
+    /**
+     * Processes URLs for JAR scanning.
+     *
+     * @param scanType the type of scan to perform
+     * @param callback the callback handler for found JARs
+     * @param processedURLs the set of already processed URLs
+     * @param isWebapp true if processing webapp URLs
+     * @param classPathUrlsToProcess the queue of URLs to process
+     */
     protected void processURLs(JarScanType scanType, JarScannerCallback callback, Set<URL> processedURLs,
             boolean isWebapp, Deque<URL> classPathUrlsToProcess) {
 
@@ -333,6 +406,11 @@ public class StandardJarScanner implements JarScanner {
     }
 
 
+    /**
+     * Adds URLs from the system classpath to the processing queue.
+     *
+     * @param classPathUrlsToProcess the queue to add URLs to
+     */
     protected void addClassPath(Deque<URL> classPathUrlsToProcess) {
         String classPath = System.getProperty("java.class.path");
 
@@ -367,8 +445,16 @@ public class StandardJarScanner implements JarScanner {
     }
 
 
-    /*
+    /**
      * Scan a URL for JARs with the optional extensions to look at all files and all directories.
+     *
+     * @param scanType the type of scan to perform
+     * @param callback the callback handler for found JARs
+     * @param url the URL to scan
+     * @param webappPath the web application path
+     * @param isWebapp true if the URL is part of a web application
+     * @param classPathUrlsToProcess the queue of URLs to process
+     * @throws IOException if an I/O error occurs during scanning
      */
     protected void process(JarScanType scanType, JarScannerCallback callback, URL url, String webappPath,
             boolean isWebapp, Deque<URL> classPathUrlsToProcess) throws IOException {

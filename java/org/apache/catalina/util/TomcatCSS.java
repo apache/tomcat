@@ -17,8 +17,20 @@
 package org.apache.catalina.util;
 
 
+/**
+ * Provides the default Tomcat CSS styles.
+ */
 public class TomcatCSS {
 
+    /**
+     * Constructs a new TomcatCSS. This utility class should not be instantiated.
+     */
+    public TomcatCSS() {
+    }
+
+    /**
+     * The default CSS styles used by Tomcat error pages.
+     */
     public static final String TOMCAT_CSS = "body {font-family:Tahoma,Arial,sans-serif;} " +
             "h1, h2, h3, b {color:white;background-color:#525D76;} " + "h1 {font-size:22px;} " +
             "h2 {font-size:16px;} " + "h3 {font-size:14px;} " + "p {font-size:12px;} " + "a {color:black;} " +

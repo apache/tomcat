@@ -30,6 +30,12 @@ import org.apache.tomcat.util.security.PermissionCheck;
  */
 public class SystemPropertySource implements IntrospectionUtils.SecurePropertySource {
 
+    /**
+     * Constructs a new SystemPropertySource.
+     */
+    public SystemPropertySource() {
+    }
+
     @Override
     public String getProperty(String key) {
         // For backward compatibility

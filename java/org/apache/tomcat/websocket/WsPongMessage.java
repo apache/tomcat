@@ -24,7 +24,10 @@ public class WsPongMessage implements PongMessage {
 
     private final ByteBuffer applicationData;
 
-
+    /**
+     * Creates a pong message, copying the application data.
+     * @param applicationData the application data buffer
+     */
     public WsPongMessage(ByteBuffer applicationData) {
         byte[] dst = new byte[applicationData.limit()];
         applicationData.get(dst);

@@ -103,21 +103,51 @@ public final class UriUtil {
     }
 
 
+    /**
+     * Builds a JAR URL for the given JAR file.
+     *
+     * @param jarFile the JAR file
+     * @return the JAR URL
+     * @throws MalformedURLException if URL creation fails
+     */
     public static URL buildJarUrl(File jarFile) throws MalformedURLException {
         return buildJarUrl(jarFile, null);
     }
 
 
+    /**
+     * Builds a JAR URL for the given JAR file and entry path.
+     *
+     * @param jarFile the JAR file
+     * @param entryPath the entry path within the JAR
+     * @return the JAR URL
+     * @throws MalformedURLException if URL creation fails
+     */
     public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
         return buildJarUrl(jarFile.toURI().toString(), entryPath);
     }
 
 
+    /**
+     * Builds a JAR URL for the given file URL string.
+     *
+     * @param fileUrlString the file URL string
+     * @return the JAR URL
+     * @throws MalformedURLException if URL creation fails
+     */
     public static URL buildJarUrl(String fileUrlString) throws MalformedURLException {
         return buildJarUrl(fileUrlString, null);
     }
 
 
+    /**
+     * Builds a JAR URL for the given file URL string and entry path.
+     *
+     * @param fileUrlString the file URL string
+     * @param entryPath the entry path within the JAR
+     * @return the JAR URL
+     * @throws MalformedURLException if URL creation fails
+     */
     public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
         String safeString = makeSafeForJarUrl(fileUrlString);
         StringBuilder sb = new StringBuilder();
@@ -130,6 +160,13 @@ public final class UriUtil {
     }
 
 
+    /**
+     * Builds a JAR-safe URL for the given file, with special characters escaped.
+     *
+     * @param file the file
+     * @return the JAR-safe URL
+     * @throws MalformedURLException if URL creation fails
+     */
     public static URL buildJarSafeUrl(File file) throws MalformedURLException {
         String safe = makeSafeForJarUrl(file.toURI().toString());
         return new URL(safe);
@@ -186,6 +223,11 @@ public final class UriUtil {
     }
 
 
+    /**
+     * Returns the separator used in WAR URLs.
+     *
+     * @return the WAR separator string
+     */
     public static String getWarSeparator() {
         return WAR_SEPARATOR;
     }

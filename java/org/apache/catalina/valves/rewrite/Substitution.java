@@ -24,15 +24,57 @@ import java.util.regex.Matcher;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Represents a URL substitution pattern for rewrite rules. Supports back-references
+ * to rewrite rules and conditions, server variables, and map lookups.
+ */
 public class Substitution {
 
+    /**
+     * Constructs a new Substitution.
+     */
+    public Substitution() {
+    }
+
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(Substitution.class);
 
+    /**
+     * Abstract base class for individual substitution elements.
+     */
     public abstract static class SubstitutionElement {
+        /**
+         * Constructs a new SubstitutionElement.
+         */
+        public SubstitutionElement() {
+        }
+
+        /**
+         * Evaluates this element against the given matchers and resolver.
+         *
+         * @param rule the rewrite rule matcher
+         * @param cond the condition matcher
+         * @param resolver the property resolver
+         * @return the evaluated string
+         */
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
     }
 
+    /**
+     * Substitution element that produces a static string value.
+     */
     public static class StaticElement extends SubstitutionElement {
+        /**
+         * Constructs a new StaticElement.
+         */
+        public StaticElement() {
+        }
+
+        /**
+         * The static string value.
+         */
         public String value;
 
         @Override
@@ -42,7 +84,19 @@ public class Substitution {
 
     }
 
+    /**
+     * Substitution element that produces a back-reference to a rewrite rule group.
+     */
     public class RewriteRuleBackReferenceElement extends SubstitutionElement {
+        /**
+         * Constructs a new RewriteRuleBackReferenceElement.
+         */
+        public RewriteRuleBackReferenceElement() {
+        }
+
+        /**
+         * The group number to reference.
+         */
         public int n;
 
         @Override
@@ -63,7 +117,19 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that produces a back-reference to a rewrite condition group.
+     */
     public static class RewriteCondBackReferenceElement extends SubstitutionElement {
+        /**
+         * Constructs a new RewriteCondBackReferenceElement.
+         */
+        public RewriteCondBackReferenceElement() {
+        }
+
+        /**
+         * The group number to reference.
+         */
         public int n;
 
         @Override
@@ -72,7 +138,19 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that resolves a server variable.
+     */
     public static class ServerVariableElement extends SubstitutionElement {
+        /**
+         * Constructs a new ServerVariableElement.
+         */
+        public ServerVariableElement() {
+        }
+
+        /**
+         * The server variable name to resolve.
+         */
         public String key;
 
         @Override
@@ -81,7 +159,19 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that resolves an environment variable.
+     */
     public static class ServerVariableEnvElement extends SubstitutionElement {
+        /**
+         * Constructs a new ServerVariableEnvElement.
+         */
+        public ServerVariableEnvElement() {
+        }
+
+        /**
+         * The environment variable name to resolve.
+         */
         public String key;
 
         @Override
@@ -90,7 +180,19 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that resolves an SSL variable.
+     */
     public static class ServerVariableSslElement extends SubstitutionElement {
+        /**
+         * Constructs a new ServerVariableSslElement.
+         */
+        public ServerVariableSslElement() {
+        }
+
+        /**
+         * The SSL variable name to resolve.
+         */
         public String key;
 
         @Override
@@ -99,7 +201,19 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that resolves an HTTP header variable.
+     */
     public static class ServerVariableHttpElement extends SubstitutionElement {
+        /**
+         * Constructs a new ServerVariableHttpElement.
+         */
+        public ServerVariableHttpElement() {
+        }
+
+        /**
+         * The HTTP header name to resolve.
+         */
         public String key;
 
         @Override
@@ -108,9 +222,29 @@ public class Substitution {
         }
     }
 
+    /**
+     * Substitution element that performs a rewrite map lookup.
+     */
     public class MapElement extends SubstitutionElement {
+        /**
+         * Constructs a new MapElement.
+         */
+        public MapElement() {
+        }
+
+        /**
+         * The rewrite map to use for lookup.
+         */
         public RewriteMap map = null;
+
+        /**
+         * The default value elements if map lookup fails.
+         */
         public SubstitutionElement[] defaultValue = null;
+
+        /**
+         * The key elements for the map lookup.
+         */
         public SubstitutionElement[] key = null;
 
         @Override
@@ -123,24 +257,53 @@ public class Substitution {
         }
     }
 
+    /**
+     * The parsed substitution elements.
+     */
     protected SubstitutionElement[] elements = null;
 
+    /**
+     * The raw substitution string.
+     */
     protected String sub = null;
 
+    /**
+     * Returns the raw substitution string.
+     *
+     * @return the substitution string
+     */
     public String getSub() {
         return sub;
     }
 
+    /**
+     * Sets the raw substitution string to be parsed.
+     *
+     * @param sub the substitution string
+     */
     public void setSub(String sub) {
         this.sub = sub;
     }
 
+    /**
+     * Whether to escape back references.
+     */
     private boolean escapeBackReferences;
 
+    /**
+     * Sets whether back references should be URL-encoded.
+     *
+     * @param escapeBackReferences true to enable escaping
+     */
     void setEscapeBackReferences(boolean escapeBackReferences) {
         this.escapeBackReferences = escapeBackReferences;
     }
 
+    /**
+     * Parses the substitution string into individual elements.
+     *
+     * @param maps the available rewrite maps
+     */
     public void parse(Map<String,RewriteMap> maps) {
         this.elements = parseSubstitution(sub, maps);
     }
