@@ -70,7 +70,7 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     }
 
     /**
-     * Sub-classes may override this method to perform initialization. Called from {@link #init(jakarta.servlet.ServletConfig)}.
+     * Sub-classes may override this method to perform initialization. Called from {@link #init(javax.servlet.ServletConfig)}.
      */
     public void _jspInit() {
     }

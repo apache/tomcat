@@ -278,10 +278,10 @@ public class ServerInfo {
                 String bundleName = manifest.getMainAttributes().getValue("Bundle-SymbolicName");
                 if (bundleName != null) {
                     // Tomcat core JARs have Bundle-SymbolicName starting with org.apache.tomcat,
-                    // org.apache.catalina, or jakarta.
+                    // org.apache.catalina, or javax.
                     if (bundleName.startsWith("org.apache.tomcat") ||
                             bundleName.startsWith("org.apache.catalina") ||
-                            bundleName.startsWith("jakarta.")) {
+                            bundleName.startsWith("javax.")) {
                         return true;
                     }
                 }

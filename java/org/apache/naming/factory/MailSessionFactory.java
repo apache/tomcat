@@ -49,7 +49,7 @@ import javax.naming.spi.ObjectFactory;
  * <pre>
  * &lt;Resource name="mail/smtp"
  *           auth="CONTAINER"
- *           type="jakarta.mail.Session"
+ *           type="javax.mail.Session"
  *           mail.smtp.host="mail.mycompany.com"
  *           /&gt;
  * </pre>

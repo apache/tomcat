@@ -45,7 +45,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <pre>
  * &lt;Resource name="mail/send"
  *           auth="CONTAINER"
- *           type="jakarta.mail.internet.MimePartDataSource"
+ *           type="javax.mail.internet.MimePartDataSource"
  *           factory="org.apache.naming.factory.SendMailFactory"
  *           mail.smtp.host="your.smtp.host"
  *           mail.smtp.user="someuser"

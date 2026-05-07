@@ -116,6 +116,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Wrong references to jakarta instead of javax. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.118 (remm)" rtext="release in progress">
   <subsection name="Catalina">
