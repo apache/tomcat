@@ -16,21 +16,72 @@
  */
 package org.apache.tomcat.util.net.openssl.ciphers;
 
+/**
+ * Key exchange algorithms supported by OpenSSL.
+ */
 public enum KeyExchange {
-    EECDH /* SSL_kEECDH - ephemeral ECDH */,
-    RSA /* SSL_kRSA - RSA key exchange */,
-    DHr /* SSL_kDHr - DH cert, RSA CA cert */ /* no such cipher suites supported */,
-    DHd /* SSL_kDHd - DH cert, DSA CA cert */ /* no such cipher suite supported */,
-    EDH /* SSL_kDHE - tmp DH key no DH cert */,
-    PSK /* SSK_kPSK - PSK */,
-    FZA /* SSL_kFZA - Fortezza */ /* no such cipher suite supported */,
-    KRB5 /* SSL_kKRB5 - Kerberos 5 key exchange */,
-    ECDHr /* SSL_kECDHr - ECDH cert, RSA CA cert */,
-    ECDHe /* SSL_kECDHe - ECDH cert, ECDSA CA cert */,
-    GOST /* SSL_kGOST - GOST key exchange */,
-    SRP /* SSL_kSRP - SRP */,
+    /**
+     * Ephemeral ECDH (SSL_kEECDH).
+     */
+    EECDH,
+    /**
+     * RSA key exchange (SSL_kRSA).
+     */
+    RSA,
+    /**
+     * DH cert, RSA CA cert (SSL_kDHr). Not supported.
+     */
+    DHr,
+    /**
+     * DH cert, DSA CA cert (SSL_kDHd). Not supported.
+     */
+    DHd,
+    /**
+     * Temporary DH key, no DH cert (SSL_kDHE).
+     */
+    EDH,
+    /**
+     * Pre-shared key (SSK_kPSK).
+     */
+    PSK,
+    /**
+     * Fortezza (SSL_kFZA). Not supported.
+     */
+    FZA,
+    /**
+     * Kerberos 5 key exchange (SSL_kKRB5).
+     */
+    KRB5,
+    /**
+     * ECDH cert, RSA CA cert (SSL_kECDHr).
+     */
+    ECDHr,
+    /**
+     * ECDH cert, ECDSA CA cert (SSL_kECDHe).
+     */
+    ECDHe,
+    /**
+     * GOST key exchange (SSL_kGOST).
+     */
+    GOST,
+    /**
+     * SRP (SSL_kSRP).
+     */
+    SRP,
+    /**
+     * RSA with pre-shared key.
+     */
     RSAPSK,
+    /**
+     * ECDHE with pre-shared key.
+     */
     ECDHEPSK,
+    /**
+     * DHE with pre-shared key.
+     */
     DHEPSK,
-    ANY /* TLS 1.3 */
+    /**
+     * Any key exchange (TLS 1.3).
+     */
+    ANY
 }

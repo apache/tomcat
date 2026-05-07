@@ -71,11 +71,17 @@ public final class Request {
     private static final AtomicLong requestIdGenerator = new AtomicLong(0);
 
     // public static final int NOTE_ADAPTER = 1; // Defined in CoyoteAdapter
+    /**
+     * Note key for bad request.
+     */
     public static final int NOTE_BAD_REQUEST = 2;
 
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Default constructor.
+     */
     public Request() {
         parameters.setQuery(queryMB);
         parameters.setURLDecoder(urlDecoder);
@@ -184,10 +190,20 @@ public final class Request {
     // Lock used to manage concurrent access to above flags
     private final Object nonBlockingStateLock = new Object();
 
+    /**
+     * Return the read listener.
+     *
+     * @return the read listener
+     */
     public ReadListener getReadListener() {
         return listener;
     }
 
+    /**
+     * Set the read listener for non-blocking reads.
+     *
+     * @param listener the read listener
+     */
     public void setReadListener(ReadListener listener) {
         if (listener == null) {
             throw new NullPointerException(sm.getString("request.nullReadListener"));
@@ -230,6 +246,11 @@ public final class Request {
         }
     }
 
+    /**
+     * Check if the request is ready for reading.
+     *
+     * @return {@code true} if ready for reading
+     */
     public boolean isReady() {
         // Assume read is not possible
         boolean ready;
@@ -255,6 +276,11 @@ public final class Request {
         return ready.get();
     }
 
+    /**
+     * Called when data is available for reading.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void onDataAvailable() throws IOException {
         boolean fire = false;
         synchronized (nonBlockingStateLock) {
@@ -272,6 +298,11 @@ public final class Request {
 
     private final AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
+    /**
+     * Send the all-data-read event.
+     *
+     * @return {@code true} if the event was sent
+     */
     public boolean sendAllDataReadEvent() {
         return allDataReadEventSent.compareAndSet(false, true);
     }
@@ -279,11 +310,21 @@ public final class Request {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Return the MIME headers.
+     *
+     * @return the MIME headers
+     */
     public MimeHeaders getMimeHeaders() {
         return headers;
     }
 
 
+    /**
+     * Check if trailer fields are ready.
+     *
+     * @return {@code true} if trailer fields are ready
+     */
     public boolean isTrailerFieldsReady() {
         AtomicBoolean result = new AtomicBoolean(false);
         action(ActionCode.IS_TRAILER_FIELDS_READY, result);
@@ -291,16 +332,31 @@ public final class Request {
     }
 
 
+    /**
+     * Return the trailer fields as a map.
+     *
+     * @return the trailer fields
+     */
     public Map<String,String> getTrailerFields() {
         return trailerFields.toMap();
     }
 
 
+    /**
+     * Return the MIME trailer fields.
+     *
+     * @return the MIME trailer fields
+     */
     public MimeHeaders getMimeTrailerFields() {
         return trailerFields;
     }
 
 
+    /**
+     * Return the URL decoder.
+     *
+     * @return the URL decoder
+     */
     public UDecoder getURLDecoder() {
         return urlDecoder;
     }
@@ -308,6 +364,11 @@ public final class Request {
 
     // -------------------- Request data --------------------
 
+    /**
+     * Return the scheme (e.g. "http" or "https").
+     *
+     * @return the scheme
+     */
     public MessageBytes scheme() {
         return schemeMB;
     }
@@ -324,10 +385,22 @@ public final class Request {
         return methodMB;
     }
 
+    /**
+     * Set the HTTP method.
+     *
+     * @param method the HTTP method
+     */
     public void setMethod(String method) {
         methodMB.setString(method);
     }
 
+    /**
+     * Set the HTTP method from a byte buffer.
+     *
+     * @param buf the byte buffer
+     * @param start the start offset
+     * @param len the length
+     */
     public void setMethod(byte[] buf, int start, int len) {
         String method = Method.bytesToString(buf, start, len);
         if (method == null) {
@@ -338,22 +411,47 @@ public final class Request {
         }
     }
 
+    /**
+     * Return the HTTP method.
+     *
+     * @return the HTTP method
+     */
     public String getMethod() {
         return methodMB.toStringType();
     }
 
+    /**
+     * Return the request URI.
+     *
+     * @return the request URI
+     */
     public MessageBytes requestURI() {
         return uriMB;
     }
 
+    /**
+     * Return the decoded request URI.
+     *
+     * @return the decoded URI
+     */
     public MessageBytes decodedURI() {
         return decodedUriMB;
     }
 
+    /**
+     * Return the query string.
+     *
+     * @return the query string
+     */
     public MessageBytes queryString() {
         return queryMB;
     }
 
+    /**
+     * Return the protocol.
+     *
+     * @return the protocol
+     */
     public MessageBytes protocol() {
         return protoMB;
     }
@@ -367,46 +465,101 @@ public final class Request {
         return serverNameMB;
     }
 
+    /**
+     * Return the server port.
+     *
+     * @return the server port
+     */
     public int getServerPort() {
         return serverPort;
     }
 
+    /**
+     * Set the server port.
+     *
+     * @param serverPort the server port
+     */
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
     }
 
+    /**
+     * Return the remote address.
+     *
+     * @return the remote address
+     */
     public MessageBytes remoteAddr() {
         return remoteAddrMB;
     }
 
+    /**
+     * Return the peer address.
+     *
+     * @return the peer address
+     */
     public MessageBytes peerAddr() {
         return peerAddrMB;
     }
 
+    /**
+     * Return the remote host.
+     *
+     * @return the remote host
+     */
     public MessageBytes remoteHost() {
         return remoteHostMB;
     }
 
+    /**
+     * Return the local name.
+     *
+     * @return the local name
+     */
     public MessageBytes localName() {
         return localNameMB;
     }
 
+    /**
+     * Return the local address.
+     *
+     * @return the local address
+     */
     public MessageBytes localAddr() {
         return localAddrMB;
     }
 
+    /**
+     * Return the remote port.
+     *
+     * @return the remote port
+     */
     public int getRemotePort() {
         return remotePort;
     }
 
+    /**
+     * Set the remote port.
+     *
+     * @param port the remote port
+     */
     public void setRemotePort(int port) {
         this.remotePort = port;
     }
 
+    /**
+     * Return the local port.
+     *
+     * @return the local port
+     */
     public int getLocalPort() {
         return localPort;
     }
 
+    /**
+     * Set the local port.
+     *
+     * @param port the local port
+     */
     public void setLocalPort(int port) {
         this.localPort = port;
     }
@@ -466,6 +619,11 @@ public final class Request {
     }
 
 
+    /**
+     * Return the charset holder.
+     *
+     * @return the charset holder
+     */
     public CharsetHolder getCharsetHolder() {
         if (charsetHolder == null) {
             charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
@@ -474,6 +632,11 @@ public final class Request {
     }
 
 
+    /**
+     * Set the charset holder.
+     *
+     * @param charsetHolder the charset holder
+     */
     public void setCharsetHolder(CharsetHolder charsetHolder) {
         if (charsetHolder == null || charsetHolder.getName() == null) {
             this.charsetHolder = null;
@@ -483,11 +646,21 @@ public final class Request {
     }
 
 
+    /**
+     * Set the content length.
+     *
+     * @param len the content length
+     */
     public void setContentLength(long len) {
         this.contentLength = len;
     }
 
 
+    /**
+     * Return the content length.
+     *
+     * @return the content length
+     */
     public int getContentLength() {
         long length = getContentLengthLong();
 
@@ -497,6 +670,11 @@ public final class Request {
         return -1;
     }
 
+    /**
+     * Return the content length as a long.
+     *
+     * @return the content length
+     */
     public long getContentLengthLong() {
         if (contentLength > -1) {
             return contentLength;
@@ -508,6 +686,11 @@ public final class Request {
         return contentLength;
     }
 
+    /**
+     * Return the content type as a string.
+     *
+     * @return the content type
+     */
     public String getContentType() {
         contentType();
         if (contentTypeMB == null || contentTypeMB.isNull()) {
@@ -517,11 +700,21 @@ public final class Request {
     }
 
 
+    /**
+     * Set the content type.
+     *
+     * @param type the content type
+     */
     public void setContentType(String type) {
         contentTypeMB.setString(type);
     }
 
 
+    /**
+     * Return the content type.
+     *
+     * @return the content type
+     */
     public MessageBytes contentType() {
         if (contentTypeMB == null) {
             contentTypeMB = headers.getValue("content-type");
@@ -530,21 +723,42 @@ public final class Request {
     }
 
 
+    /**
+     * Set the content type.
+     *
+     * @param mb the content type
+     */
     public void setContentType(MessageBytes mb) {
         contentTypeMB = mb;
     }
 
 
+    /**
+     * Return the value of the specified header.
+     *
+     * @param name the header name
+     * @return the header value
+     */
     public String getHeader(String name) {
         return headers.getHeader(name);
     }
 
 
+    /**
+     * Set the expectation flag.
+     *
+     * @param expectation the expectation flag
+     */
     public void setExpectation(boolean expectation) {
         this.expectation = expectation;
     }
 
 
+    /**
+     * Check if there is an expectation.
+     *
+     * @return {@code true} if there is an expectation
+     */
     public boolean hasExpectation() {
         return expectation;
     }
@@ -552,10 +766,20 @@ public final class Request {
 
     // -------------------- Associated response --------------------
 
+    /**
+     * Return the associated response.
+     *
+     * @return the response
+     */
     public Response getResponse() {
         return response;
     }
 
+    /**
+     * Set the associated response.
+     *
+     * @param response the response
+     */
     public void setResponse(Response response) {
         this.response = response;
         response.setRequest(this);
@@ -565,6 +789,12 @@ public final class Request {
         this.hook = hook;
     }
 
+    /**
+     * Perform an action on this request.
+     *
+     * @param actionCode the action code
+     * @param param the action parameter
+     */
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
             hook.action(actionCode, Objects.requireNonNullElse(param, this));
@@ -574,6 +804,11 @@ public final class Request {
 
     // -------------------- Cookies --------------------
 
+    /**
+     * Return the server cookies.
+     *
+     * @return the server cookies
+     */
     public ServerCookies getCookies() {
         return serverCookies;
     }
@@ -581,15 +816,32 @@ public final class Request {
 
     // -------------------- Parameters --------------------
 
+    /**
+     * Return the request parameters.
+     *
+     * @return the parameters
+     */
     public Parameters getParameters() {
         return parameters;
     }
 
 
+    /**
+     * Add a path parameter.
+     *
+     * @param name the parameter name
+     * @param value the parameter value
+     */
     public void addPathParameter(String name, String value) {
         pathParameters.put(name, value);
     }
 
+    /**
+     * Return the value of the specified path parameter.
+     *
+     * @param name the parameter name
+     * @return the parameter value
+     */
     public String getPathParameter(String name) {
         return pathParameters.get(name);
     }
@@ -598,56 +850,123 @@ public final class Request {
     // -------------------- Other attributes --------------------
     // We can use notes for most - need to discuss what is of general interest
 
+    /**
+     * Set an attribute.
+     *
+     * @param name the attribute name
+     * @param o the attribute value
+     */
     public void setAttribute(String name, Object o) {
         attributes.put(name, o);
     }
 
+    /**
+     * Return the request attributes map.
+     *
+     * @return the attributes map
+     */
     public HashMap<String,Object> getAttributes() {
         return attributes;
     }
 
+    /**
+     * Return the value of the specified attribute.
+     *
+     * @param name the attribute name
+     * @return the attribute value
+     */
     public Object getAttribute(String name) {
         return attributes.get(name);
     }
 
+    /**
+     * Return the remote user.
+     *
+     * @return the remote user
+     */
     public MessageBytes getRemoteUser() {
         return remoteUser;
     }
 
+    /**
+     * Check if the remote user needs authorization.
+     *
+     * @return {@code true} if the remote user needs authorization
+     */
     public boolean getRemoteUserNeedsAuthorization() {
         return remoteUserNeedsAuthorization;
     }
 
+    /**
+     * Set whether the remote user needs authorization.
+     *
+     * @param remoteUserNeedsAuthorization {@code true} if authorization is needed
+     */
     public void setRemoteUserNeedsAuthorization(boolean remoteUserNeedsAuthorization) {
         this.remoteUserNeedsAuthorization = remoteUserNeedsAuthorization;
     }
 
+    /**
+     * Return the authentication type.
+     *
+     * @return the authentication type
+     */
     public MessageBytes getAuthType() {
         return authType;
     }
 
+    /**
+     * Return the number of available bytes.
+     *
+     * @return the available bytes
+     */
     public int getAvailable() {
         return available;
     }
 
+    /**
+     * Set the number of available bytes.
+     *
+     * @param available the available bytes
+     */
     public void setAvailable(int available) {
         this.available = available;
     }
 
+    /**
+     * Check if sendfile is enabled.
+     *
+     * @return {@code true} if sendfile is enabled
+     */
     public boolean getSendfile() {
         return sendfile;
     }
 
+    /**
+     * Set whether sendfile is enabled.
+     *
+     * @param sendfile {@code true} to enable sendfile
+     */
     public void setSendfile(boolean sendfile) {
         this.sendfile = sendfile;
     }
 
+    /**
+     * Check if the request body has been fully read.
+     *
+     * @return {@code true} if finished
+     */
     public boolean isFinished() {
         AtomicBoolean result = new AtomicBoolean(false);
         action(ActionCode.REQUEST_BODY_FULLY_READ, result);
         return result.get();
     }
 
+    /**
+     * Check if relative redirects are supported.
+     *
+     * @return {@code true} if relative redirects are supported
+     */
     public boolean getSupportsRelativeRedirects() {
         return !protocol().equals("") && !protocol().equals("HTTP/1.0");
     }
@@ -655,11 +974,21 @@ public final class Request {
 
     // -------------------- Input Buffer --------------------
 
+    /**
+     * Return the input buffer.
+     *
+     * @return the input buffer
+     */
     public InputBuffer getInputBuffer() {
         return inputBuffer;
     }
 
 
+    /**
+     * Set the input buffer.
+     *
+     * @param inputBuffer the input buffer
+     */
     public void setInputBuffer(InputBuffer inputBuffer) {
         this.inputBuffer = inputBuffer;
     }
@@ -712,6 +1041,11 @@ public final class Request {
     }
 
 
+    /**
+     * Check if an error exception is present.
+     *
+     * @return {@code true} if an exception is present
+     */
     public boolean isExceptionPresent() {
         return errorException != null;
     }
@@ -719,11 +1053,21 @@ public final class Request {
 
     // -------------------- debug --------------------
 
+    /**
+     * Return the request ID.
+     *
+     * @return the request ID
+     */
     public String getRequestId() {
         return requestId;
     }
 
 
+    /**
+     * Return the protocol request ID.
+     *
+     * @return the protocol request ID
+     */
     public String getProtocolRequestId() {
         AtomicReference<String> ref = new AtomicReference<>();
         hook.action(ActionCode.PROTOCOL_REQUEST_ID, ref);
@@ -731,6 +1075,11 @@ public final class Request {
     }
 
 
+    /**
+     * Return the servlet connection.
+     *
+     * @return the servlet connection
+     */
     public ServletConnection getServletConnection() {
         AtomicReference<ServletConnection> ref = new AtomicReference<>();
         hook.action(ActionCode.SERVLET_CONNECTION, ref);
@@ -743,10 +1092,20 @@ public final class Request {
         return "R( " + requestURI().toString() + ")";
     }
 
+    /**
+     * Return the request start time in milliseconds.
+     *
+     * @return the start time
+     */
     public long getStartTime() {
         return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
     }
 
+    /**
+     * Return the request start time in nanoseconds.
+     *
+     * @return the start time in nanoseconds
+     */
     public long getStartTimeNanos() {
         return startTimeNanos;
     }
@@ -764,23 +1123,42 @@ public final class Request {
         startInstant = Instant.now();
     }
 
+    /**
+     * Mark the request start time.
+     */
     public void markStartTime() {
         startTimeNanos = System.nanoTime();
         startInstant = Instant.now();
     }
 
+    /**
+     * Return the request start instant.
+     *
+     * @return the start instant
+     */
     public Instant getStartInstant() {
         return startInstant;
     }
 
+    /**
+     * Return the thread ID.
+     *
+     * @return the thread ID
+     */
     public long getThreadId() {
         return threadId;
     }
 
+    /**
+     * Clear the request thread ID.
+     */
     public void clearRequestThread() {
         threadId = 0;
     }
 
+    /**
+     * Set the request thread ID.
+     */
     @SuppressWarnings("deprecation")
     public void setRequestThread() {
         Thread t = Thread.currentThread();
@@ -788,6 +1166,11 @@ public final class Request {
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
+    /**
+     * Check if the current thread is the request thread.
+     *
+     * @return {@code true} if the current thread is the request thread
+     */
     @SuppressWarnings("deprecation")
     public boolean isRequestThread() {
         return Thread.currentThread().getId() == threadId;
@@ -811,6 +1194,12 @@ public final class Request {
     }
 
 
+    /**
+     * Return the note at the specified position.
+     *
+     * @param pos the position
+     * @return the note
+     */
     public Object getNote(int pos) {
         return notes[pos];
     }
@@ -819,6 +1208,9 @@ public final class Request {
     // -------------------- Recycling --------------------
 
 
+    /**
+     * Recycle this request for reuse.
+     */
     public void recycle() {
         bytesRead = 0;
 
@@ -895,18 +1287,36 @@ public final class Request {
     }
 
     // -------------------- Info --------------------
+    /**
+     * Update request counters.
+     */
     public void updateCounters() {
         reqProcessorMX.updateCounters();
     }
 
+    /**
+     * Return the request processor info.
+     *
+     * @return the request processor info
+     */
     public RequestInfo getRequestProcessor() {
         return reqProcessorMX;
     }
 
+    /**
+     * Return the number of bytes read.
+     *
+     * @return the bytes read
+     */
     public long getBytesRead() {
         return bytesRead;
     }
 
+    /**
+     * Check if the request is currently being processed.
+     *
+     * @return {@code true} if processing
+     */
     public boolean isProcessing() {
         return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }

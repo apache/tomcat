@@ -29,6 +29,11 @@ import java.util.Map;
  * Representation of a Context element.
  */
 public class ResourceBase implements Serializable, Injectable {
+    /**
+     * Default constructor.
+     */
+    public ResourceBase() {
+    }
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -41,10 +46,20 @@ public class ResourceBase implements Serializable, Injectable {
      */
     private String description = null;
 
+    /**
+     * Return the description of this resource.
+     *
+     * @return The description of this resource
+     */
     public String getDescription() {
         return this.description;
     }
 
+    /**
+     * Set the description of this resource.
+     *
+     * @param description The description of this resource
+     */
     public void setDescription(String description) {
         this.description = description;
     }
@@ -60,6 +75,11 @@ public class ResourceBase implements Serializable, Injectable {
         return this.name;
     }
 
+    /**
+     * Set the name of this resource.
+     *
+     * @param name The name of this resource
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -70,21 +90,44 @@ public class ResourceBase implements Serializable, Injectable {
      */
     private String type = null;
 
+    /**
+     * Return the name of the resource implementation class.
+     *
+     * @return The name of the resource implementation class
+     */
     public String getType() {
         return this.type;
     }
 
+    /**
+     * Set the name of the resource implementation class.
+     *
+     * @param type The name of the resource implementation class
+     */
     public void setType(String type) {
         this.type = type;
     }
 
 
+    /**
+     * The JNDI lookup name for this resource.
+     */
     private String lookupName = null;
 
+    /**
+     * Return the JNDI lookup name for this resource.
+     *
+     * @return The JNDI lookup name
+     */
     public String getLookupName() {
         return lookupName;
     }
 
+    /**
+     * Set the JNDI lookup name for this resource.
+     *
+     * @param lookupName The JNDI lookup name
+     */
     public void setLookupName(String lookupName) {
         if (lookupName == null || lookupName.isEmpty()) {
             this.lookupName = null;
@@ -217,10 +260,20 @@ public class ResourceBase implements Serializable, Injectable {
      */
     private NamingResources resources = null;
 
+    /**
+     * Return the NamingResources with which this resource is associated.
+     *
+     * @return The NamingResources with which this resource is associated
+     */
     public NamingResources getNamingResources() {
         return this.resources;
     }
 
+    /**
+     * Set the NamingResources with which this resource is associated.
+     *
+     * @param resources The NamingResources with which this resource is associated
+     */
     public void setNamingResources(NamingResources resources) {
         this.resources = resources;
     }

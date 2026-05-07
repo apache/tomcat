@@ -38,6 +38,14 @@ public class RxTaskPool {
     private final TaskCreator creator;
 
 
+    /**
+     * Create a new fixed-size receive task pool.
+     *
+     * @param maxTasks maximum number of tasks in the pool
+     * @param minTasks minimum number of tasks in the pool
+     * @param creator factory for creating new receive tasks
+     * @throws Exception if initialization fails
+     */
     public RxTaskPool(int maxTasks, int minTasks, TaskCreator creator) throws Exception {
         // fill up the pool with worker threads
         this.maxTasks = maxTasks;
@@ -45,6 +53,11 @@ public class RxTaskPool {
         this.creator = creator;
     }
 
+    /**
+     * Configure a receive task by associating it with this pool.
+     *
+     * @param task the task to configure
+     */
     protected void configureTask(AbstractRxTask task) {
         synchronized (task) {
             task.setTaskPool(this);
@@ -84,6 +97,11 @@ public class RxTaskPool {
         return worker;
     }
 
+    /**
+     * Return the number of idle tasks currently available in the pool.
+     *
+     * @return count of idle tasks
+     */
     public int available() {
         synchronized (mutex) {
             return idle.size();
@@ -111,14 +129,27 @@ public class RxTaskPool {
         }
     }
 
+    /**
+     * Return the maximum number of tasks allowed in the pool.
+     *
+     * @return maximum task count
+     */
     public int getMaxThreads() {
         return maxTasks;
     }
 
+    /**
+     * Return the minimum number of tasks maintained in the pool.
+     *
+     * @return minimum task count
+     */
     public int getMinThreads() {
         return minTasks;
     }
 
+    /**
+     * Stop the pool, closing all idle tasks and preventing new tasks from being acquired.
+     */
     public void stop() {
         running = false;
         synchronized (mutex) {
@@ -131,19 +162,42 @@ public class RxTaskPool {
         }
     }
 
+    /**
+     * Set the maximum number of tasks allowed in the pool.
+     *
+     * @param maxThreads maximum task count
+     */
     public void setMaxTasks(int maxThreads) {
         this.maxTasks = maxThreads;
     }
 
+    /**
+     * Set the minimum number of tasks maintained in the pool.
+     *
+     * @param minThreads minimum task count
+     */
     public void setMinTasks(int minThreads) {
         this.minTasks = minThreads;
     }
 
+    /**
+     * Return the task creator factory used by this pool.
+     *
+     * @return the task creator
+     */
     public TaskCreator getTaskCreator() {
         return this.creator;
     }
 
+    /**
+     * Factory interface for creating receive tasks.
+     */
     public interface TaskCreator {
+        /**
+         * Creates a new receive task.
+         *
+         * @return a new receive task instance
+         */
         AbstractRxTask createRxTask();
     }
 }

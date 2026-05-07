@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.http;
 
+/**
+ * HTTP method constants and utilities.
+ */
 public class Method {
 
     /*
@@ -29,23 +32,39 @@ public class Method {
      */
 
     // Standard HTTP methods supported by HttpServlet
+    /** GET method. */
     public static final String GET = "GET";
+    /** POST method. */
     public static final String POST = "POST";
+    /** PUT method. */
     public static final String PUT = "PUT";
+    /** PATCH method. */
     public static final String PATCH = "PATCH";
+    /** HEAD method. */
     public static final String HEAD = "HEAD";
+    /** OPTIONS method. */
     public static final String OPTIONS = "OPTIONS";
+    /** DELETE method. */
     public static final String DELETE = "DELETE";
+    /** TRACE method. */
     public static final String TRACE = "TRACE";
     // Additional WebDAV methods
+    /** PROPFIND method. */
     public static final String PROPFIND = "PROPFIND";
+    /** PROPPATCH method. */
     public static final String PROPPATCH = "PROPPATCH";
+    /** MKCOL method. */
     public static final String MKCOL = "MKCOL";
+    /** COPY method. */
     public static final String COPY = "COPY";
+    /** MOVE method. */
     public static final String MOVE = "MOVE";
+    /** LOCK method. */
     public static final String LOCK = "LOCK";
+    /** UNLOCK method. */
     public static final String UNLOCK = "UNLOCK";
     // Other methods recognised by Tomcat
+    /** CONNECT method. */
     public static final String CONNECT = "CONNECT";
 
 

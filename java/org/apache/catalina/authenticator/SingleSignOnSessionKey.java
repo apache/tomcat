@@ -36,6 +36,11 @@ public class SingleSignOnSessionKey implements Serializable {
     private final String contextName;
     private final String hostName;
 
+    /**
+     * Creates a session key from the given session, using the session's current ID.
+     *
+     * @param session the session from which to extract the key information
+     */
     public SingleSignOnSessionKey(Session session) {
         this.sessionId = session.getId();
         Context context = session.getManager().getContext();
@@ -43,6 +48,12 @@ public class SingleSignOnSessionKey implements Serializable {
         this.hostName = context.getParent().getName();
     }
 
+    /**
+     * Creates a session key using the given session context and an explicit session ID.
+     *
+     * @param session the session from which to extract context and host information
+     * @param sessionId the session ID to use for this key
+     */
     public SingleSignOnSessionKey(Session session, String sessionId) {
         this.sessionId = sessionId;
         Context context = session.getManager().getContext();
@@ -50,14 +61,29 @@ public class SingleSignOnSessionKey implements Serializable {
         this.hostName = context.getParent().getName();
     }
 
+    /**
+     * Returns the session ID associated with this key.
+     *
+     * @return the session ID
+     */
     public String getSessionId() {
         return sessionId;
     }
 
+    /**
+     * Returns the context name associated with this key.
+     *
+     * @return the context name
+     */
     public String getContextName() {
         return contextName;
     }
 
+    /**
+     * Returns the host name associated with this key.
+     *
+     * @return the host name
+     */
     public String getHostName() {
         return hostName;
     }

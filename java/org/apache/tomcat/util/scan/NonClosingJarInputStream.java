@@ -27,10 +27,23 @@ import java.util.jar.JarInputStream;
  */
 public class NonClosingJarInputStream extends JarInputStream {
 
+    /**
+     * Constructs a NonClosingJarInputStream with verification.
+     *
+     * @param in The input stream to wrap
+     * @param verify Whether to verify entries
+     * @throws IOException if an I/O error occurs
+     */
     public NonClosingJarInputStream(InputStream in, boolean verify) throws IOException {
         super(in, verify);
     }
 
+    /**
+     * Constructs a NonClosingJarInputStream without verification.
+     *
+     * @param in The input stream to wrap
+     * @throws IOException if an I/O error occurs
+     */
     public NonClosingJarInputStream(InputStream in) throws IOException {
         super(in);
     }
@@ -40,6 +53,11 @@ public class NonClosingJarInputStream extends JarInputStream {
         // Make this a NO-OP so that further entries can be read from the stream
     }
 
+    /**
+     * Actually closes the underlying stream.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void reallyClose() throws IOException {
         super.close();
     }

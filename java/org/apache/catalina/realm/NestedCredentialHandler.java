@@ -21,7 +21,16 @@ import java.util.List;
 
 import org.apache.catalina.CredentialHandler;
 
+/**
+ * Nested credential handler that delegates to multiple handlers.
+ */
 public class NestedCredentialHandler implements CredentialHandler {
+
+    /**
+     * Default constructor.
+     */
+    public NestedCredentialHandler() {
+    }
 
     private final List<CredentialHandler> credentialHandlers = new ArrayList<>();
 
@@ -51,10 +60,18 @@ public class NestedCredentialHandler implements CredentialHandler {
     }
 
 
+    /**
+     * Add a credential handler.
+     * @param handler the handler to add
+     */
     public void addCredentialHandler(CredentialHandler handler) {
         credentialHandlers.add(handler);
     }
 
+    /**
+     * Get the credential handlers.
+     * @return the credential handlers
+     */
     public CredentialHandler[] getCredentialHandlers() {
         return credentialHandlers.toArray(new CredentialHandler[0]);
     }

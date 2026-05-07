@@ -66,6 +66,10 @@ import org.apache.tomcat.util.security.Escape;
 public class Response implements HttpServletResponse {
 
     private static final Log log = LogFactory.getLog(Response.class);
+
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(Response.class);
 
     private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
@@ -141,11 +145,22 @@ public class Response implements HttpServletResponse {
     private HttpServletResponse applicationResponse = null;
 
 
+    /**
+     * Constructor with default output buffer size.
+     *
+     * @param coyoteResponse The Coyote response
+     */
     public Response(org.apache.coyote.Response coyoteResponse) {
         this(coyoteResponse, OutputBuffer.DEFAULT_BUFFER_SIZE);
     }
 
 
+    /**
+     * Constructor with specified output buffer size.
+     *
+     * @param coyoteResponse The Coyote response
+     * @param outputBufferSize The output buffer size
+     */
     public Response(org.apache.coyote.Response coyoteResponse, int outputBufferSize) {
         this.coyoteResponse = coyoteResponse;
         outputBuffer = new OutputBuffer(outputBufferSize, coyoteResponse);
@@ -155,7 +170,9 @@ public class Response implements HttpServletResponse {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * @return the Coyote response.
+     * Return the Coyote response.
+     *
+     * @return the Coyote response
      */
     public org.apache.coyote.Response getCoyoteResponse() {
         return this.coyoteResponse;
@@ -163,7 +180,9 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * @return the Context within which this Request is being processed.
+     * Return the Context within which this request is being processed.
+     *
+     * @return the Context within which this request is being processed
      */
     public Context getContext() {
         return request.getContext();
@@ -206,8 +225,10 @@ public class Response implements HttpServletResponse {
     // ------------------------------------------------------- Response Methods
 
     /**
-     * @return the number of bytes the application has actually written to the output stream. This excludes chunking,
-     *             compression, etc. as well as headers.
+     * Return the number of bytes the application has actually written to the output stream. This excludes chunking,
+     * compression, etc. as well as headers.
+     *
+     * @return the number of bytes the application has actually written to the output stream
      */
     public long getContentWritten() {
         return outputBuffer.getContentWritten();
@@ -215,10 +236,11 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * @return the number of bytes the actually written to the socket. This includes chunking, compression, etc. but
-     *             excludes headers.
+     * Return the number of bytes actually written to the socket. This includes chunking, compression, etc. but
+     * excludes headers.
      *
      * @param flush if <code>true</code> will perform a buffer flush first
+     * @return the number of bytes actually written to the socket
      */
     public long getBytesWritten(boolean flush) {
         if (flush) {
@@ -258,7 +280,9 @@ public class Response implements HttpServletResponse {
     protected Request request = null;
 
     /**
-     * @return the Request with which this Response is associated.
+     * Get the request with which this response is associated.
+     *
+     * @return the request with which this response is associated
      */
     public Request getRequest() {
         return this.request;
@@ -281,7 +305,9 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * @return the <code>ServletResponse</code> for which this object is the facade.
+     * Get the {@code HttpServletResponse} for which this object is the facade.
+     *
+     * @return the {@code HttpServletResponse} for which this object is the facade
      */
     public HttpServletResponse getResponse() {
         if (facade == null) {
@@ -361,16 +387,29 @@ public class Response implements HttpServletResponse {
     }
 
 
+    /**
+     * Check if error report is required.
+     *
+     * @return {@code true} if error report is required
+     */
     public boolean isErrorReportRequired() {
         return getCoyoteResponse().isErrorReportRequired();
     }
 
 
+    /**
+     * Set the error as reported.
+     *
+     * @return {@code true} if the error state was successfully transitioned to reported
+     */
     public boolean setErrorReported() {
         return getCoyoteResponse().setErrorReported();
     }
 
 
+    /**
+     * Reset the error state.
+     */
     public void resetError() {
         getCoyoteResponse().resetError();
     }
@@ -388,7 +427,9 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * @return the content length that was set or calculated for this Response.
+     * Get the content length that was set or calculated for this response.
+     *
+     * @return the content length that was set or calculated for this response
      */
     public int getContentLength() {
         return getCoyoteResponse().getContentLength();
@@ -824,7 +865,9 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * @return the error message that was set with <code>sendError()</code> for this Response.
+     * Get the error message that was set with {@code sendError()} for this response.
+     *
+     * @return the error message that was set with {@code sendError()} for this response
      */
     public String getMessage() {
         return getCoyoteResponse().getMessage();
@@ -889,6 +932,12 @@ public class Response implements HttpServletResponse {
 
     }
 
+    /**
+     * Generate the cookie header string for the given cookie.
+     *
+     * @param cookie The cookie
+     * @return The cookie header string
+     */
     public String generateCookieString(final Cookie cookie) {
         // Web application code can receive a IllegalArgumentException
         // from the generateHeader() invocation

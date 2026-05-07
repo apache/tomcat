@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat;
 
+/**
+ * Interface for components that want to be notified of periodic events.
+ */
 public interface PeriodicEventListener {
     /**
      * Execute a periodic task, such as reloading, etc.

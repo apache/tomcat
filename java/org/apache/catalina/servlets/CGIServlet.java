@@ -207,6 +207,12 @@ public final class CGIServlet extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public CGIServlet() {
+    }
+
     private static final Set<String> DEFAULT_SUPER_METHODS = new HashSet<>();
     private static final Pattern DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN;
     private static final String ALLOW_ANY_PATTERN = ".*";

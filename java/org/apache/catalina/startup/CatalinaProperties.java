@@ -33,6 +33,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class CatalinaProperties {
 
+    /**
+     * Default constructor.
+     */
+    public CatalinaProperties() {
+    }
+
     private static final Log log = LogFactory.getLog(CatalinaProperties.class);
 
     private static Properties properties = null;
@@ -44,6 +50,8 @@ public class CatalinaProperties {
 
 
     /**
+     * Returns the value of the specified property.
+     *
      * @param name The property name
      *
      * @return specified property value

@@ -45,6 +45,12 @@ import javax.naming.spi.ObjectFactory;
  */
 public class MemoryUserDatabaseFactory implements ObjectFactory {
 
+    /**
+     * Default constructor.
+     */
+    public MemoryUserDatabaseFactory() {
+    }
+
 
     // --------------------------------------------------------- Public Methods
 

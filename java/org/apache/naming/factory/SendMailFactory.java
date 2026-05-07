@@ -56,9 +56,27 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </pre>
  */
 public class SendMailFactory implements ObjectFactory {
-    // The class name for the javamail MimeMessageDataSource
+    /**
+     * Default constructor.
+     */
+    public SendMailFactory() {
+    }
+
+    /**
+     * The class name for the javamail MimePartDataSource.
+     */
     protected static final String DataSourceClassName = "jakarta.mail.internet.MimePartDataSource";
 
+    /**
+     * Create a MimePartDataSource instance from the given JNDI reference.
+     *
+     * @param refObj the JNDI reference object
+     * @param name   the JNDI name
+     * @param ctx    the JNDI context
+     * @param env    the environment properties
+     * @return a MimePartDataSource instance, or null if the reference class does not match
+     * @throws Exception if an error occurs during creation
+     */
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context ctx, Hashtable<?,?> env) throws Exception {
         final Reference ref = (Reference) refObj;

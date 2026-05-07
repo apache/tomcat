@@ -28,6 +28,12 @@ import org.apache.catalina.connector.Request;
  */
 public final class NonLoginAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Constructs a new NonLoginAuthenticator.
+     */
+    public NonLoginAuthenticator() {
+    }
+
 
     // --------------------------------------------------------- Public Methods
 

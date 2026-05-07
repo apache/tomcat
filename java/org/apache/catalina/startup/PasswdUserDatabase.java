@@ -36,6 +36,14 @@ public final class PasswdUserDatabase implements UserDatabase {
     private static final Log log = LogFactory.getLog(PasswdUserDatabase.class);
     private static final StringManager sm = StringManager.getManager(PasswdUserDatabase.class);
 
+
+    /**
+     * Construct a new {@code PasswdUserDatabase} instance.
+     */
+    public PasswdUserDatabase() {
+        // NO-OP
+    }
+
     /**
      * The pathname of the Unix password file.
      */

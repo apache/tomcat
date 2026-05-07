@@ -131,7 +131,9 @@ public class XByteBuffer implements Serializable {
     }
 
     /**
-     * @return the bytes in the buffer, in its exact length
+     * Returns the bytes in the buffer, in its exact length.
+     *
+     * @return The bytes in the buffer
      */
     public byte[] getBytes() {
         byte[] b = new byte[bufSize];

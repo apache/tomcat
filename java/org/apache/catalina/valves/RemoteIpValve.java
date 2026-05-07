@@ -409,18 +409,38 @@ public class RemoteIpValve extends ValveBase {
         this.hostHeader = hostHeader;
     }
 
+    /**
+     * Returns whether the local name should be changed.
+     *
+     * @return {@code true} if the local name should be changed
+     */
     public boolean isChangeLocalName() {
         return changeLocalName;
     }
 
+    /**
+     * Set whether the local name should be changed.
+     *
+     * @param changeLocalName {@code true} to change the local name
+     */
     public void setChangeLocalName(boolean changeLocalName) {
         this.changeLocalName = changeLocalName;
     }
 
+    /**
+     * Returns the configured HTTP server port.
+     *
+     * @return the HTTP server port
+     */
     public int getHttpServerPort() {
         return httpServerPort;
     }
 
+    /**
+     * Returns the configured HTTPS server port.
+     *
+     * @return the HTTPS server port
+     */
     public int getHttpsServerPort() {
         return httpsServerPort;
     }
@@ -445,10 +465,20 @@ public class RemoteIpValve extends ValveBase {
         this.portHeader = portHeader;
     }
 
+    /**
+     * Returns whether the local port should be changed.
+     *
+     * @return {@code true} if the local port should be changed
+     */
     public boolean isChangeLocalPort() {
         return changeLocalPort;
     }
 
+    /**
+     * Set whether the local port should be changed.
+     *
+     * @param changeLocalPort {@code true} to change the local port
+     */
     public void setChangeLocalPort(boolean changeLocalPort) {
         this.changeLocalPort = changeLocalPort;
     }
@@ -469,24 +499,30 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
+     * Return the configured protocol header name.
+     *
      * @see #setProtocolHeader(String)
      *
-     * @return the protocol header (e.g. "X-Forwarded-Proto")
+     * @return the protocol header name (e.g. "X-Forwarded-Proto")
      */
     public String getProtocolHeader() {
         return protocolHeader;
     }
 
     /**
-     * @see RemoteIpValve#setProtocolHeaderHttpsValue(String)
+     * Return the configured protocol header HTTPS value.
      *
-     * @return the value of the protocol header for incoming https request (e.g. "https")
+     * @see #setProtocolHeaderHttpsValue(String)
+     *
+     * @return the protocol header value for HTTPS requests (e.g. "https")
      */
     public String getProtocolHeaderHttpsValue() {
         return protocolHeaderHttpsValue;
     }
 
     /**
+     * Return the configured proxies header name.
+     *
      * @see #setProxiesHeader(String)
      *
      * @return the proxies header name (e.g. "X-Forwarded-By")
@@ -496,6 +532,8 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
+     * Return the configured remote IP header name.
+     *
      * @see #setRemoteIpHeader(String)
      *
      * @return the remote IP header name (e.g. "X-Forwarded-For")
@@ -505,9 +543,11 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
+     * Return whether request attributes are enabled.
+     *
      * @see #setRequestAttributesEnabled(boolean)
      *
-     * @return <code>true</code> if the attributes will be logged, otherwise <code>false</code>
+     * @return {@code true} if request attributes are enabled
      */
     public boolean getRequestAttributesEnabled() {
         return requestAttributesEnabled;

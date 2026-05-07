@@ -51,6 +51,14 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
 
     private volatile ServerAuthContext serverAuthContext;
 
+    /**
+     * Creates a new SimpleServerAuthConfig.
+     *
+     * @param layer Message layer
+     * @param appContext Application context
+     * @param handler Callback handler
+     * @param properties Configuration properties
+     */
     public SimpleServerAuthConfig(String layer, String appContext, CallbackHandler handler,
             Map<String,Object> properties) {
         this.layer = layer;
@@ -60,36 +68,64 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMessageLayer() {
         return layer;
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getAppContext() {
         return appContext;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the MessageInfo's string representation as the auth context ID.
+     */
     @Override
     public String getAuthContextID(MessageInfo messageInfo) {
         return messageInfo.toString();
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Clears the cached ServerAuthConfig so it will be recreated on next use.
+     */
     @Override
     public void refresh() {
         serverAuthContext = null;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation always returns {@code false}.
+     */
     @Override
     public boolean isProtected() {
         return false;
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Loads ServerAuthModule instances from properties keyed with
+     * {@code org.apache.catalina.authenticator.jaspic.ServerAuthModule.N} where N is 1-based index.
+     * The returned context is cached and reused for subsequent calls.
+     */
     @Override
     public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
             throws AuthException {
@@ -139,6 +175,12 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
+    /**
+     * Creates the ServerAuthContext. Can be overridden by subclasses to provide a custom implementation.
+     *
+     * @param modules List of ServerAuthModule instances
+     * @return The ServerAuthContext instance
+     */
     protected ServerAuthContext createServerAuthContext(List<ServerAuthModule> modules) {
         return new SimpleServerAuthContext(modules);
     }

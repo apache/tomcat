@@ -22,6 +22,12 @@ package org.apache.catalina.ssi;
  */
 public class SSIConditionalState {
     /**
+     * Default constructor.
+     */
+    public SSIConditionalState() {
+        // intentionally empty
+    }
+    /**
      * Set to true if the current conditional has already been completed, i.e.: a branch was taken.
      */
     boolean branchTaken = false;

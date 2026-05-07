@@ -20,29 +20,31 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * Data about a message send operation.
- *
- * @param message     The message that was sent
- * @param destination The destination of the message
- * @param exception   The exception, if any, when attempting to send the message
+ * @param message the message that was sent
+ * @param destination the destination of the message
+ * @param exception the exception, if any, when attempting to send the message
  */
 public record SendMessageData(Object message, Member destination, Exception exception) {
 
     /**
-     * @return the destination.
+     * Returns the destination of the message.
+     * @return the destination
      */
     public Member getDestination() {
         return destination;
     }
 
     /**
-     * @return the exception.
+     * Returns the exception that occurred when attempting to send the message.
+     * @return the exception
      */
     public Exception getException() {
         return exception;
     }
 
     /**
-     * @return the message.
+     * Returns the message that was sent.
+     * @return the message
      */
     public Object getMessage() {
         return message;

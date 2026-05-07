@@ -44,6 +44,9 @@ public class OutputBuffer extends Writer {
 
     private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
+    /**
+     * Default buffer size in bytes.
+     */
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     /**
@@ -332,6 +335,14 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Writes the specified bytes to the output buffer.
+     *
+     * @param b The byte array
+     * @param off The offset in the array
+     * @param len The number of bytes to write
+     * @throws IOException if an I/O error occurs
+     */
     public void write(byte[] b, int off, int len) throws IOException {
 
         if (suspended) {
@@ -343,6 +354,12 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Writes bytes from the given buffer to the output.
+     *
+     * @param from The byte buffer to read from
+     * @throws IOException if an I/O error occurs
+     */
     public void write(ByteBuffer from) throws IOException {
 
         if (suspended) {
@@ -391,6 +408,12 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Writes a single byte to the output buffer.
+     *
+     * @param b The byte to write
+     * @throws IOException if an I/O error occurs
+     */
     public void writeByte(int b) throws IOException {
 
         if (closed) {
@@ -546,6 +569,11 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Checks and initializes the character-to-byte converter if needed.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void checkConverter() throws IOException {
         if (conv != null) {
             return;
@@ -572,6 +600,11 @@ public class OutputBuffer extends Writer {
 
     // -------------------- BufferedOutputStream compatibility
 
+    /**
+     * Returns the total number of bytes and characters written.
+     *
+     * @return The total content written
+     */
     public long getContentWritten() {
         return bytesWritten + charsWritten;
     }
@@ -586,6 +619,11 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Sets the buffer size, allocating a new buffer if needed.
+     *
+     * @param size The new buffer size
+     */
     public void setBufferSize(int size) {
         if (size > bb.capacity()) {
             bb = ByteBuffer.allocate(size);
@@ -594,10 +632,18 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Resets the output buffer without resetting writer/stream flags.
+     */
     public void reset() {
         reset(false);
     }
 
+    /**
+     * Resets the output buffer.
+     *
+     * @param resetWriterStreamFlags Whether to reset writer and stream flags
+     */
     public void reset(boolean resetWriterStreamFlags) {
         clear(bb);
         clear(cb);
@@ -613,6 +659,11 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Returns the buffer size.
+     *
+     * @return The buffer size in bytes
+     */
     public int getBufferSize() {
         return bb.capacity();
     }
@@ -623,20 +674,38 @@ public class OutputBuffer extends Writer {
      * code that needs it.
      */
 
+    /**
+     * Checks if the output is ready for writing.
+     *
+     * @return true if ready for writing
+     */
     public boolean isReady() {
         return coyoteResponse.isReady();
     }
 
 
+    /**
+     * Sets the write listener for this output buffer.
+     *
+     * @param listener The write listener
+     */
     public void setWriteListener(WriteListener listener) {
         coyoteResponse.setWriteListener(listener);
     }
 
 
+    /**
+     * Checks if this output buffer is in blocking mode.
+     *
+     * @return true if in blocking mode
+     */
     public boolean isBlocking() {
         return coyoteResponse.getWriteListener() == null;
     }
 
+    /**
+     * Checks and registers for write if needed.
+     */
     public void checkRegisterForWrite() {
         coyoteResponse.checkRegisterForWrite();
     }
@@ -706,6 +775,12 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Appends bytes from the given buffer to the output.
+     *
+     * @param from The byte buffer to append
+     * @throws IOException if an I/O error occurs
+     */
     public void append(ByteBuffer from) throws IOException {
         if (bb.remaining() == 0) {
             appendByteBuffer(from);
@@ -719,6 +794,11 @@ public class OutputBuffer extends Writer {
     }
 
 
+    /**
+     * Sets the error exception for this output buffer.
+     *
+     * @param e The exception
+     */
     public void setErrorException(Exception e) {
         coyoteResponse.setErrorException(e);
     }

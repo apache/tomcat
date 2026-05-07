@@ -18,6 +18,9 @@ package org.apache.tomcat.util.http;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Defines the possible values for the SameSite cookie attribute.
+ */
 public enum SameSiteCookies {
 
     /**
@@ -48,10 +51,22 @@ public enum SameSiteCookies {
         this.value = value;
     }
 
+    /**
+     * Returns the string value of this SameSite setting.
+     *
+     * @return the SameSite value string
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Converts a string value to the corresponding SameSiteCookies enum constant.
+     *
+     * @param value the string representation of the SameSite value
+     * @return the matching SameSiteCookies enum constant
+     * @throws IllegalStateException if the value does not match any known SameSite value
+     */
     public static SameSiteCookies fromString(String value) {
         for (SameSiteCookies sameSiteCookies : values()) {
             if (sameSiteCookies.getValue().equalsIgnoreCase(value)) {

@@ -52,8 +52,17 @@ import org.apache.tomcat.util.security.ConstantTime;
  */
 public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase {
 
+    /**
+     * Default constructor.
+     */
+    public MessageDigestCredentialHandler() {
+    }
+
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
 
+    /**
+     * The default number of iterations.
+     */
     public static final int DEFAULT_ITERATIONS = 1;
 
     private Charset encoding = StandardCharsets.UTF_8;
@@ -61,11 +70,19 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
     private boolean digestInRfc3112Order = false;
 
 
+    /**
+     * Get the encoding.
+     * @return the encoding
+     */
     public String getEncoding() {
         return encoding.name();
     }
 
 
+    /**
+     * Set the encoding.
+     * @param encodingName the encoding name
+     */
     public void setEncoding(String encodingName) {
         if (encodingName == null) {
             encoding = StandardCharsets.UTF_8;
@@ -92,11 +109,19 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
     }
 
 
+    /**
+     * Get whether the digest is in RFC 3112 order.
+     * @return whether the digest is in RFC 3112 order
+     */
     public boolean getDigestInRfc3112Order() {
         return digestInRfc3112Order;
     }
 
 
+    /**
+     * Set whether the digest is in RFC 3112 order.
+     * @param digestInRfc3112Order whether the digest is in RFC 3112 order
+     */
     public void setDigestInRfc3112Order(boolean digestInRfc3112Order) {
         this.digestInRfc3112Order = digestInRfc3112Order;
     }

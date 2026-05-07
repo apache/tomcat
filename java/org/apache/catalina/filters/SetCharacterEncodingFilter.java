@@ -51,6 +51,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class SetCharacterEncodingFilter extends FilterBase {
 
+    /**
+     * Default constructor.
+     */
+    public SetCharacterEncodingFilter() {
+    }
+
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private final Log log = LogFactory.getLog(SetCharacterEncodingFilter.class); // must not be static
@@ -63,10 +69,20 @@ public class SetCharacterEncodingFilter extends FilterBase {
      */
     private String encoding = null;
 
+    /**
+     * Sets the character encoding to be configured for requests.
+     *
+     * @param encoding the character encoding
+     */
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
+    /**
+     * Returns the character encoding configured for this filter.
+     *
+     * @return the character encoding
+     */
     public String getEncoding() {
         return encoding;
     }
@@ -77,10 +93,20 @@ public class SetCharacterEncodingFilter extends FilterBase {
      */
     private boolean ignore = false;
 
+    /**
+     * Sets whether to ignore any character encoding specified by the client.
+     *
+     * @param ignore {@code true} to ignore client-specified encoding
+     */
     public void setIgnore(boolean ignore) {
         this.ignore = ignore;
     }
 
+    /**
+     * Returns whether client-specified character encodings are ignored.
+     *
+     * @return {@code true} if client encodings are ignored
+     */
     public boolean isIgnore() {
         return ignore;
     }
@@ -118,6 +144,11 @@ public class SetCharacterEncodingFilter extends FilterBase {
 
     // ------------------------------------------------------ Protected Methods
 
+    /**
+     * Returns the logger used by this filter.
+     *
+     * @return the logger instance
+     */
     @Override
     protected Log getLogger() {
         return log;

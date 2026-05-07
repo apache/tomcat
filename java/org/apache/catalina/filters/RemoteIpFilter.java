@@ -452,29 +452,71 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class RemoteIpFilter extends GenericFilter {
 
+    /**
+     * Default constructor.
+     */
+    public RemoteIpFilter() {
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Wrapper for {@link HttpServletRequest} that allows modification of headers, remote address,
+     * scheme, and other properties used by the RemoteIpFilter.
+     */
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
+        /**
+         * Map of header names to their values.
+         */
         protected final Map<String,List<String>> headers;
 
+        /**
+         * The local name of the server.
+         */
         protected String localName;
 
+        /**
+         * The local port of the server.
+         */
         protected int localPort;
 
+        /**
+         * The remote address of the client.
+         */
         protected String remoteAddr;
 
+        /**
+         * The remote host of the client.
+         */
         protected String remoteHost;
 
+        /**
+         * The scheme of the request.
+         */
         protected String scheme;
 
+        /**
+         * Whether the request is secure.
+         */
         protected boolean secure;
 
+        /**
+         * The server name.
+         */
         protected String serverName;
 
+        /**
+         * The server port.
+         */
         protected int serverPort;
 
+        /**
+         * Create a new XForwardedRequest wrapper.
+         *
+         * @param request the request to wrap
+         */
         public XForwardedRequest(HttpServletRequest request) {
             super(request);
             this.localName = request.getLocalName();
@@ -515,6 +557,12 @@ public class RemoteIpFilter extends GenericFilter {
             return header.getValue().get(0);
         }
 
+        /**
+         * Find the header entry for the given name (case-insensitive).
+         *
+         * @param name the header name to look up
+         * @return the header entry, or {@code null} if not found
+         */
         protected Map.Entry<String,List<String>> getHeaderEntry(String name) {
             for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
                 if (entry.getKey().equalsIgnoreCase(name)) {
@@ -582,6 +630,11 @@ public class RemoteIpFilter extends GenericFilter {
             return serverPort;
         }
 
+        /**
+         * Remove a header by name.
+         *
+         * @param name the header name to remove
+         */
         public void removeHeader(String name) {
             Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header != null) {
@@ -589,6 +642,12 @@ public class RemoteIpFilter extends GenericFilter {
             }
         }
 
+        /**
+         * Set a header value.
+         *
+         * @param name the header name
+         * @param value the header value
+         */
         public void setHeader(String name, String value) {
             List<String> values = Collections.singletonList(value);
             Map.Entry<String,List<String>> header = getHeaderEntry(name);
@@ -600,34 +659,74 @@ public class RemoteIpFilter extends GenericFilter {
 
         }
 
+        /**
+         * Set the local name.
+         *
+         * @param localName the local name
+         */
         public void setLocalName(String localName) {
             this.localName = localName;
         }
 
+        /**
+         * Set the local port.
+         *
+         * @param localPort the local port
+         */
         public void setLocalPort(int localPort) {
             this.localPort = localPort;
         }
 
+        /**
+         * Set the remote address.
+         *
+         * @param remoteAddr the remote address
+         */
         public void setRemoteAddr(String remoteAddr) {
             this.remoteAddr = remoteAddr;
         }
 
+        /**
+         * Set the remote host.
+         *
+         * @param remoteHost the remote host
+         */
         public void setRemoteHost(String remoteHost) {
             this.remoteHost = remoteHost;
         }
 
+        /**
+         * Set the scheme.
+         *
+         * @param scheme the scheme
+         */
         public void setScheme(String scheme) {
             this.scheme = scheme;
         }
 
+        /**
+         * Set whether the request is secure.
+         *
+         * @param secure whether the request is secure
+         */
         public void setSecure(boolean secure) {
             super.getRequest().setAttribute(Globals.REMOTE_IP_FILTER_SECURE, Boolean.valueOf(secure));
         }
 
+        /**
+         * Set the server name.
+         *
+         * @param serverName the server name
+         */
         public void setServerName(String serverName) {
             this.serverName = serverName;
         }
 
+        /**
+         * Set the server port.
+         *
+         * @param serverPort the server port
+         */
         public void setServerPort(int serverPort) {
             this.serverPort = serverPort;
         }
@@ -639,35 +738,77 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
 
+    /**
+     * Parameter name for the HTTP server port configuration.
+     */
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
+    /**
+     * Parameter name for the HTTPS server port configuration.
+     */
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
 
+    /**
+     * Parameter name for the internal proxies configuration.
+     */
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
+    /**
+     * String manager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(RemoteIpFilter.class);
 
+    /**
+     * Parameter name for the protocol header configuration.
+     */
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
+    /**
+     * Parameter name for the protocol header HTTPS value configuration.
+     */
     protected static final String PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER = "protocolHeaderHttpsValue";
 
+    /**
+     * Parameter name for the host header configuration.
+     */
     protected static final String HOST_HEADER_PARAMETER = "hostHeader";
 
+    /**
+     * Parameter name for the port header configuration.
+     */
     protected static final String PORT_HEADER_PARAMETER = "portHeader";
 
+    /**
+     * Parameter name for the change local name configuration.
+     */
     protected static final String CHANGE_LOCAL_NAME_PARAMETER = "changeLocalName";
 
+    /**
+     * Parameter name for the change local port configuration.
+     */
     protected static final String CHANGE_LOCAL_PORT_PARAMETER = "changeLocalPort";
 
+    /**
+     * Parameter name for the proxies header configuration.
+     */
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
 
+    /**
+     * Parameter name for the remote IP header configuration.
+     */
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
 
+    /**
+     * Parameter name for the trusted proxies configuration.
+     */
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
+    /**
+     * Parameter name for the enable lookups configuration.
+     */
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
     private int httpServerPort = 80;
@@ -705,6 +846,17 @@ public class RemoteIpFilter extends GenericFilter {
     private boolean enableLookups;
 
 
+    /**
+     * Process the incoming request, updating the remote address, scheme, and headers based on
+     * the configured forwarded headers when the request comes from a trusted proxy.
+     *
+     * @param request  The servlet request to be processed
+     * @param response The servlet response to be created
+     * @param chain    The filter chain
+     *
+     * @throws IOException      if an input/output error occurs
+     * @throws ServletException if a servlet error occurs
+     */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
@@ -943,14 +1095,29 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    /**
+     * Returns whether the local name is changed by this filter.
+     *
+     * @return true if the local name is changed
+     */
     public boolean isChangeLocalName() {
         return changeLocalName;
     }
 
+    /**
+     * Returns whether the local port is changed by this filter.
+     *
+     * @return true if the local port is changed
+     */
     public boolean isChangeLocalPort() {
         return changeLocalPort;
     }
 
+    /**
+     * Returns the configured HTTPS server port.
+     *
+     * @return the HTTPS server port
+     */
     public int getHttpsServerPort() {
         return httpsServerPort;
     }
@@ -987,27 +1154,54 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    /**
+     * Returns the configured protocol header name.
+     *
+     * @return the protocol header name
+     */
     public String getProtocolHeader() {
         return protocolHeader;
     }
 
+    /**
+     * Returns the configured port header name.
+     *
+     * @return the port header name
+     */
     public String getPortHeader() {
         return portHeader;
     }
 
+    /**
+     * Returns the configured HTTPS value for the protocol header.
+     *
+     * @return the protocol header HTTPS value
+     */
     public String getProtocolHeaderHttpsValue() {
         return protocolHeaderHttpsValue;
     }
 
+    /**
+     * Returns the configured proxies header name.
+     *
+     * @return the proxies header name
+     */
     public String getProxiesHeader() {
         return proxiesHeader;
     }
 
+    /**
+     * Returns the configured remote IP header name.
+     *
+     * @return the remote IP header name
+     */
     public String getRemoteIpHeader() {
         return remoteIpHeader;
     }
 
     /**
+     * Returns whether request attributes for access logging are enabled.
+     *
      * @see #setRequestAttributesEnabled(boolean)
      *
      * @return <code>true</code> if the attributes will be logged, otherwise <code>false</code>
@@ -1048,6 +1242,11 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    /**
+     * Returns whether DNS lookups are enabled for remote address resolution.
+     *
+     * @return true if DNS lookups are enabled
+     */
     public boolean getEnableLookups() {
         return enableLookups;
     }
@@ -1331,6 +1530,11 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    /**
+     * Set whether DNS lookups are enabled.
+     *
+     * @param enableLookups {@code true} to enable DNS lookups
+     */
     public void setEnableLookups(boolean enableLookups) {
         this.enableLookups = enableLookups;
     }

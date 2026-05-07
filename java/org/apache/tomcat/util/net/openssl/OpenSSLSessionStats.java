@@ -32,89 +32,113 @@ public final class OpenSSLSessionStats {
     }
 
     /**
-     * @return The current number of sessions in the internal session cache.
+     * Returns the current number of sessions in the internal session cache.
+     *
+     * @return The current number of sessions
      */
     public long number() {
         return SSLContext.sessionNumber(context);
     }
 
     /**
-     * @return The number of started SSL/TLS handshakes in client mode.
+     * Returns the number of started SSL/TLS handshakes in client mode.
+     *
+     * @return The number of started handshakes
      */
     public long connect() {
         return SSLContext.sessionConnect(context);
     }
 
     /**
-     * @return The number of successfully established SSL/TLS sessions in client mode.
+     * Returns the number of successfully established SSL/TLS sessions in client mode.
+     *
+     * @return The number of successful connections
      */
     public long connectGood() {
         return SSLContext.sessionConnectGood(context);
     }
 
     /**
-     * @return The number of start renegotiations in client mode.
+     * Returns the number of start renegotiations in client mode.
+     *
+     * @return The number of renegotiations
      */
     public long connectRenegotiate() {
         return SSLContext.sessionConnectRenegotiate(context);
     }
 
     /**
-     * @return The number of started SSL/TLS handshakes in server mode.
+     * Returns the number of started SSL/TLS handshakes in server mode.
+     *
+     * @return The number of started handshakes
      */
     public long accept() {
         return SSLContext.sessionAccept(context);
     }
 
     /**
-     * @return The number of successfully established SSL/TLS sessions in server mode.
+     * Returns the number of successfully established SSL/TLS sessions in server mode.
+     *
+     * @return The number of successful accepts
      */
     public long acceptGood() {
         return SSLContext.sessionAcceptGood(context);
     }
 
     /**
-     * @return The number of start renegotiations in server mode.
+     * Returns the number of start renegotiations in server mode.
+     *
+     * @return The number of renegotiations
      */
     public long acceptRenegotiate() {
         return SSLContext.sessionAcceptRenegotiate(context);
     }
 
     /**
-     * @return The number of successfully reused sessions. In client mode, a session set with {@code SSL_set_session}
-     *             successfully reused is counted as a hit. In server mode, a session successfully retrieved from
-     *             internal or external cache is counted as a hit.
+     * Returns the number of successfully reused sessions. In client mode, a session set with {@code SSL_set_session}
+     * successfully reused is counted as a hit. In server mode, a session successfully retrieved from
+     * internal or external cache is counted as a hit.
+     *
+     * @return The number of session hits
      */
     public long hits() {
         return SSLContext.sessionHits(context);
     }
 
     /**
-     * @return The number of successfully retrieved sessions from the external session cache in server mode.
+     * Returns the number of successfully retrieved sessions from the external session cache in server mode.
+     *
+     * @return The number of callback hits
      */
     public long cbHits() {
         return SSLContext.sessionCbHits(context);
     }
 
     /**
-     * @return The number of sessions proposed by clients that were not found in the internal session cache in server
-     *             mode.
+     * Returns the number of sessions proposed by clients that were not found in the internal session cache in server
+     * mode.
+     *
+     * @return The number of session misses
      */
     public long misses() {
         return SSLContext.sessionMisses(context);
     }
 
     /**
-     * @return The number of sessions proposed by clients and either found in the internal or external session cache in
-     *             server mode, but that were invalid due to timeout. These sessions are not included in the
-     *             {@link #hits()} count.
+     * Returns the number of sessions proposed by clients and either found in the internal or external session cache in
+     * server mode, but that were invalid due to timeout. These sessions are not included in the
+     * {@link #hits()} count.
+     *
+     * @return The number of session timeouts
      */
     public long timeouts() {
         return SSLContext.sessionTimeouts(context);
     }
 
     /**
-     * @return The number of sessions that were removed because the maximum session cache size was exceeded.
+     * Returns the number of sessions that were removed because the maximum session cache size was exceeded.
+     *
+     * @return The number of cache full evictions
      */
     public long cacheFull() {
         return SSLContext.sessionCacheFull(context);

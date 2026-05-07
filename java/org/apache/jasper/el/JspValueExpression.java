@@ -36,10 +36,19 @@ public final class JspValueExpression extends ValueExpression implements Externa
 
     private String mark;
 
+    /**
+     * Default constructor for deserialization.
+     */
     public JspValueExpression() {
         super();
     }
 
+    /**
+     * Constructs an instance with the given mark and target expression.
+     *
+     * @param mark The mark string
+     * @param target The target value expression
+     */
     public JspValueExpression(String mark, ValueExpression target) {
         this.target = target;
         this.mark = mark;

@@ -27,6 +27,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class ListTask extends AbstractCatalinaTask {
 
+    /**
+     * Default constructor.
+     */
+    public ListTask() {
+    }
+
 
     // ------------------------------------------------------------- Properties
 

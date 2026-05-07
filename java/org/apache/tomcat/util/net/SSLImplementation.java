@@ -32,6 +32,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class SSLImplementation {
 
+    /**
+     * Default constructor.
+     */
+    public SSLImplementation() {
+        // Default constructor
+    }
+
     private static final Log logger = LogFactory.getLog(SSLImplementation.class);
     private static final StringManager sm = StringManager.getManager(SSLImplementation.class);
 
@@ -72,5 +79,11 @@ public abstract class SSLImplementation {
      */
     public abstract SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes);
 
+    /**
+     * Returns the SSL utility for the given certificate.
+     *
+     * @param certificate The certificate
+     * @return the SSL utility
+     */
     public abstract SSLUtil getSSLUtil(SSLHostConfigCertificate certificate);
 }

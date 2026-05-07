@@ -20,11 +20,20 @@ import java.io.Serial;
 
 import jakarta.el.PropertyNotFoundException;
 
+/**
+ * Exception thrown when a JSP property is not found.
+ */
 public final class JspPropertyNotFoundException extends PropertyNotFoundException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs an instance with the given mark and cause.
+     *
+     * @param mark The mark string
+     * @param e The cause exception
+     */
     public JspPropertyNotFoundException(String mark, PropertyNotFoundException e) {
         super(mark + " " + e.getMessage(), e.getCause());
     }

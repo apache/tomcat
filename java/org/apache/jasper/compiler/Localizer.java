@@ -27,6 +27,12 @@ import org.apache.jasper.runtime.ExceptionUtils;
  */
 public class Localizer {
 
+    /**
+     * Default constructor.
+     */
+    public Localizer() {
+    }
+
     private static ResourceBundle bundle;
 
     static {
@@ -37,7 +43,7 @@ public class Localizer {
         }
     }
 
-    /*
+    /**
      * Returns the localized error message corresponding to the given error code.
      *
      * If the given error code is not defined in the resource bundle for localized error messages, it is used as the
@@ -59,7 +65,7 @@ public class Localizer {
         return errMsg;
     }
 
-    /*
+    /**
      * Returns the localized error message corresponding to the given error code.
      *
      * If the given error code is not defined in the resource bundle for localized error messages, it is used as the

@@ -24,6 +24,12 @@ import org.apache.tools.ant.BuildException;
 public class ServerinfoTask extends AbstractCatalinaTask {
 
     /**
+     * Default constructor.
+     */
+    public ServerinfoTask() {
+    }
+
+    /**
      * Execute the requested operation.
      *
      * @exception BuildException if an error occurs

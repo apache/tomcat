@@ -66,6 +66,9 @@ public class SecurityListener implements LifecycleListener {
     private Integer minimumUmask = Integer.valueOf(7);
 
 
+    /**
+     * Creates a new SecurityListener instance with "root" as the default prohibited OS user.
+     */
     public SecurityListener() {
         checkedOsUsers.add("root");
     }
@@ -172,6 +175,10 @@ public class SecurityListener implements LifecycleListener {
     }
 
 
+    /**
+     * Checks that the current operating system user is not in the list of prohibited users.
+     * Throws an Error if the user is prohibited.
+     */
     protected void checkOsUser() {
         String userName = System.getProperty("user.name");
         if (userName != null) {
@@ -185,6 +192,10 @@ public class SecurityListener implements LifecycleListener {
     }
 
 
+    /**
+     * Checks that the operating system umask meets the minimum required value.
+     * Skips the check on Windows. Throws an Error if the umask is insufficient.
+     */
     protected void checkUmask() {
         String prop = System.getProperty(UMASK_PROPERTY_NAME);
         Integer umask = null;
@@ -215,6 +226,10 @@ public class SecurityListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Checks if the Tomcat build date exceeds the configured warning age threshold.
+     * Logs a warning if the build is too old or if the build date cannot be read.
+     */
     protected void checkServerBuildAge() {
         int allowedAgeDays = getBuildDateWarningAgeDays();
 

@@ -40,10 +40,15 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base class for wrapping a socket connection.
+ * @param <E> the socket type
+ */
 public abstract class SocketWrapperBase<E> {
 
     private static final Log log = LogFactory.getLog(SocketWrapperBase.class);
 
+    /** String manager for this class. */
     protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
     /*
@@ -60,13 +65,17 @@ public abstract class SocketWrapperBase<E> {
     private final AbstractEndpoint<E,?> endpoint;
     private final ReentrantLock lock = new ReentrantLock();
 
+    /** Indicates whether the socket has been closed. */
     protected final AtomicBoolean closed = new AtomicBoolean(false);
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
+    /** Read timeout in milliseconds. */
     private volatile long readTimeout = -1;
+    /** Write timeout in milliseconds. */
     private volatile long writeTimeout = -1;
 
+    /** The previous I/O exception that occurred on this socket. */
     protected volatile IOException previousIOException = null;
 
     private volatile int keepAliveLeft = 100;
@@ -77,14 +86,22 @@ public abstract class SocketWrapperBase<E> {
     /*
      * Following cached for speed / reduced GC
      */
+    /** Local address. */
     protected String localAddr = null;
+    /** Local name. */
     protected String localName = null;
+    /** Local port. */
     protected int localPort = -1;
+    /** Remote address. */
     protected String remoteAddr = null;
+    /** Remote host. */
     protected String remoteHost = null;
+    /** Remote port. */
     protected int remotePort = -1;
+    /** Servlet connection. */
     protected volatile ServletConnection servletConnection = null;
 
+    /** SNI host name. */
     protected String sniHostName = null;
 
     /**
@@ -115,9 +132,13 @@ public abstract class SocketWrapperBase<E> {
     /*
      * Asynchronous operations.
      */
+    /** Semaphore for pending read operations. */
     protected final Semaphore readPending;
+    /** Current read operation state. */
     protected volatile OperationState<?> readOperation = null;
+    /** Semaphore for pending write operations. */
     protected final Semaphore writePending;
+    /** Current write operation state. */
     protected volatile OperationState<?> writeOperation = null;
 
     /**
@@ -127,6 +148,11 @@ public abstract class SocketWrapperBase<E> {
      */
     private final AtomicReference<Object> currentProcessor = new AtomicReference<>();
 
+    /**
+     * Creates a new socket wrapper.
+     * @param socket the socket to wrap
+     * @param endpoint the endpoint
+     */
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
@@ -140,30 +166,61 @@ public abstract class SocketWrapperBase<E> {
         connectionId = Long.toHexString(connectionIdGenerator.getAndIncrement());
     }
 
+    /**
+     * Returns the wrapped socket.
+     * @return the socket
+     */
     public E getSocket() {
         return socket;
     }
 
+   /**
+     * Resets the wrapped socket with a new socket instance.
+     *
+     * @param closedSocket the new socket to wrap
+     */
     protected void reset(E closedSocket) {
         socket = closedSocket;
     }
 
+    /**
+     * Returns the endpoint.
+     * @return the endpoint
+     */
     protected AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
     }
 
+    /**
+     * Returns the lock for this wrapper.
+     * @return the lock
+     */
     public ReentrantLock getLock() {
         return lock;
     }
 
+    /**
+     * Returns the current processor.
+     * @return the current processor
+     */
     public Object getCurrentProcessor() {
         return currentProcessor.get();
     }
 
+    /**
+     * Sets the current processor associated with this wrapper.
+     *
+     * @param currentProcessor the processor to associate
+     */
     public void setCurrentProcessor(Object currentProcessor) {
         this.currentProcessor.set(currentProcessor);
     }
 
+    /**
+     * Retrieves and clears the current processor associated with this wrapper.
+     *
+     * @return the previous processor, or {@code null} if none was set
+     */
     public Object takeCurrentProcessor() {
         return currentProcessor.getAndSet(null);
     }
@@ -183,10 +240,20 @@ public abstract class SocketWrapperBase<E> {
         executor.execute(runnable);
     }
 
+    /**
+     * Returns the first I/O error that occurred on this socket.
+     *
+     * @return the recorded error, or {@code null} if no error has occurred
+     */
     public IOException getError() {
         return error;
     }
 
+    /**
+     * Records the first I/O error that occurs on this socket. Subsequent calls are ignored.
+     *
+     * @param error the error to record
+     */
     public void setError(IOException error) {
         // Not perfectly thread-safe but good enough. Just needs to ensure that
         // once this.error is non-null, it can never be null.
@@ -196,28 +263,47 @@ public abstract class SocketWrapperBase<E> {
         this.error = error;
     }
 
+    /**
+     * Throws the recorded error if one has occurred.
+     *
+     * @throws IOException if an error was previously recorded
+     */
     public void checkError() throws IOException {
         if (error != null) {
             throw error;
         }
     }
 
+    /**
+     * Returns the protocol negotiated for this connection.
+     *
+     * @return the negotiated protocol, or {@code null} if none has been negotiated
+     */
     public String getNegotiatedProtocol() {
         return negotiatedProtocol;
     }
 
+    /**
+     * Sets the protocol negotiated for this connection.
+     *
+     * @param negotiatedProtocol the negotiated protocol
+     */
     public void setNegotiatedProtocol(String negotiatedProtocol) {
         this.negotiatedProtocol = negotiatedProtocol;
     }
 
     /**
-     * @return the sniHostName
+     * Returns the SNI host name.
+     *
+     * @return the SNI host name
      */
     public String getSniHostName() {
         return this.sniHostName;
     }
 
     /**
+     * Sets the SNI host name.
+     *
      * @param sniHostName the SNI host name to set
      */
     public void setSniHostName(String sniHostName) {
@@ -237,6 +323,11 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
+    /**
+     * Returns the read timeout in milliseconds.
+     *
+     * @return the read timeout, or -1 for infinite timeout
+     */
     public long getReadTimeout() {
         return this.readTimeout;
     }
@@ -254,19 +345,39 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
+    /**
+     * Returns the write timeout in milliseconds.
+     *
+     * @return the write timeout, or -1 for infinite timeout
+     */
     public long getWriteTimeout() {
         return this.writeTimeout;
     }
 
 
+    /**
+     * Sets the number of keep-alive requests remaining.
+     *
+     * @param keepAliveLeft the number of keep-alive requests remaining
+     */
     public void setKeepAliveLeft(int keepAliveLeft) {
         this.keepAliveLeft = keepAliveLeft;
     }
 
+    /**
+     * Decrements the number of keep-alive requests remaining.
+     *
+     * @return the updated number of keep-alive requests remaining
+     */
     public int decrementKeepAlive() {
         return (--keepAliveLeft);
     }
 
+    /**
+     * Returns the remote host name.
+     *
+     * @return the remote host name
+     */
     public String getRemoteHost() {
         if (remoteHost == null) {
             populateRemoteHost();
@@ -274,8 +385,16 @@ public abstract class SocketWrapperBase<E> {
         return remoteHost;
     }
 
+  /**
+     * Populates the cached remote host name from the underlying socket.
+     */
     protected abstract void populateRemoteHost();
 
+    /**
+     * Returns the remote IP address.
+     *
+     * @return the remote IP address
+     */
     public String getRemoteAddr() {
         if (remoteAddr == null) {
             populateRemoteAddr();
@@ -283,8 +402,16 @@ public abstract class SocketWrapperBase<E> {
         return remoteAddr;
     }
 
+  /**
+     * Populates the cached remote IP address from the underlying socket.
+     */
     protected abstract void populateRemoteAddr();
 
+    /**
+     * Returns the remote port number.
+     *
+     * @return the remote port number
+     */
     public int getRemotePort() {
         if (remotePort == -1) {
             populateRemotePort();
@@ -292,8 +419,16 @@ public abstract class SocketWrapperBase<E> {
         return remotePort;
     }
 
+ /**
+     * Populates the cached remote port number from the underlying socket.
+     */
     protected abstract void populateRemotePort();
 
+    /**
+     * Returns the local host name.
+     *
+     * @return the local host name
+     */
     public String getLocalName() {
         if (localName == null) {
             populateLocalName();
@@ -301,8 +436,16 @@ public abstract class SocketWrapperBase<E> {
         return localName;
     }
 
+/**
+     * Populates the cached local host name from the underlying socket.
+     */
     protected abstract void populateLocalName();
 
+    /**
+     * Returns the local IP address.
+     *
+     * @return the local IP address
+     */
     public String getLocalAddr() {
         if (localAddr == null) {
             populateLocalAddr();
@@ -310,8 +453,16 @@ public abstract class SocketWrapperBase<E> {
         return localAddr;
     }
 
+/**
+     * Populates the cached local IP address from the underlying socket.
+     */
     protected abstract void populateLocalAddr();
 
+    /**
+     * Returns the local port number.
+     *
+     * @return the local port number
+     */
     public int getLocalPort() {
         if (localPort == -1) {
             populateLocalPort();
@@ -319,17 +470,35 @@ public abstract class SocketWrapperBase<E> {
         return localPort;
     }
 
+/**
+     * Populates the cached local port number from the underlying socket.
+     */
     protected abstract void populateLocalPort();
 
+    /**
+     * Returns the socket buffer handler.
+     *
+     * @return the socket buffer handler
+     */
     public SocketBufferHandler getSocketBufferHandler() {
         return socketBufferHandler;
     }
 
+    /**
+     * Checks if there is data available to read from the socket.
+     *
+     * @return {@code true} since it is always safe to attempt a read
+     */
     public boolean hasDataToRead() {
         // Return true because it is always safe to make a read attempt
         return true;
     }
 
+    /**
+     * Checks if there is data waiting to be written to the socket.
+     *
+     * @return {@code true} if there is pending write data
+     */
     public boolean hasDataToWrite() {
         return !socketBufferHandler.isWriteBufferEmpty() || !nonBlockingWriteBuffer.isEmpty();
     }
@@ -353,6 +522,11 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Checks if the socket write buffer is writable and there is no pending non-blocking write data.
+     *
+     * @return {@code true} if the socket is ready for writing
+     */
     public boolean canWrite() {
         if (socketBufferHandler == null) {
             throw new IllegalStateException(sm.getString("socket.closed"));
@@ -373,14 +547,56 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Reads data from the socket into a byte array.
+     *
+     * @param block Whether to block
+     * @param b The byte array to read into
+     * @param off The offset in the array
+     * @param len The number of bytes to read
+     *
+     * @return the number of bytes read
+     *
+     * @throws IOException If an I/O error occurs
+     */
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
 
+    /**
+     * Reads data from the socket into a ByteBuffer.
+     *
+     * @param block Whether to block
+     * @param to The ByteBuffer to read into
+     *
+     * @return the number of bytes read
+     *
+     * @throws IOException If an I/O error occurs
+     */
     public abstract int read(boolean block, ByteBuffer to) throws IOException;
 
+    /**
+     * Checks if the socket is ready for reading.
+     *
+     * @return {@code true} if data is available to read
+     *
+     * @throws IOException If an I/O error occurs
+     */
     public abstract boolean isReadyForRead() throws IOException;
 
+    /**
+     * Sets the application-level read buffer handler.
+     *
+     * @param handler The application buffer handler
+     */
     public abstract void setAppReadBufHandler(ApplicationBufferHandler handler);
 
+    /**
+     * Copies available data from the internal read buffer into the provided byte array.
+     *
+     * @param b the byte array to populate
+     * @param off the offset in the array
+     * @param len the maximum number of bytes to copy
+     * @return the number of bytes copied
+     */
     protected int populateReadBuffer(byte[] b, int off, int len) {
         socketBufferHandler.configureReadBufferForRead();
         ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
@@ -400,6 +616,12 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Copies available data from the internal read buffer into the provided ByteBuffer.
+     *
+     * @param to the ByteBuffer to populate
+     * @return the number of bytes copied
+     */
     protected int populateReadBuffer(ByteBuffer to) {
         // Is there enough data in the read buffer to satisfy this request?
         // Copy what data there is in the read buffer to the byte array
@@ -454,7 +676,9 @@ public abstract class SocketWrapperBase<E> {
     protected abstract void doClose();
 
     /**
-     * @return true if the wrapper has been closed
+     * Checks if the socket wrapper has been closed.
+     *
+     * @return {@code true} if the wrapper has been closed
      */
     public boolean isClosed() {
         return closed.get();
@@ -723,12 +947,10 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    /**
-     * Writes as much data as possible from any that remains in the buffers.
+ /**
+     * Flushes remaining buffered data using a non-blocking write.
      *
-     * @return <code>true</code> if data remains to be flushed after this method completes, otherwise
-     *             <code>false</code>.
-     *
+     * @return {@code true} if data remains to be flushed after this method completes, otherwise {@code false}
      * @throws IOException If an IO error occurs during the write
      */
     protected abstract boolean flushNonBlocking() throws IOException;
@@ -760,15 +982,36 @@ public abstract class SocketWrapperBase<E> {
     protected abstract void doWrite(boolean block, ByteBuffer from) throws IOException;
 
 
+    /**
+     * Processes a socket event.
+     *
+     * @param socketStatus The socket event status
+     * @param dispatch Whether to dispatch to a worker thread
+     */
     public void processSocket(SocketEvent socketStatus, boolean dispatch) {
         endpoint.processSocket(this, socketStatus, dispatch);
     }
 
 
+    /**
+     * Registers interest in read events.
+     */
     public abstract void registerReadInterest();
 
+    /**
+     * Registers interest in write events.
+     */
     public abstract void registerWriteInterest();
 
+    /**
+     * Creates a sendfile data object for the specified file.
+     *
+     * @param filename The file to send
+     * @param pos The starting position in the file
+     * @param length The number of bytes to send
+     *
+     * @return a new sendfile data object
+     */
     public abstract SendfileDataBase createSendfileData(String filename, long pos, long length);
 
     /**
@@ -804,6 +1047,9 @@ public abstract class SocketWrapperBase<E> {
     // ------------------------------------------------------- NIO 2 style APIs
 
 
+    /**
+     * Defines the blocking behavior for I/O operations.
+     */
     public enum BlockingMode {
         /**
          * The operation will not block. If there are pending operations, the operation will throw a pending exception.
@@ -824,6 +1070,9 @@ public abstract class SocketWrapperBase<E> {
         BLOCK
     }
 
+    /**
+     * Represents the completion state of an asynchronous I/O operation.
+     */
     public enum CompletionState {
         /**
          * Operation is still pending.
@@ -847,6 +1096,9 @@ public abstract class SocketWrapperBase<E> {
         DONE
     }
 
+    /**
+     * Defines the possible outcomes for completion handler invocation.
+     */
     public enum CompletionHandlerCall {
         /**
          * Operation should continue, the completion handler shouldn't be called.
@@ -862,6 +1114,9 @@ public abstract class SocketWrapperBase<E> {
         DONE
     }
 
+    /**
+     * Interface for determining whether a completion handler should be invoked.
+     */
     public interface CompletionCheck {
         /**
          * Determine what call, if any, should be made to the completion handler.
@@ -927,20 +1182,49 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      */
     protected abstract class OperationState<A> implements Runnable {
+        /** Indicates whether this is a read operation. */
         protected final boolean read;
+        /** Buffers used for the vectored I/O operation. */
         protected final ByteBuffer[] buffers;
+        /** Offset in the buffer array. */
         protected final int offset;
+        /** Number of buffers in the operation. */
         protected final int length;
+        /** Attachment object passed to the completion handler. */
         protected final A attachment;
+        /** Timeout value for the operation. */
         protected final long timeout;
+        /** Time unit for the timeout. */
         protected final TimeUnit unit;
+        /** Blocking mode for the operation. */
         protected final BlockingMode block;
+        /** Completion check to determine handler invocation. */
         protected final CompletionCheck check;
+        /** Completion handler to invoke when the operation completes. */
         protected final CompletionHandler<Long,? super A> handler;
+        /** Semaphore for synchronizing concurrent operations. */
         protected final Semaphore semaphore;
+        /** Vectored I/O completion handler. */
         protected final VectoredIOCompletionHandler<A> completion;
+        /** Flag to ensure the completion handler is called only once. */
         protected final AtomicBoolean callHandler;
 
+        /**
+         * Creates a new operation state for a vectored I/O operation.
+         *
+         * @param read Whether this is a read operation
+         * @param buffers The buffers for the operation
+         * @param offset The offset in the buffer array
+         * @param length The number of buffers
+         * @param block The blocking mode
+         * @param timeout The timeout duration
+         * @param unit The timeout time unit
+         * @param attachment An attachment object
+         * @param check The completion check
+         * @param handler The completion handler
+         * @param semaphore The semaphore for synchronization
+         * @param completion The vectored I/O completion handler
+         */
         protected OperationState(boolean read, ByteBuffer[] buffers, int offset, int length, BlockingMode block,
                 long timeout, TimeUnit unit, A attachment, CompletionCheck check,
                 CompletionHandler<Long,? super A> handler, Semaphore semaphore,
@@ -960,16 +1244,25 @@ public abstract class SocketWrapperBase<E> {
             callHandler = (handler != null) ? new AtomicBoolean(true) : null;
         }
 
+        /** Total number of bytes transferred by the operation. */
         protected volatile long nBytes = 0;
+        /** Current completion state of the operation. */
         protected volatile CompletionState state = CompletionState.PENDING;
+        /** Indicates whether the vectored I/O completion processing is done. */
         protected boolean completionDone = true;
 
-        /**
-         * @return true if the operation is still inline, false if the operation is running on a thread that is not the
-         *             original caller
+      /**
+         * Determines whether the operation is still executing on the original caller thread.
+         *
+         * @return {@code true} if the operation is still inline, {@code false} if running on a separate thread
          */
         protected abstract boolean isInline();
 
+        /**
+      * Checks if there is remaining outbound data in the buffers.
+      *
+      * @return {@code false} by default; overridden by NIO implementations
+      */
         protected boolean hasOutboundRemaining() {
             // NIO2 and APR never have remaining outbound data when the
             // completion handler is called. NIO needs to override this.
@@ -1019,6 +1312,12 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      */
     protected class VectoredIOCompletionHandler<A> implements CompletionHandler<Long,OperationState<A>> {
+        /**
+         * Creates a new vectored I/O completion handler.
+         */
+        protected VectoredIOCompletionHandler() {
+        }
+
         @Override
         public void completed(Long nBytes, OperationState<A> state) {
             if (nBytes.longValue() < 0) {
@@ -1414,6 +1713,25 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Creates a new operation state for vectored I/O operations.
+     *
+     * @param read Whether this is a read operation
+     * @param buffers The buffers for the operation
+     * @param offset The offset in the buffer array
+     * @param length The number of buffers
+     * @param block The blocking mode
+     * @param timeout The timeout duration
+     * @param unit The timeout time unit
+     * @param attachment An attachment object
+     * @param check The completion check
+     * @param handler The completion handler
+     * @param semaphore The semaphore for synchronization
+     * @param completion The vectored I/O completion handler
+     * @param <A> The attachment type
+     *
+     * @return a new operation state instance
+     */
     protected abstract <A> OperationState<A> newOperationState(boolean read, ByteBuffer[] buffers, int offset,
             int length, BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
             CompletionHandler<Long,? super A> handler, Semaphore semaphore, VectoredIOCompletionHandler<A> completion);
@@ -1421,6 +1739,15 @@ public abstract class SocketWrapperBase<E> {
 
     // --------------------------------------------------------- Utility methods
 
+    /**
+     * Transfers data from a byte array into a ByteBuffer.
+     *
+     * @param from the source byte array
+     * @param offset the offset in the source array
+     * @param length the maximum number of bytes to transfer
+     * @param to the destination ByteBuffer
+     * @return the number of bytes transferred
+     */
     protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {
         int max = Math.min(length, to.remaining());
         if (max > 0) {
@@ -1429,6 +1756,13 @@ public abstract class SocketWrapperBase<E> {
         return max;
     }
 
+    /**
+     * Transfers data from one ByteBuffer to another.
+     *
+     * @param from the source ByteBuffer
+     * @param to the destination ByteBuffer
+     * @return the number of bytes transferred
+     */
     protected static int transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());
         if (max > 0) {
@@ -1440,6 +1774,14 @@ public abstract class SocketWrapperBase<E> {
         return max;
     }
 
+    /**
+     * Checks if any buffer in the specified range has remaining capacity.
+     *
+     * @param buffers the array of ByteBuffers
+     * @param offset the starting index in the array
+     * @param length the number of buffers to check
+     * @return {@code true} if any buffer has remaining capacity
+     */
     protected static boolean buffersArrayHasRemaining(ByteBuffer[] buffers, int offset, int length) {
         for (int pos = offset; pos < offset + length; pos++) {
             if (buffers[pos].hasRemaining()) {
@@ -1452,6 +1794,13 @@ public abstract class SocketWrapperBase<E> {
 
     // -------------------------------------------------------------- ID methods
 
+    /**
+     * Returns the ServletConnection for this socket, creating it if necessary.
+     *
+     * @param protocol the protocol name
+     * @param protocolConnectionId the protocol-level connection ID
+     * @return the ServletConnection instance
+     */
     public ServletConnection getServletConnection(String protocol, String protocolConnectionId) {
         if (servletConnection == null) {
             servletConnection =

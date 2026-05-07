@@ -1252,6 +1252,11 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
 
+    /**
+     * Prints the contents of the map for debugging purposes.
+     *
+     * @param header Header string to print before the map contents
+     */
     protected void printMap(String header) {
         try {
             System.out.println("\nDEBUG MAP:" + header);

@@ -20,6 +20,9 @@ import jakarta.servlet.SessionCookieConfig;
 
 import org.apache.catalina.Context;
 
+/**
+ * Utility class for managing session configuration.
+ */
 public class SessionConfig {
 
     private static final String DEFAULT_SESSION_COOKIE_NAME = "JSESSIONID";

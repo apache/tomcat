@@ -28,6 +28,12 @@ import jakarta.servlet.FilterConfig;
  */
 public abstract class RateLimiterBase implements RateLimiter {
 
+    /**
+     * Default constructor.
+     */
+    public RateLimiterBase() {
+    }
+
     private static final AtomicInteger index = new AtomicInteger();
 
     TimeBucketCounterBase bucketCounter;

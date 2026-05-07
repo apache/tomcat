@@ -50,31 +50,62 @@ import org.ietf.jgss.Oid;
  */
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Default constructor.
+     */
+    public SpnegoAuthenticator() {
+    }
+
     private final Log log = LogFactory.getLog(SpnegoAuthenticator.class); // must not be static
     private static final String AUTH_HEADER_VALUE_NEGOTIATE = "Negotiate";
 
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
 
+    /**
+     * Returns the JAAS login configuration name.
+     *
+     * @return the login configuration name
+     */
     public String getLoginConfigName() {
         return loginConfigName;
     }
 
+    /**
+     * Sets the JAAS login configuration name.
+     *
+     * @param loginConfigName the login configuration name
+     */
     public void setLoginConfigName(String loginConfigName) {
         this.loginConfigName = loginConfigName;
     }
 
     private boolean storeDelegatedCredential = true;
 
+    /**
+     * Returns whether delegated credentials should be stored in the subject.
+     *
+     * @return {@code true} if delegated credentials are stored
+     */
     public boolean isStoreDelegatedCredential() {
         return storeDelegatedCredential;
     }
 
+    /**
+     * Sets whether delegated credentials should be stored in the subject.
+     *
+     * @param storeDelegatedCredential {@code true} to store delegated credentials
+     */
     public void setStoreDelegatedCredential(boolean storeDelegatedCredential) {
         this.storeDelegatedCredential = storeDelegatedCredential;
     }
 
     private Pattern noKeepAliveUserAgents = null;
 
+    /**
+     * Returns the regex pattern for user agents that should not use keep-alive connections.
+     *
+     * @return the regex pattern, or {@code null} if not configured
+     */
     public String getNoKeepAliveUserAgents() {
         Pattern p = noKeepAliveUserAgents;
         if (p == null) {
@@ -84,6 +115,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
     }
 
+    /**
+     * Sets the regex pattern for user agents that should not use keep-alive connections.
+     *
+     * @param noKeepAliveUserAgents the regex pattern, or {@code null} to disable
+     */
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
         if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.isEmpty()) {
             this.noKeepAliveUserAgents = null;

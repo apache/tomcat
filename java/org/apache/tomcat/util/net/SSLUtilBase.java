@@ -76,20 +76,41 @@ public abstract class SSLUtilBase implements SSLUtil {
     private static final Log log = LogFactory.getLog(SSLUtilBase.class);
     private static final StringManager sm = StringManager.getManager(SSLUtilBase.class);
 
+    /**
+     * Default key alias.
+     */
     public static final String DEFAULT_KEY_ALIAS = "tomcat";
 
+    /**
+     * The SSL host configuration.
+     */
     protected final SSLHostConfig sslHostConfig;
+
+    /**
+     * The SSL host configuration certificate.
+     */
     protected final SSLHostConfigCertificate certificate;
 
     private final String[] enabledProtocols;
     private final String[] enabledCiphers;
 
 
+    /**
+     * Constructor.
+     *
+     * @param certificate The SSL host configuration certificate
+     */
     protected SSLUtilBase(SSLHostConfigCertificate certificate) {
         this(certificate, true);
     }
 
 
+    /**
+     * Constructor.
+     *
+     * @param certificate The SSL host configuration certificate
+     * @param warnTls13 Whether to warn about TLS 1.3 issues
+     */
     protected SSLUtilBase(SSLHostConfigCertificate certificate, boolean warnTls13) {
         this.certificate = certificate;
         this.sslHostConfig = certificate.getSSLHostConfig();
@@ -578,13 +599,40 @@ public abstract class SSLUtilBase implements SSLUtil {
     }
 
 
+    /**
+     * Returns the set of implemented SSL/TLS protocols.
+     *
+     * @return the implemented protocols
+     */
     protected abstract Set<String> getImplementedProtocols();
 
+    /**
+     * Returns the set of implemented SSL/TLS ciphers.
+     *
+     * @return the implemented ciphers
+     */
     protected abstract Set<String> getImplementedCiphers();
 
+    /**
+     * Returns the log for this utility.
+     *
+     * @return the log
+     */
     protected abstract Log getLog();
 
+    /**
+     * Returns whether TLS 1.3 renegotiation authentication is available.
+     *
+     * @return {@code true} if TLS 1.3 renegotiation authentication is available
+     */
     protected abstract boolean isTls13RenegAuthAvailable();
 
+    /**
+     * Creates an SSL context with the given negotiable protocols.
+     *
+     * @param negotiableProtocols The negotiable protocols
+     * @return the SSL context
+     * @throws Exception if creation fails
+     */
     protected abstract SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception;
 }

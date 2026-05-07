@@ -19,7 +19,16 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin for the JSTL otherwise tag.
+ */
 public final class Otherwise implements TagPlugin {
+
+    /**
+     * Constructs an Otherwise tag plugin.
+     */
+    public Otherwise() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

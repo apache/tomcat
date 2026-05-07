@@ -18,6 +18,9 @@ package org.apache.catalina.tribes;
 
 import java.util.Properties;
 
+/**
+ * Interface for membership providers.
+ */
 public interface MembershipProvider {
 
     /**

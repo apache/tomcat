@@ -30,18 +30,37 @@ public class RemoteProcessException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
     public RemoteProcessException() {
         super();
     }
 
+    /**
+     * Construct an exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public RemoteProcessException(String message) {
         super(message);
     }
 
+    /**
+     * Construct an exception with the specified message and cause.
+     *
+     * @param message the detail message
+     * @param cause the cause
+     */
     public RemoteProcessException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Construct an exception with the specified cause.
+     *
+     * @param cause the cause
+     */
     public RemoteProcessException(Throwable cause) {
         super(cause);
     }

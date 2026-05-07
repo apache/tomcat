@@ -39,17 +39,45 @@ import org.apache.catalina.tribes.util.StringManager;
  * interceptor in the chain.
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(ChannelCoordinator.class);
+
+    /**
+     * The cluster receiver.
+     */
     private ChannelReceiver clusterReceiver;
+
+    /**
+     * The cluster sender.
+     */
     private ChannelSender clusterSender;
+
+    /**
+     * The membership service.
+     */
     private MembershipService membershipService;
 
+    /**
+     * Current start level.
+     */
     private int startLevel = 0;
 
+    /**
+     * Default constructor.
+     */
     public ChannelCoordinator() {
         this(new NioReceiver(), new ReplicationTransmitter(), new McastService());
     }
 
+    /**
+     * Construct a ChannelCoordinator with the specified receiver, sender and membership service.
+     *
+     * @param receiver The channel receiver
+     * @param sender The channel sender
+     * @param service The membership service
+     */
     public ChannelCoordinator(ChannelReceiver receiver, ChannelSender sender, MembershipService service) {
 
         this.optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE | Channel.SEND_OPTIONS_USE_ACK |
@@ -261,18 +289,38 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         return true;
     }
 
+    /**
+     * Returns the cluster receiver.
+     *
+     * @return the cluster receiver
+     */
     public ChannelReceiver getClusterReceiver() {
         return clusterReceiver;
     }
 
+    /**
+     * Returns the cluster sender.
+     *
+     * @return the cluster sender
+     */
     public ChannelSender getClusterSender() {
         return clusterSender;
     }
 
+    /**
+     * Returns the membership service.
+     *
+     * @return the membership service
+     */
     public MembershipService getMembershipService() {
         return membershipService;
     }
 
+    /**
+     * Sets the cluster receiver.
+     *
+     * @param clusterReceiver The new cluster receiver
+     */
     public synchronized void setClusterReceiver(ChannelReceiver clusterReceiver) {
         if (startLevel != 0) {
             throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
@@ -288,6 +336,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         }
     }
 
+    /**
+     * Sets the cluster sender.
+     *
+     * @param clusterSender The new cluster sender
+     */
     public synchronized void setClusterSender(ChannelSender clusterSender) {
         if (startLevel != 0) {
             throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
@@ -295,6 +348,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         this.clusterSender = clusterSender;
     }
 
+    /**
+     * Sets the membership service.
+     *
+     * @param membershipService The new membership service
+     */
     public synchronized void setMembershipService(MembershipService membershipService) {
         if (startLevel != 0) {
             throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));

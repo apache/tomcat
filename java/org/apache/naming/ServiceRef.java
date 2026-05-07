@@ -47,6 +47,10 @@ public class ServiceRef extends AbstractRef {
      * ServiceQname address type.
      */
     public static final String SERVICE_NAMESPACE = "service namespace";
+
+    /**
+     * Service local part address type.
+     */
     public static final String SERVICE_LOCAL_PART = "service local part";
 
 
@@ -80,12 +84,32 @@ public class ServiceRef extends AbstractRef {
     private final List<HandlerRef> handlers = new CopyOnWriteArrayList<>();
 
 
+    /**
+     * Creates a ServiceRef with the given parameters and no factory information.
+     *
+     * @param refname the reference name
+     * @param serviceInterface the service interface class name
+     * @param serviceQname the service QName (namespace and local part)
+     * @param wsdl the WSDL location
+     * @param jaxrpcmapping the JAX-RPC mapping
+     */
     public ServiceRef(String refname, String serviceInterface, String[] serviceQname, String wsdl,
             String jaxrpcmapping) {
         this(refname, serviceInterface, serviceQname, wsdl, jaxrpcmapping, null, null);
     }
 
 
+    /**
+     * Creates a ServiceRef with the given parameters and factory information.
+     *
+     * @param refname the reference name
+     * @param serviceInterface the service interface class name
+     * @param serviceQname the service QName (namespace and local part)
+     * @param wsdl the WSDL location
+     * @param jaxrpcmapping the JAX-RPC mapping
+     * @param factory the factory class name
+     * @param factoryLocation the factory location
+     */
     public ServiceRef(@SuppressWarnings("unused") String refname, String serviceInterface, String[] serviceQname,
             String wsdl, String jaxrpcmapping, String factory, String factoryLocation) {
         super(serviceInterface, factory, factoryLocation);
@@ -123,11 +147,21 @@ public class ServiceRef extends AbstractRef {
     }
 
 
+    /**
+     * Returns the number of handlers in the list.
+     *
+     * @return the number of handlers
+     */
     public int getHandlersSize() {
         return handlers.size();
     }
 
 
+    /**
+     * Adds a handler reference to the list.
+     *
+     * @param handler the handler reference to add
+     */
     public void addHandler(HandlerRef handler) {
         handlers.add(handler);
     }

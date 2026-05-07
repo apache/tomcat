@@ -28,10 +28,26 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class SSIFsize implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFsize.class);
+
+    /**
+     * Default constructor.
+     */
+    public SSIFsize() {
+    }
+
+    /**
+     * Number of bytes in one kibibyte.
+     */
     static final int ONE_KIBIBYTE = 1024;
+    /**
+     * Number of bytes in one mebibyte.
+     */
     static final int ONE_MEBIBYTE = 1024 * 1024;
 
 
+    /**
+     * Processes the fsize directive to output the size of a file.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {
@@ -61,6 +77,13 @@ public final class SSIFsize implements SSICommand {
     }
 
 
+    /**
+     * Pads the given string with leading spaces to reach the specified maximum length.
+     *
+     * @param str      the string to pad
+     * @param maxChars the target length
+     * @return the padded string
+     */
     public String padLeft(String str, int maxChars) {
         String result = str;
         int charsToAdd = maxChars - str.length();

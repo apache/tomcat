@@ -32,8 +32,23 @@ import java.util.stream.Collectors;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
+/**
+ * Tool for inspecting and generating reflection-less property setter code.
+ */
 public final class ObjectReflectionPropertyInspector {
 
+    /**
+     * Constructs an ObjectReflectionPropertyInspector.
+     */
+    public ObjectReflectionPropertyInspector() {
+    }
+
+    /**
+     * Main entry point for the tool.
+     *
+     * @param args Command line arguments (output directory)
+     * @throws Exception if an error occurs
+     */
     public static void main(String... args) throws Exception {
         if (args.length == 0) {
             System.err.println("Usage:\n\t" + "org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector" +
@@ -98,6 +113,15 @@ public final class ObjectReflectionPropertyInspector {
             new LinkedHashSet<>(Arrays.asList(Boolean.TYPE, Integer.TYPE, Long.TYPE, String.class, InetAddress.class)));
     private static final Map<Class<?>,SetPropertyClass> classes = new LinkedHashMap<>();
 
+    /**
+     * Generates code for the given set of property classes.
+     *
+     * @param baseClasses The classes to process
+     * @param packageName The package name for generated code
+     * @param location The output directory
+     * @param className The class name for generated code
+     * @throws Exception if an error occurs
+     */
     public static void generateCode(Set<SetPropertyClass> baseClasses, String packageName, File location,
             String className) throws Exception {
         String packageDirectory = packageName.replace('.', '/');
