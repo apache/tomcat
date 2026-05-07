@@ -68,18 +68,12 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getMessageLayer() {
         return layer;
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getAppContext() {
         return appContext;
