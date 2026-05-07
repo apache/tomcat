@@ -34,6 +34,12 @@ import org.apache.tomcat.util.buf.StringUtils;
  */
 public class NetMaskSet {
 
+    /**
+     * Default constructor.
+     */
+    public NetMaskSet() {
+    }
+
     private final Set<NetMask> netmasks = new HashSet<>();
 
     /**

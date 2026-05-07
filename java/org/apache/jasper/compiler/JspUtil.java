@@ -52,7 +52,17 @@ public class JspUtil {
 
     static final int JSP_INPUT_STREAM_BUFFER_SIZE = 1024;
 
+    /**
+     * Default chunk size for reading files.
+     */
     public static final int CHUNKSIZE = 1024;
+
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private JspUtil() {
+    }
 
     /**
      * Takes a potential expression and converts it into XML form.
@@ -187,16 +197,30 @@ public class JspUtil {
         // XXX *could* move EL-syntax validation here... (sb)
     }
 
+    /**
+     * Represents a valid attribute for a tag.
+     */
     public static class ValidAttribute {
 
         private final String name;
         private final boolean mandatory;
 
+        /**
+         * Constructs an instance with the given name and mandatory flag.
+         *
+         * @param name The attribute name
+         * @param mandatory Whether the attribute is mandatory
+         */
         public ValidAttribute(String name, boolean mandatory) {
             this.name = name;
             this.mandatory = mandatory;
         }
 
+        /**
+         * Constructs an optional instance with the given name.
+         *
+         * @param name The attribute name
+         */
         public ValidAttribute(String name) {
             this(name, false);
         }
@@ -360,6 +384,13 @@ public class JspUtil {
         return call.toString();
     }
 
+    /**
+     * Generates code to coerce a string to a primitive boolean value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveBoolean(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToBoolean(" + s + ")";
@@ -372,6 +403,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Boolean object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToBoolean(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Boolean) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -386,6 +424,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive byte value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveByte(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToByte(" + s + ")";
@@ -398,6 +443,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Byte object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToByte(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Byte) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -412,6 +464,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive char value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToChar(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToChar(" + s + ")";
@@ -426,6 +485,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Character object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToCharacter(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Character) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -441,6 +507,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive double value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveDouble(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToDouble(" + s + ")";
@@ -453,6 +526,13 @@ public class JspUtil {
         }
     }
 
+   /**
+     * Generates code to coerce a string to a Double object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToDouble(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Double) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Double.class)";
@@ -466,6 +546,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive float value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveFloat(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToFloat(" + s + ")";
@@ -478,6 +565,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Float object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToFloat(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Float) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -492,6 +586,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive int value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToInt(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToInt(" + s + ")";
@@ -504,6 +605,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to an Integer object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToInteger(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Integer) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -518,6 +626,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive short value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveShort(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToShort(" + s + ")";
@@ -530,6 +645,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Short object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToShort(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Short) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -544,6 +666,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a primitive long value.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToPrimitiveLong(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToLong(" + s + ")";
@@ -556,6 +685,13 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Generates code to coerce a string to a Long object.
+     *
+     * @param s The string expression
+     * @param isNamedAttribute Whether the value comes from a named attribute
+     * @return the generated coercion code
+     */
     public static String coerceToLong(String s, boolean isNamedAttribute) {
         if (isNamedAttribute) {
             return "(java.lang.Long) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
@@ -570,6 +706,15 @@ public class JspUtil {
         }
     }
 
+    /**
+     * Gets an input stream for the given file name.
+     *
+     * @param fname The file name
+     * @param jar The JAR, or {@code null}
+     * @param ctxt The compilation context
+     * @return the input stream
+     * @throws IOException if an I/O error occurs
+     */
     public static BufferedInputStream getInputStream(String fname, Jar jar, JspCompilationContext ctxt)
             throws IOException {
 
@@ -589,6 +734,15 @@ public class JspUtil {
         return new BufferedInputStream(in, JSP_INPUT_STREAM_BUFFER_SIZE);
     }
 
+    /**
+     * Gets an input source for the given file name.
+     *
+     * @param fname The file name
+     * @param jar The JAR, or {@code null}
+     * @param ctxt The compilation context
+     * @return the input source
+     * @throws IOException if an I/O error occurs
+     */
     public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt) throws IOException {
         InputSource source;
         if (jar != null) {

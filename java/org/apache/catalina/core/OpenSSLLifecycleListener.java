@@ -43,8 +43,16 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
      */
     protected static final StringManager sm = StringManager.getManager(OpenSSLLifecycleListener.class);
 
+    /**
+     * Lock object for OpenSSL initialization.
+     */
     protected static final Object lock = new Object();
 
+    /**
+     * Checks if OpenSSL is available.
+     *
+     * @return true if OpenSSL is available
+     */
     public static boolean isAvailable() {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
         if (OpenSSLStatus.isInstanceCreated()) {
@@ -92,6 +100,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return null;
     }
 
+    /**
+     * Constructs an OpenSSLLifecycleListener.
+     */
     public OpenSSLLifecycleListener() {
         OpenSSLStatus.setInstanceCreated(true);
     }
@@ -157,6 +168,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
     }
 
+    /**
+     * Returns the SSL engine information.
+     *
+     * @return The SSL engine string, or null if not available
+     */
     public String getSSLEngine() {
         if (JreCompat.isJre22Available()) {
             try {
@@ -171,6 +187,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return null;
     }
 
+    /**
+     * Sets the SSL engine.
+     *
+     * @param SSLEngine The SSL engine to use
+     */
     public void setSSLEngine(String SSLEngine) {
         if (JreCompat.isJre22Available()) {
             try {
@@ -184,6 +205,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Returns the SSL random seed.
+     *
+     * @return The SSL random seed, or null if not available
+     */
     public String getSSLRandomSeed() {
         if (JreCompat.isJre22Available()) {
             try {
@@ -198,6 +224,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return null;
     }
 
+    /**
+     * Sets the SSL random seed.
+     *
+     * @param SSLRandomSeed The SSL random seed
+     */
     public void setSSLRandomSeed(String SSLRandomSeed) {
         if (JreCompat.isJre22Available()) {
             try {
@@ -211,6 +242,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Returns the FIPS mode status.
+     *
+     * @return The FIPS mode, or null if not available
+     */
     public String getFIPSMode() {
         if (JreCompat.isJre22Available()) {
             try {
@@ -225,6 +261,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return null;
     }
 
+    /**
+     * Sets the FIPS mode.
+     *
+     * @param FIPSMode The FIPS mode setting
+     */
     public void setFIPSMode(String FIPSMode) {
         if (JreCompat.isJre22Available()) {
             try {
@@ -238,6 +279,11 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Checks if FIPS mode is active.
+     *
+     * @return true if FIPS mode is active
+     */
     public boolean isFIPSModeActive() {
         if (JreCompat.isJre22Available()) {
             try {
@@ -252,12 +298,22 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return false;
     }
 
+    /**
+     * Sets whether to use OpenSSL.
+     *
+     * @param useOpenSSL true to use OpenSSL
+     */
     public void setUseOpenSSL(boolean useOpenSSL) {
         if (useOpenSSL != OpenSSLStatus.getUseOpenSSL()) {
             OpenSSLStatus.setUseOpenSSL(useOpenSSL);
         }
     }
 
+    /**
+     * Returns whether OpenSSL should be used.
+     *
+     * @return true if OpenSSL should be used
+     */
     public static boolean getUseOpenSSL() {
         return OpenSSLStatus.getUseOpenSSL();
     }

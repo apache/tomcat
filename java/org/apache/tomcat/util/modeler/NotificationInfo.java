@@ -29,6 +29,12 @@ import javax.management.MBeanNotificationInfo;
  */
 public class NotificationInfo extends FeatureInfo {
 
+    /**
+     * Constructs a new NotificationInfo.
+     */
+    public NotificationInfo() {
+    }
+
     private static final long serialVersionUID = -6319885418912650856L;
 
     // ----------------------------------------------------- Instance Variables
@@ -39,7 +45,13 @@ public class NotificationInfo extends FeatureInfo {
      * instance.
      */
     transient MBeanNotificationInfo info = null;
+    /**
+     * Array of notification types.
+     */
     protected String[] notifTypes = new String[0];
+    /**
+     * Lock for notification types access.
+     */
     protected final ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
 
     // ------------------------------------------------------------- Properties
@@ -70,7 +82,9 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * @return the array of notification types for this MBean.
+     * Returns the array of notification types for this MBean.
+     *
+     * @return The array of notification types
      */
     public String[] getNotifTypes() {
         Lock readLock = notifTypesLock.readLock();

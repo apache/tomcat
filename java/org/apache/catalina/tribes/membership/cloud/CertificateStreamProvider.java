@@ -35,6 +35,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 
+/**
+ * Provider for SSL socket factory using certificate streams.
+ */
 public class CertificateStreamProvider extends AbstractStreamProvider {
 
     private static final Log log = LogFactory.getLog(CertificateStreamProvider.class);

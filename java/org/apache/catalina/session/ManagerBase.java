@@ -98,7 +98,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     protected String secureRandomProvider = null;
 
+    /**
+     * The session ID generator.
+     */
     protected SessionIdGenerator sessionIdGenerator = null;
+    /**
+     * The session ID generator class.
+     */
     protected Class<? extends SessionIdGenerator> sessionIdGeneratorClass = null;
 
     /**
@@ -108,10 +114,19 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     private final Object sessionMaxAliveTimeUpdateLock = new Object();
 
 
+    /**
+     * The size of the timing stats cache.
+     */
     protected static final int TIMING_STATS_CACHE_SIZE = 100;
 
     // Use LinkedList as the Deques are initialised by filling with null
+    /**
+     * Timing information for session creation.
+     */
     protected final Deque<SessionTiming> sessionCreationTiming = new LinkedList<>();
+    /**
+     * Timing information for session expiration.
+     */
     protected final Deque<SessionTiming> sessionExpirationTiming = new LinkedList<>();
 
     /**
@@ -133,6 +148,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Deprecated
     protected long sessionCounter = 0;
 
+
+    /**
+     * The maximum number of active sessions recorded.
+     */
     protected volatile int maxActive = 0;
 
     private final Object maxActiveUpdateLock = new Object();
@@ -525,11 +544,21 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         this.expiredSessions.set(expiredSessions);
     }
 
+    /**
+     * Get the processing time.
+     *
+     * @return the processing time
+     */
     public long getProcessingTime() {
         return processingTime;
     }
 
 
+    /**
+     * Set the processing time.
+     *
+     * @param processingTime the processing time to set
+     */
     public void setProcessingTime(long processingTime) {
         this.processingTime = processingTime;
     }
@@ -809,6 +838,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
 
+    /**
+     * Change the session ID.
+     *
+     * @param session The session
+     * @param newId The new session ID
+     * @param notifySessionListeners Whether to notify session listeners
+     * @param notifyContainerListeners Whether to notify container listeners
+     */
     protected void changeSessionId(Session session, String newId, boolean notifySessionListeners,
             boolean notifyContainerListeners) {
         String oldId = session.getIdInternal();
@@ -1200,6 +1237,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
 
+    /**
+     * Expire the session with the given ID.
+     *
+     * @param sessionId The session ID
+     */
     public void expireSession(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1211,6 +1253,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         s.expire();
     }
 
+    /**
+     * Get the timestamp of the last access for the given session.
+     *
+     * @param sessionId The session ID
+     * @return the timestamp or -1 if not found
+     */
     public long getThisAccessedTimestamp(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1222,6 +1270,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         return s.getThisAccessedTime();
     }
 
+    /**
+     * Get the last access time for the given session as a formatted string.
+     *
+     * @param sessionId The session ID
+     * @return the formatted time or empty string if not found
+     */
     public String getThisAccessedTime(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1233,6 +1287,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         return new Date(s.getThisAccessedTime()).toString();
     }
 
+    /**
+     * Get the timestamp of the last access for the given session.
+     *
+     * @param sessionId The session ID
+     * @return the timestamp or -1 if not found
+     */
     public long getLastAccessedTimestamp(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1244,6 +1304,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         return s.getLastAccessedTime();
     }
 
+    /**
+     * Get the last access time for the given session as a formatted string.
+     *
+     * @param sessionId The session ID
+     * @return the formatted time or empty string if not found
+     */
     public String getLastAccessedTime(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1255,6 +1321,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         return new Date(s.getLastAccessedTime()).toString();
     }
 
+    /**
+     * Get the creation time for the given session as a formatted string.
+     *
+     * @param sessionId The session ID
+     * @return the formatted time or empty string if not found
+     */
     public String getCreationTime(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1266,6 +1338,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         return new Date(s.getCreationTime()).toString();
     }
 
+    /**
+     * Get the creation timestamp for the given session.
+     *
+     * @param sessionId The session ID
+     * @return the timestamp or -1 if not found
+     */
     public long getCreationTimestamp(String sessionId) {
         Session s = sessions.get(sessionId);
         if (s == null) {
@@ -1321,14 +1399,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         }
 
         /**
-         * @return Time stamp associated with this piece of timing information in milliseconds.
+         * Return the time stamp associated with this piece of timing information in milliseconds.
+         *
+         * @return Time stamp associated with this piece of timing information in milliseconds
          */
         public long getTimestamp() {
             return timestamp;
         }
 
         /**
-         * @return Duration associated with this piece of timing information in seconds.
+         * Return the duration associated with this piece of timing information in seconds.
+         *
+         * @return Duration associated with this piece of timing information in seconds
          */
         public int getDuration() {
             return duration;

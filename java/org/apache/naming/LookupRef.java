@@ -32,11 +32,25 @@ public class LookupRef extends AbstractRef {
     public static final String LOOKUP_NAME = "lookup-name";
 
 
+    /**
+     * Constructor.
+     *
+     * @param resourceType The resource type
+     * @param lookupName The JNDI lookup name
+     */
     public LookupRef(String resourceType, String lookupName) {
         this(resourceType, null, null, lookupName);
     }
 
 
+    /**
+     * Constructor.
+     *
+     * @param resourceType The resource type
+     * @param factory The factory class name
+     * @param factoryLocation The factory location
+     * @param lookupName The JNDI lookup name
+     */
     public LookupRef(String resourceType, String factory, String factoryLocation, String lookupName) {
         super(resourceType, factory, factoryLocation);
         if (lookupName != null && !lookupName.isEmpty()) {

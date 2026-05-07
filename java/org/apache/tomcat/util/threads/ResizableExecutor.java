@@ -18,6 +18,9 @@ package org.apache.tomcat.util.threads;
 
 import java.util.concurrent.Executor;
 
+/**
+ * Executor that supports dynamic resizing of the thread pool and queue.
+ */
 public interface ResizableExecutor extends Executor {
 
     /**
@@ -27,6 +30,11 @@ public interface ResizableExecutor extends Executor {
      */
     int getPoolSize();
 
+    /**
+     * Returns the maximum number of threads in the pool.
+     *
+     * @return the maximum number of threads
+     */
     int getMaxThreads();
 
     /**
@@ -36,8 +44,21 @@ public interface ResizableExecutor extends Executor {
      */
     int getActiveCount();
 
+    /**
+     * Resize the thread pool.
+     *
+     * @param corePoolSize    The new core pool size
+     * @param maximumPoolSize The new maximum pool size
+     * @return True if the pool was resized successfully
+     */
     boolean resizePool(int corePoolSize, int maximumPoolSize);
 
+    /**
+     * Resize the work queue.
+     *
+     * @param capacity The new queue capacity
+     * @return True if the queue was resized successfully
+     */
     boolean resizeQueue(int capacity);
 
 }

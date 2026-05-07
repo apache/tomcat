@@ -45,22 +45,34 @@ public class OperationInfo extends FeatureInfo {
 
     // ----------------------------------------------------- Instance Variables
 
+    // Instance variables for OperationInfo: impact, role, parametersLock, parameters.
+     /** Impact of the operation. */
     protected String impact = "UNKNOWN";
+    /** Role of the operation. */
     protected String role = "operation";
+    /** Lock for parameter access. */
     protected final ReadWriteLock parametersLock = new ReentrantReadWriteLock();
+    /** Array of parameters. */
     protected ParameterInfo[] parameters = new ParameterInfo[0];
 
 
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the "impact" of this operation, which should be a (case-insensitive) string value "ACTION",
-     *             "ACTION_INFO", "INFO", or "UNKNOWN".
+     * Returns the "impact" of this operation, which should be a (case-insensitive) string value "ACTION",
+     * "ACTION_INFO", "INFO", or "UNKNOWN".
+     *
+     * @return The impact of this operation
      */
     public String getImpact() {
         return this.impact;
     }
 
+    /**
+     * Sets the impact of this operation.
+     *
+     * @param impact The impact value
+     */
     public void setImpact(String impact) {
         if (impact == null) {
             this.impact = null;
@@ -71,19 +83,28 @@ public class OperationInfo extends FeatureInfo {
 
 
     /**
-     * @return the role of this operation ("getter", "setter", "operation", or "constructor").
+     * Returns the role of this operation ("getter", "setter", "operation", or "constructor").
+     *
+     * @return The role of this operation
      */
     public String getRole() {
         return this.role;
     }
 
+    /**
+     * Sets the role of this operation.
+     *
+     * @param role The role value
+     */
     public void setRole(String role) {
         this.role = role;
     }
 
 
     /**
-     * @return the fully qualified Java class name of the return type for this operation.
+     * Returns the fully qualified Java class name of the return type for this operation.
+     *
+     * @return The return type
      */
     public String getReturnType() {
         if (type == null) {
@@ -92,12 +113,19 @@ public class OperationInfo extends FeatureInfo {
         return type;
     }
 
+    /**
+     * Sets the return type of this operation.
+     *
+     * @param returnType The return type
+     */
     public void setReturnType(String returnType) {
         this.type = returnType;
     }
 
     /**
-     * @return the array of parameters for this operation.
+     * Returns the array of parameters for this operation.
+     *
+     * @return The parameter array
      */
     public ParameterInfo[] getSignature() {
         Lock readLock = parametersLock.readLock();
@@ -159,6 +187,11 @@ public class OperationInfo extends FeatureInfo {
         return (MBeanOperationInfo) info;
     }
 
+    /**
+     * Creates an array of MBeanParameterInfo from the operation parameters.
+     *
+     * @return The MBean parameter info array
+     */
     protected MBeanParameterInfo[] getMBeanParameterInfo() {
         ParameterInfo[] params = getSignature();
         MBeanParameterInfo[] parameters = new MBeanParameterInfo[params.length];

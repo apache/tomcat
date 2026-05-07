@@ -32,6 +32,9 @@ import java.util.concurrent.TimeoutException;
  */
 public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
 
+    /**
+     * The wrapped ScheduledExecutorService instance.
+     */
     protected final ScheduledExecutorService executor;
 
     /**

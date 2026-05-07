@@ -34,6 +34,9 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Utility class for parsing and managing HTTP parameters.
+ */
 public final class Parameters {
 
     private static final Log log = LogFactory.getLog(Parameters.class);
@@ -64,22 +67,45 @@ public final class Parameters {
      */
     private FailReason parseFailedReason = null;
 
+    /**
+     * Construct a new {@code Parameters} instance with default settings.
+     */
     public Parameters() {
         // NO-OP
     }
 
+    /**
+     * Set the query string to be parsed into parameters.
+     *
+     * @param queryMB The query string as a MessageBytes object
+     */
     public void setQuery(MessageBytes queryMB) {
         this.queryMB = queryMB;
     }
 
+    /**
+     * Set the maximum number of parameters allowed.
+     *
+     * @param limit The maximum number of parameters, or -1 for no limit
+     */
     public void setLimit(int limit) {
         this.limit = limit;
     }
 
+    /**
+     * Returns the character set used for decoding body parameters.
+     *
+     * @return the character set
+     */
     public Charset getCharset() {
         return charset;
     }
 
+    /**
+     * Set the character set used for decoding body parameters.
+     *
+     * @param charset The character set, or null to use the default (ISO-8859-1)
+     */
     public void setCharset(Charset charset) {
         if (charset == null) {
             charset = DEFAULT_BODY_CHARSET;
@@ -90,6 +116,11 @@ public final class Parameters {
         }
     }
 
+    /**
+     * Set the character set used for decoding query string parameters.
+     *
+     * @param queryStringCharset The character set, or null to use the default (UTF-8)
+     */
     public void setQueryStringCharset(Charset queryStringCharset) {
         if (queryStringCharset == null) {
             queryStringCharset = DEFAULT_URI_CHARSET;
@@ -119,11 +150,19 @@ public final class Parameters {
     }
 
 
+    /**
+     * Returns the number of parameters that have been parsed.
+     *
+     * @return the number of parameters
+     */
     public int size() {
         return parameterCount;
     }
 
 
+    /**
+     * Reset this object so it can be reused for a new request.
+     */
     public void recycle() {
         parameterCount = 0;
         paramHashValues.clear();
@@ -138,6 +177,13 @@ public final class Parameters {
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
 
+    /**
+     * Returns the values of the parameter with the given name.
+     *
+     * @param name The name of the parameter
+     *
+     * @return The values of the parameter, or null if the parameter does not exist
+     */
     public String[] getParameterValues(String name) {
         handleQueryParameters();
         // no "facade"
@@ -148,11 +194,23 @@ public final class Parameters {
         return values.toArray(new String[0]);
     }
 
+    /**
+     * Returns the names of all parameters.
+     *
+     * @return An enumeration of parameter names
+     */
     public Enumeration<String> getParameterNames() {
         handleQueryParameters();
         return Collections.enumeration(paramHashValues.keySet());
     }
 
+    /**
+     * Returns the first value of the parameter with the given name.
+     *
+     * @param name The name of the parameter
+     *
+     * @return The first value of the parameter, or null if the parameter does not exist
+     */
     public String getParameter(String name) {
         handleQueryParameters();
         ArrayList<String> values = paramHashValues.get(name);
@@ -195,6 +253,14 @@ public final class Parameters {
     }
 
 
+    /**
+     * Add a parameter with the given key and value.
+     *
+     * @param key The parameter name
+     * @param value The parameter value
+     *
+     * @throws IllegalStateException If the parameter count limit has been reached
+     */
     public void addParameter(String key, String value) throws IllegalStateException {
 
         if (key == null) {
@@ -212,6 +278,11 @@ public final class Parameters {
         paramHashValues.computeIfAbsent(key, k -> new ArrayList<>(1)).add(value);
     }
 
+    /**
+     * Set the URL decoder to use for decoding parameter names and values.
+     *
+     * @param u The URL decoder
+     */
     public void setURLDecoder(UDecoder u) {
         urlDec = u;
     }
@@ -227,6 +298,13 @@ public final class Parameters {
     private static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
 
 
+    /**
+     * Process the given byte array as a set of URL-encoded parameters using the current character set.
+     *
+     * @param bytes The byte array containing the parameters
+     * @param start The start index in the byte array
+     * @param len The length of the parameter data in the byte array
+     */
     public void processParameters(byte[] bytes, int start, int len) {
         processParameters(bytes, start, len, charset);
     }
@@ -469,6 +547,12 @@ public final class Parameters {
         urlDec.convert(bc, true);
     }
 
+    /**
+     * Process the given MessageBytes as a set of URL-encoded parameters using the specified character set.
+     *
+     * @param data The MessageBytes containing the parameters
+     * @param charset The character set to use for decoding
+     */
     public void processParameters(MessageBytes data, Charset charset) {
         if (data == null || data.isNull() || data.getLength() <= 0) {
             return;

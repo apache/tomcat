@@ -28,6 +28,12 @@ import java.util.List;
  */
 public class MultiThrowable extends Throwable {
 
+    /**
+     * Default constructor.
+     */
+    public MultiThrowable() {
+    }
+
     private static final long serialVersionUID = 1L;
 
     private final List<Throwable> throwables = new ArrayList<>();
@@ -43,7 +49,9 @@ public class MultiThrowable extends Throwable {
 
 
     /**
-     * @return A read-only list of the wrapped throwables.
+     * Return a read-only list of the wrapped throwables.
+     *
+     * @return A read-only list of the wrapped throwables
      */
     public List<Throwable> getThrowables() {
         return Collections.unmodifiableList(throwables);
@@ -51,8 +59,10 @@ public class MultiThrowable extends Throwable {
 
 
     /**
+     * Return the wrapped throwable.
+     *
      * @return {@code null} if there are no wrapped throwables, the Throwable if there is a single wrapped throwable or
-     *             the current instance of there are multiple wrapped throwables
+     *             the current instance if there are multiple wrapped throwables
      */
     public Throwable getThrowable() {
         if (size() == 0) {
@@ -66,7 +76,9 @@ public class MultiThrowable extends Throwable {
 
 
     /**
-     * @return The number of throwables currently wrapped by this instance.
+     * Return the number of throwables currently wrapped by this instance.
+     *
+     * @return The number of throwables currently wrapped by this instance
      */
     public int size() {
         return throwables.size();

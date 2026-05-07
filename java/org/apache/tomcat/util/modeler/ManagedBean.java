@@ -65,13 +65,34 @@ public class ManagedBean implements java.io.Serializable {
 
     private final Map<String,OperationInfo> operations = new HashMap<>();
 
+    /**
+     * The fully qualified name of the Java class of the MBean.
+     */
     protected String className = BASE_MBEAN;
+    /**
+     * The human-readable description of this MBean.
+     */
     protected String description = null;
+    /**
+     * The ObjectName domain in which this MBean should be registered.
+     */
     protected String domain = null;
+    /**
+     * The group to which this MBean belongs.
+     */
     protected String group = null;
+    /**
+     * The name of this managed bean.
+     */
     protected String name = null;
 
+    /**
+     * The collection of notifications for this MBean.
+     */
     private NotificationInfo[] notifications = new NotificationInfo[0];
+    /**
+     * The fully qualified name of the Java class of the resource implementation class.
+     */
     protected String type = null;
 
     /**
@@ -90,7 +111,9 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the collection of attributes for this MBean.
+     * Return the collection of attributes for this MBean.
+     *
+     * @return the collection of attributes for this MBean
      */
     public AttributeInfo[] getAttributes() {
         return attributes.values().toArray(new AttributeInfo[0]);
@@ -107,6 +130,11 @@ public class ManagedBean implements java.io.Serializable {
         return this.className;
     }
 
+    /**
+     * Set the fully qualified name of the Java class of the MBean.
+     *
+     * @param className the className to set
+     */
     public void setClassName(String className) {
         mBeanInfoLock.writeLock().lock();
         try {
@@ -119,12 +147,19 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the human-readable description of this MBean.
+     * Return the human-readable description of this MBean.
+     *
+     * @return the human-readable description of this MBean
      */
     public String getDescription() {
         return this.description;
     }
 
+    /**
+     * Set the human-readable description of this MBean.
+     *
+     * @param description the description to set
+     */
     public void setDescription(String description) {
         mBeanInfoLock.writeLock().lock();
         try {
@@ -137,38 +172,59 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the (optional) <code>ObjectName</code> domain in which this MBean should be registered in the
-     *             MBeanServer.
+     * Return the (optional) <code>ObjectName</code> domain in which this MBean should be registered in the
+     * MBeanServer.
+     *
+     * @return the (optional) <code>ObjectName</code> domain in which this MBean should be registered
      */
     public String getDomain() {
         return this.domain;
     }
 
+    /**
+     * Set the (optional) <code>ObjectName</code> domain in which this MBean should be registered.
+     *
+     * @param domain the domain to set
+     */
     public void setDomain(String domain) {
         this.domain = domain;
     }
 
 
     /**
-     * @return the (optional) group to which this MBean belongs.
+     * Return the (optional) group to which this MBean belongs.
+     *
+     * @return the (optional) group to which this MBean belongs
      */
     public String getGroup() {
         return this.group;
     }
 
+    /**
+     * Set the (optional) group to which this MBean belongs.
+     *
+     * @param group the group to set
+     */
     public void setGroup(String group) {
         this.group = group;
     }
 
 
     /**
-     * @return the name of this managed bean, which must be unique among all MBeans managed by a particular MBeans
-     *             server.
+     * Return the name of this managed bean, which must be unique among all MBeans managed by a particular MBeans
+     * server.
+     *
+     * @return the name of this managed bean
      */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Set the name of this managed bean.
+     *
+     * @param name the name to set
+     */
     public void setName(String name) {
         mBeanInfoLock.writeLock().lock();
         try {
@@ -181,7 +237,9 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the collection of notifications for this MBean.
+     * Return the collection of notifications for this MBean.
+     *
+     * @return the collection of notifications for this MBean
      */
     public NotificationInfo[] getNotifications() {
         return this.notifications;
@@ -189,7 +247,9 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the collection of operations for this MBean.
+     * Return the collection of operations for this MBean.
+     *
+     * @return the collection of operations for this MBean
      */
     public OperationInfo[] getOperations() {
         return operations.values().toArray(new OperationInfo[0]);
@@ -197,13 +257,20 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * @return the fully qualified name of the Java class of the resource implementation class described by the managed
-     *             bean described by this descriptor.
+     * Return the fully qualified name of the Java class of the resource implementation class described by the managed
+     * bean described by this descriptor.
+     *
+     * @return the fully qualified name of the Java class of the resource implementation class
      */
     public String getType() {
         return this.type;
     }
 
+    /**
+     * Set the fully qualified name of the Java class of the resource implementation class.
+     *
+     * @param type the type to set
+     */
     public void setType(String type) {
         mBeanInfoLock.writeLock().lock();
         try {
@@ -437,6 +504,16 @@ public class ManagedBean implements java.io.Serializable {
         return m;
     }
 
+    /**
+     * Get the setter method for the given attribute.
+     *
+     * @param aname The attribute name
+     * @param bean The MBean
+     * @param resource The resource
+     * @return the setter method
+     * @throws AttributeNotFoundException if the attribute is not found
+     * @throws ReflectionException if a reflection error occurs
+     */
     public Method getSetter(String aname, BaseModelMBean bean, Object resource)
             throws AttributeNotFoundException, ReflectionException {
 
@@ -477,6 +554,18 @@ public class ManagedBean implements java.io.Serializable {
         return m;
     }
 
+    /**
+     * Get the method to invoke for the given operation.
+     *
+     * @param aname The operation name
+     * @param params The parameters
+     * @param signature The parameter signature
+     * @param bean The MBean
+     * @param resource The resource
+     * @return the method to invoke
+     * @throws MBeanException if the operation is not found
+     * @throws ReflectionException if a reflection error occurs
+     */
     public Method getInvoke(String aname, Object[] params, String[] signature, BaseModelMBean bean, Object resource)
             throws MBeanException, ReflectionException {
 

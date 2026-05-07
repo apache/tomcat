@@ -47,13 +47,17 @@ public interface Loader {
 
 
     /**
-     * @return the Java class loader to be used by this Loader.
+     * Return the Java class loader to be used by this Loader.
+     *
+     * @return the Java class loader to be used by this Loader
      */
     ClassLoader getClassLoader();
 
 
     /**
-     * @return the Context with which this Loader has been associated.
+     * Return the Context with which this Loader has been associated.
+     *
+     * @return the Context with which this Loader has been associated
      */
     Context getContext();
 
@@ -67,7 +71,9 @@ public interface Loader {
 
 
     /**
-     * @return the "follow standard delegation model" flag used to configure our ClassLoader.
+     * Return the "follow standard delegation model" flag used to configure our ClassLoader.
+     *
+     * @return the "follow standard delegation model" flag used to configure our ClassLoader
      */
     boolean getDelegate();
 

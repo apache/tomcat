@@ -37,6 +37,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NamingResourcesMBean extends BaseModelMBean {
 
+    /**
+     * Default constructor.
+     */
+    public NamingResourcesMBean() {
+    }
+
     private static final StringManager sm = StringManager.getManager(NamingResourcesMBean.class);
 
     // ----------------------------------------------------- Instance Variables

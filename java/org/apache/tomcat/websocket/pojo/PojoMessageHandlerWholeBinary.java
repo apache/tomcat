@@ -42,6 +42,21 @@ public class PojoMessageHandlerWholeBinary extends PojoMessageHandlerWholeBase<B
 
     private final boolean isForInputStream;
 
+    /**
+     * Create a whole binary message handler.
+     *
+     * @param pojo            POJO instance
+     * @param method          Method to invoke
+     * @param session         WebSocket session
+     * @param config          Endpoint configuration
+     * @param decoderClazzes  List of decoder classes
+     * @param params          Pre-populated parameter array
+     * @param indexPayload    Index of the payload parameter
+     * @param convert         Convert the message before passing to the method
+     * @param indexSession    Index of the session parameter
+     * @param isForInputStream True if the payload is an InputStream
+     * @param maxMessageSize  Maximum message size
+     */
     public PojoMessageHandlerWholeBinary(Object pojo, Method method, Session session, EndpointConfig config,
             List<Class<? extends Decoder>> decoderClazzes, Object[] params, int indexPayload, boolean convert,
             int indexSession, boolean isForInputStream, long maxMessageSize) {

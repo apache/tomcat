@@ -25,6 +25,19 @@ import jakarta.websocket.Session;
  */
 public class PojoMessageHandlerPartialText extends PojoMessageHandlerPartialBase<String> {
 
+    /**
+     * Create a partial text message handler.
+     *
+     * @param pojo          POJO instance
+     * @param method        Method to invoke
+     * @param session       WebSocket session
+     * @param params        Pre-populated parameter array
+     * @param indexPayload  Index of the payload parameter
+     * @param convert       Convert the message before passing to the method
+     * @param indexBoolean  Index of the last flag parameter
+     * @param indexSession  Index of the session parameter
+     * @param maxMessageSize Maximum message size
+     */
     public PojoMessageHandlerPartialText(Object pojo, Method method, Session session, Object[] params, int indexPayload,
             boolean convert, int indexBoolean, int indexSession, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert, indexBoolean, indexSession, maxMessageSize);

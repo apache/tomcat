@@ -40,7 +40,9 @@ public interface Member extends Serializable {
     byte[] SHUTDOWN_PAYLOAD = new byte[] { 66, 65, 66, 89, 45, 65, 76, 69, 88 };
 
     /**
-     * @return the name of this node, should be unique within the group.
+     * Return the name of this node, should be unique within the group.
+     *
+     * @return the name of this node
      */
     String getName();
 
@@ -110,6 +112,8 @@ public interface Member extends Serializable {
     boolean isSuspect();
 
     /**
+     * Check if the member has been confirmed to malfunction.
+     *
      * @return {@code true} if the member has been confirmed to malfunction
      */
     boolean isFailing();
@@ -123,6 +127,8 @@ public interface Member extends Serializable {
     byte[] getUniqueId();
 
     /**
+     * Return the payload associated with this member.
+     *
      * @return the payload associated with this member
      */
     byte[] getPayload();
@@ -135,6 +141,8 @@ public interface Member extends Serializable {
     void setPayload(byte[] payload);
 
     /**
+     * Return the command associated with this member.
+     *
      * @return the command associated with this member
      */
     byte[] getCommand();
@@ -147,6 +155,8 @@ public interface Member extends Serializable {
     void setCommand(byte[] command);
 
     /**
+     * Return the domain for this cluster.
+     *
      * @return the domain for this cluster
      */
     byte[] getDomain();
@@ -180,6 +190,8 @@ public interface Member extends Serializable {
     int getDataLength();
 
     /**
+     * Check if the member is the local member.
+     *
      * @return {@code true} if the member is local member
      */
     boolean isLocal();

@@ -102,14 +102,27 @@ public class ParameterLimitValve extends ValveBase {
      */
     private boolean context = false;
 
+    /**
+     * Construct a new {@code ParameterLimitValve} instance.
+     */
     public ParameterLimitValve() {
         super(true);
     }
 
+    /**
+     * Returns the relative path to the configuration file.
+     *
+     * @return the relative path to the configuration file
+     */
     public String getResourcePath() {
         return resourcePath;
     }
 
+    /**
+     * Set the relative path to the configuration file.
+     *
+     * @param resourcePath the relative path to the configuration file
+     */
     public void setResourcePath(String resourcePath) {
         this.resourcePath = resourcePath;
     }
@@ -171,6 +184,12 @@ public class ParameterLimitValve extends ValveBase {
 
     }
 
+    /**
+     * Set the mapping of URL patterns to their corresponding parameter limits from a string containing the
+     * configuration.
+     *
+     * @param urlPatternConfig The URL pattern to parameter limit mappings
+     */
     public void setUrlPatternLimits(String urlPatternConfig) {
         urlPatternLimits.clear();
         setUrlPatternLimits(new BufferedReader(new StringReader(urlPatternConfig)));

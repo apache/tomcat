@@ -44,8 +44,17 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class MBeanUtils {
 
+    /**
+     * Default constructor.
+     */
+    public MBeanUtils() {
+    }
+
     // ------------------------------------------------------- Static Variables
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MBeanUtils.class);
 
     /**

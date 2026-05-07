@@ -778,6 +778,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    /**
+     * Return whether TRACE requests are allowed.
+     *
+     * @return {@code true} if TRACE requests are allowed
+     */
     public boolean getAllowTrace() {
         checkFacade();
         return request.getConnector().getAllowTrace();

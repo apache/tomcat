@@ -28,7 +28,8 @@ public interface Rules {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the Digester instance with which this Rules instance is associated.
+     * Returns the Digester instance with which this Rules instance is associated.
+     * @return the Digester instance
      */
     Digester getDigester();
 

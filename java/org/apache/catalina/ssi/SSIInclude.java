@@ -28,6 +28,15 @@ import org.apache.tomcat.util.res.StringManager;
 public final class SSIInclude implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIInclude.class);
 
+    /**
+     * Default constructor.
+     */
+    public SSIInclude() {
+    }
+
+    /**
+     * Processes the include directive to insert the contents of another file.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

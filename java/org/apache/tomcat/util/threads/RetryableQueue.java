@@ -19,6 +19,11 @@ package org.apache.tomcat.util.threads;
 
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * A retryable queue interface that extends {@link BlockingQueue}.
+ *
+ * @param <T> The type of elements held in this queue
+ */
 public interface RetryableQueue<T> extends BlockingQueue<T> {
 
     /**

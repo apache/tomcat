@@ -57,6 +57,11 @@ import jakarta.mail.Session;
  */
 public class MailSessionFactory implements ObjectFactory {
 
+    /**
+     * Default constructor.
+     */
+    public MailSessionFactory() {
+    }
 
     /**
      * The Java type for which this factory knows how to create objects.

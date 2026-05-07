@@ -41,6 +41,12 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
  */
 public class MemoryRealm extends RealmBase {
 
+    /**
+     * Default constructor.
+     */
+    public MemoryRealm() {
+    }
+
     private static final Log log = LogFactory.getLog(MemoryRealm.class);
 
     // ----------------------------------------------------- Instance Variables

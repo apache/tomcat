@@ -150,6 +150,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public ManagerServlet() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -489,6 +495,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Reload SSL host configurations.
+     *
+     * @param writer The output writer
+     * @param tlsHostName The TLS host name or null for all hosts
+     * @param smClient StringManager for the client's locale
+     */
     protected void sslReload(PrintWriter writer, String tlsHostName, StringManager smClient) {
         Connector[] connectors = getConnectors();
         boolean found = false;
@@ -551,6 +564,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Display SSL/TLS ciphers for each connector.
+     *
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     */
     protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
         Map<String,List<String>> connectorCiphers = getConnectorCiphers(smClient);
@@ -1510,6 +1529,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Validate the context name.
+     *
+     * @param cn The context name to validate
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     * @return true if valid, false otherwise
+     */
     protected static boolean validateContextName(ContextName cn, PrintWriter writer, StringManager smClient) {
 
         // ContextName should be non-null with a path that is empty or starts
@@ -1526,6 +1553,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         return false;
     }
 
+    /**
+     * Get the SSL ciphers for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to cipher lists
+     */
     protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
@@ -1549,6 +1582,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Get the SSL certificates for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to certificate lists
+     */
     protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
@@ -1593,6 +1632,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Get the trusted certificates for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to trusted certificate lists
+     */
     protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 

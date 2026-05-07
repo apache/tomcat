@@ -24,17 +24,45 @@ import java.io.Serializable;
 
 import org.apache.catalina.tribes.util.Arrays;
 
+/**
+ * A message used for RPC communication between group members.
+ */
 public class RpcMessage implements Externalizable {
 
+    /**
+     * The payload of the message.
+     */
     protected Serializable message;
+
+    /**
+     * The unique identifier for this message.
+     */
     protected byte[] uuid;
+
+    /**
+     * The RPC channel identifier.
+     */
     protected byte[] rpcId;
+
+    /**
+     * Whether this message is a reply.
+     */
     protected boolean reply = false;
 
+    /**
+     * Default constructor required by Externalizable.
+     */
     public RpcMessage() {
         // for serialization
     }
 
+    /**
+     * Create a new RpcMessage.
+     *
+     * @param rpcId   The RPC channel identifier
+     * @param uuid    The unique identifier for this message
+     * @param message The message payload
+     */
     public RpcMessage(byte[] rpcId, byte[] uuid, Serializable message) {
         this.rpcId = rpcId;
         this.uuid = uuid;
@@ -69,11 +97,23 @@ public class RpcMessage implements Externalizable {
                 Arrays.toString(uuid) + "; msg=" + message;
     }
 
+    /**
+     * A reply message sent when no RPC channel is found for a given RPC ID.
+     */
     public static class NoRpcChannelReply extends RpcMessage {
+        /**
+         * Default constructor required by Externalizable.
+         */
         public NoRpcChannelReply() {
 
         }
 
+        /**
+         * Create a new NoRpcChannelReply.
+         *
+         * @param rpcid The RPC channel identifier
+         * @param uuid  The unique identifier for this message
+         */
         public NoRpcChannelReply(byte[] rpcid, byte[] uuid) {
             super(rpcid, uuid, null);
             reply = true;

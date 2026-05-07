@@ -40,15 +40,28 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     private ObjectName oname = null;
 
+    /**
+     * Default constructor.
+     */
     public ReplicationTransmitter() {
     }
 
     private MultiPointSender transport = new PooledParallelSender();
 
+    /**
+     * Return the transport used for message sending.
+     *
+     * @return the transport
+     */
     public MultiPointSender getTransport() {
         return transport;
     }
 
+    /**
+     * Set the transport used for message sending.
+     *
+     * @param transport the new transport
+     */
     public void setTransport(MultiPointSender transport) {
         this.transport = transport;
     }

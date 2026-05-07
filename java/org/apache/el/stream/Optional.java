@@ -21,6 +21,9 @@ import jakarta.el.LambdaExpression;
 
 import org.apache.el.util.MessageFactory;
 
+/**
+ * Represents an optional value that may or may not be present.
+ */
 public class Optional {
 
     private final Object obj;
@@ -32,6 +35,12 @@ public class Optional {
     }
 
 
+    /**
+     * Returns the contained value, or throws an exception if empty.
+     *
+     * @return The contained value
+     * @throws ELException if the value is not present
+     */
     public Object get() throws ELException {
         if (obj == null) {
             throw new ELException(MessageFactory.get("stream.optional.empty"));
@@ -41,6 +50,11 @@ public class Optional {
     }
 
 
+    /**
+     * If a value is present, invokes the given lambda with the value.
+     *
+     * @param le The lambda expression to invoke
+     */
     public void ifPresent(LambdaExpression le) {
         if (obj != null) {
             le.invoke(obj);
@@ -48,6 +62,12 @@ public class Optional {
     }
 
 
+    /**
+     * Returns the contained value, or the given default value if empty.
+     *
+     * @param other The default value
+     * @return The contained value or the default
+     */
     public Object orElse(Object other) {
         if (obj == null) {
             return other;
@@ -57,6 +77,12 @@ public class Optional {
     }
 
 
+    /**
+     * Returns the contained value, or the result of evaluating the given lambda if empty.
+     *
+     * @param le The lambda expression or already-evaluated value
+     * @return The contained value or the result of the lambda
+     */
     public Object orElseGet(Object le) {
         if (obj == null) {
             // EL 3.0 specification says parameter is LambdaExpression but it

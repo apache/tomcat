@@ -27,12 +27,24 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.HexUtils;
 
+/**
+ * A credential handler that uses a {@link javax.crypto.SecretKeyFactory} (PBE) to hash credentials.
+ */
 public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
 
     private static final Log log = LogFactory.getLog(SecretKeyCredentialHandler.class);
 
+    /**
+     * The default algorithm used for key derivation.
+     */
     public static final String DEFAULT_ALGORITHM = "PBKDF2WithHmacSHA1";
+    /**
+     * The default derived key length in bits.
+     */
     public static final int DEFAULT_KEY_LENGTH = 160;
+    /**
+     * The default number of iterations for key derivation.
+     */
     public static final int DEFAULT_ITERATIONS = 20000;
 
 
@@ -40,6 +52,11 @@ public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
     private int keyLength = DEFAULT_KEY_LENGTH;
 
 
+    /**
+     * Create a handler with the default algorithm.
+     *
+     * @throws NoSuchAlgorithmException if the default algorithm is not available
+     */
     public SecretKeyCredentialHandler() throws NoSuchAlgorithmException {
         setAlgorithm(DEFAULT_ALGORITHM);
     }
@@ -57,11 +74,18 @@ public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
     }
 
 
+    /**
+     * Returns the key length.
+     * @return the key length
+     */
     public int getKeyLength() {
         return keyLength;
     }
 
-
+    /**
+     * Sets the key length.
+     * @param keyLength the key length
+     */
     public void setKeyLength(int keyLength) {
         this.keyLength = keyLength;
     }

@@ -27,7 +27,16 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
+/**
+ * OpenSSL implementation of SSLImplementation.
+ */
 public class OpenSSLImplementation extends SSLImplementation {
+
+    /**
+     * Constructs an OpenSSLImplementation.
+     */
+    public OpenSSLImplementation() {
+    }
 
     @Override
     public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {

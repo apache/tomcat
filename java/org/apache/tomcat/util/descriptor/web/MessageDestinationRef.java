@@ -29,6 +29,12 @@ public class MessageDestinationRef extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public MessageDestinationRef() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -37,10 +43,18 @@ public class MessageDestinationRef extends ResourceBase {
      */
     private String link = null;
 
+    /**
+     * Get the link.
+     * @return the link
+     */
     public String getLink() {
         return this.link;
     }
 
+    /**
+     * Set the link.
+     * @param link the link
+     */
     public void setLink(String link) {
         this.link = link;
     }
@@ -51,10 +65,18 @@ public class MessageDestinationRef extends ResourceBase {
      */
     private String usage = null;
 
+    /**
+     * Get the usage.
+     * @return the usage
+     */
     public String getUsage() {
         return this.usage;
     }
 
+    /**
+     * Set the usage.
+     * @param usage the usage
+     */
     public void setUsage(String usage) {
         this.usage = usage;
     }

@@ -49,6 +49,15 @@ import org.apache.catalina.tribes.util.StringManager;
  * counter. <b>default=true</b>
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
+    /**
+     * Constructs an OrderInterceptor.
+     */
+    public OrderInterceptor() {
+    }
+
+    /**
+     * String manager for internationalization.
+     */
     protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);
     private final Map<Member,Counter> outcounter = new HashMap<>();
     private final Map<Member,Counter> incounter = new HashMap<>();
@@ -115,6 +124,12 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    /**
+     * Processes leftover messages for a member.
+     *
+     * @param member The member
+     * @param force Whether to force processing
+     */
     protected void processLeftOvers(Member member, boolean force) {
         MessageOrder tmp = incoming.get(member);
         if (force) {
@@ -127,9 +142,10 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     /**
-     * @param order MessageOrder
+     * Processes incoming messages, handling expiration and ordering.
      *
-     * @return boolean - true if a message expired and was processed
+     * @param order The message order to process
+     * @return true if a message expired and was processed
      */
     protected boolean processIncoming(MessageOrder order) {
         boolean result = false;
@@ -205,11 +221,23 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         super.memberDisappeared(member);
     }
 
+    /**
+     * Increments the outgoing message counter for a member.
+     *
+     * @param mbr The member
+     * @return The new counter value
+     */
     protected int incCounter(Member mbr) {
         Counter cnt = getOutCounter(mbr);
         return cnt.inc();
     }
 
+    /**
+     * Returns the incoming counter for a member, creating one if needed.
+     *
+     * @param mbr The member
+     * @return The counter
+     */
     protected Counter getInCounter(Member mbr) {
         Counter cnt = incounter.get(mbr);
         if (cnt == null) {
@@ -220,6 +248,12 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt;
     }
 
+    /**
+     * Returns the outgoing counter for a member, creating one if needed.
+     *
+     * @param mbr The member
+     * @return The counter
+     */
     protected Counter getOutCounter(Member mbr) {
         Counter cnt = outcounter.get(mbr);
         if (cnt == null) {
@@ -229,53 +263,117 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt;
     }
 
+    /**
+     * Counter for tracking message sequence numbers.
+     */
     protected static class Counter {
+        /**
+         * Constructs a Counter with initial value 0.
+         */
+        public Counter() {
+        }
+
         private final AtomicInteger value = new AtomicInteger(0);
 
+        /**
+         * Returns the current counter value.
+         *
+         * @return The counter value
+         */
         public int getCounter() {
             return value.get();
         }
 
+        /**
+         * Sets the counter value.
+         *
+         * @param counter The new counter value
+         */
         public void setCounter(int counter) {
             this.value.set(counter);
         }
 
+        /**
+         * Increments the counter and returns the new value.
+         *
+         * @return The new counter value
+         */
         public int inc() {
             return value.addAndGet(1);
         }
     }
 
+    /**
+     * Represents a message in the ordering queue.
+     */
     protected static class MessageOrder {
         private final long received = System.currentTimeMillis();
         private MessageOrder next;
         private final int msgNr;
         private ChannelMessage msg;
 
+        /**
+         * Constructs a MessageOrder with the given message number and message.
+         *
+         * @param msgNr The message number
+         * @param msg The channel message
+         */
         public MessageOrder(int msgNr, ChannelMessage msg) {
             this.msgNr = msgNr;
             this.msg = msg;
         }
 
+        /**
+         * Checks if this message has expired.
+         *
+         * @param expireTime The expiration time in milliseconds
+         * @return true if the message has expired
+         */
         public boolean isExpired(long expireTime) {
             return (System.currentTimeMillis() - received) > expireTime;
         }
 
+        /**
+         * Returns the channel message.
+         *
+         * @return The channel message
+         */
         public ChannelMessage getMessage() {
             return msg;
         }
 
+        /**
+         * Sets the channel message.
+         *
+         * @param msg The channel message
+         */
         public void setMessage(ChannelMessage msg) {
             this.msg = msg;
         }
 
+        /**
+         * Sets the next message in the order.
+         *
+         * @param order The next message order
+         */
         public void setNext(MessageOrder order) {
             this.next = order;
         }
 
+        /**
+         * Returns the next message in the order.
+         *
+         * @return The next message order
+         */
         public MessageOrder getNext() {
             return next;
         }
 
+        /**
+         * Returns the count of messages in this chain.
+         *
+         * @return The message count
+         */
         public int getCount() {
             int counter = 1;
             MessageOrder tmp = next;
@@ -286,6 +384,13 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             return counter;
         }
 
+        /**
+         * Adds a message order to the end of the chain.
+         *
+         * @param head The head of the chain
+         * @param add The message order to add
+         * @return The head of the updated chain
+         */
         @SuppressWarnings("null") // prev cannot be null
         public static MessageOrder add(MessageOrder head, MessageOrder add) {
             if (head == null) {
@@ -324,6 +429,11 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             return head;
         }
 
+        /**
+         * Returns the message number.
+         *
+         * @return The message number
+         */
         public int getMsgNr() {
             return msgNr;
         }
@@ -331,26 +441,56 @@ public class OrderInterceptor extends ChannelInterceptorBase {
 
     }
 
+    /**
+     * Sets the message expiration time in milliseconds.
+     *
+     * @param expire The expiration time
+     */
     public void setExpire(long expire) {
         this.expire = expire;
     }
 
+    /**
+     * Sets whether expired messages should be forwarded.
+     *
+     * @param forwardExpired true to forward expired messages
+     */
     public void setForwardExpired(boolean forwardExpired) {
         this.forwardExpired = forwardExpired;
     }
 
+    /**
+     * Sets the maximum queue size.
+     *
+     * @param maxQueue The maximum queue size
+     */
     public void setMaxQueue(int maxQueue) {
         this.maxQueue = maxQueue;
     }
 
+    /**
+     * Returns the message expiration time in milliseconds.
+     *
+     * @return The expiration time
+     */
     public long getExpire() {
         return expire;
     }
 
+    /**
+     * Returns whether expired messages are forwarded.
+     *
+     * @return true if expired messages are forwarded
+     */
     public boolean getForwardExpired() {
         return forwardExpired;
     }
 
+    /**
+     * Returns the maximum queue size.
+     *
+     * @return The maximum queue size
+     */
     public int getMaxQueue() {
         return maxQueue;
     }

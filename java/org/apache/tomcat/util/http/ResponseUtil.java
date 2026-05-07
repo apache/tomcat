@@ -29,6 +29,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.parser.TokenList;
 
+/**
+ * Utility methods for HTTP response handling.
+ */
 public class ResponseUtil {
 
     private static final String VARY_HEADER = "vary";
@@ -39,11 +42,23 @@ public class ResponseUtil {
     }
 
 
+    /**
+     * Add a Vary header field name to the given headers.
+     *
+     * @param headers The headers
+     * @param name The field name
+     */
     public static void addVaryFieldName(MimeHeaders headers, String name) {
         addVaryFieldName(new HeaderAdapter(headers), name);
     }
 
 
+    /**
+     * Add a Vary header field name to the given response.
+     *
+     * @param response The response
+     * @param name The field name
+     */
     public static void addVaryFieldName(HttpServletResponse response, String name) {
         addVaryFieldName(new ResponseAdapter(response), name);
     }

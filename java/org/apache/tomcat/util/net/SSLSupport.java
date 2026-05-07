@@ -115,22 +115,25 @@ public interface SSLSupport {
     String getSessionId() throws IOException;
 
     /**
-     * @return the protocol String indicating how the SSL socket was created e.g. TLSv1 or TLSv1.2 etc.
+     * Returns the protocol string indicating how the SSL socket was created e.g. TLSv1 or TLSv1.2 etc.
      *
+     * @return the protocol string
      * @throws IOException If an error occurs trying to obtain the protocol information from the socket
      */
     String getProtocol() throws IOException;
 
     /**
-     * @return the list of SSL/TLS protocol versions requested by the client
+     * Returns the list of SSL/TLS protocol versions requested by the client.
      *
+     * @return the list of requested protocols
      * @throws IOException If an error occurs trying to obtain the client requested protocol information from the socket
      */
     String getRequestedProtocols() throws IOException;
 
     /**
-     * @return the list of SSL/TLS ciphers requested by the client
+     * Returns the list of SSL/TLS ciphers requested by the client.
      *
+     * @return the list of requested ciphers
      * @throws IOException If an error occurs trying to obtain the client request cipher information from the socket
      */
     String getRequestedCiphers() throws IOException;

@@ -24,6 +24,11 @@ import org.apache.catalina.connector.Request;
  * General purpose request parsing and encoding utility methods.
  */
 public final class RequestUtil {
+    /**
+     * Default constructor.
+     */
+    public RequestUtil() {
+    }
 
     /**
      * Build an appropriate return value for {@link HttpServletRequest#getRequestURL()} based on the provided request

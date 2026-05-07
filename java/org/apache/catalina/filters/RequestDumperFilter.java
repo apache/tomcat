@@ -49,6 +49,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RequestDumperFilter extends GenericFilter {
 
+    /**
+     * Default constructor.
+     */
+    public RequestDumperFilter() {
+        super();
+    }
+
     private static final long serialVersionUID = 1L;
 
     private static final String NON_HTTP_REQ_MSG = "Not available. Non-http request.";

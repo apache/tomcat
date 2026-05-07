@@ -43,20 +43,53 @@ import org.apache.juli.logging.LogFactory;
 public class MessageDispatchInterceptor extends ChannelInterceptorBase implements MessageDispatchInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MessageDispatchInterceptor.class);
 
+    /**
+     * Maximum queue size.
+     */
     protected long maxQueueSize = 1024 * 1024 * 64; // 64 MiB
+    /**
+     * Whether the queue is running.
+     */
     protected volatile boolean run = false;
+    /**
+     * Whether to use deep clone.
+     */
     protected boolean useDeepClone = true;
+    /**
+     * Whether to always send.
+     */
     protected boolean alwaysSend = true;
 
+    /**
+     * Current queue size.
+     */
     protected final AtomicLong currentSize = new AtomicLong(0);
+    /**
+     * The executor service.
+     */
     protected ExecutorService executor = null;
+    /**
+     * Maximum number of threads.
+     */
     protected int maxThreads = 10;
+    /**
+     * Maximum number of spare threads.
+     */
     protected int maxSpareThreads = 2;
+    /**
+     * Keep alive time.
+     */
     protected long keepAliveTime = 5000;
 
 
+    /**
+     * Default constructor.
+     */
     public MessageDispatchInterceptor() {
         setOptionFlag(Channel.SEND_OPTIONS_ASYNCHRONOUS);
     }
@@ -90,12 +123,22 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Add a message to the queue.
+     * @param msg the message
+     * @param destination the destination
+     * @param payload the payload
+     * @return true if added
+     */
     public boolean addToQueue(final ChannelMessage msg, final Member[] destination, final InterceptorPayload payload) {
         executor.execute(() -> sendAsyncData(msg, destination, payload));
         return true;
     }
 
 
+    /**
+     * Start the dispatch queue.
+     */
     public void startQueue() {
         if (run) {
             return;
@@ -110,6 +153,9 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Stop the dispatch queue.
+     */
     public void stopQueue() {
         run = false;
         executor.shutdownNow();
@@ -126,11 +172,19 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Set the maximum queue size.
+     * @param maxQueueSize the maximum queue size
+     */
     public void setMaxQueueSize(long maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
     }
 
 
+    /**
+     * Set whether to use deep clone.
+     * @param useDeepClone whether to use deep clone
+     */
     public void setUseDeepClone(boolean useDeepClone) {
         this.useDeepClone = useDeepClone;
     }
@@ -141,6 +195,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Get whether deep clone is used.
+     * @return whether deep clone is used
+     */
     public boolean getUseDeepClone() {
         return useDeepClone;
     }
@@ -151,11 +209,21 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Add to the current size and return the new value.
+     * @param inc the increment
+     * @return the new size
+     */
     public long addAndGetCurrentSize(long inc) {
         return currentSize.addAndGet(inc);
     }
 
 
+    /**
+     * Set the current size and return the value.
+     * @param value the value
+     * @return the value
+     */
     public long setAndGetCurrentSize(long value) {
         currentSize.set(value);
         return value;
@@ -177,16 +245,28 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Set the keep alive time.
+     * @param keepAliveTime the keep alive time
+     */
     public void setKeepAliveTime(long keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
     }
 
 
+    /**
+     * Set the maximum spare threads.
+     * @param maxSpareThreads the maximum spare threads
+     */
     public void setMaxSpareThreads(int maxSpareThreads) {
         this.maxSpareThreads = maxSpareThreads;
     }
 
 
+    /**
+     * Set the maximum threads.
+     * @param maxThreads the maximum threads
+     */
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
     }
@@ -233,6 +313,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Send async data.
+     * @param msg the message
+     * @param destination the destination
+     * @param payload the payload
+     */
     protected void sendAsyncData(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
         ErrorHandler handler = null;
         if (payload != null) {

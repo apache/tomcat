@@ -36,19 +36,35 @@ public class ServerCookie implements Serializable {
     private final MessageBytes name = MessageBytes.newInstance();
     private final MessageBytes value = MessageBytes.newInstance();
 
+    /**
+     * Creates a new empty ServerCookie instance.
+     */
     public ServerCookie() {
         // NOOP
     }
 
+    /**
+     * Resets this cookie's name and value so it can be reused.
+     */
     public void recycle() {
         name.recycle();
         value.recycle();
     }
 
+    /**
+     * Returns the name of this cookie as a {@link MessageBytes} object.
+     *
+     * @return the cookie name
+     */
     public MessageBytes getName() {
         return name;
     }
 
+    /**
+     * Returns the value of this cookie as a {@link MessageBytes} object.
+     *
+     * @return the cookie value
+     */
     public MessageBytes getValue() {
         return value;
     }

@@ -27,7 +27,19 @@ import org.apache.tomcat.util.res.StringManager;
  * Source for descriptor data. More sources can be added.
  */
 public abstract class ModelerSource {
+    /**
+     * Default constructor.
+     */
+    public ModelerSource() {
+    }
+
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(Registry.class);
+    /**
+     * The source object.
+     */
     protected Object source;
 
     /**

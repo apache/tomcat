@@ -33,6 +33,12 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class ServerInfo {
 
+    /**
+     * Default constructor.
+     */
+    public ServerInfo() {
+    }
+
 
     // ------------------------------------------------------- Static Variables
 
@@ -98,33 +104,43 @@ public class ServerInfo {
 
 
     /**
-     * @return the server identification for this version of Tomcat.
+     * Returns the server identification for this version of Tomcat.
+     * @return the server identification string
      */
     public static String getServerInfo() {
         return serverInfo;
     }
 
     /**
-     * @return the server built time for this version of Tomcat.
+     * Returns the server built time for this version of Tomcat.
+     * @return the server built time string
      */
     public static String getServerBuilt() {
         return serverBuilt;
     }
 
     /**
-     * @return the server built date for this version of Tomcat in ISO-8601 date format.
+     * Returns the server built date for this version of Tomcat in ISO-8601 date format.
+     * @return the server built date in ISO-8601 format
      */
     public static String getServerBuiltISO() {
         return serverBuiltIso;
     }
 
     /**
-     * @return the server's version number.
+     * Returns the server's version number.
+     * @return the server version number
      */
     public static String getServerNumber() {
         return serverNumber;
     }
 
+    /**
+     * Main entry point that prints server version, build date, OS, JVM, APR,
+     * OpenSSL, and third-party library information to standard output.
+     *
+     * @param args Command line arguments (not used)
+     */
     public static void main(String[] args) {
         // Suppress INFO logging from library initialization
         java.util.logging.Logger.getLogger("org.apache.tomcat.util.net.openssl.panama").setLevel(java.util.logging.Level.WARNING);

@@ -17,9 +17,15 @@
 package org.apache.tomcat.jni;
 
 /**
- * Provides access to APR memory pools which are used to manage memory allocations for natively created instances.
- */
+  * Provides access to APR memory pools which are used to manage memory allocations for natively created instances.
+  */
 public class Pool {
+
+    /**
+     * Default constructor required by JNI.
+     */
+    public Pool() {
+    }
 
     /**
      * Create a new pool.

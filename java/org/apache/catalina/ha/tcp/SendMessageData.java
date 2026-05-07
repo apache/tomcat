@@ -40,21 +40,24 @@ public class SendMessageData {
     }
 
     /**
-     * @return the destination.
+     * Returns the destination of the message.
+     * @return the destination
      */
     public Member getDestination() {
         return destination;
     }
 
     /**
-     * @return the exception.
+     * Returns the exception that occurred when attempting to send the message.
+     * @return the exception
      */
     public Exception getException() {
         return exception;
     }
 
     /**
-     * @return the message.
+     * Returns the message that was sent.
+     * @return the message
      */
     public Object getMessage() {
         return message;

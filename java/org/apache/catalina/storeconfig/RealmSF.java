@@ -31,6 +31,13 @@ public class RealmSF extends StoreFactoryBase {
 
     private static final Log log = LogFactory.getLog(RealmSF.class);
 
+    /**
+     * Default constructor.
+     */
+    public RealmSF() {
+        super();
+    }
+
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
         if (aElement instanceof CombinedRealm) {

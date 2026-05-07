@@ -53,6 +53,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public JspServlet() {
+    }
+
     // Logger
     private final transient Log log = LogFactory.getLog(JspServlet.class);
 

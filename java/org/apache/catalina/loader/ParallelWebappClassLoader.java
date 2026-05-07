@@ -21,6 +21,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreCompat;
 
+/**
+ * A class loader that is parallel capable. Parallel capable class loaders
+ * can load classes concurrently from multiple threads.
+ */
 public class ParallelWebappClassLoader extends WebappClassLoaderBase {
 
     private static final Log log = LogFactory.getLog(ParallelWebappClassLoader.class);
@@ -33,11 +37,19 @@ public class ParallelWebappClassLoader extends WebappClassLoaderBase {
         }
     }
 
+    /**
+     * Construct a new {@code ParallelWebappClassLoader} with no parent class loader.
+     */
     public ParallelWebappClassLoader() {
         super();
     }
 
 
+    /**
+     * Construct a new {@code ParallelWebappClassLoader} with the specified parent class loader.
+     *
+     * @param parent The parent class loader
+     */
     public ParallelWebappClassLoader(ClassLoader parent) {
         super(parent);
     }

@@ -16,6 +16,9 @@
  */
 package org.apache.juli;
 
+/**
+ * Utility class for log-related operations.
+ */
 public class LogUtil {
 
     private LogUtil() {

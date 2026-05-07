@@ -44,6 +44,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class Mapper {
 
+    /**
+     * Default constructor.
+     */
+    public Mapper() {
+    }
+
 
     private static final Log log = LogFactory.getLog(Mapper.class);
 
@@ -393,6 +399,17 @@ public final class Mapper {
     }
 
 
+    /**
+     * Add a wrapper to the given context.
+     *
+     * @param hostName The host name
+     * @param contextPath The context path
+     * @param version The version
+     * @param path The wrapper path
+     * @param wrapper The wrapper
+     * @param jspWildCard Whether it's a JSP wildcard
+     * @param resourceOnly Whether it's resource only
+     */
     public void addWrapper(String hostName, String contextPath, String version, String path, Wrapper wrapper,
             boolean jspWildCard, boolean resourceOnly) {
         hostName = renameWildcardHost(hostName);
@@ -403,6 +420,14 @@ public final class Mapper {
         addWrapper(contextVersion, path, wrapper, jspWildCard, resourceOnly);
     }
 
+    /**
+     * Add wrappers to the given context.
+     *
+     * @param hostName The host name
+     * @param contextPath The context path
+     * @param version The version
+     * @param wrappers The wrappers to add
+     */
     public void addWrappers(String hostName, String contextPath, String version,
             Collection<WrapperMappingInfo> wrappers) {
         hostName = renameWildcardHost(hostName);
@@ -1466,11 +1491,28 @@ public final class Mapper {
     // ------------------------------------------------- MapElement Inner Class
 
 
+    /**
+     * Base class for mapped elements.
+     *
+     * @param <T> The type of the mapped object
+     */
     protected abstract static class MapElement<T> {
 
+        /**
+         * The name of the element.
+         */
         public final String name;
+        /**
+         * The mapped object.
+         */
         public final T object;
 
+        /**
+         * Constructor.
+         *
+         * @param name The name of the element
+         * @param object The mapped object
+         */
         public MapElement(String name, T object) {
             this.name = name;
             this.object = object;
@@ -1481,8 +1523,14 @@ public final class Mapper {
     // ------------------------------------------------------- Host Inner Class
 
 
+    /**
+     * Represents a mapped host.
+     */
     protected static final class MappedHost extends MapElement<Host> {
 
+        /**
+         * The list of contexts for this host.
+         */
         public volatile ContextList contextList;
 
         /**
@@ -1522,30 +1570,65 @@ public final class Mapper {
             this.aliases = null;
         }
 
+        /**
+         * Check if this is an alias.
+         *
+         * @return true if this is an alias
+         */
         public boolean isAlias() {
             return realHost != this;
         }
 
+        /**
+         * Get the real host.
+         *
+         * @return the real host
+         */
         public MappedHost getRealHost() {
             return realHost;
         }
 
+        /**
+         * Get the real host name.
+         *
+         * @return the real host name
+         */
         public String getRealHostName() {
             return realHost.name;
         }
 
+        /**
+         * Get the aliases.
+         *
+         * @return the aliases
+         */
         public Collection<MappedHost> getAliases() {
             return aliases;
         }
 
+        /**
+         * Add an alias.
+         *
+         * @param alias the alias to add
+         */
         public void addAlias(MappedHost alias) {
             aliases.add(alias);
         }
 
+        /**
+         * Add aliases.
+         *
+         * @param c the aliases to add
+         */
         public void addAliases(Collection<? extends MappedHost> c) {
             aliases.addAll(c);
         }
 
+        /**
+         * Remove an alias.
+         *
+         * @param alias the alias to remove
+         */
         public void removeAlias(MappedHost alias) {
             aliases.remove(alias);
         }
@@ -1555,20 +1638,45 @@ public final class Mapper {
     // ------------------------------------------------ ContextList Inner Class
 
 
+    /**
+     * List of mapped contexts.
+     */
     protected static final class ContextList {
 
+        /**
+         * The array of mapped contexts.
+         */
         public final MappedContext[] contexts;
+        /**
+         * The nesting level.
+         */
         public final int nesting;
 
+        /**
+         * Default constructor.
+         */
         public ContextList() {
             this(new MappedContext[0], 0);
         }
 
+        /**
+         * Constructor.
+         *
+         * @param contexts The array of mapped contexts
+         * @param nesting The nesting level
+         */
         private ContextList(MappedContext[] contexts, int nesting) {
             this.contexts = contexts;
             this.nesting = nesting;
         }
 
+        /**
+         * Add a context to the list.
+         *
+         * @param mappedContext The context to add
+         * @param slashCount The number of slashes in the path
+         * @return the new ContextList or null if failed
+         */
         public ContextList addContext(MappedContext mappedContext, int slashCount) {
             MappedContext[] newContexts = new MappedContext[contexts.length + 1];
             if (insertMap(contexts, newContexts, mappedContext)) {
@@ -1577,6 +1685,12 @@ public final class Mapper {
             return null;
         }
 
+        /**
+         * Remove a context from the list.
+         *
+         * @param path The path of the context to remove
+         * @return the new ContextList or null if failed
+         */
         public ContextList removeContext(String path) {
             MappedContext[] newContexts = new MappedContext[contexts.length - 1];
             if (removeMap(contexts, newContexts, path)) {
@@ -1594,27 +1708,82 @@ public final class Mapper {
     // ---------------------------------------------------- Context Inner Class
 
 
+    /**
+     * Represents a mapped context.
+     */
     protected static final class MappedContext extends MapElement<Void> {
+        /**
+         * The versions of the context.
+         */
         public volatile ContextVersion[] versions;
 
+        /**
+         * Constructor.
+         *
+         * @param name The name of the context
+         * @param firstVersion The first version
+         */
         public MappedContext(String name, ContextVersion firstVersion) {
             super(name, null);
             this.versions = new ContextVersion[] { firstVersion };
         }
     }
 
+    /**
+     * Represents a versioned context.
+     */
     protected static final class ContextVersion extends MapElement<Context> {
+        /**
+         * The context path.
+         */
         public final String path;
+        /**
+         * The number of slashes in the path.
+         */
         public final int slashCount;
+        /**
+         * The web resource root.
+         */
         public final WebResourceRoot resources;
+        /**
+         * The welcome resources.
+         */
         public String[] welcomeResources;
+        /**
+         * The default wrapper.
+         */
         public MappedWrapper defaultWrapper = null;
+        /**
+         * The exact match wrappers.
+         */
         public MappedWrapper[] exactWrappers = new MappedWrapper[0];
+        /**
+         * The wildcard match wrappers.
+         */
         public MappedWrapper[] wildcardWrappers = new MappedWrapper[0];
+        /**
+         * The extension match wrappers.
+         */
         public MappedWrapper[] extensionWrappers = new MappedWrapper[0];
+        /**
+         * The nesting level.
+         */
         public int nesting = 0;
+        /**
+         * Whether the context is paused.
+         */
         private volatile boolean paused;
 
+        /**
+         * Constructor.
+         *
+         * @param version The version
+         * @param path The context path
+         * @param slashCount The number of slashes in the path
+         * @param context The context
+         * @param resources The web resource root
+         * @param welcomeResources The welcome resources
+         */
         public ContextVersion(String version, String path, int slashCount, Context context, WebResourceRoot resources,
                 String[] welcomeResources) {
             super(version, context);
@@ -1624,10 +1793,18 @@ public final class Mapper {
             this.welcomeResources = welcomeResources;
         }
 
+        /**
+         * Check if the context is paused.
+         *
+         * @return true if paused
+         */
         public boolean isPaused() {
             return paused;
         }
 
+        /**
+         * Mark the context as paused.
+         */
         public void markPaused() {
             paused = true;
         }
@@ -1636,11 +1813,28 @@ public final class Mapper {
     // ---------------------------------------------------- Wrapper Inner Class
 
 
+    /**
+     * Represents a mapped wrapper.
+     */
     protected static class MappedWrapper extends MapElement<Wrapper> {
 
+        /**
+         * Whether this is a JSP wildcard mapping.
+         */
         public final boolean jspWildCard;
+        /**
+         * Whether this is resource only.
+         */
         public final boolean resourceOnly;
 
+        /**
+         * Constructor.
+         *
+         * @param name The name of the wrapper
+         * @param wrapper The wrapper
+         * @param jspWildCard Whether it's a JSP wildcard
+         * @param resourceOnly Whether it's resource only
+         */
         public MappedWrapper(String name, Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
             super(name, wrapper);
             this.jspWildCard = jspWildCard;

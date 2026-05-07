@@ -47,38 +47,70 @@ public abstract class Node implements TagConstants {
 
     private static final VariableInfo[] ZERO_VARIABLE_INFO = {};
 
+    /**
+     * The attributes for this node.
+     */
     protected Attributes attrs;
 
-    // xmlns attributes that represent tag libraries (only in XML syntax)
+    /**
+     * The xmlns attributes that represent tag libraries (only in XML syntax).
+     */
     protected Attributes taglibAttrs;
 
-    /*
-     * xmlns attributes that do not represent tag libraries (only in XML syntax)
+    /**
+     * The xmlns attributes that do not represent tag libraries (only in XML syntax).
      */
     protected Attributes nonTaglibXmlnsAttrs;
 
+    /**
+     * The body of this node.
+     */
     protected Nodes body;
 
+    /**
+     * The text content associated with this node.
+     */
     protected String text;
 
+    /**
+     * The location in the source file where this node begins.
+     */
     protected Mark startMark;
 
+    /**
+     * The starting line number in the generated Java code.
+     */
     protected int beginJavaLine;
 
+    /**
+     * The ending line number in the generated Java code.
+     */
     protected int endJavaLine;
 
+    /**
+     * The parent node in the parse tree.
+     */
     protected Node parent;
 
-    protected Nodes namedAttributeNodes; // cached for performance
+    /**
+     * Cached named attribute nodes for performance.
+     */
+    protected Nodes namedAttributeNodes;
 
+    /**
+     * The qualified name of this node.
+     */
     protected String qName;
 
+    /**
+     * The local name of this node.
+     */
     protected String localName;
 
-    /*
+    /**
      * The name of the inner class to which the codes for this node and its body are generated. For instance, for
-     * <jsp:body> in foo.jsp, this is "foo_jspHelper". This is primarily used for communicating such info from Generator
-     * to Smap generator.
+     * &lt;jsp:body> in foo.jsp, this is "foo_jspHelper". This is primarily used for communicating such info from
+     * Generator to Smap generator.
      */
     protected String innerClassName;
 
@@ -153,45 +185,72 @@ public abstract class Node implements TagConstants {
         addToParent(parent);
     }
 
+    /**
+     * Returns the qualified name of this node.
+     *
+     * @return The qualified name
+     */
     public String getQName() {
         return this.qName;
     }
 
+    /**
+     * Returns the local name of this node.
+     *
+     * @return The local name
+     */
     public String getLocalName() {
         return this.localName;
     }
 
-    /*
+    /**
      * Gets this Node's attributes.
-     *
+     * <p>
      * In the case of a Node parsed from standard syntax, this method returns all the Node's attributes.
-     *
+     * <p>
      * In the case of a Node parsed from XML syntax, this method returns only those attributes whose name does not start
      * with xmlns.
+     *
+     * @return The attributes
      */
     public Attributes getAttributes() {
         return this.attrs;
     }
 
-    /*
-     * Gets this Node's xmlns attributes that represent tag libraries (only meaningful for Nodes parsed from XML syntax)
+    /**
+     * Gets this Node's xmlns attributes that represent tag libraries (only meaningful for Nodes parsed from XML syntax).
+     *
+     * @return The taglib attributes
      */
     public Attributes getTaglibAttributes() {
         return this.taglibAttrs;
     }
 
-    /*
+    /**
      * Gets this Node's xmlns attributes that do not represent tag libraries (only meaningful for Nodes parsed from XML
-     * syntax)
+     * syntax).
+     *
+     * @return The non-taglib xmlns attributes
      */
     public Attributes getNonTaglibXmlnsAttributes() {
         return this.nonTaglibXmlnsAttrs;
     }
 
+    /**
+     * Sets the attributes for this node.
+     *
+     * @param attrs The attributes to set
+     */
     public void setAttributes(Attributes attrs) {
         this.attrs = attrs;
     }
 
+    /**
+     * Returns the value of the attribute with the given name.
+     *
+     * @param name The name of the attribute
+     * @return The attribute value, or {@code null} if not found
+     */
     public String getAttributeValue(String name) {
         return (attrs == null) ? null : attrs.getValue(name);
     }
@@ -287,42 +346,92 @@ public abstract class Node implements TagConstants {
         return result;
     }
 
+    /**
+     * Returns the body of this node.
+     *
+     * @return The body nodes
+     */
     public Nodes getBody() {
         return body;
     }
 
+    /**
+     * Sets the body of this node.
+     *
+     * @param body The body nodes
+     */
     public void setBody(Nodes body) {
         this.body = body;
     }
 
+    /**
+     * Returns the text content of this node.
+     *
+     * @return The text content
+     */
     public String getText() {
         return text;
     }
 
+    /**
+     * Returns the start mark (location) of this node.
+     *
+     * @return The start mark
+     */
     public Mark getStart() {
         return startMark;
     }
 
+    /**
+     * Returns the parent node.
+     *
+     * @return The parent node
+     */
     public Node getParent() {
         return parent;
     }
 
+    /**
+     * Returns the starting line number in the generated Java code.
+     *
+     * @return The starting Java line number
+     */
     public int getBeginJavaLine() {
         return beginJavaLine;
     }
 
+    /**
+     * Sets the starting line number in the generated Java code.
+     *
+     * @param begin The starting Java line number
+     */
     public void setBeginJavaLine(int begin) {
         beginJavaLine = begin;
     }
 
+    /**
+     * Returns the ending line number in the generated Java code.
+     *
+     * @return The ending Java line number
+     */
     public int getEndJavaLine() {
         return endJavaLine;
     }
 
+    /**
+     * Sets the ending line number in the generated Java code.
+     *
+     * @param end The ending Java line number
+     */
     public void setEndJavaLine(int end) {
         endJavaLine = end;
     }
 
+    /**
+     * Returns the root node of the parse tree.
+     *
+     * @return The root node
+     */
     public Node.Root getRoot() {
         Node n = this;
         while (!(n instanceof Node.Root)) {
@@ -331,10 +440,20 @@ public abstract class Node implements TagConstants {
         return (Node.Root) n;
     }
 
+    /**
+     * Returns the name of the inner class for this node.
+     *
+     * @return The inner class name
+     */
     public String getInnerClassName() {
         return innerClassName;
     }
 
+    /**
+     * Sets the name of the inner class for this node.
+     *
+     * @param icn The inner class name
+     */
     public void setInnerClassName(String icn) {
         innerClassName = icn;
     }
@@ -432,54 +551,103 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Returns whether this JSP page uses XML syntax.
+         *
+         * @return true if XML syntax is used
+         */
         public boolean isXmlSyntax() {
             return isXmlSyntax;
         }
 
-        /*
+        /**
          * Sets the encoding specified in the JSP config element whose URL pattern matches the page containing this
          * Root.
+         *
+         * @param enc The page encoding from the JSP config
          */
         public void setJspConfigPageEncoding(String enc) {
             jspConfigPageEnc = enc;
         }
 
-        /*
+        /**
          * Gets the encoding specified in the JSP config element whose URL pattern matches the page containing this
          * Root.
+         *
+         * @return The page encoding from the JSP config
          */
         public String getJspConfigPageEncoding() {
             return jspConfigPageEnc;
         }
 
+        /**
+         * Sets the encoding of the page.
+         *
+         * @param enc The page encoding
+         */
         public void setPageEncoding(String enc) {
             pageEnc = enc;
         }
 
+        /**
+         * Returns the encoding of the page.
+         *
+         * @return The page encoding
+         */
         public String getPageEncoding() {
             return pageEnc;
         }
 
+        /**
+         * Sets whether the page encoding is the default encoding.
+         *
+         * @param isDefault true if the page encoding is the default
+         */
         public void setIsDefaultPageEncoding(boolean isDefault) {
             isDefaultPageEncoding = isDefault;
         }
 
+        /**
+         * Returns whether the page encoding is the default encoding.
+         *
+         * @return true if the page encoding is the default
+         */
         public boolean isDefaultPageEncoding() {
             return isDefaultPageEncoding;
         }
 
+        /**
+         * Sets whether the encoding is specified in the prolog.
+         *
+         * @param isSpecified true if the encoding is specified in the prolog
+         */
         public void setIsEncodingSpecifiedInProlog(boolean isSpecified) {
             isEncodingSpecifiedInProlog = isSpecified;
         }
 
+        /**
+         * Returns whether the encoding is specified in the prolog.
+         *
+         * @return true if the encoding is specified in the prolog
+         */
         public boolean isEncodingSpecifiedInProlog() {
             return isEncodingSpecifiedInProlog;
         }
 
+        /**
+         * Sets whether a BOM (Byte Order Mark) is present.
+         *
+         * @param isBom true if a BOM is present
+         */
         public void setIsBomPresent(boolean isBom) {
             isBomPresent = isBom;
         }
 
+        /**
+         * Returns whether a BOM (Byte Order Mark) is present.
+         *
+         * @return true if a BOM is present
+         */
         public boolean isBomPresent() {
             return isBomPresent;
         }
@@ -558,6 +726,11 @@ public abstract class Node implements TagConstants {
             }
         }
 
+        /**
+         * Returns the list of imported classes and packages.
+         *
+         * @return The list of imports
+         */
         public List<String> getImports() {
             return imports;
         }
@@ -653,6 +826,11 @@ public abstract class Node implements TagConstants {
             }
         }
 
+        /**
+         * Returns the list of imported classes and packages for this tag directive.
+         *
+         * @return The list of imports
+         */
         public List<String> getImports() {
             return imports;
         }
@@ -881,14 +1059,29 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the EL expression nodes.
+         *
+         * @param el The EL nodes
+         */
         public void setEL(ELNode.Nodes el) {
             this.el = el;
         }
 
+        /**
+         * Returns the EL expression nodes.
+         *
+         * @return The EL nodes
+         */
         public ELNode.Nodes getEL() {
             return el;
         }
 
+        /**
+         * Returns the type character of this EL expression.
+         *
+         * @return The type character
+         */
         public char getType() {
             return this.type;
         }
@@ -915,10 +1108,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the value attribute for this param action.
+         *
+         * @param value The value to set
+         */
         public void setValue(JspAttribute value) {
             this.value = value;
         }
 
+        /**
+         * Returns the value attribute of this param action.
+         *
+         * @return The value attribute
+         */
         public JspAttribute getValue() {
             return value;
         }
@@ -983,10 +1186,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the page attribute for this include action.
+         *
+         * @param page The page attribute
+         */
         public void setPage(JspAttribute page) {
             this.page = page;
         }
 
+        /**
+         * Returns the page attribute for this include action.
+         *
+         * @return The page attribute
+         */
         public JspAttribute getPage() {
             return page;
         }
@@ -1013,10 +1226,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the page attribute for this forward action.
+         *
+         * @param page The page attribute
+         */
         public void setPage(JspAttribute page) {
             this.page = page;
         }
 
+        /**
+         * Returns the page attribute for this forward action.
+         *
+         * @return The page attribute
+         */
         public JspAttribute getPage() {
             return page;
         }
@@ -1063,10 +1286,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the value attribute for this setProperty action.
+         *
+         * @param value The value to set
+         */
         public void setValue(JspAttribute value) {
             this.value = value;
         }
 
+        /**
+         * Returns the value attribute of this setProperty action.
+         *
+         * @return The value attribute
+         */
         public JspAttribute getValue() {
             return value;
         }
@@ -1093,10 +1326,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the bean name attribute for this useBean action.
+         *
+         * @param beanName The bean name to set
+         */
         public void setBeanName(JspAttribute beanName) {
             this.beanName = beanName;
         }
 
+        /**
+         * Returns the bean name attribute of this useBean action.
+         *
+         * @return The bean name attribute
+         */
         public JspAttribute getBeanName() {
             return beanName;
         }
@@ -1159,10 +1402,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the JSP attributes for this uninterpreted tag.
+         *
+         * @param jspAttrs The JSP attributes to set
+         */
         public void setJspAttributes(JspAttribute[] jspAttrs) {
             this.jspAttrs = jspAttrs;
         }
 
+        /**
+         * Returns the JSP attributes of this uninterpreted tag.
+         *
+         * @return The JSP attributes
+         */
         public JspAttribute[] getJspAttributes() {
             return jspAttrs;
         }
@@ -1191,23 +1444,37 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Sets the JSP attributes for this element.
+         *
+         * @param jspAttrs The JSP attributes to set
+         */
         public void setJspAttributes(JspAttribute[] jspAttrs) {
             this.jspAttrs = jspAttrs;
         }
 
+        /**
+         * Returns the JSP attributes of this element.
+         *
+         * @return The JSP attributes
+         */
         public JspAttribute[] getJspAttributes() {
             return jspAttrs;
         }
 
-        /*
-         * Sets the XML-style 'name' attribute
+        /**
+         * Sets the XML-style 'name' attribute.
+         *
+         * @param nameAttr The name attribute to set
          */
         public void setNameAttribute(JspAttribute nameAttr) {
             this.nameAttr = nameAttr;
         }
 
-        /*
-         * Gets the XML-style 'name' attribute
+        /**
+         * Gets the XML-style 'name' attribute.
+         *
+         * @return The name attribute
          */
         public JspAttribute getNameAttribute() {
             return this.nameAttr;
@@ -1235,78 +1502,181 @@ public abstract class Node implements TagConstants {
      * information is set in the Collector.
      */
     public static class ChildInfo {
-        private boolean scriptless; // true if the tag and its body
 
-        // contain no scripting elements.
+        /**
+         * True if the tag and its body contain no scripting elements.
+         */
+        private boolean scriptless;
+
+        /**
+         * True if the tag body contains a useBean action.
+         */
         private boolean hasUseBean;
 
+        /**
+         * True if the tag body contains an include action.
+         */
         private boolean hasIncludeAction;
 
+        /**
+         * True if the tag body contains a param action.
+         */
         private boolean hasParamAction;
 
+        /**
+         * True if the tag body contains a setProperty action.
+         */
         private boolean hasSetProperty;
 
+        /**
+         * True if the tag body contains scripting variables.
+         */
         private boolean hasScriptingVars;
 
+        /**
+         * Constructs a new ChildInfo instance.
+         */
+        public ChildInfo() {
+        }
+
+        /**
+         * Sets whether the tag and its body contain no scripting elements.
+         *
+         * @param s True if scriptless
+         */
         public void setScriptless(boolean s) {
             scriptless = s;
         }
 
+        /**
+         * Returns whether the tag and its body contain no scripting elements.
+         *
+         * @return True if scriptless
+         */
         public boolean isScriptless() {
             return scriptless;
         }
 
+        /**
+         * Sets whether the tag body contains a useBean action.
+         *
+         * @param u True if it has useBean
+         */
         public void setHasUseBean(boolean u) {
             hasUseBean = u;
         }
 
+        /**
+         * Returns whether the tag body contains a useBean action.
+         *
+         * @return True if it has useBean
+         */
         public boolean hasUseBean() {
             return hasUseBean;
         }
 
+        /**
+         * Sets whether the tag body contains an include action.
+         *
+         * @param i True if it has include action
+         */
         public void setHasIncludeAction(boolean i) {
             hasIncludeAction = i;
         }
 
+        /**
+         * Returns whether the tag body contains an include action.
+         *
+         * @return True if it has include action
+         */
         public boolean hasIncludeAction() {
             return hasIncludeAction;
         }
 
+        /**
+         * Sets whether the tag body contains a param action.
+         *
+         * @param i True if it has param action
+         */
         public void setHasParamAction(boolean i) {
             hasParamAction = i;
         }
 
+        /**
+         * Returns whether the tag body contains a param action.
+         *
+         * @return True if it has param action
+         */
         public boolean hasParamAction() {
             return hasParamAction;
         }
 
+        /**
+         * Sets whether the tag body contains a setProperty action.
+         *
+         * @param s True if it has setProperty
+         */
         public void setHasSetProperty(boolean s) {
             hasSetProperty = s;
         }
 
+        /**
+         * Returns whether the tag body contains a setProperty action.
+         *
+         * @return True if it has setProperty
+         */
         public boolean hasSetProperty() {
             return hasSetProperty;
         }
 
+        /**
+         * Sets whether the tag body contains scripting variables.
+         *
+         * @param s True if it has scripting variables
+         */
         public void setHasScriptingVars(boolean s) {
             hasScriptingVars = s;
         }
 
+        /**
+         * Returns whether the tag body contains scripting variables.
+         *
+         * @return True if it has scripting variables
+         */
         public boolean hasScriptingVars() {
             return hasScriptingVars;
         }
     }
 
 
+    /**
+     * Base class for nodes that collect child element information.
+     */
     public abstract static class ChildInfoBase extends Node {
 
         private final ChildInfo childInfo = new ChildInfo();
 
+        /**
+         * Constructs a ChildInfoBase node.
+         *
+         * @param qName The qualified name
+         * @param localName The local name
+         * @param attrs The attributes
+         * @param nonTaglibXmlnsAttrs The non-taglib xmlns attributes
+         * @param taglibAttrs The taglib xmlns attributes
+         * @param start The start mark
+         * @param parent The parent node
+         */
         ChildInfoBase(String qName, String localName, Attributes attrs, Attributes nonTaglibXmlnsAttrs,
                 Attributes taglibAttrs, Mark start, Node parent) {
             super(qName, localName, attrs, nonTaglibXmlnsAttrs, taglibAttrs, start, parent);
         }
 
+        /**
+         * Returns the collected child element information.
+         *
+         * @return The child info
+         */
         public ChildInfo getChildInfo() {
             return childInfo;
         }
@@ -1441,27 +1811,46 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * @return The URI namespace that this custom action belongs to
+         * Returns the URI namespace that this custom action belongs to.
+         *
+         * @return The URI namespace
          */
         public String getURI() {
             return this.uri;
         }
 
         /**
+         * Returns the tag prefix.
+         *
          * @return The tag prefix
          */
         public String getPrefix() {
             return prefix;
         }
 
+        /**
+         * Sets the JSP attributes for this custom tag.
+         *
+         * @param jspAttrs The JSP attributes
+         */
         public void setJspAttributes(JspAttribute[] jspAttrs) {
             this.jspAttrs = jspAttrs;
         }
 
+        /**
+         * Returns the JSP attributes for this custom tag.
+         *
+         * @return The JSP attributes
+         */
         public JspAttribute[] getJspAttributes() {
             return jspAttrs;
         }
 
+        /**
+         * Sets the tag data for this custom tag.
+         *
+         * @param tagData The tag data
+         */
         public void setTagData(TagData tagData) {
             this.tagData = tagData;
             this.varInfos = tagInfo.getVariableInfo(tagData);
@@ -1470,89 +1859,193 @@ public abstract class Node implements TagConstants {
             }
         }
 
+        /**
+         * Returns the tag data for this custom tag.
+         *
+         * @return The tag data
+         */
         public TagData getTagData() {
             return tagData;
         }
 
+        /**
+         * Sets the tag handler pool name.
+         *
+         * @param s The tag handler pool name
+         */
         public void setTagHandlerPoolName(String s) {
             tagHandlerPoolName = s;
         }
 
+        /**
+         * Returns the tag handler pool name.
+         *
+         * @return The tag handler pool name
+         */
         public String getTagHandlerPoolName() {
             return tagHandlerPoolName;
         }
 
+        /**
+         * Returns the tag information for this custom tag.
+         *
+         * @return The tag info
+         */
         public TagInfo getTagInfo() {
             return tagInfo;
         }
 
+        /**
+         * Returns the tag file information for this custom tag.
+         *
+         * @return The tag file info, or {@code null} if not a tag file
+         */
         public TagFileInfo getTagFileInfo() {
             return tagFileInfo;
         }
 
-        /*
-         * @return true if this custom action is supported by a tag file, false otherwise
+        /**
+         * Returns whether this custom action is supported by a tag file.
+         *
+         * @return {@code true} if this custom action is supported by a tag file, {@code false} otherwise
          */
         public boolean isTagFile() {
             return tagFileInfo != null;
         }
 
+        /**
+         * Returns the tag handler class.
+         *
+         * @return The tag handler class
+         */
         public Class<?> getTagHandlerClass() {
             return tagHandlerClass;
         }
 
+        /**
+         * Sets the tag handler class.
+         *
+         * @param hc The tag handler class
+         */
         public void setTagHandlerClass(Class<?> hc) {
             tagHandlerClass = hc;
         }
 
+        /**
+         * Returns whether the tag handler implements IterationTag.
+         *
+         * @return {@code true} if the tag handler implements IterationTag
+         */
         public boolean implementsIterationTag() {
             return implementsIterationTag;
         }
 
+        /**
+         * Returns whether the tag handler implements BodyTag.
+         *
+         * @return {@code true} if the tag handler implements BodyTag
+         */
         public boolean implementsBodyTag() {
             return implementsBodyTag;
         }
 
+        /**
+         * Returns whether the tag handler implements TryCatchFinally.
+         *
+         * @return {@code true} if the tag handler implements TryCatchFinally
+         */
         public boolean implementsTryCatchFinally() {
             return implementsTryCatchFinally;
         }
 
+        /**
+         * Returns whether the tag handler implements JspIdConsumer.
+         *
+         * @return {@code true} if the tag handler implements JspIdConsumer
+         */
         public boolean implementsJspIdConsumer() {
             return implementsJspIdConsumer;
         }
 
+        /**
+         * Returns whether the tag handler implements SimpleTag.
+         *
+         * @return {@code true} if the tag handler implements SimpleTag
+         */
         public boolean implementsSimpleTag() {
             return implementsSimpleTag;
         }
 
+        /**
+         * Returns whether the tag handler implements DynamicAttributes.
+         *
+         * @return {@code true} if the tag handler implements DynamicAttributes
+         */
         public boolean implementsDynamicAttributes() {
             return implementsDynamicAttributes;
         }
 
+        /**
+         * Returns the tag variable information from the tag info.
+         *
+         * @return The tag variable info array
+         */
         public TagVariableInfo[] getTagVariableInfos() {
             return tagInfo.getTagVariableInfos();
         }
 
+        /**
+         * Returns the variable information computed from the tag data.
+         *
+         * @return The variable info array
+         */
         public VariableInfo[] getVariableInfos() {
             return varInfos;
         }
 
+        /**
+         * Sets the parent custom tag.
+         *
+         * @param n The parent custom tag
+         */
         public void setCustomTagParent(Node.CustomTag n) {
             this.customTagParent = n;
         }
 
+        /**
+         * Returns the parent custom tag.
+         *
+         * @return The parent custom tag
+         */
         public Node.CustomTag getCustomTagParent() {
             return this.customTagParent;
         }
 
+        /**
+         * Sets the number count for this custom tag.
+         *
+         * @param count The number count
+         */
         public void setNumCount(Integer count) {
             this.numCount = count;
         }
 
+        /**
+         * Returns the number count for this custom tag.
+         *
+         * @return The number count
+         */
         public Integer getNumCount() {
             return this.numCount;
         }
 
+        /**
+         * Sets the scripting variables for the given scope.
+         *
+         * @param vec The list of scripting variables
+         * @param scope The variable scope (AT_BEGIN, AT_END, or NESTED)
+         * @throws IllegalArgumentException if the scope is invalid
+         */
         public void setScriptingVars(List<Object> vec, int scope) {
             switch (scope) {
                 case VariableInfo.AT_BEGIN:
@@ -1570,8 +2063,12 @@ public abstract class Node implements TagConstants {
             }
         }
 
-        /*
+        /**
          * Gets the scripting variables for the given scope that need to be declared.
+         *
+         * @param scope The variable scope (AT_BEGIN, AT_END, or NESTED)
+         * @return The list of scripting variables for the given scope
+         * @throws IllegalArgumentException if the scope is invalid
          */
         public List<Object> getScriptingVars(int scope) {
             List<Object> vec = null;
@@ -1594,9 +2091,11 @@ public abstract class Node implements TagConstants {
             return vec;
         }
 
-        /*
+        /**
          * Gets this custom tag's custom nesting level, which is given as the number of times this custom tag is nested
          * inside itself.
+         *
+         * @return The custom nesting level
          */
         public int getCustomNestingLevel() {
             return customNestingLevel;
@@ -1623,34 +2122,74 @@ public abstract class Node implements TagConstants {
             return result;
         }
 
+        /**
+         * Sets whether to use a tag plugin for this custom tag.
+         *
+         * @param use {@code true} to use a tag plugin
+         */
         public void setUseTagPlugin(boolean use) {
             useTagPlugin = use;
         }
 
+        /**
+         * Returns whether a tag plugin is used for this custom tag.
+         *
+         * @return {@code true} if a tag plugin is used
+         */
         public boolean useTagPlugin() {
             return useTagPlugin;
         }
 
+        /**
+         * Sets the tag plugin context for this custom tag.
+         *
+         * @param tagPluginContext The tag plugin context
+         */
         public void setTagPluginContext(TagPluginContext tagPluginContext) {
             this.tagPluginContext = tagPluginContext;
         }
 
+        /**
+         * Returns the tag plugin context for this custom tag.
+         *
+         * @return The tag plugin context
+         */
         public TagPluginContext getTagPluginContext() {
             return tagPluginContext;
         }
 
+        /**
+         * Sets the nodes generated at the start tag by a tag plugin.
+         *
+         * @param sTag The start tag nodes
+         */
         public void setAtSTag(Nodes sTag) {
             atSTag = sTag;
         }
 
+        /**
+         * Returns the nodes generated at the start tag by a tag plugin.
+         *
+         * @return The start tag nodes
+         */
         public Nodes getAtSTag() {
             return atSTag;
         }
 
+        /**
+         * Sets the nodes generated at the end tag by a tag plugin.
+         *
+         * @param eTag The end tag nodes
+         */
         public void setAtETag(Nodes eTag) {
             atETag = eTag;
         }
 
+        /**
+         * Returns the nodes generated at the end tag by a tag plugin.
+         *
+         * @return The end tag nodes
+         */
         public Nodes getAtETag() {
             return atETag;
         }
@@ -1730,10 +2269,20 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Returns the name of the attribute.
+         *
+         * @return The attribute name
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Returns the custom tag this attribute belongs to.
+         *
+         * @return The custom tag
+         */
         public CustomTag getTag() {
             return tag;
         }
@@ -1804,6 +2353,11 @@ public abstract class Node implements TagConstants {
             v.visit(this);
         }
 
+        /**
+         * Returns the name of this named attribute.
+         *
+         * @return The attribute name
+         */
         public String getName() {
             return this.name;
         }
@@ -1813,25 +2367,46 @@ public abstract class Node implements TagConstants {
             return this.localName;
         }
 
+        /**
+         * Returns the prefix of this named attribute.
+         *
+         * @return The attribute prefix
+         */
         public String getPrefix() {
             return this.prefix;
         }
 
+        /**
+         * Returns whether this named attribute should be trimmed.
+         *
+         * @return true if trimming is enabled
+         */
         public boolean isTrim() {
             return trim;
         }
 
+        /**
+         * Sets the omit attribute for this named attribute.
+         *
+         * @param omit The omit attribute to set
+         */
         public void setOmit(JspAttribute omit) {
             this.omit = omit;
         }
 
+        /**
+         * Returns the omit attribute of this named attribute.
+         *
+         * @return The omit attribute
+         */
         public JspAttribute getOmit() {
             return omit;
         }
 
         /**
-         * @return A unique temporary variable name to store the result in. (this probably could go elsewhere, but it's
-         *             convenient here)
+         * Returns a unique temporary variable name to store the result in.
+         *
+         * @return A unique temporary variable name
          */
         public String getTemporaryVariableName() {
             if (temporaryVariableName == null) {
@@ -1924,6 +2499,11 @@ public abstract class Node implements TagConstants {
             text = text.substring(index);
         }
 
+        /**
+         * Sets the text content of this template text node.
+         *
+         * @param text The text content to set
+         */
         public void setText(String text) {
             this.text = text;
         }
@@ -1940,7 +2520,9 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * @return true if this template text contains whitespace only.
+         * Checks if this template text contains whitespace only.
+         *
+         * @return true if this template text contains whitespace only
          */
         public boolean isAllSpace() {
             boolean isAllSpace = true;
@@ -1966,6 +2548,11 @@ public abstract class Node implements TagConstants {
             extraSmap.add(Integer.valueOf(srcLine));
         }
 
+        /**
+         * Returns the extra source-to-Java line mappings for this template text.
+         *
+         * @return The extra SMAP entries, or null if none
+         */
         public ArrayList<Integer> getExtraSmap() {
             return extraSmap;
         }
@@ -2048,6 +2635,8 @@ public abstract class Node implements TagConstants {
         }
 
         /**
+         * Returns the name of the attribute.
+         *
          * @return The name of the attribute
          */
         public String getName() {
@@ -2055,6 +2644,8 @@ public abstract class Node implements TagConstants {
         }
 
         /**
+         * Returns the local name of the attribute.
+         *
          * @return The local name of the attribute
          */
         public String getLocalName() {
@@ -2062,30 +2653,46 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * @return The namespace of the attribute, or null if in the default namespace
+         * Returns the namespace of the attribute.
+         *
+         * @return The namespace of the attribute, or {@code null} if in the default namespace
          */
         public String getURI() {
             return uri;
         }
 
+        /**
+         * Returns the TagAttributeInfo for this attribute.
+         *
+         * @return The TagAttributeInfo, or {@code null} if not available
+         */
         public TagAttributeInfo getTagAttributeInfo() {
             return this.tai;
         }
 
         /**
-         * @return return true if there's TagAttributeInfo meaning we need to assign a ValueExpression
+         * Returns whether this is a deferred value expression input.
+         *
+         * @return {@code true} if there's TagAttributeInfo meaning we need to assign a ValueExpression
          */
         public boolean isDeferredInput() {
             return this.tai != null && this.tai.isDeferredValue();
         }
 
         /**
-         * @return return true if there's TagAttributeInfo meaning we need to assign a MethodExpression
+         * Returns whether this is a deferred method expression input.
+         *
+         * @return {@code true} if there's TagAttributeInfo meaning we need to assign a MethodExpression
          */
         public boolean isDeferredMethodInput() {
             return this.tai != null && this.tai.isDeferredMethod();
         }
 
+        /**
+         * Returns the expected type name for this attribute.
+         *
+         * @return The expected type name, or "java.lang.Object" as default
+         */
         public String getExpectedTypeName() {
             if (this.tai != null) {
                 if (this.isDeferredInput()) {
@@ -2103,6 +2710,11 @@ public abstract class Node implements TagConstants {
             return "java.lang.Object";
         }
 
+        /**
+         * Returns the parameter type names for a deferred method expression.
+         *
+         * @return Array of parameter type names, or empty array if not applicable
+         */
         public String[] getParameterTypeNames() {
             if (this.tai != null) {
                 if (this.isDeferredMethodInput()) {
@@ -2125,9 +2737,9 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * Only makes sense if namedAttribute is false.
+         * Returns the value for the attribute. Only makes sense if namedAttribute is false.
          *
-         * @return the value for the attribute, or the expression string (stripped of "&lt;%=", "%>", "%=", or "%" but
+         * @return The value for the attribute, or the expression string (stripped of "&lt;%=", "%>", "%=", or "%" but
          *             containing "${" and "}" for EL expressions)
          */
         public String getValue() {
@@ -2135,30 +2747,36 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * Only makes sense if namedAttribute is true.
+         * Returns the named attribute node. Only makes sense if namedAttribute is true.
          *
-         * @return the nodes that evaluate to the body of this attribute.
+         * @return The nodes that evaluate to the body of this attribute
          */
         public NamedAttribute getNamedAttributeNode() {
             return namedAttributeNode;
         }
 
         /**
-         * @return true if the value represents a traditional rtexprvalue
+         * Returns whether the value represents a traditional rtexprvalue.
+         *
+         * @return {@code true} if the value represents a traditional rtexprvalue
          */
         public boolean isExpression() {
             return expression;
         }
 
         /**
-         * @return true if the value represents a NamedAttribute value.
+         * Returns whether the value represents a NamedAttribute value.
+         *
+         * @return {@code true} if the value represents a NamedAttribute value
          */
         public boolean isNamedAttribute() {
             return namedAttribute;
         }
 
         /**
-         * @return true if the value represents an expression that should be fed to the expression interpreter false for
+         * Returns whether the value represents an expression that should be fed to the expression interpreter.
+         *
+         * @return {@code true} if the value should be fed to the expression interpreter; {@code false} for
          *             string literals or rtexprvalues that should not be interpreted or reevaluated
          */
         public boolean isELInterpreterInput() {
@@ -2166,20 +2784,30 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * @return true if the value is a string literal known at translation time.
+         * Returns whether the value is a string literal known at translation time.
+         *
+         * @return {@code true} if the value is a string literal known at translation time
          */
         public boolean isLiteral() {
             return !expression && (el == null) && !namedAttribute;
         }
 
         /**
+         * Returns whether the attribute is a "dynamic" attribute of a custom tag that implements
+         * DynamicAttributes interface.
+         *
          * @return {@code true} if the attribute is a "dynamic" attribute of a custom tag that implements
-         *             DynamicAttributes interface. That is, a random extra attribute that is not declared by the tag.
+         *             DynamicAttributes interface. That is, a random extra attribute that is not declared by the tag
          */
         public boolean isDynamic() {
             return dynamic;
         }
 
+        /**
+         * Returns the EL expression nodes for this attribute.
+         *
+         * @return The EL nodes, or {@code null} if not an EL expression
+         */
         public ELNode.Nodes getEL() {
             return el;
         }
@@ -2238,10 +2866,21 @@ public abstract class Node implements TagConstants {
             }
         }
 
+        /**
+         * Returns the number of nodes in this collection.
+         *
+         * @return The number of nodes
+         */
         public int size() {
             return list.size();
         }
 
+        /**
+         * Returns the node at the given index.
+         *
+         * @param index The index of the node to retrieve
+         * @return The node at the given index, or null if out of bounds
+         */
         public Node getNode(int index) {
             Node n = null;
             try {
@@ -2252,14 +2891,29 @@ public abstract class Node implements TagConstants {
             return n;
         }
 
+        /**
+         * Returns the root node of this collection.
+         *
+         * @return The root node, or null if not set
+         */
         public Node.Root getRoot() {
             return root;
         }
 
+        /**
+         * Returns whether the generated content is buffered.
+         *
+         * @return true if content is generated in a buffer
+         */
         public boolean isGeneratedInBuffer() {
             return generatedInBuffer;
         }
 
+        /**
+         * Sets whether the generated content is buffered.
+         *
+         * @param g true if content is generated in a buffer
+         */
         public void setGeneratedInBuffer(boolean g) {
             generatedInBuffer = g;
         }
@@ -2273,10 +2927,17 @@ public abstract class Node implements TagConstants {
     public static class Visitor {
 
         /**
+         * Constructs a new Visitor instance.
+         */
+        public Visitor() {
+        }
+
+        /**
          * This method provides a place to put actions that are common to all nodes. Override this in the child visitor
          * class if needed.
          *
          * @param n The node to visit
+         * @throws JasperException if an error occurs while visiting the node
          */
         @SuppressWarnings("unused")
         protected void doVisit(Node n) throws JasperException {
@@ -2287,6 +2948,7 @@ public abstract class Node implements TagConstants {
          * Visit the body of a node, using the current visitor
          *
          * @param n The node to visit
+         * @throws JasperException if an error occurs while visiting the body
          */
         protected void visitBody(Node n) throws JasperException {
             if (n.getBody() != null) {
@@ -2294,81 +2956,189 @@ public abstract class Node implements TagConstants {
             }
         }
 
+        /**
+         * Visits a root node.
+         *
+         * @param n The root node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(Root n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a JSP root node.
+         *
+         * @param n The JSP root node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(JspRoot n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a page directive node.
+         *
+         * @param n The page directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(PageDirective n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a tag directive node.
+         *
+         * @param n The tag directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(TagDirective n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an include directive node.
+         *
+         * @param n The include directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(IncludeDirective n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a taglib directive node.
+         *
+         * @param n The taglib directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(TaglibDirective n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an attribute directive node.
+         *
+         * @param n The attribute directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(AttributeDirective n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a variable directive node.
+         *
+         * @param n The variable directive node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(VariableDirective n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a comment node.
+         *
+         * @param n The comment node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(Comment n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a declaration node.
+         *
+         * @param n The declaration node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(Declaration n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an expression node.
+         *
+         * @param n The expression node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(Expression n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a scriptlet node.
+         *
+         * @param n The scriptlet node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(Scriptlet n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an EL expression node.
+         *
+         * @param n The EL expression node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(ELExpression n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an include action node.
+         *
+         * @param n The include action node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(IncludeAction n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a forward action node.
+         *
+         * @param n The forward action node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(ForwardAction n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a get property node.
+         *
+         * @param n The get property node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(GetProperty n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a set property node.
+         *
+         * @param n The set property node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(SetProperty n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a param action node.
+         *
+         * @param n The param action node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(ParamAction n) throws JasperException {
             doVisit(n);
             visitBody(n);
@@ -2384,6 +3154,12 @@ public abstract class Node implements TagConstants {
             visitBody(n);
         }
 
+        /**
+         * Visits a use bean node.
+         *
+         * @param n The use bean node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(UseBean n) throws JasperException {
             doVisit(n);
             visitBody(n);
@@ -2394,54 +3170,120 @@ public abstract class Node implements TagConstants {
             visitBody(n);
         }
 
+        /**
+         * Visits a custom tag node.
+         *
+         * @param n The custom tag node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(CustomTag n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits an uninterpreted tag node.
+         *
+         * @param n The uninterpreted tag node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(UninterpretedTag n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a JSP element node.
+         *
+         * @param n The JSP element node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(JspElement n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a JSP text node.
+         *
+         * @param n The JSP text node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(JspText n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a named attribute node.
+         *
+         * @param n The named attribute node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(NamedAttribute n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a JSP body node.
+         *
+         * @param n The JSP body node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(JspBody n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits an invoke action node.
+         *
+         * @param n The invoke action node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(InvokeAction n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a do body action node.
+         *
+         * @param n The do body action node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(DoBodyAction n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }
 
+        /**
+         * Visits a template text node.
+         *
+         * @param n The template text node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(TemplateText n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits a JSP output node.
+         *
+         * @param n The JSP output node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(JspOutput n) throws JasperException {
             doVisit(n);
         }
 
+        /**
+         * Visits an attribute generator node.
+         *
+         * @param n The attribute generator node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
         public void visit(AttributeGenerator n) throws JasperException {
             doVisit(n);
         }

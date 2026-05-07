@@ -25,12 +25,20 @@ import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 
+/**
+ * Listener that notifies the {@link SingleSignOn} valve when a session is destroyed or its ID changes.
+ */
 public class SingleSignOnListener implements SessionListener, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final String ssoId;
 
+    /**
+     * Creates a new SSO listener for the given SSO identifier.
+     *
+     * @param ssoId the SSO identifier associated with this listener
+     */
     public SingleSignOnListener(String ssoId) {
         this.ssoId = ssoId;
     }

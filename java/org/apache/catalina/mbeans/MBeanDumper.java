@@ -38,7 +38,19 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class MBeanDumper {
 
+    /**
+     * Default constructor.
+     */
+    public MBeanDumper() {
+    }
+
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(MBeanDumper.class);
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MBeanDumper.class);
 
     private static final String CRLF = "\r\n";
@@ -156,6 +168,12 @@ public class MBeanDumper {
     }
 
 
+    /**
+     * Escape a string value for display.
+     *
+     * @param value the value to escape
+     * @return the escaped value
+     */
     public static String escape(String value) {
         // The only invalid char is \n
         // We also need to keep the string short and split it with \nSPACE

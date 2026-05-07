@@ -18,18 +18,45 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.Properties;
 
+/**
+ * Utility methods for managing JDBC pool properties.
+ */
 public class PoolUtilities {
 
+    /**
+     * Property key for the database user name.
+     */
     public static final String PROP_USER = "user";
 
+    /**
+     * Property key for the database password.
+     */
     public static final String PROP_PASSWORD = "password";
 
+    /**
+     * Default constructor.
+     */
+    public PoolUtilities() {
+    }
+
+    /**
+     * Creates a shallow copy of the given properties.
+     *
+     * @param p the properties to clone
+     * @return a new Properties instance containing all entries from the source
+     */
     public static Properties clone(Properties p) {
         Properties c = new Properties();
         c.putAll(p);
         return c;
     }
 
+    /**
+     * Creates a copy of the given properties with the password entry removed.
+     *
+     * @param p the properties to clone
+     * @return a new Properties instance with all entries except the password
+     */
     public static Properties cloneWithoutPassword(Properties p) {
         Properties result = clone(p);
         result.remove(PROP_PASSWORD);

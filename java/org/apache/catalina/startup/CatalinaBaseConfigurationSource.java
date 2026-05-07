@@ -29,16 +29,42 @@ import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Configuration source that loads resources from the Catalina base directory.
+ */
 public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
+    /**
+     * String manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    /**
+     * Legacy name for the embedded server XML configuration file.
+     */
     public static final String LEGACY_SERVER_EMBED_XML = "server-embed.xml";
 
+    /**
+     * Path to the server XML configuration file.
+     */
     private final String serverXmlPath;
+
+    /**
+     * Catalina base directory.
+     */
     private final File catalinaBaseFile;
+
+    /**
+     * Catalina base URI.
+     */
     private final URI catalinaBaseUri;
 
+    /**
+     * Construct a configuration source with the specified Catalina base directory and server XML path.
+     *
+     * @param catalinaBaseFile The Catalina base directory
+     * @param serverXmlPath The path to the server XML configuration file
+     */
     public CatalinaBaseConfigurationSource(File catalinaBaseFile, String serverXmlPath) {
         this.catalinaBaseFile = catalinaBaseFile;
         catalinaBaseUri = catalinaBaseFile.toURI();

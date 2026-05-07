@@ -1333,7 +1333,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return true if the internal naming support is used.
+     * Check if internal naming support is used.
+     *
+     * @return {@code true} if internal naming support is used
      */
     public boolean isUseNaming() {
         return useNaming;
@@ -1405,7 +1407,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the antiResourceLocking flag for this Context.
+     * Return the anti-resource-locking flag for this context.
+     *
+     * @return the anti-resource-locking flag
      */
     public boolean getAntiResourceLocking() {
         return this.antiResourceLocking;
@@ -1461,7 +1465,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the Locale to character set mapper for this Context.
+     * Return the locale to character set mapper for this context.
+     *
+     * @return the character set mapper
      */
     public CharsetMapper getCharsetMapper() {
 
@@ -2096,8 +2102,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the original document root for this Context. This can be an absolute pathname, a relative pathname, or a
-     *             URL. Is only set as deployment has change docRoot!
+     * Return the original document root for this context. This can be an absolute pathname, a relative pathname, or a
+     * URL. Is only set as deployment has change docRoot!
+     *
+     * @return the original document root
      */
     public String getOriginalDocBase() {
         return this.originalDocBase;
@@ -2248,7 +2256,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the value of the unloadDelay flag.
+     * Return the value of the unload delay flag.
+     *
+     * @return the unload delay value
      */
     public long getUnloadDelay() {
         return this.unloadDelay;
@@ -2272,7 +2282,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return unpack WAR flag.
+     * Return the unpack WAR flag.
+     *
+     * @return {@code true} if WAR files should be unpacked
      */
     public boolean getUnpackWAR() {
         return unpackWAR;
@@ -2402,8 +2414,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     // ------------------------------------------------------ Public Properties
 
     /**
-     * @return whether or not an attempt to modify the JNDI context will trigger an exception or if the request will be
-     *             ignored.
+     * Return whether an attempt to modify the JNDI context will trigger an exception or if the request will be ignored.
+     *
+     * @return {@code true} if modification triggers an exception
      */
     public boolean getJndiExceptionOnFailedWrite() {
         return jndiExceptionOnFailedWrite;
@@ -2422,7 +2435,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the Locale to character set mapper class for this Context.
+     * Return the locale to character set mapper class for this context.
+     *
+     * @return the character set mapper class name
      */
     public String getCharsetMapperClass() {
         return this.charsetMapperClass;
@@ -2464,7 +2479,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
     /**
-     * @return the work directory for this Context.
+     * Return the work directory for this context.
+     *
+     * @return the work directory path
      */
     public String getWorkDir() {
         return this.workDir;
@@ -2500,7 +2517,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the clearReferencesStopThreads flag for this Context.
+     * Return the clearReferencesStopThreads flag for this context.
+     *
+     * @return the clearReferencesStopThreads flag
      */
     public boolean getClearReferencesStopThreads() {
         return this.clearReferencesStopThreads;
@@ -2523,7 +2542,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the clearReferencesStopTimerThreads flag for this Context.
+     * Return the clearReferencesStopTimerThreads flag for this context.
+     *
+     * @return the clearReferencesStopTimerThreads flag
      */
     public boolean getClearReferencesStopTimerThreads() {
         return this.clearReferencesStopTimerThreads;
@@ -2545,7 +2566,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the clearReferencesHttpClientKeepAliveThread flag for this Context.
+     * Return the clearReferencesHttpClientKeepAliveThread flag for this context.
+     *
+     * @return the clearReferencesHttpClientKeepAliveThread flag
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
         return this.clearReferencesHttpClientKeepAliveThread;
@@ -3074,9 +3097,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the message destination with the specified name, if any; otherwise, return <code>null</code>.
+     * Return the message destination with the specified name, if any; otherwise, return {@code null}.
      *
      * @param name Name of the desired message destination
+     * @return the message destination, or {@code null}
      */
     public MessageDestination findMessageDestination(String name) {
         synchronized (messageDestinations) {
@@ -3086,8 +3110,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * @return the array of defined message destinations for this web application. If none have been defined, a
-     *             zero-length array is returned.
+     * Return the array of defined message destinations for this web application. If none have been defined, a
+     * zero-length array is returned.
+     *
+     * @return the message destinations
      */
     public MessageDestination[] findMessageDestinations() {
         synchronized (messageDestinations) {
@@ -5511,7 +5537,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     // ------------------------------------------------------------- Attributes
 
     /**
-     * @return the naming resources associated with this web application.
+     * Return the welcome files for this web application.
+     *
+     * @return the welcome files
      */
     public String[] getWelcomeFiles() {
 

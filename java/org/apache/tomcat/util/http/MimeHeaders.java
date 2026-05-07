@@ -141,6 +141,10 @@ public class MimeHeaders {
     }
 
 
+    /**
+     * Convert headers to a map.
+     * @return the map of headers
+     */
     public Map<String,String> toMap() {
         if (count == 0) {
             return Collections.emptyMap();
@@ -156,6 +160,10 @@ public class MimeHeaders {
     }
 
 
+    /**
+     * Filter headers to only include allowed ones.
+     * @param allowedHeaders the allowed headers
+     */
     public void filter(Set<String> allowedHeaders) {
         int j = -1;
         for (int i = 0; i < count; i++) {
@@ -171,6 +179,11 @@ public class MimeHeaders {
     }
 
 
+    /**
+     * Duplicate headers from the source.
+     * @param source the source headers
+     * @throws IOException if an I/O error occurs
+     */
     public void duplicate(MimeHeaders source) throws IOException {
         for (int i = 0; i < source.size(); i++) {
             MimeHeaderField mhf = createHeader();
@@ -183,27 +196,29 @@ public class MimeHeaders {
     // -------------------- Idx access to headers ----------
 
     /**
-     * @return the current number of header fields.
+     * Return the current number of header fields.
+     *
+     * @return the current number of header fields
      */
     public int size() {
         return count;
     }
 
     /**
-     * @param n The header index
+     * Return the Nth header name.
      *
-     * @return the Nth header name, or null if there is no such header. This may be used to iterate through all header
-     *             fields.
+     * @param n The header index
+     * @return the Nth header name, or null if there is no such header
      */
     public MessageBytes getName(int n) {
         return n >= 0 && n < count ? headers[n].getName() : null;
     }
 
     /**
-     * @param n The header index
+     * Return the Nth header value.
      *
-     * @return the Nth header value, or null if there is no such header. This may be used to iterate through all header
-     *             fields.
+     * @param n The header index
+     * @return the Nth header value, or null if there is no such header
      */
     public MessageBytes getValue(int n) {
         return n >= 0 && n < count ? headers[n].getValue() : null;
@@ -245,6 +260,11 @@ public class MimeHeaders {
         return new NamesEnumerator(this);
     }
 
+    /**
+     * Get the values for a header name.
+     * @param name the header name
+     * @return the enumeration of values
+     */
     public Enumeration<String> values(String name) {
         return new ValuesEnumerator(this, name);
     }
@@ -373,6 +393,11 @@ public class MimeHeaders {
         return result;
     }
 
+    /**
+     * Get the value of a header.
+     * @param name the header name
+     * @return the header value
+     */
     public String getHeader(String name) {
         MessageBytes mh = getValue(name);
         return mh != null ? mh.toStringType() : null;

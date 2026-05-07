@@ -25,6 +25,11 @@ import org.apache.naming.ResourceEnvRef;
  * Object factory for Resources env.
  */
 public class ResourceEnvFactory extends FactoryBase {
+    /**
+     * Default constructor.
+     */
+    public ResourceEnvFactory() {
+    }
 
     @Override
     protected boolean isReferenceTypeSupported(Object obj) {
