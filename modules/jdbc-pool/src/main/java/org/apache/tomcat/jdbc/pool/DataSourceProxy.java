@@ -75,13 +75,14 @@ public class DataSourceProxy implements PoolConfiguration {
 
    /**
      * Check if this proxy wraps an instance of the given interface.
-     * This implementation always returns false.
+     * This implementation always returns {@code false}.
+     * <p>
+     * Has to match signature in DataSource.
      *
-     * @param iface The interface to check
+     * @param iface The interface to check - ignored
      * @return false
      * @throws SQLException never thrown
      */
-    @SuppressWarnings("unused") // Has to match signature in DataSource
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         // we are not a wrapper of anything
         return false;
@@ -90,14 +91,15 @@ public class DataSourceProxy implements PoolConfiguration {
 
    /**
       * Unwrap the proxy to the given interface.
-      * This implementation always returns null.
+      * This implementation always returns {@code null}.
+      * <p>
+      * Has to match signature in DataSource
       *
       * @param <T> The interface type
-      * @param iface The interface to unwrap to
+      * @param iface The interface to unwrap to - ignored
       * @return null
       * @throws SQLException never thrown
       */
-    @SuppressWarnings("unused") // Has to match signature in DataSource
     public <T> T unwrap(Class<T> iface) throws SQLException {
         //we can't unwrap anything
         return null;
