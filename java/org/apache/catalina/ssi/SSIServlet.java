@@ -39,6 +39,12 @@ import javax.servlet.http.HttpServletResponse;
 public class SSIServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public SSIServlet() {
+    }
+
     /** Debug level for this servlet. */
     protected int debug = 0;
     /** Should the output be buffered. */
@@ -57,6 +63,11 @@ public class SSIServlet extends HttpServlet {
 
     // ----------------- Public methods.
 
+    /**
+     * Initialize the SSI servlet with configuration parameters.
+     *
+     * @throws ServletException if initialization fails
+     */
     @Override
     public void init() throws ServletException {
 
@@ -162,6 +173,15 @@ public class SSIServlet extends HttpServlet {
     }
 
 
+    /**
+     * Process SSI directives in the given resource.
+     *
+     * @param req     the HTTP servlet request
+     * @param res     the HTTP servlet response
+     * @param resource the URL of the resource to process
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected void processSSI(HttpServletRequest req, HttpServletResponse res, URL resource) throws IOException {
         SSIExternalResolver ssiExternalResolver = new SSIServletExternalResolver(getServletContext(), req, res,
                 isVirtualWebappRelative, debug, inputEncoding);

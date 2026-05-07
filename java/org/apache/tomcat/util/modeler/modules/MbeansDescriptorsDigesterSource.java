@@ -29,7 +29,19 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 
+/**
+ * Source for loading MBean descriptors from XML using a Digester.
+ */
 public class MbeansDescriptorsDigesterSource extends ModelerSource {
+    /**
+     * Default constructor.
+     */
+    public MbeansDescriptorsDigesterSource() {
+    }
+
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
     private static final Object dLock = new Object();
 
@@ -93,11 +105,21 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
 
     }
 
+    /**
+     * Set the registry.
+     *
+     * @param reg the registry to set
+     */
     public void setRegistry(Registry reg) {
         this.registry = reg;
     }
 
 
+    /**
+     * Set the source.
+     *
+     * @param source the source to set
+     */
     public void setSource(Object source) {
         this.source = source;
     }
@@ -110,6 +132,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
         return mbeans;
     }
 
+    /**
+     * Execute the descriptor loading.
+     *
+     * @throws Exception if an error occurs
+     */
     public void execute() throws Exception {
         if (registry == null) {
             registry = Registry.getRegistry(null);

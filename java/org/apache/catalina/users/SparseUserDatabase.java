@@ -18,8 +18,24 @@ package org.apache.catalina.users;
 
 import org.apache.catalina.UserDatabase;
 
+/**
+ * Abstract base class for a sparse user database implementation.
+ * A sparse database creates MBeans for users, groups, and roles on demand
+ * rather than registering all of them at startup.
+ */
 public abstract class SparseUserDatabase implements UserDatabase {
 
+    /**
+     * Default constructor required for subclasses.
+     */
+    public SparseUserDatabase() {
+    }
+
+    /**
+     * Indicates that this is a sparse user database.
+     *
+     * @return always {@code true}
+     */
     @Override
     public boolean isSparse() {
         return true;

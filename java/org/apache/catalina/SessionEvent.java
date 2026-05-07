@@ -64,23 +64,24 @@ public final class SessionEvent extends EventObject {
 
 
     /**
-     * @return the event data of this event.
+     * Returns the event data of this event.
+     * @return the event data
      */
     public Object getData() {
         return this.data;
     }
 
-
     /**
-     * @return the Session on which this event occurred.
+     * Returns the Session on which this event occurred.
+     * @return the session
      */
     public Session getSession() {
         return this.session;
     }
 
-
     /**
-     * @return the event type of this event.
+     * Returns the event type of this event.
+     * @return the event type
      */
     public String getType() {
         return this.type;

@@ -18,6 +18,10 @@ package org.apache.catalina.util;
 
 import javax.servlet.FilterConfig;
 
+/**
+ * Defines the contract for a rate limiter that tracks and limits the number of
+ * requests per time window for a given identifier.
+ */
 public interface RateLimiter {
 
     /**

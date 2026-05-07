@@ -75,6 +75,9 @@ public class Catalina {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    /**
+     * Default path to the server configuration file.
+     */
     public static final String SERVER_XML = "conf/server.xml";
 
     // ----------------------------------------------------- Instance Variables
@@ -158,6 +161,9 @@ public class Catalina {
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Default constructor.
+     */
     public Catalina() {
         setSecurityProtection();
         ExceptionUtils.preload();
@@ -166,61 +172,121 @@ public class Catalina {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Set the pathname to the server configuration file.
+     *
+     * @param file The new configuration file path
+     */
     public void setConfigFile(String file) {
         configFile = file;
     }
 
 
+    /**
+     * Return the pathname to the server configuration file.
+     *
+     * @return the configuration file path
+     */
     public String getConfigFile() {
         return configFile;
     }
 
 
+    /**
+     * Set whether to use a shutdown hook.
+     *
+     * @param useShutdownHook The new use shutdown hook value
+     */
     public void setUseShutdownHook(boolean useShutdownHook) {
         this.useShutdownHook = useShutdownHook;
     }
 
 
+    /**
+     * Return whether a shutdown hook is used.
+     *
+     * @return <code>true</code> if a shutdown hook is used
+     */
     public boolean getUseShutdownHook() {
         return useShutdownHook;
     }
 
 
+    /**
+     * Return whether code generation is enabled.
+     *
+     * @return <code>true</code> if code generation is enabled
+     */
     public boolean getGenerateCode() {
         return this.generateCode;
     }
 
 
+    /**
+     * Set whether code generation is enabled.
+     *
+     * @param generateCode The new code generation value
+     */
     public void setGenerateCode(boolean generateCode) {
         this.generateCode = generateCode;
     }
 
 
+    /**
+     * Return whether generated code should be used.
+     *
+     * @return <code>true</code> if generated code should be used
+     */
     public boolean getUseGeneratedCode() {
         return this.useGeneratedCode;
     }
 
 
+    /**
+     * Set whether generated code should be used.
+     *
+     * @param useGeneratedCode The new use generated code value
+     */
     public void setUseGeneratedCode(boolean useGeneratedCode) {
         this.useGeneratedCode = useGeneratedCode;
     }
 
 
+    /**
+     * Return the location of generated sources.
+     *
+     * @return the generated code location
+     */
     public File getGeneratedCodeLocation() {
         return this.generatedCodeLocation;
     }
 
 
+    /**
+     * Set the location of generated sources.
+     *
+     * @param generatedCodeLocation The new generated code location
+     */
     public void setGeneratedCodeLocation(File generatedCodeLocation) {
         this.generatedCodeLocation = generatedCodeLocation;
     }
 
 
+    /**
+     * Return the top package name for generated source.
+     *
+     * @return the generated code package name
+     */
     public String getGeneratedCodePackage() {
         return this.generatedCodePackage;
     }
 
 
+    /**
+     * Set the top package name for generated source.
+     *
+     * @param generatedCodePackage The new generated code package name
+     */
     public void setGeneratedCodePackage(String generatedCodePackage) {
         this.generatedCodePackage = generatedCodePackage;
     }
@@ -235,6 +301,11 @@ public class Catalina {
         this.parentClassLoader = parentClassLoader;
     }
 
+    /**
+     * Return the shared extensions class loader.
+     *
+     * @return the shared extensions class loader
+     */
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null) {
             return parentClassLoader;
@@ -242,17 +313,29 @@ public class Catalina {
         return ClassLoader.getSystemClassLoader();
     }
 
+    /**
+     * Set the server component.
+     *
+     * @param server The server component
+     */
     public void setServer(Server server) {
         this.server = server;
     }
 
 
+    /**
+     * Return the server component.
+     *
+     * @return the server component
+     */
     public Server getServer() {
         return server;
     }
 
 
     /**
+     * Return whether naming is enabled.
+     *
      * @return <code>true</code> if naming is enabled.
      */
     public boolean isUseNaming() {
@@ -269,10 +352,20 @@ public class Catalina {
         this.useNaming = useNaming;
     }
 
+    /**
+     * Set the await flag.
+     *
+     * @param b The new await value
+     */
     public void setAwait(boolean b) {
         await = b;
     }
 
+    /**
+     * Return the await flag.
+     *
+     * @return <code>true</code> if await is enabled
+     */
     public boolean isAwait() {
         return await;
     }
@@ -507,6 +600,11 @@ public class Catalina {
     }
 
 
+    /**
+     * Parse the server.xml configuration file.
+     *
+     * @param start <code>true</code> if parsing for start, <code>false</code> if parsing for stop
+     */
     protected void parseServerXml(boolean start) {
         // Set configuration source
         ConfigFileLoader
@@ -596,10 +694,18 @@ public class Catalina {
         }
     }
 
+    /**
+     * Stop the currently running server instance.
+     */
     public void stopServer() {
         stopServer(null);
     }
 
+    /**
+     * Stop the currently running server instance.
+     *
+     * @param arguments Command line arguments
+     */
     public void stopServer(String[] arguments) {
 
         if (arguments != null) {
@@ -700,8 +806,10 @@ public class Catalina {
     }
 
 
-    /*
-     * Load using arguments
+    /**
+     * Load the server configuration and initialize the server using the specified command line arguments.
+     *
+     * @param args Command line arguments
      */
     public void load(String[] args) {
 
@@ -846,6 +954,9 @@ public class Catalina {
     }
 
 
+    /**
+     * Initialize output stream redirection.
+     */
     protected void initStreams() {
         // Replace System.out and System.err with a custom PrintStream
         System.setOut(new SystemLogHandler(System.out));
@@ -853,6 +964,9 @@ public class Catalina {
     }
 
 
+    /**
+     * Initialize naming support.
+     */
     protected void initNaming() {
         // Setting additional variables
         if (!useNaming) {
@@ -890,6 +1004,9 @@ public class Catalina {
     }
 
 
+    /**
+     * Generate the loader class for generated code.
+     */
     protected void generateLoader() {
         String loaderClassName = "DigesterGeneratedCodeLoader";
         StringBuilder code = new StringBuilder();
@@ -915,6 +1032,12 @@ public class Catalina {
     }
 
 
+    /**
+     * Generate the class header for generated code.
+     *
+     * @param digester The digester instance
+     * @param start <code>true</code> if generating start code, <code>false</code> if generating stop code
+     */
     protected void generateClassHeader(Digester digester, boolean start) {
         StringBuilder code = digester.getGeneratedCode();
         code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
@@ -930,6 +1053,11 @@ public class Catalina {
     }
 
 
+    /**
+     * Generate the class footer for generated code.
+     *
+     * @param digester The digester instance
+     */
     protected void generateClassFooter(Digester digester) {
         StringBuilder code = digester.getGeneratedCode();
         code.append('}').append(System.lineSeparator());
@@ -937,7 +1065,17 @@ public class Catalina {
     }
 
 
+    /**
+     * Interface for generated server XML loading classes.
+     */
     public interface ServerXml {
+        /**
+         * Load the server configuration into the specified Catalina instance.
+         *
+         * @param catalina The Catalina instance
+         *
+         * @throws Exception if an error occurs during loading
+         */
         void load(Catalina catalina) throws Exception;
     }
 
@@ -949,6 +1087,12 @@ public class Catalina {
      * Shutdown hook which will perform a clean shutdown of Catalina if needed.
      */
     protected class CatalinaShutdownHook extends Thread {
+
+        /**
+         * Default constructor.
+         */
+        public CatalinaShutdownHook() {
+        }
 
         @Override
         public void run() {

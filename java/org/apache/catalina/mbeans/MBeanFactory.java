@@ -48,10 +48,25 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Factory for creating MBeans.
+ */
 public class MBeanFactory {
 
+    /**
+     * Default constructor.
+     */
+    public MBeanFactory() {
+    }
+
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(MBeanFactory.class);
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MBeanFactory.class);
 
     /**

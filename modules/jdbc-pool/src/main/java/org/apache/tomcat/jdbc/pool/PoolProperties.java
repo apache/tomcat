@@ -30,13 +30,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Implementation of {@link PoolConfiguration} that holds the configuration
+ * properties for a connection pool.
+ */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
     private static final long serialVersionUID = -8519283440854213745L;
     private static final Log log = LogFactory.getLog(PoolProperties.class);
 
+    /**
+     * Constructs a PoolProperties with default values.
+     */
+    public PoolProperties() {
+    }
+
+    /**
+     * Default maximum number of active connections.
+     */
     public static final int DEFAULT_MAX_ACTIVE = 100;
 
+    /**
+     * Counter for tracking the number of pools created.
+     */
     protected static final AtomicInteger poolCounter = new AtomicInteger(0);
     private volatile Properties dbProperties = new Properties();
     private volatile String url = null;
@@ -636,6 +652,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         return buf.toString();
     }
 
+    /**
+     * Returns the current pool counter value.
+     * @return the pool counter value
+     */
     public static int getPoolCounter() {
         return poolCounter.get();
     }
@@ -690,36 +710,78 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Definition of a JDBC interceptor with its configuration properties.
+     */
     public static class InterceptorDefinition implements Serializable {
         private static final long serialVersionUID = 1L;
+        /**
+         * Interceptor class name.
+         */
         protected String className;
+        /**
+         * Map of interceptor properties.
+         */
         protected Map<String,InterceptorProperty> properties = new HashMap<>();
+        /**
+         * Cached interceptor class.
+         */
         protected volatile Class<?> clazz = null;
+        /**
+         * Constructs an InterceptorDefinition with the given class name.
+         * @param className the interceptor class name
+         */
         public InterceptorDefinition(String className) {
             this.className = className;
         }
 
+        /**
+         * Constructs an InterceptorDefinition with the given class.
+         * @param cl the interceptor class
+         */
         public InterceptorDefinition(Class<?> cl) {
             this(cl.getName());
             clazz = cl;
         }
 
+        /**
+         * Returns the interceptor class name.
+         * @return the class name
+         */
         public String getClassName() {
             return className;
         }
+        /**
+         * Adds a property with the given name and value.
+         * @param name the property name
+         * @param value the property value
+         */
         public void addProperty(String name, String value) {
             InterceptorProperty p = new InterceptorProperty(name,value);
             addProperty(p);
         }
 
+        /**
+         * Adds the given interceptor property.
+         * @param p the property to add
+         */
         public void addProperty(InterceptorProperty p) {
             properties.put(p.getName(), p);
         }
 
+        /**
+         * Returns the map of interceptor properties.
+         * @return the properties map
+         */
         public Map<String,InterceptorProperty> getProperties() {
             return properties;
         }
 
+        /**
+         * Returns the interceptor class, loading it if necessary.
+         * @return the interceptor class
+         * @throws ClassNotFoundException if the class cannot be found
+         */
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
@@ -747,22 +809,49 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
     }
 
+    /**
+     * Represents a property for a JDBC interceptor.
+     */
     public static class InterceptorProperty implements Serializable {
         private static final long serialVersionUID = 1L;
+        /**
+         * Property name.
+         */
         String name;
+        /**
+         * Property value.
+         */
         String value;
+        /**
+         * Constructs an InterceptorProperty with the given name and value.
+         * @param name the property name
+         * @param value the property value
+         */
         public InterceptorProperty(String name, String value) {
             assert(name!=null);
             this.name = name;
             this.value = value;
         }
+        /**
+         * Returns the property name.
+         * @return the property name
+         */
         public String getName() {
             return name;
         }
+        /**
+         * Returns the property value.
+         * @return the property value
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * Returns the property value as a boolean.
+         * @param def the default value if the property is null or invalid
+         * @return the boolean value
+         */
         public boolean getValueAsBoolean(boolean def) {
             if (value==null) {
               return def;
@@ -776,6 +865,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             return def;
         }
 
+        /**
+         * Returns the property value as an int.
+         * @param def the default value if the property is null or invalid
+         * @return the int value
+         */
         public int getValueAsInt(int def) {
             if (value==null) {
               return def;
@@ -788,6 +882,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a long.
+         * @param def the default value if the property is null or invalid
+         * @return the long value
+         */
         public long getValueAsLong(long def) {
             if (value==null) {
               return def;
@@ -799,6 +898,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a byte.
+         * @param def the default value if the property is null or invalid
+         * @return the byte value
+         */
         public byte getValueAsByte(byte def) {
             if (value==null) {
               return def;
@@ -810,6 +914,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a short.
+         * @param def the default value if the property is null or invalid
+         * @return the short value
+         */
         public short getValueAsShort(short def) {
             if (value==null) {
               return def;
@@ -821,6 +930,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a float.
+         * @param def the default value if the property is null or invalid
+         * @return the float value
+         */
         public float getValueAsFloat(float def) {
             if (value==null) {
               return def;
@@ -832,6 +946,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a double.
+         * @param def the default value if the property is null or invalid
+         * @return the double value
+         */
         public double getValueAsDouble(double def) {
             if (value==null) {
               return def;
@@ -843,6 +962,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a char.
+         * @param def the default value if the property is null or invalid
+         * @return the char value
+         */
         public char getValueAschar(char def) {
             if (value==null) {
               return def;
@@ -934,6 +1058,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Parses a property string into a Properties object.
+     * @param propText the property string with semicolon-separated key=value pairs
+     * @param props the Properties object to populate, or null to create a new one
+     * @return the populated Properties object
+     */
     public static Properties getProperties(String propText, Properties props) {
         if (props==null) {
           props = new Properties();

@@ -76,6 +76,11 @@ import javax.servlet.http.HttpSession;
  * </pre>
  */
 public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
+    /**
+     * Default constructor.
+     */
+    public RestCsrfPreventionFilter() {
+    }
     private enum MethodType {
         NON_MODIFYING_METHOD,
         MODIFYING_METHOD
@@ -241,6 +246,11 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
     }
 
+    /**
+     * Get the set of paths that accept parameters.
+     *
+     * @return The set of paths that accept parameters
+     */
     public Set<String> getPathsAcceptingParams() {
         return pathsAcceptingParams;
     }

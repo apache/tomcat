@@ -45,14 +45,39 @@ public abstract class PojoMessageHandlerWholeBase<T> extends PojoMessageHandlerB
     private final Log log = LogFactory.getLog(PojoMessageHandlerWholeBase.class); // must not be static
     private static final StringManager sm = StringManager.getManager(PojoMessageHandlerWholeBase.class);
 
+    /**
+     * The list of decoders for this message handler.
+     */
     protected final List<Decoder> decoders = new ArrayList<>();
 
+    /**
+     * Create a whole message handler.
+     *
+     * @param pojo          POJO instance
+     * @param method        Method to invoke
+     * @param session       WebSocket session
+     * @param params        Pre-populated parameter array
+     * @param indexPayload  Index of the payload parameter
+     * @param convert       Convert the message before passing to the method
+     * @param indexSession  Index of the session parameter
+     * @param maxMessageSize Maximum message size
+     */
     public PojoMessageHandlerWholeBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
             boolean convert, int indexSession, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert, indexSession, maxMessageSize);
     }
 
 
+    /**
+     * Create an instance of the given decoder class.
+     *
+     * @param clazz Decoder class
+     *
+     * @return New decoder instance
+     *
+     * @throws ReflectiveOperationException If the decoder cannot be instantiated
+     * @throws NamingException If the instance manager fails to create the decoder
+     */
     protected Decoder createDecoderInstance(Class<? extends Decoder> clazz)
             throws ReflectiveOperationException, NamingException {
         InstanceManager instanceManager = ((WsSession) session).getInstanceManager();
@@ -106,6 +131,9 @@ public abstract class PojoMessageHandlerWholeBase<T> extends PojoMessageHandlerB
     }
 
 
+    /**
+     * Called when the WebSocket session is closed. Destroys all decoders.
+     */
     protected void onClose() {
         InstanceManager instanceManager = ((WsSession) session).getInstanceManager();
 
@@ -122,10 +150,26 @@ public abstract class PojoMessageHandlerWholeBase<T> extends PojoMessageHandlerB
     }
 
 
+    /**
+     * Convert the message to the type expected by the target method.
+     *
+     * @param message Message to convert
+     *
+     * @return Converted message
+     */
     protected Object convert(T message) {
         return message;
     }
 
 
+    /**
+     * Decode the message using the registered decoders.
+     *
+     * @param message Message to decode
+     *
+     * @return Decoded message or {@code null} if no decoder could decode it
+     *
+     * @throws DecodeException If the message cannot be decoded
+     */
     protected abstract Object decode(T message) throws DecodeException;
 }

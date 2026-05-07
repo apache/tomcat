@@ -29,6 +29,9 @@ import javax.el.MethodInfo;
 import org.apache.el.util.ReflectionUtil;
 
 
+/**
+ * Literal method expression.
+ */
 public class MethodExpressionLiteral extends MethodExpression implements Externalizable {
 
     private Class<?> expectedType;
@@ -37,10 +40,19 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
 
     private Class<?>[] paramTypes;
 
+    /**
+     * Default constructor.
+     */
     public MethodExpressionLiteral() {
         // do nothing
     }
 
+    /**
+     * Constructor.
+     * @param expr the expression
+     * @param expectedType the expected type
+     * @param paramTypes the parameter types
+     */
     public MethodExpressionLiteral(String expr, Class<?> expectedType, Class<?>[] paramTypes) {
         this.expr = expr;
         this.expectedType = expectedType;

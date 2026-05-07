@@ -36,6 +36,12 @@ import javax.servlet.http.HttpSession;
 public class SessionInitializerFilter implements Filter {
 
     /**
+     * Default constructor.
+     */
+    public SessionInitializerFilter() {
+    }
+
+    /**
      * Calls {@link HttpServletRequest}'s getSession() to initialize the HttpSession and continues processing the chain.
      *
      * @param request  The request to process

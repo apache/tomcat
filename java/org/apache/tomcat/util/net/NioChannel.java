@@ -34,14 +34,36 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NioChannel implements ByteChannel, ScatteringByteChannel, GatheringByteChannel {
 
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(NioChannel.class);
 
+    /**
+     * Empty byte buffer used when no data is available.
+     */
     protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
+    /**
+     * The buffer handler for socket I/O operations.
+     */
     protected final SocketBufferHandler bufHandler;
+
+    /**
+     * The underlying socket channel.
+     */
     protected SocketChannel sc = null;
+
+    /**
+     * The socket wrapper associated with this channel.
+     */
     protected NioSocketWrapper socketWrapper = null;
 
+    /**
+     * Creates a new NIO channel with the specified buffer handler.
+     *
+     * @param bufHandler The buffer handler for socket I/O operations
+     */
     public NioChannel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
     }
@@ -181,18 +203,38 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         return sc.read(dsts, offset, length);
     }
 
+    /**
+     * Returns the buffer handler for this channel.
+     *
+     * @return the buffer handler
+     */
     public SocketBufferHandler getBufHandler() {
         return bufHandler;
     }
 
+    /**
+     * Returns the underlying socket channel.
+     *
+     * @return the socket channel
+     */
     public SocketChannel getIOChannel() {
         return sc;
     }
 
+    /**
+     * Indicates whether the channel is in the process of closing.
+     *
+     * @return {@code false} for non-secure channels
+     */
     public boolean isClosing() {
         return false;
     }
 
+    /**
+     * Indicates whether the SSL handshake is complete.
+     *
+     * @return {@code true} for non-secure channels (no handshake required)
+     */
     public boolean isHandshakeComplete() {
         return true;
     }
@@ -216,6 +258,11 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         return super.toString() + ":" + sc;
     }
 
+    /**
+     * Returns the number of bytes remaining in the outbound buffer.
+     *
+     * @return Always returns 0 for non-secure channels
+     */
     public int getOutboundRemaining() {
         return 0;
     }
@@ -245,12 +292,25 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         }
     }
 
+    /**
+     * Application-level read buffer handler.
+     */
     private ApplicationBufferHandler appReadBufHandler;
 
+    /**
+     * Sets the application-level read buffer handler.
+     *
+     * @param handler The application buffer handler
+     */
     public void setAppReadBufHandler(ApplicationBufferHandler handler) {
         this.appReadBufHandler = handler;
     }
 
+    /**
+     * Returns the application-level read buffer handler.
+     *
+     * @return the application buffer handler
+     */
     protected ApplicationBufferHandler getAppReadBufHandler() {
         return appReadBufHandler;
     }

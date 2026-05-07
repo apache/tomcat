@@ -77,10 +77,22 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
 
     private Class<?>[] paramTypes;
 
+    /**
+     * Default constructor.
+     */
     public MethodExpressionImpl() {
         super();
     }
 
+    /**
+     * Constructor.
+     * @param expr the expression
+     * @param node the node
+     * @param fnMapper the function mapper
+     * @param varMapper the variable mapper
+     * @param expectedType the expected type
+     * @param paramTypes the parameter types
+     */
     public MethodExpressionImpl(String expr, Node node, FunctionMapper fnMapper, VariableMapper varMapper,
             Class<?> expectedType, Class<?>[] paramTypes) {
         super();

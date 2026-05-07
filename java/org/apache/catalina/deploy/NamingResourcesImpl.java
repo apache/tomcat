@@ -189,7 +189,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the transaction object.
+     * Return the transaction object.
+     *
+     * @return the transaction object
      */
     public ContextTransaction getTransaction() {
         return transaction;
@@ -471,8 +473,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the EJB resource reference with the specified name, if any; otherwise, return <code>null</code>.
+     * Return the EJB resource reference with the specified name.
      *
+     * @return the EJB resource reference, or <code>null</code> if not found
      * @param name Name of the desired EJB resource reference
      */
     public ContextEjb findEjb(String name) {
@@ -485,8 +488,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined EJB resource references for this application. If there are none, a zero-length array is
-     *             returned.
+     * Return the defined EJB resource references for this application.
+     *
+     * @return the EJB resource references, or a zero-length array if none
      */
     public ContextEjb[] findEjbs() {
 
@@ -498,8 +502,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the environment entry with the specified name, if any; otherwise, return <code>null</code>.
+     * Return the environment entry with the specified name.
      *
+     * @return the environment entry, or <code>null</code> if not found
      * @param name Name of the desired environment entry
      */
     public ContextEnvironment findEnvironment(String name) {
@@ -512,8 +517,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the array of defined environment entries for this web application. If none have been defined, a
-     *             zero-length array is returned.
+     * Return the array of defined environment entries for this web application.
+     *
+     * @return the environment entries, or a zero-length array if none
      */
     public ContextEnvironment[] findEnvironments() {
 
@@ -525,8 +531,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the local EJB resource reference with the specified name, if any; otherwise, return <code>null</code>.
+     * Return the local EJB resource reference with the specified name.
      *
+     * @return the local EJB resource reference, or <code>null</code> if not found
      * @param name Name of the desired EJB resource reference
      */
     public ContextLocalEjb findLocalEjb(String name) {
@@ -539,8 +546,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined local EJB resource references for this application. If there are none, a zero-length array is
-     *             returned.
+     * Return the defined local EJB resource references for this application.
+     *
+     * @return the local EJB resource references, or a zero-length array if none
      */
     public ContextLocalEjb[] findLocalEjbs() {
 
@@ -552,8 +560,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the message destination reference with the specified name, if any; otherwise, return <code>null</code>.
+     * Return the message destination reference with the specified name.
      *
+     * @return the message destination reference, or <code>null</code> if not found
      * @param name Name of the desired message destination reference
      */
     public MessageDestinationRef findMessageDestinationRef(String name) {
@@ -566,8 +575,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined message destination references for this application. If there are none, a zero-length array
-     *             is returned.
+     * Return the defined message destination references for this application.
+     *
+     * @return the message destination references, or a zero-length array if none
      */
     public MessageDestinationRef[] findMessageDestinationRefs() {
 
@@ -579,8 +589,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the resource reference with the specified name, if any; otherwise return <code>null</code>.
+     * Return the resource reference with the specified name.
      *
+     * @return the resource reference, or <code>null</code> if not found
      * @param name Name of the desired resource reference
      */
     public ContextResource findResource(String name) {
@@ -593,8 +604,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the resource link with the specified name, if any; otherwise return <code>null</code>.
+     * Return the resource link with the specified name.
      *
+     * @return the resource link, or <code>null</code> if not found
      * @param name Name of the desired resource link
      */
     public ContextResourceLink findResourceLink(String name) {
@@ -607,8 +619,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined resource links for this application. If none have been defined, a zero-length array is
-     *             returned.
+     * Return the defined resource links for this application.
+     *
+     * @return the resource links, or a zero-length array if none
      */
     public ContextResourceLink[] findResourceLinks() {
 
@@ -620,8 +633,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined resource references for this application. If none have been defined, a zero-length array is
-     *             returned.
+     * Return the defined resource references for this application.
+     *
+     * @return the resource references, or a zero-length array if none
      */
     public ContextResource[] findResources() {
 
@@ -633,9 +647,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the resource environment reference type for the specified name, if any; otherwise return
-     *             <code>null</code>.
+     * Return the resource environment reference type for the specified name.
      *
+     * @return the resource environment reference, or <code>null</code> if not found
      * @param name Name of the desired resource environment reference
      */
     public ContextResourceEnvRef findResourceEnvRef(String name) {
@@ -648,8 +662,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the array of resource environment reference names for this web application. If none have been specified,
-     *             a zero-length array is returned.
+     * Return the array of resource environment reference names for this web application.
+     *
+     * @return the resource environment references, or a zero-length array if none
      */
     public ContextResourceEnvRef[] findResourceEnvRefs() {
 
@@ -661,8 +676,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the web service reference for the specified name, if any; otherwise return <code>null</code>.
+     * Return the web service reference for the specified name.
      *
+     * @return the web service reference, or <code>null</code> if not found
      * @param name Name of the desired web service
      */
     public ContextService findService(String name) {
@@ -675,8 +691,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the defined web service references for this application. If none have been defined, a zero-length array
-     *             is returned.
+     * Return the defined web service references for this application.
+     *
+     * @return the web service references, or a zero-length array if none
      */
     public ContextService[] findServices() {
 

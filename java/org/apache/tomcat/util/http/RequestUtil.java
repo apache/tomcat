@@ -22,8 +22,14 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Utility methods for HTTP request processing.
+ */
 public class RequestUtil {
 
+    /**
+     * Hide default constructor as this is a utility class.
+     */
     private RequestUtil() {
         // Hide default constructor as this is a utility class
     }
@@ -125,6 +131,13 @@ public class RequestUtil {
     }
 
 
+    /**
+     * Check if the given origin matches the origin of the request.
+     *
+     * @param request The HTTP servlet request
+     * @param origin  The origin to check
+     * @return True if the origin matches the request's origin
+     */
     public static boolean isSameOrigin(HttpServletRequest request, String origin) {
         // Build scheme://host:port from request
         StringBuilder target = new StringBuilder();

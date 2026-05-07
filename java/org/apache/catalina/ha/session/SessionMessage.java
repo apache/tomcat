@@ -86,7 +86,8 @@ public interface SessionMessage extends ClusterMessage {
     int EVT_ALL_SESSION_NOCONTEXTMANAGER = 16;
 
     /**
-     * @return the context name associated with this message
+     * Returns the context name associated with this message.
+     * @return the context name
      */
     String getContextName();
 
@@ -105,12 +106,14 @@ public interface SessionMessage extends ClusterMessage {
     int getEventType();
 
     /**
-     * @return the serialized data for the session
+     * Returns the serialized data for the session.
+     * @return the serialized session data
      */
     byte[] getSession();
 
     /**
-     * @return the session ID for the session
+     * Returns the session ID for the session.
+     * @return the session ID
      */
     String getSessionID();
 

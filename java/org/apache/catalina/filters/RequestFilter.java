@@ -48,6 +48,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class RequestFilter extends FilterBase {
 
+    /**
+     * Default constructor.
+     */
+    public RequestFilter() {
+        super();
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -77,6 +84,8 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
+     * Return the regular expression used to test for allowed requests for this Filter, if any.
+     *
      * @return the regular expression used to test for allowed requests for this Filter, if any; otherwise, return
      *             <code>null</code>.
      */
@@ -103,6 +112,8 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
+     * Return the regular expression used to test for denied requests for this Filter, if any.
+     *
      * @return the regular expression used to test for denied requests for this Filter, if any; otherwise, return
      *             <code>null</code>.
      */
@@ -129,6 +140,8 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
+     * Return the HTTP response status code used to reject denied requests.
+     *
      * @return response status code that is used to reject denied request.
      */
     public int getDenyStatus() {

@@ -42,6 +42,20 @@ public class PojoMessageHandlerWholeText extends PojoMessageHandlerWholeBase<Str
 
     private final Class<?> primitiveType;
 
+    /**
+     * Create a whole text message handler.
+     *
+     * @param pojo            POJO instance
+     * @param method          Method to invoke
+     * @param session         WebSocket session
+     * @param config          Endpoint configuration
+     * @param decoderClazzes  List of decoder classes
+     * @param params          Pre-populated parameter array
+     * @param indexPayload    Index of the payload parameter
+     * @param convert         Convert the message before passing to the method
+     * @param indexSession    Index of the session parameter
+     * @param maxMessageSize  Maximum message size
+     */
     public PojoMessageHandlerWholeText(Object pojo, Method method, Session session, EndpointConfig config,
             List<Class<? extends Decoder>> decoderClazzes, Object[] params, int indexPayload, boolean convert,
             int indexSession, long maxMessageSize) {

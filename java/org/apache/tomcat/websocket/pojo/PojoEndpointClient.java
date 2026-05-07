@@ -39,6 +39,14 @@ public class PojoEndpointClient extends PojoEndpointBase {
         setMethodMapping(new PojoMethodMapping(pojo.getClass(), decoders, null));
     }
 
+    /**
+     * Constructs a new PojoEndpointClient.
+     *
+     * @param pojo the POJO instance annotated with {@code @ClientEndpoint}
+     * @param decoders the list of decoder classes
+     * @param instanceManager the instance manager for lifecycle management
+     * @throws DeploymentException if the endpoint cannot be configured
+     */
     public PojoEndpointClient(Object pojo, List<Class<? extends Decoder>> decoders, InstanceManager instanceManager)
             throws DeploymentException {
         super(Collections.emptyMap());

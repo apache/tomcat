@@ -49,14 +49,26 @@ public class McastServiceImpl extends MembershipProviderBase {
 
     private static final Log log = LogFactory.getLog(McastService.class);
 
+    /**
+     * The maximum packet size.
+     */
     protected static final int MAX_PACKET_SIZE = 65535;
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
     /**
-     * Internal flag used for the listen thread that listens to the multicasting socket.
+     * Flag to control the sender thread.
      */
     protected volatile boolean doRunSender = false;
+    /**
+     * Flag to control the receiver thread.
+     */
     protected volatile boolean doRunReceiver = false;
+    /**
+     * The start level.
+     */
     protected volatile int startLevel = 0;
     /**
      * Socket that we intend to listen to
@@ -177,6 +189,11 @@ public class McastServiceImpl extends MembershipProviderBase {
         init();
     }
 
+    /**
+     * Initialize the mcast service.
+     *
+     * @throws IOException if initialization fails
+     */
     public void init() throws IOException {
         setupSocket();
         sendPacket = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
@@ -191,6 +208,11 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }
 
+    /**
+     * Setup the multicast socket.
+     *
+     * @throws IOException if socket setup fails
+     */
     protected void setupSocket() throws IOException {
         if (mcastBindAddress != null) {
             try {
@@ -462,8 +484,14 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }
 
+    /**
+     * Mutex for expired member checking.
+     */
     protected final Object expiredMutex = new Object();
 
+    /**
+     * Check for expired members.
+     */
     protected void checkExpired() {
         synchronized (expiredMutex) {
             Member[] expired = membership.expire(timeToExpiration);
@@ -501,8 +529,18 @@ public class McastServiceImpl extends MembershipProviderBase {
         send(checkexpired, null);
     }
 
+    /**
+     * Lock for send operations.
+     */
     private final Object sendLock = new Object();
 
+    /**
+     * Send a packet.
+     *
+     * @param checkexpired whether to check for expired members
+     * @param packet the packet to send
+     * @throws IOException if send fails
+     */
     public void send(boolean checkexpired, DatagramPacket packet) throws IOException {
         checkexpired = (checkexpired && (packet == null));
         // ignore if we haven't started the sender
@@ -528,33 +566,66 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }
 
+    /**
+     * Get the service start time.
+     * @return the service start time
+     */
     public long getServiceStartTime() {
         return (member != null) ? member.getServiceStartTime() : -1L;
     }
 
+    /**
+     * Get the recovery counter.
+     * @return the recovery counter
+     */
     public int getRecoveryCounter() {
         return recoveryCounter;
     }
 
+    /**
+     * Check if recovery is enabled.
+     * @return true if recovery is enabled
+     */
     public boolean isRecoveryEnabled() {
         return recoveryEnabled;
     }
 
+    /**
+     * Get the recovery sleep time.
+     * @return the recovery sleep time
+     */
     public long getRecoverySleepTime() {
         return recoverySleepTime;
     }
 
+    /**
+     * Get the channel.
+     * @return the channel
+     */
     public Channel getChannel() {
         return channel;
     }
 
+    /**
+     * Set the channel.
+     * @param channel the channel to set
+     */
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
+    /**
+     * Thread that receives multicast packets.
+     */
     public class ReceiverThread extends Thread {
+        /**
+         * Error counter.
+         */
         int errorCounter = 0;
 
+        /**
+         * Constructor.
+         */
         public ReceiverThread() {
             super();
             String channelName = "";
@@ -602,10 +673,23 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }// class ReceiverThread
 
+    /**
+     * Thread that sends multicast packets.
+     */
     public class SenderThread extends Thread {
+        /**
+         * Send interval.
+         */
         final long time;
+        /**
+         * Error counter.
+         */
         int errorCounter = 0;
 
+        /**
+         * Constructor.
+         * @param time the send interval
+         */
         public SenderThread(long time) {
             this.time = time;
             String channelName = "";
@@ -642,10 +726,20 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }// class SenderThread
 
+    /**
+     * Thread that handles recovery.
+     */
     protected static class RecoveryThread extends Thread {
 
+        /**
+         * Flag to track if recovery is running.
+         */
         private static final AtomicBoolean running = new AtomicBoolean(false);
 
+        /**
+         * Recover the mcast service.
+         * @param parent the parent service
+         */
         public static synchronized void recover(McastServiceImpl parent) {
 
             if (!parent.isRecoveryEnabled()) {
@@ -667,12 +761,23 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
 
 
+        /**
+         * The parent service.
+         */
         final McastServiceImpl parent;
 
+        /**
+         * Constructor.
+         * @param parent the parent service
+         */
         public RecoveryThread(McastServiceImpl parent) {
             this.parent = parent;
         }
 
+        /**
+         * Stop the service.
+         * @return true if stopped successfully
+         */
         public boolean stopService() {
             try {
                 parent.stop(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
@@ -683,6 +788,10 @@ public class McastServiceImpl extends MembershipProviderBase {
             }
         }
 
+        /**
+         * Start the service.
+         * @return true if started successfully
+         */
         public boolean startService() {
             try {
                 parent.init();
@@ -726,14 +835,26 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }
 
+    /**
+     * Set the recovery counter.
+     * @param recoveryCounter the recovery counter
+     */
     public void setRecoveryCounter(int recoveryCounter) {
         this.recoveryCounter = recoveryCounter;
     }
 
+    /**
+     * Set whether recovery is enabled.
+     * @param recoveryEnabled whether recovery is enabled
+     */
     public void setRecoveryEnabled(boolean recoveryEnabled) {
         this.recoveryEnabled = recoveryEnabled;
     }
 
+    /**
+     * Set the recovery sleep time.
+     * @param recoverySleepTime the recovery sleep time
+     */
     public void setRecoverySleepTime(long recoverySleepTime) {
         this.recoverySleepTime = recoverySleepTime;
     }

@@ -49,7 +49,14 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Wildcard value that represents all roles.
+     */
     public static final String ROLE_ALL_ROLES = "*";
+
+    /**
+     * Wildcard value that represents all authenticated users.
+     */
     public static final String ROLE_ALL_AUTHENTICATED_USERS = "**";
 
     private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
@@ -164,7 +171,9 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the display name of this security constraint.
+     * Get the display name of this security constraint.
+     *
+     * @return the display name of this security constraint
      */
     public String getDisplayName() {
 
@@ -608,6 +617,14 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     }
 
 
+    /**
+     * Find HTTP methods that are not covered by the given security constraints.
+     *
+     * @param constraints The existing security constraints
+     * @param denyUncoveredHttpMethods Whether to automatically create constraints for uncovered methods
+     * @param log The log to use for reporting uncovered methods
+     * @return New security constraints for uncovered methods, or an empty array if all methods are covered
+     */
     public static SecurityConstraint[] findUncoveredHttpMethods(SecurityConstraint[] constraints,
             boolean denyUncoveredHttpMethods, Log log) {
 

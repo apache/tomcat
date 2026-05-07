@@ -56,6 +56,12 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
     private String keyPrefix;
 
     /**
+     * Creates a new instance of the {@code PropertiesRoleMappingListener}.
+     */
+    public PropertiesRoleMappingListener() {
+    }
+
+    /**
      * Sets the path to the role mapping properties file. You can use protocol {@code webapp:} and whatever
      * {@link ConfigFileLoader} supports.
      *

@@ -71,6 +71,13 @@ public final class ReplicationStream extends ObjectInputStream {
         }
     }
 
+    /**
+     * Resolve a class by name using the configured class loaders.
+     *
+     * @param name the class name
+     * @return the resolved class
+     * @exception ClassNotFoundException if this class cannot be found
+     */
     public Class<?> resolveClass(String name) throws ClassNotFoundException {
 
         boolean tryRepFirst = name.startsWith("org.apache.catalina.tribes");
@@ -135,10 +142,24 @@ public final class ReplicationStream extends ObjectInputStream {
     }
 
 
+    /**
+     * Find a replication class by name using the class loader of this class.
+     *
+     * @param name the class name
+     * @return the resolved class
+     * @exception ClassNotFoundException if this class cannot be found
+     */
     public Class<?> findReplicationClass(String name) throws ClassNotFoundException {
         return Class.forName(name, false, getClass().getClassLoader());
     }
 
+    /**
+     * Find an external class by name using the configured class loaders.
+     *
+     * @param name the class name
+     * @return the resolved class
+     * @exception ClassNotFoundException if this class cannot be found
+     */
     public Class<?> findExternalClass(String name) throws ClassNotFoundException {
         ClassNotFoundException cnfe = null;
         for (ClassLoader classLoader : classLoaders) {

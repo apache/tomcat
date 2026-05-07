@@ -23,6 +23,19 @@ import java.net.InetAddress;
  */
 public class Proxy {
 
+    /**
+     * The IP address of the front-end proxy server.
+     */
     public InetAddress address = null;
+
+    /**
+     * The port on which the front-end proxy server listens.
+     */
     public int port = 80;
+
+    /**
+     * Default constructor.
+     */
+    public Proxy() {
+    }
 }

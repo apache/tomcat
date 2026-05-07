@@ -29,6 +29,12 @@ public class MessageDestination extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public MessageDestination() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -37,10 +43,18 @@ public class MessageDestination extends ResourceBase {
      */
     private String displayName = null;
 
+    /**
+     * Get the display name.
+     * @return the display name
+     */
     public String getDisplayName() {
         return this.displayName;
     }
 
+    /**
+     * Set the display name.
+     * @param displayName the display name
+     */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -51,10 +65,18 @@ public class MessageDestination extends ResourceBase {
      */
     private String largeIcon = null;
 
+    /**
+     * Get the large icon.
+     * @return the large icon
+     */
     public String getLargeIcon() {
         return this.largeIcon;
     }
 
+    /**
+     * Set the large icon.
+     * @param largeIcon the large icon
+     */
     public void setLargeIcon(String largeIcon) {
         this.largeIcon = largeIcon;
     }
@@ -65,10 +87,18 @@ public class MessageDestination extends ResourceBase {
      */
     private String smallIcon = null;
 
+    /**
+     * Get the small icon.
+     * @return the small icon
+     */
     public String getSmallIcon() {
         return this.smallIcon;
     }
 
+    /**
+     * Set the small icon.
+     * @param smallIcon the small icon
+     */
     public void setSmallIcon(String smallIcon) {
         this.smallIcon = smallIcon;
     }

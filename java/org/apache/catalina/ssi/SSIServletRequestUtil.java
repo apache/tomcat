@@ -21,7 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.http.RequestUtil;
 
+/**
+ * Utility methods for SSI servlet request handling.
+ */
 public class SSIServletRequestUtil {
+
+    private SSIServletRequestUtil() {
+    }
+
     /**
      * Return the relative path associated with this servlet. Taken from DefaultServlet.java. Perhaps this should be put
      * in org.apache.catalina.util somewhere? Seems like it would be widely used.

@@ -46,12 +46,36 @@ public interface SSLUtil {
         return new SSLContextWrapper(sslContext, keyManager, trustManager);
     }
 
+    /**
+     * Creates an SSL context for the given negotiable protocols.
+     *
+     * @param negotiableProtocols The negotiable protocols
+     * @return the SSL context
+     * @throws Exception if an error occurs
+     */
     SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
 
+    /**
+     * Returns the key managers.
+     *
+     * @return The key managers
+     * @throws Exception if an error occurs
+     */
     KeyManager[] getKeyManagers() throws Exception;
 
+    /**
+     * Returns the trust managers.
+     *
+     * @return The trust managers
+     * @throws Exception if an error occurs
+     */
     TrustManager[] getTrustManagers() throws Exception;
 
+    /**
+     * Configures the given SSL session context.
+     *
+     * @param sslSessionContext The SSL session context to configure
+     */
     void configureSessionContext(SSLSessionContext sslSessionContext);
 
     /**

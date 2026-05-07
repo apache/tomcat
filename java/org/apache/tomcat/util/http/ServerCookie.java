@@ -50,10 +50,16 @@ public class ServerCookie implements Serializable {
     // Discard - implied by maxAge <0
     // Port
 
+    /**
+     * Creates a new empty ServerCookie instance.
+     */
     public ServerCookie() {
         // NOOP
     }
 
+    /**
+     * Resets this cookie's name and value so it can be reused.
+     */
     public void recycle() {
         name.recycle();
         value.recycle();
@@ -75,10 +81,20 @@ public class ServerCookie implements Serializable {
         return path;
     }
 
+    /**
+     * Returns the name of this cookie as a {@link MessageBytes} object.
+     *
+     * @return the cookie name
+     */
     public MessageBytes getName() {
         return name;
     }
 
+    /**
+     * Returns the value of this cookie as a {@link MessageBytes} object.
+     *
+     * @return the cookie value
+     */
     public MessageBytes getValue() {
         return value;
     }

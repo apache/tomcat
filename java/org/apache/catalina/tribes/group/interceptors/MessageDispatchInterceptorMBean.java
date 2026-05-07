@@ -16,31 +16,82 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for MessageDispatchInterceptor.
+ */
 public interface MessageDispatchInterceptorMBean {
 
+    /**
+     * Get the option flag.
+     * @return the option flag
+     */
     int getOptionFlag();
 
+    /**
+     * Check if always send is enabled.
+     * @return whether always send is enabled
+     */
     boolean isAlwaysSend();
 
+    /**
+     * Set always send.
+     * @param alwaysSend whether to always send
+     */
     void setAlwaysSend(boolean alwaysSend);
 
+    /**
+     * Get the maximum queue size.
+     * @return the maximum queue size
+     */
     long getMaxQueueSize();
 
+    /**
+     * Get the current queue size.
+     * @return the current queue size
+     */
     long getCurrentSize();
 
+    /**
+     * Get the keep alive time.
+     * @return the keep alive time
+     */
     long getKeepAliveTime();
 
+    /**
+     * Get the maximum spare threads.
+     * @return the maximum spare threads
+     */
     int getMaxSpareThreads();
 
+    /**
+     * Get the maximum threads.
+     * @return the maximum threads
+     */
     int getMaxThreads();
 
     // pool stats
+    /**
+     * Get the pool size.
+     * @return the pool size
+     */
     int getPoolSize();
 
+    /**
+     * Get the active count.
+     * @return the active count
+     */
     int getActiveCount();
 
+    /**
+     * Get the task count.
+     * @return the task count
+     */
     long getTaskCount();
 
+    /**
+     * Get the completed task count.
+     * @return the completed task count
+     */
     long getCompletedTaskCount();
 
 }

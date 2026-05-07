@@ -23,8 +23,16 @@ import java.util.List;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Tokenizer that splits input text into tokens, respecting quoted strings
+ * (enclosed in double quotes), escape sequences, and comment lines
+ * (starting with {@code #}).
+ */
 public class QuotedStringTokenizer {
 
+    /**
+     * StringManager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(QuotedStringTokenizer.class);
 
     private final Iterator<String> tokenIterator;
@@ -39,6 +47,11 @@ public class QuotedStringTokenizer {
         COMMENT
     }
 
+    /**
+     * Creates a new tokenizer for the given text.
+     *
+     * @param text the text to tokenize, or {@code null} for an empty token list
+     */
     public QuotedStringTokenizer(String text) {
         List<String> tokens;
         if (text != null) {
@@ -128,15 +141,30 @@ public class QuotedStringTokenizer {
         return WordMode.SPACES;
     }
 
+    /**
+     * Returns whether there are more tokens available.
+     *
+     * @return {@code true} if there are more tokens, {@code false} otherwise
+     */
     public boolean hasMoreTokens() {
         return tokenIterator.hasNext();
     }
 
+    /**
+     * Returns the next token from the input text.
+     *
+     * @return the next token
+     */
     public String nextToken() {
         returnedTokens++;
         return tokenIterator.next();
     }
 
+    /**
+     * Returns the number of remaining tokens.
+     *
+     * @return the number of tokens that have not yet been returned by {@link #nextToken()}
+     */
     public int countTokens() {
         return tokenCount - returnedTokens;
     }

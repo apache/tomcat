@@ -31,6 +31,13 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
  */
 public class SSLHostConfigSF extends StoreFactoryBase {
 
+    /**
+     * Default constructor.
+     */
+    public SSLHostConfigSF() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(SSLHostConfigSF.class);
 
     @Override

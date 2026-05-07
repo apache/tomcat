@@ -20,16 +20,35 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an OpenSSL configuration containing a list of commands.
+ */
 public class OpenSSLConf implements Serializable {
+
+    /**
+     * Constructs a new OpenSSLConf.
+     */
+    public OpenSSLConf() {
+    }
 
     private static final long serialVersionUID = 1L;
 
     private final List<OpenSSLConfCmd> commands = new ArrayList<>();
 
+    /**
+     * Adds a command to this configuration.
+     *
+     * @param cmd The command to add
+     */
     public void addCmd(OpenSSLConfCmd cmd) {
         commands.add(cmd);
     }
 
+    /**
+     * Returns the list of commands in this configuration.
+     *
+     * @return The list of commands
+     */
     public List<OpenSSLConfCmd> getCommands() {
         return commands;
     }

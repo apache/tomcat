@@ -37,6 +37,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
+    /**
+     * Default constructor.
+     */
+    public CaseInsensitiveKeyMap() {
+    }
+
     private static final StringManager sm = StringManager.getManager(CaseInsensitiveKeyMap.class);
 
     private final Map<Key,V> map = new HashMap<>();

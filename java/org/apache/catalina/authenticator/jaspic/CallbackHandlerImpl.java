@@ -44,6 +44,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CallbackHandlerImpl implements CallbackHandler, Contained {
 
+    /**
+     * Default constructor.
+     */
+    public CallbackHandlerImpl() {
+    }
+
     private static final StringManager sm = StringManager.getManager(CallbackHandlerImpl.class);
     private final Log log = LogFactory.getLog(CallbackHandlerImpl.class); // must not be static
 

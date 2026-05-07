@@ -25,6 +25,12 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class CertificateStoreAppender extends StoreAppender {
 
+    /**
+     * Default constructor.
+     */
+    public CertificateStoreAppender() {
+    }
+
     @Override
     protected Object checkAttribute(StoreDescription desc, PropertyDescriptor descriptor, String attributeName,
             Object bean, Object bean2) {

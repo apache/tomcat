@@ -176,6 +176,17 @@ public class SocketProperties {
     private ObjectName oname = null;
 
 
+    /**
+     * Creates a new instance of SocketProperties with default values.
+     */
+    public SocketProperties() {
+    }
+
+    /**
+     * Applies socket properties to the given {@link Socket}.
+     * @param socket the socket to configure
+     * @throws SocketException if a socket error occurs
+     */
     public void setProperties(Socket socket) throws SocketException {
         if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
@@ -211,6 +222,11 @@ public class SocketProperties {
         }
     }
 
+    /**
+     * Applies socket properties to the given {@link ServerSocket}.
+     * @param socket the server socket to configure
+     * @throws SocketException if a socket error occurs
+     */
     public void setProperties(ServerSocket socket) throws SocketException {
         if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
@@ -227,6 +243,11 @@ public class SocketProperties {
         }
     }
 
+    /**
+     * Applies socket properties to the given {@link AsynchronousSocketChannel}.
+     * @param socket the asynchronous socket channel to configure
+     * @throws IOException if an I/O error occurs
+     */
     public void setProperties(AsynchronousSocketChannel socket) throws IOException {
         if (rxBufSize != null) {
             socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
@@ -248,6 +269,11 @@ public class SocketProperties {
         }
     }
 
+    /**
+     * Applies socket properties to the given {@link AsynchronousServerSocketChannel}.
+     * @param socket the asynchronous server socket channel to configure
+     * @throws IOException if an I/O error occurs
+     */
     public void setProperties(AsynchronousServerSocketChannel socket) throws IOException {
         if (rxBufSize != null) {
             socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
@@ -257,186 +283,370 @@ public class SocketProperties {
         }
     }
 
+    /**
+     * Returns whether direct buffers are used for network buffers.
+     * @return {@code true} if direct buffers are enabled
+     */
     public boolean getDirectBuffer() {
         return directBuffer;
     }
 
+    /**
+     * Returns whether direct buffers are used for SSL network buffers.
+     * @return {@code true} if direct SSL buffers are enabled
+     */
     public boolean getDirectSslBuffer() {
         return directSslBuffer;
     }
 
+    /**
+     * Returns the OOBINLINE socket option value.
+     * @return the OOBINLINE value
+     */
     public boolean getOoBInline() {
         return ooBInline.booleanValue();
     }
 
+    /**
+     * Returns the performance preference for bandwidth.
+     * @return the bandwidth preference value
+     */
     public int getPerformanceBandwidth() {
         return performanceBandwidth.intValue();
     }
 
+    /**
+     * Returns the performance preference for connection time.
+     * @return the connection time preference value
+     */
     public int getPerformanceConnectionTime() {
         return performanceConnectionTime.intValue();
     }
 
+    /**
+     * Returns the performance preference for latency.
+     * @return the latency preference value
+     */
     public int getPerformanceLatency() {
         return performanceLatency.intValue();
     }
 
+    /**
+     * Returns the socket receive buffer size in bytes.
+     * @return the receive buffer size
+     */
     public int getRxBufSize() {
         return rxBufSize.intValue();
     }
 
+    /**
+     * Returns the SO_KEEPALIVE socket option value.
+     * @return the keep-alive value
+     */
     public boolean getSoKeepAlive() {
         return soKeepAlive.booleanValue();
     }
 
+    /**
+     * Returns whether SO_LINGER is enabled.
+     * @return {@code true} if SO_LINGER is enabled
+     */
     public boolean getSoLingerOn() {
         return soLingerOn.booleanValue();
     }
 
+    /**
+     * Returns the SO_LINGER timeout value in seconds.
+     * @return the linger timeout value
+     */
     public int getSoLingerTime() {
         return soLingerTime.intValue();
     }
 
+    /**
+     * Returns the SO_REUSEADDR socket option value.
+     * @return the reuse address value
+     */
     public boolean getSoReuseAddress() {
         return soReuseAddress.booleanValue();
     }
 
+    /**
+     * Returns the SO_TIMEOUT value in milliseconds.
+     * @return the socket timeout value
+     */
     public int getSoTimeout() {
         return soTimeout.intValue();
     }
 
+    /**
+     * Returns the TCP_NODELAY socket option value.
+     * @return the TCP no delay value
+     */
     public boolean getTcpNoDelay() {
         return tcpNoDelay.booleanValue();
     }
 
+    /**
+     * Returns the socket send buffer size in bytes.
+     * @return the send buffer size
+     */
     public int getTxBufSize() {
         return txBufSize.intValue();
     }
 
+    /**
+     * Returns the NioChannel pool size.
+     * @return the buffer pool size
+     */
     public int getBufferPool() {
         return bufferPool;
     }
 
+    /**
+     * Returns the buffer pool size in bytes to be cached.
+     * @return the buffer pool byte size
+     */
     public int getBufferPoolSize() {
         return bufferPoolSize;
     }
 
+    /**
+     * Returns the poller event cache size.
+     * @return the event cache size
+     */
     public int getEventCache() {
         return eventCache;
     }
 
+    /**
+     * Returns the application read buffer size in bytes.
+     * @return the application read buffer size
+     */
     public int getAppReadBufSize() {
         return appReadBufSize;
     }
 
+    /**
+     * Returns the application write buffer size in bytes.
+     * @return the application write buffer size
+     */
     public int getAppWriteBufSize() {
         return appWriteBufSize;
     }
 
+    /**
+     * Returns the socket processor cache size.
+     * @return the processor cache size
+     */
     public int getProcessorCache() {
         return processorCache;
     }
 
+    /**
+     * Returns the minimum frequency of the timeout interval in milliseconds.
+     * @return the timeout interval
+     */
     public long getTimeoutInterval() {
         return timeoutInterval;
     }
 
+    /**
+     * Returns the direct buffer pool size.
+     * @return the direct buffer pool size
+     */
     public int getDirectBufferPool() {
         return bufferPool;
     }
 
+    /**
+     * Sets the performance preference for connection time.
+     * @param performanceConnectionTime the connection time preference value
+     */
     public void setPerformanceConnectionTime(int performanceConnectionTime) {
         this.performanceConnectionTime = Integer.valueOf(performanceConnectionTime);
     }
 
+    /**
+     * Sets the socket send buffer size in bytes.
+     * @param txBufSize the send buffer size
+     */
     public void setTxBufSize(int txBufSize) {
         this.txBufSize = Integer.valueOf(txBufSize);
     }
 
+    /**
+     * Sets the TCP_NODELAY socket option.
+     * @param tcpNoDelay the TCP no delay value
+     */
     public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = Boolean.valueOf(tcpNoDelay);
     }
 
+    /**
+     * Sets the SO_TIMEOUT value in milliseconds.
+     * @param soTimeout the socket timeout value
+     */
     public void setSoTimeout(int soTimeout) {
         this.soTimeout = Integer.valueOf(soTimeout);
     }
 
+    /**
+     * Sets the SO_REUSEADDR socket option.
+     * @param soReuseAddress the reuse address value
+     */
     public void setSoReuseAddress(boolean soReuseAddress) {
         this.soReuseAddress = Boolean.valueOf(soReuseAddress);
     }
 
+    /**
+     * Sets the SO_LINGER timeout value in seconds.
+     * @param soLingerTime the linger timeout value
+     */
     public void setSoLingerTime(int soLingerTime) {
         this.soLingerTime = Integer.valueOf(soLingerTime);
     }
 
+    /**
+     * Sets the SO_KEEPALIVE socket option.
+     * @param soKeepAlive the keep-alive value
+     */
     public void setSoKeepAlive(boolean soKeepAlive) {
         this.soKeepAlive = Boolean.valueOf(soKeepAlive);
     }
 
+    /**
+     * Sets the socket receive buffer size in bytes.
+     * @param rxBufSize the receive buffer size
+     */
     public void setRxBufSize(int rxBufSize) {
         this.rxBufSize = Integer.valueOf(rxBufSize);
     }
 
+    /**
+     * Sets the performance preference for latency.
+     * @param performanceLatency the latency preference value
+     */
     public void setPerformanceLatency(int performanceLatency) {
         this.performanceLatency = Integer.valueOf(performanceLatency);
     }
 
+    /**
+     * Sets the performance preference for bandwidth.
+     * @param performanceBandwidth the bandwidth preference value
+     */
     public void setPerformanceBandwidth(int performanceBandwidth) {
         this.performanceBandwidth = Integer.valueOf(performanceBandwidth);
     }
 
+    /**
+     * Sets the OOBINLINE socket option.
+     * @param ooBInline the OOB inline value
+     */
     public void setOoBInline(boolean ooBInline) {
         this.ooBInline = Boolean.valueOf(ooBInline);
     }
 
+    /**
+     * Sets whether direct buffers are used for network buffers.
+     * @param directBuffer {@code true} to enable direct buffers
+     */
     public void setDirectBuffer(boolean directBuffer) {
         this.directBuffer = directBuffer;
     }
 
+    /**
+     * Sets whether direct buffers are used for SSL network buffers.
+     * @param directSslBuffer {@code true} to enable direct SSL buffers
+     */
     public void setDirectSslBuffer(boolean directSslBuffer) {
         this.directSslBuffer = directSslBuffer;
     }
 
+    /**
+     * Sets whether SO_LINGER is enabled.
+     * @param soLingerOn {@code true} to enable SO_LINGER
+     */
     public void setSoLingerOn(boolean soLingerOn) {
         this.soLingerOn = Boolean.valueOf(soLingerOn);
     }
 
+    /**
+     * Sets the NioChannel pool size.
+     * @param bufferPool the buffer pool size
+     */
     public void setBufferPool(int bufferPool) {
         this.bufferPool = bufferPool;
     }
 
+    /**
+     * Sets the buffer pool size in bytes to be cached.
+     * @param bufferPoolSize the buffer pool byte size
+     */
     public void setBufferPoolSize(int bufferPoolSize) {
         this.bufferPoolSize = bufferPoolSize;
     }
 
+    /**
+     * Sets the poller event cache size.
+     * @param eventCache the event cache size
+     */
     public void setEventCache(int eventCache) {
         this.eventCache = eventCache;
     }
 
+    /**
+     * Sets the application read buffer size in bytes.
+     * @param appReadBufSize the application read buffer size
+     */
     public void setAppReadBufSize(int appReadBufSize) {
         this.appReadBufSize = appReadBufSize;
     }
 
+    /**
+     * Sets the application write buffer size in bytes.
+     * @param appWriteBufSize the application write buffer size
+     */
     public void setAppWriteBufSize(int appWriteBufSize) {
         this.appWriteBufSize = appWriteBufSize;
     }
 
+    /**
+     * Sets the socket processor cache size.
+     * @param processorCache the processor cache size
+     */
     public void setProcessorCache(int processorCache) {
         this.processorCache = processorCache;
     }
 
+    /**
+     * Sets the minimum frequency of the timeout interval in milliseconds.
+     * @param timeoutInterval the timeout interval
+     */
     public void setTimeoutInterval(long timeoutInterval) {
         this.timeoutInterval = timeoutInterval;
     }
 
+    /**
+     * Sets the direct buffer pool size.
+     * @param directBufferPool the direct buffer pool size
+     */
     public void setDirectBufferPool(int directBufferPool) {
         this.bufferPool = directBufferPool;
     }
 
+    /**
+     * Returns the unlock timeout in milliseconds.
+     * @return the unlock timeout
+     */
     public int getUnlockTimeout() {
         return unlockTimeout;
     }
 
+    /**
+     * Sets the unlock timeout in milliseconds.
+     * @param unlockTimeout the unlock timeout value (must be positive)
+     */
     public void setUnlockTimeout(int unlockTimeout) {
         if (unlockTimeout > 0) {
             this.unlockTimeout = unlockTimeout;

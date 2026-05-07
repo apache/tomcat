@@ -35,6 +35,14 @@ public class PojoPathParam {
     private final String name;
 
 
+    /**
+     * Create a path parameter.
+     *
+     * @param type Parameter type
+     * @param name Parameter name (may be {@code null} for non-{@code @PathParam} parameters)
+     *
+     * @throws DeploymentException If the type is not valid for a {@code @PathParam} parameter
+     */
     public PojoPathParam(Class<?> type, String name) throws DeploymentException {
         if (name != null) {
             // Annotated as @PathParam so validate type
@@ -45,11 +53,21 @@ public class PojoPathParam {
     }
 
 
+    /**
+     * Return the type of the parameter.
+     *
+     * @return Parameter type
+     */
     public Class<?> getType() {
         return type;
     }
 
 
+    /**
+     * Return the name of the parameter.
+     *
+     * @return Parameter name or {@code null} for non-{@code @PathParam} parameters
+     */
     public String getName() {
         return name;
     }

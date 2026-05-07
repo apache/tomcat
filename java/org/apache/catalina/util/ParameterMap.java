@@ -115,6 +115,8 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 
 
     /**
+     * Returns the current lock state of this parameter map.
+     *
      * @return the locked state of this parameter map.
      */
     public boolean isLocked() {

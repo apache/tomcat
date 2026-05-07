@@ -43,10 +43,17 @@ public class ServletWriter implements AutoCloseable {
     private int javaLine = 1;
 
 
+    /**
+     * Creates a new ServletWriter.
+     * @param writer the underlying PrintWriter
+     */
     public ServletWriter(PrintWriter writer) {
         this.writer = writer;
     }
 
+    /**
+     * Closes the underlying writer.
+     */
     @Override
     public void close() {
         writer.close();
@@ -55,6 +62,10 @@ public class ServletWriter implements AutoCloseable {
 
     // -------------------- Access information --------------------
 
+    /**
+     * Returns the current Java line number.
+     * @return the current line number
+     */
     public int getJavaLine() {
         return javaLine;
     }
@@ -62,6 +73,9 @@ public class ServletWriter implements AutoCloseable {
 
     // -------------------- Formatting --------------------
 
+    /**
+     * Increases the indentation level.
+     */
     public void pushIndent() {
         virtual_indent += TAB_WIDTH;
         if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {
@@ -69,6 +83,9 @@ public class ServletWriter implements AutoCloseable {
         }
     }
 
+    /**
+     * Decreases the indentation level.
+     */
     public void popIndent() {
         virtual_indent -= TAB_WIDTH;
         if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {

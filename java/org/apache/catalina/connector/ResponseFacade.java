@@ -143,18 +143,31 @@ public class ResponseFacade implements HttpServletResponse {
     }
 
 
+    /**
+     * Finish the response.
+     */
     public void finish() {
         checkFacade();
         response.setSuspended(true);
     }
 
 
+    /**
+     * Check if the response is finished.
+     *
+     * @return {@code true} if the response is finished
+     */
     public boolean isFinished() {
         checkFacade();
         return response.isSuspended();
     }
 
 
+    /**
+     * Get the number of bytes written.
+     *
+     * @return The number of bytes written
+     */
     public long getContentWritten() {
         checkFacade();
         return response.getContentWritten();

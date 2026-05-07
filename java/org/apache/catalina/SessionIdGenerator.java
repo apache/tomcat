@@ -16,10 +16,14 @@
  */
 package org.apache.catalina;
 
+/**
+ * Interface for generating session identifiers.
+ */
 public interface SessionIdGenerator {
 
     /**
-     * @return the node identifier associated with this node which will be included in the generated session ID.
+     * Returns the node identifier associated with this node which will be included in the generated session ID.
+     * @return the JVM route
      */
     String getJvmRoute();
 
@@ -31,7 +35,8 @@ public interface SessionIdGenerator {
     void setJvmRoute(String jvmRoute);
 
     /**
-     * @return the number of bytes for a session ID
+     * Returns the number of bytes for a session ID.
+     * @return the session ID length in bytes
      */
     int getSessionIdLength();
 

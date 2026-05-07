@@ -25,18 +25,36 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of MessageInfo for JASPIC authentication.
+ */
 public class MessageInfoImpl implements MessageInfo {
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MessageInfoImpl.class);
 
+    /**
+     * Key for the mandatory flag.
+     */
     public static final String IS_MANDATORY = "javax.security.auth.message.MessagePolicy.isMandatory";
 
     private final Map<String,Object> map = new HashMap<>();
     private HttpServletRequest request;
     private HttpServletResponse response;
 
+    /**
+     * Default constructor.
+     */
     public MessageInfoImpl() {
     }
 
+    /**
+     * Constructor.
+     * @param request the request
+     * @param response the response
+     * @param authMandatory whether auth is mandatory
+     */
     public MessageInfoImpl(HttpServletRequest request, HttpServletResponse response, boolean authMandatory) {
         this.request = request;
         this.response = response;

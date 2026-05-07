@@ -39,6 +39,12 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K,V> implements ConcurrentMap<K,V> {
 
+    /**
+     * Default constructor.
+     */
+    public ManagedConcurrentWeakHashMap() {
+    }
+
     private final ConcurrentMap<Key,V> map = new ConcurrentHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 

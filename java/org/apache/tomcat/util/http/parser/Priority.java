@@ -29,29 +29,59 @@ import org.apache.tomcat.util.http.parser.StructuredField.SfListMember;
  */
 public class Priority {
 
+    /**
+     * Default urgency value as per RFC 9218.
+     */
     public static final int DEFAULT_URGENCY = 3;
+
+    /**
+     * Default incremental flag value as per RFC 9218.
+     */
     public static final boolean DEFAULT_INCREMENTAL = false;
 
     // Explicitly set the defaults as per RFC 9218
     private int urgency = DEFAULT_URGENCY;
     private boolean incremental = DEFAULT_INCREMENTAL;
 
+    /**
+     * Creates a new Priority instance with default values as per RFC 9218.
+     */
     public Priority() {
         // Default constructor is NO-OP.
     }
 
+    /**
+     * Returns the urgency value.
+     *
+     * @return the urgency value
+     */
     public int getUrgency() {
         return urgency;
     }
 
+    /**
+     * Sets the urgency value.
+     *
+     * @param urgency the urgency value
+     */
     public void setUrgency(int urgency) {
         this.urgency = urgency;
     }
 
+    /**
+     * Returns the incremental flag.
+     *
+     * @return the incremental flag
+     */
     public boolean getIncremental() {
         return incremental;
     }
 
+    /**
+     * Sets the incremental flag.
+     *
+     * @param incremental the incremental flag
+     */
     public void setIncremental(boolean incremental) {
         this.incremental = incremental;
     }

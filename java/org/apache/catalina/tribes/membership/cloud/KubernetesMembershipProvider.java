@@ -43,8 +43,13 @@ import org.apache.tomcat.util.json.JSONParser;
  * A {@link org.apache.catalina.tribes.MembershipProvider} that uses Kubernetes API to retrieve the members of a
  * cluster.<br>
  */
-
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
+
+    /**
+     * Default constructor.
+     */
+    public KubernetesMembershipProvider() {
+    }
 
     private static final String IPV6_URL = "%s://[%s]:%s/api/%s/namespaces/%s/pods";
     private static final String URL = "%s://%s:%s/api/%s/namespaces/%s/pods";
@@ -195,6 +200,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
     }
 
 
+    /**
+     * Parses the pod data from the given reader and populates the members list.
+     *
+     * @param reader The reader with pod data
+     * @param members The list to populate with members
+     */
     @SuppressWarnings("unchecked")
     protected void parsePods(Reader reader, List<MemberImpl> members) {
         JSONParser parser = new JSONParser(reader);

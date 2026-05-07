@@ -31,6 +31,12 @@ import java.util.Set;
 public final class Matcher {
 
     /**
+     * Default constructor.
+     */
+    public Matcher() {
+    }
+
+    /**
      * Tests whether or not a given file name matches any file name pattern in the given set. The match is performed
      * case-sensitively.
      *

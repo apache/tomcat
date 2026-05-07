@@ -25,8 +25,19 @@ import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 import org.apache.catalina.tribes.util.StringManager;
 
+/**
+ * A pooled sender that uses {@link ParallelNioSender} instances for parallel message delivery.
+ */
 public class PooledParallelSender extends PooledSender implements PooledParallelSenderMBean {
+    /** StringManager for internationalized log messages. */
     protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
+
+    /**
+     * Creates a new PooledParallelSender instance.
+     */
+    public PooledParallelSender() {
+        super();
+    }
 
     @Override
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {

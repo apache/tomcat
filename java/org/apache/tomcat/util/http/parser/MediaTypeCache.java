@@ -28,6 +28,10 @@ public class MediaTypeCache {
 
     private final ConcurrentCache<String,String[]> cache;
 
+    /**
+     * Constructor.
+     * @param size the cache size
+     */
     public MediaTypeCache(int size) {
         cache = new ConcurrentCache<>(size);
     }

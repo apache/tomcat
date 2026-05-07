@@ -36,13 +36,23 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      */
     private static final String LAST_MODIFIED = "last-modified";
 
+    /**
+     * The last modified time.
+     */
     protected long lastModified = -1;
 
     /**
      * Our ServletOutputStream
      */
     protected final ServletOutputStream captureServletOutputStream;
+    /**
+     * The servlet output stream.
+     */
     protected ServletOutputStream servletOutputStream;
+
+    /**
+     * The print writer.
+     */
     protected PrintWriter printWriter;
 
     /**

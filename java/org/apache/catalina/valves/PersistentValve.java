@@ -75,6 +75,9 @@ public class PersistentValve extends ValveBase {
 
     private volatile boolean clBindRequired;
 
+    /**
+     * Regular expression pattern used to filter requests that should bypass session persistence.
+     */
     protected Pattern filter = null;
 
     private final ConcurrentMap<String,UsageCountingSemaphore> sessionToSemaphoreMap = new ConcurrentHashMap<>();
@@ -86,6 +89,9 @@ public class PersistentValve extends ValveBase {
     private boolean semaphoreAcquireUninterruptibly = true;
 
 
+    /**
+     * Constructs a new PersistentValve instance.
+     */
     public PersistentValve() {
         super(true);
     }
@@ -307,11 +313,22 @@ public class PersistentValve extends ValveBase {
         }
     }
 
+    /**
+     * Determines whether the given URI should bypass session persistence based on the configured filter.
+     *
+     * @param uri the request URI to check
+     * @return {@code true} if the request should bypass session persistence, otherwise {@code false}
+     */
     protected boolean isRequestWithoutSession(String uri) {
         Pattern f = filter;
         return f != null && f.matcher(uri).matches();
     }
 
+    /**
+     * Returns the filter pattern used to identify requests that should bypass session persistence.
+     *
+     * @return the filter pattern, or {@code null} if no filter is configured
+     */
     public String getFilter() {
         if (filter == null) {
             return null;
@@ -319,6 +336,11 @@ public class PersistentValve extends ValveBase {
         return filter.toString();
     }
 
+    /**
+     * Sets the filter pattern used to identify requests that should bypass session persistence.
+     *
+     * @param filter the regular expression pattern, or {@code null} to disable filtering
+     */
     public void setFilter(String filter) {
         if (filter == null || filter.isEmpty()) {
             this.filter = null;

@@ -22,10 +22,18 @@ package org.apache.catalina.ssi;
  */
 public class SSIStopProcessingException extends Exception {
 
+    /**
+     * Default constructor.
+     */
     public SSIStopProcessingException() {
         super();
     }
 
+    /**
+     * Constructor with cause.
+     *
+     * @param cause the underlying cause
+     */
     public SSIStopProcessingException(Throwable cause) {
         super(cause);
     }

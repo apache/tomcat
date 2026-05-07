@@ -33,12 +33,20 @@ import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * OpenSSL implementation of SSL utility operations.
+ */
 public class OpenSSLUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLUtil.class);
 
 
+    /**
+     * Constructs an OpenSSLUtil for the given certificate.
+     *
+     * @param certificate The SSL host config certificate
+     */
     public OpenSSLUtil(SSLHostConfigCertificate certificate) {
         super(certificate);
     }
@@ -80,6 +88,14 @@ public class OpenSSLUtil extends SSLUtilBase {
     }
 
 
+    /**
+     * Chooses an X509 key manager from the array of key managers.
+     *
+     * @param managers The key managers to choose from
+     * @param throwOnMissing Whether to throw if no key manager is found
+     * @return The chosen X509 key manager
+     * @throws Exception if no suitable key manager is found and throwOnMissing is true
+     */
     public static X509KeyManager chooseKeyManager(KeyManager[] managers, boolean throwOnMissing) throws Exception {
         if (managers == null) {
             return null;

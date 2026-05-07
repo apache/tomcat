@@ -176,7 +176,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected List<String> userAttributesList = null;
 
 
-    // ------------------------------------------------------------- Properties
+    // ---------------------------------------------------- Constructors
+
+    /**
+     * Construct a new instance of this Realm with the default properties.
+     */
+    public RealmBase() {
+        super();
+    }
+
+
+    // ----------------------------------------------------- Properties
 
     /**
      * Returns the HTTP status code used when the container needs to issue an HTTP redirect to meet the requirements of
@@ -290,11 +300,23 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         this.x509UsernameRetrieverClassName = className;
     }
 
+    /**
+     * When processing users authenticated via the GSS-API, should any &quot;@...&quot; be stripped from the end of the
+     * username?
+     *
+     * @return {@code true} when the &quot;@...&quot; suffix should be stripped
+     */
     public boolean isStripRealmForGss() {
         return stripRealmForGss;
     }
 
 
+    /**
+     * Set whether any &quot;@...&quot; should be stripped from the end of the username when processing users
+     * authenticated via the GSS-API.
+     *
+     * @param stripRealmForGss {@code true} to strip the &quot;@...&quot; suffix
+     */
     public void setStripRealmForGss(boolean stripRealmForGss) {
         this.stripRealmForGss = stripRealmForGss;
     }
@@ -1109,6 +1131,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     // ------------------------------------------------------ Protected Methods
 
+    /**
+     * Check whether the current credential handler uses the specified message digest algorithm.
+     *
+     * @param algorithm The name of the message digest algorithm to check
+     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler}
+     *             using the specified algorithm
+     */
     protected boolean hasMessageDigest(String algorithm) {
         CredentialHandler ch = credentialHandler;
         if (ch instanceof MessageDigestCredentialHandler) {
@@ -1537,21 +1566,42 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         return container.getDomain();
     }
 
+    /**
+     * The path used in the JMX object name for this realm.
+     */
     protected String realmPath = "/realm0";
 
+    /**
+     * Return the path used in the JMX object name for this realm.
+     *
+     * @return The realm path
+     */
     public String getRealmPath() {
         return realmPath;
     }
 
+    /**
+     * Set the path used in the JMX object name for this realm.
+     *
+     * @param theRealmPath The realm path to use
+     */
     public void setRealmPath(String theRealmPath) {
         realmPath = theRealmPath;
     }
 
+    /**
+     * Return the suffix for the JMX object name, based on the realm path.
+     *
+     * @return The suffix string for the JMX object name
+     */
     protected String getRealmSuffix() {
         return ",realmPath=" + getRealmPath();
     }
 
 
+    /**
+     * Defines the mode for handling the {@code *.roles} special role.
+     */
     protected static class AllRolesMode {
 
         private final String name;

@@ -43,8 +43,14 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private static final Log log = LogFactory.getLog(PooledConnection.class);
 
+    /**
+     * Attribute key for the username.
+     */
     public static final String PROP_USER = PoolUtilities.PROP_USER;
 
+    /**
+     * Attribute key for the password.
+     */
     public static final String PROP_PASSWORD = PoolUtilities.PROP_PASSWORD;
 
     /**
@@ -249,6 +255,10 @@ public class PooledConnection implements PooledConnectionMBean {
         this.lastConnected = System.currentTimeMillis();
     }
 
+    /**
+     * Connects using the configured DataSource.
+     * @throws SQLException if unable to obtain a connection from the DataSource
+     */
     protected void connectUsingDataSource() throws SQLException {
         String usr = null;
         String pwd = null;
@@ -291,6 +301,10 @@ public class PooledConnection implements PooledConnectionMBean {
             throw new SQLException("DataSource is of unknown class:"+(poolProperties.getDataSource()!=null?poolProperties.getDataSource().getClass():"null"));
         }
     }
+    /**
+     * Connects using the configured JDBC Driver class.
+     * @throws SQLException if unable to instantiate the driver or obtain a connection
+     */
     protected void connectUsingDriver() throws SQLException {
 
         try {
@@ -691,6 +705,10 @@ public class PooledConnection implements PooledConnectionMBean {
         return suspect;
     }
 
+    /**
+     * Sets the suspect flag for this connection.
+     * @param suspect true if the connection is suspected to be invalid
+     */
     public void setSuspect(boolean suspect) {
         this.suspect = suspect;
     }
@@ -823,6 +841,10 @@ public class PooledConnection implements PooledConnectionMBean {
         return handler;
     }
 
+    /**
+     * Sets the interceptor chain handler for this connection.
+     * @param handler the first interceptor in the chain
+     */
     public void setHandler(JdbcInterceptor handler) {
         if (this.handler!=null && this.handler!=handler) {
             JdbcInterceptor interceptor = this.handler;
@@ -848,10 +870,17 @@ public class PooledConnection implements PooledConnectionMBean {
         return released.get();
     }
 
+    /**
+     * Returns the attributes map for this connection.
+     * @return the attributes map
+     */
     public HashMap<Object,Object> getAttributes() {
         return attributes;
     }
 
+    /**
+     * Creates and registers an MBean for this pooled connection with JMX.
+     */
     public void createMBean() {
         if (oname != null) {
           return;
@@ -860,6 +889,10 @@ public class PooledConnection implements PooledConnectionMBean {
         oname = JmxUtil.registerJmx(parent.getJmxPool().getObjectName(), keyprop, this);
     }
 
+    /**
+     * Returns the JMX ObjectName for this pooled connection.
+     * @return the JMX ObjectName or null if not registered
+     */
     public ObjectName getObjectName() {
         return oname;
     }

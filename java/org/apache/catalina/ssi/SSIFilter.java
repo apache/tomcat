@@ -43,20 +43,38 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SSIFilter extends GenericFilter {
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor.
+     */
+    public SSIFilter() {
+    }
+
     /** Debug level for this servlet. */
     protected int debug = 0;
     /** Expiration time in seconds for the doc. */
     protected Long expires = null;
-    /** virtual path can be webapp-relative */
+    /**
+     * When true, virtual paths are interpreted as webapp-relative.
+     */
     protected boolean isVirtualWebappRelative = false;
-    /** regex pattern to match when evaluating content types */
+    /**
+     * Regex pattern to match when evaluating content types for SSI processing.
+     */
     protected Pattern contentTypeRegEx = null;
-    /** default pattern for ssi filter content type matching */
+    /**
+     * Default pattern for matching SHTML content type.
+     */
     protected final Pattern shtmlRegEx = Pattern.compile("text/x-server-parsed-html(;.*)?");
-    /** Allow exec (normally blocked for security) */
+    /**
+     * When true, allows the exec directive (normally blocked for security).
+     */
     protected boolean allowExec = false;
 
 
+    /**
+     * Initializes the filter by reading configuration parameters.
+     */
     @Override
     public void init() throws ServletException {
         if (getInitParameter("debug") != null) {
@@ -82,6 +100,9 @@ public class SSIFilter extends GenericFilter {
         }
     }
 
+    /**
+     * Captures the response, processes SSI directives if the content type matches, and writes the output.
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {

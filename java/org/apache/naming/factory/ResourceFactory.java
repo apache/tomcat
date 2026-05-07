@@ -27,6 +27,11 @@ import org.apache.naming.StringManager;
  * Object factory for Resources.
  */
 public class ResourceFactory extends FactoryBase {
+    /**
+     * Default constructor.
+     */
+    public ResourceFactory() {
+    }
 
     private static final StringManager sm = StringManager.getManager(ResourceFactory.class);
 

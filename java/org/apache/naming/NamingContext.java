@@ -129,10 +129,20 @@ public class NamingContext implements Context {
      */
     private boolean exceptionOnFailedWrite = true;
 
+    /**
+     * Returns whether an attempt to write to a read-only context results in an exception.
+     *
+     * @return {@code true} if writes to a read-only context throw an exception
+     */
     public boolean getExceptionOnFailedWrite() {
         return exceptionOnFailedWrite;
     }
 
+    /**
+     * Sets whether an attempt to write to a read-only context results in an exception or is silently ignored.
+     *
+     * @param exceptionOnFailedWrite {@code true} to throw an exception on write to a read-only context
+     */
     public void setExceptionOnFailedWrite(boolean exceptionOnFailedWrite) {
         this.exceptionOnFailedWrite = exceptionOnFailedWrite;
     }
@@ -614,7 +624,9 @@ public class NamingContext implements Context {
 
 
     /**
-     * @return <code>true</code> if writing is allowed on this context.
+     * Check if writing is allowed on this context.
+     *
+     * @return <code>true</code> if writing is allowed on this context
      */
     protected boolean isWritable() {
         return ContextAccessController.isWritable(name);

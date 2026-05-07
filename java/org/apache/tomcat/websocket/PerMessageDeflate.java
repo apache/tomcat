@@ -30,6 +30,10 @@ import javax.websocket.SendHandler;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of the permessage-deflate WebSocket extension as defined in RFC 7692.
+ * This extension provides message compression for WebSocket frames.
+ */
 public class PerMessageDeflate implements Transformation {
 
     private static final StringManager sm = StringManager.getManager(PerMessageDeflate.class);
@@ -42,8 +46,14 @@ public class PerMessageDeflate implements Transformation {
     private static final int RSV_BITMASK = 0b100;
     private static final byte[] EOM_BYTES = new byte[] { 0, 0, -1, -1 };
 
+    /**
+     * The name of the permessage-deflate extension.
+     */
     public static final String NAME = "permessage-deflate";
 
+    /**
+     * The builder for the permessage-deflate transformation.
+     */
     public static final TransformationBuilder BUILDER = new TransformationBuilder() {
         @Override
         public Transformation build(List<List<Parameter>> preferences, boolean isServer) {

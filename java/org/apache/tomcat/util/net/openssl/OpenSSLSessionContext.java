@@ -33,6 +33,9 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     private static final StringManager sm = StringManager.getManager(OpenSSLSessionContext.class);
     private static final Enumeration<byte[]> EMPTY = new EmptyEnumeration();
 
+    /**
+     * Session statistics for this context.
+     */
     private final OpenSSLSessionStats stats;
     // This is deliberately unused. The reference is retained so that a
     // reference chain is established and maintained to the OpenSSLContext while
@@ -81,14 +84,18 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     }
 
     /**
-     * @return {@code true} if caching of SSL sessions is enabled, {@code false} otherwise.
+     * Checks if caching of SSL sessions is enabled.
+     *
+     * @return true if caching of SSL sessions is enabled
      */
     public boolean isSessionCacheEnabled() {
         return SSLContext.getSessionCacheMode(contextID) == SSL.SSL_SESS_CACHE_SERVER;
     }
 
     /**
-     * @return The statistics for this context.
+     * Returns the statistics for this context.
+     *
+     * @return The session statistics
      */
     public OpenSSLSessionStats stats() {
         return stats;

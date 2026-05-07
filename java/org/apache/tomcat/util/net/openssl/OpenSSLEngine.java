@@ -62,8 +62,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
 
+    /**
+     * Set of available cipher suites.
+     */
     public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
+    /**
+     * Set of implemented protocols.
+     */
     public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
 
     static {

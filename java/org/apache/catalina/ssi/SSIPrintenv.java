@@ -24,6 +24,13 @@ import java.util.Collection;
  * Implements the Server-side #printenv command.
  */
 public class SSIPrintenv implements SSICommand {
+
+    /**
+     * Default constructor.
+     */
+    public SSIPrintenv() {
+    }
+
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

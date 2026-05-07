@@ -29,6 +29,12 @@ import java.io.Serializable;
  */
 public class SecurityRoleRef implements Serializable {
 
+    /**
+     * Default constructor.
+     */
+    public SecurityRoleRef() {
+    }
+
     private static final long serialVersionUID = 1L;
 
 
@@ -39,10 +45,20 @@ public class SecurityRoleRef implements Serializable {
      */
     private String name = null;
 
+    /**
+     * Get the role name.
+     *
+     * @return the role name
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Set the role name.
+     *
+     * @param name The role name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -53,10 +69,20 @@ public class SecurityRoleRef implements Serializable {
      */
     private String link = null;
 
+    /**
+     * Get the role link.
+     *
+     * @return the role link
+     */
     public String getLink() {
         return this.link;
     }
 
+    /**
+     * Set the role link.
+     *
+     * @param link The role link
+     */
     public void setLink(String link) {
         this.link = link;
     }

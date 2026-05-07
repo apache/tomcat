@@ -399,25 +399,39 @@ public final class JspRuntimeContext {
         }
     }
 
+    /**
+     * Returns whether a compile check is currently in progress.
+     *
+     * @return {@code true} if a compile check is in progress
+     */
     public boolean isCompileCheckInProgress() {
         return compileCheckInProgress;
     }
 
     /**
-     * @return the classpath that is passed off to the Java compiler.
+     * Returns the classpath that is passed off to the Java compiler.
+     *
+     * @return the compilation classpath
      */
     public String getClassPath() {
         return classpath;
     }
 
     /**
-     * @return Last time the update background task has run
+     * Returns the last time the update background task has run.
+     *
+     * @return last time the update background task has run
      */
     public long getLastJspQueueUpdate() {
         return lastJspQueueUpdate;
     }
 
 
+    /**
+     * Returns the map of SMAP strata for compiled JSPs.
+     *
+     * @return the map of SMAP strata
+     */
     public Map<String,SmapStratum> getSmaps() {
         return smaps;
     }

@@ -23,7 +23,13 @@ package org.apache.catalina.tribes;
  */
 public interface MembershipService {
 
+    /**
+     * Receive level.
+     */
     int MBR_RX = Channel.MBR_RX_SEQ;
+    /**
+     * Transmit level.
+     */
     int MBR_TX = Channel.MBR_TX_SEQ;
 
     /**
