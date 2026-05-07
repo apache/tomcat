@@ -109,5 +109,10 @@ public interface Valve {
     void invoke(Request request, Response response) throws IOException, ServletException;
 
 
+    /**
+     * Returns whether this Valve supports Servlet 3+ async requests.
+     *
+     * @return {@code true} if async is supported, {@code false} otherwise
+     */
     boolean isAsyncSupported();
 }

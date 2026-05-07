@@ -27,6 +27,12 @@ import org.apache.catalina.WebResourceSet;
 public class WebResourceRootSF extends StoreFactoryBase {
 
     /**
+     * Constructs a new WebResourceRootSF.
+     */
+    public WebResourceRootSF() {
+    }
+
+    /**
      * Store the specified Resources children.
      * <p>
      * {@inheritDoc}

@@ -37,11 +37,29 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     private static final Log logger = LogFactory.getLog(StatementDecoratorInterceptor.class);
 
+    /**
+     * Method name for executeQuery.
+     */
     protected static final String EXECUTE_QUERY  = "executeQuery";
+    /**
+     * Method name for getGeneratedKeys.
+     */
     protected static final String GET_GENERATED_KEYS = "getGeneratedKeys";
+    /**
+     * Method name for getResultSet.
+     */
     protected static final String GET_RESULTSET  = "getResultSet";
 
+    /**
+     * Method names that return a ResultSet.
+     */
     protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET};
+
+    /**
+     * Default constructor.
+     */
+    public StatementDecoratorInterceptor() {
+    }
 
     /**
      * the constructor to create the resultSet proxies
@@ -58,6 +76,11 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * Given the comments in the jdbc-pool code regarding caching for
      * performance, continue to use Proxy.getProxyClass(). This will need to be
      * revisited if that method is marked for removal.
+     */
+   /**
+     * Gets the constructor for creating ResultSet proxies.
+     * @return the ResultSet proxy constructor
+     * @throws NoSuchMethodException if the constructor is not found
      */
     @SuppressWarnings("deprecation")
     protected Constructor<?> getResultSetConstructor() throws NoSuchMethodException {
@@ -137,14 +160,30 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         return result;
     }
 
+    /**
+     * Checks if the given method name is executeQuery.
+     * @param methodName the method name to check
+     * @return true if the method is executeQuery
+     */
     protected boolean isExecuteQuery(String methodName) {
         return EXECUTE_QUERY.equals(methodName);
     }
 
+    /**
+     * Checks if the given method is executeQuery.
+     * @param method the method to check
+     * @return true if the method is executeQuery
+     */
     protected boolean isExecuteQuery(Method method) {
         return isExecuteQuery(method.getName());
     }
 
+    /**
+     * Checks if the given method returns a ResultSet.
+     * @param method the method to check
+     * @param process whether processing is already enabled
+     * @return true if the method returns a ResultSet
+     */
     protected boolean isResultSet(Method method, boolean process) {
         return process(RESULTSET_TYPES, method, process);
     }
@@ -156,46 +195,92 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      */
     protected class StatementProxy<T extends Statement> implements InvocationHandler {
 
+        /**
+         * Indicates whether this statement has been closed.
+         */
         protected boolean closed = false;
+        /**
+         * The delegated statement.
+         */
         protected T delegate;
         private Object actualProxy;
         private Object connection;
         private String sql;
         private Constructor<?> constructor;
 
+        /**
+         * Constructs a StatementProxy.
+         * @param delegate the statement to delegate to
+         * @param sql the SQL text
+         */
         public StatementProxy(T delegate, String sql) {
             this.delegate = delegate;
             this.sql = sql;
         }
+        /**
+         * Returns the delegated statement.
+         * @return the delegated statement
+         */
         public T getDelegate() {
             return this.delegate;
         }
 
+        /**
+         * Returns the SQL text.
+         * @return the SQL text
+         */
         public String getSql() {
             return sql;
         }
 
+        /**
+         * Sets the connection proxy.
+         * @param proxy the connection proxy
+         */
         public void setConnection(Object proxy) {
             this.connection = proxy;
         }
+        /**
+         * Returns the connection proxy.
+         * @return the connection proxy
+         */
         public Object getConnection() {
             return this.connection;
         }
 
+        /**
+         * Sets the actual proxy object.
+         * @param proxy the actual proxy
+         */
         public void setActualProxy(Object proxy){
             this.actualProxy = proxy;
         }
+        /**
+         * Returns the actual proxy object.
+         * @return the actual proxy
+         */
         public Object getActualProxy() {
             return this.actualProxy;
         }
 
 
+        /**
+         * Returns the constructor used to create this proxy.
+         * @return the constructor
+         */
         public Constructor<?> getConstructor() {
             return constructor;
         }
+        /**
+         * Sets the constructor for creating proxies.
+         * @param constructor the constructor
+         */
         public void setConstructor(Constructor<?> constructor) {
             this.constructor = constructor;
         }
+        /**
+         * Called when the close method is invoked on the statement.
+         */
         public void closeInvoked() {
             if (getDelegate()!=null) {
                 try {
@@ -273,11 +358,19 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
     }
 
+    /**
+     * Invocation handler that proxies ResultSet instances.
+     */
     protected static class ResultSetProxy implements InvocationHandler {
 
         private Object st;
         private Object delegate;
 
+        /**
+         * Constructs a ResultSetProxy.
+         * @param st the statement proxy
+         * @param delegate the ResultSet to delegate to
+         */
         public ResultSetProxy(Object st, Object delegate) {
             this.st = st;
             this.delegate = delegate;

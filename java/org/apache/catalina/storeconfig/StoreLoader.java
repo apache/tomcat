@@ -67,6 +67,12 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 public class StoreLoader {
 
     /**
+     * Constructs a new StoreLoader for parsing store registry XML descriptors.
+     */
+    public StoreLoader() {
+    }
+
+    /**
      * The <code>Digester</code> instance used to parse registry descriptors.
      */
     protected static final Digester digester = createDigester();
@@ -76,14 +82,18 @@ public class StoreLoader {
     private URL registryResource;
 
     /**
-     * @return Returns the registry.
+     * Returns the StoreRegistry instance loaded from the configuration.
+     *
+     * @return the StoreRegistry instance
      */
     public StoreRegistry getRegistry() {
         return registry;
     }
 
     /**
-     * @param registry The registry to set.
+     * Sets the StoreRegistry instance to use.
+     *
+     * @param registry the StoreRegistry instance
      */
     public void setRegistry(StoreRegistry registry) {
         this.registry = registry;
@@ -150,7 +160,9 @@ public class StoreLoader {
     }
 
     /**
-     * @return the registryResource.
+     * Returns the URL of the registry resource that was loaded.
+     *
+     * @return the registry resource URL
      */
     public URL getRegistryResource() {
         return registryResource;

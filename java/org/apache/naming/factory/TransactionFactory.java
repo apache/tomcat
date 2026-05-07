@@ -26,6 +26,12 @@ import org.apache.naming.TransactionRef;
  */
 public class TransactionFactory extends FactoryBase {
 
+    /**
+     * Constructs a new TransactionFactory.
+     */
+    public TransactionFactory() {
+    }
+
     @Override
     protected boolean isReferenceTypeSupported(Object obj) {
         return obj instanceof TransactionRef;

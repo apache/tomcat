@@ -26,6 +26,12 @@ import java.util.logging.LogRecord;
  */
 public class VerbatimFormatter extends Formatter {
 
+    /**
+     * Constructs a new VerbatimFormatter.
+     */
+    public VerbatimFormatter() {
+    }
+
     @Override
     public String format(LogRecord record) {
         // Timestamp + New line for next record

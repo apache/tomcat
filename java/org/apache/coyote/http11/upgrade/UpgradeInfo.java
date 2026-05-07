@@ -23,18 +23,49 @@ package org.apache.coyote.http11.upgrade;
  */
 public class UpgradeInfo {
 
+    /**
+     * Constructs a new UpgradeInfo.
+     */
+    public UpgradeInfo() {
+    }
+
+    /**
+     * The parent group info for aggregated statistics.
+     */
     private UpgradeGroupInfo groupInfo = null;
+    /**
+     * Counter for bytes sent.
+     */
     private volatile long bytesSent = 0;
+    /**
+     * Counter for bytes received.
+     */
     private volatile long bytesReceived = 0;
+    /**
+     * Counter for messages sent.
+     */
     private volatile long msgsSent = 0;
+    /**
+     * Counter for messages received.
+     */
     private volatile long msgsReceived = 0;
 
 
+    /**
+     * Returns the parent group info.
+     *
+     * @return the group info
+     */
     public UpgradeGroupInfo getGlobalProcessor() {
         return groupInfo;
     }
 
 
+    /**
+     * Sets the parent group info.
+     *
+     * @param groupInfo the group info
+     */
     public void setGroupInfo(UpgradeGroupInfo groupInfo) {
         if (groupInfo == null) {
             if (this.groupInfo != null) {
@@ -48,53 +79,113 @@ public class UpgradeInfo {
     }
 
 
+    /**
+     * Returns the number of bytes sent.
+     *
+     * @return the bytes sent
+     */
     public long getBytesSent() {
         return bytesSent;
     }
 
+    /**
+     * Resets the bytes sent counter.
+     *
+     * @param bytesSent the new value
+     */
     public void setBytesSent(long bytesSent) {
         this.bytesSent = bytesSent;
     }
 
+    /**
+     * Adds to the bytes sent counter.
+     *
+     * @param bytesSent the amount to add
+     */
     public void addBytesSent(long bytesSent) {
         this.bytesSent += bytesSent;
     }
 
 
+    /**
+     * Returns the number of bytes received.
+     *
+     * @return the bytes received
+     */
     public long getBytesReceived() {
         return bytesReceived;
     }
 
+    /**
+     * Resets the bytes received counter.
+     *
+     * @param bytesReceived the new value
+     */
     public void setBytesReceived(long bytesReceived) {
         this.bytesReceived = bytesReceived;
     }
 
+    /**
+     * Adds to the bytes received counter.
+     *
+     * @param bytesReceived the amount to add
+     */
     public void addBytesReceived(long bytesReceived) {
         this.bytesReceived += bytesReceived;
     }
 
 
+    /**
+     * Returns the number of messages sent.
+     *
+     * @return the messages sent
+     */
     public long getMsgsSent() {
         return msgsSent;
     }
 
+    /**
+     * Resets the messages sent counter.
+     *
+     * @param msgsSent the new value
+     */
     public void setMsgsSent(long msgsSent) {
         this.msgsSent = msgsSent;
     }
 
+    /**
+     * Adds to the messages sent counter.
+     *
+     * @param msgsSent the amount to add
+     */
     public void addMsgsSent(long msgsSent) {
         this.msgsSent += msgsSent;
     }
 
 
+    /**
+     * Returns the number of messages received.
+     *
+     * @return the messages received
+     */
     public long getMsgsReceived() {
         return msgsReceived;
     }
 
+    /**
+     * Resets the messages received counter.
+     *
+     * @param msgsReceived the new value
+     */
     public void setMsgsReceived(long msgsReceived) {
         this.msgsReceived = msgsReceived;
     }
 
+    /**
+     * Adds to the messages received counter.
+     *
+     * @param msgsReceived the amount to add
+     */
     public void addMsgsReceived(long msgsReceived) {
         this.msgsReceived += msgsReceived;
     }

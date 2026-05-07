@@ -75,7 +75,9 @@ public abstract class TimeBucketCounterBase {
 
 
     /**
-     * @return bucketDuration in seconds
+     * Returns the duration of each time bucket.
+     *
+     * @return the bucket duration in seconds
      */
     public int getBucketDuration() {
         return bucketDuration;

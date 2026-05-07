@@ -42,8 +42,17 @@ import org.apache.jasper.compiler.Localizer;
 
 public class Util {
 
+    /**
+     * Constructs a new Util instance.
+     */
+    public Util() {
+    }
+
     private static final String VALID_SCHEME_CHAR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+.-";
 
+    /**
+     * The default character encoding used for URL operations.
+     */
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
     private static final int HIGHEST_SPECIAL = '>';
@@ -172,6 +181,14 @@ public class Util {
         return Objects.requireNonNullElse(result, buffer);
     }
 
+    /**
+     * Escapes XML special characters in the given character array buffer.
+     *
+     * @param arrayBuffer The character array to escape
+     * @param length      The length of the buffer to process
+     *
+     * @return The escaped string, or {@code null} if no escaping was necessary
+     */
     @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(char[] arrayBuffer, int length) {
         int start = 0;
@@ -280,6 +297,11 @@ public class Util {
         private int status = 200;
         private String charEncoding;
 
+        /**
+         * Constructs a new ImportResponseWrapper.
+         *
+         * @param arg0 The HttpServletResponse to wrap
+         */
         public ImportResponseWrapper(HttpServletResponse arg0) {
             super(arg0);
         }
@@ -322,14 +344,31 @@ public class Util {
             return status;
         }
 
+        /**
+         * Returns the character encoding of the response.
+         *
+         * @return the character encoding
+         */
         public String getCharEncoding() {
             return this.charEncoding;
         }
 
+        /**
+         * Sets the character encoding of the response.
+         *
+         * @param ce The character encoding
+         */
         public void setCharEncoding(String ce) {
             this.charEncoding = ce;
         }
 
+        /**
+         * Returns the response body as a string.
+         *
+         * @return the response body string
+         *
+         * @throws UnsupportedEncodingException If the character encoding is not supported
+         */
         public String getString() throws UnsupportedEncodingException {
             if (isWriterUsed) {
                 return sw.toString();

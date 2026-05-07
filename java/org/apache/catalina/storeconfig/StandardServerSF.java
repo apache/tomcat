@@ -28,6 +28,12 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
  */
 public class StandardServerSF extends StoreFactoryBase {
 
+    /**
+     * Default constructor.
+     */
+    public StandardServerSF() {
+    }
+
     @Override
     public void store(PrintWriter aWriter, int indent, Object aServer) throws Exception {
         storeXMLHead(aWriter);

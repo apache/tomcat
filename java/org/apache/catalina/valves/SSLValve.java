@@ -181,11 +181,23 @@ public class SSLValve extends ValveBase {
         return sslCipherUserKeySizeHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the cipher key size.
+     *
+     * @param sslCipherUserKeySizeHeader The cipher key size header name
+     */
     public void setSslCipherUserKeySizeHeader(String sslCipherUserKeySizeHeader) {
         this.sslCipherUserKeySizeHeader = sslCipherUserKeySizeHeader;
     }
 
 
+    /**
+     * Retrieves the value of the specified header from the request, handling null and "(null)" values.
+     *
+     * @param request The request object
+     * @param header The header name to retrieve
+     * @return The header value, or null if not present or equal to "(null)"
+     */
     public String mygetHeader(Request request, String header) {
         String strcert0 = request.getHeader(header);
         if (strcert0 == null) {

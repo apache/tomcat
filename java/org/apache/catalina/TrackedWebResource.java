@@ -18,8 +18,21 @@ package org.apache.catalina;
 
 import java.io.Closeable;
 
+/**
+ * Represents a web resource that tracks its creation source for leak detection.
+ */
 public interface TrackedWebResource extends Closeable {
+    /**
+     * Returns the stack trace of the code that created this resource.
+     *
+     * @return the creation stack trace
+     */
     Exception getCreatedBy();
 
+    /**
+     * Returns the name of this resource.
+     *
+     * @return the resource name
+     */
     String getName();
 }

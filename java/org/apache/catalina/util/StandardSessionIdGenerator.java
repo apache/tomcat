@@ -16,7 +16,18 @@
  */
 package org.apache.catalina.util;
 
+/**
+ * Standard implementation of {@link org.apache.catalina.SessionIdGenerator} that generates session
+ * identifiers using a pool of {@link java.security.SecureRandom} instances.
+ */
 public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
+
+    /**
+     * Construct a new instance with default configuration.
+     */
+    public StandardSessionIdGenerator() {
+        super();
+    }
 
     @Override
     public String generateSessionId(String route) {

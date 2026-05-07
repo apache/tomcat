@@ -182,6 +182,12 @@ import org.xml.sax.SAXException;
  */
 public class WebdavServlet extends DefaultServlet implements PeriodicEventListener {
 
+    /**
+     * Constructs a new WebdavServlet.
+     */
+    public WebdavServlet() {
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -474,35 +480,45 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         /**
-         * @return the updateType for this operation
+         * Returns the update type for this operation.
+         *
+         * @return the updateType
          */
         public PropertyUpdateType getUpdateType() {
             return this.updateType;
         }
 
         /**
-         * @return the propertyNode the XML node that contains the property name (and value if SET)
+         * Returns the XML node that contains the property name (and value if SET).
+         *
+         * @return the propertyNode
          */
         public Node getPropertyNode() {
             return this.propertyNode;
         }
 
         /**
-         * @return the statusCode to set as a result of the operation
+         * Returns the status code to set as a result of the operation.
+         *
+         * @return the statusCode
          */
         public int getStatusCode() {
             return this.statusCode;
         }
 
         /**
-         * @param statusCode the statusCode to set as a result of the operation
+         * Sets the status code as a result of the operation.
+         *
+         * @param statusCode the statusCode to set
          */
         public void setStatusCode(int statusCode) {
             this.statusCode = statusCode;
         }
 
         /**
-         * @return <code>true</code> if the property is protected
+         * Returns whether the property is protected.
+         *
+         * @return {@code true} if the property is protected
          */
         public boolean getProtectedProperty() {
             return this.protectedProperty;
@@ -513,8 +529,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Type of PROPFIND request.
      */
     public enum PropfindType {
+        /**
+         * Find by specific property.
+         */
         FIND_BY_PROPERTY,
+        /**
+         * Find all properties.
+         */
         FIND_ALL_PROP,
+        /**
+         * Find property names only.
+         */
         FIND_PROPERTY_NAMES
     }
 
@@ -523,7 +548,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Type of property update in a PROPPATCH.
      */
     public enum PropertyUpdateType {
+        /**
+         * Set a property.
+         */
         SET,
+        /**
+         * Remove a property.
+         */
         REMOVE
     }
 
@@ -2921,6 +2952,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Default property store, which provides memory storage without persistence.
      */
     public static class MemoryPropertyStore implements PropertyStore {
+
+        /**
+         * Constructs a new MemoryPropertyStore.
+         */
+        public MemoryPropertyStore() {
+        }
 
         private final ConcurrentHashMap<String,ArrayList<Node>> deadProperties = new ConcurrentHashMap<>();
 

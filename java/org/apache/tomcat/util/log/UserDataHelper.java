@@ -48,6 +48,11 @@ public class UserDataHelper {
     private volatile long lastInfoTime = 0;
 
 
+    /**
+     * Constructs a new UserDataHelper with the specified log instance.
+     *
+     * @param log The log instance to use for logging
+     */
     public UserDataHelper(Log log) {
         this.log = log;
 
@@ -136,8 +141,17 @@ public class UserDataHelper {
      * Log mode for the next log message.
      */
     public enum Mode {
+        /**
+         * Log at DEBUG level.
+         */
         DEBUG,
+        /**
+         * Log at INFO level for the first message, then DEBUG for subsequent messages.
+         */
         INFO_THEN_DEBUG,
+        /**
+         * Log at INFO level.
+         */
         INFO
     }
 }

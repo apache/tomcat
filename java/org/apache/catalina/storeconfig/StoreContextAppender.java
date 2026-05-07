@@ -31,6 +31,12 @@ import org.apache.catalina.core.StandardHost;
 public class StoreContextAppender extends StoreAppender {
 
     /**
+     * Constructs a new StoreContextAppender for handling StandardContext serialization.
+     */
+    public StoreContextAppender() {
+    }
+
+    /**
      * {@inheritDoc} Adds special handling for <code>docBase</code>.
      */
     @Override
@@ -83,6 +89,13 @@ public class StoreContextAppender extends StoreAppender {
         return isPrint;
     }
 
+    /**
+     * Resolves the absolute canonical path of the application base directory
+     * for the given host.
+     *
+     * @param host The StandardHost instance
+     * @return The canonical File representing the appBase directory
+     */
     protected File getAppBase(StandardHost host) {
 
         File appBase;
@@ -99,6 +112,14 @@ public class StoreContextAppender extends StoreAppender {
 
     }
 
+    /**
+     * Resolves the absolute canonical path of the document base directory
+     * for the given context.
+     *
+     * @param context The StandardContext instance
+     * @param appBase The application base directory
+     * @return The canonical File representing the docBase directory
+     */
     protected File getDocBase(StandardContext context, File appBase) {
         File docBase;
         String contextDocBase = context.getOriginalDocBase();

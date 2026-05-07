@@ -58,6 +58,15 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
 
+    /**
+     * Constructs a new WebXml.
+     */
+    public WebXml() {
+    }
+
+    /**
+     * Marker for "others" in ordering.
+     */
     protected static final String ORDER_OTHERS = "org.apache.catalina.order.others";
 
     private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
@@ -70,10 +79,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      */
     private boolean overridable = false;
 
+    /**
+     * Returns whether this web fragment is overridable.
+     *
+     * @return {@code true} if overridable
+     */
     public boolean isOverridable() {
         return overridable;
     }
 
+    /**
+     * Sets whether this web fragment is overridable.
+     *
+     * @param overridable The overridable flag
+     */
     public void setOverridable(boolean overridable) {
         this.overridable = overridable;
     }
@@ -84,14 +103,29 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      */
     private final List<String> duplicates = new ArrayList<>();
 
+    /**
+     * Returns whether this web fragment has duplicate entries.
+     *
+     * @return {@code true} if duplicates exist
+     */
     public boolean isDuplicated() {
         return !duplicates.isEmpty();
     }
 
+    /**
+     * Adds a duplicate fragment name.
+     *
+     * @param duplicate The duplicate fragment name
+     */
     public void addDuplicate(String duplicate) {
         this.duplicates.add(duplicate);
     }
 
+    /**
+     * Returns the list of duplicate fragment names.
+     *
+     * @return the duplicate fragment names
+     */
     public List<String> getDuplicates() {
         return new ArrayList<>(this.duplicates);
     }
@@ -101,22 +135,38 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      */
     private Set<String> absoluteOrdering = null;
 
+    /**
+     * Initializes the absolute ordering set if it has not been created yet.
+     */
     public void createAbsoluteOrdering() {
         if (absoluteOrdering == null) {
             absoluteOrdering = new LinkedHashSet<>();
         }
     }
 
+    /**
+     * Adds a fragment name to the absolute ordering.
+     *
+     * @param fragmentName The fragment name to add
+     */
     public void addAbsoluteOrdering(String fragmentName) {
         createAbsoluteOrdering();
         absoluteOrdering.add(fragmentName);
     }
 
+    /**
+     * Adds "others" to the absolute ordering.
+     */
     public void addAbsoluteOrderingOthers() {
         createAbsoluteOrdering();
         absoluteOrdering.add(ORDER_OTHERS);
     }
 
+    /**
+     * Returns the absolute ordering set.
+     *
+     * @return the absolute ordering
+     */
     public Set<String> getAbsoluteOrdering() {
         return absoluteOrdering;
     }
@@ -126,10 +176,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      */
     private final Set<String> after = new LinkedHashSet<>();
 
+    /**
+     * Adds a fragment name to the after ordering.
+     *
+     * @param fragmentName The fragment name to add
+     */
     public void addAfterOrdering(String fragmentName) {
         after.add(fragmentName);
     }
 
+    /**
+     * Adds "others" to the after ordering.
+     *
+     * @throws IllegalArgumentException If "others" is already in the before ordering
+     */
     public void addAfterOrderingOthers() {
         if (before.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString("webXml.multipleOther"));
@@ -137,16 +197,31 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         after.add(ORDER_OTHERS);
     }
 
+    /**
+     * Returns the after ordering set.
+     *
+     * @return the after ordering
+     */
     public Set<String> getAfterOrdering() {
         return after;
     }
 
     private final Set<String> before = new LinkedHashSet<>();
 
+    /**
+     * Adds a fragment name to the before ordering.
+     *
+     * @param fragmentName The fragment name to add
+     */
     public void addBeforeOrdering(String fragmentName) {
         before.add(fragmentName);
     }
 
+    /**
+     * Adds "others" to the before ordering.
+     *
+     * @throws IllegalArgumentException If "others" is already in the after ordering
+     */
     public void addBeforeOrderingOthers() {
         if (after.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString("webXml.multipleOther"));
@@ -154,12 +229,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         before.add(ORDER_OTHERS);
     }
 
+    /**
+     * Returns the before ordering set.
+     *
+     * @return the before ordering
+     */
     public Set<String> getBeforeOrdering() {
         return before;
     }
 
     // Common elements and attributes
     // Required attribute of web-app element
+    /**
+     * Returns the version of the web.xml.
+     *
+     * @return the version
+     */
     public String getVersion() {
         StringBuilder sb = new StringBuilder(3);
         sb.append(majorVersion);
@@ -219,10 +304,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Optional publicId attribute
     private String publicId = null;
 
+    /**
+     * Returns the public identifier.
+     *
+     * @return the public identifier
+     */
     public String getPublicId() {
         return publicId;
     }
 
+    /**
+     * Sets the public identifier.
+     *
+     * @param publicId The public identifier
+     */
     public void setPublicId(String publicId) {
         // Update major and minor version
         if (publicId == null) {
@@ -248,10 +343,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Optional metadata-complete attribute
     private boolean metadataComplete = false;
 
+    /**
+     * Returns whether metadata is complete.
+     *
+     * @return {@code true} if metadata is complete
+     */
     public boolean isMetadataComplete() {
         return metadataComplete;
     }
 
+    /**
+     * Sets whether metadata is complete.
+     *
+     * @param metadataComplete The metadata complete flag
+     */
     public void setMetadataComplete(boolean metadataComplete) {
         this.metadataComplete = metadataComplete;
     }
@@ -259,10 +364,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Optional name element
     private String name = null;
 
+    /**
+     * Returns the name of the web application.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of the web application.
+     *
+     * @param name The name
+     */
     public void setName(String name) {
         if (ORDER_OTHERS.equalsIgnoreCase(name)) {
             // This is unusual. This name will be ignored. Log the fact.
@@ -276,10 +391,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private int majorVersion = 6;
     private int minorVersion = 0;
 
+    /**
+     * Returns the major version number.
+     *
+     * @return the major version
+     */
     public int getMajorVersion() {
         return majorVersion;
     }
 
+    /**
+     * Returns the minor version number.
+     *
+     * @return the minor version
+     */
     public int getMinorVersion() {
         return minorVersion;
     }
@@ -292,10 +417,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // display-name - TODO should support multiple with language
     private String displayName = null;
 
+    /**
+     * Returns the display name of the web application.
+     *
+     * @return the display name
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * Sets the display name.
+     *
+     * @param displayName The display name
+     */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -303,10 +438,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // distributable
     private boolean distributable = false;
 
+    /**
+     * Returns whether the web application is distributable.
+     *
+     * @return {@code true} if distributable
+     */
     public boolean isDistributable() {
         return distributable;
     }
 
+    /**
+     * Sets whether the web application is distributable.
+     *
+     * @param distributable The distributable flag
+     */
     public void setDistributable(boolean distributable) {
         this.distributable = distributable;
     }
@@ -314,10 +459,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // deny-uncovered-http-methods
     private boolean denyUncoveredHttpMethods = false;
 
+    /**
+     * Returns whether uncovered HTTP methods are denied.
+     *
+     * @return {@code true} if uncovered HTTP methods are denied
+     */
     public boolean getDenyUncoveredHttpMethods() {
         return denyUncoveredHttpMethods;
     }
 
+    /**
+     * Sets whether uncovered HTTP methods are denied.
+     *
+     * @param denyUncoveredHttpMethods The deny uncovered HTTP methods flag
+     */
     public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
         this.denyUncoveredHttpMethods = denyUncoveredHttpMethods;
     }
@@ -326,10 +481,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: description (multiple with language) is ignored
     private final Map<String,String> contextParams = new HashMap<>();
 
+    /**
+     * Adds a context parameter.
+     *
+     * @param param  The parameter name
+     * @param value  The parameter value
+     */
     public void addContextParam(String param, String value) {
         contextParams.put(param, value);
     }
 
+    /**
+     * Returns the context parameters.
+     *
+     * @return the context parameters
+     */
     public Map<String,String> getContextParams() {
         return contextParams;
     }
@@ -341,6 +507,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Description for init-param is ignored
     private final Map<String,FilterDef> filters = new LinkedHashMap<>();
 
+    /**
+     * Adds a filter definition.
+     *
+     * @param filter The filter definition
+     *
+     * @throws IllegalArgumentException If a filter with the same name already exists
+     */
     public void addFilter(FilterDef filter) {
         if (filters.containsKey(filter.getFilterName())) {
             // Filter names must be unique within a web(-fragment).xml
@@ -349,6 +522,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         filters.put(filter.getFilterName(), filter);
     }
 
+    /**
+     * Returns the filter definitions.
+     *
+     * @return the filter definitions
+     */
     public Map<String,FilterDef> getFilters() {
         return filters;
     }
@@ -357,12 +535,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Set<FilterMap> filterMaps = new LinkedHashSet<>();
     private final Set<String> filterMappingNames = new HashSet<>();
 
+    /**
+     * Adds a filter mapping.
+     *
+     * @param filterMap The filter mapping
+     */
     public void addFilterMapping(FilterMap filterMap) {
         filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
 
+    /**
+     * Returns the filter mappings.
+     *
+     * @return the filter mappings
+     */
     public Set<FilterMap> getFilterMappings() {
         return filterMaps;
     }
@@ -373,10 +561,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: icon (multiple) is ignored
     private final Set<String> listeners = new LinkedHashSet<>();
 
+    /**
+     * Adds a listener class.
+     *
+     * @param className The listener class name
+     */
     public void addListener(String className) {
         listeners.add(className);
     }
 
+    /**
+     * Returns the listener class names.
+     *
+     * @return the listener class names
+     */
     public Set<String> getListeners() {
         return listeners;
     }
@@ -389,6 +587,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: security-role-ref/description (multiple with language) is ignored
     private final Map<String,ServletDef> servlets = new HashMap<>();
 
+    /**
+     * Adds a servlet definition.
+     *
+     * @param servletDef The servlet definition
+     */
     public void addServlet(ServletDef servletDef) {
         servlets.put(servletDef.getServletName(), servletDef);
         if (overridable) {
@@ -396,6 +599,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
     }
 
+    /**
+     * Returns the servlet definitions.
+     *
+     * @return the servlet definitions
+     */
     public Map<String,ServletDef> getServlets() {
         return servlets;
     }
@@ -406,10 +614,24 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
 
+    /**
+     * Adds a servlet URL mapping.
+     *
+     * @param urlPattern   The URL pattern
+     * @param servletName  The servlet name
+     */
     public void addServletMapping(String urlPattern, String servletName) {
         addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getCharset()), servletName);
     }
 
+    /**
+     * Adds a servlet URL mapping (already decoded).
+     *
+     * @param urlPattern   The URL pattern
+     * @param servletName  The servlet name
+     *
+     * @throws IllegalArgumentException If a duplicate mapping exists
+     */
     public void addServletMappingDecoded(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
@@ -421,6 +643,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         servletMappingNames.add(servletName);
     }
 
+    /**
+     * Returns the servlet URL mappings.
+     *
+     * @return the servlet mappings
+     */
     public Map<String,String> getServletMappings() {
         return servletMappings;
     }
@@ -429,10 +656,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Digester will check there is only one of these
     private SessionConfig sessionConfig = new SessionConfig();
 
+    /**
+     * Sets the session configuration.
+     *
+     * @param sessionConfig The session configuration
+     */
     public void setSessionConfig(SessionConfig sessionConfig) {
         this.sessionConfig = sessionConfig;
     }
 
+    /**
+     * Returns the session configuration.
+     *
+     * @return the session configuration
+     */
     public SessionConfig getSessionConfig() {
         return sessionConfig;
     }
@@ -440,10 +677,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // mime-mapping
     private final Map<String,String> mimeMappings = new HashMap<>();
 
+    /**
+     * Adds a MIME mapping.
+     *
+     * @param extension  The file extension
+     * @param mimeType   The MIME type
+     */
     public void addMimeMapping(String extension, String mimeType) {
         mimeMappings.put(extension, mimeType);
     }
 
+    /**
+     * Returns the MIME mappings.
+     *
+     * @return the MIME mappings
+     */
     public Map<String,String> getMimeMappings() {
         return mimeMappings;
     }
@@ -453,9 +701,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private boolean alwaysAddWelcomeFiles = true;
 
     /**
-     * When merging/parsing web.xml files into this web.xml should the current set be completely replaced?
+     * Sets whether welcome files should replace existing ones.
      *
-     * @param replaceWelcomeFiles <code>true</code> to replace welcome files rather than add to the list
+     * @param replaceWelcomeFiles The replace welcome files flag
      */
     public void setReplaceWelcomeFiles(boolean replaceWelcomeFiles) {
         this.replaceWelcomeFiles = replaceWelcomeFiles;
@@ -474,6 +722,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // welcome-file-list
     private final Set<String> welcomeFiles = new LinkedHashSet<>();
 
+    /**
+     * Adds a welcome file.
+     *
+     * @param welcomeFile The welcome file name
+     */
     public void addWelcomeFile(String welcomeFile) {
         if (replaceWelcomeFiles) {
             welcomeFiles.clear();
@@ -482,6 +735,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         welcomeFiles.add(welcomeFile);
     }
 
+    /**
+     * Returns the welcome files.
+     *
+     * @return the welcome files
+     */
     public Set<String> getWelcomeFiles() {
         return welcomeFiles;
     }
@@ -489,11 +747,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // error-page
     private final Map<String,ErrorPage> errorPages = new HashMap<>();
 
+    /**
+     * Adds an error page.
+     *
+     * @param errorPage The error page
+     */
     public void addErrorPage(ErrorPage errorPage) {
         errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
 
+    /**
+     * Returns the error pages.
+     *
+     * @return the error pages
+     */
     public Map<String,ErrorPage> getErrorPages() {
         return errorPages;
     }
@@ -502,6 +770,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // jsp-config/taglib or taglib (2.3 and earlier)
     private final Map<String,String> taglibs = new HashMap<>();
 
+    /**
+     * Adds a taglib mapping.
+     *
+     * @param uri      The taglib URI
+     * @param location The taglib location
+     */
     public void addTaglib(String uri, String location) {
         if (taglibs.containsKey(uri)) {
             // Taglib URIs must be unique within a web(-fragment).xml
@@ -510,6 +784,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         taglibs.put(uri, location);
     }
 
+    /**
+     * Returns the taglib mappings.
+     *
+     * @return the taglib mappings
+     */
     public Map<String,String> getTaglibs() {
         return taglibs;
     }
@@ -517,11 +796,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // jsp-config/jsp-property-group
     private final Set<JspPropertyGroup> jspPropertyGroups = new LinkedHashSet<>();
 
+    /**
+     * Adds a JSP property group.
+     *
+     * @param propertyGroup The JSP property group
+     */
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
         propertyGroup.setCharset(getCharset());
         jspPropertyGroups.add(propertyGroup);
     }
 
+    /**
+     * Returns the JSP property groups.
+     *
+     * @return the JSP property groups
+     */
     public Set<JspPropertyGroup> getJspPropertyGroups() {
         return jspPropertyGroups;
     }
@@ -531,11 +820,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Set<SecurityConstraint> securityConstraints = new HashSet<>();
 
+    /**
+     * Adds a security constraint.
+     *
+     * @param securityConstraint The security constraint
+     */
     public void addSecurityConstraint(SecurityConstraint securityConstraint) {
         securityConstraint.setCharset(getCharset());
         securityConstraints.add(securityConstraint);
     }
 
+    /**
+     * Returns the security constraints.
+     *
+     * @return the security constraints
+     */
     public Set<SecurityConstraint> getSecurityConstraints() {
         return securityConstraints;
     }
@@ -544,11 +843,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Digester will check there is only one of these
     private LoginConfig loginConfig = null;
 
+    /**
+     * Sets the login configuration.
+     *
+     * @param loginConfig The login configuration
+     */
     public void setLoginConfig(LoginConfig loginConfig) {
         loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
 
+    /**
+     * Returns the login configuration.
+     *
+     * @return the login configuration
+     */
     public LoginConfig getLoginConfig() {
         return loginConfig;
     }
@@ -557,10 +866,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: description (multiple with language) is ignored
     private final Set<String> securityRoles = new HashSet<>();
 
+    /**
+     * Adds a security role.
+     *
+     * @param securityRole The security role name
+     */
     public void addSecurityRole(String securityRole) {
         securityRoles.add(securityRole);
     }
 
+    /**
+     * Returns the security roles.
+     *
+     * @return the security roles
+     */
     public Set<String> getSecurityRoles() {
         return securityRoles;
     }
@@ -569,6 +888,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextEnvironment> envEntries = new HashMap<>();
 
+    /**
+     * Adds an environment entry.
+     *
+     * @param envEntry The environment entry
+     *
+     * @throws IllegalArgumentException If an entry with the same name already exists
+     */
     public void addEnvEntry(ContextEnvironment envEntry) {
         if (envEntries.containsKey(envEntry.getName())) {
             // env-entry names must be unique within a web(-fragment).xml
@@ -577,6 +903,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         envEntries.put(envEntry.getName(), envEntry);
     }
 
+    /**
+     * Returns the environment entries.
+     *
+     * @return the environment entries
+     */
     public Map<String,ContextEnvironment> getEnvEntries() {
         return envEntries;
     }
@@ -585,10 +916,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextEjb> ejbRefs = new HashMap<>();
 
+    /**
+     * Adds an EJB reference.
+     *
+     * @param ejbRef The EJB reference
+     */
     public void addEjbRef(ContextEjb ejbRef) {
         ejbRefs.put(ejbRef.getName(), ejbRef);
     }
 
+    /**
+     * Returns the EJB references.
+     *
+     * @return the EJB references
+     */
     public Map<String,ContextEjb> getEjbRefs() {
         return ejbRefs;
     }
@@ -597,10 +938,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextLocalEjb> ejbLocalRefs = new HashMap<>();
 
+    /**
+     * Adds an EJB local reference.
+     *
+     * @param ejbLocalRef The EJB local reference
+     */
     public void addEjbLocalRef(ContextLocalEjb ejbLocalRef) {
         ejbLocalRefs.put(ejbLocalRef.getName(), ejbLocalRef);
     }
 
+    /**
+     * Returns the EJB local references.
+     *
+     * @return the EJB local references
+     */
     public Map<String,ContextLocalEjb> getEjbLocalRefs() {
         return ejbLocalRefs;
     }
@@ -611,10 +962,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple icon elements ???
     private final Map<String,ContextService> serviceRefs = new HashMap<>();
 
+    /**
+     * Adds a service reference.
+     *
+     * @param serviceRef The service reference
+     */
     public void addServiceRef(ContextService serviceRef) {
         serviceRefs.put(serviceRef.getName(), serviceRef);
     }
 
+    /**
+     * Returns the service references.
+     *
+     * @return the service references
+     */
     public Map<String,ContextService> getServiceRefs() {
         return serviceRefs;
     }
@@ -623,6 +984,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextResource> resourceRefs = new HashMap<>();
 
+    /**
+     * Adds a resource reference.
+     *
+     * @param resourceRef The resource reference
+     *
+     * @throws IllegalArgumentException If a reference with the same name already exists
+     */
     public void addResourceRef(ContextResource resourceRef) {
         if (resourceRefs.containsKey(resourceRef.getName())) {
             // resource-ref names must be unique within a web(-fragment).xml
@@ -631,6 +999,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         resourceRefs.put(resourceRef.getName(), resourceRef);
     }
 
+    /**
+     * Returns the resource references.
+     *
+     * @return the resource references
+     */
     public Map<String,ContextResource> getResourceRefs() {
         return resourceRefs;
     }
@@ -639,6 +1012,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextResourceEnvRef> resourceEnvRefs = new HashMap<>();
 
+    /**
+     * Adds a resource environment reference.
+     *
+     * @param resourceEnvRef The resource environment reference
+     *
+     * @throws IllegalArgumentException If a reference with the same name already exists
+     */
     public void addResourceEnvRef(ContextResourceEnvRef resourceEnvRef) {
         if (resourceEnvRefs.containsKey(resourceEnvRef.getName())) {
             // resource-env-ref names must be unique within a web(-fragment).xml
@@ -648,6 +1028,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         resourceEnvRefs.put(resourceEnvRef.getName(), resourceEnvRef);
     }
 
+    /**
+     * Returns the resource environment references.
+     *
+     * @return the resource environment references
+     */
     public Map<String,ContextResourceEnvRef> getResourceEnvRefs() {
         return resourceEnvRefs;
     }
@@ -656,6 +1041,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     private final Map<String,MessageDestinationRef> messageDestinationRefs = new HashMap<>();
 
+    /**
+     * Adds a message destination reference.
+     *
+     * @param messageDestinationRef The message destination reference
+     *
+     * @throws IllegalArgumentException If a reference with the same name already exists
+     */
     public void addMessageDestinationRef(MessageDestinationRef messageDestinationRef) {
         if (messageDestinationRefs.containsKey(messageDestinationRef.getName())) {
             // message-destination-ref names must be unique within a
@@ -666,6 +1058,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         messageDestinationRefs.put(messageDestinationRef.getName(), messageDestinationRef);
     }
 
+    /**
+     * Returns the message destination references.
+     *
+     * @return the message destination references
+     */
     public Map<String,MessageDestinationRef> getMessageDestinationRefs() {
         return messageDestinationRefs;
     }
@@ -676,6 +1073,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple icon elements ???
     private final Map<String,MessageDestination> messageDestinations = new HashMap<>();
 
+    /**
+     * Adds a message destination.
+     *
+     * @param messageDestination The message destination
+     *
+     * @throws IllegalArgumentException If a destination with the same name already exists
+     */
     public void addMessageDestination(MessageDestination messageDestination) {
         if (messageDestinations.containsKey(messageDestination.getName())) {
             // message-destination names must be unique within a
@@ -686,6 +1090,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         messageDestinations.put(messageDestination.getName(), messageDestination);
     }
 
+    /**
+     * Returns the message destinations.
+     *
+     * @return the message destinations
+     */
     public Map<String,MessageDestination> getMessageDestinations() {
         return messageDestinations;
     }
@@ -693,10 +1102,21 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // locale-encoding-mapping-list
     private final Map<String,String> localeEncodingMappings = new HashMap<>();
 
+    /**
+     * Adds a locale-encoding mapping.
+     *
+     * @param locale   The locale
+     * @param encoding The encoding
+     */
     public void addLocaleEncodingMapping(String locale, String encoding) {
         localeEncodingMappings.put(locale, encoding);
     }
 
+    /**
+     * Returns the locale-encoding mappings.
+     *
+     * @return the locale-encoding mappings
+     */
     public Map<String,String> getLocaleEncodingMappings() {
         return localeEncodingMappings;
     }
@@ -704,12 +1124,23 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // post-construct elements
     private final Map<String,String> postConstructMethods = new HashMap<>();
 
+    /**
+     * Adds a post-construct method.
+     *
+     * @param clazz  The class name
+     * @param method The method name
+     */
     public void addPostConstructMethods(String clazz, String method) {
         if (!postConstructMethods.containsKey(clazz)) {
             postConstructMethods.put(clazz, method);
         }
     }
 
+    /**
+     * Returns the post-construct methods.
+     *
+     * @return the post-construct methods
+     */
     public Map<String,String> getPostConstructMethods() {
         return postConstructMethods;
     }
@@ -717,16 +1148,32 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // pre-destroy elements
     private final Map<String,String> preDestroyMethods = new HashMap<>();
 
+    /**
+     * Adds a pre-destroy method.
+     *
+     * @param clazz  The class name
+     * @param method The method name
+     */
     public void addPreDestroyMethods(String clazz, String method) {
         if (!preDestroyMethods.containsKey(clazz)) {
             preDestroyMethods.put(clazz, method);
         }
     }
 
+    /**
+     * Returns the pre-destroy methods.
+     *
+     * @return the pre-destroy methods
+     */
     public Map<String,String> getPreDestroyMethods() {
         return preDestroyMethods;
     }
 
+    /**
+     * Returns the JSP configuration descriptor.
+     *
+     * @return the JSP configuration descriptor
+     */
     public JspConfigDescriptor getJspConfigDescriptor() {
         if (jspPropertyGroups.isEmpty() && taglibs.isEmpty()) {
             return null;
@@ -749,10 +1196,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     private String requestCharacterEncoding;
 
+    /**
+     * Returns the request character encoding.
+     *
+     * @return the request character encoding
+     */
     public String getRequestCharacterEncoding() {
         return requestCharacterEncoding;
     }
 
+    /**
+     * Sets the request character encoding.
+     *
+     * @param requestCharacterEncoding The request character encoding
+     */
     public void setRequestCharacterEncoding(String requestCharacterEncoding) {
         if (requestCharacterEncoding != null) {
             try {
@@ -766,10 +1223,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     private String responseCharacterEncoding;
 
+    /**
+     * Returns the response character encoding.
+     *
+     * @return the response character encoding
+     */
     public String getResponseCharacterEncoding() {
         return responseCharacterEncoding;
     }
 
+    /**
+     * Sets the response character encoding.
+     *
+     * @param responseCharacterEncoding The response character encoding
+     */
     public void setResponseCharacterEncoding(String responseCharacterEncoding) {
         if (responseCharacterEncoding != null) {
             try {
@@ -786,10 +1253,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // URL of JAR / exploded JAR for this web-fragment
     private URL uRL = null;
 
+    /**
+     * Sets the URL of the web.xml.
+     *
+     * @param url The URL
+     */
     public void setURL(URL url) {
         this.uRL = url;
     }
 
+    /**
+     * Returns the URL of the web.xml.
+     *
+     * @return the URL
+     */
     public URL getURL() {
         return uRL;
     }
@@ -797,10 +1274,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Name of jar file
     private String jarName = null;
 
+    /**
+     * Sets the JAR name for this web fragment.
+     *
+     * @param jarName The JAR name
+     */
     public void setJarName(String jarName) {
         this.jarName = jarName;
     }
 
+    /**
+     * Returns the JAR name for this web fragment.
+     *
+     * @return the JAR name
+     */
     public String getJarName() {
         return jarName;
     }
@@ -809,10 +1296,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // is.
     private boolean webappJar = true;
 
+    /**
+     * Sets whether this descriptor came from a webapp JAR.
+     *
+     * @param webappJar The webapp JAR flag
+     */
     public void setWebappJar(boolean webappJar) {
         this.webappJar = webappJar;
     }
 
+    /**
+     * Returns whether this descriptor came from a webapp JAR.
+     *
+     * @return {@code true} if from a webapp JAR
+     */
     public boolean getWebappJar() {
         return webappJar;
     }
@@ -820,10 +1317,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Does this web application delegate first for class loading?
     private boolean delegate = false;
 
+    /**
+     * Returns whether this web application delegates first for class loading.
+     *
+     * @return {@code true} if delegation is enabled
+     */
     public boolean getDelegate() {
         return delegate;
     }
 
+    /**
+     * Sets whether this web application delegates first for class loading.
+     *
+     * @param delegate The delegate flag
+     */
     public void setDelegate(boolean delegate) {
         this.delegate = delegate;
     }

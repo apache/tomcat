@@ -28,16 +28,34 @@ public final class UniqueId implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The raw byte array containing the unique identifier.
+     */
     final byte[] id;
 
+    /**
+     * Constructs a new UniqueId with a null identifier.
+     */
     public UniqueId() {
         this(null);
     }
 
+    /**
+     * Constructs a new UniqueId from the given byte array.
+     *
+     * @param id the byte array containing the identifier
+     */
     public UniqueId(byte[] id) {
         this.id = id;
     }
 
+    /**
+     * Constructs a new UniqueId from a portion of the given byte array.
+     *
+     * @param id the source byte array
+     * @param offset the start offset
+     * @param length the number of bytes
+     */
     public UniqueId(byte[] id, int offset, int length) {
         this.id = new byte[length];
         System.arraycopy(id, offset, this.id, 0, length);
@@ -69,6 +87,11 @@ public final class UniqueId implements Serializable {
         return result;
     }
 
+    /**
+     * Returns the raw bytes of this unique identifier.
+     *
+     * @return the byte array
+     */
     public byte[] getBytes() {
         return id;
     }

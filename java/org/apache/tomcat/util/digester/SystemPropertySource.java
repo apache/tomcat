@@ -26,6 +26,12 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class SystemPropertySource implements IntrospectionUtils.PropertySource {
 
+    /**
+     * Constructs a new SystemPropertySource.
+     */
+    public SystemPropertySource() {
+    }
+
     @Override
     public String getProperty(String key) {
         return System.getProperty(key);

@@ -61,6 +61,9 @@ public class TLSClientHelloExtractor {
     private static final int TLS_EXTENSION_ALPN = 16;
     private static final int TLS_EXTENSION_SUPPORTED_VERSION = 43;
 
+    /**
+     * HTTP response sent to clients that connect without TLS when TLS is required.
+     */
     public static byte[] USE_TLS_RESPONSE =
             ("HTTP/1.1 400 \r\n" + "Content-Type: text/plain;charset=UTF-8\r\n" + "Connection: close\r\n" + "\r\n" +
                     "Bad Request\r\n" + "This combination of host and port requires TLS.\r\n")
@@ -214,13 +217,20 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the result of the TLS ClientHello extraction.
+     *
+     * @return the extraction result
+     */
     public ExtractorResult getResult() {
         return result;
     }
 
 
     /**
-     * @return The SNI value provided by the client converted to lower case if not already lower case.
+     * Returns the SNI value provided by the client.
+     *
+     * @return The SNI value provided by the client converted to lower case if not already lower case
      */
     public String getSNIValue() {
         if (result == ExtractorResult.COMPLETE) {
@@ -231,6 +241,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the list of cipher suites requested by the client.
+     *
+     * @return the list of requested cipher suites
+     */
     public List<Cipher> getClientRequestedCiphers() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedCiphers;
@@ -240,6 +255,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the names of cipher suites requested by the client.
+     *
+     * @return the list of cipher suite names
+     */
     public List<String> getClientRequestedCipherNames() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedCipherNames;
@@ -249,6 +269,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the application-level protocols requested by the client.
+     *
+     * @return the list of requested application protocols
+     */
     public List<String> getClientRequestedApplicationProtocols() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedApplicationProtocols;
@@ -258,6 +283,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the transport protocols requested by the client.
+     *
+     * @return the list of requested protocols
+     */
     public List<String> getClientRequestedProtocols() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedProtocols;
@@ -267,6 +297,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the key exchange groups supported by the client.
+     *
+     * @return the list of supported groups
+     */
     public List<Group> getClientSupportedGroups() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientSupportedGroups;
@@ -276,6 +311,11 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Returns the signature schemes requested by the client.
+     *
+     * @return the list of signature schemes
+     */
     public List<SignatureScheme> getClientSignatureSchemes() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientSignatureSchemes;
@@ -484,11 +524,29 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * Possible results of TLS ClientHello extraction.
+     */
     public enum ExtractorResult {
+        /**
+         * Extraction completed successfully.
+         */
         COMPLETE,
+        /**
+         * The requested information is not present in the ClientHello.
+         */
         NOT_PRESENT,
+        /**
+         * Not enough data available for extraction.
+         */
         UNDERFLOW,
+        /**
+         * More data needs to be read.
+         */
         NEED_READ,
+        /**
+         * The connection is not using TLS.
+         */
         NON_SECURE
     }
 }

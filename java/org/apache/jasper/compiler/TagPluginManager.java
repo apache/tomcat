@@ -42,10 +42,23 @@ public class TagPluginManager {
     private HashMap<String,TagPlugin> tagPlugins;
     private boolean initialized = false;
 
+    /**
+     * Creates a new TagPluginManager for the given servlet context.
+     *
+     * @param ctxt the servlet context
+     */
     public TagPluginManager(ServletContext ctxt) {
         this.ctxt = ctxt;
     }
 
+    /**
+     * Applies tag plugin optimizations to the given page.
+     *
+     * @param page the page node tree
+     * @param err the error dispatcher
+     * @param pageInfo page information
+     * @throws JasperException if an error occurs during optimization
+     */
     public void apply(Node.Nodes page, ErrorDispatcher err, PageInfo pageInfo) throws JasperException {
 
         init(err);

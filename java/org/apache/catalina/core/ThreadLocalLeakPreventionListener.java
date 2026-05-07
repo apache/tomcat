@@ -44,6 +44,12 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  */
 public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
+    /**
+     * Constructs a new ThreadLocalLeakPreventionListener.
+     */
+    public ThreadLocalLeakPreventionListener() {
+    }
+
     private static final Log log = LogFactory.getLog(ThreadLocalLeakPreventionListener.class);
 
     private volatile boolean serverStopping = false;

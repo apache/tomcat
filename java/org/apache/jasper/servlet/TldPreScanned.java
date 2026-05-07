@@ -25,10 +25,25 @@ import jakarta.servlet.ServletContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
+/**
+ * TLD scanner that processes only pre-scanned TLD URLs, skipping JAR scanning.
+ */
 public class TldPreScanned extends TldScanner {
 
+    /**
+     * The collection of pre-scanned TLD URLs.
+     */
     private final Collection<URL> preScannedURLs;
 
+    /**
+     * Creates a new TldPreScanned scanner.
+     *
+     * @param context the servlet context
+     * @param namespaceAware whether namespace processing is enabled
+     * @param validation whether XML validation is enabled
+     * @param blockExternal whether external entities should be blocked
+     * @param preScannedTlds the collection of pre-scanned TLD URLs
+     */
     public TldPreScanned(ServletContext context, boolean namespaceAware, boolean validation, boolean blockExternal,
             Collection<URL> preScannedTlds) {
         super(context, namespaceAware, validation, blockExternal);

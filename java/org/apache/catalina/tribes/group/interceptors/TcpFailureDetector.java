@@ -56,28 +56,64 @@ import org.apache.juli.logging.LogFactory;
  */
 public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFailureDetectorMBean {
 
+    /**
+     * Constructs a new TcpFailureDetector.
+     */
+    public TcpFailureDetector() {
+    }
+
     private static final Log log = LogFactory.getLog(TcpFailureDetector.class);
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(TcpFailureDetector.class);
 
+    /**
+     * Test payload sent during member liveness checks.
+     */
     protected static final byte[] TCP_FAIL_DETECT = new byte[] { 79, -89, 115, 72, 121, -126, 67, -55, -97, 111, -119,
             -128, -95, 91, 7, 20, 125, -39, 82, 91, -21, -15, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74, 55, 21,
             -66, -121, 69, 126, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50, 85, -10, -108, -73, 58, -6, 64, 120, -111, 4,
             125, -41, 114, -124, -64, -43 };
 
+    /**
+     * Connection timeout in milliseconds for member checks.
+     */
     protected long connectTimeout = 1000;// 1 second default
 
+    /**
+     * Whether to perform TCP send tests during member checks.
+     */
     protected boolean performSendTest = true;
 
+    /**
+     * Whether to perform TCP read tests during member checks.
+     */
     protected boolean performReadTest = false;
 
+    /**
+     * Read test timeout in milliseconds.
+     */
     protected long readTestTimeout = 5000;// 5 seconds
 
+    /**
+     * The membership tracker.
+     */
     protected Membership membership = null;
 
+    /**
+     * Map of members suspected of being dead and their detection time.
+     */
     protected final HashMap<Member,Long> removeSuspects = new HashMap<>();
 
+    /**
+     * Map of members suspected of rejoining and their detection time.
+     */
     protected final HashMap<Member,Long> addSuspects = new HashMap<>();
 
+    /**
+     * Timeout in seconds for removing suspected dead members.
+     */
     protected int removeSuspectsTimeout = 300; // 5 minutes
 
     @Override
@@ -255,6 +291,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
     }
 
+    /**
+     * Performs a forced check of all cluster members.
+     */
     protected void performForcedCheck() {
         // update all alive times
         Member[] members = super.getMembers();
@@ -278,6 +317,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
 
     }
 
+    /**
+     * Performs a basic check of suspected members.
+     */
     protected void performBasicCheck() {
         // update all alive times
         Member[] members = super.getMembers();
@@ -337,6 +379,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
     }
 
+    /**
+     * Initializes the membership tracker if not already set up.
+     */
     protected synchronized void setupMembership() {
         if (membership == null) {
             membership = new Membership(super.getLocalMember(true));
@@ -344,11 +389,29 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
 
     }
 
+    /**
+     * Checks whether the given member is alive using the default test parameters.
+     *
+     * @param mbr the member to check
+     * @return true if the member is alive
+     */
     protected boolean memberAlive(Member mbr) {
         return memberAlive(mbr, TCP_FAIL_DETECT, performSendTest, performReadTest, readTestTimeout, connectTimeout,
                 getOptionFlag());
     }
 
+    /**
+     * Checks whether the given member is alive using the specified test parameters.
+     *
+     * @param mbr the member to check
+     * @param msgData the test message data
+     * @param sendTest whether to perform a send test
+     * @param readTest whether to perform a read test
+     * @param readTimeout the read timeout in milliseconds
+     * @param conTimeout the connection timeout in milliseconds
+     * @param optionFlag the socket option flag
+     * @return true if the member is alive
+     */
     protected boolean memberAlive(Member mbr, byte[] msgData, boolean sendTest, boolean readTest, long readTimeout,
             long conTimeout, int optionFlag) {
         // could be a shutdown notification

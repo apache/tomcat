@@ -26,6 +26,15 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
  */
 public class UpgradeApplicationBufferHandler implements ApplicationBufferHandler {
 
+    /**
+     * Constructs a new UpgradeApplicationBufferHandler.
+     */
+    public UpgradeApplicationBufferHandler() {
+    }
+
+    /**
+     * The buffered request body data.
+     */
     private ByteBuffer byteBuffer;
 
     @Override

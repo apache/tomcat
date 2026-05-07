@@ -63,6 +63,10 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot {
 
     private static final Log log = LogFactory.getLog(StandardRoot.class);
+
+    /**
+     * Provides localized error messages.
+     */
     protected static final StringManager sm = StringManager.getManager(StandardRoot.class);
 
     private Context context;
@@ -103,6 +107,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         // NO-OP
     }
 
+    /**
+     * Creates a new standard implementation of {@link WebResourceRoot} with the given context.
+     *
+     * @param context The context associated with this web resource root
+     */
     public StandardRoot(Context context) {
         this.context = context;
     }
@@ -203,6 +212,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return getResource(path, true, false);
     }
 
+    /**
+     * Retrieve a web resource by path with configurable validation and class loader resource lookup.
+     *
+     * @param path The path of the resource to retrieve
+     * @param validate Whether to validate and normalize the path
+     * @param useClassLoaderResources Whether to search class loader resources
+     * @return The web resource, or a non-existent resource if not found
+     */
     protected WebResource getResource(String path, boolean validate, boolean useClassLoaderResources) {
         if (validate) {
             path = validate(path);
@@ -262,6 +279,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return result;
     }
 
+    /**
+     * Retrieve a web resource by path from all registered resource sets.
+     *
+     * @param path The path of the resource to retrieve
+     * @param useClassLoaderResources Whether to search class loader resources
+     * @return The web resource, or a non-existent resource if not found
+     */
     protected final WebResource getResourceInternal(String path, boolean useClassLoaderResources) {
         WebResource result;
         WebResource virtual = null;
@@ -309,6 +333,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         }
     }
 
+    /**
+     * Retrieve all web resources matching the given path from all registered resource sets.
+     *
+     * @param path The path of the resources to retrieve
+     * @param useClassLoaderResources Whether to search class loader resources
+     * @return Array of web resources found at the given path
+     */
     protected WebResource[] getResourcesInternal(String path, boolean useClassLoaderResources) {
         List<WebResource> result = new ArrayList<>();
         for (List<WebResourceSet> list : allResources) {
@@ -334,6 +365,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return listResources(path, true);
     }
 
+    /**
+     * List all web resources at the given path.
+     *
+     * @param path The path to list resources for
+     * @param validate Whether to validate and normalize the path
+     * @return Array of web resources found at the given path
+     */
     protected WebResource[] listResources(String path, boolean validate) {
         if (validate) {
             path = validate(path);
@@ -436,10 +474,20 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return postResources.toArray(new WebResourceSet[0]);
     }
 
+    /**
+     * Returns the class resource sets registered with this root.
+     *
+     * @return Array of class resource sets
+     */
     protected WebResourceSet[] getClassResources() {
         return classResources.toArray(new WebResourceSet[0]);
     }
 
+    /**
+     * Adds a class resource set to this root.
+     *
+     * @param webResourceSet The resource set to add
+     */
     protected void addClassResources(WebResourceSet webResourceSet) {
         webResourceSet.setRoot(this);
         classResources.add(webResourceSet);
@@ -546,6 +594,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return this.archiveIndexStrategy;
     }
 
+    /**
+     * Returns the list of currently tracked resources.
+     *
+     * @return List of tracked resource paths
+     */
     public List<String> getTrackedResources() {
         List<String> result = new ArrayList<>(trackedResources.size());
         for (TrackedWebResource resource : trackedResources) {
@@ -693,6 +746,10 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         }
     }
 
+    /**
+     * Registers the URL stream handler factory to support jar:war:file:/ URLs,
+     * which are required for resource JARs in packed WAR files.
+     */
     protected void registerURLStreamHandlerFactory() {
         if (!JreCompat.isGraalAvailable()) {
             // Ensure support for jar:war:file:/ URLs will be available (required
@@ -731,6 +788,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         setState(LifecycleState.STARTING);
     }
 
+    /**
+     * Creates the main resource set based on the context's docBase.
+     *
+     * @return The main resource set for the web application
+     */
     protected WebResourceSet createMainResourceSet() {
         String docBase = context.getDocBase();
 

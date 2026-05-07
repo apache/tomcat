@@ -31,17 +31,40 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Two-phase commit interceptor that ensures reliable message delivery.
+ */
 public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
+
+    /**
+     * Constructs a new TwoPhaseCommitInterceptor.
+     */
+    public TwoPhaseCommitInterceptor() {
+    }
 
     private static final byte[] START_DATA =
             new byte[] { 113, 1, -58, 2, -34, -60, 75, -78, -101, -12, 32, -29, 32, 111, -40, 4 };
     private static final byte[] END_DATA =
             new byte[] { 54, -13, 90, 110, 47, -31, 75, -24, -81, -29, 36, 52, -58, 77, -110, 56 };
     private static final Log log = LogFactory.getLog(TwoPhaseCommitInterceptor.class);
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(TwoPhaseCommitInterceptor.class);
 
+    /**
+     * Map of pending messages keyed by their unique ID.
+     */
     protected final HashMap<UniqueId,MapEntry> messages = new HashMap<>();
+
+    /**
+     * Message expiration time in milliseconds.
+     */
     protected long expire = 1000 * 60; // one minute expiration
+
+    /**
+     * Whether to deep clone messages before storage.
+     */
     protected boolean deepclone = true;
 
     @Override
@@ -100,18 +123,34 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    /**
+     * Returns whether deep cloning is enabled.
+     * @return true if deep cloning is enabled
+     */
     public boolean getDeepclone() {
         return deepclone;
     }
 
+    /**
+     * Returns the message expiration time in milliseconds.
+     * @return the expiration time
+     */
     public long getExpire() {
         return expire;
     }
 
+    /**
+     * Sets whether deep cloning should be used.
+     * @param deepclone true to enable deep cloning
+     */
     public void setDeepclone(boolean deepclone) {
         this.deepclone = deepclone;
     }
 
+    /**
+     * Sets the message expiration time in milliseconds.
+     * @param expire the expiration time
+     */
     public void setExpire(long expire) {
         this.expire = expire;
     }
@@ -136,7 +175,20 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    /**
+     * Entry that holds a message, its ID, and the timestamp of arrival.
+     *
+     * @param msg the channel message
+     * @param id the unique identifier
+     * @param timestamp the arrival time
+     */
     public record MapEntry(ChannelMessage msg, UniqueId id, long timestamp) {
+        /**
+         * Checks if this entry has expired.
+         * @param now the current time
+         * @param expiration the expiration period
+         * @return true if expired
+         */
         public boolean expired(long now, long expiration) {
             return (now - timestamp) > expiration;
         }

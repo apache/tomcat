@@ -20,7 +20,17 @@ import java.util.List;
 
 import jakarta.websocket.Extension;
 
+/**
+ * Builder for creating WebSocket transformations.
+ */
 public interface TransformationBuilder {
 
+    /**
+     * Builds a transformation based on the given extension preferences.
+     *
+     * @param preferences the negotiated extension parameters
+     * @param isServer true if building for the server side
+     * @return the built transformation
+     */
     Transformation build(List<List<Extension.Parameter>> preferences, boolean isServer);
 }

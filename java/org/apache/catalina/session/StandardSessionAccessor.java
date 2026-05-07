@@ -28,6 +28,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Accessor for a StandardSession object.
+ */
 public class StandardSessionAccessor implements HttpSession.Accessor {
 
     private static final Log log = LogFactory.getLog(StandardSessionAccessor.class);
@@ -37,6 +40,12 @@ public class StandardSessionAccessor implements HttpSession.Accessor {
     private final String id;
 
 
+    /**
+     * Construct a new session accessor.
+     *
+     * @param manager The manager that owns the session
+     * @param id The session identifier
+     */
     public StandardSessionAccessor(Manager manager, String id) {
         if (manager == null) {
             throw new IllegalStateException(sm.getString("standardSessionAccessor.nullManager"));

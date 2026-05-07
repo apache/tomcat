@@ -753,6 +753,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private Boolean failCtxIfServletStartFails;
 
+    /**
+     * Default no-op naming listener used when no custom ThreadBindingListener is configured.
+     */
     protected static final ThreadBindingListener DEFAULT_NAMING_LISTENER = (new ThreadBindingListener() {
         @Override
         public void bind() {
@@ -762,6 +765,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         public void unbind() {
         }
     });
+    /**
+     * Listener for thread binding operations during naming context management.
+     */
     protected ThreadBindingListener threadBindingListener = DEFAULT_NAMING_LISTENER;
 
     private final Object namingToken = new Object();
@@ -843,11 +849,21 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns the size of the cache for not-found class resources.
+     *
+     * @return The cache size
+     */
     public int getNotFoundClassResourceCacheSize() {
         return notFoundClassResourceCacheSize;
     }
 
 
+    /**
+     * Sets the size of the cache for not-found class resources.
+     *
+     * @param notFoundClassResourceCacheSize The cache size
+     */
     public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
         this.notFoundClassResourceCacheSize = notFoundClassResourceCacheSize;
     }
@@ -877,6 +893,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns the number of in-progress async requests.
+     *
+     * @return The count of in-progress async requests
+     */
     public long getInProgressAsyncCount() {
         return inProgressAsyncCount.get();
     }
@@ -1638,6 +1659,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     }
 
+    /**
+     * Returns the location of the default context XML.
+     *
+     * @return The default context XML location
+     */
     public String getDefaultContextXml() {
         return defaultContextXml;
     }
@@ -1652,6 +1678,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         this.defaultContextXml = defaultContextXml;
     }
 
+    /**
+     * Returns the location of the default web XML.
+     *
+     * @return The default web XML location
+     */
     public String getDefaultWebXml() {
         return defaultWebXml;
     }
@@ -1675,14 +1706,29 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         return startupTime;
     }
 
+    /**
+     * Sets the time (in milliseconds) it took to start this context.
+     *
+     * @param startupTime Time (in milliseconds) it took to start this context.
+     */
     public void setStartupTime(long startupTime) {
         this.startupTime = startupTime;
     }
 
+    /**
+     * Gets the time (in milliseconds) spent scanning TLDs during startup.
+     *
+     * @return Time (in milliseconds) spent scanning TLDs.
+     */
     public long getTldScanTime() {
         return tldScanTime;
     }
 
+    /**
+     * Sets the time (in milliseconds) spent scanning TLDs during startup.
+     *
+     * @param tldScanTime Time (in milliseconds) spent scanning TLDs.
+     */
     public void setTldScanTime(long tldScanTime) {
         this.tldScanTime = tldScanTime;
     }
@@ -1760,18 +1806,38 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns the J2EE Application ObjectName this module belongs to.
+     *
+     * @return The J2EE Application ObjectName
+     */
     public String getJ2EEApplication() {
         return j2EEApplication;
     }
 
+    /**
+     * Sets the J2EE Application ObjectName this module belongs to.
+     *
+     * @param j2EEApplication The J2EE Application ObjectName
+     */
     public void setJ2EEApplication(String j2EEApplication) {
         this.j2EEApplication = j2EEApplication;
     }
 
+    /**
+     * Returns the J2EE Server ObjectName this module is deployed on.
+     *
+     * @return The J2EE Server ObjectName
+     */
     public String getJ2EEServer() {
         return j2EEServer;
     }
 
+    /**
+     * Sets the J2EE Server ObjectName this module is deployed on.
+     *
+     * @param j2EEServer The J2EE Server ObjectName
+     */
     public void setJ2EEServer(String j2EEServer) {
         this.j2EEServer = j2EEServer;
     }
@@ -2494,11 +2560,21 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns whether RMI targets should be cleared during stop to prevent memory leaks.
+     *
+     * @return True if RMI targets should be cleared
+     */
     public boolean getClearReferencesRmiTargets() {
         return this.clearReferencesRmiTargets;
     }
 
 
+    /**
+     * Sets whether RMI targets should be cleared during stop to prevent memory leaks.
+     *
+     * @param clearReferencesRmiTargets True to clear RMI targets
+     */
     public void setClearReferencesRmiTargets(boolean clearReferencesRmiTargets) {
         boolean oldClearReferencesRmiTargets = this.clearReferencesRmiTargets;
         this.clearReferencesRmiTargets = clearReferencesRmiTargets;
@@ -2576,10 +2652,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns whether threads should be renewed when stopping the context.
+     *
+     * @return True if threads should be renewed
+     */
     public boolean getRenewThreadsWhenStoppingContext() {
         return this.renewThreadsWhenStoppingContext;
     }
 
+    /**
+     * Sets whether threads should be renewed when stopping the context.
+     *
+     * @param renewThreadsWhenStoppingContext True to renew threads
+     */
     public void setRenewThreadsWhenStoppingContext(boolean renewThreadsWhenStoppingContext) {
         boolean oldRenewThreadsWhenStoppingContext = this.renewThreadsWhenStoppingContext;
         this.renewThreadsWhenStoppingContext = renewThreadsWhenStoppingContext;
@@ -2588,11 +2674,21 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns whether ThreadLocal references should be cleared during stop to prevent memory leaks.
+     *
+     * @return True if ThreadLocal references should be cleared
+     */
     public boolean getClearReferencesThreadLocals() {
         return clearReferencesThreadLocals;
     }
 
 
+    /**
+     * Sets whether ThreadLocal references should be cleared during stop to prevent memory leaks.
+     *
+     * @param clearReferencesThreadLocals True to clear ThreadLocal references
+     */
     public void setClearReferencesThreadLocals(boolean clearReferencesThreadLocals) {
         boolean oldClearReferencesThreadLocals = this.clearReferencesThreadLocals;
         this.clearReferencesThreadLocals = clearReferencesThreadLocals;
@@ -2601,20 +2697,40 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Returns whether memory leak checks should be skipped on JVM shutdown.
+     *
+     * @return True if memory leak checks should be skipped
+     */
     public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
         return skipMemoryLeakChecksOnJvmShutdown;
     }
 
 
+    /**
+     * Sets whether memory leak checks should be skipped on JVM shutdown.
+     *
+     * @param skipMemoryLeakChecksOnJvmShutdown True to skip memory leak checks
+     */
     public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
         this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
     }
 
 
+    /**
+     * Returns whether the context should fail if a servlet fails to start.
+     *
+     * @return True if the context should fail, false otherwise, or null to inherit from parent
+     */
     public Boolean getFailCtxIfServletStartFails() {
         return failCtxIfServletStartFails;
     }
 
+    /**
+     * Sets whether the context should fail if a servlet fails to start.
+     *
+     * @param failCtxIfServletStartFails True to fail the context, false to continue, or null to inherit
+     */
     public void setFailCtxIfServletStartFails(Boolean failCtxIfServletStartFails) {
         Boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
         this.failCtxIfServletStartFails = failCtxIfServletStartFails;
@@ -2622,6 +2738,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 failCtxIfServletStartFails);
     }
 
+    /**
+     * Returns the computed value of failCtxIfServletStartFails, inheriting from parent Host if not explicitly set.
+     *
+     * @return True if the context should fail when a servlet start fails
+     */
     protected boolean getComputedFailCtxIfServletStartFails() {
         if (failCtxIfServletStartFails != null) {
             return failCtxIfServletStartFails.booleanValue();
@@ -3760,6 +3881,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    /**
+     * Checks whether the given servlet was dynamically created by this context.
+     *
+     * @param servlet The servlet to check
+     * @return True if the servlet was dynamically created
+     */
     public boolean wasCreatedDynamicServlet(Servlet servlet) {
         return createdServlets.contains(servlet);
     }
@@ -5559,10 +5686,21 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     private String server = null;
 
+    /**
+     * Returns the J2EE Server ObjectName this module is deployed on.
+     *
+     * @return The server ObjectName
+     */
     public String getServer() {
         return server;
     }
 
+    /**
+     * Sets the J2EE Server ObjectName this module is deployed on.
+     *
+     * @param server The server ObjectName
+     * @return The previous server value
+     */
     public String setServer(String server) {
         return this.server = server;
     }

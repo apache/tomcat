@@ -25,6 +25,9 @@ import java.util.Set;
 
 import jakarta.websocket.Extension;
 
+/**
+ * Factory for managing WebSocket transformation builders.
+ */
 public class TransformationFactory {
 
     private static final TransformationFactory factory = new TransformationFactory();
@@ -40,11 +43,24 @@ public class TransformationFactory {
     }
 
 
+    /**
+     * Returns the singleton TransformationFactory instance.
+     *
+     * @return the factory instance
+     */
     public static TransformationFactory getInstance() {
         return factory;
     }
 
 
+    /**
+     * Creates a transformation for the given extension.
+     *
+     * @param name the extension name
+     * @param preferences the negotiated parameters
+     * @param isServer true if creating for the server side
+     * @return the transformation, or null if not found
+     */
     public Transformation create(String name, List<List<Extension.Parameter>> preferences, boolean isServer) {
         TransformationBuilder builder = builders.get(name);
         if (builder != null) {
@@ -54,16 +70,32 @@ public class TransformationFactory {
     }
 
 
+    /**
+     * Registers a transformation builder for the given extension name.
+     *
+     * @param name the extension name
+     * @param builder the transformation builder
+     */
     public void registerExtension(String name, TransformationBuilder builder) {
         builders.put(name, builder);
     }
 
 
+    /**
+     * Returns the names of all registered extensions.
+     *
+     * @return the set of extension names
+     */
     public Set<String> getInstalledExtensionNames() {
         return new HashSet<>(builders.keySet());
     }
 
 
+    /**
+     * Returns all registered extensions.
+     *
+     * @return the set of extensions
+     */
     public Set<Extension> getInstalledExtensions() {
         Set<Extension> result = new HashSet<>();
         for (String extensionName : builders.keySet()) {

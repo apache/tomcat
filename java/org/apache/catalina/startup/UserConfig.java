@@ -43,6 +43,11 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class UserConfig implements LifecycleListener {
 
+    /**
+     * Constructs a new UserConfig.
+     */
+    public UserConfig() {
+    }
 
     private static final Log log = LogFactory.getLog(UserConfig.class);
 
@@ -105,7 +110,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the Context configuration class name.
+     * Returns the Context configuration class name.
+     *
+     * @return the Context configuration class name
      */
     public String getConfigClass() {
         return this.configClass;
@@ -113,9 +120,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the Context configuration class name.
+     * Sets the Context configuration class name.
      *
-     * @param configClass The new Context configuration class name.
+     * @param configClass The new Context configuration class name
      */
     public void setConfigClass(String configClass) {
         this.configClass = configClass;
@@ -123,7 +130,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the Context implementation class name.
+     * Returns the Context implementation class name.
+     *
+     * @return the Context implementation class name
      */
     public String getContextClass() {
         return this.contextClass;
@@ -131,9 +140,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the Context implementation class name.
+     * Sets the Context implementation class name.
      *
-     * @param contextClass The new Context implementation class name.
+     * @param contextClass The new Context implementation class name
      */
     public void setContextClass(String contextClass) {
         this.contextClass = contextClass;
@@ -141,7 +150,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the directory name for user web applications.
+     * Returns the directory name for user web applications.
+     *
+     * @return the directory name
      */
     public String getDirectoryName() {
         return this.directoryName;
@@ -149,7 +160,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the directory name for user web applications.
+     * Sets the directory name for user web applications.
      *
      * @param directoryName The new directory name
      */
@@ -159,7 +170,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the base directory containing user home directories.
+     * Returns the base directory containing user home directories.
+     *
+     * @return the base directory
      */
     public String getHomeBase() {
         return this.homeBase;
@@ -167,7 +180,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the base directory containing user home directories.
+     * Sets the base directory containing user home directories.
      *
      * @param homeBase The new base directory
      */
@@ -177,7 +190,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the user database class name for this component.
+     * Returns the user database class name.
+     *
+     * @return the user database class name
      */
     public String getUserClass() {
         return this.userClass;
@@ -185,7 +200,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the user database class name for this component.
+     * Sets the user database class name.
      *
      * @param userClass The user database class name
      */
@@ -194,7 +209,9 @@ public final class UserConfig implements LifecycleListener {
     }
 
     /**
-     * @return the regular expression used to test for user who deployment is allowed.
+     * Returns the regular expression that defines allowed users.
+     *
+     * @return the allow pattern, or null if all users are allowed
      */
     public String getAllow() {
         if (allow == null) {
@@ -219,7 +236,9 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * @return the regular expression used to test for user who deployment is denied.
+     * Returns the regular expression that defines denied users.
+     *
+     * @return the deny pattern, or null if no users are denied
      */
     public String getDeny() {
         if (deny == null) {

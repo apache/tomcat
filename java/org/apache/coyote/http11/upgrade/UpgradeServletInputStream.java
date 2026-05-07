@@ -29,22 +29,58 @@ import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Input stream for an HTTP upgraded connection.
+ */
 public class UpgradeServletInputStream extends ServletInputStream {
 
     private static final Log log = LogFactory.getLog(UpgradeServletInputStream.class);
     private static final StringManager sm = StringManager.getManager(UpgradeServletInputStream.class);
 
+    /**
+     * The processor handling this connection.
+     */
     private final UpgradeProcessorBase processor;
+
+    /**
+     * The underlying socket wrapper.
+     */
     private final SocketWrapperBase<?> socketWrapper;
+
+    /**
+     * Statistics for this connection.
+     */
     private final UpgradeInfo upgradeInfo;
 
+    /**
+     * Whether the stream has been closed.
+     */
     private volatile boolean closed = false;
+
+    /**
+     * Whether end-of-file has been reached.
+     */
     private volatile boolean eof = false;
+
     // Start in blocking-mode
+    /**
+     * Whether data is ready to read.
+     */
     private volatile Boolean ready = Boolean.TRUE;
+
+    /**
+     * The async read listener.
+     */
     private volatile ReadListener listener = null;
 
 
+    /**
+     * Constructs a new UpgradeServletInputStream.
+     *
+     * @param processor the processor
+     * @param socketWrapper the socket wrapper
+     * @param upgradeInfo the statistics object
+     */
     public UpgradeServletInputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
             UpgradeInfo upgradeInfo) {
         this.processor = processor;

@@ -18,37 +18,93 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * MBean interface for managing the ThroughputInterceptor.
+ */
 public interface ThroughputInterceptorMBean {
 
+    /**
+     * Returns the socket option flag.
+     * @return the option flag
+     */
     int getOptionFlag();
 
-    // Attributes
+    /**
+     * Returns the reporting interval in milliseconds.
+     * @return the interval
+     */
     int getInterval();
 
+    /**
+     * Sets the reporting interval in milliseconds.
+     * @param interval the interval
+     */
     void setInterval(int interval);
 
-    // stats
+    /**
+     * Returns the last message count.
+     * @return the last count
+     */
     double getLastCnt();
 
+    /**
+     * Returns the application-layer transmit rate in MB/s.
+     * @return the MB/s rate
+     */
     double getMbAppTx();
 
+    /**
+     * Returns the receive rate in MB/s.
+     * @return the MB/s rate
+     */
     double getMbRx();
 
+    /**
+     * Returns the transmit rate in MB/s.
+     * @return the MB/s rate
+     */
     double getMbTx();
 
+    /**
+     * Returns the received message count.
+     * @return the count
+     */
     AtomicLong getMsgRxCnt();
 
+    /**
+     * Returns the transmitted message count.
+     * @return the count
+     */
     AtomicLong getMsgTxCnt();
 
+    /**
+     * Returns the transmit error count.
+     * @return the count
+     */
     AtomicLong getMsgTxErr();
 
+    /**
+     * Returns the receive start timestamp.
+     * @return the timestamp
+     */
     long getRxStart();
 
+    /**
+     * Returns the last transmit time.
+     * @return the time
+     */
     double getTimeTx();
 
+    /**
+     * Returns the transmit start timestamp.
+     * @return the timestamp
+     */
     long getTxStart();
 
-    // Operations
+    /**
+     * Reports throughput statistics.
+     * @param timeTx the transmit time
+     */
     void report(double timeTx);
 
 }

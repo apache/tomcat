@@ -37,7 +37,16 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
+    /**
+     * List of statements created on the associated connection.
+     */
     protected List<StatementEntry> statements = new LinkedList<>();
+
+    /**
+     * Default constructor.
+     */
+    public StatementFinalizer() {
+    }
 
     private boolean logCreationStack = false;
 
@@ -93,10 +102,17 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         super.reset(parent, con);
     }
 
+    /**
+     * Entry that tracks a statement and its allocation stack.
+     */
     protected class StatementEntry {
         private WeakReference<Statement> statement;
         private Throwable allocationStack;
 
+        /**
+         * Creates a new StatementEntry.
+         * @param statement the statement to track
+         */
         public StatementEntry(Statement statement) {
             this.statement = new WeakReference<>(statement);
             if (logCreationStack) {
@@ -104,10 +120,18 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             }
         }
 
+        /**
+         * Returns the tracked statement.
+         * @return the statement, or null if it has been garbage collected
+         */
         public Statement getStatement() {
             return statement.get();
         }
 
+        /**
+         * Returns the stack trace from when this statement was created.
+         * @return the allocation stack trace, or null if tracing is disabled
+         */
         public Throwable getAllocationStack() {
             return allocationStack;
         }

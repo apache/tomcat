@@ -18,9 +18,21 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import org.apache.catalina.tribes.Member;
 
+/**
+ * MBean interface for the static membership interceptor.
+ */
 public interface StaticMembershipInterceptorMBean {
 
+    /**
+     * Returns the option flag used for message sending.
+     * @return the option flag
+     */
     int getOptionFlag();
 
+    /**
+     * Returns the local member.
+     * @param incAlive whether to increment the alive counter
+     * @return the local member
+     */
     Member getLocalMember(boolean incAlive);
 }

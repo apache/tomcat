@@ -251,11 +251,25 @@ public class TldScanner {
         }
     }
 
+    /**
+     * Parses a TLD from the given resource path string.
+     *
+     * @param resourcePath the resource path
+     * @throws IOException if an I/O error occurs
+     * @throws SAXException if a parsing error occurs
+     */
     protected void parseTld(String resourcePath) throws IOException, SAXException {
         TldResourcePath tldResourcePath = new TldResourcePath(context.getResource(resourcePath), resourcePath);
         parseTld(tldResourcePath);
     }
 
+    /**
+     * Parses a TLD from the given resource path.
+     *
+     * @param path the TLD resource path
+     * @throws IOException if an I/O error occurs
+     * @throws SAXException if a parsing error occurs
+     */
     protected void parseTld(TldResourcePath path) throws IOException, SAXException {
         TaglibXml tld = tldParser.parse(path);
         String uri = tld.getUri();

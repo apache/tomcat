@@ -23,23 +23,49 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * Represents an HTTP Upgrade protocol value with optional version.
+ */
 public class Upgrade {
 
+    /**
+     * The protocol name.
+     */
     private final String protocolName;
+
+    /**
+     * The protocol version, or null if not specified.
+     */
     private final String protocolVersion;
 
 
+    /**
+     * Constructs a new Upgrade.
+     *
+     * @param protocolName the protocol name
+     * @param protocolVersion the protocol version, or null
+     */
     private Upgrade(String protocolName, String protocolVersion) {
         this.protocolName = protocolName;
         this.protocolVersion = protocolVersion;
     }
 
 
+    /**
+     * Returns the protocol name.
+     *
+     * @return the protocol name
+     */
     public String getProtocolName() {
         return protocolName;
     }
 
 
+    /**
+     * Returns the protocol version, or null if not specified.
+     *
+     * @return the protocol version
+     */
     public String getProtocolVersion() {
         return protocolVersion;
     }
@@ -55,6 +81,12 @@ public class Upgrade {
     }
 
 
+    /**
+     * Parses Upgrade header values into a list of Upgrade instances.
+     *
+     * @param headerValues the enumeration of header values
+     * @return the list of parsed upgrades, or null if parsing fails
+     */
     public static List<Upgrade> parse(Enumeration<String> headerValues) {
         try {
             List<Upgrade> result = new ArrayList<>();

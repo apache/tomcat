@@ -23,8 +23,16 @@ package org.apache.catalina;
  */
 public interface ThreadBindingListener {
 
+    /**
+     * Binds the current thread to the application context by setting
+     * up the naming context and context class loader.
+     */
     void bind();
 
+    /**
+     * Unbinds the current thread from the application context by clearing
+     * the naming context and context class loader.
+     */
     void unbind();
 
 }
