@@ -50,6 +50,9 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
      * @param webAppMount  The web app mount
      * @param base         The base
      * @param internalPath The internal path
+     *
+     * @throws IllegalArgumentException if the {@link WebResourceRoot} is available but this resource set cannot be
+     *                                      started
      */
     public AbstractSingleArchiveResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath)
             throws IllegalArgumentException {

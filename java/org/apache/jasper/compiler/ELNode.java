@@ -403,7 +403,6 @@ public abstract class ELNode {
          *
          * @throws JasperException if an error occurs during visitation
          */
-        @SuppressWarnings("unused")
         public void visit(Function n) throws JasperException {
             // NOOP by default
         }
@@ -415,7 +414,6 @@ public abstract class ELNode {
          *
          * @throws JasperException if an error occurs during visitation
          */
-        @SuppressWarnings("unused")
         public void visit(Text n) throws JasperException {
             // NOOP by default
         }
@@ -427,7 +425,6 @@ public abstract class ELNode {
          *
          * @throws JasperException if an error occurs during visitation
          */
-        @SuppressWarnings("unused")
         public void visit(ELText n) throws JasperException {
             // NOOP by default
         }

@@ -102,7 +102,7 @@ public class ServiceRef extends AbstractRef {
     /**
      * Creates a ServiceRef with the given parameters and factory information.
      *
-     * @param refname the reference name
+     * @param refname the reference name - unused
      * @param serviceInterface the service interface class name
      * @param serviceQname the service QName (namespace and local part)
      * @param wsdl the WSDL location
@@ -110,7 +110,7 @@ public class ServiceRef extends AbstractRef {
      * @param factory the factory class name
      * @param factoryLocation the factory location
      */
-    public ServiceRef(@SuppressWarnings("unused") String refname, String serviceInterface, String[] serviceQname,
+    public ServiceRef(String refname, String serviceInterface, String[] serviceQname,
             String wsdl, String jaxrpcmapping, String factory, String factoryLocation) {
         super(serviceInterface, factory, factoryLocation);
         StringRefAddr refAddr;

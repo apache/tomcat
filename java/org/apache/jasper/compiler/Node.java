@@ -2844,13 +2844,12 @@ public abstract class Node implements TagConstants {
         }
 
         /**
-         * This method provides a place to put actions that are common to all nodes. Override this in the child visitor
-         * class if needed.
+         * This method provides a place to put actions that are common to all nodes. It is a NO-OP by default. Override
+         * this in the child visitor class if needed.
          *
          * @param n The node to visit
          * @throws JasperException if an error occurs while visiting the node
          */
-        @SuppressWarnings("unused")
         protected void doVisit(Node n) throws JasperException {
             // NOOP by default
         }
