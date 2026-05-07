@@ -16,31 +16,80 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for managing the TcpFailureDetector interceptor.
+ */
 public interface TcpFailureDetectorMBean {
 
+    /**
+     * Returns the socket option flag used for member checks.
+     * @return the option flag
+     */
     int getOptionFlag();
 
-    // Attributes
+    /**
+     * Returns the connection timeout in milliseconds.
+     * @return the connection timeout
+     */
     long getConnectTimeout();
 
+    /**
+     * Returns whether send tests are performed.
+     * @return true if send tests are enabled
+     */
     boolean getPerformSendTest();
 
+    /**
+     * Returns whether read tests are performed.
+     * @return true if read tests are enabled
+     */
     boolean getPerformReadTest();
 
+    /**
+     * Returns the read test timeout in milliseconds.
+     * @return the read test timeout
+     */
     long getReadTestTimeout();
 
+    /**
+     * Returns the timeout for removing suspects.
+     * @return the remove suspects timeout
+     */
     int getRemoveSuspectsTimeout();
 
+    /**
+     * Sets whether read tests should be performed.
+     * @param performReadTest true to enable read tests
+     */
     void setPerformReadTest(boolean performReadTest);
 
+    /**
+     * Sets whether send tests should be performed.
+     * @param performSendTest true to enable send tests
+     */
     void setPerformSendTest(boolean performSendTest);
 
+    /**
+     * Sets the read test timeout in milliseconds.
+     * @param readTestTimeout the timeout value
+     */
     void setReadTestTimeout(long readTestTimeout);
 
+    /**
+     * Sets the connection timeout in milliseconds.
+     * @param connectTimeout the timeout value
+     */
     void setConnectTimeout(long connectTimeout);
 
+    /**
+     * Sets the timeout for removing suspects.
+     * @param removeSuspectsTimeout the timeout value
+     */
     void setRemoveSuspectsTimeout(int removeSuspectsTimeout);
 
-    // Operations
+    /**
+     * Checks the status of cluster members.
+     * @param checkAll true to check all members, false to check only suspects
+     */
     void checkMembers(boolean checkAll);
 }

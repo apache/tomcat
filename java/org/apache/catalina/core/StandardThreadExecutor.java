@@ -36,8 +36,14 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
+/**
+ * Standard implementation of an {@link Executor} based on a Java thread pool.
+ */
 public class StandardThreadExecutor extends LifecycleMBeanBase implements Executor, ExecutorService, ResizableExecutor {
 
+    /**
+     * StringManager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
     // ---------------------------------------------- Properties
@@ -95,6 +101,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
     private TaskQueue taskqueue = null;
 
     // ---------------------------------------------- Constructors
+    /**
+     * Default constructor required for the Digester.
+     */
     public StandardThreadExecutor() {
         // empty constructor for the digester
     }
@@ -152,25 +161,48 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         }
     }
 
+    /**
+     * Notify the underlying executor that the associated context is stopping so that it can prepare for shutdown.
+     */
     public void contextStopping() {
         if (executor != null) {
             executor.contextStopping();
         }
     }
 
+    /**
+     * Return the thread priority for new threads.
+     *
+     * @return the thread priority
+     */
     public int getThreadPriority() {
         return threadPriority;
     }
 
+    /**
+     * Return whether threads are daemon threads.
+     *
+     * @return true if threads are daemon threads
+     */
     public boolean isDaemon() {
 
         return daemon;
     }
 
+    /**
+     * Return the name prefix for new threads.
+     *
+     * @return the name prefix
+     */
     public String getNamePrefix() {
         return namePrefix;
     }
 
+    /**
+     * Return the maximum idle time in milliseconds.
+     *
+     * @return the maximum idle time in milliseconds
+     */
     public int getMaxIdleTime() {
         return maxIdleTime;
     }
@@ -180,6 +212,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         return maxThreads;
     }
 
+    /**
+     * Return the minimum number of spare threads.
+     *
+     * @return the minimum spare threads
+     */
     public int getMinSpareThreads() {
         return minSpareThreads;
     }
@@ -189,18 +226,38 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         return name;
     }
 
+    /**
+     * Set the thread priority for new threads.
+     *
+     * @param threadPriority the thread priority
+     */
     public void setThreadPriority(int threadPriority) {
         this.threadPriority = threadPriority;
     }
 
+    /**
+     * Set whether threads are daemon threads.
+     *
+     * @param daemon true for daemon threads
+     */
     public void setDaemon(boolean daemon) {
         this.daemon = daemon;
     }
 
+    /**
+     * Set the name prefix for new threads.
+     *
+     * @param namePrefix the name prefix
+     */
     public void setNamePrefix(String namePrefix) {
         this.namePrefix = namePrefix;
     }
 
+    /**
+     * Set the maximum idle time in milliseconds.
+     *
+     * @param maxIdleTime the maximum idle time
+     */
     public void setMaxIdleTime(int maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
         if (executor != null) {
@@ -208,6 +265,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         }
     }
 
+    /**
+     * Set the maximum number of threads in the pool.
+     *
+     * @param maxThreads the maximum threads
+     */
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         if (executor != null) {
@@ -215,6 +277,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         }
     }
 
+    /**
+     * Set the minimum number of spare threads.
+     *
+     * @param minSpareThreads the minimum spare threads
+     */
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
         if (executor != null) {
@@ -222,22 +289,47 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         }
     }
 
+    /**
+     * Set the name for this executor.
+     *
+     * @param name the executor name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Set the maximum queue size.
+     *
+     * @param size the maximum queue size
+     */
     public void setMaxQueueSize(int size) {
         this.maxQueueSize = size;
     }
 
+    /**
+     * Return the maximum number of elements that can queue up before tasks are rejected.
+     *
+     * @return the maximum queue size
+     */
     public int getMaxQueueSize() {
         return maxQueueSize;
     }
 
+    /**
+     * Return the thread renewal delay in milliseconds.
+     *
+     * @return the thread renewal delay
+     */
     public long getThreadRenewalDelay() {
         return threadRenewalDelay;
     }
 
+    /**
+     * Set the thread renewal delay in milliseconds.
+     *
+     * @param threadRenewalDelay the thread renewal delay
+     */
     public void setThreadRenewalDelay(long threadRenewalDelay) {
         this.threadRenewalDelay = threadRenewalDelay;
         if (executor != null) {
@@ -251,14 +343,29 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         return (executor != null) ? executor.getActiveCount() : 0;
     }
 
+    /**
+     * Return the approximate total number of tasks that have completed execution.
+     *
+     * @return the completed task count
+     */
     public long getCompletedTaskCount() {
         return (executor != null) ? executor.getCompletedTaskCount() : 0;
     }
 
+    /**
+     * Return the core number of threads for the underlying thread pool.
+     *
+     * @return the core pool size
+     */
     public int getCorePoolSize() {
         return (executor != null) ? executor.getCorePoolSize() : 0;
     }
 
+    /**
+     * Return the largest number of threads that have ever simultaneously been in the pool.
+     *
+     * @return the largest pool size
+     */
     public int getLargestPoolSize() {
         return (executor != null) ? executor.getLargestPoolSize() : 0;
     }
@@ -268,6 +375,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
         return (executor != null) ? executor.getPoolSize() : 0;
     }
 
+    /**
+     * Return the current queue size.
+     *
+     * @return the queue size, or -1 if not available
+     */
     public int getQueueSize() {
         return (executor != null) ? executor.getQueue().size() : -1;
     }

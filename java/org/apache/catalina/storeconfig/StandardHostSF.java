@@ -34,6 +34,12 @@ import org.apache.catalina.ha.ClusterValve;
 public class StandardHostSF extends StoreFactoryBase {
 
     /**
+     * Constructs a new StandardHostSF instance for storing Host elements in server.xml.
+     */
+    public StandardHostSF() {
+    }
+
+    /**
      * Store the specified Host properties and children (Listener,Alias,Realm,Valve,Cluster, Context)
      * <p>
      * {@inheritDoc}

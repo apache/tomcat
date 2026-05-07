@@ -48,9 +48,16 @@ import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
+/**
+ * Utility methods for handling WebSocket upgrade requests.
+ */
 public class UpgradeUtil {
 
     private static final StringManager sm = StringManager.getManager(UpgradeUtil.class.getPackage().getName());
+
+    /**
+     * The WebSocket magic key used to compute the Sec-WebSocket-Accept header.
+     */
     private static final byte[] WS_ACCEPT =
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(StandardCharsets.ISO_8859_1);
 
@@ -79,6 +86,17 @@ public class UpgradeUtil {
     }
 
 
+    /**
+     * Performs the WebSocket upgrade handshake.
+     *
+     * @param sc the server container
+     * @param req the HTTP request
+     * @param resp the HTTP response
+     * @param sec the endpoint configuration
+     * @param pathParams the path parameters
+     * @throws ServletException if the upgrade fails
+     * @throws IOException if an I/O error occurs
+     */
     public static void doUpgrade(WsServerContainer sc, HttpServletRequest req, HttpServletResponse resp,
             ServerEndpointConfig sec, Map<String,String> pathParams) throws ServletException, IOException {
 

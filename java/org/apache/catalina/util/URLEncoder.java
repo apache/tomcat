@@ -33,7 +33,14 @@ public final class URLEncoder implements Cloneable {
     private static final char[] hexadecimal =
             { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
+    /**
+     * Pre-configured encoder for URI paths.
+     */
     public static final URLEncoder DEFAULT = new URLEncoder();
+
+    /**
+     * Pre-configured encoder for query strings.
+     */
     public static final URLEncoder QUERY = new URLEncoder();
 
     static {
@@ -99,6 +106,9 @@ public final class URLEncoder implements Cloneable {
     private boolean encodeSpaceAsPlus = false;
 
 
+    /**
+     * Constructs a new URLEncoder with alphanumeric characters as safe.
+     */
     public URLEncoder() {
         this(new BitSet(256));
 
@@ -119,16 +129,31 @@ public final class URLEncoder implements Cloneable {
     }
 
 
+    /**
+     * Marks the given character as safe (not requiring encoding).
+     *
+     * @param c the character
+     */
     public void addSafeCharacter(char c) {
         safeCharacters.set(c);
     }
 
 
+    /**
+     * Removes the given character from the set of safe characters.
+     *
+     * @param c the character
+     */
     public void removeSafeCharacter(char c) {
         safeCharacters.clear(c);
     }
 
 
+    /**
+     * Sets whether space characters should be encoded as '+' instead of '%20'.
+     *
+     * @param encodeSpaceAsPlus true to use '+' for spaces
+     */
     public void setEncodeSpaceAsPlus(boolean encodeSpaceAsPlus) {
         this.encodeSpaceAsPlus = encodeSpaceAsPlus;
     }

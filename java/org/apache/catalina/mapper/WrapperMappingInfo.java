@@ -35,18 +35,38 @@ public class WrapperMappingInfo {
         this.resourceOnly = resourceOnly;
     }
 
+    /**
+     * Returns the URL pattern.
+     *
+     * @return the URL pattern
+     */
     public String getMapping() {
         return mapping;
     }
 
+    /**
+     * Returns the wrapper for the Servlet.
+     *
+     * @return the wrapper
+     */
     public Wrapper getWrapper() {
         return wrapper;
     }
 
+    /**
+     * Returns whether this is a mapping for JSP files.
+     *
+     * @return {@code true} if this is a JSP wildcard mapping
+     */
     public boolean isJspWildCard() {
         return jspWildCard;
     }
 
+    /**
+     * Returns whether this is a resource only mapping.
+     *
+     * @return {@code true} if this is a resource only mapping
+     */
     public boolean isResourceOnly() {
         return resourceOnly;
     }

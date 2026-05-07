@@ -29,18 +29,35 @@ public class TaskThread extends Thread {
     private static final StringManager sm = StringManager.getManager(TaskThread.class);
     private final long creationTime;
 
+    /**
+     * Creates a new TaskThread with the specified parameters.
+     *
+     * @param group the thread group
+     * @param target the runnable task
+     * @param name the thread name
+     */
     public TaskThread(ThreadGroup group, Runnable target, String name) {
         super(group, new WrappingRunnable(target), name);
         this.creationTime = System.currentTimeMillis();
     }
 
+    /**
+     * Creates a new TaskThread with the specified parameters and stack size.
+     *
+     * @param group the thread group
+     * @param target the runnable task
+     * @param name the thread name
+     * @param stackSize the desired stack size
+     */
     public TaskThread(ThreadGroup group, Runnable target, String name, long stackSize) {
         super(group, new WrappingRunnable(target), name, stackSize);
         this.creationTime = System.currentTimeMillis();
     }
 
     /**
-     * @return the time (in ms) at which this thread was created
+     * Returns the time at which this thread was created.
+     *
+     * @return the creation time in milliseconds since the epoch
      */
     public final long getCreationTime() {
         return creationTime;

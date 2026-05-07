@@ -35,6 +35,13 @@ public class TaskThreadFactory implements ThreadFactory {
     private final boolean daemon;
     private final int threadPriority;
 
+    /**
+     * Creates a new TaskThreadFactory.
+     *
+     * @param namePrefix the prefix for thread names
+     * @param daemon whether threads should be daemon threads
+     * @param priority the thread priority
+     */
     public TaskThreadFactory(String namePrefix, boolean daemon, int priority) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();

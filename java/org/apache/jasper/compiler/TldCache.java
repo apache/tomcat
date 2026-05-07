@@ -40,14 +40,38 @@ import org.xml.sax.SAXException;
  */
 public class TldCache {
 
+    /**
+     * The ServletContext attribute name used to store the TldCache instance.
+     */
     public static final String SERVLET_CONTEXT_ATTRIBUTE_NAME = TldCache.class.getName();
 
+    /**
+     * The servlet context associated with this cache.
+     */
     private final ServletContext servletContext;
+
+    /**
+     * Maps TLD URIs to their resource paths.
+     */
     private final Map<String,TldResourcePath> uriTldResourcePathMap = new HashMap<>();
+
+    /**
+     * Maps TLD resource paths to their cached tag library XML data.
+     */
     private final Map<TldResourcePath,TaglibXmlCacheEntry> tldResourcePathTaglibXmlMap = new HashMap<>();
+
+    /**
+     * The parser used to parse TLD files.
+     */
     private final TldParser tldParser;
 
 
+    /**
+     * Returns the TldCache instance for the given servlet context.
+     *
+     * @param servletContext the servlet context
+     * @return the TldCache instance
+     */
     public static TldCache getInstance(ServletContext servletContext) {
         if (servletContext == null) {
             throw new IllegalArgumentException(
@@ -57,6 +81,13 @@ public class TldCache {
     }
 
 
+    /**
+     * Creates a new TldCache.
+     *
+     * @param servletContext the servlet context
+     * @param uriTldResourcePathMap the pre-scanned URI to resource path mappings
+     * @param tldResourcePathTaglibXmlMap the pre-parsed TLD data
+     */
     public TldCache(ServletContext servletContext, Map<String,TldResourcePath> uriTldResourcePathMap,
             Map<TldResourcePath,TaglibXml> tldResourcePathTaglibXmlMap) {
         this.servletContext = servletContext;
@@ -81,11 +112,24 @@ public class TldCache {
     }
 
 
+    /**
+     * Returns the resource path for the given TLD URI.
+     *
+     * @param uri the TLD URI
+     * @return the resource path, or null if not found
+     */
     public TldResourcePath getTldResourcePath(String uri) {
         return uriTldResourcePathMap.get(uri);
     }
 
 
+    /**
+     * Returns the parsed tag library XML for the given resource path.
+     *
+     * @param tldResourcePath the TLD resource path
+     * @return the parsed tag library XML, or null if not found
+     * @throws JasperException if an error occurs during parsing
+     */
     public TaglibXml getTaglibXml(TldResourcePath tldResourcePath) throws JasperException {
         TaglibXmlCacheEntry cacheEntry = tldResourcePathTaglibXmlMap.get(tldResourcePath);
         if (cacheEntry == null) {

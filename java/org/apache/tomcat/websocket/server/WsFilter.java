@@ -31,6 +31,12 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class WsFilter extends GenericFilter {
 
+    /**
+     * Constructs a new WsFilter.
+     */
+    public WsFilter() {
+    }
+
     private static final long serialVersionUID = 1L;
 
     private transient WsServerContainer sc;

@@ -32,16 +32,31 @@ import org.apache.el.lang.ELArithmetic;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.util.MessageFactory;
 
+/**
+ * A stream of elements supporting sequential operations such as filter, map,
+ * reduce, and various terminal operations.
+ */
 public class Stream {
 
     private final Iterator<Object> iterator;
 
 
+    /**
+     * Constructs a new Stream from the given iterator.
+     *
+     * @param iterator the iterator providing the stream elements
+     */
     public Stream(Iterator<Object> iterator) {
         this.iterator = iterator;
     }
 
 
+    /**
+     * Returns a stream consisting of the elements that match the given predicate.
+     *
+     * @param le the predicate to apply to each element
+     * @return the new filtered stream
+     */
     public Stream filter(final LambdaExpression le) {
         Iterator<Object> downStream = new OpIterator() {
             @Override
@@ -60,6 +75,13 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the results of applying the given function
+     * to the elements of this stream.
+     *
+     * @param le the function to apply to each element
+     * @return the new mapped stream
+     */
     public Stream map(final LambdaExpression le) {
         Iterator<Object> downStream = new OpIterator() {
             @Override
@@ -75,6 +97,14 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the results of replacing each element of
+     * this stream with the contents of a stream produced by applying the provided
+     * function to each element.
+     *
+     * @param le the function to apply to each element which produces a new stream
+     * @return the new flattened stream
+     */
     public Stream flatMap(final LambdaExpression le) {
         Iterator<Object> downStream = new OpIterator() {
 
@@ -99,6 +129,11 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the distinct elements of this stream.
+     *
+     * @return the new stream with distinct elements
+     */
     public Stream distinct() {
         Iterator<Object> downStream = new OpIterator() {
 
@@ -120,6 +155,12 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the elements of this stream, sorted
+     * according to natural order.
+     *
+     * @return the new sorted stream
+     */
     public Stream sorted() {
         Iterator<Object> downStream = new OpIterator() {
 
@@ -150,6 +191,13 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the elements of this stream, sorted
+     * according to the order induced by the provided comparator.
+     *
+     * @param le the comparator to determine sort order
+     * @return the new sorted stream
+     */
     public Stream sorted(final LambdaExpression le) {
         Iterator<Object> downStream = new OpIterator() {
 
@@ -181,6 +229,12 @@ public class Stream {
     }
 
 
+    /**
+     * Performs an action for each element of this stream.
+     *
+     * @param le the action to perform for each element
+     * @return null
+     */
     public Object forEach(final LambdaExpression le) {
         while (iterator.hasNext()) {
             le.invoke(iterator.next());
@@ -189,6 +243,13 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a stream consisting of the elements of this stream, additionally
+     * performing the provided action on each element as elements are consumed.
+     *
+     * @param le the action to perform on each element
+     * @return the new stream
+     */
     public Stream peek(final LambdaExpression le) {
         Iterator<Object> downStream = new OpIterator() {
             @Override
@@ -205,20 +266,46 @@ public class Stream {
     }
 
 
+    /**
+     * Returns the underlying iterator for this stream.
+     *
+     * @return the underlying iterator
+     */
     public Iterator<?> iterator() {
         return iterator;
     }
 
 
+    /**
+     * Returns a stream consisting of the first {@code count} elements of this stream.
+     *
+     * @param count the number of elements to limit to
+     * @return the new limited stream
+     */
     public Stream limit(final Number count) {
         return substream(Integer.valueOf(0), count);
     }
 
 
+    /**
+     * Returns a stream consisting of the elements of this stream from the
+     * specified start position to the end.
+     *
+     * @param start the start position (inclusive)
+     * @return the new substream
+     */
     public Stream substream(final Number start) {
         return substream(start, Integer.valueOf(Integer.MAX_VALUE));
     }
 
+    /**
+     * Returns a stream consisting of the elements of this stream from the
+     * specified start position up to, but not including, the specified end position.
+     *
+     * @param start the start position (inclusive)
+     * @param end the end position (exclusive)
+     * @return the new substream
+     */
     public Stream substream(final Number start, final Number end) {
 
         Iterator<Object> downStream = new OpIterator() {
@@ -244,6 +331,11 @@ public class Stream {
     }
 
 
+    /**
+     * Returns a list containing all the elements of this stream.
+     *
+     * @return the list of elements
+     */
     public List<Object> toList() {
         List<Object> result = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -253,6 +345,11 @@ public class Stream {
     }
 
 
+    /**
+     * Returns an array containing all the elements of this stream.
+     *
+     * @return the array of elements
+     */
     public Object[] toArray() {
         List<Object> result = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -262,6 +359,13 @@ public class Stream {
     }
 
 
+    /**
+     * Performs a reduction on the elements of this stream, using the provided
+     * accumulator function. The first element is used as the initial value.
+     *
+     * @param le the accumulator function
+     * @return an Optional describing the reduced value, or empty if this stream is empty
+     */
     public Optional reduce(LambdaExpression le) {
         Object seed = null;
 
@@ -277,6 +381,14 @@ public class Stream {
     }
 
 
+    /**
+     * Performs a reduction on the elements of this stream, using the provided
+     * initial value and accumulator function.
+     *
+     * @param seed the initial value for the reduction
+     * @param le the accumulator function
+     * @return the result of the reduction
+     */
     public Object reduce(Object seed, LambdaExpression le) {
         Object result = seed;
 
@@ -288,26 +400,53 @@ public class Stream {
     }
 
 
+    /**
+     * Returns the maximum element of this stream according to natural order.
+     *
+     * @return an Optional describing the maximum element, or empty if this stream is empty
+     */
     public Optional max() {
         return compare(true);
     }
 
 
+    /**
+     * Returns the maximum element of this stream according to the provided comparator.
+     *
+     * @param le the comparator to determine the maximum
+     * @return an Optional describing the maximum element, or empty if this stream is empty
+     */
     public Optional max(LambdaExpression le) {
         return compare(true, le);
     }
 
 
+    /**
+     * Returns the minimum element of this stream according to natural order.
+     *
+     * @return an Optional describing the minimum element, or empty if this stream is empty
+     */
     public Optional min() {
         return compare(false);
     }
 
 
+    /**
+     * Returns the minimum element of this stream according to the provided comparator.
+     *
+     * @param le the comparator to determine the minimum
+     * @return an Optional describing the minimum element, or empty if this stream is empty
+     */
     public Optional min(LambdaExpression le) {
         return compare(false, le);
     }
 
 
+    /**
+     * Calculates the average of all numeric elements in the stream.
+     *
+     * @return an Optional containing the average, or empty if the stream is empty
+     */
     public Optional average() {
         long count = 0;
         Number sum = Long.valueOf(0);
@@ -325,6 +464,11 @@ public class Stream {
     }
 
 
+    /**
+     * Returns the sum of all numeric elements in the stream.
+     *
+     * @return the sum of all elements
+     */
     public Number sum() {
         Number sum = Long.valueOf(0);
 
@@ -336,6 +480,11 @@ public class Stream {
     }
 
 
+    /**
+     * Counts the number of elements in the stream.
+     *
+     * @return the number of elements
+     */
     public Long count() {
         long count = 0;
 
@@ -348,6 +497,12 @@ public class Stream {
     }
 
 
+    /**
+     * Checks if any element in the stream matches the given predicate.
+     *
+     * @param le the predicate lambda expression
+     * @return an Optional containing true if any element matches, or empty if the stream is empty
+     */
     public Optional anyMatch(LambdaExpression le) {
         if (!iterator.hasNext()) {
             return Optional.EMPTY;
@@ -363,6 +518,12 @@ public class Stream {
     }
 
 
+    /**
+     * Checks if all elements in the stream match the given predicate.
+     *
+     * @param le the predicate lambda expression
+     * @return an Optional containing true if all elements match, or empty if the stream is empty
+     */
     public Optional allMatch(LambdaExpression le) {
         if (!iterator.hasNext()) {
             return Optional.EMPTY;
@@ -378,6 +539,12 @@ public class Stream {
     }
 
 
+    /**
+     * Checks if no elements of this stream match the given predicate.
+     *
+     * @param le the predicate lambda expression
+     * @return an Optional containing true if no elements match, or empty if the stream is empty
+     */
     public Optional noneMatch(LambdaExpression le) {
         if (!iterator.hasNext()) {
             return Optional.EMPTY;
@@ -393,6 +560,12 @@ public class Stream {
     }
 
 
+    /**
+     * Returns an Optional describing the first element of this stream,
+     * or an empty Optional if the stream is empty.
+     *
+     * @return an Optional describing the first element of this stream
+     */
     public Optional findFirst() {
         if (iterator.hasNext()) {
             return new Optional(iterator.next());

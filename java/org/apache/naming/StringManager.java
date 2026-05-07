@@ -160,6 +160,12 @@ public class StringManager {
     }
 
 
+    /**
+     * Returns the StringManager for the package of the given class.
+     *
+     * @param clazz the class whose package's StringManager is requested
+     * @return the StringManager for the specified class's package
+     */
     public static StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
     }

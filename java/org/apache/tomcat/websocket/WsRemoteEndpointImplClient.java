@@ -26,11 +26,18 @@ import java.util.concurrent.locks.ReentrantLock;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
 
+/**
+ * Client-side implementation of a WebSocket remote endpoint.
+ */
 public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
     private final AsyncChannelWrapper channel;
     private final ReentrantLock lock = new ReentrantLock();
 
+    /**
+     * Constructs a client-side remote endpoint for the given channel.
+     * @param channel the async channel wrapper
+     */
     public WsRemoteEndpointImplClient(AsyncChannelWrapper channel) {
         this.channel = channel;
     }

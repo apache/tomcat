@@ -41,12 +41,33 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
+    /**
+     * All statement types (prepared and callable).
+     */
     protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL};
+    /**
+     * Callable statement type only.
+     */
     protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL};
+    /**
+     * Prepared statement type only.
+     */
     protected static final String[] PREPARED_TYPE = new String[] {PREPARE_STATEMENT};
+    /**
+     * No statement types.
+     */
     protected static final String[] NO_TYPE = new String[] {};
 
+    /**
+     * Attribute key for storing the statement cache in connection attributes.
+     */
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
+
+    /**
+     * Default constructor.
+     */
+    public StatementCache() {
+    }
 
     /*begin properties for the statement cache*/
     private boolean cachePrepared = true;
@@ -72,6 +93,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         return maxCacheSize;
     }
 
+    /**
+     * Returns the statement types being cached.
+     *
+     * @return array of statement type strings
+     */
     public String[] getTypes() {
         return types;
     }
@@ -170,6 +196,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         super.disconnected(parent, con, finalizing);
     }
 
+    /**
+     * Closes the given cached statement by forcing it to close.
+     *
+     * @param st the cached statement to close
+     */
     public void closeStatement(CachedStatement st) {
         if (st==null) {
           return;
@@ -213,6 +244,13 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
     }
 
+    /**
+     * Checks if a statement for the given method and arguments is currently cached.
+     *
+     * @param method the SQL method (prepareStatement or prepareCall)
+     * @param args the method arguments
+     * @return the cached statement, or null if not cached
+     */
     public CachedStatement isCached(Method method, Object[] args) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
@@ -225,6 +263,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         return cache.get(key);
     }
 
+    /**
+     * Caches the given statement proxy if there is room in the cache.
+     *
+     * @param proxy the statement proxy to cache
+     * @return true if the statement was cached, false otherwise
+     */
     public boolean cacheStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
@@ -246,6 +290,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
     }
 
+    /**
+     * Removes the given statement from the cache.
+     *
+     * @param proxy the statement proxy to remove
+     * @return true if the statement was removed, false otherwise
+     */
     public boolean removeStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
@@ -260,6 +310,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
     /*end the actual statement cache*/
 
+    /**
+     * Returns the statement cache for the current pooled connection.
+     *
+     * @return the cache map, or null if the connection has been closed
+     */
     protected ConcurrentHashMap<CacheKey,CachedStatement> getCache() {
         PooledConnection pCon = this.pcon;
         if (pCon == null) {
@@ -283,8 +338,19 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         return cache.size();
     }
 
+    /**
+     * Proxy for a cached prepared statement.
+     */
     protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<PreparedStatement> {
+        /**
+         * Cache key for this statement.
+         */
         CacheKey key;
+        /**
+         * Constructs a CachedStatement.
+         * @param parent the parent prepared statement
+         * @param sql the SQL text
+         */
         public CachedStatement(PreparedStatement parent, String sql) {
             super(parent, sql);
         }
@@ -326,25 +392,50 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
         }
 
+        /**
+         * Forces immediate closure of this cached statement.
+         */
         public void forceClose() {
             removeStatement(this);
             super.closeInvoked();
         }
 
+        /**
+         * Returns the cache key for this statement.
+         * @return the cache key
+         */
         public CacheKey getCacheKey() {
             return key;
         }
 
+        /**
+         * Sets the cache key for this statement.
+         * @param cacheKey the cache key
+         */
         public void setCacheKey(CacheKey cacheKey) {
             key = cacheKey;
         }
 
     }
 
+    /**
+     * Creates a cache key from the given method and arguments.
+     *
+     * @param method the SQL method
+     * @param args the method arguments
+     * @return the cache key
+     */
     protected CacheKey createCacheKey(Method method, Object[] args) {
         return createCacheKey(method.getName(), args);
     }
 
+    /**
+     * Creates a cache key from the given method name and arguments.
+     *
+     * @param methodName the SQL method name
+     * @param args the method arguments
+     * @return the cache key, or null if the method name doesn't match a cached type
+     */
     protected CacheKey createCacheKey(String methodName, Object[] args) {
         CacheKey key = null;
         if (compare(PREPARE_STATEMENT, methodName)) {

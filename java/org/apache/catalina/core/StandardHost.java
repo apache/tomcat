@@ -402,7 +402,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return the Java class name of the Context implementation class for new web applications.
+     * Returns the Java class name of the Context implementation class for new web applications.
+     *
+     * @return the Java class name of the Context implementation class
      */
     public String getContextClass() {
         return this.contextClass;
@@ -445,7 +447,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if XML context descriptors should be deployed.
+     * Returns whether XML context descriptors should be deployed.
+     *
+     * @return <code>true</code> if XML context descriptors should be deployed
      */
     public boolean isDeployXML() {
         return deployXML;
@@ -463,7 +467,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return the copy XML config file flag for this component.
+     * Returns the copy XML config file flag for this component.
+     *
+     * @return the copy XML config file flag
      */
     public boolean isCopyXML() {
         return this.copyXML;
@@ -481,7 +487,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return the Java class name of the error report valve class for new web applications.
+     * Returns the Java class name of the error report valve class for new web applications.
+     *
+     * @return the Java class name of the error report valve class
      */
     public String getErrorReportValveClass() {
         return this.errorReportValveClass;
@@ -525,7 +533,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if WARs should be unpacked on deployment.
+     * Returns whether WARs should be unpacked on deployment.
+     *
+     * @return <code>true</code> if WARs should be unpacked
      */
     public boolean isUnpackWARs() {
         return unpackWARs;
@@ -543,7 +553,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return host work directory base.
+     * Returns the host work directory base.
+     *
+     * @return host work directory base
      */
     public String getWorkDir() {
         return workDir;
@@ -593,7 +605,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if a webapp start should fail if a Servlet startup fails
+     * Returns whether a webapp start should fail if a Servlet startup fails.
+     *
+     * @return <code>true</code> if a webapp start should fail on servlet startup failure
      */
     public boolean isFailCtxIfServletStartFails() {
         return failCtxIfServletStartFails;
@@ -786,7 +800,9 @@ public class StandardHost extends ContainerBase implements Host {
 
     // -------------------- JMX --------------------
     /**
-     * @return the MBean Names of the Valves associated with this Host
+     * Returns the MBean Names of the Valves associated with this Host.
+     *
+     * @return the MBean Names of the Valves
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -805,6 +821,11 @@ public class StandardHost extends ContainerBase implements Host {
         return mbeanNames;
     }
 
+    /**
+     * Returns the array of aliases for this host.
+     *
+     * @return the array of aliases
+     */
     public String[] getAliases() {
         synchronized (aliasesLock) {
             return aliases;

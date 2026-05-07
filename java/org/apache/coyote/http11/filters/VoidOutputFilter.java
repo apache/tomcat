@@ -28,6 +28,12 @@ import org.apache.coyote.http11.OutputFilter;
  */
 public class VoidOutputFilter implements OutputFilter {
 
+    /**
+     * Constructs a new VoidOutputFilter.
+     */
+    public VoidOutputFilter() {
+    }
+
     private HttpOutputBuffer buffer = null;
 
 

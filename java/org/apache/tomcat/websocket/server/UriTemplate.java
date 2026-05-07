@@ -41,6 +41,12 @@ public class UriTemplate {
     private final boolean hasParameters;
 
 
+    /**
+     * Creates a new UriTemplate from the given path.
+     *
+     * @param path the URI template path
+     * @throws DeploymentException if the path is invalid
+     */
     public UriTemplate(String path) throws DeploymentException {
 
         if (path == null || !path.startsWith("/") || path.contains("/../") || path.contains("/./") ||
@@ -97,6 +103,12 @@ public class UriTemplate {
     }
 
 
+    /**
+     * Matches this template against a candidate URI path.
+     *
+     * @param candidate the candidate URI path
+     * @return the path parameters if matched, or null
+     */
     public Map<String,String> match(UriTemplate candidate) {
 
         Map<String,String> result = new HashMap<>();
@@ -127,16 +139,31 @@ public class UriTemplate {
     }
 
 
+    /**
+     * Returns whether this template contains path parameters.
+     *
+     * @return true if there are parameters
+     */
     public boolean hasParameters() {
         return hasParameters;
     }
 
 
+    /**
+     * Returns the number of path segments.
+     *
+     * @return the segment count
+     */
     public int getSegmentCount() {
         return segments.size();
     }
 
 
+    /**
+     * Returns the normalized path with numeric parameter indices.
+     *
+     * @return the normalized path
+     */
     public String getNormalizedPath() {
         return normalized;
     }

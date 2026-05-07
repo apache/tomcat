@@ -26,12 +26,18 @@ import java.util.Map;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
+/**
+ * Implementation of VariableMapper that stores variables in a map.
+ */
 public class VariableMapperImpl extends VariableMapper implements Externalizable {
 
     private static final long serialVersionUID = 1L;
 
     private Map<String,ValueExpression> vars = new HashMap<>();
 
+    /**
+     * Constructs a new VariableMapperImpl for deserialization.
+     */
     public VariableMapperImpl() {
         super();
     }

@@ -18,11 +18,27 @@ package org.apache.tomcat.util.descriptor.web;
 
 import jakarta.servlet.descriptor.TaglibDescriptor;
 
+/**
+ * Implementation of TaglibDescriptor that holds the location and URI of a tag library.
+ */
 public class TaglibDescriptorImpl implements TaglibDescriptor {
 
+    /**
+     * The location of the tag library descriptor file.
+     */
     private final String location;
+
+    /**
+     * The URI that identifies this tag library.
+     */
     private final String uri;
 
+    /**
+     * Constructs a new TaglibDescriptorImpl.
+     *
+     * @param location the location of the tag library descriptor
+     * @param uri the URI identifying the tag library
+     */
     public TaglibDescriptorImpl(String location, String uri) {
         this.location = location;
         this.uri = uri;

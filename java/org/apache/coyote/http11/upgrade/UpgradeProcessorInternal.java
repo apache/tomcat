@@ -29,12 +29,25 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
+/**
+ * Upgrade processor for internal (Coyote-based) upgrade handlers.
+ */
 public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     private static final Log log = LogFactory.getLog(UpgradeProcessorInternal.class);
 
+    /**
+     * The internal upgrade handler.
+     */
     private final InternalHttpUpgradeHandler internalHttpUpgradeHandler;
 
+    /**
+     * Constructs a new UpgradeProcessorInternal.
+     *
+     * @param wrapper the socket wrapper
+     * @param upgradeToken the upgrade token
+     * @param upgradeGroupInfo the group info for statistics
+     */
     public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
             UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);
@@ -85,6 +98,11 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     }
 
 
+    /**
+     * Returns whether the internal handler has pending async I/O.
+     *
+     * @return true if there is async I/O
+     */
     public boolean hasAsyncIO() {
         return internalHttpUpgradeHandler.hasAsyncIO();
     }

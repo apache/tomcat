@@ -30,16 +30,36 @@ public class ToStringUtil {
     }
 
 
+    /**
+     * Generates a toString representation for a Contained component.
+     *
+     * @param contained the component
+     * @return the string representation
+     */
     public static String toString(Contained contained) {
         return toString(contained, contained.getContainer());
     }
 
 
+    /**
+     * Generates a toString representation for an object with an associated container.
+     *
+     * @param obj the object
+     * @param container the associated container
+     * @return the string representation
+     */
     public static String toString(Object obj, Container container) {
         return containedToString(obj, container, "Container");
     }
 
 
+    /**
+     * Generates a toString representation for an object with an associated manager.
+     *
+     * @param obj the object
+     * @param manager the associated manager
+     * @return the string representation
+     */
     public static String toString(Object obj, Manager manager) {
         return containedToString(obj, manager, "Manager");
     }

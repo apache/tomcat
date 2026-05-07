@@ -46,6 +46,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class WebAnnotationSet {
 
+    /**
+     * Constructs a new WebAnnotationSet.
+     */
+    public WebAnnotationSet() {
+    }
+
     private static final String SEPARATOR = "/";
     private static final String MAPPED_NAME_PROPERTY = "mappedName";
 
@@ -193,6 +199,12 @@ public class WebAnnotationSet {
     }
 
 
+    /**
+     * Processes @Resource annotations on fields of the given class.
+     *
+     * @param context The context to add resources to
+     * @param clazz   The class to scan for field annotations
+     */
     protected static void loadFieldsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
         Field[] fields = Introspection.getDeclaredFields(clazz);
@@ -209,6 +221,12 @@ public class WebAnnotationSet {
     }
 
 
+    /**
+     * Processes @Resource annotations on methods of the given class.
+     *
+     * @param context The context to add resources to
+     * @param clazz   The class to scan for method annotations
+     */
     protected static void loadMethodsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
         Method[] methods = Introspection.getDeclaredMethods(clazz);
@@ -242,6 +260,14 @@ public class WebAnnotationSet {
     }
 
 
+    /**
+     * Processes a Resource annotation with default name and type.
+     *
+     * @param context      The context to add resources to
+     * @param annotation   The annotation
+     * @param defaultName  The default resource name
+     * @param defaultType  The default resource type
+     */
     protected static void addResource(Context context, Resource annotation, String defaultName, Class<?> defaultType) {
         String name = getName(annotation, defaultName);
         String type = getType(annotation, defaultType);

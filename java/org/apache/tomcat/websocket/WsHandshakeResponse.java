@@ -33,10 +33,17 @@ public class WsHandshakeResponse implements HandshakeResponse {
     private final Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
 
+    /**
+     * Default constructor.
+     */
     public WsHandshakeResponse() {
     }
 
 
+    /**
+     * Creates a handshake response from the given headers.
+     * @param headers the response headers
+     */
     public WsHandshakeResponse(Map<String,List<String>> headers) {
         for (Entry<String,List<String>> entry : headers.entrySet()) {
             if (this.headers.containsKey(entry.getKey())) {

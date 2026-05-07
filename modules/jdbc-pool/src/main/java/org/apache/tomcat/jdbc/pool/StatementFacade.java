@@ -31,10 +31,17 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
 
+/**
+ * Facade that creates statement and result set proxies.
+ */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
     private static final Log logger = LogFactory.getLog(StatementFacade.class);
 
+    /**
+     * Constructs a StatementFacade.
+     * @param interceptor the next interceptor in the chain
+     */
     protected StatementFacade(JdbcInterceptor interceptor) {
         setUseEquals(interceptor.isUseEquals());
         setNext(interceptor);
@@ -77,13 +84,27 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     }
 
     /**
-     * Class to measure query execute time.
+     * Proxy for a SQL statement used to measure query execute time.
      */
     protected class StatementProxy implements InvocationHandler {
+        /**
+         * Indicates whether this statement has been closed.
+         */
         protected boolean closed = false;
+        /**
+         * The delegated statement.
+         */
         protected Object delegate;
+        /**
+         * The SQL query text.
+         */
         protected final String query;
 
+        /**
+         * Constructs a StatementProxy.
+         * @param parent the parent statement
+         * @param query the SQL query text
+         */
         public StatementProxy(Object parent, String query) {
             this.delegate = parent;
             this.query = query;
@@ -175,11 +196,19 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         }
     }
 
+   /**
+     * Proxy for a ResultSet.
+     */
     protected class ResultSetProxy implements InvocationHandler {
 
         private final Object parent;
         private Object delegate;
 
+        /**
+         * Constructs a ResultSetProxy.
+         * @param delegate the ResultSet to delegate to
+         * @param parent the parent statement proxy
+         */
         public ResultSetProxy(Object delegate, Object parent) {
             this.delegate = delegate;
             this.parent = parent;

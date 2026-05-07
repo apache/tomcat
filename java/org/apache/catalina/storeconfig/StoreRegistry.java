@@ -49,6 +49,12 @@ import org.apache.tomcat.util.res.StringManager;
  * Central StoreRegistry for all server.xml elements
  */
 public class StoreRegistry {
+    /**
+     * Constructs a new StoreRegistry with default settings.
+     */
+    public StoreRegistry() {
+    }
+
     private static final Log log = LogFactory.getLog(StoreRegistry.class);
     private static final StringManager sm = StringManager.getManager(StoreRegistry.class);
 
@@ -68,28 +74,36 @@ public class StoreRegistry {
             CredentialHandler.class, UpgradeProtocol.class, CookieProcessor.class };
 
     /**
-     * @return the name
+     * Returns the name of this registry.
+     *
+     * @return the registry name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param name The name to set.
+     * Sets the name of this registry.
+     *
+     * @param name the registry name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return the version
+     * Returns the version of this registry.
+     *
+     * @return the registry version
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * @param version The version to set
+     * Sets the version of this registry.
+     *
+     * @param version the registry version
      */
     public void setVersion(String version) {
         this.version = version;
@@ -206,7 +220,9 @@ public class StoreRegistry {
     // Attributes
 
     /**
-     * @return the encoding
+     * Returns the character encoding used when writing configuration files.
+     *
+     * @return the character encoding
      */
     public String getEncoding() {
         return encoding;

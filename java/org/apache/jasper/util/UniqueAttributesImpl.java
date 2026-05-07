@@ -35,10 +35,18 @@ public class UniqueAttributesImpl extends AttributesImpl {
     private final boolean pageDirective;
     private final Set<String> qNames = new HashSet<>();
 
+    /**
+     * Constructs a new UniqueAttributesImpl for non-page directives.
+     */
     public UniqueAttributesImpl() {
         this.pageDirective = false;
     }
 
+    /**
+     * Constructs a new UniqueAttributesImpl.
+     *
+     * @param pageDirective true if processing a page directive
+     */
     public UniqueAttributesImpl(boolean pageDirective) {
         this.pageDirective = pageDirective;
     }

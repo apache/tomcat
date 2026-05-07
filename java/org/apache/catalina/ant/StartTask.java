@@ -28,6 +28,12 @@ import org.apache.tools.ant.BuildException;
 public class StartTask extends AbstractCatalinaCommandTask {
 
     /**
+     * Default constructor.
+     */
+    public StartTask() {
+    }
+
+    /**
      * Execute the requested operation.
      *
      * @exception BuildException if an error occurs

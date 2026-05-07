@@ -21,8 +21,14 @@ import java.nio.ByteBuffer;
 
 import jakarta.websocket.RemoteEndpoint;
 
+/**
+ * Base class for WebSocket remote endpoints.
+ */
 public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
+    /**
+     * The underlying endpoint implementation.
+     */
     protected final WsRemoteEndpointImplBase base;
 
 

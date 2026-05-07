@@ -19,7 +19,16 @@ package org.apache.catalina.util;
 import org.apache.catalina.Globals;
 import org.apache.tomcat.util.net.SSLSupport;
 
+/**
+ * Utility methods for TLS-related operations.
+ */
 public class TLSUtil {
+
+    /**
+     * Constructs a new TLSUtil. This utility class should not be instantiated.
+     */
+    public TLSUtil() {
+    }
 
     /**
      * Determines if the named request attribute is used to pass information about the TLS configuration of the

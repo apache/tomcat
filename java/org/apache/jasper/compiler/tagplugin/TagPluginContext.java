@@ -24,19 +24,24 @@ package org.apache.jasper.compiler.tagplugin;
 
 public interface TagPluginContext {
     /**
-     * @return true if the body of the tag is scriptless.
+     * Checks whether the body of the current tag is scriptless.
+     *
+     * @return true if the body of the tag is scriptless
      */
     boolean isScriptless();
 
     /**
-     * @param attribute Name of the attribute
+     * Checks whether the specified attribute is present in the current tag.
      *
+     * @param attribute Name of the attribute
      * @return true if the attribute is specified in the tag
      */
     boolean isAttributeSpecified(String attribute);
 
     /**
-     * @return A unique temporary variable name that the plugin can use.
+     * Generates a unique temporary variable name for use in generated code.
+     *
+     * @return A unique temporary variable name that the plugin can use
      */
     String getTemporaryVariableName();
 
@@ -66,17 +71,19 @@ public interface TagPluginContext {
     void generateJavaSource(String s);
 
     /**
-     * @param attribute The attribute name
+     * Checks whether the specified attribute has a translation-time constant value.
      *
-     * @return true if the attribute is specified and its value is a translation-time constant.
+     * @param attribute The attribute name
+     * @return true if the attribute is specified and its value is a translation-time constant
      */
     boolean isConstantAttribute(String attribute);
 
     /**
-     * @param attribute The attribute name
+     * Returns the value of a constant attribute.
      *
+     * @param attribute The attribute name
      * @return A string that is the value of a constant attribute. Undefined if the attribute is not a
-     *             (translation-time) constant. null if the attribute is not specified.
+     *             (translation-time) constant. null if the attribute is not specified
      */
     String getConstantAttribute(String attribute);
 

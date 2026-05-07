@@ -39,6 +39,11 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
 
     private Object threadBuilder;
 
+    /**
+     * Constructs a new VirtualThreadExecutor.
+     *
+     * @param namePrefix The name prefix for virtual threads
+     */
     public VirtualThreadExecutor(String namePrefix) {
         threadBuilder = jreCompat.createVirtualThreadBuilder(namePrefix);
     }

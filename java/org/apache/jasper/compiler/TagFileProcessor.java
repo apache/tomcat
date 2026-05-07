@@ -45,6 +45,12 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
  */
 public class TagFileProcessor {
 
+    /**
+     * Constructs a new TagFileProcessor.
+     */
+    public TagFileProcessor() {
+    }
+
     private List<Compiler> tempVector;
 
     /**

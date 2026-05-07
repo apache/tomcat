@@ -35,10 +35,18 @@ public class TcclThreadFactory implements ThreadFactory {
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
 
+    /**
+     * Creates a new TcclThreadFactory with an auto-generated name prefix.
+     */
     public TcclThreadFactory() {
         this("pool-" + poolNumber.getAndIncrement() + "-thread-");
     }
 
+    /**
+     * Creates a new TcclThreadFactory with the specified name prefix.
+     *
+     * @param namePrefix the prefix for thread names
+     */
     public TcclThreadFactory(String namePrefix) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
