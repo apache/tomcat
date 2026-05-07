@@ -114,6 +114,14 @@
         Add support for literal <code>'%'</code> characters in access log
         output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
       </add>
+      <fix>
+        Lower the log level to debug when OpenSSL initialization fails in
+        <code>OpenSSLLifecycleListener</code> to avoid stack traces
+        when <code>libssl.so</code> is not present and to align the behavior
+        of the <code>isAvailable()</code> check with the
+        <code>AprLifecycleListener<code> and gracefully fail when natives
+        are not present. (csutherl)
+      </fix>
     </changelog>
   </subsection>
 </section>
