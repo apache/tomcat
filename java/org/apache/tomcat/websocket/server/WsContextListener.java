@@ -28,6 +28,12 @@ import jakarta.servlet.ServletContextListener;
  */
 public class WsContextListener implements ServletContextListener {
 
+    /**
+     * Constructs a new WsContextListener.
+     */
+    public WsContextListener() {
+    }
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext sc = sce.getServletContext();

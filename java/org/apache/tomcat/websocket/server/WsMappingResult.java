@@ -20,5 +20,10 @@ import java.util.Map;
 
 import jakarta.websocket.server.ServerEndpointConfig;
 
+/**
+ * Result of WebSocket endpoint mapping, containing the configured endpoint and path parameters.
+ * @param config the server endpoint configuration
+ * @param pathParams the path parameters
+ */
 public record WsMappingResult(ServerEndpointConfig config, Map<String,String> pathParams) {
 }

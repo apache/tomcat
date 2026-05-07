@@ -137,7 +137,9 @@ public class WebdavIfHeader {
     }
 
     /**
-     * @return If String.
+     * Returns the name of the header.
+     *
+     * @return the header name
      */
     public String getHeaderName() {
         return "If";
@@ -190,21 +192,27 @@ public class WebdavIfHeader {
     }
 
     /**
-     * @return an iterator over all resources present in the if header.
+     * Returns an iterator over all resources present in the if header.
+     *
+     * @return an iterator over all resources
      */
     public Iterator<String> getResources() {
         return resources.iterator();
     }
 
     /**
-     * @return an iterator over all tokens present in the if header, that were not denied by a leading NOT statement.
+     * Returns an iterator over all tokens present in the if header, that were not denied by a leading NOT statement.
+     *
+     * @return an iterator over all tokens
      */
     public Iterator<String> getAllTokens() {
         return allTokens.iterator();
     }
 
     /**
-     * @return an iterator over all NOT tokens present in the if header, that were explicitly denied.
+     * Returns an iterator over all NOT tokens present in the if header, that were explicitly denied.
+     *
+     * @return an iterator over all NOT tokens
      */
     public Iterator<String> getAllNotTokens() {
         return allNotTokens.iterator();

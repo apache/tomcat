@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Provides the ability to open input streams to remote URLs.
+ */
 public interface StreamProvider {
     /**
      * Open stream to the specified URL.

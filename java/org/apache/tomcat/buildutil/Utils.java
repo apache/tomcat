@@ -19,6 +19,9 @@ package org.apache.tomcat.buildutil;
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * Utility class for build operations.
+ */
 public class Utils {
 
     private Utils() {
@@ -26,6 +29,13 @@ public class Utils {
     }
 
 
+    /**
+     * Writes the Apache License header to the given writer.
+     *
+     * @param w The writer to write the license to
+     *
+     * @throws IOException If an I/O error occurs
+     */
     public static void insertLicense(Writer w) throws IOException {
         w.write("# Licensed to the Apache Software Foundation (ASF) under one or more");
         w.write(System.lineSeparator());

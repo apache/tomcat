@@ -16,9 +16,24 @@
  */
 package org.apache.jasper;
 
+/**
+ * Options for the trimDirectiveWhitespaces JSP attribute.
+ */
 public enum TrimSpacesOption {
+    /**
+     * Equivalent to trimDirectiveWhitespaces="false".
+     */
     FALSE,
+    /**
+     * Equivalent to trimDirectiveWhitespaces="true".
+     */
     TRUE,
+    /**
+     * Trim whitespace around directives and scriptlet elements.
+     */
     SINGLE,
+    /**
+     * Trim whitespace around directives, scriptlet elements, and template text.
+     */
     EXTENDED
 }

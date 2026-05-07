@@ -449,30 +449,79 @@ public interface WebResourceRoot extends Lifecycle {
         return false;
     }
 
+    /**
+     * Types of resource sets in a WebResourceRoot.
+     */
     enum ResourceSetType {
+        /**
+         * Pre resource set - processed first.
+         */
         PRE,
+        /**
+         * Resource JAR set.
+         */
         RESOURCE_JAR,
+        /**
+         * Post resource set - processed last.
+         */
         POST,
+        /**
+         * Classes JAR set.
+         */
         CLASSES_JAR
     }
 
+    /**
+     * Strategies for archive indexing.
+     */
     enum ArchiveIndexStrategy {
+        /**
+         * Simple strategy - no bloom filter, no retention.
+         */
         SIMPLE(false, false),
+        /**
+         * Bloom filter strategy with retention.
+         */
         BLOOM(true, true),
+        /**
+         * Bloom filter strategy without retention.
+         */
         PURGED(true, false);
 
+        /**
+         * Whether this strategy uses a bloom filter.
+         */
         private final boolean usesBloom;
+        /**
+         * Whether this strategy retains the index.
+         */
         private final boolean retain;
 
+        /**
+         * Constructs a new ArchiveIndexStrategy.
+         *
+         * @param usesBloom Whether this strategy uses a bloom filter
+         * @param retain    Whether this strategy retains the index
+         */
         ArchiveIndexStrategy(boolean usesBloom, boolean retain) {
             this.usesBloom = usesBloom;
             this.retain = retain;
         }
 
+        /**
+         * Returns whether this strategy uses a bloom filter.
+         *
+         * @return {@code true} if bloom filter is used
+         */
         public boolean getUsesBloom() {
             return usesBloom;
         }
 
+        /**
+         * Returns whether this strategy retains the index.
+         *
+         * @return {@code true} if index is retained
+         */
         public boolean getRetain() {
             return retain;
         }

@@ -28,6 +28,9 @@ import jakarta.servlet.ServletContext;
  */
 public class StringInterpreterFactory {
 
+    /**
+     * The name used for the StringInterpreter ServletContext attribute and init parameter.
+     */
     public static final String STRING_INTERPRETER_CLASS_NAME = StringInterpreter.class.getName();
 
     private static final StringInterpreter DEFAULT_INSTANCE = new DefaultStringInterpreter();
@@ -85,7 +88,16 @@ public class StringInterpreterFactory {
     }
 
 
+    /**
+     * Default implementation of StringInterpreter that handles standard type conversions.
+     */
     public static class DefaultStringInterpreter implements StringInterpreter {
+
+        /**
+         * Constructs a new DefaultStringInterpreter.
+         */
+        public DefaultStringInterpreter() {
+        }
 
         @Override
         public String convertString(Class<?> c, String s, String attrName, Class<?> propEditorClass,

@@ -83,10 +83,22 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
 
     private transient Node node;
 
+    /**
+     * Constructs a new ValueExpressionImpl.
+     */
     public ValueExpressionImpl() {
         super();
     }
 
+    /**
+     * Constructs a new ValueExpressionImpl.
+     *
+     * @param expr         The expression string
+     * @param node         The AST node
+     * @param fnMapper     The function mapper
+     * @param varMapper    The variable mapper
+     * @param expectedType The expected return type
+     */
     public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper, VariableMapper varMapper,
             Class<?> expectedType) {
         this.expr = expr;

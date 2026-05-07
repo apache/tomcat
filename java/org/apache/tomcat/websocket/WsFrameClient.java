@@ -28,6 +28,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * WebSocket frame handler for client connections.
+ */
 public class WsFrameClient extends WsFrameBase {
 
     private final Log log = LogFactory.getLog(WsFrameClient.class); // must not be static
@@ -38,6 +41,14 @@ public class WsFrameClient extends WsFrameBase {
     // Not final as it may need to be re-sized
     private volatile ByteBuffer response;
 
+    /**
+     * Constructs a new WsFrameClient.
+     *
+     * @param response         The response buffer
+     * @param channel          The async channel wrapper
+     * @param wsSession        The WebSocket session
+     * @param transformation   The transformation to apply
+     */
     public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel, WsSession wsSession,
             Transformation transformation) {
         super(wsSession, transformation);

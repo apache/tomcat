@@ -48,6 +48,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 
+    /**
+     * Default constructor.
+     */
+    public StatusManagerServlet() {
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 

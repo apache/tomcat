@@ -26,6 +26,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class StringInterpreterEnum extends DefaultStringInterpreter {
 
+    /**
+     * Constructs a new StringInterpreterEnum.
+     */
+    public StringInterpreterEnum() {
+    }
+
     // Can't be static
     private final Log log = LogFactory.getLog(ELInterpreterTagSetters.class);
 

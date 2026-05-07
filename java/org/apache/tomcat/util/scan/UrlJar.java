@@ -26,6 +26,11 @@ import java.net.URLConnection;
  */
 public class UrlJar extends AbstractInputStreamJar {
 
+    /**
+     * Constructs a new UrlJar for the given JAR URL.
+     *
+     * @param jarFileURL the JAR file URL
+     */
     public UrlJar(URL jarFileURL) {
         super(jarFileURL);
     }

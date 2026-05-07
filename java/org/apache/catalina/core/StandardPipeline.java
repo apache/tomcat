@@ -318,6 +318,11 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
 
     }
 
+    /**
+     * Return the JMX ObjectNames for all the Valves in this Pipeline.
+     *
+     * @return the array of JMX ObjectNames
+     */
     public ObjectName[] getValveObjectNames() {
 
         List<ObjectName> valveList = new ArrayList<>();

@@ -29,17 +29,34 @@ import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Output stream for an HTTP upgraded connection.
+ */
 public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private static final Log log = LogFactory.getLog(UpgradeServletOutputStream.class);
     private static final StringManager sm = StringManager.getManager(UpgradeServletOutputStream.class);
 
+    /**
+     * The processor handling this connection.
+     */
     private final UpgradeProcessorBase processor;
+
+    /**
+     * The underlying socket wrapper.
+     */
     private final SocketWrapperBase<?> socketWrapper;
+
+    /**
+     * Statistics for this connection.
+     */
     private final UpgradeInfo upgradeInfo;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and registered.
+    /**
+     * Lock for registered state.
+     */
     private final Object registeredLock = new Object();
 
     // Used to ensure that only one thread writes to the socket at a time and
@@ -47,19 +64,41 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     // write. Note it is not necessary to hold this lock when checking if buffer
     // contains data but, depending on how the result is used, some form of
     // synchronization may be required (see fireListenerLock for an example).
+    /**
+     * Lock for write operations.
+     */
     private final Object writeLock = new Object();
 
+    /**
+     * Whether a flush is in progress.
+     */
     private volatile boolean flushing = false;
 
+    /**
+     * Whether the stream has been closed.
+     */
     private volatile boolean closed = false;
 
     // Start in blocking-mode
+    /**
+     * The async write listener.
+     */
     private volatile WriteListener listener = null;
 
     // Guarded by registeredLock
+    /**
+     * Whether the write listener is registered.
+     */
     private boolean registered = false;
 
 
+    /**
+     * Constructs a new UpgradeServletOutputStream.
+     *
+     * @param processor the processor
+     * @param socketWrapper the socket wrapper
+     * @param upgradeInfo the statistics object
+     */
     public UpgradeServletOutputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
             UpgradeInfo upgradeInfo) {
         this.processor = processor;

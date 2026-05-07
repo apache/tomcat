@@ -33,11 +33,23 @@ import org.apache.tomcat.util.res.StringManager;
 /*
  * Sender to proxies using multicast socket.
  */
+/**
+ * TCP-based sender for sending heartbeat messages to proxy servers.
+ */
 public class TcpSender implements Sender {
+
+    /**
+     * Constructs a new TcpSender.
+     */
+    public TcpSender() {
+    }
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
     private static final StringManager sm = StringManager.getManager(TcpSender.class);
 
+    /**
+     * The heartbeat listener configuration.
+     */
     HeartbeatListener config = null;
 
     /**
@@ -47,11 +59,18 @@ public class TcpSender implements Sender {
 
 
     /**
-     * Active connections.
+     * Active socket connections to proxies.
      */
-
     protected Socket[] connections = null;
+
+    /**
+     * Readers for active connections.
+     */
     protected BufferedReader[] connectionReaders = null;
+
+    /**
+     * Writers for active connections.
+     */
     protected BufferedWriter[] connectionWriters = null;
 
 

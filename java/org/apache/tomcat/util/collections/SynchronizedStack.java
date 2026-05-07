@@ -25,10 +25,24 @@ package org.apache.tomcat.util.collections;
  */
 public class SynchronizedStack<T> {
 
+    /**
+     * The default initial capacity for a new stack.
+     */
     public static final int DEFAULT_SIZE = 128;
+
+    /**
+     * Indicates no limit on stack size.
+     */
     private static final int DEFAULT_LIMIT = -1;
 
+    /**
+     * The current capacity of the internal array.
+     */
     private int size;
+
+    /**
+     * The maximum capacity, or -1 for unlimited.
+     */
     private int limit;
 
     /*
@@ -36,13 +50,25 @@ public class SynchronizedStack<T> {
      */
     private int index = -1;
 
+    /**
+     * The internal array backing the stack.
+     */
     private Object[] stack;
 
 
+    /**
+     * Constructs a new SynchronizedStack with default size and no limit.
+     */
     public SynchronizedStack() {
         this(DEFAULT_SIZE, DEFAULT_LIMIT);
     }
 
+    /**
+     * Constructs a new SynchronizedStack with the specified initial size and limit.
+     *
+     * @param size the initial capacity
+     * @param limit the maximum capacity, or -1 for unlimited
+     */
     public SynchronizedStack(int size, int limit) {
         if (limit > -1 && size > limit) {
             this.size = limit;
@@ -102,6 +128,11 @@ public class SynchronizedStack<T> {
         index = -1;
     }
 
+    /**
+     * Sets the maximum number of elements that can be pushed onto this stack.
+     *
+     * @param limit the maximum size, or -1 for unlimited
+     */
     public synchronized void setLimit(int limit) {
         this.limit = limit;
     }

@@ -33,18 +33,38 @@ import org.apache.tomcat.InstanceManager;
 public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
         InstanceManager instanceManager, String protocol) {
 
+    /**
+     * Returns the context binder for this upgrade.
+     *
+     * @return the context binder
+     */
     public ContextBind getContextBind() {
         return contextBind;
     }
 
+    /**
+     * Returns the HTTP upgrade handler.
+     *
+     * @return the upgrade handler
+     */
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 
+    /**
+     * Returns the instance manager for creating servlets and filters.
+     *
+     * @return the instance manager
+     */
     public InstanceManager getInstanceManager() {
         return instanceManager;
     }
 
+    /**
+     * Returns the protocol name for the upgrade.
+     *
+     * @return the protocol name
+     */
     public String getProtocol() {
         return protocol;
     }

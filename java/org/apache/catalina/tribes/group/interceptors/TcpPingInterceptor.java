@@ -32,29 +32,68 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Sends a ping to all members. Configure this interceptor with the TcpFailureDetector below it, and the
- * TcpFailureDetector will act as the membership guide.
+ * Sends periodic TCP pings to cluster members for health monitoring.
  */
-
 public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPingInterceptorMBean {
 
+    /**
+     * Constructs a new TcpPingInterceptor.
+     */
+    public TcpPingInterceptor() {
+    }
+
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(TcpPingInterceptor.class);
 
+    /**
+     * Test payload sent during ping checks.
+     */
     protected static final byte[] TCP_PING_DATA = new byte[] { 79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119,
             -128, -95, 91, 7, 20, 125, -39, 82, 91, -21, -33, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74, 55, 21,
             -66, -121, 69, 33, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50, 85, -10, -108, -73, 58, -33, 33, 120, -111, 4,
             125, -41, 114, -124, -64, -43 };
 
+    /**
+     * Ping interval in milliseconds.
+     */
     protected long interval = 1000; // 1 second
 
+    /**
+     * Whether to use a dedicated thread for pinging.
+     */
     protected boolean useThread = false;
+
+    /**
+     * Whether to ping only static members.
+     */
     protected boolean staticOnly = false;
+
+    /**
+     * Whether the ping thread is currently running.
+     */
     protected volatile boolean running = true;
+
+    /**
+     * The background ping thread.
+     */
     protected PingThread thread = null;
+
+    /**
+     * Counter for naming ping threads.
+     */
     protected static final AtomicInteger cnt = new AtomicInteger(0);
 
+    /**
+     * Reference to the associated failure detector.
+     */
     WeakReference<TcpFailureDetector> failureDetector = null;
+
+    /**
+     * Reference to the static membership interceptor.
+     */
     WeakReference<StaticMembershipInterceptor> staticMembers = null;
 
     @Override
@@ -109,14 +148,29 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         return interval;
     }
 
+    /**
+     * Sets the ping interval in milliseconds.
+     *
+     * @param interval the interval in milliseconds
+     */
     public void setInterval(long interval) {
         this.interval = interval;
     }
 
+    /**
+     * Sets whether to use a dedicated thread for pinging.
+     *
+     * @param useThread true to use a dedicated thread
+     */
     public void setUseThread(boolean useThread) {
         this.useThread = useThread;
     }
 
+    /**
+     * Sets whether to ping only static members.
+     *
+     * @param staticOnly true to ping only static members
+     */
     public void setStaticOnly(boolean staticOnly) {
         this.staticOnly = staticOnly;
     }
@@ -126,10 +180,18 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         return useThread;
     }
 
+    /**
+     * Returns whether static-only mode is enabled.
+     *
+     * @return true if only static members are pinged
+     */
     public boolean getStaticOnly() {
         return staticOnly;
     }
 
+    /**
+     * Sends a ping to cluster members.
+     */
     protected void sendPing() {
         TcpFailureDetector tcpFailureDetector = failureDetector != null ? failureDetector.get() : null;
         if (tcpFailureDetector != null) {
@@ -146,6 +208,11 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         }
     }
 
+    /**
+     * Sends a ping message to the specified members.
+     *
+     * @param members the members to ping
+     */
     protected void sendPingMessage(Member[] members) {
         if (members == null || members.length == 0) {
             return;
@@ -180,7 +247,15 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         }
     }// messageReceived
 
+    /**
+     * Background thread that sends periodic pings.
+     */
     protected class PingThread extends Thread {
+        /**
+         * Constructs a new PingThread.
+         */
+        public PingThread() {
+        }
         @Override
         public void run() {
             while (running) {

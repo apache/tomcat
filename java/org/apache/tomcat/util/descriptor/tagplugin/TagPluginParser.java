@@ -42,11 +42,24 @@ public class TagPluginParser {
     private final Digester digester;
     private final Map<String,String> plugins = new HashMap<>();
 
+    /**
+     * Creates a new TagPluginParser.
+     *
+     * @param context the servlet context
+     * @param blockExternal whether to block external entities
+     */
     public TagPluginParser(ServletContext context, boolean blockExternal) {
         digester = DigesterFactory.newDigester(false, false, new TagPluginRuleSet(), blockExternal);
         digester.setClassLoader(context.getClassLoader());
     }
 
+    /**
+     * Parses a tag plugin descriptor from the given URL.
+     *
+     * @param url the URL of the descriptor file
+     * @throws IOException if an I/O error occurs
+     * @throws SAXException if a parsing error occurs
+     */
     public void parse(URL url) throws IOException, SAXException {
         try (InputStream is = url.openStream()) {
             XmlErrorHandler handler = new XmlErrorHandler();
@@ -69,10 +82,21 @@ public class TagPluginParser {
         }
     }
 
+    /**
+     * Registers a plugin class for the given tag class.
+     *
+     * @param tagClass the tag handler class name
+     * @param pluginClass the plugin class name
+     */
     public void addPlugin(String tagClass, String pluginClass) {
         plugins.put(tagClass, pluginClass);
     }
 
+    /**
+     * Returns the map of registered tag plugins.
+     *
+     * @return the map from tag class names to plugin class names
+     */
     public Map<String,String> getPlugins() {
         return plugins;
     }

@@ -34,11 +34,24 @@ public final class StringUtils {
     }
 
 
+    /**
+     * Joins two strings with a comma separator.
+     *
+     * @param a the first string
+     * @param b the second string
+     * @return the joined string
+     */
     public static String join(String a, String b) {
         return join(new String[] { a, b });
     }
 
 
+    /**
+     * Joins the elements of a string array with a comma separator.
+     *
+     * @param array the array of strings to join
+     * @return the joined string
+     */
     public static String join(String[] array) {
         if (array == null) {
             return EMPTY_STRING;
@@ -47,6 +60,14 @@ public final class StringUtils {
     }
 
 
+    /**
+     * Joins the elements of a string array with the specified separator
+     * and appends the result to the given StringBuilder.
+     *
+     * @param array the array of strings to join
+     * @param separator the separator character
+     * @param sb the StringBuilder to append to
+     */
     public static void join(String[] array, char separator, StringBuilder sb) {
         if (array == null) {
             return;
@@ -55,11 +76,24 @@ public final class StringUtils {
     }
 
 
+    /**
+     * Joins the elements of a collection with a comma separator.
+     *
+     * @param collection the collection of strings to join
+     * @return the joined string
+     */
     public static String join(Collection<String> collection) {
         return join(collection, ',');
     }
 
 
+    /**
+     * Joins the elements of a collection with the specified separator.
+     *
+     * @param collection the collection of strings to join
+     * @param separator the separator character
+     * @return the joined string
+     */
     public static String join(Collection<String> collection, char separator) {
         // Shortcut
         if (collection == null || collection.isEmpty()) {
@@ -72,11 +106,29 @@ public final class StringUtils {
     }
 
 
+    /**
+     * Joins the elements of an iterable with the specified separator
+     * and appends the result to the given StringBuilder.
+     *
+     * @param iterable the iterable of strings to join
+     * @param separator the separator character
+     * @param sb the StringBuilder to append to
+     */
     public static void join(Iterable<String> iterable, char separator, StringBuilder sb) {
         join(iterable, separator, (x) -> x, sb);
     }
 
 
+    /**
+     * Joins the elements of an array using the specified separator and function,
+     * and appends the result to the given StringBuilder.
+     *
+     * @param array the array to join
+     * @param separator the separator character
+     * @param function the function to apply to each element
+     * @param sb the StringBuilder to append to
+     * @param <T> the element type
+     */
     public static <T> void join(T[] array, char separator, Function<T,String> function, StringBuilder sb) {
         if (array == null) {
             return;
@@ -85,6 +137,16 @@ public final class StringUtils {
     }
 
 
+    /**
+     * Joins the elements of an iterable using the specified separator and function,
+     * and appends the result to the given StringBuilder.
+     *
+     * @param iterable the iterable to join
+     * @param separator the separator character
+     * @param function the function to apply to each element
+     * @param sb the StringBuilder to append to
+     * @param <T> the element type
+     */
     public static <T> void join(Iterable<T> iterable, char separator, Function<T,String> function, StringBuilder sb) {
         if (iterable == null) {
             return;

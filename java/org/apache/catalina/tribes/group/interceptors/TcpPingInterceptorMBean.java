@@ -16,12 +16,30 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for managing the TcpPingInterceptor.
+ */
 public interface TcpPingInterceptorMBean {
 
+    /**
+     * Returns the socket option flag used for ping messages.
+     *
+     * @return the option flag
+     */
     int getOptionFlag();
 
+    /**
+     * Returns the ping interval in milliseconds.
+     *
+     * @return the ping interval
+     */
     long getInterval();
 
+    /**
+     * Returns whether a dedicated ping thread is used.
+     *
+     * @return true if a dedicated thread is used
+     */
     boolean getUseThread();
 
 }

@@ -34,16 +34,27 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class ValveBase extends LifecycleMBeanBase implements Contained, Valve {
 
+    /**
+     * StringManager for internationalized strings.
+     */
     protected static final StringManager sm = StringManager.getManager(ValveBase.class);
 
 
     // ------------------------------------------------------ Constructor
 
+    /**
+     * Constructs a new ValveBase with async support disabled.
+     */
     public ValveBase() {
         this(false);
     }
 
 
+    /**
+     * Constructs a new ValveBase.
+     *
+     * @param asyncSupported Whether this valve supports async requests
+     */
     public ValveBase(boolean asyncSupported) {
         this.asyncSupported = asyncSupported;
     }
@@ -95,6 +106,11 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
+    /**
+     * Sets whether this valve supports Servlet 3+ async requests.
+     *
+     * @param asyncSupported Whether this valve supports async requests
+     */
     public void setAsyncSupported(boolean asyncSupported) {
         this.asyncSupported = asyncSupported;
     }

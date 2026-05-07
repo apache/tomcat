@@ -32,10 +32,18 @@ public class WsIOException extends IOException {
 
     private final CloseReason closeReason;
 
+    /**
+     * Creates a WebSocket I/O exception with the given close reason.
+     * @param closeReason the WebSocket close reason
+     */
     public WsIOException(CloseReason closeReason) {
         this.closeReason = closeReason;
     }
 
+    /**
+     * Returns the WebSocket close reason for this exception.
+     * @return the close reason
+     */
     public CloseReason getCloseReason() {
         return closeReason;
     }

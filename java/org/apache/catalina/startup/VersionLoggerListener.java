@@ -38,6 +38,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class VersionLoggerListener implements LifecycleListener {
 
+    /**
+     * Constructs a new VersionLoggerListener.
+     */
+    public VersionLoggerListener() {
+    }
+
     private static final Log log = LogFactory.getLog(VersionLoggerListener.class);
 
     /**
@@ -45,36 +51,74 @@ public class VersionLoggerListener implements LifecycleListener {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    /**
+     * Whether to log JVM arguments.
+     */
     private boolean logArgs = true;
+    /**
+     * Whether to log environment variables.
+     */
     private boolean logEnv = false;
+    /**
+     * Whether to log system properties.
+     */
     private boolean logProps = false;
 
-
+    /**
+     * Returns whether JVM arguments will be logged.
+     *
+     * @return {@code true} if JVM arguments will be logged
+     */
     public boolean getLogArgs() {
         return logArgs;
     }
 
 
+    /**
+     * Sets whether JVM arguments will be logged.
+     *
+     * @param logArgs Whether to log JVM arguments
+     */
     public void setLogArgs(boolean logArgs) {
         this.logArgs = logArgs;
     }
 
 
+    /**
+     * Returns whether environment variables will be logged.
+     *
+     * @return {@code true} if environment variables will be logged
+     */
     public boolean getLogEnv() {
         return logEnv;
     }
 
 
+    /**
+     * Sets whether environment variables will be logged.
+     *
+     * @param logEnv Whether to log environment variables
+     */
     public void setLogEnv(boolean logEnv) {
         this.logEnv = logEnv;
     }
 
 
+    /**
+     * Returns whether system properties will be logged.
+     *
+     * @return {@code true} if system properties will be logged
+     */
     public boolean getLogProps() {
         return logProps;
     }
 
 
+    /**
+     * Sets whether system properties will be logged.
+     *
+     * @param logProps Whether to log system properties
+     */
     public void setLogProps(boolean logProps) {
         this.logProps = logProps;
     }

@@ -27,6 +27,9 @@ import java.nio.charset.StandardCharsets;
  */
 public class Utf8Encoder extends CharsetEncoder {
 
+    /**
+     * Constructs a new UTF-8 CharsetEncoder.
+     */
     public Utf8Encoder() {
         super(StandardCharsets.UTF_8, 1.1f, 4.0f);
     }

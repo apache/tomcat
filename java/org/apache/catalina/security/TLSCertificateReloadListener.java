@@ -44,6 +44,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class TLSCertificateReloadListener implements LifecycleListener {
 
+    /**
+     * Constructs a new TLSCertificateReloadListener.
+     */
+    public TLSCertificateReloadListener() {
+    }
+
     private static final Log log = LogFactory.getLog(TLSCertificateReloadListener.class);
     private static final StringManager sm = StringManager.getManager(TLSCertificateReloadListener.class);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");

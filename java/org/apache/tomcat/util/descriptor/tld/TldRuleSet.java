@@ -28,9 +28,15 @@ import org.apache.tomcat.util.digester.RuleSet;
 import org.xml.sax.Attributes;
 
 /**
- * RulesSet for digesting TLD files.
+ * Digester rule set for parsing Tag Library Descriptor files.
  */
 public class TldRuleSet implements RuleSet {
+
+    /**
+     * Constructs a new TldRuleSet.
+     */
+    public TldRuleSet() {
+    }
     private static final String PREFIX = "taglib";
     private static final String VALIDATOR_PREFIX = PREFIX + "/validator";
     private static final String TAG_PREFIX = PREFIX + "/tag";
@@ -171,6 +177,9 @@ public class TldRuleSet implements RuleSet {
         }
     }
 
+    /**
+     * Intermediate representation of a tag attribute during TLD parsing.
+     */
     public static class Attribute {
         private final boolean allowShortNames;
         private String name;
@@ -188,14 +197,26 @@ public class TldRuleSet implements RuleSet {
             this.allowShortNames = allowShortNames;
         }
 
+        /**
+         * Sets the attribute name.
+         * @param name the attribute name
+         */
         public void setName(String name) {
             this.name = name;
         }
 
+        /**
+         * Sets whether the attribute is required.
+         * @param required true if required
+         */
         public void setRequired(boolean required) {
             this.required = required;
         }
 
+        /**
+         * Sets the attribute type, with short name resolution.
+         * @param type the type name
+         */
         public void setType(String type) {
             if (allowShortNames) {
                 switch (type) {
@@ -238,34 +259,64 @@ public class TldRuleSet implements RuleSet {
             }
         }
 
+        /**
+         * Sets whether the attribute is evaluated at request time.
+         * @param requestTime true if request-time
+         */
         public void setRequestTime(boolean requestTime) {
             this.requestTime = requestTime;
         }
 
+        /**
+         * Sets whether the attribute is a fragment type.
+         * @param fragment true if fragment
+         */
         public void setFragment(boolean fragment) {
             this.fragment = fragment;
         }
 
+        /**
+         * Sets the attribute description.
+         * @param description the description
+         */
         public void setDescription(String description) {
             this.description = description;
         }
 
+        /**
+         * Marks the attribute as a deferred value.
+         */
         public void setDeferredValue() {
             this.deferredValue = true;
         }
 
+        /**
+         * Marks the attribute as a deferred method.
+         */
         public void setDeferredMethod() {
             this.deferredMethod = true;
         }
 
+        /**
+         * Sets the expected type name for deferred attributes.
+         * @param expectedTypeName the expected type name
+         */
         public void setExpectedTypeName(String expectedTypeName) {
             this.expectedTypeName = expectedTypeName;
         }
 
+        /**
+         * Sets the method signature for deferred method attributes.
+         * @param methodSignature the method signature
+         */
         public void setMethodSignature(String methodSignature) {
             this.methodSignature = methodSignature;
         }
 
+        /**
+         * Converts this intermediate attribute representation to a TagAttributeInfo.
+         * @return the TagAttributeInfo
+         */
         public TagAttributeInfo toTagAttributeInfo() {
             if (fragment) {
                 // JSP8.5.2: for a fragment type is fixed and rexprvalue is true
@@ -325,29 +376,77 @@ public class TldRuleSet implements RuleSet {
         }
     }
 
+    /**
+     * Intermediate representation of a tag variable during TLD parsing.
+     */
     public static class Variable {
+        /**
+         * Constructs a new Variable.
+         */
+        public Variable() {
+        }
+
+        /**
+         * The explicitly given variable name.
+         */
         private String nameGiven;
+
+        /**
+         * The attribute name from which to derive the variable name.
+         */
         private String nameFromAttribute;
+
+        /**
+         * The variable type class name.
+         */
         private String className = "java.lang.String";
+
+        /**
+         * Whether to declare the variable.
+         */
         private boolean declare = true;
+
+        /**
+         * The variable scope.
+         */
         private int scope = VariableInfo.NESTED;
 
+        /**
+         * Sets the explicit variable name.
+         * @param nameGiven the variable name
+         */
         public void setNameGiven(String nameGiven) {
             this.nameGiven = nameGiven;
         }
 
+        /**
+         * Sets the attribute name from which to derive the variable name.
+         * @param nameFromAttribute the attribute name
+         */
         public void setNameFromAttribute(String nameFromAttribute) {
             this.nameFromAttribute = nameFromAttribute;
         }
 
+        /**
+         * Sets the variable type class name.
+         * @param className the class name
+         */
         public void setClassName(String className) {
             this.className = className;
         }
 
+        /**
+         * Sets whether to declare the variable.
+         * @param declare true to declare
+         */
         public void setDeclare(boolean declare) {
             this.declare = declare;
         }
 
+        /**
+         * Sets the variable scope.
+         * @param scopeName the scope name
+         */
         public void setScope(String scopeName) {
             switch (scopeName) {
                 case "NESTED":
@@ -362,6 +461,10 @@ public class TldRuleSet implements RuleSet {
             }
         }
 
+        /**
+         * Converts this intermediate variable representation to a TagVariableInfo.
+         * @return the TagVariableInfo
+         */
         public TagVariableInfo toTagVariableInfo() {
             return new TagVariableInfo(nameGiven, nameFromAttribute, className, declare, scope);
         }

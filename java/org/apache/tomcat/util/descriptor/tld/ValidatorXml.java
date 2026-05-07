@@ -23,21 +23,54 @@ import java.util.Map;
  * Model of a Tag Library Validator from the XML descriptor.
  */
 public class ValidatorXml {
+    /**
+     * The fully qualified class name of the validator.
+     */
     private String validatorClass;
+    /**
+     * The initialization parameters for the validator.
+     */
     private final Map<String,String> initParams = new HashMap<>();
 
+    /**
+     * Constructs a new ValidatorXml.
+     */
+    public ValidatorXml() {
+    }
+
+    /**
+     * Returns the validator class name.
+     *
+     * @return the validator class name
+     */
     public String getValidatorClass() {
         return validatorClass;
     }
 
+    /**
+     * Sets the validator class name.
+     *
+     * @param validatorClass The validator class name
+     */
     public void setValidatorClass(String validatorClass) {
         this.validatorClass = validatorClass;
     }
 
+    /**
+     * Adds an initialization parameter.
+     *
+     * @param name  The parameter name
+     * @param value The parameter value
+     */
     public void addInitParam(String name, String value) {
         initParams.put(name, value);
     }
 
+    /**
+     * Returns the initialization parameters.
+     *
+     * @return the initialization parameters
+     */
     public Map<String,String> getInitParams() {
         return initParams;
     }

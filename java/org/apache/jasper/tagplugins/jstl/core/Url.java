@@ -20,7 +20,16 @@ import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.jasper.tagplugins.jstl.Util;
 
+/**
+ * Tag plugin that optimizes JSTL &lt;c:url&gt; tag handling.
+ */
 public class Url implements TagPlugin {
+
+    /**
+     * Constructs a new Url tag plugin.
+     */
+    public Url() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

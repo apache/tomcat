@@ -32,6 +32,9 @@ import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
+/**
+ * WebSocket frame handler for server connections.
+ */
 public class WsFrameServer extends WsFrameBase {
 
     private final Log log = LogFactory.getLog(WsFrameServer.class); // must not be static
@@ -42,6 +45,15 @@ public class WsFrameServer extends WsFrameBase {
     private final ClassLoader applicationClassLoader;
 
 
+    /**
+     * Constructs a new WsFrameServer.
+     *
+     * @param socketWrapper           The socket wrapper
+     * @param upgradeInfo             The upgrade information
+     * @param wsSession               The WebSocket session
+     * @param transformation          The transformation to apply
+     * @param applicationClassLoader  The application class loader
+     */
     public WsFrameServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo, WsSession wsSession,
             Transformation transformation, ClassLoader applicationClassLoader) {
         super(wsSession, transformation);

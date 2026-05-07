@@ -22,7 +22,16 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Store factory for wrapper lifecycle listeners.
+ */
 public class WrapperLifecycleSF extends StoreFactoryBase {
+
+    /**
+     * Constructs a new WrapperLifecycleSF.
+     */
+    public WrapperLifecycleSF() {
+    }
     private static final Log log = LogFactory.getLog(WrapperLifecycleSF.class);
 
     @Override

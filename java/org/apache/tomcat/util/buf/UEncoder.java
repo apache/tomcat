@@ -27,8 +27,17 @@ import java.util.BitSet;
  */
 public final class UEncoder {
 
+    /**
+     * Pre-defined sets of safe characters for URL encoding.
+     */
     public enum SafeCharsSet {
+        /**
+         * Safe character set that includes the forward slash.
+         */
         WITH_SLASH("/"),
+        /**
+         * Default safe character set.
+         */
         DEFAULT("");
 
         private final BitSet safeChars;

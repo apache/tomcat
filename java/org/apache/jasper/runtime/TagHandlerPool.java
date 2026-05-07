@@ -30,17 +30,48 @@ import org.apache.tomcat.InstanceManager;
  */
 public class TagHandlerPool {
 
+    /**
+     * The array of pooled tag handlers.
+     */
     private Tag[] handlers;
 
+    /**
+     * Option name for the tag pool class name.
+     */
     public static final String OPTION_TAGPOOL = "tagpoolClassName";
+
+    /**
+     * Option name for the maximum pool size.
+     */
     public static final String OPTION_MAXSIZE = "tagpoolMaxSize";
+
+    /**
+     * Option name for using InstanceManager for tag creation.
+     */
     public static final String OPTION_USEIMFORTAGS = "useInstanceManagerForTags";
 
     // index of next available tag handler
+    /**
+     * Index of the next available tag handler in the pool.
+     */
     private int current;
+
+    /**
+     * The instance manager used for tag handler creation.
+     */
     protected InstanceManager instanceManager = null;
+
+    /**
+     * Whether to use the instance manager for tag handler creation.
+     */
     protected boolean useInstanceManagerForTags;
 
+    /**
+     * Creates or retrieves a TagHandlerPool for the given servlet configuration.
+     *
+     * @param config the servlet configuration
+     * @return the tag handler pool instance
+     */
     public static TagHandlerPool getTagHandlerPool(ServletConfig config) {
         TagHandlerPool result = null;
 
@@ -61,6 +92,11 @@ public class TagHandlerPool {
         return result;
     }
 
+    /**
+     * Initializes this pool with settings from the given servlet configuration.
+     *
+     * @param config the servlet configuration
+     */
     protected void init(ServletConfig config) {
         int maxSize = -1;
         String maxSizeS = getOption(config, OPTION_MAXSIZE, null);
@@ -152,6 +188,15 @@ public class TagHandlerPool {
     }
 
 
+    /**
+     * Retrieves a configuration option from the given servlet config, falling back
+     * to the servlet context init parameter, then to the default value.
+     *
+     * @param config the servlet configuration
+     * @param name the option name
+     * @param defaultV the default value if not found
+     * @return the option value or the default
+     */
     protected static String getOption(ServletConfig config, String name, String defaultV) {
         if (config == null) {
             return defaultV;

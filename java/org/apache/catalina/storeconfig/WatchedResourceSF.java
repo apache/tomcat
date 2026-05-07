@@ -22,7 +22,16 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Store factory for watched resources in a StandardContext.
+ */
 public class WatchedResourceSF extends StoreFactoryBase {
+
+    /**
+     * Constructs a new WatchedResourceSF.
+     */
+    public WatchedResourceSF() {
+    }
     private static final Log log = LogFactory.getLog(WatchedResourceSF.class);
 
     @Override

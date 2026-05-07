@@ -25,18 +25,53 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class UpgradeInfo {
 
+    /**
+     * Constructs a new UpgradeInfo.
+     */
+    public UpgradeInfo() {
+    }
+
+    /**
+     * The parent group info for aggregated statistics.
+     */
     private UpgradeGroupInfo groupInfo = null;
+
+    /**
+     * Counter for bytes sent.
+     */
     private final LongAdder bytesSent = new LongAdder();
+
+    /**
+     * Counter for bytes received.
+     */
     private final LongAdder bytesReceived = new LongAdder();
+
+    /**
+     * Counter for messages sent.
+     */
     private final LongAdder msgsSent = new LongAdder();
+
+    /**
+     * Counter for messages received.
+     */
     private final LongAdder msgsReceived = new LongAdder();
 
 
+    /**
+     * Returns the parent group info.
+     *
+     * @return the group info
+     */
     public UpgradeGroupInfo getGlobalProcessor() {
         return groupInfo;
     }
 
 
+    /**
+     * Sets the parent group info.
+     *
+     * @param groupInfo the group info
+     */
     public void setGroupInfo(UpgradeGroupInfo groupInfo) {
         if (groupInfo == null) {
             if (this.groupInfo != null) {
@@ -50,10 +85,20 @@ public class UpgradeInfo {
     }
 
 
+    /**
+     * Returns the number of bytes sent.
+     *
+     * @return the bytes sent
+     */
     public long getBytesSent() {
         return bytesSent.longValue();
     }
 
+    /**
+     * Resets the bytes sent counter.
+     *
+     * @param bytesSent the new value
+     */
     public void setBytesSent(long bytesSent) {
         this.bytesSent.reset();
         if (bytesSent > 0) {
@@ -61,15 +106,30 @@ public class UpgradeInfo {
         }
     }
 
+    /**
+     * Adds to the bytes sent counter.
+     *
+     * @param bytesSent the amount to add
+     */
     public void addBytesSent(long bytesSent) {
         this.bytesSent.add(bytesSent);
     }
 
 
+    /**
+     * Returns the number of bytes received.
+     *
+     * @return the bytes received
+     */
     public long getBytesReceived() {
         return bytesReceived.longValue();
     }
 
+    /**
+     * Resets the bytes received counter.
+     *
+     * @param bytesReceived the new value
+     */
     public void setBytesReceived(long bytesReceived) {
         this.bytesReceived.reset();
         if (bytesReceived > 0) {
@@ -77,15 +137,30 @@ public class UpgradeInfo {
         }
     }
 
+    /**
+     * Adds to the bytes received counter.
+     *
+     * @param bytesReceived the amount to add
+     */
     public void addBytesReceived(long bytesReceived) {
         this.bytesReceived.add(bytesReceived);
     }
 
 
+    /**
+     * Returns the number of messages sent.
+     *
+     * @return the messages sent
+     */
     public long getMsgsSent() {
         return msgsSent.longValue();
     }
 
+    /**
+     * Resets the messages sent counter.
+     *
+     * @param msgsSent the new value
+     */
     public void setMsgsSent(long msgsSent) {
         this.msgsSent.reset();
         if (msgsSent > 0) {
@@ -93,15 +168,30 @@ public class UpgradeInfo {
         }
     }
 
+    /**
+     * Adds to the messages sent counter.
+     *
+     * @param msgsSent the amount to add
+     */
     public void addMsgsSent(long msgsSent) {
         this.msgsSent.add(msgsSent);
     }
 
 
+    /**
+     * Returns the number of messages received.
+     *
+     * @return the messages received
+     */
     public long getMsgsReceived() {
         return msgsReceived.longValue();
     }
 
+    /**
+     * Resets the messages received counter.
+     *
+     * @param msgsReceived the new value
+     */
     public void setMsgsReceived(long msgsReceived) {
         this.msgsReceived.reset();
         if (msgsReceived > 0) {
@@ -109,6 +199,11 @@ public class UpgradeInfo {
         }
     }
 
+    /**
+     * Adds to the messages received counter.
+     *
+     * @param msgsReceived the amount to add
+     */
     public void addMsgsReceived(long msgsReceived) {
         this.msgsReceived.add(msgsReceived);
     }

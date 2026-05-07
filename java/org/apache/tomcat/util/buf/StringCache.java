@@ -34,6 +34,11 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StringCache {
 
+    /**
+     * Constructs a new StringCache with default settings.
+     */
+    public StringCache() {
+    }
 
     private static final Log log = LogFactory.getLog(StringCache.class);
     private static final StringManager sm = StringManager.getManager(StringCache.class);
@@ -48,16 +53,28 @@ public class StringCache {
     protected static boolean byteEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.byte.enabled");
 
 
+    /**
+     * Whether the char chunk string cache is enabled.
+     */
     protected static boolean charEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.char.enabled");
 
 
+    /**
+     * Number of toString calls required before the cache is built.
+     */
     protected static int trainThreshold =
             Integer.getInteger("tomcat.util.buf.StringCache.trainThreshold", 20000).intValue();
 
 
+    /**
+     * Maximum size of the string cache.
+     */
     protected static int cacheSize = Integer.getInteger("tomcat.util.buf.StringCache.cacheSize", 200).intValue();
 
 
+    /**
+     * Maximum length of strings to cache.
+     */
     protected static final int maxStringSize =
             Integer.getInteger("tomcat.util.buf.StringCache.maxStringSize", 128).intValue();
 
@@ -114,7 +131,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the cacheSize.
+     * Returns the maximum size of the string cache.
+     *
+     * @return the cache size
      */
     public int getCacheSize() {
         return cacheSize;
@@ -122,7 +141,9 @@ public class StringCache {
 
 
     /**
-     * @param cacheSize The cacheSize to set.
+     * Sets the maximum size of the string cache.
+     *
+     * @param cacheSize the cache size
      */
     public void setCacheSize(int cacheSize) {
         StringCache.cacheSize = cacheSize;
@@ -130,7 +151,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the enabled.
+     * Returns whether the byte chunk string cache is enabled.
+     *
+     * @return true if byte chunk caching is enabled
      */
     public boolean getByteEnabled() {
         return byteEnabled;
@@ -138,7 +161,9 @@ public class StringCache {
 
 
     /**
-     * @param byteEnabled The enabled to set.
+     * Sets whether the byte chunk string cache is enabled.
+     *
+     * @param byteEnabled true if byte chunk caching should be enabled
      */
     public void setByteEnabled(boolean byteEnabled) {
         StringCache.byteEnabled = byteEnabled;
@@ -146,7 +171,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the enabled.
+     * Returns whether the char chunk string cache is enabled.
+     *
+     * @return true if char chunk caching is enabled
      */
     public boolean getCharEnabled() {
         return charEnabled;
@@ -154,7 +181,9 @@ public class StringCache {
 
 
     /**
-     * @param charEnabled The enabled to set.
+     * Sets whether the char chunk string cache is enabled.
+     *
+     * @param charEnabled true if char chunk caching should be enabled
      */
     public void setCharEnabled(boolean charEnabled) {
         StringCache.charEnabled = charEnabled;
@@ -162,7 +191,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the trainThreshold.
+     * Returns the number of toString calls required before the cache is built.
+     *
+     * @return the training threshold
      */
     public int getTrainThreshold() {
         return trainThreshold;
@@ -170,7 +201,9 @@ public class StringCache {
 
 
     /**
-     * @param trainThreshold The trainThreshold to set.
+     * Sets the number of toString calls required before the cache is built.
+     *
+     * @param trainThreshold the training threshold
      */
     public void setTrainThreshold(int trainThreshold) {
         StringCache.trainThreshold = trainThreshold;
@@ -178,7 +211,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the accessCount.
+     * Returns the total number of cache lookups performed.
+     *
+     * @return the access count
      */
     public int getAccessCount() {
         return accessCount;
@@ -186,7 +221,9 @@ public class StringCache {
 
 
     /**
-     * @return Returns the hitCount.
+     * Returns the number of cache hits.
+     *
+     * @return the hit count
      */
     public int getHitCount() {
         return hitCount;
@@ -196,6 +233,9 @@ public class StringCache {
     // -------------------------------------------------- Public Static Methods
 
 
+    /**
+     * Resets all cache statistics and clears the cache.
+     */
     public void reset() {
         hitCount = 0;
         accessCount = 0;
@@ -210,6 +250,12 @@ public class StringCache {
     }
 
 
+    /**
+     * Converts the given ByteChunk to a String using the cache.
+     *
+     * @param bc the ByteChunk to convert
+     * @return the resulting String
+     */
     public static String toString(ByteChunk bc) {
         try {
             return toString(bc, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
@@ -220,6 +266,16 @@ public class StringCache {
     }
 
 
+    /**
+     * Converts the given ByteChunk to a String using the cache, with the specified
+     * error handling actions.
+     *
+     * @param bc the ByteChunk to convert
+     * @param malformedInputAction action for malformed input
+     * @param unmappableCharacterAction action for unmappable characters
+     * @return the resulting String
+     * @throws CharacterCodingException if a coding error occurs
+     */
     public static String toString(ByteChunk bc, CodingErrorAction malformedInputAction,
             CodingErrorAction unmappableCharacterAction) throws CharacterCodingException {
 
@@ -328,6 +384,12 @@ public class StringCache {
     }
 
 
+    /**
+     * Converts the given CharChunk to a String using the cache.
+     *
+     * @param cc the CharChunk to convert
+     * @return the resulting String
+     */
     public static String toString(CharChunk cc) {
 
         // If the cache is null, then either caching is disabled, or we're
@@ -652,7 +714,16 @@ public class StringCache {
 
     // -------------------------------------------------- ByteEntry Inner Class
 
+    /**
+     * Cache entry for byte chunk to String mapping.
+     */
     protected static class ByteEntry {
+
+        /**
+         * Constructs a new ByteEntry.
+         */
+        public ByteEntry() {
+        }
 
         private byte[] name = null;
         private Charset charset = null;
@@ -692,7 +763,16 @@ public class StringCache {
     // -------------------------------------------------- CharEntry Inner Class
 
 
+    /**
+     * Cache entry for char chunk to String mapping.
+     */
     protected static class CharEntry {
+
+        /**
+         * Constructs a new CharEntry.
+         */
+        public CharEntry() {
+        }
 
         private char[] name = null;
         private String value = null;

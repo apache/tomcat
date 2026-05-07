@@ -18,7 +18,16 @@ package org.apache.catalina.util;
 
 import java.util.regex.Pattern;
 
+/**
+ * Utility methods for string manipulation in Catalina.
+ */
 public class StringUtil {
+    /**
+     * Constructs a new StringUtil. This utility class should not be instantiated.
+     */
+    public StringUtil() {
+    }
+
     /**
      * {@link Pattern} for a comma delimited string that support whitespace characters
      */

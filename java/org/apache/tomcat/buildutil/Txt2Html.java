@@ -42,6 +42,12 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class Txt2Html extends Task {
 
+    /**
+     * Constructs a new Txt2Html task.
+     */
+    public Txt2Html() {
+    }
+
     /** The directory to contain the resulting files */
     private File todir;
 

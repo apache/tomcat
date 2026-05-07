@@ -321,11 +321,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Sets the size of the cache for class resources that were not found.
+     *
+     * @param notFoundClassResourceCacheSize The cache size
+     */
     public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
         notFoundClassResources.setLimit(notFoundClassResourceCacheSize);
     }
 
 
+    /**
+     * Returns the size of the cache for class resources that were not found.
+     *
+     * @return the cache size
+     */
     public int getNotFoundClassResourceCacheSize() {
         return notFoundClassResources.getLimit();
     }
@@ -380,11 +390,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    /**
+     * Returns whether RMI target references should be cleared on reload.
+     *
+     * @return the clearReferencesRmiTargets flag
+     */
     public boolean getClearReferencesRmiTargets() {
         return this.clearReferencesRmiTargets;
     }
 
 
+    /**
+     * Sets whether RMI target references should be cleared on reload.
+     *
+     * @param clearReferencesRmiTargets The new value
+     */
     public void setClearReferencesRmiTargets(boolean clearReferencesRmiTargets) {
         this.clearReferencesRmiTargets = clearReferencesRmiTargets;
     }
@@ -470,21 +490,41 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    /**
+     * Returns whether ThreadLocal references should be cleared on reload.
+     *
+     * @return the clearReferencesThreadLocals flag
+     */
     public boolean getClearReferencesThreadLocals() {
         return clearReferencesThreadLocals;
     }
 
 
+    /**
+     * Sets whether ThreadLocal references should be cleared on reload.
+     *
+     * @param clearReferencesThreadLocals The new value
+     */
     public void setClearReferencesThreadLocals(boolean clearReferencesThreadLocals) {
         this.clearReferencesThreadLocals = clearReferencesThreadLocals;
     }
 
 
+    /**
+     * Returns whether memory leak checks should be skipped on JVM shutdown.
+     *
+     * @return the skipMemoryLeakChecksOnJvmShutdown flag
+     */
     public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
         return skipMemoryLeakChecksOnJvmShutdown;
     }
 
 
+    /**
+     * Sets whether memory leak checks should be skipped on JVM shutdown.
+     *
+     * @param skipMemoryLeakChecksOnJvmShutdown The new value
+     */
     public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
         this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
     }
@@ -522,6 +562,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
     }
 
+    /**
+     * Copies the state of this class loader to another, excluding transformers.
+     *
+     * @param base The target class loader
+     */
     protected void copyStateWithoutTransformers(WebappClassLoaderBase base) {
         base.resources = this.resources;
         base.delegate = this.delegate;
@@ -618,6 +663,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ---------------------------------------------------- ClassLoader Methods
 
 
+    /**
+     * Defines a class from byte array. Exposed for use by tests.
+     *
+     * @param name              The class name
+     * @param b                 The byte array
+     * @param off               The offset
+     * @param len               The length
+     * @param protectionDomain  The protection domain
+     *
+     * @return the defined class
+     */
     // Note: exposed for use by tests
     protected final Class<?> doDefineClass(String name, byte[] b, int off, int len, ProtectionDomain protectionDomain) {
         return super.defineClass(name, b, off, len, protectionDomain);
@@ -1198,6 +1254,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    /**
+     * Checks that the class loader is in a valid state for class loading.
+     *
+     * @param className The class being loaded
+     *
+     * @throws ClassNotFoundException If the class loader is not in a valid state
+     */
     protected void checkStateForClassLoading(String className) throws ClassNotFoundException {
         // It is not permitted to load new classes once the web application has
         // been stopped.
@@ -1209,6 +1272,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    /**
+     * Checks that the class loader is in a valid state for resource loading.
+     *
+     * @param resource The resource being loaded
+     *
+     * @throws IllegalStateException If the class loader is not in a valid state
+     */
     protected void checkStateForResourceLoading(String resource) throws IllegalStateException {
         // It is not permitted to load resources once the web application has
         // been stopped.
@@ -1350,10 +1420,22 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     // ------------------------------------------------------ Protected Methods
 
+    /**
+     * Returns the Java SE class loader.
+     *
+     * @return the Java SE class loader
+     */
     protected ClassLoader getJavaseClassLoader() {
         return javaseClassLoader;
     }
 
+    /**
+     * Sets the Java SE class loader.
+     *
+     * @param classLoader The Java SE class loader
+     *
+     * @throws IllegalArgumentException If the class loader is null
+     */
     protected void setJavaseClassLoader(ClassLoader classLoader) {
         if (classLoader == null) {
             throw new IllegalArgumentException(sm.getString("webappClassLoader.javaseClassLoaderNull"));
