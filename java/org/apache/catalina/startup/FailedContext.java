@@ -1170,9 +1170,8 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     /**
      * Adds a valve to this context. This is a no-op for a failed context.
      *
-     * @param valve the valve to add
+     * @param valve the valve to add - ignored
      */
-    @SuppressWarnings("unused")
     public synchronized void addValve(Valve valve) {
         // NO-OP
     }

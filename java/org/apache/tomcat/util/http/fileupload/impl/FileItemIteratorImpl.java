@@ -146,11 +146,11 @@ public class FileItemIteratorImpl implements FileItemIterator {
      * Initializes the multipart stream for processing the request.
      *
      * @param fileUploadBase The file upload base configuration
-     * @param pRequestContext The request context
+     * @param pRequestContext The request context - unused
      * @throws FileUploadException If the request content type is invalid or size exceeds limits
      * @throws IOException If an I/O error occurs
      */
-    protected void init(final FileUploadBase fileUploadBase, @SuppressWarnings("unused") final RequestContext pRequestContext)
+    protected void init(final FileUploadBase fileUploadBase, final RequestContext pRequestContext)
             throws FileUploadException, IOException {
         final String contentType = ctx.getContentType();
         if ((null == contentType)
