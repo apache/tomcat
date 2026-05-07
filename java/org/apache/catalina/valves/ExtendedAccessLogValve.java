@@ -640,17 +640,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 if ("taken".equals(nextToken)) {
                     if (tokenizer.hasSubToken()) {
                         nextToken = tokenizer.getToken();
-                        if ("ns".equals(nextToken)) {
-                            return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                        } else if ("us".equals(nextToken)) {
-                            return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
-                        } else if ("ms".equals(nextToken)) {
-                            return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                        } else if ("fracsec".equals(nextToken)) {
-                            return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                        } else {
-                            return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
-                        }
+                        return new ElapsedTimeElement(nextToken);
                     } else {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
                     }

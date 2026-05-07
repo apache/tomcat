@@ -1684,6 +1684,25 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.style = style;
         }
 
+        /**
+         * Creates a new ElapsedTimeElement that will log the time in the specified style.
+         *
+         * @param styleName The name of the elapsed-time style to use.
+         */
+        public ElapsedTimeElement(String styleName) {
+            if ("ns".equals(styleName)) {
+                this.style = ElapsedTimeElement.Style.NANOSECONDS;
+            } else if ("us".equals(styleName)) {
+                this.style = ElapsedTimeElement.Style.MICROSECONDS;
+            } else if ("ms".equals(styleName)) {
+                this.style = ElapsedTimeElement.Style.MILLISECONDS;
+            } else if ("fracsec".equals(styleName)) {
+                this.style = ElapsedTimeElement.Style.SECONDS_FRACTIONAL;
+            } else {
+                this.style = ElapsedTimeElement.Style.SECONDS;
+            }
+        }
+
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             style.append(buf, time);
@@ -2284,18 +2303,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 't':
                 return new DateAndTimeElement(name);
             case 'T':
-                // ms for milliseconds, us for microseconds, and s for seconds
-                if ("ns".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                } else if ("us".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
-                } else if ("ms".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                } else if ("fracsec".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                } else {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
-                }
+                return new ElapsedTimeElement(name);
             default:
                 return new StringElement("???");
         }
