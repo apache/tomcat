@@ -19,12 +19,19 @@ package org.apache.tomcat.util.net.openssl;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Represents an OpenSSL configuration command with a name-value pair.
+ */
 public class OpenSSLConfCmd implements Serializable {
 
     // Tomcat / Tomcat Native custom commands. Used internally by Tomcat. Not intended for direct use by users.
+     /** Disables OCSP checking. */
     public static final String NO_OCSP_CHECK = "NO_OCSP_CHECK";
+    /** Enables OCSP soft fail mode. */
     public static final String OCSP_SOFT_FAIL = "OCSP_SOFT_FAIL";
+    /** Sets OCSP timeout. */
     public static final String OCSP_TIMEOUT = "OCSP_TIMEOUT";
+    /** Sets OCSP verify flags. */
     public static final String OCSP_VERIFY_FLAGS = "OCSP_VERIFY_FLAGS";
 
     @Serial
@@ -33,26 +40,55 @@ public class OpenSSLConfCmd implements Serializable {
     private String name = null;
     private String value = null;
 
+    /**
+     * Constructs a new OpenSSLConfCmd with no name or value.
+     */
     public OpenSSLConfCmd() {
     }
 
+    /**
+     * Constructs a new OpenSSLConfCmd with the given name and value.
+     *
+     * @param name The command name
+     * @param value The command value
+     */
     public OpenSSLConfCmd(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
+    /**
+     * Returns the command name.
+     *
+     * @return The command name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the command name.
+     *
+     * @param name The command name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the command value.
+     *
+     * @return The command value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Sets the command value.
+     *
+     * @param value The command value
+     */
     public void setValue(String value) {
         this.value = value;
     }

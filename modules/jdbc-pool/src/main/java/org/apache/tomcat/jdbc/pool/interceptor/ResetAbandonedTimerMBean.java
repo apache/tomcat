@@ -16,6 +16,14 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+/**
+ * MBean interface for the ResetAbandonedTimer connection pool interceptor.
+ */
 public interface ResetAbandonedTimerMBean {
+    /**
+     * Reset the abandoned timer for the pooled connection.
+     *
+     * @return True if the timer was reset, false if no connection is associated
+     */
     boolean resetTimer();
 }

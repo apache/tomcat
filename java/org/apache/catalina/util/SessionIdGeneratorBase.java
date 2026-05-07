@@ -31,12 +31,20 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation of {@link SessionIdGenerator} that manages a pool of
+ * {@link SecureRandom} instances for generating session identifiers.
+ */
 public abstract class SessionIdGeneratorBase extends LifecycleBase implements SessionIdGenerator {
 
     private final Log log = LogFactory.getLog(SessionIdGeneratorBase.class); // must not be static
 
     private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
+    /**
+     * The default SecureRandom algorithm. SHA1PRNG if available, otherwise the
+     * platform default.
+     */
     public static final String DEFAULT_SECURE_RANDOM_ALGORITHM;
 
     static {
@@ -70,6 +78,11 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
 
     private String secureRandomProvider = null;
 
+    /**
+     * Construct a new SessionIdGeneratorBase instance.
+     */
+    protected SessionIdGeneratorBase() {
+    }
 
     /** Node identifier when in a cluster. Defaults to the empty string. */
     private String jvmRoute = "";
@@ -150,35 +163,61 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     }
 
 
+    /**
+     * @return the node identifier used when generating session IDs in a clustered environment
+     */
     @Override
     public String getJvmRoute() {
         return jvmRoute;
     }
 
 
+    /**
+     * Set the node identifier used when generating session IDs in a clustered environment.
+     *
+     * @param jvmRoute the node identifier
+     */
     @Override
     public void setJvmRoute(String jvmRoute) {
         this.jvmRoute = jvmRoute;
     }
 
 
+    /**
+     * @return the number of bytes used for a session ID
+     */
     @Override
     public int getSessionIdLength() {
         return sessionIdLength;
     }
 
 
+    /**
+     * Set the number of bytes used for a session ID.
+     *
+     * @param sessionIdLength the number of bytes
+     */
     @Override
     public void setSessionIdLength(int sessionIdLength) {
         this.sessionIdLength = sessionIdLength;
     }
 
+    /**
+     * Generate a new session ID using the configured jvmRoute.
+     *
+     * @return the newly generated session ID
+     */
     @Override
     public String generateSessionId() {
         return generateSessionId(jvmRoute);
     }
 
 
+    /**
+     * Fill the given byte array with random bytes using a pooled {@link SecureRandom} instance.
+     *
+     * @param bytes the byte array to fill with random data
+     */
     protected void getRandomBytes(byte[] bytes) {
 
         SecureRandom random = randoms.poll();

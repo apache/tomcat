@@ -19,7 +19,18 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin for the JSTL {@code <c:param>} tag. This plugin generates code to append URL-encoded
+ * name=value pairs to a URL string.
+ */
 public class Param implements TagPlugin {
+
+    /**
+     * Construct a new {@code Param} instance.
+     */
+    public Param() {
+        // NO-OP
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

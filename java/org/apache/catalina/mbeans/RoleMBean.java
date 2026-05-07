@@ -27,6 +27,13 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class RoleMBean extends BaseModelMBean {
 
+    /**
+     * Create a new RoleMBean instance.
+     */
+    public RoleMBean() {
+        super();
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**

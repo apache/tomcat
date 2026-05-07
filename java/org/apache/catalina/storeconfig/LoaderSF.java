@@ -28,6 +28,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LoaderSF extends StoreFactoryBase {
 
+    /**
+     * Default constructor.
+     */
+    public LoaderSF() {
+    }
+
     private static final Log log = LogFactory.getLog(LoaderSF.class);
 
     @Override

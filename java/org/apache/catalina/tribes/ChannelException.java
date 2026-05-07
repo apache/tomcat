@@ -168,18 +168,41 @@ public class ChannelException extends Exception {
      * Represent a failure to a specific member when a message was sent to more than one member
      */
     public static class FaultyMember {
+        /**
+         * The cause of the failure.
+         */
         protected final Exception cause;
+
+        /**
+         * The member that failed.
+         */
         protected final Member member;
 
+        /**
+         * Construct a FaultyMember with the specified member and cause.
+         *
+         * @param mbr The member that failed
+         * @param x The cause of the failure
+         */
         public FaultyMember(Member mbr, Exception x) {
             this.member = mbr;
             this.cause = x;
         }
 
+        /**
+         * Returns the member that failed.
+         *
+         * @return the member
+         */
         public Member getMember() {
             return member;
         }
 
+        /**
+         * Returns the cause of the failure.
+         *
+         * @return the cause
+         */
         public Exception getCause() {
             return cause;
         }

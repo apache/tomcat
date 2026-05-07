@@ -18,12 +18,34 @@ package org.apache.tomcat.util.net.openssl.ciphers;
 
 import org.apache.tomcat.util.net.Constants;
 
+/**
+ * Represents the SSL/TLS protocol versions supported by OpenSSL.
+ */
 public enum Protocol {
 
+    /**
+     * SSL version 3.
+     */
     SSLv3(Constants.SSL_PROTO_SSLv3),
+
+    /**
+     * SSL version 2.
+     */
     SSLv2(Constants.SSL_PROTO_SSLv2),
+
+    /**
+     * TLS version 1.0.
+     */
     TLSv1(Constants.SSL_PROTO_TLSv1),
+
+    /**
+     * TLS version 1.2.
+     */
     TLSv1_2(Constants.SSL_PROTO_TLSv1_2),
+
+    /**
+     * TLS version 1.3.
+     */
     TLSv1_3(Constants.SSL_PROTO_TLSv1_3);
 
     private final String openSSLName;

@@ -27,6 +27,12 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
  */
 public class OpenSSLConfSF extends StoreFactoryBase {
 
+    /**
+     * Constructs an OpenSSLConfSF.
+     */
+    public OpenSSLConfSF() {
+    }
+
     private static final Set<String> INTERNAL_COMMANDS = Set.of(OpenSSLConfCmd.NO_OCSP_CHECK);
 
     /**

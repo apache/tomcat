@@ -25,10 +25,29 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
+/**
+ * Interceptor that sets a query timeout on every created {@link Statement}.
+ */
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
-    private static Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
+    private static final Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
+
+    /**
+     * Query timeout value in seconds.
+     */
     int timeout = 1;
 
+    /**
+     * Default constructor.
+     */
+    public QueryTimeoutInterceptor() {
+        super();
+    }
+
+    /**
+     * Initializes the {@code queryTimeout} property from the provided configuration map.
+     *
+     * @param properties map of interceptor properties
+     */
     @Override
     public void setProperties(Map<String,InterceptorProperty> properties) {
         super.setProperties(properties);
@@ -38,6 +57,16 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         }
     }
 
+    /**
+     * Sets the query timeout on the created statement if it is a {@link Statement} and the timeout value is positive.
+     *
+     * @param proxy     the actual proxy object
+     * @param method    the method that was called
+     * @param args      the arguments to the method
+     * @param statement the statement that the underlying connection created
+     * @param time      elapsed time in milliseconds
+     * @return the (possibly wrapped) statement object
+     */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         if (statement instanceof Statement && timeout > 0) {
@@ -51,6 +80,9 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         return statement;
     }
 
+    /**
+     * No-op; this interceptor holds no state that requires cleanup on close.
+     */
     @Override
     public void closeInvoked() {
     }

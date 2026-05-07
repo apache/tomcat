@@ -126,15 +126,28 @@ public class RewriteValve extends ValveBase {
     protected ArrayList<String> mapsConfiguration = new ArrayList<>();
 
 
+    /**
+     * Create a new RewriteValve instance.
+     */
     public RewriteValve() {
         super(true);
     }
 
 
+    /**
+     * Get whether the rewrite valve is enabled.
+     *
+     * @return {@code true} if the valve is enabled
+     */
     public boolean getEnabled() {
         return enabled;
     }
 
+    /**
+     * Set whether the rewrite valve is enabled.
+     *
+     * @param enabled {@code true} to enable the valve
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -200,6 +213,13 @@ public class RewriteValve extends ValveBase {
 
     }
 
+    /**
+     * Set the rewrite configuration.
+     *
+     * @param configuration The rewrite configuration string
+     *
+     * @throws Exception if the configuration cannot be parsed
+     */
     public void setConfiguration(String configuration) throws Exception {
         if (containerLog == null) {
             containerLog = LogFactory.getLog(getContainer().getLogName() + ".rewrite");
@@ -213,6 +233,11 @@ public class RewriteValve extends ValveBase {
         parse(new BufferedReader(new StringReader(configuration)));
     }
 
+    /**
+     * Get the rewrite configuration.
+     *
+     * @return The rewrite configuration string
+     */
     public String getConfiguration() {
         StringBuilder buffer = new StringBuilder();
         for (String mapConfiguration : mapsConfiguration) {
@@ -230,6 +255,13 @@ public class RewriteValve extends ValveBase {
         return buffer.toString();
     }
 
+    /**
+     * Parse the rewrite configuration from the given reader.
+     *
+     * @param reader The reader containing the rewrite configuration
+     *
+     * @throws LifecycleException if the configuration cannot be parsed
+     */
     protected void parse(BufferedReader reader) throws LifecycleException {
         List<RewriteRule> rules = new ArrayList<>();
         List<RewriteCond> conditions = new ArrayList<>();

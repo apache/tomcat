@@ -38,6 +38,9 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
     private ObjectName oname = null;
 
+    /**
+     * Default constructor.
+     */
     public ResetAbandonedTimer() {
     }
 

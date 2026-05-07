@@ -38,11 +38,29 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RpcChannel implements ChannelListener {
     private static final Log log = LogFactory.getLog(RpcChannel.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(RpcChannel.class);
 
+    /**
+     * Return the first reply received.
+     */
     public static final int FIRST_REPLY = 1;
+
+    /**
+     * Return replies from a majority of members.
+     */
     public static final int MAJORITY_REPLY = 2;
+
+    /**
+     * Return replies from all members.
+     */
     public static final int ALL_REPLY = 3;
+
+    /**
+     * Do not wait for any reply.
+     */
     public static final int NO_REPLY = 4;
 
     private Channel channel;
@@ -192,6 +210,9 @@ public class RpcChannel implements ChannelListener {
         } // end if
     }
 
+    /**
+     * Remove this channel listener from the channel.
+     */
     public void breakdown() {
         channel.removeChannelListener(this);
     }
@@ -205,34 +226,74 @@ public class RpcChannel implements ChannelListener {
         }
     }
 
+    /**
+     * Get the underlying channel.
+     *
+     * @return the channel
+     */
     public Channel getChannel() {
         return channel;
     }
 
+    /**
+     * Get the RPC callback handler.
+     *
+     * @return the callback
+     */
     public RpcCallback getCallback() {
         return callback;
     }
 
+    /**
+     * Get the RPC identifier.
+     *
+     * @return the RPC ID
+     */
     public byte[] getRpcId() {
         return rpcId;
     }
 
+    /**
+     * Set the underlying channel.
+     *
+     * @param channel the channel
+     */
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
+    /**
+     * Set the RPC callback handler.
+     *
+     * @param callback the callback
+     */
     public void setCallback(RpcCallback callback) {
         this.callback = callback;
     }
 
+    /**
+     * Set the RPC identifier.
+     *
+     * @param rpcId the RPC ID
+     */
     public void setRpcId(byte[] rpcId) {
         this.rpcId = rpcId;
     }
 
+    /**
+     * Get the reply message options.
+     *
+     * @return the reply message options
+     */
     public int getReplyMessageOptions() {
         return replyMessageOptions;
     }
 
+    /**
+     * Set the reply message options.
+     *
+     * @param replyMessageOptions the reply message options
+     */
     public void setReplyMessageOptions(int replyMessageOptions) {
         this.replyMessageOptions = replyMessageOptions;
     }
@@ -241,22 +302,55 @@ public class RpcChannel implements ChannelListener {
      * Class that holds all response.
      */
     public static class RpcCollector {
+        /**
+         * Collected responses.
+         */
         public final ArrayList<Response> responses = new ArrayList<>();
+
+        /**
+         * The collector key.
+         */
         public final RpcCollectorKey key;
+
+        /**
+         * The RPC options.
+         */
         public final int options;
+
+        /**
+         * The destination count.
+         */
         public int destcnt;
 
+        /**
+         * Create a new RpcCollector.
+         *
+         * @param key     The collector key
+         * @param options The RPC options
+         * @param destcnt The destination count
+         */
         public RpcCollector(RpcCollectorKey key, int options, int destcnt) {
             this.key = key;
             this.options = options;
             this.destcnt = destcnt;
         }
 
+        /**
+         * Add a response to the collector.
+         *
+         * @param message The response message
+         * @param sender  The sender of the response
+         */
         public void addResponse(Serializable message, Member sender) {
             Response resp = new Response(sender, message);
             responses.add(resp);
         }
 
+        /**
+         * Check if the collector has received enough responses.
+         *
+         * @return {@code true} if the collector is complete
+         */
         public boolean isComplete() {
             if (destcnt <= 0) {
                 return true;
@@ -286,14 +380,30 @@ public class RpcChannel implements ChannelListener {
             }
         }
 
+        /**
+         * Get the collected responses.
+         *
+         * @return the collected responses
+         */
         public Response[] getResponses() {
             return responses.toArray(new Response[0]);
         }
     }
 
+    /**
+     * Key used to identify an RPC collector.
+     */
     public static class RpcCollectorKey {
+        /**
+         * The unique identifier.
+         */
         final byte[] id;
 
+        /**
+         * Create a new RpcCollectorKey.
+         *
+         * @param id The unique identifier
+         */
         public RpcCollectorKey(byte[] id) {
             this.id = id;
         }

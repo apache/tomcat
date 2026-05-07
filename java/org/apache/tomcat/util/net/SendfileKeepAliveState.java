@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+/**
+ * Defines the keep-alive state of a connection during sendfile processing.
+ */
 public enum SendfileKeepAliveState {
 
     /**

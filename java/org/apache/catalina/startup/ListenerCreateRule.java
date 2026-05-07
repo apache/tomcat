@@ -34,9 +34,21 @@ import org.xml.sax.Attributes;
  */
 public class ListenerCreateRule extends ObjectCreateRule {
 
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(ListenerCreateRule.class);
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(ListenerCreateRule.class);
 
+    /**
+     * Constructor.
+     *
+     * @param className The class name for the listener
+     * @param attributeName The attribute name
+     */
     public ListenerCreateRule(String className, String attributeName) {
         super(className, attributeName);
     }
@@ -69,15 +81,31 @@ public class ListenerCreateRule extends ObjectCreateRule {
         }
     }
 
+    /**
+     * A listener that is optional and may not be available at runtime.
+     */
     public static class OptionalListener implements LifecycleListener {
+        /**
+         * The class name of the listener.
+         */
         protected final String className;
+        /**
+         * The properties of the listener.
+         */
         protected final HashMap<String,String> properties = new HashMap<>();
 
+        /**
+         * Constructor.
+         *
+         * @param className The class name of the listener
+         */
         public OptionalListener(String className) {
             this.className = className;
         }
 
         /**
+         * Return the class name of the listener.
+         *
          * @return the className
          */
         public String getClassName() {

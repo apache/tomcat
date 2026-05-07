@@ -24,7 +24,17 @@ import java.util.Set;
  * they may be added to the ELContext when it is created.
  */
 public interface JspSourceImports {
+    /**
+     * Returns the set of package imports.
+     *
+     * @return the package imports
+     */
     Set<String> getPackageImports();
 
+    /**
+     * Returns the set of class imports.
+     *
+     * @return the class imports
+     */
     Set<String> getClassImports();
 }

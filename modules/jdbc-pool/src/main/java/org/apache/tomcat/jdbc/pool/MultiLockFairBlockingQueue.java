@@ -51,11 +51,19 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
     final AtomicInteger putQueue = new AtomicInteger(0);
     final AtomicInteger pollQueue = new AtomicInteger(0);
 
+    /**
+     * Get the next put index.
+     * @return the next put index
+     */
     public int getNextPut() {
         int idx = Math.abs(putQueue.incrementAndGet()) % LOCK_COUNT;
         return idx;
     }
 
+    /**
+     * Get the next poll index.
+     * @return the next poll index
+     */
     public int getNextPoll() {
         int idx = Math.abs(pollQueue.incrementAndGet()) % LOCK_COUNT;
         return idx;
@@ -407,15 +415,30 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Non cancellable Future used to check and see if a connection has been made available
     //------------------------------------------------------------------
+    /**
+     * Future for an item in the queue.
+     * @param <T> the item type
+     */
     protected class ItemFuture<T> implements Future<T> {
+        /** The item. */
         protected volatile T item = null;
+        /** The latch. */
         protected volatile ExchangeCountDownLatch<T> latch = null;
+        /** Whether cancelled. */
         protected volatile boolean canceled = false;
 
+        /**
+         * Constructor.
+         * @param item the item
+         */
         public ItemFuture(T item) {
             this.item = item;
         }
 
+        /**
+         * Constructor.
+         * @param latch the latch
+         */
         public ItemFuture(ExchangeCountDownLatch<T> latch) {
             this.latch = latch;
         }
@@ -468,14 +491,31 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Count down latch that can be used to exchange information
     //------------------------------------------------------------------
+    /**
+     * Count down latch that can exchange information.
+     * @param <T> the item type
+     */
     protected class ExchangeCountDownLatch<T> extends CountDownLatch {
+        /** The item. */
         protected volatile T item;
+        /**
+         * Constructor.
+         * @param i the count
+         */
         public ExchangeCountDownLatch(int i) {
             super(i);
         }
+        /**
+         * Get the item.
+         * @return the item
+         */
         public T getItem() {
             return item;
         }
+        /**
+         * Set the item.
+         * @param item the item
+         */
         public void setItem(T item) {
             this.item = item;
         }
@@ -484,11 +524,20 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // Iterator safe from concurrent modification exceptions
     //------------------------------------------------------------------
+    /**
+     * Iterator safe from concurrent modification exceptions.
+     */
     protected class FairIterator implements Iterator<E> {
+        /** The elements. */
         E[] elements = null;
+        /** The current index. */
         int index;
+        /** The current element. */
         E element = null;
 
+        /**
+         * Constructor.
+         */
         @SuppressWarnings("unchecked") // Can't create arrays of generic types
         public FairIterator() {
             ArrayList<E> list = new ArrayList<>(MultiLockFairBlockingQueue.this.size());

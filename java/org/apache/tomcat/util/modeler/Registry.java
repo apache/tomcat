@@ -92,6 +92,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Protected constructor for Registry. Use {@link #getRegistry(Object)} to obtain an instance.
+     */
     protected Registry() {
         super();
     }
@@ -143,6 +146,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     }
 
 
+    /**
+     * Disables the registry by replacing it with a no-op implementation. After calling this method,
+     * the registry will not load or process MBean descriptors.
+     */
     public static synchronized void disableRegistry() {
         if (registry == null) {
             registry = new NoDescriptorRegistry();

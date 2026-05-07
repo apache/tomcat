@@ -28,22 +28,64 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class MappingData {
 
+    /**
+     * Default constructor.
+     */
+    public MappingData() {
+    }
+
+    /**
+     * The mapped host.
+     */
     public Host host = null;
+    /**
+     * The mapped context.
+     */
     public Context context = null;
+    /**
+     * The number of slashes in the context path.
+     */
     public int contextSlashCount = 0;
+    /**
+     * The mapped contexts.
+     */
     public Context[] contexts = null;
+    /**
+     * The mapped wrapper.
+     */
     public Wrapper wrapper = null;
+    /**
+     * Whether this is a JSP wildcard mapping.
+     */
     public boolean jspWildCard = false;
 
+    /**
+     * The request path.
+     */
     public final MessageBytes requestPath = MessageBytes.newInstance();
+    /**
+     * The wrapper path.
+     */
     public final MessageBytes wrapperPath = MessageBytes.newInstance();
+    /**
+     * The path info.
+     */
     public final MessageBytes pathInfo = MessageBytes.newInstance();
 
+    /**
+     * The redirect path.
+     */
     public final MessageBytes redirectPath = MessageBytes.newInstance();
 
     // Fields used by ApplicationMapping to implement jakarta.servlet.http.HttpServletMapping
+    /**
+     * The match type.
+     */
     public MappingMatch matchType = null;
 
+    /**
+     * Recycle this mapping data for reuse.
+     */
     public void recycle() {
         host = null;
         context = null;

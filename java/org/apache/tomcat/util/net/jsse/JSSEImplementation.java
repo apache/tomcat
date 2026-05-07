@@ -26,8 +26,14 @@ import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
 
+/**
+ * JSSE-based SSL implementation.
+ */
 public class JSSEImplementation extends SSLImplementation {
 
+    /**
+     * Default constructor.
+     */
     public JSSEImplementation() {
         // Make sure the keySizeCache is loaded now as part of connector startup
         // else the cache will be populated on first use which will slow that

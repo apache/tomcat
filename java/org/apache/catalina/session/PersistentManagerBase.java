@@ -41,6 +41,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public abstract class PersistentManagerBase extends ManagerBase implements StoreManager {
 
+    /**
+     * Construct a new {@code PersistentManagerBase} instance.
+     */
+    public PersistentManagerBase() {
+        // NO-OP
+    }
+
     private final Log log = LogFactory.getLog(PersistentManagerBase.class); // must not be static
 
 
@@ -148,6 +155,9 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
+     * Returns the maximum time in seconds a session may be idle before it is eligible to be swapped to disk due to
+     * inactivity.
+     *
      * @return The maximum time in seconds a session may be idle before it is eligible to be swapped to disk due to
      *             inactivity. A value of {@code -1} means sessions should not be swapped out just because of
      *             inactivity.
@@ -175,6 +185,9 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
+     * Returns the minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
+     * the active session count below maxActiveSessions.
+     *
      * @return The minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
      *             the active session count below maxActiveSessions. A value of {@code -1} means sessions will not be
      *             swapped out to keep the active session count down.

@@ -94,7 +94,9 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * @return the locked state of this parameter map.
+     * Return the locked state of this parameter map.
+     *
+     * @return the locked state of this parameter map
      */
     public boolean isLocked() {
         return this.locked;

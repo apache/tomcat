@@ -89,6 +89,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
         super();
     }
 
+    /**
+     * Sets the maximum number of queries to track statistics for.
+     *
+     * @param maxQueries the maximum number of queries
+     */
     public void setMaxQueries(int maxQueries) {
         this.maxQueries = maxQueries;
     }
@@ -147,6 +152,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
         // NOOP
     }
 
+    /**
+     * Tracks the preparation time for a prepared statement.
+     *
+     * @param sql the SQL statement
+     * @param time the time taken to prepare the statement
+     */
     @Override
     public void prepareStatement(String sql, long time) {
         if (this.maxQueries > 0 ) {
@@ -157,6 +168,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    /**
+     * Tracks the preparation time for a callable statement.
+     *
+     * @param sql the SQL call
+     * @param time the time taken to prepare the call
+     */
     @Override
     public void prepareCall(String sql, long time) {
         if (this.maxQueries > 0 ) {
@@ -167,6 +184,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    /**
+     * Initializes the query statistics map for the given connection pool.
+     *
+     * @param pool the connection pool that has started
+     */
     @Override
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
@@ -184,12 +206,23 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    /**
+     * Removes the query statistics map for the given connection pool.
+     *
+     * @param pool the connection pool that has been closed
+     */
     @Override
     public void poolClosed(ConnectionPool pool) {
         perPoolStats.remove(pool.getName());
         super.poolClosed(pool);
     }
 
+    /**
+     * Retrieves or creates a QueryStats entry for the given SQL string.
+     *
+     * @param sql the SQL query string
+     * @return the query statistics, or {@code null} if the pool has been closed
+     */
     protected QueryStats getQueryStats(String sql) {
         if (sql==null) {
             sql = "";
@@ -235,6 +268,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
 
+    /**
+     * Resets the query statistics reference when a connection is reset.
+     *
+     * @param parent the connection pool
+     * @param con the pooled connection being reset
+     */
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
@@ -246,22 +285,48 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
 
+    /**
+     * Returns whether slow query logging is enabled.
+     *
+     * @return {@code true} if slow query logging is enabled
+     */
     public boolean isLogSlow() {
         return logSlow;
     }
 
+    /**
+     * Enables or disables slow query logging.
+     *
+     * @param logSlow {@code true} to enable slow query logging
+     */
     public void setLogSlow(boolean logSlow) {
         this.logSlow = logSlow;
     }
 
+    /**
+     * Returns whether failed query logging is enabled.
+     *
+     * @return {@code true} if failed query logging is enabled
+     */
     public boolean isLogFailed() {
         return logFailed;
     }
 
+    /**
+     * Enables or disables failed query logging.
+     *
+     * @param logFailed {@code true} to enable failed query logging
+     */
     public void setLogFailed(boolean logFailed) {
         this.logFailed = logFailed;
     }
 
+    /**
+     * Configures this interceptor from the given properties map, supporting
+     * threshold, maxQueries, logSlow, and logFailed settings.
+     *
+     * @param properties the interceptor properties
+     */
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
@@ -288,6 +353,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
 
+    /**
+     * Holds timing and invocation statistics for a single SQL query.
+     */
     public static class QueryStats {
         static final String[] FIELD_NAMES = new String[] {
             "query",
@@ -343,14 +411,29 @@ public class SlowQueryReport extends AbstractQueryReport  {
         private volatile long prepareTime;
         private volatile long lastInvocation = 0;
 
+        /**
+         * Returns the names of the fields in the composite data representation.
+         *
+         * @return the field names
+         */
         public static String[] getFieldNames() {
             return FIELD_NAMES;
         }
 
+        /**
+         * Returns the descriptions of the fields in the composite data representation.
+         *
+         * @return the field descriptions
+         */
         public static String[] getFieldDescriptions() {
             return FIELD_DESCRIPTIONS;
         }
 
+        /**
+         * Returns the JMX OpenType of each field in the composite data representation.
+         *
+         * @return the field types
+         */
         public static OpenType<?>[] getFieldTypes() {
             return FIELD_TYPES;
         }
@@ -386,6 +469,13 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return buf.toString();
         }
 
+        /**
+         * Returns the query statistics as JMX CompositeData.
+         *
+         * @param type the composite type definition
+         * @return the composite data representation of this query's statistics
+         * @throws OpenDataException if the data cannot be converted
+         */
         public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException{
             Object[] values = new Object[] {
                     query,
@@ -403,16 +493,32 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return new CompositeDataSupport(type,FIELD_NAMES,values);
         }
 
+        /**
+         * Creates a new QueryStats instance for the given SQL query.
+         *
+         * @param query the SQL query string
+         */
         public QueryStats(String query) {
             this.query = query;
         }
 
+        /**
+         * Records the time taken to prepare this query.
+         *
+         * @param invocationTime the time in milliseconds to prepare the query
+         */
         public synchronized void prepare(long invocationTime) {
             prepareCount++;
             prepareTime+=invocationTime;
 
         }
 
+        /**
+         * Records a successful query invocation, updating min/max/total timing statistics.
+         *
+         * @param invocationTime the time in milliseconds the query took
+         * @param now the current timestamp in milliseconds
+         */
         public synchronized void add(long invocationTime, long now) {
             maxInvocationTime = Math.max(invocationTime, maxInvocationTime);
             if (maxInvocationTime == invocationTime) {
@@ -427,36 +533,77 @@ public class SlowQueryReport extends AbstractQueryReport  {
             lastInvocation = now;
         }
 
+        /**
+         * Records a failed query invocation, updating timing statistics and failure count.
+         *
+         * @param invocationTime the time in milliseconds the query took before failing
+         * @param now the current timestamp in milliseconds
+         */
         public synchronized void failure(long invocationTime, long now) {
             add(invocationTime,now);
             failures++;
 
         }
 
+        /**
+         * Returns the SQL query string for these statistics.
+         *
+         * @return the SQL query string
+         */
         public String getQuery() {
             return query;
         }
 
+        /**
+         * Returns the total number of times this query has been invoked.
+         *
+         * @return the number of invocations
+         */
         public int getNrOfInvocations() {
             return nrOfInvocations;
         }
 
+        /**
+         * Returns the longest time this query took to execute.
+         *
+         * @return the maximum invocation time in milliseconds
+         */
         public long getMaxInvocationTime() {
             return maxInvocationTime;
         }
 
+        /**
+         * Returns the timestamp when the longest query execution occurred.
+         *
+         * @return the timestamp in milliseconds of the maximum invocation
+         */
         public long getMaxInvocationDate() {
             return maxInvocationDate;
         }
 
+        /**
+         * Returns the shortest time this query took to execute.
+         *
+         * @return the minimum invocation time in milliseconds
+         */
         public long getMinInvocationTime() {
             return minInvocationTime;
         }
 
+        /**
+         * Returns the timestamp when the shortest query execution occurred.
+         *
+         * @return the timestamp in milliseconds of the minimum invocation
+         */
         public long getMinInvocationDate() {
             return minInvocationDate;
         }
 
+        /**
+         * Returns the total time spent executing this query across all invocations.
+         *
+         * @return the total invocation time in milliseconds
+         */
         public long getTotalInvocationTime() {
             return totalInvocationTime;
         }
@@ -475,18 +622,30 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return false;
         }
 
+        /**
+         * Returns whether this query was last invoked before the given query stats.
+         *
+         * @param other the other query statistics to compare against
+         * @return {@code true} if this query's last invocation is older
+         */
         public boolean isOlderThan(QueryStats other) {
             return this.lastInvocation < other.lastInvocation;
         }
     }
 
     /**
-     * Compare QueryStats by their lastInvocation value. QueryStats that have
-     * never been updated, have a lastInvocation value of {@code 0} which should
-     * be handled as the newest possible invocation.
+     * Compares QueryStats by their lastInvocation value. QueryStats that have
+     * never been updated have a lastInvocation value of {@code 0} which is
+     * treated as the newest possible invocation.
      */
     // Public for unit tests
     public static class QueryStatsComparator implements Comparator<QueryStats> {
+
+        /**
+         * Creates a new QueryStatsComparator.
+         */
+        public QueryStatsComparator() {
+        }
 
         @Override
         public int compare(QueryStats stats1, QueryStats stats2) {

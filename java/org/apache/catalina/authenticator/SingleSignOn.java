@@ -91,6 +91,9 @@ public class SingleSignOn extends ValveBase {
 
     // ------------------------------------------------------ Constructor
 
+    /**
+     * Creates a new SingleSignOn valve.
+     */
     public SingleSignOn() {
         super(true);
     }
@@ -508,6 +511,12 @@ public class SingleSignOn extends ValveBase {
     }
 
 
+    /**
+     * Populates the request with the authentication data from the SSO entry.
+     *
+     * @param request the request to populate
+     * @param ssoId the SSO identifier
+     */
     protected void populateRequestFromSsoEntry(Request request, String ssoId) {
         SingleSignOnEntry entry = cache.get(ssoId);
         if (entry != null) {
@@ -659,6 +668,13 @@ public class SingleSignOn extends ValveBase {
         engine = null;
     }
 
+    /**
+     * Handles a session ID change by updating the SSO entry to track the new session ID.
+     *
+     * @param ssoId the SSO identifier
+     * @param session the session with the new ID
+     * @param oldSessionId the previous session ID
+     */
     protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
         if (containerLog.isDebugEnabled()) {
             containerLog.debug(sm.getString("singleSignOn.debug.sessionChangedId", session, oldSessionId, ssoId));

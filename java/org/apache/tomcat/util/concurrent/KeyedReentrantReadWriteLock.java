@@ -43,6 +43,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class KeyedReentrantReadWriteLock {
 
+    /**
+     * Default constructor.
+     */
+    public KeyedReentrantReadWriteLock() {
+    }
+
     private final Map<String,CountedLock> locksMap = new HashMap<>();
 
 

@@ -18,6 +18,15 @@ package org.apache.tomcat.util.net;
 
 import jakarta.servlet.ServletConnection;
 
+/**
+ * Implementation of {@link ServletConnection} that provides connection metadata
+ * such as connection ID, protocol, and security status.
+ *
+ * @param connectionId the unique identifier for this connection
+ * @param protocol the protocol used for this connection
+ * @param protocolConnectionId the protocol-specific connection identifier
+ * @param secure whether this connection is secure
+ */
 public record ServletConnectionImpl(String connectionId, String protocol, String protocolConnectionId, boolean secure)
         implements ServletConnection {
     @Override

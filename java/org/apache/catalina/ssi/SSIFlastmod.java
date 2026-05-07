@@ -30,6 +30,15 @@ import org.apache.tomcat.util.res.StringManager;
 public final class SSIFlastmod implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFlastmod.class);
 
+    /**
+     * Default constructor.
+     */
+    public SSIFlastmod() {
+    }
+
+    /**
+     * Processes the flastmod directive to output the last modified date of a file.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

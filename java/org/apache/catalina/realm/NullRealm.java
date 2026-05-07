@@ -24,6 +24,12 @@ import java.security.Principal;
  */
 public class NullRealm extends RealmBase {
 
+    /**
+     * Constructs a new NullRealm.
+     */
+    public NullRealm() {
+    }
+
     @Override
     protected String getPassword(String username) {
         // Always return null

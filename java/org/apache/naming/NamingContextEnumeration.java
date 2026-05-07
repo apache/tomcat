@@ -31,6 +31,11 @@ public class NamingContextEnumeration implements NamingEnumeration<NameClassPair
     // ----------------------------------------------------------- Constructors
 
 
+    /**
+     * Creates a new context enumeration.
+     *
+     * @param entries The iterator of naming entries
+     */
     public NamingContextEnumeration(Iterator<NamingEntry> entries) {
         iterator = entries;
     }

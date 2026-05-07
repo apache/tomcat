@@ -36,15 +36,29 @@ import org.apache.juli.logging.LogFactory;
 public class ObjectReader {
 
     private static final Log log = LogFactory.getLog(ObjectReader.class);
+    /**
+     * String manager for internationalization.
+     */
     protected static final StringManager sm = StringManager.getManager(ObjectReader.class);
 
     private XByteBuffer buffer;
 
+    /**
+     * Timestamp of the last access.
+     */
     protected long lastAccess = System.currentTimeMillis();
 
+    /**
+     * Whether this reader is currently being accessed.
+     */
     protected boolean accessed = false;
     private volatile boolean cancelled;
 
+    /**
+     * Creates an ObjectReader with the specified packet size.
+     *
+     * @param packetSize The initial packet buffer size
+     */
     public ObjectReader(int packetSize) {
         this.buffer = new XByteBuffer(packetSize, true);
     }
@@ -74,16 +88,27 @@ public class ObjectReader {
         }
     }
 
+    /**
+     * Marks this reader as being accessed.
+     */
     public synchronized void access() {
         this.accessed = true;
         this.lastAccess = System.currentTimeMillis();
     }
 
+    /**
+     * Marks this reader as no longer being accessed.
+     */
     public synchronized void finish() {
         this.accessed = false;
         this.lastAccess = System.currentTimeMillis();
     }
 
+    /**
+     * Checks if this reader is currently being accessed.
+     *
+     * @return true if the reader is being accessed
+     */
     public synchronized boolean isAccessed() {
         return this.accessed;
     }
@@ -108,6 +133,15 @@ public class ObjectReader {
         return pkgCnt;
     }
 
+    /**
+     * Appends new bytes to the buffer.
+     *
+     * @param data The byte array
+     * @param off The offset in the array
+     * @param len The length of data
+     * @param count Whether to count packages
+     * @return Number of messages sent to callback, or -1 if count is false
+     */
     public int append(byte[] data, int off, int len, boolean count) {
         buffer.append(data, off, len);
         int pkgCnt = -1;
@@ -136,11 +170,21 @@ public class ObjectReader {
         return result;
     }
 
+    /**
+     * Returns the current buffer size.
+     *
+     * @return The buffer length
+     */
     public int bufferSize() {
         return buffer.getLength();
     }
 
 
+    /**
+     * Checks if there is a complete package available.
+     *
+     * @return true if a complete package exists
+     */
     public boolean hasPackage() {
         return buffer.countPackages(true) > 0;
     }
@@ -154,22 +198,45 @@ public class ObjectReader {
         return buffer.countPackages();
     }
 
+    /**
+     * Closes this reader and releases the buffer.
+     */
     public void close() {
         this.buffer = null;
     }
 
+    /**
+     * Returns the timestamp of the last access.
+     *
+     * @return The last access timestamp
+     */
     public synchronized long getLastAccess() {
         return lastAccess;
     }
 
+    /**
+     * Checks if this reader has been cancelled.
+     *
+     * @return true if cancelled
+     */
     public boolean isCancelled() {
         return cancelled;
     }
 
+    /**
+     * Sets the timestamp of the last access.
+     *
+     * @param lastAccess The last access timestamp
+     */
     public synchronized void setLastAccess(long lastAccess) {
         this.lastAccess = lastAccess;
     }
 
+    /**
+     * Sets the cancelled state of this reader.
+     *
+     * @param cancelled The cancelled state
+     */
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }

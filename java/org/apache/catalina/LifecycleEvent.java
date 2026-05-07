@@ -55,7 +55,9 @@ public final class LifecycleEvent extends EventObject {
 
 
     /**
-     * @return the event data of this event.
+     * Returns the event data of this event.
+     *
+     * @return the event data
      */
     public Object getData() {
         return data;
@@ -63,7 +65,9 @@ public final class LifecycleEvent extends EventObject {
 
 
     /**
-     * @return the Lifecycle on which this event occurred.
+     * Returns the Lifecycle on which this event occurred.
+     *
+     * @return the lifecycle
      */
     public Lifecycle getLifecycle() {
         return (Lifecycle) getSource();
@@ -71,7 +75,9 @@ public final class LifecycleEvent extends EventObject {
 
 
     /**
-     * @return the event type of this event.
+     * Returns the event type of this event.
+     *
+     * @return the event type
      */
     public String getType() {
         return this.type;

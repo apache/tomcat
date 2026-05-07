@@ -18,23 +18,40 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import org.apache.tomcat.util.bcel.Const;
 
+/**
+ * Represents a simple element value in an annotation, where the value is a primitive type or String
+ * referenced by an index in the constant pool.
+ */
 public class SimpleElementValue extends ElementValue {
     private final int index;
 
+    /**
+     * Creates a new SimpleElementValue.
+     *
+     * @param type the type of the element value
+     * @param index the index of the value in the constant pool
+     * @param cpool the constant pool
+     */
     SimpleElementValue(final int type, final int index, final ConstantPool cpool) {
         super(type, cpool);
         this.index = index;
     }
 
     /**
-     * @return Value entry index in the constant pool.
+     * Returns the constant pool index of this element value.
+     *
+     * @return the constant pool index
      */
     public int getIndex() {
         return index;
     }
 
 
-    // Whatever kind of value it is, return it as a string
+    /**
+     * Returns the string representation of this element value based on its type.
+     *
+     * @return the string representation of the value
+     */
     @Override
     public String stringifyValue() {
         final ConstantPool cpool = super.getConstantPool();

@@ -26,6 +26,9 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
+/**
+ * Holds a POJO instance for use as a WebSocket client endpoint.
+ */
 public class PojoHolder implements ClientEndpointHolder {
 
     private static final StringManager sm = StringManager.getManager(PojoHolder.class);
@@ -33,7 +36,12 @@ public class PojoHolder implements ClientEndpointHolder {
     private final Object pojo;
     private final ClientEndpointConfig clientEndpointConfig;
 
-
+    /**
+     * Constructs a new PojoHolder.
+     *
+     * @param pojo the POJO instance annotated with {@code @ClientEndpoint}
+     * @param clientEndpointConfig the client endpoint configuration
+     */
     public PojoHolder(Object pojo, ClientEndpointConfig clientEndpointConfig) {
         this.pojo = pojo;
         this.clientEndpointConfig = clientEndpointConfig;

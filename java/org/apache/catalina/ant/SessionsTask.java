@@ -23,16 +23,41 @@ import org.apache.tools.ant.BuildException;
  */
 public class SessionsTask extends AbstractCatalinaCommandTask {
 
+    /**
+     * Default constructor.
+     */
+    public SessionsTask() {
+    }
+
+    /**
+     * Minimum idle time in seconds for sessions to be included in the response.
+     */
     protected String idle = null;
 
+    /**
+     * Returns the minimum idle time in seconds for sessions to be included.
+     *
+     * @return the minimum idle time
+     */
     public String getIdle() {
         return this.idle;
     }
 
+    /**
+     * Sets the minimum idle time in seconds for sessions to be included.
+     *
+     * @param idle the minimum idle time
+     */
     public void setIdle(String idle) {
         this.idle = idle;
     }
 
+    /**
+     * Appends the idle parameter to the query string if both path and idle are set.
+     *
+     * @param command the command being executed
+     * @return the query string buffer
+     */
     @Override
     public StringBuilder createQueryString(String command) {
         StringBuilder buffer = super.createQueryString(command);

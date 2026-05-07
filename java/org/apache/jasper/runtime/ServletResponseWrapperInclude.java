@@ -38,6 +38,11 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
 
     private final JspWriter jspWriter;
 
+    /**
+     * Creates a new response wrapper for include operations.
+     * @param response the servlet response
+     * @param jspWriter the JSP writer
+     */
     public ServletResponseWrapperInclude(ServletResponse response, JspWriter jspWriter) {
         super((HttpServletResponse) response);
         this.printWriter = new PrintWriter(jspWriter);

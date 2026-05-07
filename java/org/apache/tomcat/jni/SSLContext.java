@@ -20,8 +20,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * JNI bindings for OpenSSL SSL_CTX operations.
+ */
 public final class SSLContext {
 
+    /**
+     * Default constructor. This class provides only static methods.
+     */
+    public SSLContext() {
+        super();
+    }
+
+    /**
+     * Default session ID context value.
+     */
     public static final byte[] DEFAULT_SESSION_ID_CONTEXT = new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' };
 
     /**
@@ -249,28 +262,114 @@ public final class SSLContext {
     /*
      * Session resumption statistics methods. http://www.openssl.org/docs/ssl/SSL_CTX_sess_number.html
      */
+
+    /**
+     * Returns the total number of session attempts accepted by the server.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of accepted sessions
+     */
     public static native long sessionAccept(long ctx);
 
+    /**
+     * Returns the number of sessions actually reused on the server side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of good session accepts
+     */
     public static native long sessionAcceptGood(long ctx);
 
+    /**
+     * Returns the number of session renegotiations on the server side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session renegotiations accepted
+     */
     public static native long sessionAcceptRenegotiate(long ctx);
 
+    /**
+     * Returns the number of times the session cache grew to the maximum allowed size and therefore further entries
+     * could not be inserted.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of times the session cache was full
+     */
     public static native long sessionCacheFull(long ctx);
 
+    /**
+     * Returns the number of sessions that were resumed by the callback.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session callback hits
+     */
     public static native long sessionCbHits(long ctx);
 
+    /**
+     * Returns the total number of session connection attempts by the client.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session connects
+     */
     public static native long sessionConnect(long ctx);
 
+    /**
+     * Returns the number of sessions that were actually reused on the client side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of good session connects
+     */
     public static native long sessionConnectGood(long ctx);
 
+    /**
+     * Returns the number of session renegotiations on the client side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session renegotiations connected
+     */
     public static native long sessionConnectRenegotiate(long ctx);
 
+    /**
+     * Returns the number of sessions that were actually reused (hits).
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session hits
+     */
     public static native long sessionHits(long ctx);
 
+    /**
+     * Returns the number of sessions that were not found in the cache (misses).
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session misses
+     */
     public static native long sessionMisses(long ctx);
 
+    /**
+     * Returns the total number of sessions currently in the cache.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The total number of sessions
+     */
     public static native long sessionNumber(long ctx);
 
+    /**
+     * Returns the number of sessions that have timed out.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session timeouts
+     */
     public static native long sessionTimeouts(long ctx);
 
     /**

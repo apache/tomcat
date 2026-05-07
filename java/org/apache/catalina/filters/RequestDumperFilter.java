@@ -50,6 +50,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RequestDumperFilter extends GenericFilter {
 
+    /**
+     * Default constructor.
+     */
+    public RequestDumperFilter() {
+        super();
+    }
+
     @Serial
     private static final long serialVersionUID = 1L;
 
