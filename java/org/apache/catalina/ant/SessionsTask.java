@@ -68,11 +68,6 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
         return buffer;
     }
 
-    /**
-     * Execute the requested operation.
-     *
-     * @exception BuildException if an error occurs
-     */
     @Override
     public void execute() throws BuildException {
 
