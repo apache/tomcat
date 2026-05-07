@@ -126,7 +126,7 @@
         <code>OpenSSLLifecycleListener</code> to avoid stack traces
         when <code>libssl.so</code> is not present and to align the behavior
         of the <code>isAvailable()</code> check with the
-        <code>AprLifecycleListener<code> and gracefully fail when natives
+        <code>AprLifecycleListener</code> and gracefully fail when natives
         are not present. (csutherl)
       </fix>
       <add>
