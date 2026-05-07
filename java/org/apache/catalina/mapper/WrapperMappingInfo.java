@@ -26,14 +26,7 @@ import org.apache.catalina.Wrapper;
  * @param jspWildCard  Is this a mapping for JSP files?
  * @param resourceOnly Is this a resource only mapping?
  */
-public record WrapperMappingInfo(
-        // @fmt:off
-        String    mapping,    // The URL pattern
-        Wrapper   wrapper,    // The wrapper for the Servlet
-        boolean   jspWildCard,    // Is this a mapping for JSP files
-        boolean   resourceOnly // Is this a resource only mapping
-        // @fmt:on
-) {
+public record WrapperMappingInfo(String mapping, Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
 
     /**
      * Returns the URL pattern.
