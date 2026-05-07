@@ -29,6 +29,7 @@ import jakarta.websocket.server.ServerEndpointConfig;
 /**
  * Default implementation of {@link ServerEndpointConfig.Configurator} for WebSocket server endpoints.
  */
+@SuppressWarnings("javadoc") // Eclipse bug - the Javadoc is fine
 @aQute.bnd.annotation.spi.ServiceProvider(value = ServerEndpointConfig.Configurator.class)
 public class DefaultServerEndpointConfigurator extends ServerEndpointConfig.Configurator {
 
