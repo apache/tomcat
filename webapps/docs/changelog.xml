@@ -163,6 +163,13 @@
         always return <code>null</code> if the provided name starts with
         <code>/</code>. (markt)
       </fix>
+      <fix>
+        Update <code>StoreRegistry</code> to dynamically load optional clustering
+        classes rather than statically referencing them. This matches the pattern
+        used in <code>Catalina.addClusterRuleSet()</code> and prevents
+        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
+        is configured but clustering classes are not available. (csutherl)
+      </fix>
       <update>
         Update the default value for the <code>allowPostAsGet</code>
         initialisation parameter of the Default servlet from <code>true</code>
