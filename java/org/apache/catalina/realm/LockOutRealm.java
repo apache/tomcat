@@ -222,9 +222,7 @@ public class LockOutRealm extends CombinedRealm {
      * @return true if the user is locked, false otherwise
      */
     public boolean isLocked(String username) {
-        if (!getCaseSensitive()) {
-            username = username.toLowerCase(Locale.ROOT);
-        }
+        username = normalizeUsername(username);
         LockRecord lockRecord;
         synchronized (this) {
             lockRecord = failedUsers.get(username);
@@ -247,11 +245,8 @@ public class LockOutRealm extends CombinedRealm {
      * After successful authentication, any record of previous authentication failure is removed.
      */
     private synchronized void registerAuthSuccess(String username) {
-        if (!getCaseSensitive()) {
-            username = username.toLowerCase(Locale.ROOT);
-        }
         // Successful authentication means removal from the list of failed users
-        failedUsers.remove(username);
+        failedUsers.remove(normalizeUsername(username));
     }
 
 
@@ -259,9 +254,7 @@ public class LockOutRealm extends CombinedRealm {
      * After a failed authentication, add the record of the failed authentication.
      */
     private void registerAuthFailure(String username) {
-        if (!getCaseSensitive()) {
-            username = username.toLowerCase(Locale.ROOT);
-        }
+        username = normalizeUsername(username);
         LockRecord lockRecord;
         synchronized (this) {
             if (!failedUsers.containsKey(username)) {
@@ -380,6 +373,14 @@ public class LockOutRealm extends CombinedRealm {
      */
     public void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
+    }
+
+
+    private String normalizeUsername(String username) {
+        if (username != null && !getCaseSensitive()) {
+            return username.toLowerCase(Locale.ROOT);
+        }
+        return username;
     }
 
 
