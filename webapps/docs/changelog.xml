@@ -363,6 +363,10 @@
       <update>
         Update Commons Daemon to 1.6.0. (markt)
       </update>
+      <fix>
+        Prevent duplicate log messages when clustering JARs are not present on
+        startup. (csutherl)
+      </fix>
     </changelog>
   </subsection>
 </section>
