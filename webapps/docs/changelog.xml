@@ -120,6 +120,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Manager: Add checks to ensure that any uploaded files are uploaded to
+        the expected location. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.55 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
