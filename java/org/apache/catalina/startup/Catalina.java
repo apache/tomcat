@@ -130,6 +130,12 @@ public class Catalina {
 
 
     /**
+     * Prevent duplicate log lines when clustering is unavailable.
+     */
+    protected boolean clusterUnavailabilityLogged = false;
+
+
+    /**
      * Rethrow exceptions on init failure.
      */
     protected boolean throwOnInitFailure = Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE");
@@ -597,10 +603,13 @@ public class Catalina {
             RuleSet ruleSet = (RuleSet) constructor.newInstance(prefix);
             digester.addRuleSet(ruleSet);
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()), e);
-            } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()));
+            if (!clusterUnavailabilityLogged) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()), e);
+                } else if (log.isInfoEnabled()) {
+                    log.info(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()));
+                }
+                clusterUnavailabilityLogged = true;
             }
         }
     }

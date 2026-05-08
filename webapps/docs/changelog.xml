@@ -114,6 +114,10 @@
         Add support for literal <code>'%'</code> characters in access log
         output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
       </add>
+      <fix>
+        Prevent duplicate log messages when clustering JARs are not present on
+        startup. (csutherl)
+      </fix>
     </changelog>
   </subsection>
 </section>
