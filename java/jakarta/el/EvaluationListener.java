@@ -17,9 +17,19 @@
 package jakarta.el;
 
 /**
+ * Listener interface for monitoring EL expression evaluation events. Implementations can track when expressions are
+ * evaluated and when properties are resolved during evaluation. Register an instance with an {@link ELContext} using
+ * {@link ELContext#addEvaluationListener(EvaluationListener)}.
+ *
  * @since EL 3.0
  */
 public abstract class EvaluationListener {
+
+    /**
+     * Constructs an EvaluationListener.
+     */
+    public EvaluationListener() {
+    }
 
     /**
      * Fired before the evaluation of the expression.

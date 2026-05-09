@@ -16,22 +16,49 @@
  */
 package jakarta.el;
 
+/**
+ * Exception thrown when an EL expression attempts to write to a read-only property.
+ * <p>
+ * This exception is raised during setValue operations when the target property
+ * exists but cannot be modified.
+ *
+ * @since EL 2.1
+ */
 public class PropertyNotWritableException extends ELException {
 
     private static final long serialVersionUID = 827987155471214717L;
 
+    /**
+     * Constructs a new instance with no detail message or cause.
+     */
     public PropertyNotWritableException() {
         super();
     }
 
+    /**
+     * Constructs a new instance with the specified detail message and no cause.
+     *
+     * @param message the detail message
+     */
     public PropertyNotWritableException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new instance with the specified cause and no detail message.
+     *
+     * @param cause the underlying cause
+     */
     public PropertyNotWritableException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new instance with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the underlying cause
+     */
     public PropertyNotWritableException(String message, Throwable cause) {
         super(message, cause);
     }

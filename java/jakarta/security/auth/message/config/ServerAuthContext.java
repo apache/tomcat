@@ -18,5 +18,12 @@ package jakarta.security.auth.message.config;
 
 import jakarta.security.auth.message.ServerAuth;
 
+/**
+ * Provides server-side authentication of requests and response signing.
+ * <p>
+ * This interface extends {@link ServerAuth} and is obtained from a
+ * {@link ServerAuthConfig}. It is used by the container to authenticate
+ * incoming requests and secure outgoing responses.
+ */
 public interface ServerAuthContext extends ServerAuth {
 }

@@ -33,18 +33,26 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Generated {
     /**
-     * @return The name of the code generator. It is recommended that the fully qualified name of the code generator is
-     *             used.
+     * Specifies the name(s) of the tool(s) that generated the annotated element.
+     * It is recommended that the fully qualified name of the code generator is used.
+     *
+     * @return the array of code generator names
      */
     String[] value();
 
     /**
-     * @return The date the code was generated
+     * Specifies the date and time when the code was generated, typically in
+     * ISO 8601 format. An empty string indicates the date is not specified.
+     *
+     * @return the code generation date, or an empty string if not specified
      */
     String date() default "";
 
     /**
-     * @return Additional comments (if any) related to the code generation
+     * Provides additional comments or metadata related to the code generation
+     * process, such as version information or configuration details.
+     *
+     * @return additional comments about the code generation, or an empty string if none
      */
     String comments() default "";
 }

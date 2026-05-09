@@ -23,6 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Indicates that all authenticated users are permitted to access the annotated
+ * enterprise bean or business method. When applied at the class level, any
+ * authenticated user may invoke any business method of the bean. When applied
+ * at the method level, the specified method is accessible to all authenticated
+ * users. This annotation takes precedence over {@link RolesAllowed}.
+ *
  * @since Common Annotations 1.0
  */
 @Documented

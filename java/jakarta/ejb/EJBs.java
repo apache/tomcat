@@ -21,9 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Groups multiple {@link EJB} annotations on a single declaration. Use this annotation when a class has dependencies
+ * on more than one enterprise bean.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface EJBs {
+
+    /**
+     * The array of EJB annotations.
+     *
+     * @return the EJB annotations
+     */
     EJB[] value();
 }

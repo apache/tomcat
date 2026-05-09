@@ -19,24 +19,47 @@ package jakarta.el;
 import java.io.Serializable;
 
 /**
+ * Holds a reference to a resolved property, consisting of a base object and a property identifier. This class is
+ * used to capture the result of property resolution during EL evaluation, allowing the caller to perform additional
+ * operations on the resolved property.
+ *
  * @since EL 2.2
  */
 public class ValueReference implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /** The base object on which the property was resolved. */
     private final Object base;
+
+    /** The property identifier. */
     private final Object property;
 
+    /**
+     * Constructs a new value reference with the given base object and property.
+     *
+     * @param base     The base object on which the property was resolved
+     * @param property The property identifier
+     */
     public ValueReference(Object base, Object property) {
         this.base = base;
         this.property = property;
     }
 
+    /**
+     * Returns the base object on which the property was resolved.
+     *
+     * @return The base object
+     */
     public Object getBase() {
         return base;
     }
 
+    /**
+     * Returns the property identifier.
+     *
+     * @return The property identifier
+     */
     public Object getProperty() {
         return property;
     }

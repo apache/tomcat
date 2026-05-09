@@ -18,5 +18,10 @@ package jakarta.security.auth.message.config;
 
 import jakarta.security.auth.message.ClientAuth;
 
+/**
+ * Runtime context for client-side JASPIC authentication. A ClientAuthContext is created by a
+ * {@link ClientAuthConfig} and performs the actual authentication of outbound requests and validation of inbound
+ * responses.
+ */
 public interface ClientAuthContext extends ClientAuth {
 }

@@ -16,7 +16,16 @@
  */
 package jakarta.security.auth.message.config;
 
+/**
+ * Listener interface for JASPIC registration events.
+ */
 public interface RegistrationListener {
 
+    /**
+     * Notifies the listener of a registration event.
+     *
+     * @param layer the authentication layer
+     * @param appContext the application context
+     */
     void notify(String layer, String appContext);
 }

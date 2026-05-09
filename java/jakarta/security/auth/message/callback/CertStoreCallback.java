@@ -21,19 +21,33 @@ import java.security.cert.CertStore;
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables a runtime to inform authentication modules of the CertStore to use.
+ * Callback that enables a runtime to inform authentication modules of the {@link CertStore} to use for certificate
+ * validation. The runtime populates the CertStore, and the authentication module retrieves it.
  */
 public class CertStoreCallback implements Callback {
 
     private CertStore certStore;
 
+    /**
+     * Constructs an empty CertStoreCallback. The runtime will populate the CertStore via {@link #setCertStore}.
+     */
     public CertStoreCallback() {
     }
 
+    /**
+     * Sets the CertStore to be used for certificate validation.
+     *
+     * @param certStore the CertStore
+     */
     public void setCertStore(CertStore certStore) {
         this.certStore = certStore;
     }
 
+    /**
+     * Returns the CertStore set by the runtime.
+     *
+     * @return the CertStore, or {@code null} if not yet set
+     */
     public CertStore getCertStore() {
         return certStore;
     }

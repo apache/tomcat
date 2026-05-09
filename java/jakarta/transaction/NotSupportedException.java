@@ -16,14 +16,25 @@
  */
 package jakarta.transaction;
 
+/**
+ * Thrown when a requested operation is not supported.
+ */
 public class NotSupportedException extends Exception {
 
     private static final long serialVersionUID = 56870312332816390L;
 
+    /**
+     * Constructs a {@code NotSupportedException} with no detail message.
+     */
     public NotSupportedException() {
         super();
     }
 
+    /**
+     * Constructs a {@code NotSupportedException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public NotSupportedException(String msg) {
         super(msg);
     }

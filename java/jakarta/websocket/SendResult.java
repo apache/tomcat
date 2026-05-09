@@ -16,6 +16,9 @@
  */
 package jakarta.websocket;
 
+/**
+ * Represents the result of an asynchronous WebSocket message send operation.
+ */
 public final class SendResult {
     private final Throwable exception;
     private final boolean ok;
@@ -29,10 +32,21 @@ public final class SendResult {
         this(null);
     }
 
+    /**
+     * Returns the exception that occurred during the send operation, or {@code null} if the
+     * operation was successful.
+     *
+     * @return The exception, or {@code null} if successful
+     */
     public Throwable getException() {
         return exception;
     }
 
+    /**
+     * Returns whether the send operation was successful.
+     *
+     * @return {@code true} if the send was successful, {@code false} otherwise
+     */
     public boolean isOK() {
         return ok;
     }

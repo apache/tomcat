@@ -24,10 +24,31 @@ import jakarta.security.auth.message.AuthException;
 import jakarta.security.auth.message.ClientAuth;
 import jakarta.security.auth.message.MessagePolicy;
 
+/**
+ * A pluggable client-side authentication module in JASPIC. A ClientAuthModule implements the authentication logic
+ * for client-side operations and is initialized with message policies, a callback handler, and configuration
+ * options.
+ */
 public interface ClientAuthModule extends ClientAuth {
 
+    /**
+     * Initializes the authentication module with the given policies, callback handler, and options. This method is
+     * called once when the module is created.
+     *
+     * @param requestPolicy  the message policy for requests
+     * @param responsePolicy the message policy for responses
+     * @param handler        the callback handler for obtaining sensitive data
+     * @param options        configuration options for the module
+     *
+     * @throws AuthException if initialization fails
+     */
     void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
             Map<String,Object> options) throws AuthException;
 
+    /**
+     * Returns the array of MessageInfo implementation classes supported by this module.
+     *
+     * @return an array of supported MessageInfo classes
+     */
     Class<?>[] getSupportedMessageTypes();
 }

@@ -19,11 +19,30 @@ package jakarta.websocket;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides configuration information for a WebSocket endpoint, including encoders, decoders,
+ * and user properties.
+ */
 public interface EndpointConfig {
 
+    /**
+     * Returns the list of encoder classes for this endpoint.
+     *
+     * @return The list of encoder classes
+     */
     List<Class<? extends Encoder>> getEncoders();
 
+    /**
+     * Returns the list of decoder classes for this endpoint.
+     *
+     * @return The list of decoder classes
+     */
     List<Class<? extends Decoder>> getDecoders();
 
+    /**
+     * Returns a map of user properties associated with this endpoint configuration.
+     *
+     * @return The user properties map
+     */
     Map<String,Object> getUserProperties();
 }

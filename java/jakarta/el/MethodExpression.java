@@ -16,11 +16,23 @@
  */
 package jakarta.el;
 
+/**
+ * Represents a compiled EL method expression. A MethodExpression is the result of compiling an EL expression
+ * that resolves to a method, and can be invoked at a later time with a given set of parameters.
+ */
 public abstract class MethodExpression extends Expression {
 
     private static final long serialVersionUID = 8163925562047324656L;
 
     /**
+     * Constructs a MethodExpression.
+     */
+    public MethodExpression() {
+    }
+
+    /**
+     * Returns information about the method that this expression resolves to.
+     *
      * @param context The EL context for this evaluation
      *
      * @return Information about the method that this expression resolves to
@@ -34,6 +46,8 @@ public abstract class MethodExpression extends Expression {
     public abstract MethodInfo getMethodInfo(ELContext context);
 
     /**
+     * Invokes the method that this expression resolves to with the given parameters.
+     *
      * @param context The EL context for this evaluation
      * @param params  The parameters with which to invoke this method expression
      *
@@ -49,6 +63,8 @@ public abstract class MethodExpression extends Expression {
     public abstract Object invoke(ELContext context, Object[] params);
 
     /**
+     * Returns whether the parameters for the method invocation are provided by the expression or by the container.
+     *
      * @return This default implementation always returns <code>false</code>
      *
      * @since EL 3.0

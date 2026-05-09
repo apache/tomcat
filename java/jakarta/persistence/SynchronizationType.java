@@ -16,7 +16,16 @@
  */
 package jakarta.persistence;
 
+/**
+ * Specifies the synchronization type of an entity manager with JTA transactions.
+ */
 public enum SynchronizationType {
+    /**
+     * The entity manager participates in the current JTA transaction.
+     */
     SYNCHRONIZED,
+    /**
+     * The entity manager does not participate in the current JTA transaction.
+     */
     UNSYNCHRONIZED
 }

@@ -20,11 +20,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies a property for configuring a persistence context or persistence unit.
+ * Used within the properties element of PersistenceContext or PersistenceUnit annotations.
+ */
 @Target({})
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface PersistenceProperty {
+    /**
+     * The name of the property.
+     *
+     * @return the property name
+     */
     String name();
 
+    /**
+     * The value of the property.
+     *
+     * @return the property value
+     */
     String value();
 }

@@ -21,21 +21,40 @@ import javax.security.auth.callback.Callback;
 
 /**
  * Callback that enables an authentication module to inform the runtime of the groups a user is in.
+ * The callback handler populates the given Subject with the group principals, or returns the
+ * group names that were provided.
  */
 public class GroupPrincipalCallback implements Callback {
 
     private final Subject subject;
     private final String[] groups;
 
+    /**
+     * Constructs a callback with a Subject and an array of group names. The callback handler
+     * will create principals for the group names and add them to the subject.
+     *
+     * @param subject the subject to which the group principals will be added
+     * @param groups  the group names associated with the caller
+     */
     public GroupPrincipalCallback(Subject subject, String[] groups) {
         this.subject = subject;
         this.groups = groups;
     }
 
+    /**
+     * Returns the Subject associated with this callback.
+     *
+     * @return the Subject
+     */
     public Subject getSubject() {
         return subject;
     }
 
+    /**
+     * Returns the group names associated with this callback.
+     *
+     * @return the group names
+     */
     public String[] getGroups() {
         return groups;
     }

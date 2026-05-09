@@ -21,20 +21,56 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Declares a dependency on an enterprise bean. The EJB annotation can be applied to a field or method to inject
+ * a reference to an enterprise bean, or to a class to declare bean dependencies for the entire bean.
+ */
 @Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface EJB {
+
+    /**
+     * The name element for the annotation. The name of an enterprise bean is relative to the javax.np.Context of
+     * the bean. The name must be unique within the bean.
+     *
+     * @return the name of the enterprise bean
+     */
     String name() default "";
 
+    /**
+     * A description of the enterprise bean reference.
+     *
+     * @return the description
+     */
     String description() default "";
 
+    /**
+     * The interface of the enterprise bean.
+     *
+     * @return the bean interface class
+     */
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     Class beanInterface() default Object.class;
 
+    /**
+     * The name of the enterprise bean. The beanName is relative to the javax.naming.Context of the bean that
+     * owns this reference.
+     *
+     * @return the name of the enterprise bean
+     */
     String beanName() default "";
 
+    /**
+     * A provider-specific name that this reference should be mapped to. The entire name is provider-specific.
+     *
+     * @return the provider-specific mapped name
+     */
     String mappedName() default "";
 
+    /**
+     * A JNDI name used to locate the enterprise bean. The lookup element overrides the default JNDI lookup name.
+     *
+     * @return the JNDI lookup string
+     */
     String lookup() default "";
 }

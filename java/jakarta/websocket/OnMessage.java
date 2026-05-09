@@ -21,8 +21,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotates a method on a POJO endpoint to handle incoming WebSocket messages. The annotated
+ * method will be called when a message is received.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface OnMessage {
+
+    /**
+     * The maximum message size in bytes that this handler will accept. Messages larger than
+     * this size will be discarded. A value of -1 indicates no limit.
+     *
+     * @return The maximum message size in bytes
+     */
     long maxMessageSize() default -1;
 }

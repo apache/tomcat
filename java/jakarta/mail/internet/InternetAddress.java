@@ -16,8 +16,19 @@
  */
 package jakarta.mail.internet;
 
+/**
+ * Represents an Internet email address as defined by RFC 822.
+ * An Internet address consists of an optional personal name and
+ * an address string in the form of local-part@domain.
+ */
 @SuppressWarnings("unused") // Dummy implementation
 public class InternetAddress {
+    /**
+     * Constructs an InternetAddress from the specified address string.
+     * The address string may optionally include a personal name portion.
+     *
+     * @param from the email address string to parse
+     */
     public InternetAddress(String from) {
         // Dummy implementation
     }

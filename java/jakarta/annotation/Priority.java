@@ -31,7 +31,11 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Priority {
 
     /**
-     * @return the int value
+     * Specifies the priority value used to determine the ordering of the annotated
+     * element. Lower values indicate higher priority. The annotated class or
+     * parameter defines how the priority value is interpreted and applied.
+     *
+     * @return the priority ordering value
      */
     int value();
 }

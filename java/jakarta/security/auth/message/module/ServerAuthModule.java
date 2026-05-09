@@ -24,10 +24,35 @@ import jakarta.security.auth.message.AuthException;
 import jakarta.security.auth.message.MessagePolicy;
 import jakarta.security.auth.message.ServerAuth;
 
+/**
+ * Provides server-side authentication of requests and response signing.
+ * <p>
+ * This interface extends {@link ServerAuth} and is implemented by authentication
+ * module providers. It is initialized by the container and provides the actual
+ * authentication logic for server-side message authentication.
+ */
 public interface ServerAuthModule extends ServerAuth {
 
+    /**
+     * Initialize the authentication module.
+     * <p>
+     * This method is called by the container to initialize the module with the
+     * request and response policies, a callback handler, and a set of options.
+     *
+     * @param requestPolicy  The policy for the request message
+     * @param responsePolicy The policy for the response message
+     * @param handler        The callback handler used to obtain credentials
+     * @param options        The options provided to the module
+     *
+     * @throws AuthException If an error occurs during initialization
+     */
     void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
             Map<String,Object> options) throws AuthException;
 
+    /**
+     * Returns the array of message types supported by the module.
+     *
+     * @return The array of supported message type classes
+     */
     Class<?>[] getSupportedMessageTypes();
 }

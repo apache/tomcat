@@ -23,8 +23,15 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Future;
 
 
+/**
+ * Interface for sending messages to the remote endpoint of a WebSocket session.
+ * Provides both synchronous ({@link Basic}) and asynchronous ({@link Async}) sending capabilities.
+ */
 public interface RemoteEndpoint {
 
+    /**
+     * Asynchronous API for sending messages to the remote endpoint.
+     */
     interface Async extends RemoteEndpoint {
 
         /**
@@ -109,6 +116,9 @@ public interface RemoteEndpoint {
 
     }
 
+   /**
+     * Synchronous (blocking) API for sending messages to the remote endpoint.
+     */
     interface Basic extends RemoteEndpoint {
 
         /**
@@ -155,8 +165,20 @@ public interface RemoteEndpoint {
          */
         void sendBinary(ByteBuffer partialByte, boolean isLast) throws IOException;
 
+        /**
+         * Returns an {@link OutputStream} for sending a binary message to the remote endpoint.
+         *
+         * @return An output stream for sending binary data
+         * @throws IOException if an I/O error occurs
+         */
         OutputStream getSendStream() throws IOException;
 
+        /**
+         * Returns a {@link Writer} for sending a text message to the remote endpoint.
+         *
+         * @return A writer for sending text data
+         * @throws IOException if an I/O error occurs
+         */
         Writer getSendWriter() throws IOException;
 
         /**

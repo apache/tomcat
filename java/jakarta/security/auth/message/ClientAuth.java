@@ -18,6 +18,10 @@ package jakarta.security.auth.message;
 
 import javax.security.auth.Subject;
 
+/**
+ * Defines the contract for client-side authentication in JASPIC. A ClientAuth implementation authenticates outbound
+ * requests and validates inbound responses in a client-to-server communication pattern.
+ */
 public interface ClientAuth {
 
     /**

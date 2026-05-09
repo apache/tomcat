@@ -33,7 +33,10 @@ import java.lang.annotation.Target;
 public @interface Resources {
 
     /**
-     * @return a Resource[] with the value of this Resources
+     * Specifies the array of {@link Resource} annotations that define the resources
+     * required by the annotated component.
+     *
+     * @return the array of resource definitions
      */
     Resource[] value();
 }

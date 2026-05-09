@@ -27,10 +27,26 @@ public class TrustStoreCallback implements Callback {
 
     private KeyStore trustStore;
 
+    /**
+     * Constructs a new TrustStoreCallback.
+     */
+    public TrustStoreCallback() {
+    }
+
+    /**
+     * Sets the trust store to be used for certificate validation.
+     *
+     * @param trustStore The trust store containing trusted certificates
+     */
     public void setTrustStore(KeyStore trustStore) {
         this.trustStore = trustStore;
     }
 
+    /**
+     * Returns the trust store.
+     *
+     * @return The trust store, or {@code null} if not set
+     */
     public KeyStore getTrustStore() {
         return trustStore;
     }

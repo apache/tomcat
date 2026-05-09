@@ -16,7 +16,25 @@
  */
 package jakarta.mail;
 
+/**
+ * Abstract base class for providing user authentication when establishing network connections. Subclasses override
+ * {@link #getPasswordAuthentication} to return the appropriate credentials. This class is part of the Jakarta Mail
+ * API and follows the pattern defined by {@link java.net.Authenticator}.
+ */
 public class Authenticator {
+
+    /**
+     * Default constructor for subclasses.
+     */
+    public Authenticator() {
+    }
+
+    /**
+     * Returns the password authentication information for the current request. The default implementation returns
+     * {@code null}. Subclasses should override this method to provide actual credentials.
+     *
+     * @return the PasswordAuthentication object, or {@code null} if no authentication is available
+     */
     protected PasswordAuthentication getPasswordAuthentication() {
         return null;
     }

@@ -16,7 +16,17 @@
  */
 package jakarta.websocket;
 
+/**
+ * Base class for programmatic WebSocket endpoints. Subclasses must implement the
+ * {@link #onOpen(Session, EndpointConfig)} method to handle new connections.
+ */
 public abstract class Endpoint {
+
+    /**
+     * Creates a new Endpoint instance.
+     */
+    public Endpoint() {
+    }
 
     /**
      * Event that is triggered when a new session starts.

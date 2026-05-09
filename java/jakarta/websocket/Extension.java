@@ -18,14 +18,42 @@ package jakarta.websocket;
 
 import java.util.List;
 
+/**
+ * Represents a WebSocket extension that can be negotiated during the handshake.
+ */
 public interface Extension {
+
+    /**
+     * Returns the name of this extension.
+     *
+     * @return The extension name
+     */
     String getName();
 
+    /**
+     * Returns the parameters associated with this extension.
+     *
+     * @return The list of extension parameters
+     */
     List<Parameter> getParameters();
 
+    /**
+     * Represents a parameter of a WebSocket extension.
+     */
     interface Parameter {
+
+        /**
+         * Returns the name of this parameter.
+         *
+         * @return The parameter name
+         */
         String getName();
 
+        /**
+         * Returns the value of this parameter.
+         *
+         * @return The parameter value
+         */
         String getValue();
     }
 }

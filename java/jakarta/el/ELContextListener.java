@@ -16,8 +16,21 @@
  */
 package jakarta.el;
 
+/**
+ * Listener interface for EL context lifecycle events. Implementations are notified when an
+ * {@link ELContext} is created or released, allowing them to perform initialization or
+ * cleanup operations on the context.
+ *
+ * @since EL 2.1
+ */
 public interface ELContextListener extends java.util.EventListener {
 
+    /**
+     * Notification that an EL context has been created. Implementations can use this callback
+     * to register resources, resolvers, or other objects with the newly created context.
+     *
+     * @param event the event containing the ELContext that was created
+     */
     void contextCreated(ELContextEvent event);
 
 }

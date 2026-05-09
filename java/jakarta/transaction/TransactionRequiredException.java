@@ -16,14 +16,25 @@
  */
 package jakarta.transaction;
 
+/**
+ * Thrown when an operation requires an active transaction but none exists.
+ */
 public class TransactionRequiredException extends java.rmi.RemoteException {
 
     private static final long serialVersionUID = -1898806419937446439L;
 
+    /**
+     * Constructs a {@code TransactionRequiredException} with no detail message.
+     */
     public TransactionRequiredException() {
         super();
     }
 
+    /**
+     * Constructs a {@code TransactionRequiredException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public TransactionRequiredException(String msg) {
         super(msg);
     }
