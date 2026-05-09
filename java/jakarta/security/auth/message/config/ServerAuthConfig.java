@@ -22,8 +22,20 @@ import javax.security.auth.Subject;
 
 import jakarta.security.auth.message.AuthException;
 
+/**
+ * Server-side authentication configuration obtained from an {@link AuthConfigProvider}.
+ */
 public interface ServerAuthConfig extends AuthConfig {
 
+    /**
+     * Returns the {@link ServerAuthContext} for the given authentication context ID.
+     *
+     * @param authContextID the authentication context identifier
+     * @param serviceSubject the service subject
+     * @param properties the configuration properties
+     * @return the server authentication context
+     * @throws AuthException if an error occurs during authentication context creation
+     */
     ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
             throws AuthException;
 }

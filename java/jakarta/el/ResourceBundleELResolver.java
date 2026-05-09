@@ -20,8 +20,26 @@ import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * EL resolver for resource bundle properties.
+ * <p>
+ * This resolver handles base objects of type {@link ResourceBundle}. It accepts
+ * any non-null object as a property, coerces it to a String, and uses it to
+ * look up the corresponding message in the resource bundle. If the key is not
+ * found, the resolver returns a placeholder string of the form {@code ???key???}.
+ * Resource bundles are always read-only.
+ * <p>
+ * {@code ELResolver}s are combined using {@link CompositeELResolver}s to define
+ * rich semantics for evaluating an expression. See the javadocs for
+ * {@link ELResolver} for details.
+ *
+ * @since EL 2.1
+ */
 public class ResourceBundleELResolver extends ELResolver {
 
+    /**
+     * Constructs a new instance of the resolver.
+     */
     public ResourceBundleELResolver() {
         super();
     }

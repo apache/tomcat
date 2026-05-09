@@ -164,7 +164,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getParameterMap() on the wrapped request object.
      */
     @Override
-    public Map<String,String[]> getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         return this.request.getParameterMap();
     }
 
@@ -400,7 +400,8 @@ public class ServletRequestWrapper implements ServletRequest {
     }
 
     /**
-     * TODO SERVLET3 - Add comments
+     * If the request wrapped by this wrapper, or a wrapper used in the construction of this wrapper, instances the
+     * given request, then return <code>true</code>. Otherwise return <code>false</code>.
      *
      * @param wrapped The request to compare to the wrapped request
      *
@@ -420,7 +421,8 @@ public class ServletRequestWrapper implements ServletRequest {
     }
 
     /**
-     * TODO SERVLET3 - Add comments
+     * If the request wrapped by this wrapper, or a wrapper used in the construction of this wrapper, is an instance of
+     * the type given, then return <code>true</code>. Otherwise return <code>false</code>.
      *
      * @param wrappedType The class to compare to the class of the wrapped request
      *

@@ -24,9 +24,20 @@ import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 /**
+ * ELResolver that resolves static fields and invokes static methods on classes. This resolver handles expressions
+ * where the base is an {@link ELClass} and the property is a {@link String} representing a field or method name.
+ * Static fields are read-only.
+ *
  * @since EL 3.0
  */
 public class StaticFieldELResolver extends ELResolver {
+
+    /**
+     * Constructs a new instance of the resolver.
+     */
+    public StaticFieldELResolver() {
+        super();
+    }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {

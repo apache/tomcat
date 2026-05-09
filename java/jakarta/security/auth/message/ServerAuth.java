@@ -18,6 +18,13 @@ package jakarta.security.auth.message;
 
 import javax.security.auth.Subject;
 
+/**
+ * Provides server-side authentication of requests and response signing.
+ * <p>
+ * This interface defines the contract for authenticating incoming requests
+ * and optionally securing outgoing responses in a server-side context.
+ * Implementations are typically obtained through a {@link jakarta.security.auth.message.config.ServerAuthContext}.
+ */
 public interface ServerAuth {
 
     /**

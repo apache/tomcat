@@ -18,15 +18,53 @@ package jakarta.security.auth.message;
 
 import java.util.Map;
 
+/**
+ * Represents the request and response messages associated with a
+ * message-based authentication exchange.  The {@code MessageInfo} object
+ * provides access to the request and response message objects, as well
+ * as a map of additional context information.  The types of the request
+ * and response message objects are protocol-specific.
+ */
 public interface MessageInfo {
 
+    /**
+     * Returns the request message object associated with this
+     * authentication exchange.  The type of the returned object is
+     * protocol-specific.
+     *
+     * @return the request message object, or {@code null} if not available
+     */
     Object getRequestMessage();
 
+    /**
+     * Returns the response message object associated with this
+     * authentication exchange.  The type of the returned object is
+     * protocol-specific.
+     *
+     * @return the response message object, or {@code null} if not available
+     */
     Object getResponseMessage();
 
+    /**
+     * Sets the request message object for this authentication exchange.
+     *
+     * @param request the request message object
+     */
     void setRequestMessage(Object request);
 
+    /**
+     * Sets the response message object for this authentication exchange.
+     *
+     * @param response the response message object
+     */
     void setResponseMessage(Object response);
 
+    /**
+     * Returns a map of additional context information associated with
+     * this authentication exchange.  The map may contain protocol-specific
+     * attributes such as message headers.
+     *
+     * @return a {@code Map} of context information, or {@code null} if not available
+     */
     Map<String,Object> getMap();
 }

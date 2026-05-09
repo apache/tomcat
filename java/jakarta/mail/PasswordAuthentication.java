@@ -16,8 +16,20 @@
  */
 package jakarta.mail;
 
+/**
+ * Stores username and password credentials for mail authentication. This class follows the pattern defined by
+ * {@link java.net.PasswordAuthentication} and is used with {@link Authenticator} to provide credentials when
+ * establishing mail connections.
+ */
 @SuppressWarnings("unused") // Dummy implementation
 public class PasswordAuthentication {
+
+    /**
+     * Constructs a PasswordAuthentication with the given user and password.
+     *
+     * @param user     the username
+     * @param password the password
+     */
     public PasswordAuthentication(String user, String password) {
         // Dummy implementation
     }

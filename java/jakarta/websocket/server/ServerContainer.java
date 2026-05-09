@@ -26,8 +26,21 @@ import jakarta.websocket.WebSocketContainer;
  * Provides the ability to deploy endpoints programmatically.
  */
 public interface ServerContainer extends WebSocketContainer {
+    /**
+     * Deploys the given endpoint class. The class must be annotated with
+     * {@link jakarta.websocket.server.ServerEndpoint} or extend {@link jakarta.websocket.Endpoint}.
+     *
+     * @param clazz The endpoint class to deploy
+     * @throws DeploymentException If the endpoint cannot be deployed
+     */
     void addEndpoint(Class<?> clazz) throws DeploymentException;
 
+    /**
+     * Deploys the endpoint configured by the given {@link ServerEndpointConfig}.
+     *
+     * @param sec The server endpoint configuration
+     * @throws DeploymentException If the endpoint cannot be deployed
+     */
     void addEndpoint(ServerEndpointConfig sec) throws DeploymentException;
 
     /**

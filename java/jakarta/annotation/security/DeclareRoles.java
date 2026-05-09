@@ -23,6 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Declares that role names used in security constraints for the annotated
+ * enterprise bean should be treated as declared roles. When this annotation
+ * is present, the container must create any roles referenced in security
+ * constraints that are not explicitly defined in the deployment descriptor.
+ *
  * @since Common Annotations 1.0
  */
 @Documented
@@ -31,7 +36,11 @@ import java.lang.annotation.Target;
 public @interface DeclareRoles {
 
     /**
-     * @return a String[] with the roles
+     * Specifies the declared role names that should be recognized by the container.
+     * These roles may be referenced in security constraints without being explicitly
+     * defined in the deployment descriptor.
+     *
+     * @return the array of declared role names
      */
     String[] value();
 }

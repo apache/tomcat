@@ -21,16 +21,34 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * An {@link ELResolver} that resolves properties on {@link java.util.Map} objects using
+ * the property as a map key. When the base object is a {@code Map}, the property is used
+ * directly as the key to look up or set values. This resolver supports read and write
+ * operations, and can be configured as read-only to prevent modification of map entries.
+ *
+ * @since EL 2.1
+ */
 public class MapELResolver extends ELResolver {
 
     private static final Class<?> UNMODIFIABLE = Collections.unmodifiableMap(new HashMap<>()).getClass();
 
     private final boolean readOnly;
 
+    /**
+     * Constructs a MapELResolver that allows both read and write operations on maps.
+     */
     public MapELResolver() {
         this.readOnly = false;
     }
 
+    /**
+     * Constructs a MapELResolver with the specified read-only setting. When read-only
+     * is {@code true}, attempts to set values on map entries will throw a
+     * {@link PropertyNotWritableException}.
+     *
+     * @param readOnly {@code true} if this resolver should be read-only, {@code false} otherwise
+     */
     public MapELResolver(boolean readOnly) {
         this.readOnly = readOnly;
     }

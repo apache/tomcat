@@ -19,6 +19,9 @@ package jakarta.websocket;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the HTTP response returned by the server during a WebSocket handshake.
+ */
 public interface HandshakeResponse {
 
     /**
@@ -26,5 +29,10 @@ public interface HandshakeResponse {
      */
     String SEC_WEBSOCKET_ACCEPT = "Sec-WebSocket-Accept";
 
+    /**
+     * Returns the HTTP headers from the handshake response.
+     *
+     * @return The HTTP headers
+     */
     Map<String,List<String>> getHeaders();
 }

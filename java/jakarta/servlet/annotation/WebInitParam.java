@@ -39,16 +39,22 @@ import java.lang.annotation.Target;
 public @interface WebInitParam {
 
     /**
+     * The name of the initialization parameter.
+     *
      * @return name of the initialization parameter
      */
     String name();
 
     /**
+     * The value of the initialization parameter.
+     *
      * @return value of the initialization parameter
      */
     String value();
 
     /**
+     * A description of the initialization parameter.
+     *
      * @return description of the initialization parameter
      */
     String description() default "";

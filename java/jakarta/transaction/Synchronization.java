@@ -16,8 +16,25 @@
  */
 package jakarta.transaction;
 
+/**
+ * Callback interface for notification of transaction completion.
+ * Registered with a transaction so that the implementing object is
+ * notified when the transaction is about to complete and when it has
+ * completed.
+ */
 public interface Synchronization {
+    /**
+     * Called before the transaction is committed or rolled back.
+     * This method is invoked after all work on the transaction has
+     * been completed but before the commit or rollback is performed.
+     */
     void beforeCompletion();
 
+    /**
+     * Called after the transaction has completed.
+     *
+     * @param status the status of the transaction, one of the
+     *               {@link Status} constants
+     */
     void afterCompletion(int status);
 }

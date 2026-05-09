@@ -23,14 +23,39 @@ import java.lang.annotation.Target;
 
 import jakarta.websocket.ClientEndpointConfig.Configurator;
 
+/**
+ * Annotates a class as a WebSocket client endpoint. The annotation provides configuration
+ * information about the endpoint such as subprotocols, encoders, decoders, and configurator.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ClientEndpoint {
+
+    /**
+     * The sub-protocols that this client endpoint supports, in order of preference.
+     *
+     * @return The list of preferred sub-protocols
+     */
     String[] subprotocols() default {};
 
+    /**
+     * The decoder classes that this client endpoint uses.
+     *
+     * @return The list of decoder classes
+     */
     Class<? extends Decoder>[] decoders() default {};
 
+    /**
+     * The encoder classes that this client endpoint uses.
+     *
+     * @return The list of encoder classes
+     */
     Class<? extends Encoder>[] encoders() default {};
 
+    /**
+     * The configurator class used to customize the WebSocket handshake.
+     *
+     * @return The configurator class
+     */
     Class<? extends Configurator> configurator() default Configurator.class;
 }

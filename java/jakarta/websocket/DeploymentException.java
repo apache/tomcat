@@ -18,15 +18,29 @@ package jakarta.websocket;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when a WebSocket endpoint cannot be deployed due to a configuration error.
+ */
 public class DeploymentException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a DeploymentException with the specified detail message.
+     *
+     * @param message The detail message
+     */
     public DeploymentException(String message) {
         super(message);
     }
 
+    /**
+     * Creates a DeploymentException with the specified detail message and cause.
+     *
+     * @param message The detail message
+     * @param cause   The underlying cause of the exception
+     */
     public DeploymentException(String message, Throwable cause) {
         super(message, cause);
     }

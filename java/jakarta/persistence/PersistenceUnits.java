@@ -21,9 +21,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Groups multiple PersistenceUnit annotations for injection into a single component.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface PersistenceUnits {
+    /**
+     * The array of PersistenceUnit annotations.
+     *
+     * @return the persistence units
+     */
     PersistenceUnit[] value();
 }

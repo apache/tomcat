@@ -21,6 +21,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ELResolver} that resolves properties on {@link java.util.List} objects using
+ * integer indices. When the base object is a {@code List}, the property is coerced to an
+ * integer and used as the list index. This resolver supports read and write operations,
+ * and can be configured as read-only to prevent modification of list elements.
+ *
+ * @since EL 2.1
+ */
 public class ListELResolver extends ELResolver {
 
     private final boolean readOnly;
@@ -29,10 +37,20 @@ public class ListELResolver extends ELResolver {
     // classes. Java 9 + so a back-port would require JreCompat.
     private static final Class<?> UNMODIFIABLE = Collections.unmodifiableList(new ArrayList<>()).getClass();
 
+    /**
+     * Constructs a ListELResolver that allows both read and write operations on lists.
+     */
     public ListELResolver() {
         this.readOnly = false;
     }
 
+    /**
+     * Constructs a ListELResolver with the specified read-only setting. When read-only
+     * is {@code true}, attempts to set values on list elements will throw a
+     * {@link PropertyNotWritableException}.
+     *
+     * @param readOnly {@code true} if this resolver should be read-only, {@code false} otherwise
+     */
     public ListELResolver(boolean readOnly) {
         this.readOnly = readOnly;
     }

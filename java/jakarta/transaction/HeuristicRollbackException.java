@@ -18,15 +18,29 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a transaction has been heuristically rolled back. A heuristic
+ * rollback indicates that the transaction manager has rolled back the
+ * transaction without full agreement from all resource managers, typically
+ * as a result of a failure during the commit process.
+ */
 public class HeuristicRollbackException extends Exception {
 
     @Serial
     private static final long serialVersionUID = -3483618944556408897L;
 
+    /**
+     * Constructs a {@code HeuristicRollbackException} with no detail message.
+     */
     public HeuristicRollbackException() {
         super();
     }
 
+    /**
+     * Constructs a {@code HeuristicRollbackException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public HeuristicRollbackException(String msg) {
         super(msg);
     }

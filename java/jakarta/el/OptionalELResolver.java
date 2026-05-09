@@ -31,6 +31,12 @@ import java.util.Optional;
 public class OptionalELResolver extends ELResolver {
 
     /**
+     * Constructs an OptionalELResolver.
+     */
+    public OptionalELResolver() {
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @return If the base object is an {@link Optional} and {@link Optional#isEmpty()} returns {@code true} then the

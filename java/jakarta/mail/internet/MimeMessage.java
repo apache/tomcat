@@ -18,16 +18,35 @@ package jakarta.mail.internet;
 
 import jakarta.mail.Session;
 
+/**
+ * Represents a MIME message in the Jakarta Mail API.
+ * Provides methods for setting message headers such as sender and subject.
+ */
 @SuppressWarnings("unused") // Dummy implementation
 public class MimeMessage implements MimePart {
+    /**
+     * Constructs a MimeMessage with the given Session.
+     *
+     * @param session the mail session used to create this message
+     */
     public MimeMessage(Session session) {
         // Dummy implementation
     }
 
+    /**
+     * Sets the InternetAddress of the message sender.
+     *
+     * @param from the InternetAddress of the sender
+     */
     public void setFrom(InternetAddress from) {
         // Dummy implementation
     }
 
+    /**
+     * Sets the subject of the message.
+     *
+     * @param subject the subject string
+     */
     public void setSubject(String subject) {
         // Dummy implementation
     }

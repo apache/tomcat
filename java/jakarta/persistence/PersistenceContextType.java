@@ -16,7 +16,21 @@
  */
 package jakarta.persistence;
 
+/**
+ * Defines the type of persistence context.
+ */
 public enum PersistenceContextType {
+    /**
+     * The default persistence context type.
+     * The entity manager is tied to the current transaction and is automatically
+     * closed when the transaction completes.
+     */
     TRANSACTION,
+
+    /**
+     * An extended persistence context type.
+     * The entity manager spans multiple transactions and remains open
+     * until explicitly closed by the application.
+     */
     EXTENDED
 }

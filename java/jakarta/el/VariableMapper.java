@@ -17,11 +17,34 @@
 package jakarta.el;
 
 /**
- *
+ * Manages the mapping between variable names and their corresponding {@link ValueExpression} instances within an
+ * {@link ELContext}. Variable mappings allow EL expressions to reference named variables that resolve to computed
+ * values.
  */
 public abstract class VariableMapper {
 
+    /**
+     * Default constructor for subclasses.
+     */
+    public VariableMapper() {
+    }
+
+    /**
+     * Resolves a variable name to its corresponding ValueExpression.
+     *
+     * @param variable the name of the variable to resolve
+     *
+     * @return the ValueExpression for the variable, or {@code null} if not found
+     */
     public abstract ValueExpression resolveVariable(String variable);
 
+    /**
+     * Sets or removes a variable mapping.
+     *
+     * @param variable   the name of the variable
+     * @param expression the ValueExpression to associate with the variable, or {@code null} to remove the mapping
+     *
+     * @return the previous ValueExpression for the variable, or {@code null} if there was no mapping
+     */
     public abstract ValueExpression setVariable(String variable, ValueExpression expression);
 }

@@ -18,12 +18,34 @@ package jakarta.mail;
 
 import java.util.Properties;
 
+/**
+ * Represents a mail session configuration.
+ */
 @SuppressWarnings("unused") // Dummy implementation
 public class Session {
+    /**
+     * Default constructor.
+     */
+    public Session() {
+    }
+
+    /**
+     * Returns a Session object with the given properties and authenticator.
+     *
+     * @param props the session properties
+     * @param auth the authenticator
+     * @return the mail session
+     */
     public static Session getInstance(Properties props, Authenticator auth) {
         return null;
     }
 
+    /**
+     * Returns a Session object with the given properties.
+     *
+     * @param props the session properties
+     * @return the mail session
+     */
     public static Session getInstance(Properties props) {
         return null;
     }

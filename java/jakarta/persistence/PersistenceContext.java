@@ -21,17 +21,45 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies the entity manager for use with an entity bean or other managed class.
+ * Used to inject a persistence context into a Jakarta EE managed component.
+ */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface PersistenceContext {
+    /**
+     * The name used to look up the persistence context.
+     *
+     * @return the persistence context name
+     */
     String name() default "";
 
+    /**
+     * The unit name of the persistence unit to associate with the persistence context.
+     *
+     * @return the persistence unit name
+     */
     String unitName() default "";
 
+    /**
+     * The type of the persistence context.
+     *
+     * @return the persistence context type
+     */
     PersistenceContextType type() default PersistenceContextType.TRANSACTION;
 
+    /**
+     * Properties used to configure the persistence context.
+     *
+     * @return the configuration properties
+     */
     PersistenceProperty[] properties() default {};
 
+    /**
+     * The synchronization type of the persistence context with the transaction.
+     *
+     * @return the synchronization type
+     */
     SynchronizationType synchronization() default SynchronizationType.SYNCHRONIZED;
 }

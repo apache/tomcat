@@ -16,8 +16,17 @@
  */
 package jakarta.mail.internet;
 
+/**
+ * Provides a DataSource representation for a MimePart.
+ * Wraps a MimePart so it can be used where a DataSource is required.
+ */
 @SuppressWarnings("unused") // Dummy implementation
 public class MimePartDataSource {
+    /**
+     * Constructs a MimePartDataSource wrapping the given MimePart.
+     *
+     * @param part the MimePart to wrap
+     */
     public MimePartDataSource(MimePart part) {
         // Dummy implementation
     }

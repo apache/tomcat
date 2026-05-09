@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Standard implementation of {@link ELContext} that provides a complete EL resolution environment. It maintains a
+ * composite resolver chain, variable mapper, function mapper, and supports custom resolvers and local beans. This is
+ * the default context implementation used by {@link ELProcessor}.
+ *
  * @since EL 3.0
  */
 public class StandardELContext extends ELContext {
@@ -33,6 +37,14 @@ public class StandardELContext extends ELContext {
     private final Map<String,Object> localBeans = new HashMap<>();
 
 
+    /**
+     * Constructs a new instance backed by the given expression factory.
+     * <p>
+     * Initializes the standard resolver chain with built-in resolvers and
+     * a function mapper populated from the factory's initial function map.
+     *
+     * @param factory the expression factory providing the initial resolver and function configuration
+     */
     public StandardELContext(ExpressionFactory factory) {
         wrappedContext = null;
         variableMapper = new StandardVariableMapper();
@@ -57,6 +69,14 @@ public class StandardELContext extends ELContext {
         standardResolver.add(new BeanELResolver());
     }
 
+    /**
+     * Constructs a new instance that wraps the given context.
+     * <p>
+     * The variable mapper, function mapper, and EL resolver from the wrapped
+     * context are used, with additional standard resolvers prepended.
+     *
+     * @param context the context to wrap
+     */
     public StandardELContext(ELContext context) {
         wrappedContext = context;
         variableMapper = context.getVariableMapper();
@@ -94,6 +114,15 @@ public class StandardELContext extends ELContext {
         return standardResolver;
     }
 
+    /**
+     * Adds a custom EL resolver to the resolver chain.
+     * <p>
+     * Custom resolvers are inserted after the bean name resolver and before
+     * the standard resolvers, allowing them to intercept resolution before
+     * the built-in resolvers are consulted.
+     *
+     * @param resolver the resolver to add
+     */
     public void addELResolver(ELResolver resolver) {
         customResolvers.add(resolver);
     }

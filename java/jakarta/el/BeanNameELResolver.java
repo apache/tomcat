@@ -19,12 +19,20 @@ package jakarta.el;
 import java.util.Objects;
 
 /**
+ * ELResolver that resolves bean names to bean instances using a {@link BeanNameResolver}. This resolver handles
+ * expressions where the base is {@code null} and the property is a {@link String} representing a bean name.
+ *
  * @since EL 3.0
  */
 public class BeanNameELResolver extends ELResolver {
 
     private final BeanNameResolver beanNameResolver;
 
+    /**
+     * Constructs a BeanNameELResolver with the specified BeanNameResolver.
+     *
+     * @param beanNameResolver the resolver used to look up beans by name
+     */
     public BeanNameELResolver(BeanNameResolver beanNameResolver) {
         this.beanNameResolver = beanNameResolver;
     }

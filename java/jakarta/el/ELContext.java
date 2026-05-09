@@ -28,6 +28,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Provides the context in which an EL expression is evaluated. An ELContext holds references to the
+ * {@link ELResolver}, {@link FunctionMapper}, {@link VariableMapper}, {@link ImportHandler}, locale, and other
+ * objects required for expression evaluation. Implementations include {@link StandardELContext}.
+ */
 public abstract class ELContext {
 
     private Locale locale;
@@ -42,6 +47,9 @@ public abstract class ELContext {
 
     private Deque<Map<String,Object>> lambdaArguments = null;
 
+    /**
+     * Constructs an ELContext with the resolved flag set to {@code false}.
+     */
     public ELContext() {
         this.resolved = false;
     }
@@ -53,6 +61,13 @@ public abstract class ELContext {
         return lambdaArguments;
     }
 
+    /**
+     * Sets the internal flag indicating whether a property has been resolved during the current
+     * evaluation step. This method is used by {@link ELResolver} implementations to signal that
+     * they have handled the current base/property combination.
+     *
+     * @param resolved {@code true} if a property has been resolved, {@code false} otherwise
+     */
     public void setPropertyResolved(boolean resolved) {
         this.resolved = resolved;
     }
@@ -70,6 +85,13 @@ public abstract class ELContext {
         notifyPropertyResolved(base, property);
     }
 
+    /**
+     * Returns whether a property has been resolved during the current evaluation step.
+     * ELResolver implementations call {@link #setPropertyResolved(boolean)} to indicate resolution,
+     * and the expression evaluator checks this flag to determine if resolution was successful.
+     *
+     * @return {@code true} if a property has been resolved, {@code false} otherwise
+     */
     public boolean isPropertyResolved() {
         return this.resolved;
     }
@@ -110,6 +132,11 @@ public abstract class ELContext {
         return this.map.get(key);
     }
 
+    /**
+     * Returns the ELResolver used to resolve properties and method invocations during expression evaluation.
+     *
+     * @return the ELResolver for this context
+     */
     public abstract ELResolver getELResolver();
 
     /**
@@ -126,16 +153,39 @@ public abstract class ELContext {
         return importHandler;
     }
 
+    /**
+     * Returns the FunctionMapper used to resolve EL function names to Java methods during expression evaluation.
+     *
+     * @return the FunctionMapper for this context
+     */
     public abstract FunctionMapper getFunctionMapper();
 
+    /**
+     * Returns the locale associated with this EL context. The locale is used for type conversion
+     * operations such as parsing numbers and dates during expression evaluation.
+     *
+     * @return the locale for this context, or {@code null} if not set
+     */
     public Locale getLocale() {
         return this.locale;
     }
 
+    /**
+     * Sets the locale for this EL context. The locale is used for type conversion operations
+     * such as parsing numbers and dates during expression evaluation.
+     *
+     * @param locale the locale to use for this context
+     */
     public void setLocale(Locale locale) {
         this.locale = locale;
     }
 
+    /**
+     * Returns the VariableMapper used to resolve EL variable names to {@link ValueExpression}
+     * instances during expression evaluation.
+     *
+     * @return the VariableMapper for this context
+     */
     public abstract VariableMapper getVariableMapper();
 
     /**

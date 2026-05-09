@@ -21,19 +21,48 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Declares a reference to a web service. The WebServiceRef annotation can be applied to a field or method to inject
+ * a reference to a web service, or to a class to declare web service dependencies.
+ */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface WebServiceRef {
+
+    /**
+     * The name for the web service reference. The name is relative to the default initial context.
+     *
+     * @return the name of the web service reference
+     */
     String name() default "";
 
+    /**
+     * The type of the injected object, typically the service endpoint interface.
+     *
+     * @return the type class
+     */
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     Class type() default Object.class;
 
+    /**
+     * The web service class, typically the service endpoint interface class.
+     *
+     * @return the web service class
+     */
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     Class value() default Object.class;
 
+    /**
+     * The location of the WSDL document for the web service.
+     *
+     * @return the WSDL location
+     */
     String wsdlLocation() default "";
 
+    /**
+     * A provider-specific name that this reference should be mapped to.
+     *
+     * @return the provider-specific mapped name
+     */
     String mappedName() default "";
 }

@@ -54,21 +54,32 @@ public interface AsyncContext {
     String ASYNC_QUERY_STRING = "jakarta.servlet.async.query_string";
 
     /**
-     * @return a reference to the ServletRequest object
+     * Returns the {@link ServletRequest} associated with this asynchronous operation.
+     *
+     * @return the ServletRequest object
      */
     ServletRequest getRequest();
 
     /**
-     * @return a reference to the ServletResponse object
+     * Returns the {@link ServletResponse} associated with this asynchronous operation.
+     *
+     * @return the ServletResponse object
      */
     ServletResponse getResponse();
 
     /**
-     * @return true if the Request and Response are the original ones
+     * Determines whether the request and response objects are the original ones passed to
+     * {@link jakarta.servlet.http.HttpServletRequest#startAsync()}, or if they are new objects created by the
+     * container.
+     *
+     * @return {@code true} if the request and response are the original objects, {@code false} otherwise
      */
     boolean hasOriginalRequestAndResponse();
 
     /**
+     * Dispatches the request to the resource at the original request URI, as specified in the original request. After
+     * the dispatch, the async request processing is complete and the response is committed.
+     *
      * @throws IllegalStateException if this method is called when the request is not in asynchronous mode. The request
      *                                   is in asynchronous mode after
      *                                   {@link jakarta.servlet.http.HttpServletRequest#startAsync()} or
@@ -79,8 +90,12 @@ public interface AsyncContext {
     void dispatch();
 
     /**
-     * @param path The path to which the request/response should be dispatched relative to the {@link ServletContext}
-     *                 from which this async request was started.
+     * Dispatches the request to the resource at the specified path relative to the {@link ServletContext} from which
+     * this async request was started. After the dispatch, the async request processing is complete and the response
+     * is committed.
+     *
+     * @param path the path to which the request/response should be dispatched relative to the {@link ServletContext}
+     *                 from which this async request was started
      *
      * @throws IllegalStateException if this method is called when the request is not in asynchronous mode. The request
      *                                   is in asynchronous mode after
@@ -92,9 +107,12 @@ public interface AsyncContext {
     void dispatch(String path);
 
     /**
-     * @param path    The path to which the request/response should be dispatched relative to the specified
-     *                    {@link ServletContext}.
-     * @param context The {@link ServletContext} to which the request/response should be dispatched.
+     * Dispatches the request to the resource at the specified path relative to the given {@link ServletContext}.
+     * After the dispatch, the async request processing is complete and the response is committed.
+     *
+     * @param path    the path to which the request/response should be dispatched relative to the specified
+     *                    {@link ServletContext}
+     * @param context the {@link ServletContext} to which the request/response should be dispatched
      *
      * @throws IllegalStateException if this method is called when the request is not in asynchronous mode. The request
      *                                   is in asynchronous mode after

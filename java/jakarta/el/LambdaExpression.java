@@ -21,6 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Represents a lambda expression in EL. A lambda expression has a list of formal parameters
+ * and a body expression. When invoked, the lambda binds the actual arguments to its formal
+ * parameters and evaluates the body expression within a scoped {@link ELContext}. Lambda
+ * expressions support nesting, with inner lambdas having access to outer lambda arguments.
+ *
+ * @since EL 3.0
+ */
 public class LambdaExpression {
 
     private final List<String> formalParameters;
@@ -28,16 +36,42 @@ public class LambdaExpression {
     private final Map<String,Object> nestedArguments = new HashMap<>();
     private ELContext context = null;
 
+    /**
+     * Constructs a LambdaExpression with the given formal parameters and body expression.
+     *
+     * @param formalParameters the list of formal parameter names for the lambda
+     * @param expression       the body expression to evaluate when the lambda is invoked
+     */
     public LambdaExpression(List<String> formalParameters, ValueExpression expression) {
         this.formalParameters = formalParameters;
         this.expression = expression;
 
     }
 
+    /**
+     * Sets the {@link ELContext} to be used when this lambda is invoked without an explicit
+     * context argument. This is called automatically when the lambda is coerced to a
+     * functional interface type.
+     *
+     * @param context the ELContext to use for evaluation
+     */
     public void setELContext(ELContext context) {
         this.context = context;
     }
 
+    /**
+     * Invokes the lambda expression with the given arguments in the specified EL context.
+     * The formal parameters are bound to the corresponding arguments, and the body
+     * expression is evaluated within a lambda scope. If the result is another lambda,
+     * the current arguments are made available to the nested lambda.
+     *
+     * @param context the ELContext in which to evaluate the lambda
+     * @param args    the actual arguments to bind to the formal parameters
+     *
+     * @return the result of evaluating the lambda body expression
+     *
+     * @throws ELException if the number of arguments is less than the number of formal parameters
+     */
     @SuppressWarnings("null") // args[i] can't be null due to earlier checks
     public Object invoke(ELContext context, Object... args) throws ELException {
 
@@ -81,6 +115,17 @@ public class LambdaExpression {
         }
     }
 
+    /**
+     * Invokes the lambda expression with the given arguments using the EL context set by
+     * {@link #setELContext(ELContext)}. This is a convenience method for use when the
+     * lambda has been assigned to a functional interface variable.
+     *
+     * @param args the actual arguments to bind to the formal parameters
+     *
+     * @return the result of evaluating the lambda body expression
+     *
+     * @throws ELException if the number of arguments is less than the number of formal parameters
+     */
     public Object invoke(Object... args) {
         return invoke(context, args);
     }

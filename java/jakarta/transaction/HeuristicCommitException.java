@@ -18,15 +18,29 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a transaction has been heuristically committed. A heuristic
+ * commit indicates that the transaction manager has committed the transaction
+ * without full agreement from all resource managers, typically as a result of
+ * a failure during the commit process.
+ */
 public class HeuristicCommitException extends Exception {
 
     @Serial
     private static final long serialVersionUID = -3977609782149921760L;
 
+    /**
+     * Constructs a {@code HeuristicCommitException} with no detail message.
+     */
     public HeuristicCommitException() {
         super();
     }
 
+    /**
+     * Constructs a {@code HeuristicCommitException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public HeuristicCommitException(String msg) {
         super(msg);
     }

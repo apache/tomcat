@@ -16,8 +16,18 @@
  */
 package jakarta.websocket;
 
+/**
+ * Base interface for WebSocket message handlers. Use {@link Whole} for handling complete
+ * messages and {@link Partial} for handling messages that may arrive in fragments.
+ */
 public interface MessageHandler {
 
+    /**
+     * A message handler that receives partial (fragmented) messages. The handler is called
+     * multiple times for a single WebSocket message if it arrives in fragments.
+     *
+     * @param <T> The type of message data
+     */
     interface Partial<T> extends MessageHandler {
 
         /**
@@ -29,6 +39,12 @@ public interface MessageHandler {
         void onMessage(T messagePart, boolean last);
     }
 
+   /**
+     * A message handler that receives whole (complete) messages. The handler is called once
+     * per WebSocket message.
+     *
+     * @param <T> The type of message data
+     */
     interface Whole<T> extends MessageHandler {
 
         /**

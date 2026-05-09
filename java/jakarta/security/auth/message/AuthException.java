@@ -20,13 +20,25 @@ import java.io.Serial;
 
 import javax.security.auth.login.LoginException;
 
+/**
+ * Exception thrown when a JASPIC authentication operation fails. This exception is used by authentication modules
+ * and contexts to signal errors during the authentication process.
+ */
 public class AuthException extends LoginException {
     @Serial
     private static final long serialVersionUID = -1156951780670243758L;
 
+    /**
+     * Constructs an AuthException with no detail message.
+     */
     public AuthException() {
     }
 
+    /**
+     * Constructs an AuthException with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public AuthException(String msg) {
         super(msg);
     }
