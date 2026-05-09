@@ -35,7 +35,13 @@ public class ServerCookie implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // RFC 6265
+    /**
+     * The cookie name.
+     */
     private final MessageBytes name = MessageBytes.newInstance();
+    /**
+     * The cookie value.
+     */
     private final MessageBytes value = MessageBytes.newInstance();
 
     /**

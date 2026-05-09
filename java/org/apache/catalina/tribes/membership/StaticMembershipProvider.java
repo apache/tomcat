@@ -453,8 +453,11 @@ public class StaticMembershipProvider extends MembershipProviderBase
          * Message type for member ping.
          */
         public static final int MSG_PING = 3;
+        /** The type of this member message. */
         private final int msgtype;
+        /** The membership group identifier. */
         private final byte[] membershipId;
+        /** The member associated with this message. */
         private Member member;
 
         /**

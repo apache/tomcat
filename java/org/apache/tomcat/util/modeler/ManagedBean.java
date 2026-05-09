@@ -57,14 +57,23 @@ public class ManagedBean implements java.io.Serializable {
     static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
+    /**
+     * Lock for thread-safe access to the MBeanInfo cache.
+     */
     private final ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
     /**
      * The <code>ModelMBeanInfo</code> object that corresponds to this <code>ManagedBean</code> instance.
      */
     private transient volatile MBeanInfo info = null;
 
+    /**
+     * The map of attribute descriptors by name.
+     */
     private final Map<String,AttributeInfo> attributes = new HashMap<>();
 
+    /**
+     * The map of operation descriptors by key.
+     */
     private final Map<String,OperationInfo> operations = new HashMap<>();
 
     /**

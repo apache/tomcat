@@ -35,6 +35,9 @@ public class MultipartDef implements Serializable {
     }
 
     // ------------------------------------------------------------- Properties
+    /**
+     * The location for temporary file storage.
+     */
     private String location;
 
     /**
@@ -54,6 +57,9 @@ public class MultipartDef implements Serializable {
     }
 
 
+    /**
+     * The maximum allowed file size.
+     */
     private String maxFileSize;
 
     /**
@@ -73,6 +79,9 @@ public class MultipartDef implements Serializable {
     }
 
 
+    /**
+     * The maximum allowed request size.
+     */
     private String maxRequestSize;
 
     /**
@@ -92,6 +101,9 @@ public class MultipartDef implements Serializable {
     }
 
 
+    /**
+     * The file size threshold for switching to disk storage.
+     */
     private String fileSizeThreshold;
 
     /**

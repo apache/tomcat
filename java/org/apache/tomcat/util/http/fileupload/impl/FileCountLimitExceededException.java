@@ -26,6 +26,9 @@ public class FileCountLimitExceededException extends FileUploadException {
 
     private static final long serialVersionUID = 2408766352570556046L;
 
+    /**
+     * The file count limit that was exceeded.
+     */
     private final long limit;
 
     /**

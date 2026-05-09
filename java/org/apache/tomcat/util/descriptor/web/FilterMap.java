@@ -72,8 +72,14 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     // as equal to a REQUEST
     private static final int NOT_SET = 0;
 
+    /**
+     * The dispatcher mapping bitmask for this filter mapping.
+     */
     private int dispatcherMapping = NOT_SET;
 
+    /**
+     * The name of the filter associated with this mapping.
+     */
     private String filterName = null;
 
     /**

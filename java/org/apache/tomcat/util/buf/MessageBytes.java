@@ -40,6 +40,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     // primary type ( whatever is set as original value )
+    /**
+     * The primary data type of this MessageBytes instance.
+     */
     private int type = T_NULL;
 
     /**
@@ -64,15 +67,30 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
+    /**
+     * The cached hash code value.
+     */
     private int hashCode = 0;
     // did we compute the hashcode ?
+    /**
+     * Whether the hash code has been computed.
+     */
     private boolean hasHashCode = false;
 
     // Internal objects to represent array + offset, and specific methods
+    /**
+     * The internal byte chunk for byte array representation.
+     */
     private final ByteChunk byteC = new ByteChunk();
+    /**
+     * The internal char chunk for character array representation.
+     */
     private final CharChunk charC = new CharChunk();
 
     // String
+    /**
+     * The cached string value.
+     */
     private String strValue;
 
     /**
@@ -574,7 +592,13 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     // efficient long
+    /**
+     * The cached long value.
+     */
     private long longValue;
+    /**
+     * Whether the long value has been computed.
+     */
     private boolean hasLongValue = false;
 
     /**

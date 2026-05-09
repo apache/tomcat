@@ -109,6 +109,9 @@ public final class ByteChunk extends AbstractChunk {
     private transient Charset charset;
 
     // byte[]
+    /**
+     * The underlying byte buffer.
+     */
     private byte[] buff;
 
     // transient as serialization is primarily for values via, e.g. JMX
@@ -133,6 +136,11 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+   /**
+     * Serializes this ByteChunk, writing the charset name.
+     * @param oos the object output stream
+     * @throws IOException if an I/O error occurs
+     */
     @Serial
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
@@ -140,6 +148,12 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Deserializes this ByteChunk, restoring the charset.
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the class is not found
+     * @throws IOException if an I/O error occurs
+     */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();

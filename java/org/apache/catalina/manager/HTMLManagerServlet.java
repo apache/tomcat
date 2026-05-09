@@ -85,7 +85,9 @@ public class HTMLManagerServlet extends ManagerServlet {
     static final String connectorCertsJspPath = "/WEB-INF/jsp/connectorCerts.jsp";
     static final String connectorTrustedCertsJspPath = "/WEB-INF/jsp/connectorTrustedCerts.jsp";
 
+    /** Whether to show proxy sessions in the output. */
     private boolean showProxySessions = false;
+    /** The HTML subtitle for the manager pages. */
     private String htmlSubTitle = null;
 
     // --------------------------------------------------------- Public Methods

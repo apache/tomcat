@@ -28,9 +28,13 @@ public class UndeployMessage implements ClusterMessage {
     @Serial
     private static final long serialVersionUID = 2L;
 
+    /** The sender's member address. */
     private Member address;
+    /** The message timestamp. */
     private long timestamp;
+    /** The unique identifier for this message. */
     private final String uniqueId;
+    /** The context name to undeploy. */
     private final String contextName;
 
     /**

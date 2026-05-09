@@ -72,6 +72,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
     private static final StringManager sm = StringManager.getManager(NamingResourcesImpl.class);
 
+    /**
+     * Flag that controls whether resources require explicit JMX registration.
+     */
     private volatile boolean resourceRequireExplicitRegistration = false;
 
     // ----------------------------------------------------------- Constructors

@@ -784,6 +784,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         // Although the internal implementation uses a Map, this cache
         // implementation is only concerned with the keys.
+        /**
+         * The internal cache map.
+         */
         private final Map<T,T> cache;
 
         /**

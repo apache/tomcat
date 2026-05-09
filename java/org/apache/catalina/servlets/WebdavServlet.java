@@ -263,6 +263,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private int maxDepth = MAX_DEPTH;
 
 
+    /** The maximum size of the request body in bytes. */
     private int maxRequestBodySize = DEFAULT_MAX_REQUEST_BODY_SIZE;
 
 

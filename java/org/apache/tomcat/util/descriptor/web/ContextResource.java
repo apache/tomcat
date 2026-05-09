@@ -114,6 +114,9 @@ public class ContextResource extends ResourceBase {
      * This method must only speed up the clean-up of resources that would otherwise happen via garbage collection.
      */
     private String closeMethod = null;
+    /**
+     * Whether the close method has been explicitly configured.
+     */
     private boolean closeMethodConfigured = false;
 
     /**

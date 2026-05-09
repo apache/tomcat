@@ -37,7 +37,9 @@ public class OpenSSLConfCmd implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** The command name. */
     private String name = null;
+    /** The command value. */
     private String value = null;
 
     /**

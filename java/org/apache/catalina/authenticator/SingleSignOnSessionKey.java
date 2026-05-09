@@ -32,8 +32,17 @@ public class SingleSignOnSessionKey implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The session ID.
+     */
     private final String sessionId;
+    /**
+     * The context name.
+     */
     private final String contextName;
+    /**
+     * The host name.
+     */
     private final String hostName;
 
     /**

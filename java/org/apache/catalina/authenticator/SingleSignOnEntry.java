@@ -45,17 +45,32 @@ public class SingleSignOnEntry implements Serializable {
 
     // ------------------------------------------------------ Instance Fields
 
+    /**
+     * The authentication type (BASIC, CLIENT_CERT, DIGEST or FORM).
+     */
     private String authType = null;
 
+    /**
+     * The password used for authentication.
+     */
     private String password = null;
 
     // Marked as transient so special handling can be applied to serialization
     private transient Principal principal = null;
 
+    /**
+     * Map of session keys associated with this SSO entry.
+     */
     private final Map<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
 
+    /**
+     * The username used for authentication.
+     */
     private String username = null;
 
+    /**
+     * Flag indicating whether re-authentication is supported.
+     */
     private boolean canReauthenticate = false;
 
     // --------------------------------------------------------- Constructors
@@ -188,6 +203,12 @@ public class SingleSignOnEntry implements Serializable {
     }
 
 
+    /**
+     * Custom serialization to handle the transient principal field.
+     *
+     * @param out the object output stream
+     * @throws IOException if an I/O error occurs
+     */
     @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
@@ -199,6 +220,13 @@ public class SingleSignOnEntry implements Serializable {
         }
     }
 
+    /**
+     * Custom deserialization to restore the transient principal field.
+     *
+     * @param in the object input stream
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if the principal class cannot be found
+     */
     @Serial
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();

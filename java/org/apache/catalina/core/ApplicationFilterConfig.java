@@ -336,8 +336,12 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /*
-     * Log objects are not Serializable.
+    /**
+     * Restores the transient log field after deserialization.
+     *
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the log class cannot be found
+     * @throws IOException if an I/O error occurs
      */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

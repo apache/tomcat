@@ -54,57 +54,109 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * Counter for tracking the number of pools created.
      */
     protected static final AtomicInteger poolCounter = new AtomicInteger(0);
+    /** Database-specific properties. */
     private volatile Properties dbProperties = new Properties();
+    /** The JDBC connection URL. */
     private volatile String url = null;
+    /** The JDBC driver class name. */
     private volatile String driverClassName = null;
+    /** The default auto-commit setting for connections. */
     private volatile Boolean defaultAutoCommit = null;
+    /** The default read-only setting for connections. */
     private volatile Boolean defaultReadOnly = null;
+    /** The default transaction isolation level. */
     private volatile int defaultTransactionIsolation = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
+    /** The default catalog for connections. */
     private volatile String defaultCatalog = null;
+    /** Additional connection properties. */
     private volatile String connectionProperties;
+    /** The initial number of connections in the pool. */
     private volatile int initialSize = 10;
+    /** The maximum number of active connections. */
     private volatile int maxActive = DEFAULT_MAX_ACTIVE;
+    /** The maximum number of idle connections. */
     private volatile int maxIdle = maxActive;
+    /** The minimum number of idle connections. */
     private volatile int minIdle = initialSize;
+    /** The maximum wait time in milliseconds for a connection. */
     private volatile int maxWait = 30000;
+    /** The SQL query used for validation. */
     private volatile String validationQuery;
+    /** The validation query timeout in seconds. */
     private volatile int validationQueryTimeout = -1;
+    /** The fully qualified class name of the validator. */
     private volatile String validatorClassName;
+    /** The validator instance. */
     private transient volatile Validator validator;
+    /** Whether to validate connections on borrow. */
     private volatile boolean testOnBorrow = false;
+    /** Whether to validate connections on return. */
     private volatile boolean testOnReturn = false;
+    /** Whether to validate idle connections. */
     private volatile boolean testWhileIdle = false;
+    /** The time between eviction runs in milliseconds. */
     private volatile int timeBetweenEvictionRunsMillis = 5000;
+    /** The number of connections to test per eviction run. */
     private volatile int numTestsPerEvictionRun;
+    /** The minimum idle time before a connection is eligible for eviction. */
     private volatile int minEvictableIdleTimeMillis = 60000;
+    /** Whether to allow access to the underlying connection. */
     private volatile boolean accessToUnderlyingConnectionAllowed = true;
+    /** Whether to remove abandoned connections. */
     private volatile boolean removeAbandoned = false;
+    /** The timeout in seconds for abandoned connection removal. */
     private volatile int removeAbandonedTimeout = 60;
+    /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
+    /** The pool name. */
     private volatile String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+"-"+System.identityHashCode(PoolProperties.class)+"]";
+    /** The database password. */
     private volatile String password;
+    /** The database username. */
     private volatile String username;
+    /** The validation interval in milliseconds. */
     private volatile long validationInterval = 3000;
+    /** Whether JMX registration is enabled. */
     private volatile boolean jmxEnabled = true;
+    /** The SQL to execute on connection creation. */
     private volatile String initSQL;
+    /** Whether to validate connections on creation. */
     private volatile boolean testOnConnect =false;
+    /** The JDBC interceptors configuration. */
     private volatile String jdbcInterceptors=null;
+    /** Whether to use a fair queue for connection requests. */
     private volatile boolean fairQueue = true;
+    /** Whether to use equals for object comparison. */
     private volatile boolean useEquals = true;
+    /** The percentage threshold for abandoning connections. */
     private volatile int abandonWhenPercentageFull = 0;
+    /** The maximum age of a connection in milliseconds. */
     private volatile long maxAge = 0;
+    /** Whether to use locking for thread safety. */
     private volatile boolean useLock = false;
+    /** The interceptor definitions. */
     private volatile InterceptorDefinition[] interceptors = null;
+    /** The suspect timeout in seconds. */
     private volatile int suspectTimeout = 0;
+    /** The underlying data source. */
     private volatile Object dataSource = null;
+    /** The JNDI name of the data source. */
     private volatile String dataSourceJNDI = null;
+    /** Whether alternate usernames are allowed. */
     private volatile boolean alternateUsernameAllowed = false;
+    /** Whether to commit on connection return. */
     private volatile boolean commitOnReturn = false;
+    /** Whether to rollback on connection return. */
     private volatile boolean rollbackOnReturn = false;
+    /** Whether to use a disposable connection facade. */
     private volatile boolean useDisposableConnectionFacade = true;
+    /** Whether to log validation errors. */
     private volatile boolean logValidationErrors = false;
+    /** Whether to propagate interrupt state. */
     private volatile boolean propagateInterruptState = false;
+    /** Whether to ignore exceptions during pre-load. */
     private volatile boolean ignoreExceptionOnPreLoad = false;
+    /** Whether to use a statement facade. */
     private volatile boolean useStatementFacade = true;
 
     @Override

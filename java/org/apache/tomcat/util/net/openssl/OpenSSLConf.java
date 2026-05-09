@@ -35,6 +35,9 @@ public class OpenSSLConf implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The list of OpenSSL configuration commands.
+     */
     private final List<OpenSSLConfCmd> commands = new ArrayList<>();
 
     /**

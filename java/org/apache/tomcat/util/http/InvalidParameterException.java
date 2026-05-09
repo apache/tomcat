@@ -31,6 +31,9 @@ public class InvalidParameterException extends IllegalStateException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The HTTP error code associated with this exception.
+     */
     private final int errorCode;
 
 

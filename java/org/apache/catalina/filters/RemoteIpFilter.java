@@ -811,8 +811,10 @@ public class RemoteIpFilter extends GenericFilter {
      */
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
+    /** The default HTTP server port. */
     private int httpServerPort = 80;
 
+    /** The default HTTPS server port. */
     private int httpsServerPort = 443;
 
     private Pattern internalProxiesRegex = null;
@@ -821,28 +823,38 @@ public class RemoteIpFilter extends GenericFilter {
             NetMaskSet.parse("10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8," +
                     "::1/128,fe80::/10,fc00::/7");
 
+    /** The header used to determine the protocol. */
     private String protocolHeader = "X-Forwarded-Proto";
 
+    /** The protocol header value that indicates HTTPS. */
     private String protocolHeaderHttpsValue = "https";
 
+    /** The header used to determine the host. */
     private String hostHeader = null;
 
+    /** Whether to change the local name. */
     private boolean changeLocalName = false;
 
+    /** The header used to determine the port. */
     private String portHeader = null;
 
+    /** Whether to change the local port. */
     private boolean changeLocalPort = false;
 
+    /** The header used to determine the proxy chain. */
     private String proxiesHeader = "X-Forwarded-By";
 
+    /** The header used to determine the remote IP address. */
     private String remoteIpHeader = "X-Forwarded-For";
 
+    /** Whether to set request attributes. */
     private boolean requestAttributesEnabled = true;
 
     private Pattern trustedProxiesRegex = null;
 
     private NetMaskSet trustedProxiesCidr = null;
 
+    /** Whether DNS lookups are enabled. */
     private boolean enableLookups;
 
 
@@ -1542,6 +1554,12 @@ public class RemoteIpFilter extends GenericFilter {
     /*
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
+     */
+   /**
+     * Restores the log after deserialization.
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the class is not found
+     * @throws IOException if an I/O error occurs
      */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

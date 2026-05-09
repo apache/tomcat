@@ -39,8 +39,10 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
 
+    /** The underlying map to which operations are delegated. */
     private final Map<K,V> delegatedMap;
 
+    /** An unmodifiable view of the delegated map. */
     private final Map<K,V> unmodifiableDelegatedMap;
 
 

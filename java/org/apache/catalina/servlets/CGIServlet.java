@@ -247,8 +247,9 @@ public final class CGIServlet extends HttpServlet {
     /** the encoding to use for parameters */
     private String parameterEncoding = System.getProperty("file.encoding", "UTF-8");
 
-    /* The HTTP methods this Servlet will pass to the CGI script */
+    /** The HTTP methods this servlet will pass to the CGI script. */
     private final Set<String> cgiMethods = new HashSet<>();
+    /** Whether all HTTP methods are allowed for CGI scripts. */
     private boolean cgiMethodsAll = false;
 
     private transient WebResourceRoot resources = null;

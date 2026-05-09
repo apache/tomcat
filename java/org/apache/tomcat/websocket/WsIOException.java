@@ -30,6 +30,7 @@ public class WsIOException extends IOException {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** The WebSocket close reason. */
     private final CloseReason closeReason;
 
     /**

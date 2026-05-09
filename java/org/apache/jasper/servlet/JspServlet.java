@@ -60,11 +60,14 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private final transient Log log = LogFactory.getLog(JspServlet.class);
 
     private transient ServletContext context;
+    /** The servlet configuration. */
     private ServletConfig config;
     private transient Options options;
     private transient JspRuntimeContext rctxt;
-    // jspFile for a jsp configured explicitly as a servlet, in environments where this
-    // configuration is translated into an init-param for this servlet.
+    /**
+     * The JSP file for a JSP configured explicitly as a servlet, in environments where this
+     * configuration is translated into an init-param for this servlet.
+     */
     private String jspFile;
 
 
