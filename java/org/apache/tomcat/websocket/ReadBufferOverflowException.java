@@ -25,6 +25,7 @@ public class ReadBufferOverflowException extends IOException {
 
     private static final long serialVersionUID = 1L;
 
+    /** The minimum buffer size required. */
     private final int minBufferSize;
 
     /**

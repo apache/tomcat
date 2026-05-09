@@ -27,12 +27,18 @@ import org.apache.catalina.tribes.Member;
 public class FileMessage extends ClusterMessageBase {
     private static final long serialVersionUID = 2L;
 
+    /** The message number within the file transfer. */
     private int messageNumber;
+    /** The file data payload. */
     private byte[] data;
+    /** The length of the data. */
     private int dataLength;
 
+    /** The total number of messages in the transfer. */
     private long totalNrOfMsgs;
+    /** The name of the file being transferred. */
     private final String fileName;
+    /** The context name associated with the file. */
     private final String contextName;
 
     /**

@@ -33,7 +33,13 @@ public class ServerCookie implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Version 0 (Netscape) attributes
+    /**
+     * The cookie name.
+     */
     private final MessageBytes name = MessageBytes.newInstance();
+    /**
+     * The cookie value.
+     */
     private final MessageBytes value = MessageBytes.newInstance();
     // Expires - Not stored explicitly. Generated from Max-Age (see V1)
     private final MessageBytes path = MessageBytes.newInstance();

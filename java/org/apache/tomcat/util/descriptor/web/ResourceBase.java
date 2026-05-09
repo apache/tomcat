@@ -178,6 +178,9 @@ public class ResourceBase implements Serializable, Injectable {
         return properties.keySet().iterator();
     }
 
+    /**
+     * The list of injection targets for this resource.
+     */
     private final List<InjectionTarget> injectionTargets = new ArrayList<>();
 
     @Override

@@ -25,7 +25,13 @@ public class InjectionTarget implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The fully qualified class name of the injection target.
+     */
     private String targetClass;
+    /**
+     * The name of the field or method to inject into.
+     */
     private String targetName;
 
 

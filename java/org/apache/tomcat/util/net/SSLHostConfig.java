@@ -89,73 +89,217 @@ public class SSLHostConfig implements Serializable {
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_3);
     }
 
+    /**
+     * The detected configuration type (JSSE or OpenSSL).
+     */
     private Type configType = null;
+    /**
+     * The detected trust configuration type (JSSE or OpenSSL).
+     */
     private Type trustConfigType = null;
 
+    /**
+     * The name of the virtual host.
+     */
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
+    /**
+     * The native OpenSSL configuration context pointer.
+     */
     private transient volatile Long openSslConfContext = Long.valueOf(0);
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is here at the virtual host level. JSSE can't so the
     // reference is held on the certificate.
+    /**
+     * The native OpenSSL SSL context pointer.
+     */
     private transient volatile Long openSslContext = Long.valueOf(0);
 
+    /**
+     * Whether TLS 1.3 renegotiation is available.
+     */
     private boolean tls13RenegotiationAvailable = false;
 
     // Configuration properties
 
     // Internal
+    /**
+     * The ciphers enabled by the SSL engine.
+     */
     private String[] enabledCiphers;
+    /**
+     * The protocols enabled by the SSL engine.
+     */
     private String[] enabledProtocols;
+    /**
+     * The JMX object name.
+     */
     private ObjectName oname;
     // Need to know if TLS 1.3 has been explicitly requested as a warning needs
     // to generated if it is explicitly requested for a JVM that does not
     // support it. Uses a set so it is extensible for TLS 1.4 etc.
+    /**
+     * The set of protocols explicitly requested by the user.
+     */
     private final Set<String> explicitlyRequestedProtocols = new HashSet<>();
     // Nested
+    /**
+     * The default certificate configuration.
+     */
     private SSLHostConfigCertificate defaultCertificate = null;
+    /**
+     * The set of certificate configurations.
+     */
     private final Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
     // Common
+    /**
+     * The path to the certificate revocation list file.
+     */
     private String certificateRevocationListFile;
+    /**
+     * The client certificate verification mode.
+     */
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
+    /**
+     * The depth for certificate chain verification.
+     */
     private int certificateVerificationDepth = 10;
     // Used to track if certificateVerificationDepth has been explicitly set
+    /**
+     * Whether the certificate verification depth was explicitly configured.
+     */
     private boolean certificateVerificationDepthConfigured = false;
+    /**
+     * The cipher configuration for TLS 1.2 and below (OpenSSL format).
+     */
     private String ciphers = DEFAULT_TLS_CIPHERS_12;
+    /**
+     * The cipher suite configuration for TLS 1.3.
+     */
     private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
     private String cipherSuitesFromCiphers = null;
+    /**
+     * The parsed cipher list for TLS 1.2 and below.
+     */
     private LinkedHashSet<Cipher> cipherList = null;
+    /**
+     * The parsed cipher suite list for TLS 1.3.
+     */
     private LinkedHashSet<Cipher> cipherSuiteList = null;
+    /**
+     * The JSSE cipher names derived from the configuration.
+     */
     private List<String> jsseCipherNames = null;
+    /**
+     * Whether to honor the server's cipher order preference.
+     */
     private boolean honorCipherOrder = false;
+    /**
+     * Whether OCSP stapling is enabled.
+     */
     private boolean ocspEnabled = false;
+    /**
+     * Whether OCSP soft fail is enabled.
+     */
     private boolean ocspSoftFail = true;
+    /**
+     * The OCSP request timeout in milliseconds.
+     */
     private int ocspTimeout = 15000;
+    /**
+     * The OCSP verification flags.
+     */
     private int ocspVerifyFlags = 0;
+    /**
+     * The set of enabled SSL/TLS protocols.
+     */
     private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
+    /**
+     * The SSL session cache size.
+     */
     private int sessionCacheSize = -1;
+    /**
+     * The SSL session timeout in seconds.
+     */
     private int sessionTimeout = 86400;
     // JSSE
+    /**
+     * The key manager algorithm.
+     */
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    /**
+     * Whether CRL/OCSP revocation checking is enabled.
+     */
     private boolean revocationEnabled = false;
+    /**
+     * The JSSE SSL protocol name.
+     */
     private String sslProtocol = Constants.SSL_PROTO_TLS;
+    /**
+     * The trust manager class name.
+     */
     private String trustManagerClassName;
+    /**
+     * The truststore algorithm.
+     */
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+    /**
+     * The truststore file path.
+     */
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    /**
+     * The truststore password.
+     */
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+    /**
+     * The truststore provider.
+     */
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
+    /**
+     * The truststore type.
+     */
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    /**
+     * The truststore instance.
+     */
     private transient KeyStore truststore = null;
+    /**
+     * The configured TLS named groups.
+     */
     private String groups = System.getProperty("jdk.tls.namedGroups");
+    /**
+     * The parsed group list.
+     */
     private LinkedHashSet<Group> groupList = null;
     // OpenSSL
+    /**
+     * The path to the certificate revocation list directory.
+     */
     private String certificateRevocationListPath;
+    /**
+     * The path to the CA certificate file.
+     */
     private String caCertificateFile;
+    /**
+     * The path to the CA certificate directory.
+     */
     private String caCertificatePath;
+    /**
+     * Whether TLS compression is disabled.
+     */
     private boolean disableCompression = true;
+    /**
+     * Whether TLS session tickets are disabled.
+     */
     private boolean disableSessionTickets = false;
+    /**
+     * Whether insecure renegotiation is allowed.
+     */
     private boolean insecureRenegotiation = false;
+    /**
+     * The OpenSSL configuration.
+     */
     private OpenSSLConf openSslConf = null;
 
     /**

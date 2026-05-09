@@ -60,6 +60,9 @@ public class XMLWriter {
     protected final Writer writer;
 
 
+    /**
+     * Flag to track whether the last write operation was an opening tag.
+     */
     protected boolean lastWriteWasOpen;
 
 

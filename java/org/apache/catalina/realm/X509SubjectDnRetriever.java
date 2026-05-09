@@ -23,6 +23,12 @@ import java.security.cert.X509Certificate;
  */
 public class X509SubjectDnRetriever implements X509UsernameRetriever {
 
+    /**
+     * Default constructor.
+     */
+    public X509SubjectDnRetriever() {
+    }
+
     @Override
     public String getUsername(X509Certificate clientCert) {
         return clientCert.getSubjectX500Principal().toString();
