@@ -55,6 +55,9 @@ public class SSLHostConfigCertificate implements Serializable {
     private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
 
     // Internal
+    /**
+     * The JMX object name for this certificate.
+     */
     private ObjectName oname;
 
     /*
@@ -67,27 +70,75 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     // Common
+    /**
+     * The parent SSL host configuration.
+     */
     private final SSLHostConfig sslHostConfig;
+    /**
+     * The type of this certificate.
+     */
     private final Type type;
+    /**
+     * The password for the certificate's private key.
+     */
     private String certificateKeyPassword = null;
+    /**
+     * The path to the file containing the certificate key password.
+     */
     private String certificateKeyPasswordFile = null;
 
     // JSSE
+    /**
+     * The alias of the key entry in the keystore.
+     */
     private String certificateKeyAlias;
+    /**
+     * The password used to access the keystore.
+     */
     private String certificateKeystorePassword = DEFAULT_KEYSTORE_PASSWORD;
+    /**
+     * The path to the file containing the keystore password.
+     */
     private String certificateKeystorePasswordFile = null;
+    /**
+     * The path to the keystore file.
+     */
     private String certificateKeystoreFile = DEFAULT_KEYSTORE_FILE;
+    /**
+     * The provider of the keystore.
+     */
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
+    /**
+     * The type of the keystore.
+     */
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
+    /**
+     * The Java KeyStore for this certificate.
+     */
     private transient KeyStore certificateKeystore = null;
+    /**
+     * The X509KeyManager for this certificate.
+     */
     private transient X509KeyManager certificateKeyManager = null;
 
     // OpenSSL
+    /**
+     * The path to the certificate chain file.
+     */
     private String certificateChainFile;
+    /**
+     * The path to the certificate file.
+     */
     private String certificateFile;
+    /**
+     * The path to the private key file.
+     */
     private String certificateKeyFile;
 
     // Certificate store type
+    /**
+     * The type of certificate store (KEYSTORE or PEM).
+     */
     private StoreType storeType = null;
 
     /**

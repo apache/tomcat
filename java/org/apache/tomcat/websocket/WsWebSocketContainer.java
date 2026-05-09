@@ -128,6 +128,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return InstanceManagerBindings.get(classLoader);
     }
 
+    /**
+     * Sets the instance manager for this container.
+     *
+     * @param instanceManager the instance manager
+     */
     protected void setInstanceManager(InstanceManager instanceManager) {
         this.instanceManager = instanceManager;
     }

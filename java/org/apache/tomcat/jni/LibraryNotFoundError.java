@@ -23,6 +23,9 @@ public class LibraryNotFoundError extends UnsatisfiedLinkError {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The names of the libraries that failed to load.
+     */
     private final String libraryNames;
 
     /**

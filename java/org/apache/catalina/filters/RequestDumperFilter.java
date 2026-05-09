@@ -250,9 +250,14 @@ public class RequestDumperFilter extends GenericFilter {
     }
 
 
-    /*
+    /**
+     * Restores the log after deserialization.
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
+     *
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the class is not found
+     * @throws IOException if an I/O error occurs
      */
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();

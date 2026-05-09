@@ -878,14 +878,10 @@ public class RemoteIpFilter extends GenericFilter {
         return result.toString();
     }
 
-    /**
-     * @see #setHttpServerPort(int)
-     */
+    /** The default HTTP server port. */
     private int httpServerPort = 80;
 
-    /**
-     * @see #setHttpsServerPort(int)
-     */
+    /** The default HTTPS server port. */
     private int httpsServerPort = 443;
 
     /**
@@ -899,34 +895,31 @@ public class RemoteIpFilter extends GenericFilter {
             "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
             "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
 
-    /**
-     * @see #setProtocolHeader(String)
-     */
+    /** The header used to determine the protocol. */
     private String protocolHeader = "X-Forwarded-Proto";
 
+    /** The protocol header value that indicates HTTPS. */
     private String protocolHeaderHttpsValue = "https";
 
+    /** The header used to determine the host. */
     private String hostHeader = null;
 
+    /** Whether to change the local name. */
     private boolean changeLocalName = false;
 
+    /** The header used to determine the port. */
     private String portHeader = null;
 
+    /** Whether to change the local port. */
     private boolean changeLocalPort = false;
 
-    /**
-     * @see #setProxiesHeader(String)
-     */
+    /** The header used to determine the proxy chain. */
     private String proxiesHeader = "X-Forwarded-By";
 
-    /**
-     * @see #setRemoteIpHeader(String)
-     */
+    /** The header used to determine the remote IP address. */
     private String remoteIpHeader = "X-Forwarded-For";
 
-    /**
-     * @see #setRequestAttributesEnabled(boolean)
-     */
+    /** Whether to set request attributes. */
     private boolean requestAttributesEnabled = true;
 
     /**
@@ -934,6 +927,7 @@ public class RemoteIpFilter extends GenericFilter {
      */
     private Pattern trustedProxies = null;
 
+    /** Whether DNS lookups are enabled. */
     private boolean enableLookups;
 
     /**
@@ -1532,9 +1526,13 @@ public class RemoteIpFilter extends GenericFilter {
         this.enableLookups = enableLookups;
     }
 
-    /*
+   /**
+     * Restores the log after deserialization.
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the class is not found
+     * @throws IOException if an I/O error occurs
      */
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();

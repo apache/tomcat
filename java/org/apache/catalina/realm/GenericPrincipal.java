@@ -324,6 +324,10 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     // ----------------------------------------------------------- Serialization
 
+    /**
+     * Returns a serializable replacement for this principal.
+     * @return the serializable replacement
+     */
     private Object writeReplace() {
         return new SerializablePrincipal(name, roles, userPrincipal, attributes);
     }

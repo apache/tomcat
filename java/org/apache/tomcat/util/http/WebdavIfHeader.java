@@ -703,8 +703,7 @@ public class WebdavIfHeader {
      * <pre>
      *    IfList = { [ "Not" ] ( ("&lt;" Word "&gt;" ) | ( "[" Word "]" ) ) } .
      * </pre>
-     * <p>
-     */
+      */
     private static class IfList extends ArrayList<IfListEntry> {
 
         private static final long serialVersionUID = 1L;

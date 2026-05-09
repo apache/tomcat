@@ -24,6 +24,12 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class XmlEncodingBase {
 
+    /**
+     * Default constructor.
+     */
+    public XmlEncodingBase() {
+    }
+
     private Charset charset = StandardCharsets.UTF_8;
 
 

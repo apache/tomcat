@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+/**
+ * XA-enabled data source for distributed transaction support.
+ */
 public class XADataSource extends DataSource implements javax.sql.XADataSource {
 
     /**

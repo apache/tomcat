@@ -32,6 +32,9 @@ public class SingleSignOnListener implements SessionListener, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The SSO identifier associated with this listener.
+     */
     private final String ssoId;
 
     /**
