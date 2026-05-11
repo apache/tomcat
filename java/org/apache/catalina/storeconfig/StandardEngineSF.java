@@ -26,12 +26,22 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardEngine;
-import org.apache.catalina.ha.ClusterValve;
 
 /**
  * Store server.xml Element Engine
  */
 public class StandardEngineSF extends StoreFactoryBase {
+
+    private static final Class<?> clusterValveClass;
+    static {
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName("org.apache.catalina.ha.ClusterValve");
+        } catch (ClassNotFoundException e) {
+            // Expected when clustering JARs are not present
+        }
+        clusterValveClass = clazz;
+    }
 
     /**
      * Constructs a new StandardEngineSF instance for storing Engine elements in server.xml.
@@ -69,7 +79,7 @@ public class StandardEngineSF extends StoreFactoryBase {
             if (valves != null && valves.length > 0) {
                 List<Valve> engineValves = new ArrayList<>();
                 for (Valve valve : valves) {
-                    if (!(valve instanceof ClusterValve)) {
+                    if (clusterValveClass == null || !clusterValveClass.isInstance(valve)) {
                         engineValves.add(valve);
                     }
                 }
