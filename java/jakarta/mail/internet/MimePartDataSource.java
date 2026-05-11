@@ -21,7 +21,6 @@ package jakarta.mail.internet;
  * Wraps a MimePart so it can be used where a DataSource is required.
  * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
-@SuppressWarnings("unused") // Dummy implementation
 public class MimePartDataSource {
     /**
      * Constructs a MimePartDataSource wrapping the given MimePart.

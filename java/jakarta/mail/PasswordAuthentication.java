@@ -22,7 +22,6 @@ package jakarta.mail;
  * establishing mail connections.
  * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
-@SuppressWarnings("unused") // Dummy implementation
 public class PasswordAuthentication {
 
     /**

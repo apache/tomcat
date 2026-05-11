@@ -22,7 +22,6 @@ import java.util.Properties;
  * Represents a mail session configuration.
  * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
-@SuppressWarnings("unused") // Dummy implementation
 public class Session {
     /**
      * Default constructor.

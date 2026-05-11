@@ -22,7 +22,6 @@ package jakarta.mail.internet;
  * an address string in the form of local-part@domain.
  * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
-@SuppressWarnings("unused") // Dummy implementation
 public class InternetAddress {
     /**
      * Constructs an InternetAddress from the specified address string.
