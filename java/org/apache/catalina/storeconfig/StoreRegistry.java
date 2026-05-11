@@ -120,7 +120,7 @@ public class StoreRegistry {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("registry.optionalClassLoaded", className));
             }
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("registry.optionalClassNotFound", className));
             }
