@@ -20,6 +20,7 @@ package jakarta.mail.internet;
  * Represents an Internet email address as defined by RFC 822.
  * An Internet address consists of an optional personal name and
  * an address string in the form of local-part@domain.
+ * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
 @SuppressWarnings("unused") // Dummy implementation
 public class InternetAddress {
