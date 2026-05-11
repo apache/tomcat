@@ -20,6 +20,7 @@ package jakarta.mail;
  * Stores username and password credentials for mail authentication. This class follows the pattern defined by
  * {@link java.net.PasswordAuthentication} and is used with {@link Authenticator} to provide credentials when
  * establishing mail connections.
+ * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
 @SuppressWarnings("unused") // Dummy implementation
 public class PasswordAuthentication {

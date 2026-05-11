@@ -19,6 +19,7 @@ package jakarta.mail.internet;
 /**
  * Represents a part of a MIME message in the Jakarta Mail API.
  * A MimePart can contain content and headers for a single MIME entity.
+ * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
 public interface MimePart {
     // Dummy implementation

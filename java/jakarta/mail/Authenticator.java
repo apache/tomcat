@@ -20,6 +20,7 @@ package jakarta.mail;
  * Abstract base class for providing user authentication when establishing network connections. Subclasses override
  * {@link #getPasswordAuthentication} to return the appropriate credentials. This class is part of the Jakarta Mail
  * API and follows the pattern defined by {@link java.net.Authenticator}.
+ * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
 public class Authenticator {
 

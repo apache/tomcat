@@ -21,6 +21,7 @@ import jakarta.mail.Session;
 /**
  * Represents a MIME message in the Jakarta Mail API.
  * Provides methods for setting message headers such as sender and subject.
+ * NOTE: This is a stub API, Apache Tomcat does not provide any implementation for this API.
  */
 @SuppressWarnings("unused") // Dummy implementation
 public class MimeMessage implements MimePart {
