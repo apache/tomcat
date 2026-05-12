@@ -122,6 +122,10 @@
         <code>AprLifecycleListener</code> and gracefully fail when natives
         are not present. (csutherl)
       </fix>
+      <fix>
+        <bug>70038</bug>: <code>Cookie.clone()</code> should also clone the
+        internal attribute map. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

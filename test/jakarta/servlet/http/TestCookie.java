@@ -206,7 +206,7 @@ public class TestCookie {
 
     @Test
     public void testClone() {
-        Cookie a = new Cookie("a", "a");
+        Cookie a = new Cookie("a-name", "a-value");
         a.setDomain("domain");
         a.setHttpOnly(true);
         a.setMaxAge(123);
@@ -215,13 +215,16 @@ public class TestCookie {
 
         Cookie b = (Cookie) a.clone();
 
-        Assert.assertEquals("a", b.getName());
-        Assert.assertEquals("a", b.getValue());
+        Assert.assertEquals("a-name", b.getName());
+        Assert.assertEquals("a-value", b.getValue());
         Assert.assertEquals("domain", b.getDomain());
         Assert.assertTrue(b.isHttpOnly());
         Assert.assertEquals(123, b.getMaxAge());
         Assert.assertEquals("/path", b.getPath());
         Assert.assertTrue(b.getSecure());
+
+        b.setPath("new-path");
+        Assert.assertEquals("/path", a.getPath());
     }
 
 
