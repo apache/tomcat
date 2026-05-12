@@ -1583,9 +1583,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      */
     protected static boolean validateContextName(ContextName cn, PrintWriter writer, StringManager smClient) {
 
-        // ContextName should be non-null with a path that is empty or starts
-        // with /
-        if (cn != null && (cn.getPath().startsWith("/") || cn.getPath().isEmpty())) {
+        if (cn != null && cn.isPathValid()) {
             return true;
         }
 

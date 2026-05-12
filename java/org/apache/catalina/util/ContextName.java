@@ -19,6 +19,8 @@ package org.apache.catalina.util;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.apache.tomcat.util.http.RequestUtil;
+
 /**
  * Utility class to manage context names so there is one place where the conversions between baseName, path and version
  * take place.
@@ -193,6 +195,18 @@ public final class ContextName {
     @Override
     public String toString() {
         return getDisplayName();
+    }
+
+
+    public boolean isPathValid() {
+        // No need to test for null since path can never be null (see constructors)
+        //
+        // Therefore, just need to check:
+        // - empty or start with /
+        // - normalized and no attempt to escape the root
+        //
+        // Note: Normalize check on empty path would fail
+        return path.isEmpty() || (path.startsWith("/") && path.equals(RequestUtil.normalize(path)));
     }
 
 

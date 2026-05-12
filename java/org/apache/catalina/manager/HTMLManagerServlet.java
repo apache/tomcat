@@ -250,6 +250,12 @@ public class HTMLManagerServlet extends ManagerServlet {
                 }
 
                 ContextName cn = new ContextName(filename, true);
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter);
+                if (!validateContextName(cn, printWriter, smClient)) {
+                    return stringWriter.toString();
+                }
+
                 String name = cn.getName();
 
                 if (host.findChild(name) != null && !isDeployed(name)) {

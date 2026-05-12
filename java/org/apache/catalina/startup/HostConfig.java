@@ -147,6 +147,16 @@ public class HostConfig implements LifecycleListener {
     private final Object digesterLock = new Object();
 
     /**
+     * The list of descriptors in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
+     */
+    protected final Set<String> invalidDescriptors = new HashSet<>();
+
+    /**
+     * The list of directories in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
+     */
+    protected final Set<String> invalidDirectories = new HashSet<>();
+
+    /**
      * The list of Wars in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
      */
     protected final Set<String> invalidWars = new HashSet<>();
@@ -493,7 +503,7 @@ public class HostConfig implements LifecycleListener {
         for (String file : files) {
             File contextXml = new File(configBase, file);
 
-            if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+            if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml") && !invalidDescriptors.contains(file)) {
                 ContextName cn = new ContextName(file, true);
 
                 if (tryAddServiced(cn.getName())) {
@@ -534,6 +544,13 @@ public class HostConfig implements LifecycleListener {
      */
     @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
+
+        // Check for descriptors with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalDescriptorName", contextXml.getName()));
+            invalidDescriptors.add(contextXml.getName());
+            return;
+        }
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(), true);
 
@@ -737,14 +754,6 @@ public class HostConfig implements LifecycleListener {
                             continue;
                         }
 
-                        // Check for WARs with /../ /./ or similar sequences in the name
-                        if (!validateContextPath(appBase, cn.getBaseName())) {
-                            log.error(sm.getString("hostConfig.illegalWarName", file));
-                            invalidWars.add(file);
-                            removeServiced(cn.getName());
-                            continue;
-                        }
-
                         // DeployWAR will call removeServiced
                         results.add(es.submit(new DeployWar(this, cn, war)));
                     } catch (Throwable t) {
@@ -766,40 +775,6 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private boolean validateContextPath(File appBase, String contextPath) {
-        // More complicated than the ideal as the canonical path may or may
-        // not end with File.separator for a directory
-
-        StringBuilder docBase;
-        String canonicalDocBase;
-
-        try {
-            String canonicalAppBase = appBase.getCanonicalPath();
-            docBase = new StringBuilder(canonicalAppBase);
-            if (canonicalAppBase.endsWith(File.separator)) {
-                docBase.append(contextPath.substring(1).replace('/', File.separatorChar));
-            } else {
-                docBase.append(contextPath.replace('/', File.separatorChar));
-            }
-            // At this point docBase should be canonical but will not end
-            // with File.separator
-
-            canonicalDocBase = (new File(docBase.toString())).getCanonicalPath();
-
-            // If the canonicalDocBase ends with File.separator, add one to
-            // docBase before they are compared
-            if (canonicalDocBase.endsWith(File.separator)) {
-                docBase.append(File.separator);
-            }
-        } catch (IOException ioe) {
-            return false;
-        }
-
-        // Compare the two. If they are not the same, the contextPath must
-        // have /../ like sequences in it
-        return canonicalDocBase.contentEquals(docBase);
-    }
-
     /**
      * Deploy packed WAR.
      * <p>
@@ -809,6 +784,13 @@ public class HostConfig implements LifecycleListener {
      * @param war The WAR file
      */
     protected void deployWAR(ContextName cn, File war) {
+
+        // Check for WARs with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalWarName", war.getName()));
+            invalidWars.add(war.getName());
+            return;
+        }
 
         File xml = new File(host.getAppBaseFile(), cn.getBaseName() + "/" + Constants.ApplicationContextXml);
 
@@ -1003,7 +985,7 @@ public class HostConfig implements LifecycleListener {
             }
 
             File dir = new File(appBase, file);
-            if (dir.isDirectory()) {
+            if (dir.isDirectory() && !invalidDirectories.contains(file)) {
                 ContextName cn = new ContextName(file, false);
 
                 if (tryAddServiced(cn.getName())) {
@@ -1043,6 +1025,13 @@ public class HostConfig implements LifecycleListener {
      * @param dir The path to the root folder of the webapp
      */
     protected void deployDirectory(ContextName cn, File dir) {
+
+        // Check for directories with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalDirName", dir.getName()));
+            invalidDirectories.add(dir.getName());
+            return;
+        }
 
         long startTime = 0;
         // Deploy the application in this directory
