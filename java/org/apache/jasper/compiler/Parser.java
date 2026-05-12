@@ -1034,10 +1034,7 @@ class Parser implements TagConstants {
     /*
      * StandardAction ::= 'include' StdActionContent | 'forward' StdActionContent | 'invoke' StdActionContent | 'doBody'
      * StdActionContent | 'getProperty' StdActionContent | 'setProperty' StdActionContent | 'useBean' StdActionContent |
-     * 'plugin' StdActionContent | 'element' StdActionContent ======= StandardAction ::= 'include' StdActionContent |
-     * 'forward' StdActionContent | 'invoke' StdActionContent | 'doBody' StdActionContent | 'getProperty'
-     * StdActionContent | 'setProperty' StdActionContent | 'useBean' StdActionContent | 'plugin' StdActionContent |
-     * 'element' StdActionContent >>>>>>> 76d2ad0a5d (Code clean-up. Formatting. No functional change.)
+     * 'plugin' StdActionContent | 'element' StdActionContent
      */
     private void parseStandardAction(Node parent) throws JasperException {
         Mark start = reader.mark();
