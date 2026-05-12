@@ -402,6 +402,13 @@
         that the appropriate NIO Connector is used instead. (markt)
       </add>
       <fix>
+        Update <code>StoreRegistry</code> to dynamically load optional clustering
+        classes rather than statically referencing them. This matches the pattern
+        used in <code>Catalina.addClusterRuleSet()</code> and prevents
+        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
+        is configured but clustering classes are not available. (csutherl)
+      </fix>
+      <fix>
         Respect the value for the <code>jdk.tls.namedGroups</code> system
         property as the default value for the configured group list on the
         Connector. (remm)
