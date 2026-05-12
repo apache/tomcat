@@ -126,6 +126,10 @@
         Manager: Add checks to ensure that any uploaded files are uploaded to
         the expected location. (markt)
       </add>
+      <add>
+        Manager: Add checks to ensure that the requested context path for a
+        deployed WAR, directory or descriptor file is valid. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
