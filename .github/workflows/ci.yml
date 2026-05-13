@@ -20,6 +20,9 @@ on:
     branches:
       - 10.1.x
 
+permissions:
+  contents: read
+
 env:
   LC_ALL: en_US.UTF-8
 
