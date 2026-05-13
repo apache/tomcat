@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -149,17 +149,17 @@ public class HostConfig implements LifecycleListener {
     /**
      * The list of descriptors in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
      */
-    protected final Set<String> invalidDescriptors = new HashSet<>();
+    protected final Set<String> invalidDescriptors = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * The list of directories in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
      */
-    protected final Set<String> invalidDirectories = new HashSet<>();
+    protected final Set<String> invalidDirectories = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * The list of Wars in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
      */
-    protected final Set<String> invalidWars = new HashSet<>();
+    protected final Set<String> invalidWars = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     // ------------------------------------------------------------- Properties
 
