@@ -37,6 +37,8 @@ public class TestStoreRegistry {
      *
      * StoreRegistry should initialize successfully whether clustering is available or not.
      * This matches the pattern used in Catalina.addClusterRuleSet().
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testClusteringClassesOptional() throws Exception {
@@ -82,6 +84,8 @@ public class TestStoreRegistry {
     /**
      * Test that findDescription works with interface inheritance and
      * dynamically loaded interfaces.
+     *
+     * @throws Exception if the test experiences an unexpected error
      */
     @Test
     public void testFindDescriptionWithDynamicInterfaces() throws Exception {
