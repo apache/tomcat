@@ -128,6 +128,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Log a suitable warning if an encrypted PEM file is detected using an
+        insecure form for encryption. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

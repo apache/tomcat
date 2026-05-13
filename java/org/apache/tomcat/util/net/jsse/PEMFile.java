@@ -51,6 +51,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.Asn1Writer;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -64,6 +66,7 @@ import org.ietf.jgss.Oid;
  */
 public class PEMFile {
 
+    private static final Log log = LogFactory.getLog(PEMFile.class);
     private static final StringManager sm = StringManager.getManager(PEMFile.class);
 
     private static final byte[] OID_EC_PUBLIC_KEY =
@@ -370,18 +373,21 @@ public class PEMFile {
                             secretKeyAlgorithm = "DES";
                             cipherTransformation = "DES/CBC/PKCS5Padding";
                             keyLength = 8;
+                            log.error(sm.getString("pemFile.encryption.broken", filename, algorithm));
                             break;
                         }
                         case "DES-EDE3-CBC": {
                             secretKeyAlgorithm = "DESede";
                             cipherTransformation = "DESede/CBC/PKCS5Padding";
                             keyLength = 24;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
                         case "AES-256-CBC": {
                             secretKeyAlgorithm = "AES";
                             cipherTransformation = "AES/CBC/PKCS5Padding";
                             keyLength = 32;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
                         default:
@@ -501,6 +507,7 @@ public class PEMFile {
                         throw new NoSuchAlgorithmException(
                                 sm.getString("pemFile.unknownEncryptionAlgorithm", toDottedOidString(oidCipher)));
                     }
+                    log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
 
                     byte[] iv = p.parseOctetString();
 
