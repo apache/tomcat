@@ -124,6 +124,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Expand wording and increase visibility of log message when cloud
+        membership is configured without a trust store as all certificates will
+        be trusted in this configuration. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
