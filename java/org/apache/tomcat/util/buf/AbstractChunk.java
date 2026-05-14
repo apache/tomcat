@@ -268,6 +268,15 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Sub-classes must provide an equals implementation that is consistent with {@link AbstractChunk#hashCode()}.
+     */
+    @Override
+    public abstract boolean equals(Object obj);
+
+
+    /**
      * Returns the hash code for this buffer.
      *
      * @return the hash code for this buffer
