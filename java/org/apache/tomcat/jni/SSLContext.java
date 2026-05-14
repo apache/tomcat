@@ -527,7 +527,10 @@ public final class SSLContext {
      *
      * @return The Java representation of the pointer to the OpenSSL SSLContext to use for the given host or zero if no
      *             SSLContext could be identified
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12
      */
+    @Deprecated
     public static long sniCallBack(long currentCtx, String sniHostName) {
         SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
         if (sniCallBack == null) {
@@ -582,7 +585,10 @@ public final class SSLContext {
     /**
      * Interface implemented by components that will receive the call back to select an OpenSSL SSLContext based on the
      * host name requested by the client.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12
      */
+    @Deprecated
     public interface SNICallBack {
 
         /**
