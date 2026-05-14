@@ -16,10 +16,6 @@
  */
 package org.apache.tomcat.jni;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * JNI bindings for OpenSSL SSL_CTX operations.
  */
@@ -441,31 +437,22 @@ public final class SSLContext {
      * @param sniHostName The host name requested by the client
      *
      * @return The Java representation of the pointer to the OpenSSL SSLContext to use for the given host or zero if no
-     *             SSLContext could be identified
+     *             SSLContext could be identified. Always returns {@code 0}.
+     *
+     * @deprecated Unused. This method will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static long sniCallBack(long currentCtx, String sniHostName) {
-        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
-        if (sniCallBack == null) {
-            return 0;
-        }
-        // Can't be sure OpenSSL is going to provide the SNI value in lower case
-        // so convert it before looking up the SSLContext
-        String hostName = (sniHostName == null) ? null : sniHostName.toLowerCase(Locale.ENGLISH);
-        return sniCallBack.getSslContext(hostName);
+        return 0;
     }
-
-    /**
-     * A map of default SSL Contexts to SNICallBack instances (in Tomcat these are instances of AprEndpoint) that will
-     * be used to determine the SSL Context to use bases on the SNI host name. It is structured this way since a Tomcat
-     * instance may have several TLS enabled endpoints that each have different SSL Context mappings for the same host
-     * name.
-     */
-    private static final Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
 
     /**
      * Interface implemented by components that will receive the call back to select an OpenSSL SSLContext based on the
      * host name requested by the client.
+     *
+     * @deprecated Unused. This interface will be removed in Tomcat 12 onwards
      */
+    @Deprecated
     public interface SNICallBack {
 
         /**
