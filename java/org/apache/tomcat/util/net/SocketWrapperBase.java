@@ -1631,7 +1631,9 @@ public abstract class SocketWrapperBase<E> {
             CompletionHandler<Long,? super A> handler) {
         IOException ioe = getError();
         if (ioe != null) {
-            handler.failed(ioe, attachment);
+            if (handler != null) {
+                handler.failed(ioe, attachment);
+            }
             return CompletionState.ERROR;
         }
         if (timeout == -1) {
@@ -1648,11 +1650,15 @@ public abstract class SocketWrapperBase<E> {
         if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
             try {
                 if (read ? !readPending.tryAcquire(timeout, unit) : !writePending.tryAcquire(timeout, unit)) {
-                    handler.failed(new SocketTimeoutException(), attachment);
+                    if (handler != null) {
+                        handler.failed(new SocketTimeoutException(), attachment);
+                    }
                     return CompletionState.ERROR;
                 }
             } catch (InterruptedException e) {
-                handler.failed(e, attachment);
+                if (handler != null) {
+                    handler.failed(e, attachment);
+                }
                 return CompletionState.ERROR;
             }
         } else {
@@ -1660,7 +1666,9 @@ public abstract class SocketWrapperBase<E> {
                 if (block == BlockingMode.NON_BLOCK) {
                     return CompletionState.NOT_DONE;
                 } else {
-                    handler.failed(read ? new ReadPendingException() : new WritePendingException(), attachment);
+                    if (handler != null) {
+                        handler.failed(read ? new ReadPendingException() : new WritePendingException(), attachment);
+                    }
                     return CompletionState.ERROR;
                 }
             }
