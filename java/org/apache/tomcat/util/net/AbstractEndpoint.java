@@ -2340,11 +2340,13 @@ public abstract class AbstractEndpoint<S, U> {
             unbind();
             bindState = BindState.UNBOUND;
         }
-        Registry registry = Registry.getRegistry(null);
-        registry.unregisterComponent(oname);
-        registry.unregisterComponent(socketProperties.getObjectName());
-        for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
-            unregisterJmx(sslHostConfig);
+        if (this.domain != null) {
+            Registry registry = Registry.getRegistry(null);
+            registry.unregisterComponent(oname);
+            registry.unregisterComponent(socketProperties.getObjectName());
+            for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
+                unregisterJmx(sslHostConfig);
+            }
         }
     }
 
