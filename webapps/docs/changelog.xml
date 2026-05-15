@@ -130,6 +130,11 @@
         Log a suitable warning if an encrypted PEM file is detected using an
         insecure form for encryption. (markt)
       </add>
+      <fix>
+        If TLS groups have been configured, use the configured groups rather
+        than using OpenSSL's default TLS groups when using Tomcat Native with
+        OpenSSL based connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
