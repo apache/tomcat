@@ -282,12 +282,13 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
+    <li><b><code>%%</code></b> - Literal '%' character</li>
     <li><b><code>%a</code></b> - Remote IP address.
         See also <code>%{xxx}a</code> below.</li>
     <li><b><code>%A</code></b> - Local IP address</li>
     <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
-    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%D</code></b> - Time taken to process the request, in microseconds</li>
     <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
     <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
@@ -2027,14 +2028,10 @@
       </attribute>
 
       <attribute name="applyJava8u40Fix" required="false">
-        <p>A fix introduced in Java 8 update 40 (
-        <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a>)
-        onwards broke SPNEGO authentication for IE with Tomcat running on
-        Windows 2008 R2 servers. This option enables a work-around that allows
-        SPNEGO authentication to continue working. The work-around should not
-        impact other configurations so it is enabled by default. If necessary,
-        the workaround can be disabled by setting this attribute to
-        <code>false</code>.</p>
+        <p>This attribute is hard-coded to <code>false</code> as the work around
+        it enabled is no longer required. The attribute will be removed from
+        Tomcat 12 onwards. Any attempt to set the attribute will be ignored.
+        </p>
       </attribute>
 
       <attribute name="cache" required="false">
@@ -2691,6 +2688,68 @@
     </attributes>
 
   </subsection>
+
+</section>
+
+<section name="Filter Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Filter Valve</strong> allows a Servlet Filter to be run as
+      part of the Valve pipeline. This enables reuse of existing Filter
+      implementations at the Valve level without duplicating their logic.</p>
+
+    <p>There are several caveats when using this Valve:</p>
+    <ul>
+      <li>A <em>separate instance</em> of the Filter class is created, distinct
+        from any instance that may be instantiated within a web application.</li>
+      <li>Calls to <code>FilterConfig.getFilterName()</code> will return
+        <code>null</code>.</li>
+      <li><code>FilterConfig.getServletContext()</code> will return the proper
+        <code>ServletContext</code> for a Valve attached to a
+        <code>&lt;Context&gt;</code>, but will return a
+        <code>ServletContext</code> of limited use for a Valve specified on an
+        <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.</li>
+      <li>The Filter <strong>MUST NOT</strong> wrap the
+        <code>ServletRequest</code> or <code>ServletResponse</code> objects, or
+        an <code>IllegalStateException</code> will be thrown.</li>
+    </ul>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Filter Valve</strong> supports the following
+      configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use. This MUST be set to
+          <strong>org.apache.catalina.valves.FilterValve</strong>.</p>
+      </attribute>
+
+      <attribute name="filterClass" required="true">
+        <p>The fully qualified class name of the <code>Filter</code>
+          implementation to use. The class must have a no-argument
+          constructor.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>The <strong>Filter Valve</strong> also supports nested
+      <code>&lt;init-param&gt;</code> elements to pass initialization
+      parameters to the Filter:</p>
+
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.FilterValve"
+        filterClass="com.example.MyFilter">
+    <init-param>
+      <param-name>myParam</param-name>
+      <param-value>myValue</param-value>
+    </init-param>
+  </Valve>]]></source>
+
+    </subsection>
 
 </section>
 

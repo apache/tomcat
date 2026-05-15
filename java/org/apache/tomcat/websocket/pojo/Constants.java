@@ -21,6 +21,9 @@ package org.apache.tomcat.websocket.pojo;
  */
 public class Constants {
 
+    /**
+     * Key used to store the POJO method mapping in the session.
+     */
     public static final String POJO_METHOD_MAPPING_KEY = "org.apache.tomcat.websocket.pojo.PojoEndpoint.methodMapping";
 
     private Constants() {

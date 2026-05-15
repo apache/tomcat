@@ -21,11 +21,20 @@ import java.io.PrintWriter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #exec command.
+ * Implements the Server-side #config command.
  */
 public final class SSIConfig implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIConfig.class);
 
+    /**
+     * Default constructor.
+     */
+    public SSIConfig() {
+    }
+
+    /**
+     * Processes the config directive to set errmsg, sizefmt, and timefmt options.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -25,14 +24,27 @@ import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConstantTime;
 
 /**
  * Base implementation for the Tomcat provided {@link CredentialHandler}s.
  */
 public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
+    /**
+     * Construct a new DigestCredentialHandlerBase.
+     */
+    public DigestCredentialHandlerBase() {
+    }
+
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(DigestCredentialHandlerBase.class);
 
+    /**
+     * Default salt length in bytes.
+     */
     public static final int DEFAULT_SALT_LENGTH = 32;
 
     private int iterations = getDefaultIterations();
@@ -43,6 +55,9 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the number of iterations of the associated algorithm that will be used when creating a new stored
+     * credential for a given input credential.
+     *
      * @return the number of iterations of the associated algorithm that will be used when creating a new stored
      *             credential for a given input credential.
      */
@@ -63,6 +78,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the salt length that will be used when creating a new stored credential for a given input credential.
+     *
      * @return the salt length that will be used when creating a new stored credential for a given input credential.
      */
     public int getSaltLength() {
@@ -191,7 +208,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             return false;
         }
 
-        return DigestCredentialHandlerBase.equals(storedHexEncoded, inputHexEncoded, true);
+        return ConstantTime.equals(storedHexEncoded, inputHexEncoded, true);
     }
 
 
@@ -205,6 +222,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the default salt length used by the {@link CredentialHandler}.
+     *
      * @return the default salt length used by the {@link CredentialHandler}.
      */
     protected int getDefaultSaltLength() {
@@ -257,84 +276,25 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
 
     /**
+     * Get the algorithm used to convert input credentials to stored credentials.
+     *
      * @return the algorithm used to convert input credentials to stored credentials.
      */
     public abstract String getAlgorithm();
 
 
     /**
+     * Get the default number of iterations used by the {@link CredentialHandler}.
+     *
      * @return the default number of iterations used by the {@link CredentialHandler}.
      */
     protected abstract int getDefaultIterations();
 
 
     /**
+     * Get the logger for the CredentialHandler instance.
+     *
      * @return the logger for the CredentialHandler instance.
      */
     protected abstract Log getLog();
-
-    /**
-     * Implements String equality which always compares all characters in the string, without stopping early if any
-     * characters do not match.
-     * <p>
-     * <i>Note:</i> This implementation was adapted from {@link MessageDigest#isEqual} which we assume is as
-     * optimizer-defeating as possible.
-     *
-     * @param s1         The first string to compare.
-     * @param s2         The second string to compare.
-     * @param ignoreCase <code>true</code> if the strings should be compared without regard to case. Note that "true"
-     *                       here is only guaranteed to work with plain ASCII characters.
-     *
-     * @return <code>true</code> if the strings are equal to each other, <code>false</code> otherwise.
-     */
-    public static boolean equals(final String s1, final String s2, final boolean ignoreCase) {
-        if (s1 == s2) {
-            return true;
-        }
-        if (s1 == null || s2 == null) {
-            return false;
-        }
-
-        final int len1 = s1.length();
-        final int len2 = s2.length();
-
-        if (len2 == 0) {
-            return len1 == 0;
-        }
-
-        int result = 0;
-        result |= len1 - len2;
-
-        // time-constant comparison
-        for (int i = 0; i < len1; i++) {
-            // If i >= len2, index2 is 0; otherwise, i.
-            final int index2 = ((i - len2) >>> 31) * i;
-            char c1 = s1.charAt(i);
-            char c2 = s2.charAt(index2);
-            if (ignoreCase) {
-                c1 = Character.toLowerCase(c1);
-                c2 = Character.toLowerCase(c2);
-            }
-            result |= c1 ^ c2;
-        }
-        return result == 0;
-    }
-
-    /**
-     * Implements byte-array equality which always compares all bytes in the array, without stopping early if any bytes
-     * do not match.
-     * <p>
-     * <i>Note:</i> Implementation note: this method delegates to {@link MessageDigest#isEqual} under the assumption
-     * that it provides a constant-time comparison of the bytes in the arrays. Java 7+ has such an implementation, but
-     * neither the Javadoc nor any specification requires it. Therefore, Tomcat should continue to use <i>this</i>
-     * method internally in case the JDK implementation changes so this method can be re-implemented properly.
-     *
-     * @param b1 The first array to compare.
-     * @param b2 The second array to compare.
-     *
-     * @return <code>true</code> if the arrays are equal to each other, <code>false</code> otherwise.
-     */
-    public static boolean equals(final byte[] b1, final byte[] b2) {
-        return MessageDigest.isEqual(b1, b2);
-    }
 }

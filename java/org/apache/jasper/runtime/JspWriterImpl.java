@@ -40,6 +40,9 @@ public class JspWriterImpl extends JspWriter {
     private boolean flushed = false;
     private boolean closed = false;
 
+    /**
+     * Default constructor.
+     */
     public JspWriterImpl() {
         super(Constants.DEFAULT_BUFFER_SIZE, true);
     }

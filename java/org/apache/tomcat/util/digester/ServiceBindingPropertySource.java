@@ -84,8 +84,25 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class ServiceBindingPropertySource implements IntrospectionUtils.PropertySource {
 
+    /**
+     * Default constructor.
+     */
+    public ServiceBindingPropertySource() {
+    }
+
     private static final String SERVICE_BINDING_ROOT_ENV_VAR = "SERVICE_BINDING_ROOT";
 
+    /**
+     * Resolves a property key using Kubernetes service bindings.
+     * <p>
+     * Keys are expected in the format {@code <binding-name>.<key>}, which maps to
+     * {@code $SERVICE_BINDING_ROOT/<binding-name>/<key>}. The optional {@code chomp:}
+     * prefix trims a trailing newline from the file content.
+     * </p>
+     *
+     * @param key the property key to resolve
+     * @return the resolved property value, or {@code null} if not found
+     */
     @Override
     public String getProperty(String key) {
         // get the root to search from

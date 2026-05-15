@@ -59,22 +59,37 @@ public class SecureNioChannel extends NioChannel {
 
     private final NioEndpoint endpoint;
 
+    /** Network input buffer for encrypted data */
     protected ByteBuffer netInBuffer;
+    /** Network output buffer for encrypted data */
     protected ByteBuffer netOutBuffer;
 
+    /** SSL engine for this channel */
     protected SSLEngine sslEngine;
 
+    /** True when SNI processing is complete */
     protected boolean sniComplete = false;
 
+    /** True when the SSL handshake is complete */
     protected boolean handshakeComplete = false;
+    /** True when a handshake wrap is pending */
     protected boolean needHandshakeWrap = false;
-    protected HandshakeStatus handshakeStatus; // gets set by handshake
+    /** Current handshake status, updated during handshake processing */
+    protected HandshakeStatus handshakeStatus;
 
+    /** True when the channel is closed */
     protected boolean closed = false;
+    /** True when the channel is in the process of closing */
     protected boolean closing = false;
 
     private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
+    /**
+     * Creates a new secure NIO channel.
+     *
+     * @param bufHandler Buffer handler for the application buffers
+     * @param endpoint The NIO endpoint managing this channel
+     */
     public SecureNioChannel(SocketBufferHandler bufHandler, NioEndpoint endpoint) {
         super(bufHandler);
 
@@ -94,11 +109,13 @@ public class SecureNioChannel extends NioChannel {
     public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
         super.reset(channel, socketWrapper);
         sslEngine = null;
-        sniComplete = false;
-        handshakeComplete = false;
-        closed = false;
-        closing = false;
-        netInBuffer.clear();
+        if (channel != null) {
+            sniComplete = false;
+            handshakeComplete = false;
+            closed = false;
+            closing = false;
+            netInBuffer.clear();
+        }
     }
 
     @Override
@@ -239,7 +256,7 @@ public class SecureNioChannel extends NioChannel {
     }
 
 
-    /*
+    /**
      * Peeks at the initial network bytes to determine if the SNI extension is present and, if it is, what host name has
      * been requested. Based on the provided host name, configure the SSLEngine for this connection.
      *
@@ -490,6 +507,9 @@ public class SecureNioChannel extends NioChannel {
             // call unwrap
             getBufHandler().configureReadBufferForWrite();
             result = sslEngine.unwrap(netInBuffer, getBufHandler().getReadBuffer());
+            if (log.isDebugEnabled() && result.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW) {
+                log.debug(sm.getString("channel.nio.ssl.handshakeUnwrapBufferUnderflow"));
+            }
             /*
              * ByteBuffer.compact() is an optional method but netInBuffer is created from either ByteBuffer.allocate()
              * or ByteBuffer.allocateDirect() and the ByteBuffers returned by those methods do implement compact(). The
@@ -510,6 +530,11 @@ public class SecureNioChannel extends NioChannel {
         return result;
     }
 
+    /**
+     * Returns the SSL support object for this channel, or {@code null} if the SSL engine has not been initialized.
+     *
+     * @return the SSL support object, or {@code null}
+     */
     public SSLSupport getSSLSupport() {
         if (sslEngine != null) {
             SSLSession session = sslEngine.getSession();
@@ -606,7 +631,8 @@ public class SecureNioChannel extends NioChannel {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         // are we in the middle of closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             return -1;
         }
         // did we finish our handshake?
@@ -693,7 +719,8 @@ public class SecureNioChannel extends NioChannel {
     @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
         // are we in the middle of closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             return -1;
         }
         // did we finish our handshake?
@@ -824,7 +851,8 @@ public class SecureNioChannel extends NioChannel {
             return sc.write(src);
         } else {
             // Are we closing or closed?
-            if (closing || closed) {
+            SSLEngine sslEngine = this.sslEngine;
+            if (closing || closed || sslEngine == null) {
                 throw new IOException(sm.getString("channel.nio.ssl.closing"));
             }
 
@@ -867,7 +895,8 @@ public class SecureNioChannel extends NioChannel {
     public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
         checkInterruptStatus();
         // Are we closing or closed?
-        if (closing || closed) {
+        SSLEngine sslEngine = this.sslEngine;
+        if (closing || closed || sslEngine == null) {
             throw new IOException(sm.getString("channel.nio.ssl.closing"));
         }
 
@@ -921,14 +950,34 @@ public class SecureNioChannel extends NioChannel {
         return closing;
     }
 
+    /**
+     * Returns the SSL engine for this channel.
+     *
+     * @return the SSL engine, or {@code null} if not yet created
+     */
     public SSLEngine getSslEngine() {
         return sslEngine;
     }
 
+    /**
+     * Returns an empty byte buffer used for SSL wrap operations.
+     *
+     * @return an empty byte buffer
+     */
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
     }
 
+    /**
+     * Creates and initializes the SSL engine for this channel.
+     *
+     * @param hostName The SNI host name
+     * @param clientRequestedCiphers List of ciphers requested by the client
+     * @param clientRequestedApplicationProtocols List of application protocols requested by the client
+     * @param clientRequestedProtocols List of protocol versions requested by the client
+     * @param clientSupportedGroups List of supported groups from the client
+     * @param clientSignatureSchemes List of signature schemes from the client
+     */
     protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
             List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureSchemes) {

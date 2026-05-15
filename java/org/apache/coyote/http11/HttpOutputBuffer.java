@@ -20,6 +20,10 @@ import java.io.IOException;
 
 import org.apache.coyote.OutputBuffer;
 
+/**
+ * HTTP/1.1 output buffer interface. Extends {@link OutputBuffer} with HTTP-specific methods for ending
+ * the response and flushing data to the client.
+ */
 public interface HttpOutputBuffer extends OutputBuffer {
 
     /**

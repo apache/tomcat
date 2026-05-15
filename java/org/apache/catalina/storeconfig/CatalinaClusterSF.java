@@ -35,6 +35,12 @@ import org.apache.catalina.tribes.Channel;
 public class CatalinaClusterSF extends StoreFactoryBase {
 
     /**
+     * Default constructor.
+     */
+    public CatalinaClusterSF() {
+    }
+
+    /**
      * Store the specified Cluster children.
      * <p>
      * {@inheritDoc}

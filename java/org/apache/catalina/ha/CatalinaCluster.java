@@ -55,16 +55,22 @@ public interface CatalinaCluster extends Cluster {
     void send(ClusterMessage msg, Member dest, int sendOptions);
 
     /**
+     * Checks if the cluster has members.
+     *
      * @return <code>true</code> if the cluster has members.
      */
     boolean hasMembers();
 
     /**
+     * Returns all the members currently participating in the cluster.
+     *
      * @return an array containing all the members currently participating in the cluster.
      */
     Member[] getMembers();
 
     /**
+     * Returns the member that represents this node.
+     *
      * @return the member that represents this node.
      */
     Member getLocalMember();
@@ -98,11 +104,15 @@ public interface CatalinaCluster extends Cluster {
     void setClusterDeployer(ClusterDeployer deployer);
 
     /**
+     * Returns the current Deployer.
+     *
      * @return the current Deployer
      */
     ClusterDeployer getClusterDeployer();
 
     /**
+     * Returns the map of managers.
+     *
      * @return The map of managers
      */
     Map<String,ClusterManager> getManagers();
@@ -127,6 +137,8 @@ public interface CatalinaCluster extends Cluster {
     String getManagerName(String name, Manager manager);
 
     /**
+     * Returns the current cluster valves.
+     *
      * @return the current cluster valves
      */
     Valve[] getValves();
@@ -139,6 +151,8 @@ public interface CatalinaCluster extends Cluster {
     void setChannel(Channel channel);
 
     /**
+     * Returns the channel associated with the cluster.
+     *
      * @return the channel associated with the cluster
      */
     Channel getChannel();

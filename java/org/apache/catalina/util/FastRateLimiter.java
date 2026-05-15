@@ -23,6 +23,12 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class FastRateLimiter extends RateLimiterBase {
 
+    /**
+     * Creates a new FastRateLimiter instance.
+     */
+    public FastRateLimiter() {
+    }
+
     @Override
     protected String getDefaultPolicyName() {
         return "fast";

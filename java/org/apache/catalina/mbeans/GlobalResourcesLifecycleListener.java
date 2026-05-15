@@ -48,8 +48,17 @@ import org.apache.tomcat.util.res.StringManager;
  * @since 4.1
  */
 public class GlobalResourcesLifecycleListener implements LifecycleListener {
+    /**
+     * Default constructor for GlobalResourcesLifecycleListener.
+     */
+    public GlobalResourcesLifecycleListener() {
+        super();
+    }
 
     private static final Log log = LogFactory.getLog(GlobalResourcesLifecycleListener.class);
+    /**
+     * StringManager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(GlobalResourcesLifecycleListener.class);
 
 

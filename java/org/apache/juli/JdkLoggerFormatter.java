@@ -34,12 +34,35 @@ import java.util.logging.LogRecord;
  */
 public class JdkLoggerFormatter extends Formatter {
 
-    // values from JDK Level
+    /**
+     * Constructs a new JdkLoggerFormatter.
+     */
+    public JdkLoggerFormatter() {
+    }
+
+    /**
+     * Log level value for TRACE.
+     */
     public static final int LOG_LEVEL_TRACE = 400;
+    /**
+     * Log level value for DEBUG.
+     */
     public static final int LOG_LEVEL_DEBUG = 500;
+    /**
+     * Log level value for INFO.
+     */
     public static final int LOG_LEVEL_INFO = 800;
+    /**
+     * Log level value for WARN.
+     */
     public static final int LOG_LEVEL_WARN = 900;
+    /**
+     * Log level value for ERROR.
+     */
     public static final int LOG_LEVEL_ERROR = 1000;
+    /**
+     * Log level value for FATAL.
+     */
     public static final int LOG_LEVEL_FATAL = 1000;
 
     @Override

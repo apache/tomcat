@@ -34,7 +34,7 @@ public final class ConstantDouble extends Constant {
     /**
      * Initialize instance from file data.
      *
-     * @param file Input stream
+     * @param file Input stream.
      * @throws IOException if an I/O error occurs.
      */
     ConstantDouble(final DataInput file) throws IOException {
@@ -44,7 +44,9 @@ public final class ConstantDouble extends Constant {
 
 
     /**
-     * @return data, i.e., 8 bytes.
+     * Get the 8-byte double value stored in this constant pool entry.
+     *
+     * @return the double value
      */
     public double getBytes() {
         return bytes;

@@ -25,6 +25,9 @@ import org.xml.sax.Attributes;
  */
 public abstract class Rule {
 
+    /**
+     * StringManager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(Rule.class);
 
     // ----------------------------------------------------------- Constructors

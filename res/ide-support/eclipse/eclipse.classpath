@@ -38,5 +38,8 @@
     <classpathentry kind="lib" path="@BND_JAR@"/>
     <classpathentry kind="lib" path="@MIGRATION_JAR@"/>
     <classpathentry kind="lib" path="@UNBOUNDID_JAR@"/>
+    <classpathentry kind="lib" path="@BC_PROVIDER_JAR@"/>
+    <classpathentry kind="lib" path="@BC_PKIX_JAR@"/>
+    <classpathentry kind="lib" path="@BC_UTIL_JAR@"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>

@@ -21,8 +21,17 @@ import java.util.Map;
 
 import jakarta.security.auth.message.module.ServerAuthModule;
 
+/**
+ * Factory for obtaining and managing {@link AuthConfigProvider} instances. The AuthConfigFactory is responsible for
+ * discovering, registering, and providing configuration providers for JASPIC authentication modules. Use
+ * {@link #getFactory()} to obtain the singleton instance.
+ */
 public abstract class AuthConfigFactory {
 
+    /**
+     * The name of the {@link java.security.Security} property used to specify the AuthConfigFactory implementation
+     * class.
+     */
     public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
 
     private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
@@ -30,9 +39,19 @@ public abstract class AuthConfigFactory {
 
     private static volatile AuthConfigFactory factory;
 
+    /**
+     * Protected constructor for subclasses.
+     */
     public AuthConfigFactory() {
     }
 
+    /**
+     * Returns the singleton AuthConfigFactory instance. If no instance has been set via {@link #setFactory}, the
+     * factory class is discovered from the {@link java.security.Security} property
+     * {@value #DEFAULT_FACTORY_SECURITY_PROPERTY}, or falls back to a default implementation.
+     *
+     * @return the AuthConfigFactory instance
+     */
     public static AuthConfigFactory getFactory() {
         if (factory != null) {
             return factory;
@@ -61,27 +80,97 @@ public abstract class AuthConfigFactory {
         return factory;
     }
 
+    /**
+     * Programmatically sets the AuthConfigFactory instance. This method is typically used by containers to provide
+     * their own implementation.
+     *
+     * @param factory the AuthConfigFactory instance to set
+     */
     public static synchronized void setFactory(AuthConfigFactory factory) {
         AuthConfigFactory.factory = factory;
     }
 
+    /**
+     * Returns the {@link AuthConfigProvider} for the specified message layer and application context.
+     *
+     * @param layer      the message layer
+     * @param appContext the application context
+     * @param listener   the registration listener to attach
+     *
+     * @return the AuthConfigProvider, or {@code null} if none is available
+     */
     public abstract AuthConfigProvider getConfigProvider(String layer, String appContext,
             RegistrationListener listener);
 
+    /**
+     * Registers an AuthConfigProvider by class name with the given properties.
+     *
+     * @param className  the fully qualified class name of the AuthConfigProvider
+     * @param properties the configuration properties
+     * @param layer      the message layer
+     * @param appContext the application context
+     * @param description a description of the registration
+     *
+     * @return a unique registration ID
+     */
     public abstract String registerConfigProvider(String className, Map<String,String> properties, String layer,
             String appContext, String description);
 
+    /**
+     * Registers an AuthConfigProvider instance.
+     *
+     * @param provider   the AuthConfigProvider to register
+     * @param layer      the message layer
+     * @param appContext the application context
+     * @param description a description of the registration
+     *
+     * @return a unique registration ID
+     */
     public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext,
             String description);
 
+    /**
+     * Removes a registration by its ID.
+     *
+     * @param registrationID the registration ID to remove
+     *
+     * @return {@code true} if the registration was removed, {@code false} if it did not exist
+     */
     public abstract boolean removeRegistration(String registrationID);
 
+    /**
+     * Detaches a listener from all registrations matching the given layer and application context, returning the
+     * affected registration IDs.
+     *
+     * @param listener   the listener to detach
+     * @param layer      the message layer
+     * @param appContext the application context
+     *
+     * @return an array of registration IDs from which the listener was detached
+     */
     public abstract String[] detachListener(RegistrationListener listener, String layer, String appContext);
 
+    /**
+     * Returns the registration IDs associated with the given AuthConfigProvider.
+     *
+     * @param provider the AuthConfigProvider
+     *
+     * @return an array of registration IDs
+     */
     public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
 
+    /**
+     * Returns the {@link RegistrationContext} for the given registration ID.
+     *
+     * @param registrationID the registration ID
+     *
+     * @return the RegistrationContext, or {@code null} if the ID is not found
+     */
     public abstract RegistrationContext getRegistrationContext(String registrationID);
 
+    /**
+     * Refreshes all registered AuthConfigProviders, causing them to reload their configuration.
+     */
     public abstract void refresh();
 
     /**
@@ -118,14 +207,37 @@ public abstract class AuthConfigFactory {
         return DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
     }
 
+    /**
+     * Provides information about a registered {@link AuthConfigProvider}.
+     */
     public interface RegistrationContext {
 
+        /**
+         * Returns the message layer for this registration.
+         *
+         * @return the message layer
+         */
         String getMessageLayer();
 
+        /**
+         * Returns the application context for this registration.
+         *
+         * @return the application context
+         */
         String getAppContext();
 
+        /**
+         * Returns the description of this registration.
+         *
+         * @return the description
+         */
         String getDescription();
 
+        /**
+         * Indicates whether this registration persists beyond the current container lifecycle.
+         *
+         * @return {@code true} if the registration is persistent, {@code false} otherwise
+         */
         boolean isPersistent();
     }
 }

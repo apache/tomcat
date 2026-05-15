@@ -50,6 +50,14 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class StandardService extends LifecycleMBeanBase implements Service {
 
+    /**
+     * Construct a new {@link StandardService} instance with the default settings.
+     */
+    public StandardService() {
+        super();
+    }
+
+
     private static final Log log = LogFactory.getLog(StandardService.class);
     private static final StringManager sm = StringManager.getManager(StandardService.class);
 
@@ -106,11 +114,21 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Get the number of milliseconds to wait for all threads to finish during a graceful stop.
+     *
+     * @return the number of milliseconds to wait
+     */
     public long getGracefulStopAwaitMillis() {
         return gracefulStopAwaitMillis;
     }
 
 
+    /**
+     * Set the number of milliseconds to wait for all threads to finish during a graceful stop.
+     *
+     * @param gracefulStopAwaitMillis the number of milliseconds to wait
+     */
     public void setGracefulStopAwaitMillis(long gracefulStopAwaitMillis) {
         this.gracefulStopAwaitMillis = gracefulStopAwaitMillis;
     }
@@ -225,6 +243,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
+    /**
+     * Return the JMX ObjectNames for the connectors currently associated with this service.
+     *
+     * @return the JMX ObjectNames for the associated connectors
+     */
     public ObjectName[] getConnectorNames() {
         Lock readLock = connectorsLock.readLock();
         readLock.lock();

@@ -31,6 +31,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class RemoteHostValve extends RequestFilterValve {
 
+    /**
+     * Default constructor.
+     */
+    public RemoteHostValve() {
+    }
+
     private static final Log log = LogFactory.getLog(RemoteHostValve.class);
 
 

@@ -21,9 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Groups multiple {@link WebServiceRef} annotations on a single declaration. Use this annotation when a class has
+ * dependencies on more than one web service.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface WebServiceRefs {
+
+    /**
+     * The array of WebServiceRef annotations.
+     *
+     * @return the WebServiceRef annotations
+     */
     WebServiceRef[] value();
 }

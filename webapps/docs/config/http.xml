@@ -651,6 +651,18 @@
       used.</p>
     </attribute>
 
+    <attribute name="noCompressionEncodings" requried="false">
+      <p>A comma-separated list of content encodings that indicate
+      already-compressed content. When the response already has a
+      <code>Content-Encoding</code> header with one of these values, compression
+      will not be applied to prevent double compression. This attribute is only
+      used if <strong>compression</strong> is set to <code>on</code> or
+      <code>force</code>.</p>
+      <p>If not specified, the default values is
+      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      includes all commonly used compression algorithms.</p>
+    </attribute>
+
     <attribute name="noCompressionUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which
@@ -1315,12 +1327,10 @@
     </attribute>
 
     <attribute name="groups" required="false">
-      <p>JSSE only.</p>
       <p>Allows only allowing certain named groups. The value should be a case
       sensitive comma separated list of the names of the groups.</p>
-      <p>. If not specified, the default named groups of the provider will be
-      used, and any named groups specified by the client will be passed to it.
-      </p>
+      <p>The default is the value of the <code>jdk.tls.namedGroups</code>
+      system property.</p>
     </attribute>
 
     <attribute name="honorCipherOrder" required="false">
@@ -1388,7 +1398,7 @@
       <li>TLSv1.2</li><li>TLSv1.3</li><li>all</li></ul>
       <p>Each token in the list can be prefixed with a plus sign ("+")
       or a minus sign ("-"). A plus sign adds the protocol, a minus sign
-      removes it form the current list. The list is built starting from
+      removes it from the current list. The list is built starting from
       an empty list.</p>
       <p>The token <code>all</code> is an alias for
       <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2,TLSv1.3</code>.</p>
@@ -1399,8 +1409,7 @@
       based secure connector it will always support <code>SSLv2Hello</code>. If a
       single protocol is specified it will not support
       <code>SSLv2Hello</code>.</p>
-      <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
-      unsafe.</p>
+      <p>Note that <code>SSLv3</code> is inherently unsafe.</p>
       <p>If not specified, the default value of <code>all</code> will be
       used.</p>
     </attribute>

@@ -27,13 +27,43 @@ import java.util.Properties;
  */
 public abstract class BackportBase {
 
+    /**
+     * Map of source translation properties, keyed by locale.
+     */
     protected final Map<String,Properties> sourceTranslations = new HashMap<>();
+
+    /**
+     * Map of target translation properties, keyed by locale.
+     */
     protected final Map<String,Properties> targetTranslations = new HashMap<>();
+
+    /**
+     * Root directory of the target project.
+     */
     protected final File targetRoot;
+
+    /**
+     * English source properties.
+     */
     protected final Properties sourceEnglish;
+
+    /**
+     * English target properties.
+     */
     protected final Properties targetEnglish;
+
+    /**
+     * Directory for storing exported translation files.
+     */
     protected final File storageDir;
 
+    /**
+     * Constructs a BackportBase instance.
+     *
+     * @param args array with a single element: the target directory path
+     *
+     * @throws IOException if an I/O error occurs while reading translation files
+     */
     protected BackportBase(String... args) throws IOException {
         if (args.length != 1) {
             throw new IllegalArgumentException("Missing back-port target");
@@ -61,5 +91,10 @@ public abstract class BackportBase {
         storageDir = new File(targetRoot, Constants.STORAGE_DIR);
     }
 
+    /**
+     * Executes the back-port operation.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected abstract void execute() throws IOException;
 }

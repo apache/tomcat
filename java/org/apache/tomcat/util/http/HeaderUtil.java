@@ -16,7 +16,47 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+
+/**
+ * Utility methods for HTTP header processing.
+ */
 public class HeaderUtil {
+
+    private static final Set<String> disallowedTrailerFieldNames = new HashSet<>();
+
+    static {
+        // Always add these in lower case
+        disallowedTrailerFieldNames.add("age");
+        disallowedTrailerFieldNames.add("cache-control");
+        disallowedTrailerFieldNames.add("content-length");
+        disallowedTrailerFieldNames.add("content-encoding");
+        disallowedTrailerFieldNames.add("content-range");
+        disallowedTrailerFieldNames.add("content-type");
+        disallowedTrailerFieldNames.add("date");
+        disallowedTrailerFieldNames.add("expires");
+        disallowedTrailerFieldNames.add("location");
+        disallowedTrailerFieldNames.add("retry-after");
+        disallowedTrailerFieldNames.add("trailer");
+        disallowedTrailerFieldNames.add("transfer-encoding");
+        disallowedTrailerFieldNames.add("vary");
+        disallowedTrailerFieldNames.add("warning");
+    }
+
+
+    /**
+     * Check if the specified header name is disallowed in HTTP trailers.
+     *
+     * @param headerName The header name to check
+     *
+     * @return {@code true} if the header is disallowed in trailers
+     */
+    public static boolean isHeaderDisallowedInTrailers(String headerName) {
+        return disallowedTrailerFieldNames.contains(headerName.toLowerCase(Locale.ENGLISH));
+    }
+
 
     /**
      * Converts an HTTP header line in byte form to a printable String. Bytes corresponding to visible ASCII characters

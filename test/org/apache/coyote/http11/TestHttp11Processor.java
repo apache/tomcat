@@ -32,6 +32,7 @@ import java.net.SocketAddress;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -421,7 +422,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk responseBody = new ByteChunk();
-        Map<String, List<String>> responseHeaders = new HashMap<>();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -445,7 +446,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk responseBody = new ByteChunk();
-        Map<String, List<String>> responseHeaders = new HashMap<>();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -854,11 +855,11 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk getBody = new ByteChunk();
-        Map<String, List<String>> getHeaders = new HashMap<>();
+        Map<String,List<String>> getHeaders = new HashMap<>();
         int getStatus = getUrl("http://localhost:" + getPort() + "/test", getBody, getHeaders);
 
         ByteChunk headBody = new ByteChunk();
-        Map<String, List<String>> headHeaders = new HashMap<>();
+        Map<String,List<String>> headHeaders = new HashMap<>();
         int headStatus = getUrl("http://localhost:" + getPort() + "/test", headBody, headHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, getStatus);
@@ -997,7 +998,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk responseBody = new ByteChunk();
-        Map<String, List<String>> responseHeaders = new HashMap<>();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_RESET_CONTENT, rc);
@@ -2149,7 +2150,6 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
-
     private static class EarlyHintsServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -2165,6 +2165,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
             this.useSendError = useSendError;
             this.errorString = errorString;
         }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.addHeader("Link", "</style.css>; rel=preload; as=style");
@@ -2184,5 +2185,20 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
             resp.getWriter().write("OK");
         }
+    }
+
+
+    @Test
+    public void testNoCompressionEncodings() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+        String encodings = protocol.getNoCompressionEncodings();
+        Assert.assertTrue(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd")
+                .stream().anyMatch(encodings::contains));
+
+        protocol.setNoCompressionEncodings("br");
+
+        String newEncodings = protocol.getNoCompressionEncodings();
+        Assert.assertTrue(newEncodings.contains("br"));
+        Assert.assertFalse(newEncodings.contains("gzip"));
     }
 }

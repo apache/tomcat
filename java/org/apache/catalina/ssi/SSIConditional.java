@@ -24,6 +24,16 @@ import java.text.ParseException;
  * SSI command that handles all conditional directives.
  */
 public class SSIConditional implements SSICommand {
+
+
+    /**
+     * Default constructor.
+     */
+    public SSIConditional() {
+    }
+    /**
+     * Processes if/elif/else/endif conditional directives.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) throws SSIStopProcessingException {

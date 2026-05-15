@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
+import java.net.SocketException;
+
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.Test;
@@ -43,6 +46,13 @@ public class TestOcspSoftFail extends OcspBaseTest {
 
     @Test(expected = SSLHandshakeException.class)
     public void testNoResponderWithoutSoftFail() throws Exception {
-        doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
+        try {
+            doTest(false, false, ClientCertificateVerification.ENABLED, false, Boolean.FALSE);
+        } catch (SocketException | SSLException e) {
+            // APR or NIO2 may throw a SocketException rather than a SSLHandshakeException. Not observed with NIO but
+            // for consistency / just in case.
+            // Different Java versions may throw an SSLException rather than a SSLHandshakeException
+            throw new SSLHandshakeException(e.getMessage());
+        }
     }
 }

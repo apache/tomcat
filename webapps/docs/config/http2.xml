@@ -44,15 +44,6 @@
   the Servlet API is fundamentally blocking, each HTTP/2 stream requires a
   dedicated container thread for the duration of that stream.</p>
 
-  <p>Requests processed using HTTP/2 will have the following additional request
-  attributes available:</p>
-  <ul>
-    <li><code>org.apache.coyote.connectionID</code> will return the HTTP/2
-        connection ID</li>
-    <li><code>org.apache.coyote.streamID</code> will return the HTTP/2 stream
-        ID</li>
-  </ul>
-
 </section>
 
 
@@ -86,6 +77,18 @@
       to <code>true</code> the request and response objects will be set for
       garbage collection after every request, otherwise they will be reused.
       If not specified, this attribute is set to <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="drainTimeout" required="false">
+      <p>Additional time in nanoseconds between sending the first graceful
+      GOAWAY (max stream id) and the final GOAWAY (last seen stream id). During
+      this time the server will continue to process new streams on the
+      connection. This is to mitigate the race of client-buffered/sent packets
+      for new streams and the final GOAWAY (with last seen stream id). By
+      default, Tomcat uses the last computed RTT for this interval, but the RTT
+      might have fluctuated due to network or server load conditions, or the
+      client might have already buffered frames for opening new streams on a
+      connection. If not specified, this attribute is set to <code>0</code>.</p>
     </attribute>
 
     <attribute name="initialWindowSize" required="false">

@@ -48,6 +48,13 @@ public enum ContinueResponseTiming {
 
     private static final StringManager sm = StringManager.getManager(ContinueResponseTiming.class);
 
+    /**
+     * Convert a configuration string to the corresponding {@link ContinueResponseTiming} value.
+     *
+     * @param value The configuration value
+     *
+     * @return The corresponding {@link ContinueResponseTiming}
+     */
     public static ContinueResponseTiming fromString(String value) {
         /*
          * Do this for two reasons: - Not all of the Enum values are intended to be used in configuration - the naming

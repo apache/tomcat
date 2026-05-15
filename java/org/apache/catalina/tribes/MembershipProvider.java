@@ -18,6 +18,9 @@ package org.apache.catalina.tribes;
 
 import java.util.Properties;
 
+/**
+ * Interface for membership providers.
+ */
 public interface MembershipProvider {
 
     /**
@@ -74,6 +77,8 @@ public interface MembershipProvider {
     void setMembershipService(MembershipService service);
 
     /**
+     * Checks whether the membership contains any members.
+     *
      * @return {@code true} if there are members
      */
     boolean hasMembers();

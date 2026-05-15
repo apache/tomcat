@@ -222,6 +222,10 @@
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
 
+  <!-- Location of Httpd binary (file name, not directory) -->
+  <!-- The Httpd tests cases be disabled by specifying an invalid path here -->
+  <property name="test.httpd.path" value="" />
+
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
   <defaultexcludes add="**/.git" />
@@ -253,6 +257,9 @@
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
     <pathelement location="${derby-tools.jar}"/>
+    <pathelement location="${bouncycastle-provider.jar}"/>
+    <pathelement location="${bouncycastle-pkix.jar}"/>
+    <pathelement location="${bouncycastle-util.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -269,6 +276,9 @@
     <filter token="MIGRATION_JAR" value="${migration-lib.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
+    <filter token="BC_PROVIDER_JAR" value="${bouncycastle-provider.jar}"/>
+    <filter token="BC_PKIX_JAR" value="${bouncycastle-pkix.jar}"/>
+    <filter token="BC_UTIL_JAR" value="${bouncycastle-util.jar}"/>
     <filter token="OUTPUT_DIR" value="${tomcat.output}"/>
   </filterset>
 
@@ -308,6 +318,7 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
+    <include name="**/index.db"/>
     <include name="**/jakarta.el.ExpressionFactory"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
@@ -338,6 +349,7 @@
     <include name="**/*.license"/>
     <include name="**/*.manifest"/>
     <include name="**/*.md"/>
+    <include name="**/*.mdd"/>
     <include name="**/*.mdl"/>
     <include name="**/*.MF"/>
     <include name="**/*.notice"/>
@@ -919,6 +931,8 @@
         <exclude name="res/maven/mvn.properties" />
         <!-- Exclude the default Coverity Scan output directory -->
         <exclude name="cov-int/**" />
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
@@ -956,6 +970,8 @@
         <exclude name="webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
         <exclude name="webapp/jsp/encoding/**"/>
+        <!-- Exclude OpenSSL index files -->
+        <exclude name="**/index.db" />
       </fileset>
     </checkstyle>
   </target>
@@ -2002,6 +2018,9 @@
       <condition property="test.name" value="${test.profile.buildutil}">
         <equals arg1="@{profile}" arg2="buildutil"/>
       </condition>
+      <condition property="test.name" value="${test.profile.integration}">
+        <equals arg1="@{profile}" arg2="integration"/>
+      </condition>
     </sequential>
   </macrodef>
 
@@ -2029,6 +2048,11 @@
     <!-- Special handling for tribes profile: include old slow/flaky tribes tests -->
     <condition property="test.includeTribes" value="true">
       <equals arg1="${test.profile}" arg2="tribes"/>
+    </condition>
+
+    <!-- Special handling for integration profile: include integration tests -->
+    <condition property="test.includeIntegration" value="true">
+      <equals arg1="${test.profile}" arg2="integration"/>
     </condition>
 
     <echo message="Test profile: ${test.profile}"/>
@@ -2086,13 +2110,13 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
@@ -2108,6 +2132,64 @@
         <and>
           <length string="${test.openssl.path}" trim="true" length="0" when="eq"/>
           <available file="openssl" filepath="${env.PATH}" property="test.openssl.exists"/>
+        </and>
+      </or>
+    </condition>
+    <echo message="OpenSSL is not available. OpenSSL-related tests will be skipped or may fail." level="warning" unless:set="test.openssl.exists"/>
+  </target>
+
+  <target name="test-tcnative-exists" description="Verifies tomcat-native library can be loaded">
+    <!-- Check if main classes are built -->
+    <available file="${test.run.classes}/org/apache/tomcat/jni/Library.class"
+               property="tomcat.classes.available"/>
+
+    <!-- If main classes don't exist, compile just what we need -->
+    <mkdir dir="${test.run.classes}" unless:set="tomcat.classes.available"/>
+    <javac srcdir="java" destdir="${test.run.classes}"
+           includes="org/apache/tomcat/jni/Library.java,org/apache/tomcat/jni/LibraryNotFoundError.java"
+           debug="${compile.debug}"
+           includeantruntime="false"
+           encoding="UTF-8"
+           unless:set="tomcat.classes.available">
+      <compilerarg line="-Xlint:-options"/>
+    </javac>
+
+    <!-- Compile the test class -->
+    <mkdir dir="${test.classes}"/>
+    <javac srcdir="test" destdir="${test.classes}"
+           includes="org/apache/tomcat/jni/TesterLibraryLoad.java"
+           debug="${compile.debug}"
+           includeantruntime="false"
+           encoding="UTF-8">
+      <classpath>
+        <pathelement location="${test.run.classes}"/>
+        <pathelement location="${junit.jar}"/>
+      </classpath>
+    </javac>
+
+    <!-- Run test - it will check both test.apr.loc and system library paths -->
+    <junit printsummary="no" fork="yes" showoutput="false" haltonfailure="false"
+           failureproperty="test.tcnative.error" logfailedtests="false">
+      <jvmarg value="${runtests.librarypath}"/>
+      <jvmarg value="${native.nativeaccess}"/>
+      <classpath refid="tomcat.test.classpath"/>
+      <test name="org.apache.tomcat.jni.TesterLibraryLoad"/>
+    </junit>
+
+    <echo message="Tomcat Native is not available. Tomcat Native (JNI) tests will be skipped." if:set="test.tcnative.error" level="warning"/>
+  </target>
+
+  <target name="test-httpd-exists" description="Checks for the httpd binary">
+    <property environment="env" />
+    <condition property="test.httpd.exists">
+      <or>
+        <and>
+          <length string="${test.httpd.path}" trim="true" length="0" when="gt"/>
+          <available file="${test.httpd.path}" property="test.httpd.exists"/>
+        </and>
+        <and>
+          <length string="${test.httpd.path}" trim="true" length="0" when="eq"/>
+          <available file="httpd" filepath="${env.PATH}" property="test.httpd.exists"/>
         </and>
       </or>
     </condition>
@@ -2170,6 +2252,7 @@
           <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
           <sysproperty key="tomcat.test.reports" value="${test.reports}" />
           <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
+          <sysproperty key="tomcat.test.httpd.path" value="${test.httpd.path}" />
           <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
           <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
           <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
@@ -2199,6 +2282,8 @@
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
               <!-- Exclude tests that Gump can't compile (unless explicitly requested via buildutil profile) -->
               <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil" />
+              <!-- Exclude integration tests requiring external binaries (unless explicitly requested via integration profile) -->
+              <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>
@@ -3714,6 +3799,33 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <param name="checksum.enabled" value="${derby-tools.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${derby-tools.checksum.algorithm}"/>
       <param name="checksum.value" value="${derby-tools.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-provider.loc}"/>
+      <param name="destfile" value="${bouncycastle-provider.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-provider.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-provider.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-provider.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-pkix.loc}"/>
+      <param name="destfile" value="${bouncycastle-pkix.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-pkix.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-pkix.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-pkix.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bouncycastle-util.loc}"/>
+      <param name="destfile" value="${bouncycastle-util.jar}"/>
+      <param name="destdir" value="${bouncycastle.home}"/>
+      <param name="checksum.enabled" value="${bouncycastle-util.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bouncycastle-util.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bouncycastle-util.checksum.value}"/>
     </antcall>
 
   </target>

@@ -16,8 +16,20 @@
  */
 package org.apache.tomcat;
 
+/**
+ * Defines the types of JAR scans that can be performed.
+ */
 public enum JarScanType {
+    /**
+     * Scan for TLD files.
+     */
     TLD,
+    /**
+     * Scan for pluggability annotations.
+     */
     PLUGGABILITY,
+    /**
+     * Other types of scans.
+     */
     OTHER
 }

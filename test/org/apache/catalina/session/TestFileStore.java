@@ -18,6 +18,7 @@ package org.apache.catalina.session;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -26,18 +27,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Manager;
+import org.apache.catalina.Session;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
 
-public class FileStoreTest {
+public class TestFileStore {
 
     private static final String SESS_TEMPPATH = "SESS_TEMP";
     private static final File dir = new File(SESS_TEMPPATH);
     private static FileStore fileStore;
-    private static File file1 = new File(SESS_TEMPPATH + "/tmp1.session");
-    private static File file2 = new File(SESS_TEMPPATH + "/tmp2.session");
-    private static Manager manager = new StandardManager();
+    private static final File file1 = new File(SESS_TEMPPATH + "/tmp1.session");
+    private static final File file2 = new File(SESS_TEMPPATH + "/tmp2.session");
+    private static final Manager manager = new StandardManager();
 
 
     @BeforeClass
@@ -86,7 +88,9 @@ public class FileStoreTest {
 
     @Test
     public void keys() throws Exception {
-        Assert.assertArrayEquals(new String[]{"tmp1", "tmp2"}, fileStore.keys());
+        String[] keys = fileStore.keys();
+        Arrays.sort(keys);
+        Assert.assertArrayEquals(new String[]{"tmp1", "tmp2"}, keys);
         fileStore.clear();
         Assert.assertArrayEquals(new String[]{}, fileStore.keys());
     }
@@ -96,5 +100,31 @@ public class FileStoreTest {
     public void removeTest() throws Exception {
         fileStore.remove("tmp1");
         Assert.assertEquals(1, fileStore.getSize());
+    }
+
+    @Test
+    public void pathTraversalSessionId() throws Exception {
+        File storageDir = dir.getAbsoluteFile();
+        File outsideFile = new File(storageDir.getParentFile(), "conf" + File.separator + "test.session");
+        File outsideDir = outsideFile.getParentFile();
+        boolean createdOutsideDir = false;
+        if (!outsideDir.exists()) {
+            Assert.assertTrue(outsideDir.mkdirs());
+            createdOutsideDir = true;
+        }
+        Assert.assertTrue(outsideFile.createNewFile());
+
+        try {
+            Session session = fileStore.load("./../conf/test");
+            Assert.assertNull(session);
+
+            fileStore.remove("./../conf/test");
+            Assert.assertTrue(outsideFile.exists());
+        } finally {
+            Assert.assertTrue(outsideFile.delete());
+            if (createdOutsideDir) {
+                Assert.assertTrue(outsideDir.delete());
+            }
+        }
     }
 }

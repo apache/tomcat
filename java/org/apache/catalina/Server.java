@@ -40,7 +40,9 @@ public interface Server extends Lifecycle {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the global naming resources.
+     * Returns the global naming resources for this server.
+     *
+     * @return the global naming resources
      */
     NamingResourcesImpl getGlobalNamingResources();
 
@@ -54,13 +56,17 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the global naming resources context.
+     * Returns the global JNDI naming context for this server.
+     *
+     * @return the global naming context
      */
     javax.naming.Context getGlobalNamingContext();
 
 
     /**
-     * @return the port number we listen to for shutdown commands.
+     * Returns the port number on which the server listens for shutdown commands.
+     *
+     * @return the port number for shutdown commands
      *
      * @see #getPortOffset()
      * @see #getPortWithOffset()
@@ -102,7 +108,9 @@ public interface Server extends Lifecycle {
     int getPortWithOffset();
 
     /**
-     * @return the address on which we listen to for shutdown commands.
+     * Returns the address on which the server listens for shutdown commands.
+     *
+     * @return the address for shutdown commands
      */
     String getAddress();
 
@@ -116,7 +124,9 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the shutdown command string we are waiting for.
+     * Returns the shutdown command string the server is waiting for.
+     *
+     * @return the shutdown command string
      */
     String getShutdown();
 
@@ -130,9 +140,10 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the parent class loader for this component. If not set, return {@link #getCatalina()}
-     *             {@link Catalina#getParentClassLoader()}. If catalina has not been set, return the system class
-     *             loader.
+     * Returns the parent class loader for this server component. If not explicitly set, returns the parent
+     * class loader from {@link #getCatalina()}. If Catalina has not been set, returns the system class loader.
+     *
+     * @return the parent class loader
      */
     ClassLoader getParentClassLoader();
 
@@ -146,7 +157,9 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the outer Catalina startup/shutdown component if present.
+     * Returns the outer Catalina startup/shutdown component, if one has been set.
+     *
+     * @return the Catalina component, or {@code null} if not set
      */
     Catalina getCatalina();
 
@@ -159,8 +172,10 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the configured base (instance) directory. Note that home and base may be the same (and are by default).
-     *             If this is not set the value returned by {@link #getCatalinaHome()} will be used.
+     * Returns the configured base (instance) directory. If not set, the value from {@link #getCatalinaHome()}
+     * is used. Note that home and base may be the same (and are by default).
+     *
+     * @return the configured base directory
      */
     File getCatalinaBase();
 
@@ -173,7 +188,9 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the configured home (binary) directory. Note that home and base may be the same (and are by default).
+     * Returns the configured home (binary) directory. Note that home and base may be the same (and are by default).
+     *
+     * @return the configured home directory
      */
     File getCatalinaHome();
 
@@ -229,7 +246,9 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the array of Services defined within this Server.
+     * Returns the array of all Services defined within this Server.
+     *
+     * @return the array of Services, or an empty array if none are defined
      */
     Service[] findServices();
 
@@ -243,12 +262,16 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the token necessary for operations on the associated JNDI naming context.
+     * Returns the token required for performing operations on the associated JNDI naming context.
+     *
+     * @return the JNDI naming context token
      */
     Object getNamingToken();
 
     /**
-     * @return the utility executor managed by the Service.
+     * Returns the utility executor managed by the server for background tasks.
+     *
+     * @return the utility executor service
      */
     ScheduledExecutorService getUtilityExecutor();
 

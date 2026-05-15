@@ -33,13 +33,20 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     /*
      * Private serializable variables to keep the messages state
      */
+    /** The event type of the session message. */
     private final int mEvtType;
+    /** The serialized session data. */
     private final byte[] mSession;
+    /** The session identifier. */
     private final String mSessionID;
 
+    /** The context name for the session. */
     private final String mContextName;
+    /** The timestamp when the message was serialized. */
     private long serializationTimestamp;
+    /** Whether the timestamp has been explicitly set. */
     private boolean timestampSet = false;
+    /** The unique identifier for this message. */
     private String uniqueId;
 
 

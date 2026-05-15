@@ -49,8 +49,10 @@ public class TesterOpenSSL {
         } catch (IOException ioe) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 4.0.")) {
-            // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.0.x
+        // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.1.x
+        if (versionString.startsWith("OpenSSL 4.1.")) {
+            VERSION = 40100;
+        } else if (versionString.startsWith("OpenSSL 4.0.")) {
             VERSION = 40000;
         } else if (versionString.startsWith("OpenSSL 3.6.")) {
             VERSION = 30600;
@@ -244,13 +246,18 @@ public class TesterOpenSSL {
 
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
+        String[] ciphers = getOpenSSLCiphersAsExpression(specification, true).trim().split(":");
         Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
     }
 
 
     public static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
+        return getOpenSSLCiphersAsExpression(specification, false);
+    }
+
+
+    public static String getOpenSSLCiphersAsExpression(String specification, boolean withProtocol) throws Exception {
 
         List<String> args = new ArrayList<>();
         // Standard command to list the ciphers
@@ -294,10 +301,12 @@ public class TesterOpenSSL {
                 i++;
             }
 
-            // Protocol is the second
-            int j = cipher.indexOf(' ', i);
-            name.append('+');
-            name.append(cipher.substring(i, j));
+            if (withProtocol) {
+                // Optionally include the protocol, separated with a '+'
+                int j = cipher.indexOf(' ', i);
+                name.append('+');
+                name.append(cipher.substring(i, j));
+            }
 
             // More renames
             if (OPENSSL_RENAMED_CIPHERS.containsKey(name.toString())) {

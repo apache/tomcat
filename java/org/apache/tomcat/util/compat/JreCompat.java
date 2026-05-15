@@ -22,6 +22,12 @@ package org.apache.tomcat.util.compat;
  */
 public class JreCompat {
 
+    /**
+     * Constructs a new JreCompat.
+     */
+    public JreCompat() {
+    }
+
     private static final JreCompat instance;
     private static final boolean graalAvailable;
     private static final boolean jre24Available;
@@ -57,21 +63,41 @@ public class JreCompat {
     }
 
 
+    /**
+     * Get the current JreCompat instance.
+     *
+     * @return the JreCompat instance
+     */
     public static JreCompat getInstance() {
         return instance;
     }
 
 
+    /**
+     * Check if Graal is available.
+     *
+     * @return {@code true} if Graal is available
+     */
     public static boolean isGraalAvailable() {
         return graalAvailable;
     }
 
 
+    /**
+     * Check if JRE 22 is available.
+     *
+     * @return {@code true} if JRE 22 is available
+     */
     public static boolean isJre22Available() {
         return jre22Available;
     }
 
 
+    /**
+     * Check if JRE 24 is available.
+     *
+     * @return {@code true} if JRE 24 is available
+     */
     public static boolean isJre24Available() {
         return jre24Available;
     }

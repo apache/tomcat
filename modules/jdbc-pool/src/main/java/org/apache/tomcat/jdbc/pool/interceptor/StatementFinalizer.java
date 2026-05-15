@@ -38,7 +38,16 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
+    /**
+     * List of statements created on the associated connection.
+     */
     protected List<StatementEntry> statements = new LinkedList<>();
+
+    /**
+     * Default constructor.
+     */
+    public StatementFinalizer() {
+    }
 
     private boolean logCreationStack = false;
     private int createStatementCount=0;
@@ -96,26 +105,30 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         super.reset(parent, con);
     }
 
+
     public void clearEntry() {
         if(createStatementCount%10!=0) {
             createStatementCount++;
             return;
         }else {
             createStatementCount=0;
-            Iterator<StatementEntry> iterator = statements.iterator();
-            while (iterator.hasNext()) {
-                StatementEntry st  = iterator.next();
-                if(st.getStatement()==null || st.getStatement().isClosed()) {
-                    iterator.remove();
-                }
-            }
+            statements.removeIf(entry -> {
+            Statement stmt = entry.getStatement();
+            return stmt == null || stmt.isClosed();
+            });
+            
         }
     }
+
 
     protected class StatementEntry {
         private WeakReference<Statement> statement;
         private Throwable allocationStack;
 
+        /**
+         * Creates a new StatementEntry.
+         * @param statement the statement to track
+         */
         public StatementEntry(Statement statement) {
             this.statement = new WeakReference<>(statement);
             if (logCreationStack) {
@@ -123,10 +136,18 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             }
         }
 
+        /**
+         * Returns the tracked statement.
+         * @return the statement, or null if it has been garbage collected
+         */
         public Statement getStatement() {
             return statement.get();
         }
 
+        /**
+         * Returns the stack trace from when this statement was created.
+         * @return the allocation stack trace, or null if tracing is disabled
+         */
         public Throwable getAllocationStack() {
             return allocationStack;
         }

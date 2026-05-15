@@ -22,9 +22,15 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 /**
- * Generate Sender Element
+ * Factory that generates the configuration store output for a Sender element.
  */
 public class SenderSF extends StoreFactoryBase {
+
+    /**
+     * Default constructor.
+     */
+    public SenderSF() {
+    }
 
     /**
      * Store the specified Sender child.

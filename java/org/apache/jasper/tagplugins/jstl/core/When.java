@@ -19,7 +19,16 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin for the {@code <c:when>} JSTL tag.
+ */
 public final class When implements TagPlugin {
+
+    /**
+     * Constructs a new When tag plugin.
+     */
+    public When() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

@@ -33,6 +33,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JsonErrorReportValve extends ErrorReportValve {
 
+    /**
+     * Constructs a new JsonErrorReportValve.
+     */
     public JsonErrorReportValve() {
         super();
     }

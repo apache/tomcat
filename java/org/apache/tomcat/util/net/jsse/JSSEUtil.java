@@ -46,11 +46,22 @@ public class JSSEUtil extends SSLUtilBase {
     private volatile Set<String> implementedCiphers;
 
 
+    /**
+     * Constructs an instance for the given certificate.
+     *
+     * @param certificate The certificate
+     */
     public JSSEUtil(SSLHostConfigCertificate certificate) {
         this(certificate, true);
     }
 
 
+    /**
+     * Constructs an instance for the given certificate.
+     *
+     * @param certificate The certificate
+     * @param warnOnSkip Whether to warn when skipping unsupported protocols/ciphers
+     */
     public JSSEUtil(SSLHostConfigCertificate certificate, boolean warnOnSkip) {
         super(certificate, warnOnSkip);
     }

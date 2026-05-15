@@ -43,17 +43,31 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * A sender that sends messages to multiple members in parallel using NIO.
+ */
 public class ParallelNioSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(ParallelNioSender.class);
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(ParallelNioSender.class);
 
     private static final Cleaner cleaner = Cleaner.create();
 
     private final InternalState state;
 
+    /**
+     * The timeout in milliseconds for the selector select operation.
+     */
     protected final long selectTimeout = 5000; // default 5 seconds, same as send timeout
 
+    /**
+     * Construct a new {@code ParallelNioSender}.
+     *
+     * @throws IOException If an I/O error occurs during initialization
+     */
     public ParallelNioSender() throws IOException {
         state = new InternalState(Selector.open());
         cleaner.register(this, state);

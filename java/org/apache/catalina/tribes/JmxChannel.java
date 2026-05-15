@@ -19,6 +19,9 @@ package org.apache.catalina.tribes;
 import javax.management.MBeanRegistration;
 
 
+/**
+ * JMX channel interface for managing JMX registration of a channel.
+ */
 public interface JmxChannel extends MBeanRegistration {
 
     /**

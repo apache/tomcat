@@ -35,9 +35,20 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * @since 2.1
+ * Factory for creating {@link ValueExpression} and {@link MethodExpression} instances, and for coercing objects to
+ * specific types. Implementations parse and compile EL expressions. Use {@link #newInstance()} to obtain an instance
+ * using the standard discovery mechanism.
+ *
+ * @since EL 2.1
  */
 public abstract class ExpressionFactory {
+
+    /**
+     * Constructs an ExpressionFactory. Subclasses should invoke this constructor to initialize
+     * the base factory state.
+     */
+    public ExpressionFactory() {
+    }
 
     private static final String PROPERTY_NAME = "jakarta.el.ExpressionFactory";
 
@@ -170,6 +181,16 @@ public abstract class ExpressionFactory {
      */
     public abstract ValueExpression createValueExpression(ELContext context, String expression, Class<?> expectedType);
 
+    /**
+     * Creates a {@link ValueExpression} that, when evaluated, returns the given instance
+     * of the specified type. This is a convenience method for creating a constant value
+     * expression without requiring an {@link ELContext}.
+     *
+     * @param instance     the constant value to wrap
+     * @param expectedType the expected type of the value
+     *
+     * @return a ValueExpression that returns the given instance when evaluated
+     */
     public abstract ValueExpression createValueExpression(Object instance, Class<?> expectedType);
 
     /**
@@ -202,7 +223,11 @@ public abstract class ExpressionFactory {
     public abstract <T> T coerceToType(Object obj, Class<T> expectedType);
 
     /**
-     * @return This default implementation returns null
+     * Returns an {@link ELResolver} capable of resolving properties on {@link java.io.InputStream}
+     * objects, enabling EL expressions to operate on stream types. This allows expressions to
+     * read data from input streams using standard property navigation syntax.
+     *
+     * @return the StreamELResolver, or {@code null} if not supported by this implementation
      *
      * @since EL 3.0
      */
@@ -211,7 +236,11 @@ public abstract class ExpressionFactory {
     }
 
     /**
-     * @return This default implementation returns null
+     * Returns a map of function names to {@link java.lang.reflect.Method} objects representing
+     * the standard EL functions that are available by default without explicit registration.
+     * Implementations can override this method to provide a set of built-in functions.
+     *
+     * @return a map of function names to methods, or {@code null} if no default functions are provided
      *
      * @since EL 3.0
      */

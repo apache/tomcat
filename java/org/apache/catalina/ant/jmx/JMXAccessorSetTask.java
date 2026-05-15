@@ -59,6 +59,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorSetTask extends JMXAccessorTask {
 
+    /**
+     * Constructs a new JMXAccessorSetTask.
+     */
+    public JMXAccessorSetTask() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     private String attribute;
@@ -69,28 +75,36 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attribute.
+     * Get the MBean attribute name.
+     *
+     * @return the attribute name
      */
     public String getAttribute() {
         return attribute;
     }
 
     /**
-     * @param attribute The attribute to set.
+     * Set the MBean attribute name.
+     *
+     * @param attribute the attribute to set
      */
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
 
     /**
-     * @return Returns the value.
+     * Get the attribute value.
+     *
+     * @return the value
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * @param value The value to set.
+     * Set the attribute value.
+     *
+     * @param value the value to set
      */
     public void setValue(String value) {
         this.value = value;
@@ -98,14 +112,18 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
 
     /**
-     * @return Returns the type.
+     * Get the value type.
+     *
+     * @return the type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * @param valueType The type to set.
+     * Set the value type.
+     *
+     * @param valueType the type to set
      */
     public void setType(String valueType) {
         this.type = valueType;
@@ -113,14 +131,18 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
 
     /**
-     * @return Returns the convert.
+     * Get the convert flag.
+     *
+     * @return the convert flag
      */
     public boolean isConvert() {
         return convert;
     }
 
     /**
-     * @param convert The convert to set.
+     * Set the convert flag.
+     *
+     * @param convert the flag to set
      */
     public void setConvert(boolean convert) {
         this.convert = convert;

@@ -23,6 +23,9 @@ import java.io.StringReader;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 
+/**
+ * Utility class for parsing HTTP Host header values.
+ */
 public class Host {
 
     private Host() {

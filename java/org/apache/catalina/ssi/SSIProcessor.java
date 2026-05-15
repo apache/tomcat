@@ -36,12 +36,31 @@ public class SSIProcessor {
     protected static final String COMMAND_START = "<!--#";
     /** The end pattern */
     protected static final String COMMAND_END = "-->";
+    /**
+     * External resolver for file and variable access.
+     */
     protected final SSIExternalResolver ssiExternalResolver;
+    /**
+     * Map of registered SSI command names to their handlers.
+     */
     protected final HashMap<String,SSICommand> commands = new HashMap<>();
+    /**
+     * Debug level for SSI processing.
+     */
     protected final int debug;
+    /**
+     * Whether exec commands are allowed.
+     */
     protected final boolean allowExec;
 
 
+    /**
+     * Creates a new SSI processor with the given configuration.
+     *
+     * @param ssiExternalResolver the external resolver for file/variable access
+     * @param debug               the debug level
+     * @param allowExec           whether exec commands are allowed
+     */
     public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug, boolean allowExec) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.debug = debug;
@@ -50,6 +69,9 @@ public class SSIProcessor {
     }
 
 
+    /**
+     * Registers all built-in SSI commands.
+     */
     protected void addBuiltinCommands() {
         addCommand("config", new SSIConfig());
         addCommand("echo", new SSIEcho());
@@ -69,6 +91,12 @@ public class SSIProcessor {
     }
 
 
+    /**
+     * Registers a custom SSI command handler.
+     *
+     * @param name     the command name
+     * @param command  the command handler
+     */
     public void addCommand(String name, SSICommand command) {
         commands.put(name, command);
     }
@@ -309,15 +337,35 @@ public class SSIProcessor {
     }
 
 
+    /**
+     * Compares a substring of the buffer with the given command string.
+     *
+     * @param buf      the buffer to search
+     * @param index    the starting index
+     * @param command  the command string to match
+     * @return true if the substring matches the command
+     */
     protected boolean charCmp(String buf, int index, String command) {
         return buf.regionMatches(index, command, 0, command.length());
     }
 
 
+    /**
+     * Checks if the given character is a whitespace character.
+     *
+     * @param c the character to check
+     * @return true if the character is a space, tab, newline, or carriage return
+     */
     protected boolean isSpace(char c) {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
     }
 
+    /**
+     * Checks if the given character is a quote character.
+     *
+     * @param c the character to check
+     * @return true if the character is a single, double, or backtick quote
+     */
     protected boolean isQuote(char c) {
         return c == '\'' || c == '\"' || c == '`';
     }

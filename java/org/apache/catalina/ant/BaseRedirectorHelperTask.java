@@ -40,6 +40,12 @@ import org.apache.tools.ant.types.RedirectorElement;
  */
 public abstract class BaseRedirectorHelperTask extends Task {
 
+    /**
+     * Default constructor.
+     */
+    public BaseRedirectorHelperTask() {
+    }
+
     /** Redirector helper */
     protected final Redirector redirector = new Redirector(this);
 

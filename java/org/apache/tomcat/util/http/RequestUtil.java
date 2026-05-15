@@ -22,8 +22,14 @@ import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Utility methods for HTTP request processing.
+ */
 public class RequestUtil {
 
+    /**
+     * Hide default constructor as this is a utility class.
+     */
     private RequestUtil() {
         // Hide default constructor as this is a utility class
     }
@@ -32,7 +38,7 @@ public class RequestUtil {
     /**
      * Normalize a relative URI path. This method normalizes "/./", "/../", "//" and "\". If the input path is an
      * attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to prevent attempts to 'escape
-     * the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
+     * the root'. URI paths containing null bytes will be rejected.
      *
      * @param path Relative path to be normalized
      *
@@ -46,7 +52,7 @@ public class RequestUtil {
     /**
      * Normalize a relative URI path. This method normalizes "/./", "/../" and "//". This method optionally normalizes
      * "\". If the input path is an attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to
-     * prevent attempts to 'escape the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
+     * prevent attempts to 'escape the root'. URI paths containing null bytes will be rejected.
      *
      * @param path             Relative path to be normalized
      * @param replaceBackSlash Should '\\' be normalized to '/'
@@ -55,7 +61,13 @@ public class RequestUtil {
      */
     public static String normalize(String path, boolean replaceBackSlash) {
 
+        // Keep behaviour aligned with CoyoteAdapter.normalize()
         if (path == null) {
+            return null;
+        }
+
+        // Reject paths containing null bytes
+        if (path.indexOf(0) > -1) {
             return null;
         }
 
@@ -119,6 +131,13 @@ public class RequestUtil {
     }
 
 
+    /**
+     * Check if the given origin matches the origin of the request.
+     *
+     * @param request The HTTP servlet request
+     * @param origin  The origin to check
+     * @return True if the origin matches the request's origin
+     */
     public static boolean isSameOrigin(HttpServletRequest request, String origin) {
         // Build scheme://host:port from request
         StringBuilder target = new StringBuilder();

@@ -20,20 +20,42 @@ import java.io.IOException;
 
 import org.apache.catalina.tribes.util.Arrays;
 
+/**
+ * Static member representation for cluster membership.
+ */
 public class StaticMember extends MemberImpl {
+    /**
+     * Default constructor.
+     */
     public StaticMember() {
         super();
     }
 
+    /**
+     * Creates a static member with the given host, port, and alive time.
+     * @param host the host address
+     * @param port the port number
+     * @param aliveTime the time the member was last alive
+     * @throws IOException if serialization fails
+     */
     public StaticMember(String host, int port, long aliveTime) throws IOException {
         super(host, port, aliveTime);
     }
 
+    /**
+     * Creates a static member with the given host, port, alive time, and payload.
+     * @param host the host address
+     * @param port the port number
+     * @param aliveTime the time the member was last alive
+     * @param payload the member payload data
+     * @throws IOException if serialization fails
+     */
     public StaticMember(String host, int port, long aliveTime, byte[] payload) throws IOException {
         super(host, port, aliveTime, payload);
     }
 
     /**
+     * Sets the host for this member.
      * @param host String, either in byte array string format, like {214,116,1,3} or as a regular hostname, 127.0.0.1 or
      *                 tomcat01.mydomain.com
      */
@@ -54,6 +76,7 @@ public class StaticMember extends MemberImpl {
     }
 
     /**
+     * Sets the domain for this member.
      * @param domain String, either in byte array string format, like {214,116,1,3} or as a regular string value like
      *                   'mydomain'. The latter will be converted using ISO-8859-1 encoding
      */
@@ -69,6 +92,7 @@ public class StaticMember extends MemberImpl {
     }
 
     /**
+     * Sets the unique identifier for this member.
      * @param id String, must be in byte array string format, like {214,116,1,3} and exactly 16 bytes long
      */
     public void setUniqueId(String id) {

@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -42,6 +43,7 @@ import javax.net.ssl.SSLSessionContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.jni.Buffer;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
@@ -63,8 +65,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
 
+    /**
+     * Set of available cipher suites.
+     */
     public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
+    /**
+     * Set of implemented protocols.
+     */
     public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
 
     static {
@@ -99,7 +107,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         HashSet<String> protocols = new HashSet<>();
         protocols.add(Constants.SSL_PROTO_SSLv2Hello);
-        protocols.add(Constants.SSL_PROTO_SSLv2);
         protocols.add(Constants.SSL_PROTO_SSLv3);
         protocols.add(Constants.SSL_PROTO_TLSv1);
         protocols.add(Constants.SSL_PROTO_TLSv1_1);
@@ -222,9 +229,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            cleanable.clean();
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
+            cleanable.clean();
             ByteBufferUtils.cleanDirectBuffer(buf);
         }
     }
@@ -811,9 +818,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1_2);
         }
-        if ((opts & SSL.SSL_OP_NO_SSLv2) == 0) {
-            enabled.add(Constants.SSL_PROTO_SSLv2);
-        }
         if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
@@ -832,7 +836,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return;
         }
-        boolean sslv2 = false;
         boolean sslv3 = false;
         boolean tlsv1 = false;
         boolean tlsv1_1 = false;
@@ -842,7 +845,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
             switch (p) {
-                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
                 case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
                 case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
                 case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
@@ -851,10 +853,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         // Enable all and then disable what we not want
         SSL.setOptions(state.ssl, SSL.SSL_OP_ALL);
-
-        if (!sslv2) {
-            SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv2);
-        }
+        // Always disable SSLv2
+        SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv2);
         if (!sslv3) {
             SSL.setOptions(state.ssl, SSL.SSL_OP_NO_SSLv3);
         }
@@ -1400,11 +1400,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private record OpenSSLState(long ssl, long networkBIO) implements Runnable {
         @Override
         public void run() {
-            if (networkBIO != 0) {
-                SSL.freeBIO(networkBIO);
-            }
-            if (ssl != 0) {
-                SSL.freeSSL(ssl);
+            Lock readLock = AprStatus.getStatusLock().readLock();
+            readLock.lock();
+            try {
+                if (AprStatus.isAprInitialized()) {
+                    if (networkBIO != 0) {
+                        SSL.freeBIO(networkBIO);
+                    }
+                    if (ssl != 0) {
+                        SSL.freeSSL(ssl);
+                    }
+                }
+            } finally {
+                readLock.unlock();
             }
         }
     }

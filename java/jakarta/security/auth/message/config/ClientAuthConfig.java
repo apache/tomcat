@@ -22,8 +22,23 @@ import javax.security.auth.Subject;
 
 import jakarta.security.auth.message.AuthException;
 
+/**
+ * Client-side authentication configuration obtained from an {@link AuthConfigProvider}. A ClientAuthConfig provides
+ * the configuration needed to create a {@link ClientAuthContext} for authenticating outbound requests.
+ */
 public interface ClientAuthConfig extends AuthConfig {
 
+    /**
+     * Creates a {@link ClientAuthContext} for the specified authentication context ID.
+     *
+     * @param authContextID the authentication context ID
+     * @param clientSubject the subject representing the client, to be populated upon successful authentication
+     * @param properties    additional configuration properties
+     *
+     * @return the ClientAuthContext, or {@code null} if the authContextID is not recognized
+     *
+     * @throws AuthException if an error occurs while creating the context
+     */
     ClientAuthContext getAuthContext(String authContextID, Subject clientSubject, Map<String,Object> properties)
             throws AuthException;
 }

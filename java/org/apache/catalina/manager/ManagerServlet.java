@@ -152,6 +152,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public ManagerServlet() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -491,6 +497,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Reload SSL host configurations.
+     *
+     * @param writer The output writer
+     * @param tlsHostName The TLS host name or null for all hosts
+     * @param smClient StringManager for the client's locale
+     */
     protected void sslReload(PrintWriter writer, String tlsHostName, StringManager smClient) {
         Connector[] connectors = getConnectors();
         boolean found = false;
@@ -552,6 +565,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Display SSL/TLS ciphers for each connector.
+     *
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     */
     protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
         Map<String,List<String>> connectorCiphers = getConnectorCiphers(smClient);
@@ -696,6 +715,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+        if (!pathCheck(deployedWar, host.getAppBaseFile(), writer, smClient)) {
+            // Any error reported in pathCheck()
+            return;
+        }
 
         // Determine full path for uploaded WAR
         File uploadedWar;
@@ -713,6 +736,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } else {
             File uploadPath = new File(versioned, tag);
+            if (!pathCheck(uploadPath, versioned, writer, smClient)) {
+                // Any error reported in pathCheck()
+                return;
+            }
             if (!uploadPath.mkdirs() && !uploadPath.isDirectory()) {
                 writer.println(smClient.getString("managerServlet.mkdirFail", uploadPath));
                 return;
@@ -798,8 +825,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Find the local WAR file
         File localWar = new File(new File(versioned, tag), baseName + ".war");
+        if (!pathCheck(localWar, versioned, writer, smClient)) {
+            // Any error reported in pathCheck()
+            return;
+        }
 
         File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+        if (!pathCheck(deployedWar, host.getAppBaseFile(), writer, smClient)) {
+            // Any error reported in pathCheck()
+            return;
+        }
 
         // Copy WAR to appBase
         try {
@@ -830,6 +865,19 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writeDeployResult(writer, smClient, name, displayPath);
     }
 
+
+    private static boolean pathCheck(File input, File expected, PrintWriter writer, StringManager smClient) {
+        try {
+            if (!input.getCanonicalFile().toPath().startsWith(expected.getCanonicalFile().toPath())) {
+                writer.println(smClient.getString("managerServlet.pathCheckFail", input, expected));
+                return false;
+            }
+        } catch (IOException ioe) {
+            writer.println(smClient.getString("managerServlet.pathCheckError", input, expected, ioe.getMessage()));
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Install an application for the specified path from the specified web application archive.
@@ -899,7 +947,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             return;
                         }
                         File localConfigFile = new File(configBase, baseName + ".xml");
+                        if (!pathCheck(localConfigFile, configBase, writer, smClient)) {
+                            // Any error reported in pathCheck()
+                            return;
+                        }
                         File configFile = new File(config);
+
                         // Skip delete and copy if source == destination
                         if (!configFile.getCanonicalPath().equals(localConfigFile.getCanonicalPath())) {
                             if (localConfigFile.isFile() && !localConfigFile.delete()) {
@@ -920,9 +973,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         } else {
                             localWarFile = new File(host.getAppBaseFile(), baseName);
                         }
+                        if (!pathCheck(localWarFile, host.getAppBaseFile(), writer, smClient)) {
+                            // Any error reported in pathCheck()
+                            return;
+                        }
+
                         File warFile = new File(war);
                         if (!warFile.isAbsolute()) {
                             warFile = new File(host.getAppBaseFile(), war);
+                            if (!pathCheck(warFile, host.getAppBaseFile(), writer, smClient)) {
+                                // Any error reported in pathCheck()
+                                return;
+                            }
                         }
                         // Skip delete and copy if source == destination
                         if (!warFile.getCanonicalPath().equals(localWarFile.getCanonicalPath())) {
@@ -1511,11 +1573,17 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Validate the context name.
+     *
+     * @param cn The context name to validate
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     * @return true if valid, false otherwise
+     */
     protected static boolean validateContextName(ContextName cn, PrintWriter writer, StringManager smClient) {
 
-        // ContextName should be non-null with a path that is empty or starts
-        // with /
-        if (cn != null && (cn.getPath().startsWith("/") || cn.getPath().isEmpty())) {
+        if (cn != null && cn.isPathValid()) {
             return true;
         }
 
@@ -1527,6 +1595,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         return false;
     }
 
+    /**
+     * Get the SSL ciphers for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to cipher lists
+     */
     protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
@@ -1550,6 +1624,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Get the SSL certificates for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to certificate lists
+     */
     protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
@@ -1594,6 +1674,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * Get the trusted certificates for each connector.
+     *
+     * @param smClient StringManager for the client's locale
+     * @return map of connector names to trusted certificate lists
+     */
     protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 

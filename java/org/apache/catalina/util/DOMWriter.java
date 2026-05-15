@@ -34,6 +34,11 @@ public class DOMWriter {
     private final PrintWriter out;
 
 
+    /**
+     * Construct a DOMWriter that writes to the given Writer.
+     *
+     * @param writer The Writer to write to
+     */
     public DOMWriter(Writer writer) {
         out = new PrintWriter(writer);
     }

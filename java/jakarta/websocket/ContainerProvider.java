@@ -24,6 +24,12 @@ import java.util.ServiceLoader;
  */
 public abstract class ContainerProvider {
 
+    /**
+     * Creates a new ContainerProvider instance.
+     */
+    protected ContainerProvider() {
+    }
+
     private static final String DEFAULT_PROVIDER_CLASS_NAME = "org.apache.tomcat.websocket.WsWebSocketContainer";
 
     /**
@@ -54,5 +60,10 @@ public abstract class ContainerProvider {
         return result;
     }
 
+    /**
+     * Returns the WebSocket container provided by this provider.
+     *
+     * @return The WebSocket container
+     */
     protected abstract WebSocketContainer getContainer();
 }

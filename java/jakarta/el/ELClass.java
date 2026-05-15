@@ -17,16 +17,30 @@
 package jakarta.el;
 
 /**
+ * Wrapper for a {@link Class} object that enables access to static fields and methods from EL expressions. An
+ * ELClass instance is used as the base object when resolving static members, typically in conjunction with the
+ * {@link StaticFieldELResolver}.
+ *
  * @since EL 3.0
  */
 public class ELClass {
 
     private final Class<?> clazz;
 
+    /**
+     * Constructs an ELClass wrapping the specified Class.
+     *
+     * @param clazz the class to wrap
+     */
     public ELClass(Class<?> clazz) {
         this.clazz = clazz;
     }
 
+    /**
+     * Returns the wrapped Class.
+     *
+     * @return the wrapped Class
+     */
     public Class<?> getKlass() {
         return clazz;
     }

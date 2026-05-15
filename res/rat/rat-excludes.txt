@@ -30,7 +30,8 @@
   - Files in API documentation (javadoc) that are generated
 
   - test files, such as trivial textual files containing only "OK' string,
-    files in unusual encodings or compressed files are also excluded.
+    files in that cannot support license headers and/or use unusual encodings
+    and/or are compressed files are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
 
@@ -87,6 +88,9 @@ output/dist/webapps/docs/*/search-page.js
 output/dist/webapps/docs/*/tag-search-index.js
 output/dist/webapps/docs/*/type-search-index.js
 
+output/dist/src/test/org/apache/tomcat/util/net/*.pem
+output/dist/src/test/org/apache/tomcat/util/net/index.db
+output/dist/src/test/org/apache/tomcat/util/net/jsse/*.pem
 output/dist/src/test/org/apache/tomcat/util/net/jsse/key-password
 output/dist/src/test/org/apache/tomcat/util/net/key-password
 output/dist/src/test/org/apache/tomcat/util/net/keystore-password
@@ -106,6 +110,9 @@ output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
+test/org/apache/tomcat/util/net/*.pem
+test/org/apache/tomcat/util/net/index.db
+test/org/apache/tomcat/util/net/jsse/*.pem
 test/org/apache/tomcat/util/net/jsse/key-password
 test/org/apache/tomcat/util/net/key-password
 test/org/apache/tomcat/util/net/keystore-password

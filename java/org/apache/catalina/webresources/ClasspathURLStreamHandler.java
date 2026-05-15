@@ -24,7 +24,16 @@ import java.net.URLStreamHandler;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * URL stream handler that resolves resources from the classpath.
+ */
 public class ClasspathURLStreamHandler extends URLStreamHandler {
+
+    /**
+     * Creates a new ClasspathURLStreamHandler.
+     */
+    public ClasspathURLStreamHandler() {
+    }
 
     private static final StringManager sm = StringManager.getManager(ClasspathURLStreamHandler.class);
 

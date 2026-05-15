@@ -89,18 +89,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testEXPORT40() throws Exception {
-        testSpecification("EXPORT40");
-    }
-
-
-    @Test
-    public void testEXPORT() throws Exception {
-        testSpecification("EXPORT");
-    }
-
-
-    @Test
     public void testRSA() throws Exception {
         testSpecification("RSA");
     }
@@ -245,30 +233,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testkFZA() throws Exception {
-        testSpecification("kFZA");
-    }
-
-
-    @Test
-    public void testaFZA() throws Exception {
-        testSpecification("aFZA");
-    }
-
-
-    @Test
-    public void testeFZA() throws Exception {
-        testSpecification("eFZA");
-    }
-
-
-    @Test
-    public void testFZA() throws Exception {
-        testSpecification("FZA");
-    }
-
-
-    @Test
     public void testTLSv1_2() throws Exception {
         testSpecification("TLSv1.2");
     }
@@ -282,13 +246,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSSLv3() throws Exception {
+        if (TesterOpenSSL.VERSION < 40000) {
+            return;
+        }
+        // As of OpenSSL 4.0.0, support for the SSLv3 alias has been removed
         testSpecification("SSLv3");
-    }
-
-
-    @Test
-    public void testSSLv2() throws Exception {
-        testSpecification("SSLv2");
     }
 
 
@@ -431,12 +393,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testKRB5() throws Exception {
-        testSpecification("KRB5");
-    }
-
-
-    @Test
     public void testaGOST() throws Exception {
         testSpecification("aGOST");
     }
@@ -515,6 +471,12 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
+    public void testARIAGCM() throws Exception {
+        testSpecification("ARIAGCM");
+    }
+
+
+    @Test
     public void testARIA128() throws Exception {
         testSpecification("ARIA128");
     }
@@ -523,6 +485,12 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testARIA256() throws Exception {
         testSpecification("ARIA256");
+    }
+
+
+    @Test
+    public void testCBC() throws Exception {
+        testSpecification("CBC");
     }
 
 
@@ -535,17 +503,17 @@ public class TestOpenSSLCipherConfigurationParser {
         // a number of the reference browsers
         if (TesterOpenSSL.VERSION < 30200) {
             // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
-            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!DES:!RC4:!MD5");
         } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!MD5");
         }
     }
 
 
     @Test
     public void testSpecification02() throws Exception {
-        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/
-        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
+        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/, s/\!SSLv2//, s/\!EXPORT//)
+        testSpecification("!aNULL:!eNULL:!DSS:!DES:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
     }
 
 
@@ -564,10 +532,77 @@ public class TestOpenSSLCipherConfigurationParser {
     public void testSpecification04() throws Exception {
         if (TesterOpenSSL.VERSION < 30200) {
             // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
         } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
+            testSpecification("HIGH:!aNULL:!eNULL:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
         }
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyNonsense() throws Exception {
+        testSpecificationIsEmpty("Nonsense");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptySSLv2() throws Exception {
+        testSpecificationIsEmpty("SSLv2");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT() throws Exception {
+        testSpecificationIsEmpty("EXPORT");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT40() throws Exception {
+        testSpecificationIsEmpty("EXPORT40");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyEXPORT56() throws Exception {
+        testSpecificationIsEmpty("EXPORT56");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyKRB5() throws Exception {
+        testSpecificationIsEmpty("KRB5");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptykFZA() throws Exception {
+        testSpecificationIsEmpty("kFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyaFZA() throws Exception {
+        testSpecificationIsEmpty("aFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyeFZA() throws Exception {
+        testSpecificationIsEmpty("eFZA");
+    }
+
+
+    @Test
+    public void testSpecificationIsEmptyFZA() throws Exception {
+        testSpecificationIsEmpty("FZA");
+    }
+
+
+    private void testSpecificationIsEmpty(String specification) throws Exception {
+        String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
+        Assert.assertEquals("Specification [" + specification + "] returned [" + openSSLCipherList +
+                "] rather than the expected empty list", "", openSSLCipherList);
     }
 
 

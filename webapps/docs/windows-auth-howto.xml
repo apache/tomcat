@@ -98,6 +98,8 @@ policy had to be relaxed. This is not recommended for production environments.
   <li>Create a domain user that will be mapped to the service name used by the
   Tomcat server. In this how-to, this user is called <code>tc01</code> and has a
   password of <code>tc01pass</code>.</li>
+  <li>Enable AES256 encryption for this user (via Active Directory Users and
+      Computers)</li>
   <li>Map the service principal name (SPN) to the user account. SPNs take the
   form <code>
   &lt;service class&gt;/&lt;host&gt;:&lt;port&gt;/&lt;service name&gt;</code>.
@@ -109,9 +111,12 @@ policy had to be relaxed. This is not recommended for production environments.
   itself to the domain controller. This file contains the Tomcat private key for
   the service provider account and should be protected accordingly. To generate
   the file, run the following command (all on a single line):
-  <source>ktpass /out c:\tomcat.keytab /mapuser tc01@DEV.LOCAL
+  <source>ktpass /out c:\tomcat.keytab
+          /mapuser tc01@DEV.LOCAL
           /princ HTTP/win-tc01.dev.local@DEV.LOCAL
-          /pass tc01pass /kvno 0</source></li>
+          /pass tc01pass
+          /kvno 0
+          /crypto AES256-SHA1</source></li>
   <li>Create a domain user to be used on the client. In this how-to the domain
   user is <code>test</code> with a password of <code>testpass</code>.</li>
   </ul>
@@ -135,8 +140,9 @@ policy had to be relaxed. This is not recommended for production environments.
   contained:<source>[libdefaults]
 default_realm = DEV.LOCAL
 default_keytab_name = FILE:c:\apache-tomcat-<version-major-minor/>.x\conf\tomcat.keytab
-default_tkt_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
-default_tgs_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+default_tkt_enctypes = aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+default_tgs_enctypes = aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+permitted_enctypes = aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
 forwardable=true
 
 [realms]
@@ -182,7 +188,8 @@ com.sun.security.jgss.krb5.accept {
   may be used that will simply return a Principal based on the authenticated
   user name that does not have any roles.</p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
-  2019 Standard with AdoptOpenJDK 8u232-b09 (64-bit).</p>
+  2019 Standard with Temurin Java versions 8u482-b08, 11.0.31+11, 17.0.18+8,
+  21.0.11+10 and 25.0.3+9 (all 64-bit).</p>
   </subsection>
 
   <subsection name="Tomcat instance (Linux server)">

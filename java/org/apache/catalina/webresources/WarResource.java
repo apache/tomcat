@@ -30,6 +30,14 @@ public class WarResource extends AbstractSingleArchiveResource {
     private static final Log log = LogFactory.getLog(WarResource.class);
 
 
+    /**
+     * Constructs a new WarResource.
+     *
+     * @param archiveResourceSet The archive resource set
+     * @param webAppPath         The web application path
+     * @param baseUrl            The base URL
+     * @param jarEntry           The JAR entry
+     */
     public WarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
             JarEntry jarEntry) {
         super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getWarSeparator(), jarEntry, baseUrl);

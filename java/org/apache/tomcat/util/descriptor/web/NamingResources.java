@@ -67,7 +67,9 @@ public interface NamingResources {
     void removeResourceLink(String name);
 
     /**
-     * @return the container with which the naming resources are associated.
+     * Returns the container with which the naming resources are associated.
+     *
+     * @return the container with which the naming resources are associated
      */
     Object getContainer();
 

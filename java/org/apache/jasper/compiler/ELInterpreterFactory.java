@@ -30,6 +30,9 @@ import org.apache.jasper.JspCompilationContext;
  */
 public class ELInterpreterFactory {
 
+    /**
+     * The name of the EL interpreter class used as a ServletContext attribute and init parameter key.
+     */
     public static final String EL_INTERPRETER_CLASS_NAME = ELInterpreter.class.getName();
 
     private static final ELInterpreter DEFAULT_INSTANCE = new DefaultELInterpreter();
@@ -86,7 +89,16 @@ public class ELInterpreterFactory {
     }
 
 
+    /**
+     * Default implementation of {@link ELInterpreter} that delegates to {@link JspUtil#interpreterCall}.
+     */
     public static class DefaultELInterpreter implements ELInterpreter {
+
+        /**
+         * Creates a new DefaultELInterpreter instance.
+         */
+        public DefaultELInterpreter() {
+        }
 
         @Override
         public String interpreterCall(JspCompilationContext context, boolean isTagFile, String expression,

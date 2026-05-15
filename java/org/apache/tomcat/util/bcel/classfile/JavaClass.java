@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Represents a Java class, i.e., the data structures, constant pool, fields, methods and commands contained in a Java
+ * Represents a Java class, that is, the data structures, constant pool, fields, methods and commands contained in a Java
  * .class file. See <a href="https://docs.oracle.com/javase/specs/">JVM specification</a> for details. The intent of
  * this class is to represent a parsed or otherwise existing class file. Those interested in programmatically generating
  * classes should see the <a href="../generic/ClassGen.html">ClassGen</a> class.
@@ -57,7 +57,9 @@ public class JavaClass {
     }
 
     /**
-     * @return Access flags of the object aka. "modifiers".
+     * Get the access flags of this class.
+     *
+     * @return the access flags
      */
     public final int getAccessFlags() {
         return accessFlags;
@@ -104,7 +106,9 @@ public class JavaClass {
     }
 
     /**
-     * @return Class name.
+     * Get the name of this class.
+     *
+     * @return the class name
      */
     public String getClassName() {
         return className;
@@ -112,7 +116,9 @@ public class JavaClass {
 
 
     /**
-     * @return Names of implemented interfaces.
+     * Get the names of the interfaces implemented by this class.
+     *
+     * @return the interface names
      */
     public String[] getInterfaceNames() {
         return interfaceNames;

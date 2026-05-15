@@ -49,6 +49,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
+    /**
+     * Constructs a new JMXAccessorUnregisterTask.
+     */
+    public JMXAccessorUnregisterTask() {
+    }
+
     // ------------------------------------------------------ protected Methods
 
     @Override

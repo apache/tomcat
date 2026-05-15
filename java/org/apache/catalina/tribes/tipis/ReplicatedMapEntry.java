@@ -118,7 +118,9 @@ public interface ReplicatedMapEntry extends Serializable {
     void setVersion(long version);
 
     /**
-     * @return the last replicate time.
+     * Returns the last replicate time.
+     *
+     * @return the last replicate time
      */
     long getLastTimeReplicated();
 

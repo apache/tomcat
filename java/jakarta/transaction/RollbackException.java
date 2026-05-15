@@ -18,15 +18,26 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a transaction must be rolled back.
+ */
 public class RollbackException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 4151607774785285395L;
 
+    /**
+     * Constructs a {@code RollbackException} with no detail message.
+     */
     public RollbackException() {
         super();
     }
 
+    /**
+     * Constructs a {@code RollbackException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public RollbackException(String msg) {
         super(msg);
     }

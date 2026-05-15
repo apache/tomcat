@@ -89,7 +89,7 @@ public abstract class LoggingBaseTest {
      * that have to be deleted on cleanup, register them with
      * {@link #addDeleteOnTearDown(File)}.
      */
-    public File getTemporaryDirectory() {
+    public static File getTemporaryDirectory() {
         return tempDir;
     }
 

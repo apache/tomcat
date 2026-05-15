@@ -34,6 +34,9 @@ import org.apache.catalina.util.ParameterMap;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Dynamic servlet registration implementation.
+ */
 public class ApplicationServletRegistration implements ServletRegistration.Dynamic {
 
     /**
@@ -45,6 +48,12 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     private final Context context;
     private ServletSecurityElement constraint;
 
+    /**
+     * Constructs a new ApplicationServletRegistration.
+     *
+     * @param wrapper the servlet wrapper
+     * @param context the servlet context
+     */
     public ApplicationServletRegistration(Wrapper wrapper, Context context) {
         this.wrapper = wrapper;
         this.context = context;

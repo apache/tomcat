@@ -32,6 +32,8 @@ public interface Group extends Principal {
     // ------------------------------------------------------------- Properties
 
     /**
+     * Returns the description of this group.
+     *
      * @return the description of this group.
      */
     String getDescription();
@@ -46,6 +48,8 @@ public interface Group extends Principal {
 
 
     /**
+     * Returns the group name of this group, which must be unique within the scope of a {@link UserDatabase}.
+     *
      * @return the group name of this group, which must be unique within the scope of a {@link UserDatabase}.
      */
     String getGroupname();
@@ -60,18 +64,24 @@ public interface Group extends Principal {
 
 
     /**
+     * Returns the set of {@link Role}s assigned specifically to this group.
+     *
      * @return the set of {@link Role}s assigned specifically to this group.
      */
     Iterator<Role> getRoles();
 
 
     /**
+     * Returns the {@link UserDatabase} within which this Group is defined.
+     *
      * @return the {@link UserDatabase} within which this Group is defined.
      */
     UserDatabase getUserDatabase();
 
 
     /**
+     * Returns the set of {@link User}s that are members of this group.
+     *
      * @return the set of {@link User}s that are members of this group.
      */
     Iterator<User> getUsers();

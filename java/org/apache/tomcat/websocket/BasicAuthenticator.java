@@ -26,12 +26,17 @@ import java.util.Map;
  */
 public class BasicAuthenticator extends Authenticator {
 
+    /** Default constructor. */
+    public BasicAuthenticator() { }
+
+    /** The name of the Basic authentication scheme. */
     public static final String schemeName = "basic";
+    /** The charset parameter name in the authenticate header. */
     public static final String charsetparam = "charset";
 
     @Override
-    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
-            String userRealm) throws AuthenticationException {
+    public String getAuthorization(String method, String requestUri, String authenticateHeader, String userName,
+            String userPassword, String userRealm) throws AuthenticationException {
 
         validateUsername(userName);
         validatePassword(userPassword);

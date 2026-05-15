@@ -502,18 +502,27 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
      * The checks performed below are based on the checks in Http11InputBuffer.
      */
     private boolean validateRequest() {
-        HttpParser httpParser = handler.getProtocol().getHttp11Protocol().getHttpParser();
+        // Check for issues during header processing. Include:
+        // - invalid (incorrectly formatted) :authority header
+        // - invalid (incorrectly formatted) host header
+        if (request.getNote(Request.NOTE_BAD_REQUEST) != null) {
+            // Notes not reset when request is recycled
+            request.setNote(Request.NOTE_BAD_REQUEST, null);
+            return false;
+        }
 
         // Method name must be a token
         if (!HttpParser.isToken(request.getMethod())) {
             return false;
         }
 
-        // Scheme must adhere to RFC 3986
+        // Scheme must adhere to RFC 3986 - null scheme possible with CONNECT
         String scheme = request.scheme().toString();
-        if (!HttpParser.isScheme(scheme)) {
+        if (scheme != null && !HttpParser.isScheme(scheme)) {
             return false;
         }
+
+        HttpParser httpParser = handler.getProtocol().getHttp11Protocol().getHttpParser();
 
         // Invalid character in request target
         // (other checks such as valid %nn happen later)

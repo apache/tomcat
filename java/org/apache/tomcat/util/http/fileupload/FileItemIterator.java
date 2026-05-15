@@ -97,5 +97,12 @@ public interface FileItemIterator {
      */
     FileItemStream next() throws FileUploadException, IOException;
 
+    /**
+     * Returns all file items by iterating through the entire request.
+     *
+     * @return The list of all file items
+     * @throws FileUploadException Parsing or processing the file item failed
+     * @throws IOException Reading the file item failed
+     */
     List<FileItem> getFileItems() throws FileUploadException, IOException;
 }

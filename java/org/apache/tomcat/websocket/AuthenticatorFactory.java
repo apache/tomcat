@@ -25,6 +25,12 @@ import java.util.ServiceLoader;
 public class AuthenticatorFactory {
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private AuthenticatorFactory() {
+    }
+
+    /**
      * Return a new authenticator instance.
      *
      * @param authScheme The scheme used

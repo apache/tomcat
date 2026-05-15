@@ -20,8 +20,18 @@ import java.util.Locale;
 
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Enum for handling cookies that do not contain an equals sign.
+ */
 public enum CookiesWithoutEquals {
+    /**
+     * Ignore cookies without an equals sign.
+     */
     IGNORE("ignore"),
+
+    /**
+     * Treat the value as the cookie name.
+     */
     NAME("name");
     /*
      * @formatter:off
@@ -81,10 +91,22 @@ public enum CookiesWithoutEquals {
         this.value = value;
     }
 
+    /**
+     * Get the string value of this enum constant.
+     *
+     * @return The string value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Convert a string to the corresponding {@link CookiesWithoutEquals} value.
+     *
+     * @param from The string to convert
+     *
+     * @return The corresponding enum value
+     */
     public static CookiesWithoutEquals fromString(String from) {
         String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
 

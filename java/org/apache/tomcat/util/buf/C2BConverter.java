@@ -46,6 +46,11 @@ public final class C2BConverter {
      */
     private final CharBuffer leftovers;
 
+    /**
+     * Constructs a C2BConverter for the given charset.
+     *
+     * @param charset the charset to use for encoding
+     */
     public C2BConverter(Charset charset) {
         encoder = charset.newEncoder();
         encoder.onUnmappableCharacter(CodingErrorAction.REPLACE).onMalformedInput(CodingErrorAction.REPLACE);
@@ -66,10 +71,20 @@ public final class C2BConverter {
         leftovers.position(0);
     }
 
+    /**
+     * Returns whether there are leftover characters pending encoding.
+     *
+     * @return true if there are leftovers
+     */
     public boolean isUnderflow() {
         return (leftovers.position() > 0);
     }
 
+    /**
+     * Returns whether there are leftover characters pending encoding.
+     *
+     * @return true if there are leftovers
+     */
     public boolean isUndeflow() {
         return isUnderflow();
     }
@@ -204,6 +219,11 @@ public final class C2BConverter {
         }
     }
 
+    /**
+     * Returns the charset used by this converter.
+     *
+     * @return the charset
+     */
     public Charset getCharset() {
         return encoder.charset();
     }

@@ -56,6 +56,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
+    /**
+     * Constructs a new WebappLoader.
+     */
+    public WebappLoader() {
+    }
+
     private static final Log log = LogFactory.getLog(WebappLoader.class);
 
     // ----------------------------------------------------- Instance Variables
@@ -157,6 +163,8 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
+     * Returns the Jakarta converter profile name.
+     *
      * @return a non-null String if the loader will attempt to use the Jakarta converter. The String is the name of the
      *             profile used for conversion.
      */
@@ -179,7 +187,9 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
-     * @return the ClassLoader class name.
+     * Returns the ClassLoader class name.
+     *
+     * @return the ClassLoader class name
      */
     public String getLoaderClass() {
         return this.loaderClass;
@@ -234,6 +244,11 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
 
+    /**
+     * Returns the loader repositories as an array of URLs.
+     *
+     * @return array of repository URLs
+     */
     public String[] getLoaderRepositories() {
         if (classLoader == null) {
             return new String[0];
@@ -246,6 +261,11 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
         return result;
     }
 
+    /**
+     * Returns the loader repositories as a colon-separated string.
+     *
+     * @return colon-separated repository URLs
+     */
     public String getLoaderRepositoriesString() {
         String[] repositories = getLoaderRepositories();
         StringBuilder sb = new StringBuilder();

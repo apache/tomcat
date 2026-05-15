@@ -62,6 +62,10 @@ public class AccessLogValve extends AbstractAccessLogValve {
     private static final Log log = LogFactory.getLog(AccessLogValve.class);
 
     // ------------------------------------------------------ Constructor
+
+    /**
+     * Constructs a new AccessLogValve.
+     */
     public AccessLogValve() {
         super();
     }
@@ -157,17 +161,29 @@ public class AccessLogValve extends AbstractAccessLogValve {
     // ------------------------------------------------------------- Properties
 
 
+    /**
+     * Returns the maximum number of days to retain log files.
+     *
+     * @return the maximum number of days to retain log files
+     */
     public int getMaxDays() {
         return maxDays;
     }
 
 
+    /**
+     * Set the maximum number of days to retain log files.
+     *
+     * @param maxDays the maximum number of days
+     */
     public void setMaxDays(int maxDays) {
         this.maxDays = maxDays;
     }
 
 
     /**
+     * Returns the directory in which log files are created.
+     *
      * @return the directory in which we create log files.
      */
     public String getDirectory() {
@@ -209,6 +225,8 @@ public class AccessLogValve extends AbstractAccessLogValve {
 
 
     /**
+     * Returns the log file prefix.
+     *
      * @return the log file prefix.
      */
     public String getPrefix() {
@@ -287,6 +305,8 @@ public class AccessLogValve extends AbstractAccessLogValve {
 
 
     /**
+     * Returns the log file suffix.
+     *
      * @return the log file suffix.
      */
     public String getSuffix() {
@@ -304,6 +324,8 @@ public class AccessLogValve extends AbstractAccessLogValve {
     }
 
     /**
+     * Returns the date format used for date-based log rotation.
+     *
      * @return the date format date based log rotation.
      */
     public String getFileDateFormat() {

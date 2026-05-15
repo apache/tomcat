@@ -30,10 +30,22 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
  */
 public class VoidInputFilter implements InputFilter {
 
+    /**
+     * Constructs a new VoidInputFilter.
+     */
+    public VoidInputFilter() {
+    }
+
 
     // -------------------------------------------------------------- Constants
 
+    /**
+     * Name of the void encoding.
+     */
     protected static final String ENCODING_NAME = "void";
+    /**
+     * ByteChunk representation of the void encoding name.
+     */
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 

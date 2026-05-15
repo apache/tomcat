@@ -26,12 +26,24 @@ import java.util.Arrays;
  */
 public class MethodReference {
 
+    /** The base object on which the method will be invoked. */
     private final Object base;
+    /** The method information. */
     private final MethodInfo methodInfo;
+    /** The annotations on the method. */
     private final Annotation[] annotations;
+    /** The evaluated parameter values for the method invocation. */
     private final Object[] evaluatedParameters;
 
 
+    /**
+     * Constructs a MethodReference with the given base object, method info, annotations, and evaluated parameters.
+     *
+     * @param base                 The base object on which the method will be invoked
+     * @param methodInfo           Information about the method
+     * @param annotations          The annotations on the method
+     * @param evaluatedParameters  The evaluated parameter values for the method invocation
+     */
     public MethodReference(Object base, MethodInfo methodInfo, Annotation[] annotations, Object[] evaluatedParameters) {
         this.base = base;
         this.methodInfo = methodInfo;

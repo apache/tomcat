@@ -21,27 +21,70 @@ package org.apache.naming.factory;
  */
 public final class Constants {
 
+    /**
+     * Package name for naming factory classes.
+     */
     public static final String Package = "org.apache.naming.factory";
 
+    /**
+     * Default resource factory class name.
+     */
     public static final String DEFAULT_RESOURCE_FACTORY = Package + ".ResourceFactory";
 
+    /**
+     * Default resource link factory class name.
+     */
     public static final String DEFAULT_RESOURCE_LINK_FACTORY = Package + ".ResourceLinkFactory";
 
+    /**
+     * Default transaction factory class name.
+     */
     public static final String DEFAULT_TRANSACTION_FACTORY = Package + ".TransactionFactory";
 
+    /**
+     * Default resource environment factory class name.
+     */
     public static final String DEFAULT_RESOURCE_ENV_FACTORY = Package + ".ResourceEnvFactory";
 
+    /**
+     * Default EJB factory class name.
+     */
     public static final String DEFAULT_EJB_FACTORY = Package + ".EjbFactory";
 
+    /**
+     * Default service reference factory class name.
+     */
     public static final String DEFAULT_SERVICE_FACTORY = Package + ".webservices.ServiceRefFactory";
 
+    /**
+     * Default handler factory class name.
+     */
     public static final String DEFAULT_HANDLER_FACTORY = Package + ".HandlerFactory";
 
+    /**
+     * DBCP data source factory class name.
+     */
     public static final String DBCP_DATASOURCE_FACTORY = "org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory";
 
+    /**
+     * OpenEJB factory class name.
+     */
     public static final String OPENEJB_EJB_FACTORY = Package + ".OpenEjbFactory";
 
+    /**
+     * Default JNDI lookup factory class name.
+     */
     public static final String DEFAULT_LOOKUP_JNDI_FACTORY = Package + ".LookupFactory";
 
+    /**
+     * Factory attribute name.
+     */
     public static final String FACTORY = "factory";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

@@ -16,12 +16,21 @@
  */
 package org.apache.tomcat.jni;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ * JNI bindings for OpenSSL SSL_CTX operations.
+ */
 public final class SSLContext {
 
+    /**
+     * Default constructor. This class provides only static methods.
+     */
+    public SSLContext() {
+        super();
+    }
+
+    /**
+     * Default session ID context value.
+     */
     public static final byte[] DEFAULT_SESSION_ID_CONTEXT = new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' };
 
     /**
@@ -249,28 +258,114 @@ public final class SSLContext {
     /*
      * Session resumption statistics methods. http://www.openssl.org/docs/ssl/SSL_CTX_sess_number.html
      */
+
+    /**
+     * Returns the total number of session attempts accepted by the server.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of accepted sessions
+     */
     public static native long sessionAccept(long ctx);
 
+    /**
+     * Returns the number of sessions actually reused on the server side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of good session accepts
+     */
     public static native long sessionAcceptGood(long ctx);
 
+    /**
+     * Returns the number of session renegotiations on the server side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session renegotiations accepted
+     */
     public static native long sessionAcceptRenegotiate(long ctx);
 
+    /**
+     * Returns the number of times the session cache grew to the maximum allowed size and therefore further entries
+     * could not be inserted.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of times the session cache was full
+     */
     public static native long sessionCacheFull(long ctx);
 
+    /**
+     * Returns the number of sessions that were resumed by the callback.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session callback hits
+     */
     public static native long sessionCbHits(long ctx);
 
+    /**
+     * Returns the total number of session connection attempts by the client.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session connects
+     */
     public static native long sessionConnect(long ctx);
 
+    /**
+     * Returns the number of sessions that were actually reused on the client side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of good session connects
+     */
     public static native long sessionConnectGood(long ctx);
 
+    /**
+     * Returns the number of session renegotiations on the client side.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session renegotiations connected
+     */
     public static native long sessionConnectRenegotiate(long ctx);
 
+    /**
+     * Returns the number of sessions that were actually reused (hits).
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session hits
+     */
     public static native long sessionHits(long ctx);
 
+    /**
+     * Returns the number of sessions that were not found in the cache (misses).
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session misses
+     */
     public static native long sessionMisses(long ctx);
 
+    /**
+     * Returns the total number of sessions currently in the cache.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The total number of sessions
+     */
     public static native long sessionNumber(long ctx);
 
+    /**
+     * Returns the number of sessions that have timed out.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return The number of session timeouts
+     */
     public static native long sessionTimeouts(long ctx);
 
     /**
@@ -332,54 +427,6 @@ public final class SSLContext {
      * @param depth Maximum depth of CA Certificates in Client Certificate verification.
      */
     public static native void setVerify(long ctx, int level, int depth);
-
-    /**
-     * When tc-native encounters a SNI extension in the TLS handshake it will call this method to determine which
-     * OpenSSL SSLContext to use for the connection.
-     *
-     * @param currentCtx  The OpenSSL SSLContext that the handshake started to use. This will be the default OpenSSL
-     *                        SSLContext for the endpoint associated with the socket.
-     * @param sniHostName The host name requested by the client
-     *
-     * @return The Java representation of the pointer to the OpenSSL SSLContext to use for the given host or zero if no
-     *             SSLContext could be identified
-     */
-    public static long sniCallBack(long currentCtx, String sniHostName) {
-        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
-        if (sniCallBack == null) {
-            return 0;
-        }
-        // Can't be sure OpenSSL is going to provide the SNI value in lower case
-        // so convert it before looking up the SSLContext
-        String hostName = (sniHostName == null) ? null : sniHostName.toLowerCase(Locale.ENGLISH);
-        return sniCallBack.getSslContext(hostName);
-    }
-
-    /**
-     * A map of default SSL Contexts to SNICallBack instances (in Tomcat these are instances of AprEndpoint) that will
-     * be used to determine the SSL Context to use bases on the SNI host name. It is structured this way since a Tomcat
-     * instance may have several TLS enabled endpoints that each have different SSL Context mappings for the same host
-     * name.
-     */
-    private static final Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
-
-    /**
-     * Interface implemented by components that will receive the call back to select an OpenSSL SSLContext based on the
-     * host name requested by the client.
-     */
-    public interface SNICallBack {
-
-        /**
-         * This callback is made during the TLS handshake when the client uses the SNI extension to request a specific
-         * TLS host.
-         *
-         * @param sniHostName The host name requested by the client - must be in lower case
-         *
-         * @return The Java representation of the pointer to the OpenSSL SSLContext to use for the given host or zero if
-         *             no SSLContext could be identified
-         */
-        long getSslContext(String sniHostName);
-    }
 
     /**
      * Allow to hook {@link CertificateVerifier} into the handshake processing. This will call

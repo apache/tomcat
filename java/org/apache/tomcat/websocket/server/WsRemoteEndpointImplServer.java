@@ -58,6 +58,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private volatile long timeoutExpiry = -1;
 
+    /**
+     * Constructs a server-side remote endpoint.
+     * @param socketWrapper the socket wrapper
+     * @param upgradeInfo the upgrade information
+     * @param serverContainer the server container
+     * @param connection the web connection
+     */
     public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo,
             WsServerContainer serverContainer, WebConnection connection) {
         this.socketWrapper = socketWrapper;
@@ -238,6 +245,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
+    /**
+     * Called when the underlying socket is ready for writing.
+     * @param useDispatch whether to use a dispatch for callback
+     */
     public void onWritePossible(boolean useDispatch) {
         // Note: Unused for async IO
         ByteBuffer[] buffers = this.buffers;
@@ -307,6 +318,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
+    /**
+     * Returns the timeout expiry time in milliseconds.
+     * @return the timeout expiry time
+     */
     protected long getTimeoutExpiry() {
         return timeoutExpiry;
     }
@@ -316,6 +331,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * Currently this is only called from the background thread so we could just call clearHandler() with useDispatch ==
      * false but the method parameter was added in case other callers started to use this method to make sure that those
      * callers think through what the correct value of useDispatch is for them.
+     */
+    /**
+     * Handles a write timeout event.
+     * @param useDispatch whether to use a dispatch for callback
      */
     protected void onTimeout(boolean useDispatch) {
         if (handler != null) {

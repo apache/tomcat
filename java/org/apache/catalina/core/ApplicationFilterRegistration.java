@@ -32,6 +32,9 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Dynamic filter registration implementation.
+ */
 public class ApplicationFilterRegistration implements FilterRegistration.Dynamic {
 
     /**
@@ -42,6 +45,12 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
     private final FilterDef filterDef;
     private final Context context;
 
+    /**
+     * Constructs a new ApplicationFilterRegistration.
+     *
+     * @param filterDef the filter definition
+     * @param context the context
+     */
     public ApplicationFilterRegistration(FilterDef filterDef, Context context) {
         this.filterDef = filterDef;
         this.context = context;

@@ -34,12 +34,22 @@ import org.apache.tomcat.util.res.StringManager;
  * what about the bind(IP. port) only IP makes sense (for the moment).
  * BTW:v  = version :-)
  */
+/**
+ * Listener to provide information to mod_heartbeat.c. Collects connector thread pool
+ * information via JMX to report ready and busy thread counts.
+ */
 public class CollectedInfo {
 
     private static final StringManager sm = StringManager.getManager(CollectedInfo.class);
 
+    /**
+     * The MBean server used to collect information.
+     */
     /* Collect info via JMX */
     protected MBeanServer mBeanServer = null;
+    /**
+     * The object name of the thread pool MBean.
+     */
     protected ObjectName objName = null;
 
     int ready;
@@ -48,10 +58,26 @@ public class CollectedInfo {
     int port = 0;
     String host = null;
 
+    /**
+     * Creates a new CollectedInfo instance and initializes it with the specified host and port.
+     *
+     * @param host the host
+     * @param port the port
+     *
+     * @throws Exception if initialization fails
+     */
     public CollectedInfo(String host, int port) throws Exception {
         init(host, port);
     }
 
+    /**
+     * Initializes the collected info by looking up the thread pool MBean for the given host and port.
+     *
+     * @param host the host (may be null to match any host)
+     * @param port the port (0 to match any port)
+     *
+     * @throws Exception if no matching connector is found
+     */
     public void init(String host, int port) throws Exception {
         int iport = 0;
         String shost = null;
@@ -102,6 +128,11 @@ public class CollectedInfo {
 
     }
 
+    /**
+     * Refreshes the ready and busy thread counts from the thread pool MBean.
+     *
+     * @throws Exception if not initialized or MBean access fails
+     */
     public void refresh() throws Exception {
         if (mBeanServer == null || objName == null) {
             throw new Exception(sm.getString("collectedInfo.notInitialized"));

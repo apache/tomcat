@@ -30,17 +30,41 @@ import org.apache.tomcat.util.res.StringManager;
  * what about the bind(IP. port) only IP makes sense (for the moment).
  * BTW:v  = version :-)
  */
+/**
+ * Lifecycle listener that provides heartbeat information to mod_heartbeat for Apache HTTP Server.
+ */
 public class HeartbeatListener implements LifecycleListener {
 
+    /**
+     * Logger for this listener.
+     */
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
+
+    /**
+     * Constructs a new HeartbeatListener.
+     */
+    public HeartbeatListener() {
+    }
+
+    /**
+     * String manager for this listener.
+     */
     private static final StringManager sm = StringManager.getManager(HeartbeatListener.class);
 
-    /* To allow to select the connector */
+    /**
+     * Port of the connector to proxy. Default is 8009.
+     */
     protected int port = 8009;
+
+    /**
+     * Host of the connector to proxy.
+     */
     protected String host = null;
 
     /**
-     * @return the host corresponding to the connector we want to proxy.
+     * Get the host corresponding to the connector we want to proxy.
+     *
+     * @return the host
      */
     public String getHost() {
         return this.host;
@@ -56,7 +80,9 @@ public class HeartbeatListener implements LifecycleListener {
     }
 
     /**
-     * @return the port of the connector we want to proxy.
+     * Get the port of the connector we want to proxy.
+     *
+     * @return the port
      */
     public int getPort() {
         return this.port;
@@ -71,15 +97,27 @@ public class HeartbeatListener implements LifecycleListener {
         this.port = port;
     }
 
-    /* for multicasting stuff */
-    protected String ip = "224.0.1.105"; /* Multicast IP */
-    protected int multiport = 23364; /* Multicast Port */
+    /**
+     * Multicast IP address. Default is 224.0.1.105.
+     */
+    protected String ip = "224.0.1.105";
+
+    /**
+     * Multicast port. Default is 23364.
+     */
+    protected int multiport = 23364;
+
+    /**
+     * Time-to-live for multicast packets. Default is 16.
+     */
     protected int ttl = 16;
 
     /* corresponding setters and getters */
 
     /**
-     * @return the Multicast IP we are using for Multicast
+     * Get the multicast IP address used for sending heartbeat messages.
+     *
+     * @return the multicast IP address
      */
     public String getGroup() {
         return ip;
@@ -95,7 +133,9 @@ public class HeartbeatListener implements LifecycleListener {
     }
 
     /**
-     * @return the Multicast Port we are using for Multicast.
+     * Get the multicast port used for sending heartbeat messages.
+     *
+     * @return the multicast port
      */
     public int getMultiport() {
         return multiport;
@@ -111,7 +151,9 @@ public class HeartbeatListener implements LifecycleListener {
     }
 
     /**
-     * @return the TTL for Multicast packets.
+     * Get the TTL value used for multicast packets.
+     *
+     * @return the TTL value
      */
     public int getTtl() {
         return ttl;
@@ -132,7 +174,9 @@ public class HeartbeatListener implements LifecycleListener {
     protected String proxyList = null;
 
     /**
-     * @return the list of proxies that send us requests.
+     * Get the list of proxies that send requests to this server.
+     *
+     * @return the proxy list in "address:port,address:port" format
      */
     public String getProxyList() {
         return proxyList;
@@ -154,7 +198,9 @@ public class HeartbeatListener implements LifecycleListener {
     protected String proxyURL = "/HeartbeatListener";
 
     /**
-     * @return the URL specified in &lt;Location/&gt; for the SetHandler heartbeat.
+     * Get the URL specified in &lt;Location/&gt; for the SetHandler heartbeat in httpd.conf.
+     *
+     * @return the proxy URL
      */
     public String getProxyURL() {
         return proxyURL;

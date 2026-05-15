@@ -599,7 +599,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingReadChunkedSplitMaximum() throws Exception {
         // @formatter:off
         String requestBody = new String(
-                "14" + CRLF +
+                "14;a=b;c" + CRLF +
                 "012345678901FINISHED" + CRLF +
                 "0" + CRLF +
                 TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +

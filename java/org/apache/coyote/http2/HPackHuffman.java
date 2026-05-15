@@ -21,10 +21,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Utility class for Huffman encoding and decoding used in HPACK compression for HTTP/2 headers.
+ */
 public class HPackHuffman {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private HPackHuffman() {
+    }
+
+    /**
+     * String manager for error messages.
+     */
     protected static final StringManager sm = StringManager.getManager(HPackHuffman.class);
 
     private static final HuffmanCode[] HUFFMAN_CODES;
@@ -366,17 +379,23 @@ public class HPackHuffman {
      * Decodes a huffman encoded string into the target StringBuilder. There must be enough space left in the buffer for
      * this method to succeed.
      *
-     * @param data   The byte buffer
-     * @param length The length of data from the buffer to decode
-     * @param target The target for the decompressed data
+     * @param data        The byte buffer
+     * @param length      The length of data from the buffer to decode
+     * @param target      The target for the decompressed data
+     * @param isFieldName {@code true} if a field name is being decoded (names have a more restrictive set of allowed
+     *                        characters than field values)
      *
      * @throws HpackException If the Huffman encoded value in HPACK headers did not end with EOS padding
      */
-    public static void decode(ByteBuffer data, int length, StringBuilder target) throws HpackException {
+    public static void decode(ByteBuffer data, int length, StringBuilder target, boolean isFieldName)
+            throws HpackException {
+
         assert data.remaining() >= length;
         int treePos = 0;
         boolean eosBits = true;
         int eosBitCount = 0;
+        boolean firstChar = true;
+        char c = 'a';
         for (int i = 0; i < length; ++i) {
             byte b = data.get();
             int bitPos = 7;
@@ -387,11 +406,34 @@ public class HPackHuffman {
                     if ((val & LOW_TERMINAL_BIT) == 0) {
                         treePos = val & LOW_MASK;
                         eosBits = false;
+                        // Found a zero, can't be counting EOS bits
                         eosBitCount = 0;
                     } else {
-                        target.append((char) (val & LOW_MASK));
+                        c = (char) (val & LOW_MASK);
+                        if (isFieldName) {
+                            if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
+                                throw new IllegalArgumentException(sm
+                                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
+                            }
+                        } else {
+                            if (firstChar) {
+                                if (!HttpParser.isFieldVChar(c)) {
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue.start", Character.toString(c)));
+                                }
+                                firstChar = false;
+                            } else {
+                                if (!HttpParser.isFieldContent(c)) {
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue", Character.toString(c)));
+                                }
+                            }
+                        }
+                        target.append(c);
                         treePos = 0;
                         eosBits = true;
+                        // Output a character, reset eosBitCount
+                        eosBitCount = 0;
                     }
                 } else {
                     if (eosBits) {
@@ -406,9 +448,31 @@ public class HPackHuffman {
                             // as an error
                             throw new HpackException(sm.getString("hpackhuffman.stringLiteralEOS"));
                         }
-                        target.append((char) ((val >> 16) & LOW_MASK));
+                        c = (char) ((val >> 16) & LOW_MASK);
+                        if (isFieldName) {
+                            if (!HttpParser.isToken(c) || Character.isUpperCase(c)) {
+                                throw new IllegalArgumentException(sm
+                                        .getString("hpackhuffman.decode.illegalCharacterName", Character.toString(c)));
+                            }
+                        } else {
+                            if (firstChar) {
+                                if (!HttpParser.isFieldVChar(c)) {
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue.start", Character.toString(c)));
+                                }
+                                firstChar = false;
+                            } else {
+                                if (!HttpParser.isFieldContent(c)) {
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "hpackhuffman.decode.illegalCharacterValue", Character.toString(c)));
+                                }
+                            }
+                        }
+                        target.append(c);
                         treePos = 0;
                         eosBits = true;
+                        // Output a character, reset eosBitCount
+                        eosBitCount = 0;
                     }
                 }
                 bitPos--;
@@ -420,6 +484,10 @@ public class HPackHuffman {
         if (!eosBits) {
             throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
+        if (!isFieldName && !HttpParser.isFieldVChar(c)) {
+            throw new IllegalArgumentException(
+                    sm.getString("hpackhuffman.decode.illegalCharacterValue.end", Character.toString(c)));
+        }
     }
 
 
@@ -427,13 +495,12 @@ public class HPackHuffman {
      * Encodes the given string into the buffer. If there is not enough space in the buffer, or the encoded version is
      * bigger than the original it will return false and not modify the buffers position.
      *
-     * @param buffer         The buffer to encode into
-     * @param toEncode       The string to encode
-     * @param forceLowercase If the string should be encoded in lower case
+     * @param buffer   The buffer to encode into
+     * @param toEncode The string to encode
      *
      * @return true if encoding succeeded
      */
-    public static boolean encode(ByteBuffer buffer, String toEncode, boolean forceLowercase) {
+    public static boolean encode(ByteBuffer buffer, String toEncode) {
         if (buffer.remaining() <= toEncode.length()) {
             return false;
         }
@@ -448,9 +515,6 @@ public class HPackHuffman {
                 throw new IllegalArgumentException(
                         sm.getString("hpack.invalidCharacter", Character.toString(c), Integer.valueOf(c)));
             }
-            if (forceLowercase) {
-                c = Hpack.toLower(c);
-            }
             HuffmanCode code = HUFFMAN_CODES[c];
             length += code.length;
         }
@@ -464,9 +528,6 @@ public class HPackHuffman {
         byte currentBufferByte = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
             char c = toEncode.charAt(i);
-            if (forceLowercase) {
-                c = Hpack.toLower(c);
-            }
             HuffmanCode code = HUFFMAN_CODES[c];
             if (code.length + bytePos <= 8) {
                 // it fits in the current byte
@@ -524,6 +585,9 @@ public class HPackHuffman {
         return true;
     }
 
+    /**
+     * Represents a Huffman code with a value and bit length.
+     */
     protected static class HuffmanCode {
         /**
          * The value of the least significant bits of the code
@@ -534,15 +598,31 @@ public class HPackHuffman {
          */
         int length;
 
+        /**
+         * Creates a new Huffman code.
+         *
+         * @param value the code value
+         * @param length the code length in bits
+         */
         public HuffmanCode(int value, int length) {
             this.value = value;
             this.length = length;
         }
 
+        /**
+         * Returns the code value.
+         *
+         * @return the code value
+         */
         public int getValue() {
             return value;
         }
 
+        /**
+         * Returns the code length in bits.
+         *
+         * @return the code length in bits
+         */
         public int getLength() {
             return length;
         }

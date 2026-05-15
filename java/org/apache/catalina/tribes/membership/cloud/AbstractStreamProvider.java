@@ -42,10 +42,20 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Abstract base class for {@link StreamProvider} implementations that provide common functionality for opening
+ * connections and streams.
+ */
 public abstract class AbstractStreamProvider implements StreamProvider {
+
+    /** Constructs a new AbstractStreamProvider. */
+    protected AbstractStreamProvider() {}
+
     private static final Log log = LogFactory.getLog(AbstractStreamProvider.class);
+    /** The string manager for this package. */
     protected static final StringManager sm = StringManager.getManager(AbstractStreamProvider.class);
 
+    /** Insecure trust managers that accept all certificates. */
     protected static final TrustManager[] INSECURE_TRUST_MANAGERS = new TrustManager[] { new X509TrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -62,6 +72,8 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     } };
 
     /**
+     * Returns the SSL socket factory.
+     *
      * @return the socket factory, or null if not needed
      */
     protected abstract SSLSocketFactory getSocketFactory();
@@ -81,7 +93,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     public URLConnection openConnection(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
             throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.connection", getClass().getSimpleName(), url, headers,
+            log.debug(sm.getString("abstractStream.connection", getClass().getSimpleName(), url,
                     Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         URLConnection connection;
@@ -105,6 +117,18 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         return connection;
     }
 
+    /**
+     * Opens an input stream to the specified URL.
+     *
+     * @param url            the url
+     * @param headers        the headers map
+     * @param connectTimeout connection timeout in ms
+     * @param readTimeout    read timeout in ms
+     *
+     * @return the input stream
+     *
+     * @throws IOException when an error occurs
+     */
     @Override
     public InputStream openStream(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
             throws IOException {
@@ -123,6 +147,15 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         return connection.getInputStream();
     }
 
+    /**
+     * Configures trust managers using the specified CA certificate file.
+     *
+     * @param caCertFile the path to the CA certificate file
+     *
+     * @return an array of trust managers
+     *
+     * @throws Exception if an error occurs
+     */
     protected static TrustManager[] configureCaCert(String caCertFile) throws Exception {
         if (caCertFile != null) {
             try (InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile))) {
@@ -151,7 +184,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
                 throw e;
             }
         } else {
-            log.warn(sm.getString("abstractStream.CACertUndefined"));
+            log.error(sm.getString("abstractStream.CACertUndefined"));
             return INSECURE_TRUST_MANAGERS;
         }
     }

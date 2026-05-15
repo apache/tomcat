@@ -37,6 +37,12 @@ import org.apache.naming.StringManager;
  */
 public class LookupFactory implements ObjectFactory {
 
+    /**
+     * Default constructor.
+     */
+    public LookupFactory() {
+    }
+
     private static final Log log = LogFactory.getLog(LookupFactory.class);
     private static final StringManager sm = StringManager.getManager(LookupFactory.class);
 

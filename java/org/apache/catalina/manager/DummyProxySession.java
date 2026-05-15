@@ -25,10 +25,18 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionListener;
 
+/**
+ * A dummy proxy session used for testing purposes.
+ */
 public class DummyProxySession implements Session {
 
     private String sessionId;
 
+    /**
+     * Construct a DummyProxySession with the given session ID.
+     *
+     * @param sessionId The session identifier
+     */
     public DummyProxySession(String sessionId) {
         this.sessionId = sessionId;
     }

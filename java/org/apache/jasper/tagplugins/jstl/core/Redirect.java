@@ -19,7 +19,17 @@ package org.apache.jasper.tagplugins.jstl.core;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
+/**
+ * Tag plugin for the JSTL &lt;c:redirect&gt; tag. Generates code to perform an HTTP redirect
+ * to the specified URL with optional query parameters.
+ */
 public class Redirect implements TagPlugin {
+
+    /**
+     * Default constructor.
+     */
+    public Redirect() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

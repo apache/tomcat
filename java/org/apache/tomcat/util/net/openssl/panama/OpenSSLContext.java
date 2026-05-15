@@ -193,8 +193,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             for (String enabledProtocol : sslHostConfig.getEnabledProtocols()) {
                 if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(enabledProtocol)) {
                     // NO-OP. OpenSSL always supports SSLv2Hello
-                } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(enabledProtocol)) {
-                    protocol |= SSL_PROTOCOL_SSLV2;
                 } else if (Constants.SSL_PROTO_SSLv3.equalsIgnoreCase(enabledProtocol)) {
                     protocol |= SSL_PROTOCOL_SSLV3;
                 } else if (Constants.SSL_PROTO_TLSv1.equalsIgnoreCase(enabledProtocol)) {
@@ -267,8 +265,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Set server groups
             // Note: It is also possible to override setSSLParameters in OpenSSLEngine to set the final
-            //  list of groups per connection, but this is less efficient than setting the configured
-            //  group list on the SSL context and letting OpenSSL figure it out.
+            // list of groups per connection, but this is less efficient than setting the configured
+            // group list on the SSL context and letting OpenSSL figure it out.
             if (sslHostConfig.getGroupList() != null) {
                 StringBuilder sb = new StringBuilder();
                 boolean first = true;
@@ -534,7 +532,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             if (maxTlsVersion >= TLS1_3_VERSION()) {
                 try {
-                    if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCipherSuites())) <= 0) {
+                    if (SSL_CTX_set_ciphersuites(state.sslCtx,
+                            localArena.allocateFrom(sslHostConfig.getCipherSuites())) <= 0) {
                         tls13Warning = sm.getString("engine.failedCipherSuite", sslHostConfig.getCipherSuites());
                     } else {
                         ciphersSet = true;
@@ -601,6 +600,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     } else if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                     }
+                    X509_free(x509CACert);
                 }
             } else if (sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) {
                 // Client certificate verification based on trusted CA files and dirs
@@ -612,7 +612,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         localArena
                                 .allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) :
                         MemorySegment.NULL;
-                if (SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative, caCertificatePathNative) <= 0) {
+                if (SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative,
+                        caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
@@ -687,9 +688,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 if ((opts & SSL_OP_NO_TLSv1_3()) == 0) {
                     enabled.add(Constants.SSL_PROTO_TLSv1_3);
-                }
-                if ((opts & SSL_OP_NO_SSLv2()) == 0) {
-                    enabled.add(Constants.SSL_PROTO_SSLv2);
                 }
                 if ((opts & SSL_OP_NO_SSLv3()) == 0) {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
@@ -811,18 +809,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
             byte[][] certificateChain = new byte[len][];
             try (var localArena = Arena.ofConfined()) {
-                for (int i = 0; i < len; i++) {
-                    MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
-                    MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
-                    int length = i2d_X509(x509, bufPointer);
-                    if (length < 0) {
-                        certificateChain[i] = new byte[0];
-                        continue;
-                    }
-                    MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                    certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-                    OPENSSL_free(buf);
-                }
+                OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain);
                 MemorySegment cipher = SSL_get_current_cipher(ssl);
                 String authMethod = (MemorySegment.NULL.equals(cipher)) ? "UNKNOWN" :
                         getCipherAuthenticationMethod(SSL_CIPHER_get_auth_nid(cipher), SSL_CIPHER_get_kx_nid(cipher));
@@ -1073,17 +1060,23 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     if (MemorySegment.NULL.equals(cert)) {
                         log.error(sm.getString("openssl.errorLoadingCertificateWithError",
                                 certificate.getCertificateFile(), OpenSSLLibrary.getLastError()));
+                        EVP_PKEY_free(key);
                         return false;
                     }
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    EVP_PKEY_free(key);
+                    X509_free(cert);
                     return false;
                 }
+                X509_free(cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    EVP_PKEY_free(key);
                     return false;
                 }
+                EVP_PKEY_free(key);
                 if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
@@ -1181,6 +1174,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             if (SSL_CTX_add0_chain_cert(state.sslCtx, certChainEntry) <= 0) {
                                 log.error(sm.getString("openssl.errorLoadingCertificateWithError",
                                         certificate.getCertificateChainFile(), OpenSSLLibrary.getLastError()));
+                                X509_free(certChainEntry);
                             }
                             certChainEntry = PEM_read_bio_X509_AUX(certificateChainBIO, MemorySegment.NULL,
                                     MemorySegment.NULL, MemorySegment.NULL);
@@ -1250,16 +1244,22 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         PEM_read_bio_PrivateKey(keyBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                 if (MemorySegment.NULL.equals(privateKeyAddress)) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    X509_free(x509cert);
                     return false;
                 }
                 if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
                     logLastError("openssl.errorLoadingCertificate");
+                    EVP_PKEY_free(privateKeyAddress);
+                    X509_free(x509cert);
                     return false;
                 }
+                X509_free(x509cert);
                 if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
                     logLastError("openssl.errorLoadingPrivateKey");
+                    EVP_PKEY_free(privateKeyAddress);
                     return false;
                 }
+                EVP_PKEY_free(privateKeyAddress);
                 if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
@@ -1299,6 +1299,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     if (SSL_CTX_add0_chain_cert(state.sslCtx, x509certChain) <= 0) {
                         logLastError("openssl.errorAddingCertificate");
+                        X509_free(x509certChain);
                         return false;
                     }
                 }
@@ -1371,8 +1372,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     public SSLEngine createSSLEngine() {
         return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, false, sessionContext, alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
-                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA,
-                noOcspCheck, ocspSoftFail, ocspTimeout, ocspVerifyFlags);
+                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA, noOcspCheck,
+                ocspSoftFail, ocspTimeout, ocspVerifyFlags);
     }
 
     @Override

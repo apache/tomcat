@@ -19,7 +19,17 @@ package org.apache.tomcat.util.http.parser;
 import java.io.IOException;
 import java.io.StringReader;
 
+/**
+ * Utility class for parsing and comparing HTTP entity tags (ETags) as defined in RFC 7232.
+ */
 public class EntityTag {
+
+    /**
+     * Default constructor. This class is not intended to be instantiated.
+     */
+    public EntityTag() {
+        // NO-OP
+    }
 
     /**
      * Parse the given input as (per RFC 7232) 1#entity-tag. Compare an ETag header with a resource ETag as described in
@@ -51,7 +61,7 @@ public class EntityTag {
 
         while (true) {
             boolean strong = false;
-            HttpParser.skipLws(input);
+            HttpParser.skipWhitespace(input);
 
             switch (HttpParser.skipConstant(input, "W/")) {
                 case EOF:
@@ -79,7 +89,7 @@ public class EntityTag {
                 }
             }
 
-            HttpParser.skipLws(input);
+            HttpParser.skipWhitespace(input);
 
             switch (HttpParser.skipConstant(input, ",")) {
                 case EOF:

@@ -18,15 +18,28 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a transaction is invalid. This exception indicates that the
+ * transaction on which an operation was attempted is no longer valid, for
+ * example because it has already completed or been rolled back.
+ */
 public class InvalidTransactionException extends java.rmi.RemoteException {
 
     @Serial
     private static final long serialVersionUID = 3597320220337691496L;
 
+    /**
+     * Constructs an {@code InvalidTransactionException} with no detail message.
+     */
     public InvalidTransactionException() {
         super();
     }
 
+    /**
+     * Constructs an {@code InvalidTransactionException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public InvalidTransactionException(String msg) {
         super(msg);
     }

@@ -32,8 +32,9 @@ public interface Service extends Lifecycle {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the <code>Engine</code> that handles requests for all <code>Connectors</code> associated with this
-     *             Service.
+     * Returns the <code>Engine</code> that handles requests for all <code>Connectors</code> associated with this
+     * Service.
+     * @return the Engine
      */
     Engine getContainer();
 
@@ -45,7 +46,8 @@ public interface Service extends Lifecycle {
     void setContainer(Engine engine);
 
     /**
-     * @return the name of this Service.
+     * Returns the name of this Service.
+     * @return the service name
      */
     String getName();
 
@@ -57,7 +59,8 @@ public interface Service extends Lifecycle {
     void setName(String name);
 
     /**
-     * @return the <code>Server</code> with which we are associated (if any).
+     * Returns the <code>Server</code> with which we are associated (if any).
+     * @return the associated Server
      */
     Server getServer();
 
@@ -69,8 +72,9 @@ public interface Service extends Lifecycle {
     void setServer(Server server);
 
     /**
-     * @return the parent class loader for this component. If not set, return {@link #getServer()}
-     *             {@link Server#getParentClassLoader()}. If no server has been set, return the system class loader.
+     * Returns the parent class loader for this component. If not set, return {@link #getServer()}
+     * {@link Server#getParentClassLoader()}. If no server has been set, return the system class loader.
+     * @return the parent class loader
      */
     ClassLoader getParentClassLoader();
 
@@ -82,7 +86,8 @@ public interface Service extends Lifecycle {
     void setParentClassLoader(ClassLoader parent);
 
     /**
-     * @return the domain under which this container will be / has been registered.
+     * Returns the domain under which this container will be / has been registered.
+     * @return the domain name
      */
     String getDomain();
 
@@ -142,7 +147,8 @@ public interface Service extends Lifecycle {
     void removeExecutor(Executor ex);
 
     /**
-     * @return the mapper associated with this Service.
+     * Returns the mapper associated with this Service.
+     * @return the mapper
      */
     Mapper getMapper();
 }

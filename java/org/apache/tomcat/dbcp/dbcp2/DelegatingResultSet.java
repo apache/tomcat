@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -595,14 +595,14 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     }
 
     /**
-     * If my underlying {@link ResultSet} is not a {@code DelegatingResultSet}, returns it, otherwise recursively
+     * If my underlying {@link ResultSet} is not a {@link DelegatingResultSet}, returns it, otherwise recursively
      * invokes this method on my delegate.
      * <p>
-     * Hence this method will return the first delegate that is not a {@code DelegatingResultSet}, or {@code null} when
-     * no non-{@code DelegatingResultSet} delegate can be found by traversing this chain.
+     * Hence this method will return the first delegate that is not a {@link DelegatingResultSet}, or {@code null} when
+     * no non-{@link DelegatingResultSet} delegate can be found by traversing this chain.
      * </p>
      * <p>
-     * This method is useful when you may have nested {@code DelegatingResultSet}s, and you want to make sure to obtain
+     * This method is useful when you may have nested {@link DelegatingResultSet}s, and you want to make sure to obtain
      * a "genuine" {@link ResultSet}.
      * </p>
      *
@@ -1052,6 +1052,12 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
+    /**
+     * Handles a SQL exception by delegating to a DelegatingStatement or DelegatingConnection.
+     *
+     * @param e The exception to handle.
+     * @throws SQLException Throws the given exception if not handled.
+     */
     protected void handleException(final SQLException e) throws SQLException {
         if (statement instanceof DelegatingStatement) {
             ((DelegatingStatement) statement).handleException(e);
@@ -1123,10 +1129,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
 
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        if (iface.isAssignableFrom(getClass())) {
-            return true;
-        }
-        if (iface.isAssignableFrom(resultSet.getClass())) {
+        if (iface.isAssignableFrom(getClass()) || iface.isAssignableFrom(resultSet.getClass())) {
             return true;
         }
         return resultSet.isWrapperFor(iface);

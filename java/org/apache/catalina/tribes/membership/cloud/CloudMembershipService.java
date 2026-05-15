@@ -61,12 +61,17 @@ import org.apache.juli.logging.LogFactory;
  *  }
  *  </pre>
  */
-
 public class CloudMembershipService extends MembershipServiceBase implements CloudMembershipServiceMBean {
 
     private static final Log log = LogFactory.getLog(CloudMembershipService.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(CloudMembershipService.class);
 
+    /**
+     * Property name for the membership provider class.
+     */
     public static final String MEMBERSHIP_PROVIDER_CLASS_NAME = "membershipProviderClassName";
     private static final String KUBE = "kubernetes";
     private static final String DNS = "dns";
@@ -74,6 +79,9 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
             "org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider";
     private static final String DNS_PROVIDER_CLASS =
             "org.apache.catalina.tribes.membership.cloud.DNSMembershipProvider";
+    /**
+     * Initial unique identifier for the local member.
+     */
     protected static final byte[] INITIAL_ID = new byte[16];
 
     private MembershipProvider membershipProvider;
@@ -83,6 +91,12 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
     private byte[] domain;
 
     private ObjectName oname = null;
+
+    /**
+     * Returns the default constructor for CloudMembershipService.
+     */
+    public CloudMembershipService() {
+    }
 
     /**
      * Return a property.
@@ -244,6 +258,11 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         return membershipProvider;
     }
 
+    /**
+     * Set the membership provider.
+     *
+     * @param memberProvider the membership provider
+     */
     public void setMembershipProvider(MembershipProvider memberProvider) {
         this.membershipProvider = memberProvider;
     }
@@ -253,6 +272,11 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         return Integer.parseInt(properties.getProperty("connectTimeout", "1000"));
     }
 
+    /**
+     * Set the connection timeout in milliseconds.
+     *
+     * @param connectTimeout the connection timeout
+     */
     public void setConnectTimeout(int connectTimeout) {
         properties.setProperty("connectTimeout", String.valueOf(connectTimeout));
     }
@@ -262,6 +286,11 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         return Integer.parseInt(properties.getProperty("readTimeout", "1000"));
     }
 
+    /**
+     * Set the read timeout in milliseconds.
+     *
+     * @param readTimeout the read timeout
+     */
     public void setReadTimeout(int readTimeout) {
         properties.setProperty("readTimeout", String.valueOf(readTimeout));
     }
@@ -271,6 +300,11 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         return Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
+    /**
+     * Set the member expiration time in milliseconds.
+     *
+     * @param expirationTime the expiration time
+     */
     public void setExpirationTime(long expirationTime) {
         properties.setProperty("expirationTime", String.valueOf(expirationTime));
     }

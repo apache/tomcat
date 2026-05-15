@@ -30,8 +30,8 @@ public abstract class Constant {
     /**
      * Reads one constant from the given input, the type depends on a tag byte.
      *
-     * @param dataInput Input stream
-     * @return Constant object
+     * @param dataInput Input stream.
+     * @return Constant object.
      * @throws IOException if an I/O error occurs reading from the given {@code dataInput}.
      * @throws ClassFormatException if the next byte is not recognized
      */
@@ -89,7 +89,9 @@ public abstract class Constant {
     }
 
     /**
-     * @return Tag of constant, i.e., its type. No setTag() method to avoid confusion.
+     * Gets the tag of constant.
+     *
+     * @return Tag of constant, that is, its type. No setTag() method to avoid confusion.
      */
     public final byte getTag() {
         return tag;

@@ -42,16 +42,45 @@ public class AsyncFileHandler extends FileHandler {
 
     static final String THREAD_PREFIX = "AsyncFileHandlerWriter-";
 
+    /**
+     * Overflow policy: drop the last record in the queue.
+     */
     public static final int OVERFLOW_DROP_LAST = 1;
+
+    /**
+     * Overflow policy: drop the first (oldest) record in the queue.
+     */
     public static final int OVERFLOW_DROP_FIRST = 2;
+
+    /**
+     * Overflow policy: flush the queue and retry.
+     */
     public static final int OVERFLOW_DROP_FLUSH = 3;
+
+    /**
+     * Overflow policy: drop the current record.
+     */
     public static final int OVERFLOW_DROP_CURRENT = 4;
 
+    /**
+     * Default overflow drop type value.
+     */
     public static final int DEFAULT_OVERFLOW_DROP_TYPE = 1;
+
+    /**
+     * Default maximum number of records in the queue.
+     */
     public static final int DEFAULT_MAX_RECORDS = 10000;
 
+    /**
+     * Configured overflow drop type from system property.
+     */
     public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(
             System.getProperty("org.apache.juli.AsyncOverflowDropType", Integer.toString(DEFAULT_OVERFLOW_DROP_TYPE)));
+
+    /**
+     * Configured maximum record count from system property.
+     */
     public static final int MAX_RECORDS = Integer
             .parseInt(System.getProperty("org.apache.juli.AsyncMaxRecordCount", Integer.toString(DEFAULT_MAX_RECORDS)));
 
@@ -59,17 +88,38 @@ public class AsyncFileHandler extends FileHandler {
             new LoggerExecutorService(OVERFLOW_DROP_TYPE, MAX_RECORDS);
 
     private final Object closeLock = new Object();
+    /**
+     * Indicates whether this handler has been closed.
+     */
     protected volatile boolean closed = false;
     private final LoggerExecutorService loggerService;
 
+    /**
+     * Constructs an AsyncFileHandler with default settings.
+     */
     public AsyncFileHandler() {
         this(null, null, null);
     }
 
+    /**
+     * Constructs an AsyncFileHandler with the specified directory, prefix, and suffix.
+     *
+     * @param directory The directory for log files
+     * @param prefix The log file name prefix
+     * @param suffix The log file name suffix
+     */
     public AsyncFileHandler(String directory, String prefix, String suffix) {
         this(directory, prefix, suffix, null);
     }
 
+    /**
+     * Constructs an AsyncFileHandler with the specified directory, prefix, suffix, and max days.
+     *
+     * @param directory The directory for log files
+     * @param prefix The log file name prefix
+     * @param suffix The log file name suffix
+     * @param maxDays Maximum number of days to keep log files
+     */
     public AsyncFileHandler(String directory, String prefix, String suffix, Integer maxDays) {
         this(directory, prefix, suffix, maxDays, LOGGER_SERVICE);
     }
@@ -130,6 +180,11 @@ public class AsyncFileHandler extends FileHandler {
         });
     }
 
+    /**
+     * Publishes a log record to the underlying handler.
+     *
+     * @param record The log record to publish
+     */
     protected void publishInternal(LogRecord record) {
         super.publish(record);
     }

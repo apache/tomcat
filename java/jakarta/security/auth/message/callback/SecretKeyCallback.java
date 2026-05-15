@@ -28,33 +28,70 @@ public class SecretKeyCallback implements Callback {
     private final Request request;
     private SecretKey key;
 
+    /**
+     * Constructs a SecretKeyCallback with the specified request.
+     *
+     * @param request The request describing the secret key to obtain
+     */
     public SecretKeyCallback(Request request) {
         this.request = request;
     }
 
+    /**
+     * Returns the request associated with this callback.
+     *
+     * @return The request describing the secret key to obtain
+     */
     public Request getRequest() {
         return request;
     }
 
+    /**
+     * Sets the secret key obtained by the runtime.
+     *
+     * @param key The secret key
+     */
     public void setKey(SecretKey key) {
         this.key = key;
     }
 
+    /**
+     * Returns the secret key.
+     *
+     * @return The secret key, or {@code null} if not set
+     */
     public SecretKey getKey() {
         return key;
     }
 
+    /**
+     * Represents a request for a secret key.
+     * Implementations specify the criteria for locating the desired key.
+     */
     public interface Request {
     }
 
+    /**
+     * A request for a secret key identified by its alias.
+     */
     public static class AliasRequest implements Request {
 
         private final String alias;
 
+        /**
+         * Constructs an AliasRequest with the specified alias.
+         *
+         * @param alias The alias of the secret key to obtain
+         */
         public AliasRequest(String alias) {
             this.alias = alias;
         }
 
+        /**
+         * Returns the alias of the requested secret key.
+         *
+         * @return The alias string
+         */
         public String getAlias() {
             return alias;
         }

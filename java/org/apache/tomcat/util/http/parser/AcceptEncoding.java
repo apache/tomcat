@@ -21,25 +21,53 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a single Accept-Encoding value with its quality factor.
+ */
 public class AcceptEncoding {
 
     private final String encoding;
     private final double quality;
 
+    /**
+     * Creates a new AcceptEncoding instance.
+     *
+     * @param encoding The encoding
+     * @param quality  The quality factor
+     */
     protected AcceptEncoding(String encoding, double quality) {
         this.encoding = encoding;
         this.quality = quality;
     }
 
+    /**
+     * Gets the encoding.
+     *
+     * @return the encoding
+     */
     public String getEncoding() {
         return encoding;
     }
 
+    /**
+     * Gets the quality factor.
+     *
+     * @return the quality factor
+     */
     public double getQuality() {
         return quality;
     }
 
 
+    /**
+     * Parses the Accept-Encoding header value.
+     *
+     * @param input The input reader
+     *
+     * @return A list of AcceptEncoding instances
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public static List<AcceptEncoding> parse(StringReader input) throws IOException {
 
         List<AcceptEncoding> result = new ArrayList<>();

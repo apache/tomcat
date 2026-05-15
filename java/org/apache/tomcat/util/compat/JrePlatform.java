@@ -18,7 +18,16 @@ package org.apache.tomcat.util.compat;
 
 import java.util.Locale;
 
+/**
+ * Provides flags for detecting the operating system platform.
+ */
 public class JrePlatform {
+
+    /**
+     * Constructs a new JrePlatform instance. This class cannot be instantiated.
+     */
+    public JrePlatform() {
+    }
 
     private static final String OS_NAME_PROPERTY = "os.name";
 
@@ -42,7 +51,13 @@ public class JrePlatform {
     }
 
 
+    /**
+     * {@code true} if the current platform is macOS.
+     */
     public static final boolean IS_MAC_OS;
 
+    /**
+     * {@code true} if the current platform is Windows.
+     */
     public static final boolean IS_WINDOWS;
 }

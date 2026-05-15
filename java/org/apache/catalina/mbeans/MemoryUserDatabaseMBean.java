@@ -27,6 +27,12 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 public class MemoryUserDatabaseMBean extends SparseUserDatabaseMBean {
 
     /**
+     * Default constructor.
+     */
+    public MemoryUserDatabaseMBean() {
+    }
+
+    /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
     protected final ManagedBean managed = registry.findManagedBean("MemoryUserDatabase");

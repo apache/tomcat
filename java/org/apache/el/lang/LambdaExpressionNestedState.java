@@ -30,18 +30,40 @@ public final class LambdaExpressionNestedState {
     private int nestingCount = 0;
     private boolean hasFormalParameters = false;
 
+    /**
+     * Default constructor.
+     */
+    public LambdaExpressionNestedState() {
+    }
+
+    /**
+     * Increments the nesting count for nested lambda expressions.
+     */
     public void incrementNestingCount() {
         nestingCount++;
     }
 
+    /**
+     * Returns the current nesting count.
+     *
+     * @return the nesting count
+     */
     public int getNestingCount() {
         return nestingCount;
     }
 
+    /**
+     * Marks that the current lambda expression has formal parameters.
+     */
     public void setHasFormalParameters() {
         hasFormalParameters = true;
     }
 
+    /**
+     * Returns whether the current lambda expression has formal parameters.
+     *
+     * @return {@code true} if the lambda has formal parameters
+     */
     public boolean getHasFormalParameters() {
         return hasFormalParameters;
     }

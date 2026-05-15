@@ -18,6 +18,9 @@ package org.apache.catalina.tribes.transport;
 
 import java.io.IOException;
 
+/**
+ * Interface for data senders used in the Catalina Tribes framework.
+ */
 public interface DataSender {
 
     /**
@@ -33,6 +36,8 @@ public interface DataSender {
     void disconnect();
 
     /**
+     * Returns whether the sender is connected.
+     *
      * @return {@code true} if connected
      */
     boolean isConnected();
@@ -80,11 +85,15 @@ public interface DataSender {
     void setKeepAliveTime(long keepAliveTimeInMs);
 
     /**
+     * Returns the current request count.
+     *
      * @return the request count
      */
     int getRequestCount();
 
     /**
+     * Returns the connection time.
+     *
      * @return the time to connect
      */
     long getConnectTime();

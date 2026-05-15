@@ -92,6 +92,42 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
 
 
     @Test
+    public void testHeaderFrameTooMuchPaddingWithPriority() throws Exception {
+        // Tests the case where both PADDED and PRIORITY flags are set and the
+        // padding length is too large relative to the payload after accounting
+        // for the optional bytes (1 byte pad length + 5 bytes priority = 6 bytes).
+        // With payloadSize=8 and padLength=3, the actual available payload
+        // after optional bytes is only 2, so padLength >= available triggers
+        // a PROTOCOL_ERROR and a GOAWAY frame must be sent.
+        http2Connect();
+
+        // 9 bytes frame header + 8 bytes payload
+        byte[] headerFrame = new byte[17];
+
+        // Header
+        // length = 8
+        ByteUtil.setThreeBytes(headerFrame, 0, 8);
+        headerFrame[3] = FrameType.HEADERS.getIdByte();
+        // flags: PADDED (0x08) | PRIORITY (0x20)
+        headerFrame[4] = 0x28;
+        // stream 3
+        ByteUtil.set31Bits(headerFrame, 5, 3);
+        // payload:
+        // pad length = 3 (too large: only 2 bytes remain after 6 optional bytes)
+        headerFrame[9] = 3;
+        // priority: 5 bytes (bytes 10-14, all zero)
+        // remaining 2 bytes: bytes 15-16 (all zero)
+
+        os.write(headerFrame);
+        os.flush();
+
+        // 1 is the last stream processed before the connection error (stream 1
+        // from the initial HTTP/1.1 upgrade)
+        handleGoAwayResponse(1);
+    }
+
+
+    @Test
     public void testHeaderFrameWithZeroLengthPadding() throws Exception {
         http2Connect();
 

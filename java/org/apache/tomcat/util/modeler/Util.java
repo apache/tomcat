@@ -16,12 +16,22 @@
  */
 package org.apache.tomcat.util.modeler;
 
+/**
+ * Utility class for modeler operations.
+ */
 public class Util {
 
     private Util() {
         // Utility class. Hide default constructor.
     }
 
+    /**
+     * Determines whether the given string value needs to be quoted when used in an ObjectName.
+     *
+     * @param input The string value to check
+     *
+     * @return {@code true} if the value contains characters that require quoting, {@code false} otherwise
+     */
     public static boolean objectNameValueNeedsQuote(String input) {
         for (int i = 0; i < input.length(); i++) {
             char ch = input.charAt(i);

@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.apache.tomcat.util.bcel.Const;
 
 /**
- * This class represents the constant pool, i.e., a table of constants, of a parsed classfile. It may contain null references, due to the JVM specification that
+ * This class represents the constant pool, that is, a table of constants, of a parsed classfile. It may contain null references, due to the JVM specification that
  * skips an entry after an 8-byte constant (double, long) entry. Those interested in generating constant pools programmatically should see
  * <a href="../generic/ConstantPoolGen.html"> ConstantPoolGen</a>.
  *

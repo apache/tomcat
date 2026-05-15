@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,10 +66,16 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Startup event listener for a <b>Host</b> that configures the properties of that Host, and the associated defined
+ * Startup event listener for a {@link Host} that configures the properties of that Host, and the associated defined
  * contexts.
  */
 public class HostConfig implements LifecycleListener {
+
+    /**
+     * Constructs a new HostConfig.
+     */
+    public HostConfig() {
+    }
 
     private static final Log log = LogFactory.getLog(HostConfig.class);
 
@@ -141,15 +147,27 @@ public class HostConfig implements LifecycleListener {
     private final Object digesterLock = new Object();
 
     /**
+     * The list of descriptors in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
+     */
+    protected final Set<String> invalidDescriptors = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    /**
+     * The list of directories in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
+     */
+    protected final Set<String> invalidDirectories = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    /**
      * The list of Wars in the appBase to be ignored because they are invalid (e.g. contain /../ sequences).
      */
-    protected final Set<String> invalidWars = new HashSet<>();
+    protected final Set<String> invalidWars = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * @return the Context implementation class name.
+     * Get the Context implementation class name.
+     *
+     * @return the Context implementation class name
      */
     public String getContextClass() {
         return this.contextClass;
@@ -175,7 +193,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the deploy XML config file flag for this component.
+     * Get the deploy XML config file flag for this component.
+     *
+     * @return the deploy XML flag
      */
     public boolean isDeployXML() {
         return this.deployXML;
@@ -193,7 +213,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the copy XML config file flag for this component.
+     * Get the copy XML config file flag for this component.
+     *
+     * @return the copy XML flag
      */
     public boolean isCopyXML() {
         return this.copyXML;
@@ -213,7 +235,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @return the unpack WARs flag.
+     * Get the unpack WARs flag.
+     *
+     * @return the unpack WARs flag
      */
     public boolean isUnpackWARs() {
         return this.unpackWARs;
@@ -340,6 +364,14 @@ public class HostConfig implements LifecycleListener {
         return digester;
     }
 
+    /**
+     * Return the canonical file for the given path. If the path is relative, it is resolved against the
+     * Catalina base directory.
+     *
+     * @param path the path to canonicalize
+     *
+     * @return the canonical file
+     */
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
         if (!file.isAbsolute()) {
@@ -471,7 +503,7 @@ public class HostConfig implements LifecycleListener {
         for (String file : files) {
             File contextXml = new File(configBase, file);
 
-            if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+            if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml") && !invalidDescriptors.contains(file)) {
                 ContextName cn = new ContextName(file, true);
 
                 if (tryAddServiced(cn.getName())) {
@@ -512,6 +544,13 @@ public class HostConfig implements LifecycleListener {
      */
     @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
+
+        // Check for descriptors with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalDescriptorName", contextXml.getName()));
+            invalidDescriptors.add(contextXml.getName());
+            return;
+        }
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(), true);
 
@@ -715,14 +754,6 @@ public class HostConfig implements LifecycleListener {
                             continue;
                         }
 
-                        // Check for WARs with /../ /./ or similar sequences in the name
-                        if (!validateContextPath(appBase, cn.getBaseName())) {
-                            log.error(sm.getString("hostConfig.illegalWarName", file));
-                            invalidWars.add(file);
-                            removeServiced(cn.getName());
-                            continue;
-                        }
-
                         // DeployWAR will call removeServiced
                         results.add(es.submit(new DeployWar(this, cn, war)));
                     } catch (Throwable t) {
@@ -744,40 +775,6 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private boolean validateContextPath(File appBase, String contextPath) {
-        // More complicated than the ideal as the canonical path may or may
-        // not end with File.separator for a directory
-
-        StringBuilder docBase;
-        String canonicalDocBase;
-
-        try {
-            String canonicalAppBase = appBase.getCanonicalPath();
-            docBase = new StringBuilder(canonicalAppBase);
-            if (canonicalAppBase.endsWith(File.separator)) {
-                docBase.append(contextPath.substring(1).replace('/', File.separatorChar));
-            } else {
-                docBase.append(contextPath.replace('/', File.separatorChar));
-            }
-            // At this point docBase should be canonical but will not end
-            // with File.separator
-
-            canonicalDocBase = (new File(docBase.toString())).getCanonicalPath();
-
-            // If the canonicalDocBase ends with File.separator, add one to
-            // docBase before they are compared
-            if (canonicalDocBase.endsWith(File.separator)) {
-                docBase.append(File.separator);
-            }
-        } catch (IOException ioe) {
-            return false;
-        }
-
-        // Compare the two. If they are not the same, the contextPath must
-        // have /../ like sequences in it
-        return canonicalDocBase.contentEquals(docBase);
-    }
-
     /**
      * Deploy packed WAR.
      * <p>
@@ -787,6 +784,13 @@ public class HostConfig implements LifecycleListener {
      * @param war The WAR file
      */
     protected void deployWAR(ContextName cn, File war) {
+
+        // Check for WARs with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalWarName", war.getName()));
+            invalidWars.add(war.getName());
+            return;
+        }
 
         File xml = new File(host.getAppBaseFile(), cn.getBaseName() + "/" + Constants.ApplicationContextXml);
 
@@ -981,7 +985,7 @@ public class HostConfig implements LifecycleListener {
             }
 
             File dir = new File(appBase, file);
-            if (dir.isDirectory()) {
+            if (dir.isDirectory() && !invalidDirectories.contains(file)) {
                 ContextName cn = new ContextName(file, false);
 
                 if (tryAddServiced(cn.getName())) {
@@ -1021,6 +1025,13 @@ public class HostConfig implements LifecycleListener {
      * @param dir The path to the root folder of the webapp
      */
     protected void deployDirectory(ContextName cn, File dir) {
+
+        // Check for directories with /../ /./ or similar sequences in the name
+        if (!cn.isPathValid()) {
+            log.error(sm.getString("hostConfig.illegalDirName", dir.getName()));
+            invalidDirectories.add(dir.getName());
+            return;
+        }
 
         long startTime = 0;
         // Deploy the application in this directory
@@ -1124,6 +1135,9 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Migrate legacy Java EE applications from the legacy appBase to the current appBase.
+     */
     protected void migrateLegacyApps() {
         File appBase = host.getAppBaseFile();
         File legacyAppBase = host.getLegacyAppBaseFile();
@@ -1176,6 +1190,12 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Migrate a single legacy Java EE application from source to destination using the Migration utility.
+     *
+     * @param source      the source file
+     * @param destination the destination file
+     */
     protected void migrateLegacyApp(File source, File destination) {
         File tempNew = null;
         File tempOld;
@@ -1265,6 +1285,12 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Add global redeploy resources to the deployed application. These include the host-level context.xml
+     * and the default context.xml files that trigger redeployment when modified.
+     *
+     * @param app the deployed application
+     */
     protected void addGlobalRedeployResources(DeployedApplication app) {
         // Redeploy resources processing is hard-coded to never delete this file
         File hostContextXml = new File(getConfigBaseName(), Constants.HostContextXml);
@@ -1540,6 +1566,9 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Perform actions before the Host starts, including creating required directories.
+     */
     public void beforeStart() {
         if (host.getCreateDirs()) {
             File[] dirs = new File[] { host.getAppBaseFile(), host.getConfigBaseFile() };
@@ -1779,6 +1808,12 @@ public class HostConfig implements LifecycleListener {
      * This class represents the state of a deployed application, as well as the monitored resources.
      */
     protected static class DeployedApplication {
+        /**
+         * Constructs a new DeployedApplication.
+         *
+         * @param name the application context path
+         * @param hasDescriptor whether the application has a context.xml descriptor
+         */
         public DeployedApplication(String name, boolean hasDescriptor) {
             this.name = name;
             this.hasDescriptor = hasDescriptor;

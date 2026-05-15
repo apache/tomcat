@@ -58,6 +58,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorEqualsCondition extends JMXAccessorConditionBase {
 
+    /**
+     * Constructs a new JMXAccessorEqualsCondition.
+     */
+    public JMXAccessorEqualsCondition() {
+    }
+
     @Override
     public boolean eval() {
         String value = getValue();

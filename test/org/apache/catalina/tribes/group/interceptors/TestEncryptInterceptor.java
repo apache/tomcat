@@ -161,64 +161,6 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
     }
 
     @Test
-    public void testOFB() throws Exception {
-        src.setEncryptionAlgorithm("AES/OFB/PKCS5Padding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/OFB/PKCS5Padding");
-        dest.start(Channel.SND_TX_SEQ);
-
-        String testInput = "The quick brown fox jumps over the lazy dog.";
-
-        Assert.assertEquals("Failed in OFB mode",
-                     testInput,
-                     roundTrip(testInput, src, dest));
-    }
-
-    @Test
-    public void testCFB() throws Exception {
-        src.setEncryptionAlgorithm("AES/CFB/PKCS5Padding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/CFB/PKCS5Padding");
-        dest.start(Channel.SND_TX_SEQ);
-
-        String testInput = "The quick brown fox jumps over the lazy dog.";
-
-        Assert.assertEquals("Failed in CFB mode",
-                     testInput,
-                     roundTrip(testInput, src, dest));
-    }
-
-    @Test
-    public void testGCM() throws Exception {
-        src.setEncryptionAlgorithm("AES/GCM/NoPadding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/GCM/NoPadding");
-        dest.start(Channel.SND_TX_SEQ);
-
-        String testInput = "The quick brown fox jumps over the lazy dog.";
-
-        Assert.assertEquals("Failed in GCM mode",
-                     testInput,
-                     roundTrip(testInput, src, dest));
-    }
-
-    /*
-     * ECB mode isn't supported because it's insecure.
-     */
-    @Test
-    public void testECB() throws Exception {
-        try {
-            src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
-            src.start(Channel.SND_TX_SEQ);
-
-            // start() should trigger IllegalArgumentException
-            Assert.fail("ECB mode is not being refused");
-        } catch (IllegalArgumentException iae) {
-            // Expected
-        }
-    }
-
-    @Test
     public void testViaFile() throws Exception {
         src.start(Channel.SND_TX_SEQ);
         src.setNext(new ValueCaptureInterceptor());

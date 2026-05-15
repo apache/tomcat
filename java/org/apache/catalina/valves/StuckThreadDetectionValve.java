@@ -93,6 +93,8 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     /**
+     * Returns the current threshold in seconds for stuck thread detection.
+     *
      * @see #setThreshold(int)
      *
      * @return The current threshold in seconds
@@ -102,6 +104,11 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
 
+    /**
+     * Returns the threshold in seconds before stuck threads are interrupted.
+     *
+     * @return the thread interruption threshold in seconds
+     */
     public int getInterruptThreadThreshold() {
         return interruptThreadThreshold;
     }
@@ -226,10 +233,20 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
+    /**
+     * Returns the number of threads currently detected as stuck.
+     *
+     * @return the number of stuck threads
+     */
     public int getStuckThreadCount() {
         return stuckCount.get();
     }
 
+    /**
+     * Returns the IDs of all threads currently detected as stuck.
+     *
+     * @return array of stuck thread IDs
+     */
     @SuppressWarnings("deprecation")
     public long[] getStuckThreadIds() {
         List<Long> idList = new ArrayList<>();
@@ -246,6 +263,11 @@ public class StuckThreadDetectionValve extends ValveBase {
         return result;
     }
 
+    /**
+     * Returns the names of all threads currently detected as stuck.
+     *
+     * @return array of stuck thread names
+     */
     public String[] getStuckThreadNames() {
         List<String> nameList = new ArrayList<>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
@@ -256,6 +278,12 @@ public class StuckThreadDetectionValve extends ValveBase {
         return nameList.toArray(new String[0]);
     }
 
+    /**
+     * Returns the total number of threads that have been interrupted
+     * due to being stuck.
+     *
+     * @return the count of interrupted threads
+     */
     public long getInterruptedThreadsCount() {
         return interruptedThreadsCount.get();
     }

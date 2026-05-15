@@ -33,7 +33,15 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public abstract class AbstractProcessorLight implements Processor {
 
+    /** The set of dispatch types to be processed. */
     private final Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
+
+
+    /**
+     * Constructs a new processor.
+     */
+    public AbstractProcessorLight() {
+    }
 
 
     @Override
@@ -98,6 +106,16 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
+    /**
+     * Checks for pipelined data and processes it if present.
+     *
+     * @param inState The current socket state
+     * @param socketWrapper The socket wrapper
+     *
+     * @return the state after checking for pipelined data
+     *
+     * @throws IOException If an I/O error occurs
+     */
     private SocketState checkForPipelinedData(SocketState inState, SocketWrapperBase<?> socketWrapper)
             throws IOException {
         if (inState == SocketState.OPEN) {
@@ -113,6 +131,11 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
+    /**
+     * Adds a dispatch type to the set of dispatches to be processed.
+     *
+     * @param dispatchType The dispatch type to add
+     */
     public void addDispatch(DispatchType dispatchType) {
         synchronized (dispatches) {
             dispatches.add(dispatchType);
@@ -120,6 +143,11 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
+    /**
+     * Returns an iterator over the dispatches and clears the set.
+     *
+     * @return an iterator over the dispatches, or {@code null} if there are no dispatches
+     */
     public Iterator<DispatchType> getIteratorAndClearDispatches() {
         // Note: Logic in AbstractProtocol depends on this method only returning
         // a non-null value if the iterator is non-empty. i.e. it should never
@@ -139,6 +167,9 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
+    /**
+     * Clears the set of dispatches to be processed.
+     */
     protected void clearDispatches() {
         synchronized (dispatches) {
             dispatches.clear();
@@ -195,6 +226,8 @@ public abstract class AbstractProcessorLight implements Processor {
     protected abstract SocketState asyncPostProcess() throws IOException;
 
     /**
+     * Returns the logger associated with this processor type.
+     *
      * @return the logger associated with this processor type
      */
     protected abstract Log getLog();

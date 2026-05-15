@@ -30,6 +30,13 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
  */
 public class SimpleCoordinator extends ChannelInterceptorBase {
 
+    /**
+     * Creates a new SimpleCoordinator instance.
+     */
+    public SimpleCoordinator() {
+        // NO-OP
+    }
+
     private Member[] view;
 
     private final AtomicBoolean membershipChanged = new AtomicBoolean();
@@ -99,14 +106,29 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
         super.stop(svc);
     }
 
+    /**
+     * Returns the current sorted view of cluster members.
+     *
+     * @return the current member view, or {@code null} if not yet established
+     */
     public Member[] getView() {
         return view;
     }
 
+    /**
+     * Returns the current coordinator member (first member in the sorted view).
+     *
+     * @return the coordinator member, or {@code null} if no view is established
+     */
     public Member getCoordinator() {
         return view == null ? null : view[0];
     }
 
+    /**
+     * Returns whether this member is the current coordinator.
+     *
+     * @return {@code true} if this member is the coordinator
+     */
     public boolean isCoordinator() {
         return view != null && getLocalMember(false).equals(getCoordinator());
     }

@@ -60,31 +60,31 @@ public final class ClassParser {
 
 
     /**
-     * Parses the given Java class file and return an object that represents the contained data, i.e., constants, methods,
+     * Parses the given Java class file and return an object that represents the contained data, that is, constants, methods,
      * fields and commands. A <em>ClassFormatException</em> is raised, if the file is not a valid .class file. (This does
      * not include verification of the byte code as it is performed by the Java interpreter).
      *
-     * @return Class object representing the parsed class file
+     * @return Class object representing the parsed class file.
      * @throws IOException if an I/O error occurs.
-     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file
+     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file.
      */
     public JavaClass parse() throws IOException, ClassFormatException {
-        //****************** Read headers ********************************
+        // -- Read headers --
         // Check magic tag of class file
         readID();
         // Get compiler version
         readVersion();
-        //***************** Read constant pool and related **************
+        // -- Read constant pool and related **************/
         // Read constant pool entries
         readConstantPool();
         // Get class information
         readClassInfo();
-        // Get interface information, i.e., implemented interfaces
+        // Get interface information, that is, implemented interfaces
         readInterfaces();
-        //***************** Read class fields and methods ***************
-        // Read class fields, i.e., the variables of the class
+        // -- Read class fields and methods --
+        // Read class fields, that is, the variables of the class
         readFields();
-        // Read class methods, i.e., the functions in the class
+        // Read class methods, that is, the functions in the class
         readMethods();
         // Read class attributes
         readAttributes(false);
@@ -99,7 +99,7 @@ public final class ClassParser {
      * Reads information about the attributes of the class.
      * @param fieldOrMethod false if processing a class
      * @throws IOException if an I/O error occurs.
-     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file
+     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file.
      */
     private void readAttributes(boolean fieldOrMethod) throws IOException, ClassFormatException {
         final int attributesCount = dataInputStream.readUnsignedShort();
@@ -141,7 +141,7 @@ public final class ClassParser {
      * Reads information about the class and its super class.
      *
      * @throws IOException if an I/O error occurs.
-     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file
+     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file.
      */
     private void readClassInfo() throws IOException, ClassFormatException {
         accessFlags = dataInputStream.readUnsignedShort();
@@ -254,7 +254,7 @@ public final class ClassParser {
      * Reads major and minor version of compiler which created the file.
      *
      * @throws IOException if an I/O error occurs.
-     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file
+     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file.
      */
     private void readVersion() throws IOException, ClassFormatException {
         // file.readUnsignedShort(); // Unused minor

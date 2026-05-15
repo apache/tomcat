@@ -46,57 +46,75 @@ import java.lang.annotation.Target;
 @Documented
 public @interface WebServlet {
 
-    /**
-     * @return name of the Servlet
-     */
+   /**
+      * Provides the name of this servlet.
+      *
+      * @return name of the Servlet
+      */
     String name() default "";
 
-    /**
-     * A convenience method, to allow extremely simple annotation of a class.
-     *
-     * @return array of URL patterns
-     *
-     * @see #urlPatterns()
-     */
+      /**
+       * A convenience method, to allow extremely simple annotation of a class.
+       *
+       * @return array of URL patterns
+       *
+       * @see #urlPatterns()
+       */
     String[] value() default {};
 
-    /**
-     * @return array of URL patterns to which this Filter applies
-     */
+      /**
+       * Declares the URL patterns for this servlet.
+       *
+       * @return array of URL patterns to which this Servlet applies
+       */
     String[] urlPatterns() default {};
 
-    /**
-     * @return load on startup ordering hint
-     */
+      /**
+       * Provides a load-on-startup ordering hint for this servlet.
+       *
+       * @return load on startup ordering hint
+       */
     int loadOnStartup() default -1;
 
-    /**
-     * @return array of initialization params for this Servlet
-     */
+      /**
+       * Declares initialization parameters for this servlet.
+       *
+       * @return array of initialization params for this Servlet
+       */
     WebInitParam[] initParams() default {};
 
-    /**
-     * @return asynchronous operation supported by this Servlet
-     */
+      /**
+       * Indicates whether this servlet supports asynchronous operation.
+       *
+       * @return asynchronous operation supported by this Servlet
+       */
     boolean asyncSupported() default false;
 
-    /**
-     * @return small icon for this Servlet, if present
-     */
+      /**
+       * Provides the URL of a small icon for this servlet.
+       *
+       * @return small icon for this Servlet, if present
+       */
     String smallIcon() default "";
 
-    /**
-     * @return large icon for this Servlet, if present
-     */
+      /**
+       * Provides the URL of a large icon for this servlet.
+       *
+       * @return large icon for this Servlet, if present
+       */
     String largeIcon() default "";
 
-    /**
-     * @return description of this Servlet, if present
-     */
+      /**
+       * Provides a description of this servlet.
+       *
+       * @return description of this Servlet, if present
+       */
     String description() default "";
 
-    /**
-     * @return display name of this Servlet, if present
-     */
+      /**
+       * Provides a display name for this servlet.
+       *
+       * @return display name of this Servlet, if present
+       */
     String displayName() default "";
 }

@@ -45,6 +45,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ContextNamingInfoListener implements LifecycleListener {
 
+    /**
+     * Default constructor for ContextNamingInfoListener.
+     */
+    public ContextNamingInfoListener() {
+    }
+
     private static final String PATH_ENTRY_NAME = "context/path";
     private static final String ENCODED_PATH_ENTRY_NAME = "context/encodedPath";
     private static final String WEBAPP_VERSION_ENTRY_NAME = "context/webappVersion";

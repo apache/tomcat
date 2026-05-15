@@ -219,49 +219,117 @@ public class PojoMethodMapping {
     }
 
 
+    /**
+     * Return the WebSocket path for this endpoint.
+     *
+     * @return WebSocket path
+     */
     public String getWsPath() {
         return wsPath;
     }
 
 
+    /**
+     * Return the method annotated with {@link OnOpen}.
+     *
+     * @return OnOpen method or {@code null} if not defined
+     */
     public Method getOnOpen() {
         return onOpen;
     }
 
 
+    /**
+     * Build the arguments for the onOpen method.
+     *
+     * @param pathParameters Path parameters
+     * @param session        WebSocket session
+     * @param config         Endpoint configuration
+     *
+     * @return Arguments for the onOpen method
+     *
+     * @throws DecodeException If a path parameter cannot be decoded
+     */
     public Object[] getOnOpenArgs(Map<String,String> pathParameters, Session session, EndpointConfig config)
             throws DecodeException {
         return buildArgs(onOpenParams, pathParameters, session, config, null, null);
     }
 
 
+    /**
+     * Return the method annotated with {@link OnClose}.
+     *
+     * @return OnClose method or {@code null} if not defined
+     */
     public Method getOnClose() {
         return onClose;
     }
 
 
+    /**
+     * Build the arguments for the onClose method.
+     *
+     * @param pathParameters Path parameters
+     * @param session        WebSocket session
+     * @param closeReason    Reason for the close
+     *
+     * @return Arguments for the onClose method
+     *
+     * @throws DecodeException If a path parameter cannot be decoded
+     */
     public Object[] getOnCloseArgs(Map<String,String> pathParameters, Session session, CloseReason closeReason)
             throws DecodeException {
         return buildArgs(onCloseParams, pathParameters, session, null, null, closeReason);
     }
 
 
+    /**
+     * Return the method annotated with {@link OnError}.
+     *
+     * @return OnError method or {@code null} if not defined
+     */
     public Method getOnError() {
         return onError;
     }
 
 
+    /**
+     * Build the arguments for the onError method.
+     *
+     * @param pathParameters Path parameters
+     * @param session        WebSocket session
+     * @param throwable      Throwable that triggered the error
+     *
+     * @return Arguments for the onError method
+     *
+     * @throws DecodeException If a path parameter cannot be decoded
+     */
     public Object[] getOnErrorArgs(Map<String,String> pathParameters, Session session, Throwable throwable)
             throws DecodeException {
         return buildArgs(onErrorParams, pathParameters, session, null, throwable, null);
     }
 
 
+    /**
+     * Check if there are any message handlers defined.
+     *
+     * @return {@code true} if there are message handlers
+     */
     public boolean hasMessageHandlers() {
         return !onMessage.isEmpty();
     }
 
 
+    /**
+     * Create the message handlers for the given POJO instance.
+     *
+     * @param pojo           POJO instance
+     * @param pathParameters Path parameters
+     * @param session        WebSocket session
+     * @param config         Endpoint configuration
+     *
+     * @return Set of message handlers
+     */
     public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String,String> pathParameters, Session session,
             EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();

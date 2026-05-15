@@ -32,6 +32,12 @@ import org.apache.tomcat.websocket.BackgroundProcessManager;
 public class WsWriteTimeout implements BackgroundProcess {
 
     /**
+     * Default constructor.
+     */
+    public WsWriteTimeout() {
+    }
+
+    /**
      * Note: The comparator imposes orderings that are inconsistent with equals
      */
     private final Set<WsRemoteEndpointImplServer> endpoints =
@@ -82,6 +88,11 @@ public class WsWriteTimeout implements BackgroundProcess {
     }
 
 
+    /**
+     * Registers an endpoint for timeout tracking.
+     *
+     * @param endpoint the endpoint to register
+     */
     public void register(WsRemoteEndpointImplServer endpoint) {
         boolean result = endpoints.add(endpoint);
         if (result) {
@@ -93,6 +104,11 @@ public class WsWriteTimeout implements BackgroundProcess {
     }
 
 
+    /**
+     * Unregisters an endpoint from timeout tracking.
+     *
+     * @param endpoint the endpoint to unregister
+     */
     public void unregister(WsRemoteEndpointImplServer endpoint) {
         boolean result = endpoints.remove(endpoint);
         if (result) {

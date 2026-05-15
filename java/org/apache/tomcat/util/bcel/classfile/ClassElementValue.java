@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+/**
+ * Represents a class element value in the constant pool.
+ */
 public class ClassElementValue extends ElementValue {
     // For primitive types and string type, this points to the value entry in
     // the cpool

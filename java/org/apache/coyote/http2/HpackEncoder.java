@@ -121,6 +121,22 @@ class HpackEncoder {
      * @return The state of the encoding process
      */
     State encode(MimeHeaders headers, ByteBuffer target) {
+        return encode(headers, target, true);
+    }
+
+    /**
+     * Encodes the headers into a buffer.
+     *
+     * @param headers        The headers to encode
+     * @param target         The buffer to which to write the encoded headers
+     * @param forceLowerCase Normally {@code true} to ensure that header field names are lower case as required for
+     *                           HTTP/2 but some tests may deliberately allow upper case characters to test Tomcat's
+     *                           handling of such invalid field header names.
+     *
+     * @return The state of the encoding process
+     */
+    State encode(MimeHeaders headers, ByteBuffer target, boolean forceLowerCase) {
+
         int it = headersIterator;
         if (headersIterator == -1) {
             handleTableSizeChange(target);
@@ -133,8 +149,10 @@ class HpackEncoder {
             }
         }
         while (it < currentHeaders.size()) {
-            // FIXME: Review lowercase policy
-            String headerName = headers.getName(it).toString().toLowerCase(Locale.US);
+            String headerName = headers.getName(it).toString();
+            if (forceLowerCase) {
+                headerName = headerName.toLowerCase(Locale.US);
+            }
             boolean skip = false;
             if (firstPass) {
                 if (headerName.charAt(0) != ':') {
@@ -208,23 +226,29 @@ class HpackEncoder {
         return State.COMPLETE;
     }
 
+    /*
+     * headerName must be lower case by the time this method is called.
+     *
+     * The exception to the above rule is test cases which may deliberately use some upper case characters to test how
+     * Tomcat responds to such invalid input.
+     */
     private void writeHuffmanEncodableName(ByteBuffer target, String headerName) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName)) {
-            if (HPackHuffman.encode(target, headerName, true)) {
+            if (HPackHuffman.encode(target, headerName)) {
                 return;
             }
         }
         target.put((byte) 0); // to use encodeInteger we need to place the first byte in the buffer.
         Hpack.encodeInteger(target, headerName.length(), 7);
         for (int j = 0; j < headerName.length(); ++j) {
-            target.put((byte) Hpack.toLower(headerName.charAt(j)));
+            target.put((byte) headerName.charAt(j));
         }
 
     }
 
     private void writeHuffmanEncodableValue(ByteBuffer target, String headerName, String val) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName, val)) {
-            if (!HPackHuffman.encode(target, val, false)) {
+            if (!HPackHuffman.encode(target, val)) {
                 writeValueString(target, val);
             }
         } else {

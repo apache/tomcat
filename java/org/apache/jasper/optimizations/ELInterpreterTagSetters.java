@@ -62,6 +62,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ELInterpreterTagSetters implements ELInterpreter {
 
+    /**
+     * Creates a new ELInterpreterTagSetters instance.
+     */
+    public ELInterpreterTagSetters() {
+    }
+
     // Can't be static
     private final Log log = LogFactory.getLog(ELInterpreterTagSetters.class);
 

@@ -296,10 +296,7 @@ public class TestStreamProcessor extends Http2TestBase {
         parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
-        expected.append("3-HeadersStart\n");
-        expected.append("3-Header-[:status]-[400]\n");
-        expected.append("3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n");
-        expected.append("3-HeadersEnd\n");
+        expected.append("3-RST-[1]\n");
 
         Assert.assertEquals(expected.toString(), output.getTrace());
     }
@@ -574,7 +571,6 @@ public class TestStreamProcessor extends Http2TestBase {
 
         List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", Method.CONNECT));
-        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":authority", "example.local"));
 
         byte[] headersFrameHeader = new byte[9];

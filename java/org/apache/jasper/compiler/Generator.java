@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -552,7 +553,7 @@ class Generator {
         if (!dependants.isEmpty()) {
             out.printil("static {");
             out.pushIndent();
-            out.printin("_jspx_dependants = new java.util.HashMap<java.lang.String,java.lang.Long>(");
+            out.printin("_jspx_dependants = new java.util.LinkedHashMap<java.lang.String,java.lang.Long>(");
             out.print("" + dependants.size());
             out.println(");");
             for (Entry<String,Long> entry : dependants.entrySet()) {
@@ -569,8 +570,8 @@ class Generator {
 
         // Static data for getImports()
         List<String> imports = pageInfo.getImports();
-        Set<String> packages = new HashSet<>();
-        Set<String> classes = new HashSet<>();
+        Set<String> packages = new LinkedHashSet<>();
+        Set<String> classes = new LinkedHashSet<>();
         for (String importName : imports) {
             String trimmed = importName.trim();
             if (trimmed.endsWith(".*")) {

@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
-import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,8 +43,8 @@ public class TestOcspEnabled extends OcspBaseTest {
         ocspResponder = new TesterOcspResponder();
         try {
             ocspResponder.start();
-        } catch (IOException ioe) {
-            ocspResponder = null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -112,7 +112,7 @@ public class TestOcspEnabled extends OcspBaseTest {
             if (handshakeFailureExpected) {
                 Assert.fail("Handshake did not fail when expected to do so.");
             }
-        } catch (SSLHandshakeException e) {
+        } catch (SSLHandshakeException | SocketException e) {
             if (!handshakeFailureExpected) {
                 Assert.fail("Handshake failed when not expected to do so.");
             }

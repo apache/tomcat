@@ -43,6 +43,17 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
     private java.util.concurrent.ExecutorService executor;
     private String namePrefix = "tomcat-virt-";
 
+    /**
+     * Default constructor required for the Digester.
+     */
+    public StandardVirtualThreadExecutor() {
+    }
+
+    /**
+     * Set the name for this executor.
+     *
+     * @param name the executor name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -52,10 +63,20 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         return name;
     }
 
+    /**
+     * Return the name prefix for virtual threads.
+     *
+     * @return the name prefix
+     */
     public String getNamePrefix() {
         return namePrefix;
     }
 
+    /**
+     * Set the name prefix for virtual threads.
+     *
+     * @param namePrefix the name prefix
+     */
     public void setNamePrefix(String namePrefix) {
         this.namePrefix = namePrefix;
     }

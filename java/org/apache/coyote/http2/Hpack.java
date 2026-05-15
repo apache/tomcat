@@ -25,7 +25,6 @@ final class Hpack {
 
     private static final StringManager sm = StringManager.getManager(Hpack.class);
 
-    private static final byte LOWER_DIFF = 'a' - 'A';
     static final int DEFAULT_TABLE_SIZE = 4096;
     /*
      * The HPack specification says there SHOULD be an upper bound on this.
@@ -218,14 +217,6 @@ final class Hpack {
     }
 
 
-    static char toLower(char c) {
-        if (c >= 'A' && c <= 'Z') {
-            return (char) (c + LOWER_DIFF);
-        }
-        return c;
-    }
-
     private Hpack() {
     }
-
 }

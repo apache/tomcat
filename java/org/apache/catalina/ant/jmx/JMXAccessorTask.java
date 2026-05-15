@@ -81,8 +81,20 @@ import org.apache.tools.ant.Project;
  */
 public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
+    /**
+     * Constructs a new JMXAccessorTask.
+     */
+    public JMXAccessorTask() {
+    }
+
+    /**
+     * JMX service URL prefix.
+     */
     public static final String JMX_SERVICE_PREFIX = "service:jmx:rmi:///jndi/rmi://";
 
+    /**
+     * JMX service URL suffix.
+     */
     public static final String JMX_SERVICE_SUFFIX = "/jmxrmi";
 
     // ----------------------------------------------------- Instance Variables
@@ -126,144 +138,208 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         return this.name;
     }
 
+    /**
+     * Set the name used at remote MbeanServer.
+     *
+     * @param objectName the MBean object name
+     */
     public void setName(String objectName) {
         this.name = objectName;
     }
 
     /**
-     * @return Returns the resultproperty.
+     * Get the result property name.
+     *
+     * @return the result property name
      */
     public String getResultproperty() {
         return resultproperty;
     }
 
     /**
-     * @param propertyName The resultproperty to set.
+     * Set the result property name.
+     *
+     * @param propertyName the property name to set
      */
     public void setResultproperty(String propertyName) {
         this.resultproperty = propertyName;
     }
 
     /**
-     * @return Returns the delimiter.
+     * Get the delimiter for array results.
+     *
+     * @return the delimiter
      */
     public String getDelimiter() {
         return delimiter;
     }
 
     /**
-     * @param separator The delimiter to set.
+     * Set the delimiter for array results.
+     *
+     * @param separator the delimiter to set
      */
     public void setDelimiter(String separator) {
         this.delimiter = separator;
     }
 
     /**
-     * @return Returns the echo.
+     * Get the echo flag.
+     *
+     * @return the echo flag
      */
     public boolean isEcho() {
         return echo;
     }
 
     /**
-     * @param echo The echo to set.
+     * Set the echo flag.
+     *
+     * @param echo the echo flag to set
      */
     public void setEcho(boolean echo) {
         this.echo = echo;
     }
 
     /**
-     * @return Returns the separatearrayresults.
+     * Get the separate array results flag.
+     *
+     * @return the separate array results flag
      */
     public boolean isSeparatearrayresults() {
         return separatearrayresults;
     }
 
     /**
-     * @param separateArrayResults The separatearrayresults to set.
+     * Set the separate array results flag.
+     *
+     * @param separateArrayResults the flag to set
      */
     public void setSeparatearrayresults(boolean separateArrayResults) {
         this.separatearrayresults = separateArrayResults;
     }
 
     /**
-     * @return The login password for the <code>Manager</code> application.
+     * Get the login password.
+     *
+     * @return the login password
      */
     public String getPassword() {
         return this.password;
     }
 
+    /**
+     * Set the login password.
+     *
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * @return The login username for the <code>JMX</code> MBeanServer.
+     * Get the login username.
+     *
+     * @return the login username
      */
     public String getUsername() {
         return this.username;
     }
 
+    /**
+     * Set the login username.
+     *
+     * @param username the username to set
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
     /**
-     * @return The URL of the <code>JMX JSR 160</code> MBeanServer to be used.
+     * Get the JMX MBeanServer URL.
+     *
+     * @return the JMX URL
      */
     public String getUrl() {
         return this.url;
     }
 
+    /**
+     * Set the JMX MBeanServer URL.
+     *
+     * @param url the URL to set
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
     /**
-     * @return The Host of the <code>JMX JSR 160</code> MBeanServer to be used.
+     * Get the JMX MBeanServer host.
+     *
+     * @return the host
      */
     public String getHost() {
         return this.host;
     }
 
+    /**
+     * Set the JMX MBeanServer host.
+     *
+     * @param host the host to set
+     */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * @return The Port of the <code>JMX JSR 160</code> MBeanServer to be used.
+     * Get the JMX MBeanServer port.
+     *
+     * @return the port
      */
     public String getPort() {
         return this.port;
     }
 
+    /**
+     * Set the JMX MBeanServer port.
+     *
+     * @param port the port to set
+     */
     public void setPort(String port) {
         this.port = port;
     }
 
     /**
-     * @return Returns the useRef.
+     * Check if a reference is being used.
+     *
+     * @return {@code true} if a reference is set
      */
     public boolean isUseRef() {
         return ref != null && !ref.isEmpty();
     }
 
     /**
-     * @return Returns the ref.
+     * Get the reference ID for the JMX connection.
+     *
+     * @return the reference ID
      */
     public String getRef() {
         return ref;
     }
 
     /**
-     * @param refId The ref to set.
+     * Set the reference ID for the JMX connection.
+     *
+     * @param refId the reference ID to set
      */
     public void setRef(String refId) {
         this.ref = refId;
     }
 
     /**
-     * @return Returns the ifCondition.
+     * Get the if condition property name.
+     *
+     * @return the if condition property name
      */
     public String getIf() {
         return ifCondition;
@@ -279,7 +355,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the unlessCondition.
+     * Get the unless condition property name.
+     *
+     * @return the unless condition property name
      */
     public String getUnless() {
         return unlessCondition;
@@ -552,6 +630,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
+     * Echo the result to the output.
+     *
      * @param name   context of result
      * @param result The result
      */
@@ -667,10 +747,11 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @param property The property
-     * @param value    The value
+     * Set a property value.
      *
-     * @return True if successful
+     * @param property The property name
+     * @param value    The value
+     * @return {@code true} if successful
      */
     public boolean setProperty(String property, Object value) {
         if (property != null) {

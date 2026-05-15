@@ -29,10 +29,16 @@ import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
 /**
- * @see jakarta.el.ExpressionFactory
+ * Implementation of {@link jakarta.el.ExpressionFactory}.
  */
 @aQute.bnd.annotation.spi.ServiceProvider(value = ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
+
+    /**
+     * Creates a new ExpressionFactoryImpl instance.
+     */
+    public ExpressionFactoryImpl() {
+    }
 
     static {
         ExceptionUtils.preload();

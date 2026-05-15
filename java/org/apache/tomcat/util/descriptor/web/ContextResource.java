@@ -28,6 +28,12 @@ public class ContextResource extends ResourceBase {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextResource.
+     */
+    public ContextResource() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -36,10 +42,20 @@ public class ContextResource extends ResourceBase {
      */
     private String auth = null;
 
+    /**
+     * Returns the authorization requirement for this resource.
+     *
+     * @return the authorization type
+     */
     public String getAuth() {
         return this.auth;
     }
 
+    /**
+     * Sets the authorization requirement for this resource.
+     *
+     * @param auth the authorization type
+     */
     public void setAuth(String auth) {
         this.auth = auth;
     }
@@ -49,10 +65,20 @@ public class ContextResource extends ResourceBase {
      */
     private String scope = "Shareable";
 
+    /**
+     * Returns the sharing scope of this resource factory.
+     *
+     * @return the sharing scope
+     */
     public String getScope() {
         return this.scope;
     }
 
+    /**
+     * Sets the sharing scope of this resource factory.
+     *
+     * @param scope the sharing scope
+     */
     public void setScope(String scope) {
         this.scope = scope;
     }
@@ -64,10 +90,20 @@ public class ContextResource extends ResourceBase {
      */
     private boolean singleton = true;
 
+    /**
+     * Returns whether this resource is a singleton.
+     *
+     * @return true if the resource is a singleton
+     */
     public boolean getSingleton() {
         return singleton;
     }
 
+    /**
+     * Sets whether this resource is a singleton.
+     *
+     * @param singleton true if the resource is a singleton
+     */
     public void setSingleton(boolean singleton) {
         this.singleton = singleton;
     }
@@ -78,17 +114,35 @@ public class ContextResource extends ResourceBase {
      * This method must only speed up the clean-up of resources that would otherwise happen via garbage collection.
      */
     private String closeMethod = null;
+    /**
+     * Whether the close method has been explicitly configured.
+     */
     private boolean closeMethodConfigured = false;
 
+    /**
+     * Returns the close method name.
+     *
+     * @return the close method name
+     */
     public String getCloseMethod() {
         return closeMethod;
     }
 
+    /**
+     * Sets the close method name.
+     *
+     * @param closeMethod the close method name
+     */
     public void setCloseMethod(String closeMethod) {
         closeMethodConfigured = true;
         this.closeMethod = closeMethod;
     }
 
+    /**
+     * Returns whether the close method has been explicitly configured.
+     *
+     * @return true if the close method was configured
+     */
     public boolean getCloseMethodConfigured() {
         return closeMethodConfigured;
     }

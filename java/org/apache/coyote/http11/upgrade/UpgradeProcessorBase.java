@@ -27,12 +27,26 @@ import org.apache.coyote.UpgradeToken;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
+/**
+ * Base class for HTTP upgrade processors.
+ */
 public abstract class UpgradeProcessorBase extends AbstractProcessorLight implements WebConnection {
 
+    /**
+     * Timeout value that disables timeout checking.
+     */
     protected static final int INFINITE_TIMEOUT = -1;
 
+    /**
+     * The upgrade token containing handler and context information.
+     */
     private final UpgradeToken upgradeToken;
 
+    /**
+     * Constructs a new UpgradeProcessorBase.
+     *
+     * @param upgradeToken the upgrade token
+     */
     public UpgradeProcessorBase(UpgradeToken upgradeToken) {
         this.upgradeToken = upgradeToken;
     }

@@ -85,11 +85,31 @@ public class JspCompilationContext {
     private Jar tagJar;
 
     // jspURI _must_ be relative to the context
+    /**
+     * Creates a compilation context for a JSP page.
+     *
+     * @param jspUri The URI of the JSP page relative to the context
+     * @param options The compilation options
+     * @param context The servlet context
+     * @param jsw The JSP servlet wrapper
+     * @param rctxt The JSP runtime context
+     */
     public JspCompilationContext(String jspUri, Options options, ServletContext context, JspServletWrapper jsw,
             JspRuntimeContext rctxt) {
         this(jspUri, null, options, context, jsw, rctxt, null, false);
     }
 
+    /**
+     * Creates a compilation context for a tag file.
+     *
+     * @param tagfile The URI of the tag file
+     * @param tagInfo The tag information
+     * @param options The compilation options
+     * @param context The servlet context
+     * @param jsw The JSP servlet wrapper
+     * @param rctxt The JSP runtime context
+     * @param tagJar The JAR containing the tag file
+     */
     public JspCompilationContext(String tagfile, TagInfo tagInfo, Options options, ServletContext context,
             JspServletWrapper jsw, JspRuntimeContext rctxt, Jar tagJar) {
         this(tagfile, tagInfo, options, context, jsw, rctxt, tagJar, true);
@@ -131,7 +151,9 @@ public class JspCompilationContext {
     // ---------- Class path and loader ----------
 
     /**
-     * @return the classpath that is passed off to the Java compiler.
+     * Returns the classpath used by the Java compiler for this JSP.
+     *
+     * @return the classpath that is passed off to the Java compiler
      */
     public String getClassPath() {
         if (classPath != null) {
@@ -161,10 +183,20 @@ public class JspCompilationContext {
         return rctxt.getParentClassLoader();
     }
 
+    /**
+     * Sets the class loader to use for loading classes while compiling this JSP.
+     *
+     * @param loader The class loader
+     */
     public void setClassLoader(ClassLoader loader) {
         this.loader = loader;
     }
 
+    /**
+     * Returns the JSP-specific class loader, creating it if necessary.
+     *
+     * @return the JSP class loader
+     */
     public ClassLoader getJspLoader() {
         if (jspLoader == null) {
             jspLoader = new JasperLoader(new URL[] { baseUrl }, getClassLoader(), basePackageName);
@@ -172,6 +204,9 @@ public class JspCompilationContext {
         return jspLoader;
     }
 
+    /**
+     * Clears the JSP class loader so it will be recreated on next access.
+     */
     public void clearJspLoader() {
         jspLoader = null;
     }
@@ -226,6 +261,13 @@ public class JspCompilationContext {
         return jspCompiler;
     }
 
+    /**
+     * Creates a compiler instance by class name using reflection.
+     *
+     * @param className The fully qualified compiler class name
+     *
+     * @return the compiler instance, or {@code null} if the class cannot be loaded
+     */
     protected Compiler createCompiler(String className) {
         Compiler compiler = null;
         try {
@@ -240,6 +282,11 @@ public class JspCompilationContext {
         return compiler;
     }
 
+    /**
+     * Returns the compiler instance for this compilation context.
+     *
+     * @return the compiler instance
+     */
     public Compiler getCompiler() {
         return jspCompiler;
     }
@@ -275,11 +322,27 @@ public class JspCompilationContext {
     }
 
 
+    /**
+     * Gets a resource as a URL, relative to the context of this compilation.
+     *
+     * @param res The resource path
+     *
+     * @return the resource URL
+     *
+     * @throws MalformedURLException If the resource URL is malformed
+     */
     public URL getResource(String res) throws MalformedURLException {
         return context.getResource(canonicalURI(res));
     }
 
 
+    /**
+     * Gets the resource paths beneath the given path, relative to the context.
+     *
+     * @param path The path to list resources for
+     *
+     * @return the set of resource paths
+     */
     public Set<String> getResourcePaths(String path) {
         return context.getResourcePaths(canonicalURI(path));
     }
@@ -309,6 +372,11 @@ public class JspCompilationContext {
         return this.tagJar;
     }
 
+    /**
+     * Sets the JAR file in which the tag file is packaged.
+     *
+     * @param tagJar The JAR file
+     */
     public void setTagFileJar(Jar tagJar) {
         this.tagJar = tagJar;
     }
@@ -339,6 +407,11 @@ public class JspCompilationContext {
         return className;
     }
 
+    /**
+     * Sets the class name for the generated servlet.
+     *
+     * @param className The class name
+     */
     public void setServletClassName(String className) {
         this.className = className;
     }
@@ -353,11 +426,26 @@ public class JspCompilationContext {
     }
 
 
+    /**
+     * Returns the last modified time of the given resource using the default tag JAR.
+     *
+     * @param resource The resource path
+     *
+     * @return the last modified time in milliseconds, or -1 if not available
+     */
     public Long getLastModified(String resource) {
         return getLastModified(resource, tagJar);
     }
 
 
+    /**
+     * Returns the last modified time of the given resource.
+     *
+     * @param resource The resource path
+     * @param tagJar The JAR file containing the resource, or {@code null} for webapp resources
+     *
+     * @return the last modified time in milliseconds, or -1 if not available
+     */
     public Long getLastModified(String resource, Jar tagJar) {
         long result = -1;
         URLConnection uc = null;
@@ -404,26 +492,48 @@ public class JspCompilationContext {
         return Long.valueOf(result);
     }
 
+    /**
+     * Returns whether this compilation context corresponds to a tag file.
+     *
+     * @return {@code true} if this is a tag file
+     */
     public boolean isTagFile() {
         return isTagFile;
     }
 
+    /**
+     * Returns the tag information for this compilation context.
+     *
+     * @return the tag info, or {@code null} if not a tag file
+     */
     public TagInfo getTagInfo() {
         return tagInfo;
     }
 
+    /**
+     * Sets the tag information for this compilation context.
+     *
+     * @param tagi The tag info
+     */
     public void setTagInfo(TagInfo tagi) {
         tagInfo = tagi;
     }
 
     /**
-     * @return <code>true</code> if we are compiling a tag file in prototype mode. ie we only generate codes with class
-     *             for the tag handler with empty method bodies.
+     * Returns whether we are compiling a tag file in prototype mode, i.e., generating
+     * code with class for the tag handler with empty method bodies.
+     *
+     * @return {@code true} if we are compiling a tag file in prototype mode
      */
     public boolean isPrototypeMode() {
         return protoTypeMode;
     }
 
+    /**
+     * Sets the prototype mode for tag file compilation.
+     *
+     * @param pm The prototype mode flag
+     */
     public void setPrototypeMode(boolean pm) {
         protoTypeMode = pm;
     }
@@ -452,6 +562,11 @@ public class JspCompilationContext {
         }
     }
 
+    /**
+     * Returns the derived package name based on the JSP URI path hierarchy.
+     *
+     * @return the derived package name
+     */
     protected String getDerivedPackageName() {
         if (derivedPackageName == null) {
             int iSep = jspUri.lastIndexOf('/');
@@ -461,7 +576,9 @@ public class JspCompilationContext {
     }
 
     /**
-     * @return The base package name into which all servlet and associated code is generated
+     * Returns the base package name into which all servlet and associated code is generated.
+     *
+     * @return the base package name
      */
     public String getBasePackageName() {
         return basePackageName;
@@ -477,7 +594,9 @@ public class JspCompilationContext {
     }
 
     /**
-     * @return Full path name of the Java file into which the servlet is being generated.
+     * Returns the full path name of the Java file into which the servlet is being generated.
+     *
+     * @return the full path of the generated Java file
      */
     public String getServletJavaFileName() {
         if (servletJavaFileName == null) {
@@ -487,22 +606,36 @@ public class JspCompilationContext {
     }
 
     /**
-     * @return the Options object for this context.
+     * Returns the options object for this compilation context.
+     *
+     * @return the options object
      */
     public Options getOptions() {
         return options;
     }
 
+    /**
+     * Returns the servlet context for this compilation context.
+     *
+     * @return the servlet context
+     */
     public ServletContext getServletContext() {
         return context;
     }
 
+    /**
+     * Returns the JSP runtime context for this compilation context.
+     *
+     * @return the runtime context
+     */
     public JspRuntimeContext getRuntimeContext() {
         return rctxt;
     }
 
     /**
-     * @return the path of the Java file relative to the work directory.
+     * Returns the path of the Java file relative to the work directory.
+     *
+     * @return the relative path of the Java file
      */
     public String getJavaPath() {
 
@@ -519,6 +652,11 @@ public class JspCompilationContext {
         return javaPath;
     }
 
+    /**
+     * Returns the full path name of the compiled class file.
+     *
+     * @return the class file path
+     */
     public String getClassFileName() {
         if (classFileName == null) {
             classFileName = getOutputDir() + getServletClassName() + ".class";
@@ -527,12 +665,19 @@ public class JspCompilationContext {
     }
 
     /**
-     * @return the writer that is used to write the generated Servlet source.
+     * Returns the writer used to write the generated Servlet source code.
+     *
+     * @return the servlet writer
      */
     public ServletWriter getWriter() {
         return writer;
     }
 
+    /**
+     * Sets the writer used to write the generated Servlet source code.
+     *
+     * @param writer The servlet writer
+     */
     public void setWriter(ServletWriter writer) {
         this.writer = writer;
     }
@@ -552,7 +697,9 @@ public class JspCompilationContext {
     }
 
     /**
-     * @return <code>true</code> if generated code is kept.
+     * Returns whether the generated code is kept after compilation.
+     *
+     * @return {@code true} if generated code is kept
      */
     public boolean keepGenerated() {
         return getOptions().getKeepGenerated();
@@ -560,6 +707,9 @@ public class JspCompilationContext {
 
     // ==================== Removal ====================
 
+    /**
+     * Increments the removed counter and removes the wrapper from the runtime context.
+     */
     public void incrementRemoved() {
         if (!removed && rctxt != null) {
             rctxt.removeWrapper(jspUri);
@@ -567,12 +717,23 @@ public class JspCompilationContext {
         removed = true;
     }
 
+    /**
+     * Returns whether this JSP has been removed.
+     *
+     * @return {@code true} if this JSP has been removed
+     */
     public boolean isRemoved() {
         return removed;
     }
 
     // ==================== Compile and reload ====================
 
+    /**
+     * Compiles the JSP if it is out of date with respect to the generated class file.
+     *
+     * @throws JasperException If a compilation error occurs
+     * @throws FileNotFoundException If the JSP file has been removed
+     */
     public void compile() throws JasperException, FileNotFoundException {
         createCompiler();
         if (jspCompiler.isOutDated()) {
@@ -608,6 +769,13 @@ public class JspCompilationContext {
 
     // ==================== Manipulating the class ====================
 
+    /**
+     * Loads the compiled servlet class using the JSP class loader.
+     *
+     * @return the loaded servlet class
+     *
+     * @throws JasperException If the class cannot be loaded
+     */
     public Class<?> load() throws JasperException {
         try {
             getJspLoader();
@@ -623,6 +791,11 @@ public class JspCompilationContext {
         return servletClass;
     }
 
+    /**
+     * Returns the fully qualified class name of the generated servlet or tag handler.
+     *
+     * @return the fully qualified class name
+     */
     public String getFQCN() {
         String name;
         if (isTagFile()) {
@@ -637,6 +810,9 @@ public class JspCompilationContext {
 
     private static final Object outputDirLock = new Object();
 
+    /**
+     * Checks and creates the output directory if it does not exist.
+     */
     public void checkOutputDir() {
         if (outputDir != null) {
             if (!(new File(outputDir)).exists()) {
@@ -647,6 +823,11 @@ public class JspCompilationContext {
         }
     }
 
+    /**
+     * Creates the output directory for generated files.
+     *
+     * @return {@code true} if the directory was created or already exists
+     */
     protected boolean makeOutputDir() {
         synchronized (outputDirLock) {
             File outDirFile = new File(outputDir);
@@ -654,6 +835,9 @@ public class JspCompilationContext {
         }
     }
 
+    /**
+     * Creates the output directory path based on the package name and scratch directory.
+     */
     protected void createOutputDir() {
         String path;
         if (isTagFile()) {
@@ -678,10 +862,25 @@ public class JspCompilationContext {
         }
     }
 
+    /**
+     * Checks whether the given character is a path separator.
+     *
+     * @param c The character to check
+     *
+     * @return {@code true} if the character is '/' or '\\'
+     */
     protected static boolean isPathSeparator(char c) {
         return (c == '/' || c == '\\');
     }
 
+    /**
+     * Canonicalizes a URI string by resolving relative path components like '.' and '..'
+     * and collapsing multiple separators.
+     *
+     * @param s The URI string to canonicalize
+     *
+     * @return the canonical URI, or {@code null} if the input is {@code null}
+     */
     protected static String canonicalURI(String s) {
         if (s == null) {
             return null;

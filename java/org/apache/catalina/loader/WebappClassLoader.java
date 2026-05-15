@@ -18,13 +18,23 @@ package org.apache.catalina.loader;
 
 import org.apache.catalina.LifecycleException;
 
+/**
+ * Standard web application class loader. Not parallel capable.
+ */
 public class WebappClassLoader extends WebappClassLoaderBase {
 
+    /**
+     * Constructs a new WebappClassLoader.
+     */
     public WebappClassLoader() {
         super();
     }
 
-
+    /**
+     * Constructs a new WebappClassLoader with the specified parent class loader.
+     *
+     * @param parent The parent class loader
+     */
     public WebappClassLoader(ClassLoader parent) {
         super(parent);
     }

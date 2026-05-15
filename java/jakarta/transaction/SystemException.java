@@ -18,21 +18,42 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown to indicate a system error during transaction processing.
+ * When this exception is thrown, the state of the transaction is
+ * unknown and may need to be rolled back.
+ */
 public class SystemException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 8615483418828223571L;
 
+    /**
+     * The error code associated with this exception.
+     */
     public int errorCode;
 
+    /**
+     * Constructs a {@code SystemException} with no detail message.
+     */
     public SystemException() {
         super();
     }
 
+    /**
+     * Constructs a {@code SystemException} with the specified detail message.
+     *
+     * @param s the detail message
+     */
     public SystemException(String s) {
         super(s);
     }
 
+    /**
+     * Constructs a {@code SystemException} with the specified error code.
+     *
+     * @param errcode the error code
+     */
     public SystemException(int errcode) {
         super();
         errorCode = errcode;

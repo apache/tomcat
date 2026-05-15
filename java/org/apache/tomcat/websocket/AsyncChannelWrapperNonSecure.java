@@ -36,6 +36,11 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
 
     private final AsynchronousSocketChannel socketChannel;
 
+    /**
+     * Constructs a new non-secure wrapper for the given channel.
+     *
+     * @param socketChannel the underlying {@link AsynchronousSocketChannel}
+     */
     public AsyncChannelWrapperNonSecure(AsynchronousSocketChannel socketChannel) {
         this.socketChannel = socketChannel;
     }

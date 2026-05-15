@@ -40,6 +40,9 @@ public class JsonFormatter extends OneLineFormatter {
 
     private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
+    /**
+     * Constructs a new JsonFormatter.
+     */
     public JsonFormatter() {
         String timeFormat = LogManager.getLogManager().getProperty(JsonFormatter.class.getName() + ".timeFormat");
         if (timeFormat == null) {

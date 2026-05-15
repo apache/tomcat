@@ -94,17 +94,15 @@
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
     <module name="JavadocStyle">
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1400 errors -->
+        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1600 errors -->
         <property name="checkFirstSentence" value="false"/>
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1300 errors -->
-        <property name="checkEmptyJavadoc" value="false"/>
         <!-- Does not handle HTML tags in {@code ...} correctly -->
         <property name="checkHtml" value="false"/>
     </module>
-    <!-- ~10000 errors
+    <!-- ~5900 errors
     <module name="MissingJavadocMethod"/>
     -->
-    <!-- ~1600 errors
+    <!-- ~1200 errors
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>

@@ -374,6 +374,11 @@ public class WebRuleSet implements RuleSet {
         digester.addCallParam(fullPrefix + "/pre-destroy/lifecycle-callback-method", 1);
     }
 
+    /**
+     * Configures the naming rules for the digester.
+     *
+     * @param digester The digester to configure
+     */
     protected void configureNamingRules(Digester digester) {
         // ejb-local-ref
         digester.addObjectCreate(fullPrefix + "/ejb-local-ref",
@@ -508,6 +513,12 @@ public class WebRuleSet implements RuleSet {
         configureInjectionRules(digester, "web-app/service-ref/");
     }
 
+    /**
+     * Configures the injection rules for the digester.
+     *
+     * @param digester The digester to configure
+     * @param base     The base path for injection rules
+     */
     protected void configureInjectionRules(Digester digester, String base) {
 
         digester.addCallMethod(prefix + base + "injection-target", "addInjectionTarget", 2);

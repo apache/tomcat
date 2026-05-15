@@ -40,6 +40,13 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     private final Map<String,WebXml> fragments = new HashMap<>();
     private boolean ok = true;
 
+    /**
+     * Creates a new fragment jar scanner callback.
+     *
+     * @param webXmlParser The parser used to parse web-fragment.xml files
+     * @param delegate Whether delegation is enabled
+     * @param parseRequired Whether parsing is required
+     */
     public FragmentJarScannerCallback(WebXmlParser webXmlParser, boolean delegate, boolean parseRequired) {
         this.webXmlParser = webXmlParser;
         this.delegate = delegate;
@@ -148,10 +155,20 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
         // handle multiple web-fragment.xml files.
     }
 
+    /**
+     * Returns whether all fragments were parsed successfully.
+     *
+     * @return {@code true} if parsing was successful
+     */
     public boolean isOk() {
         return ok;
     }
 
+    /**
+     * Returns the map of parsed web fragments, keyed by fragment name.
+     *
+     * @return The map of fragment name to WebXml
+     */
     public Map<String,WebXml> getFragments() {
         return fragments;
     }

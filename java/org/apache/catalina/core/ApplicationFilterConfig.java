@@ -135,6 +135,8 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
     /**
+     * Returns the filter class name.
+     *
      * @return The class of the filter we are configuring.
      */
     public String getFilterClass() {
@@ -182,6 +184,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Returns an unmodifiable map of filter initialization parameters.
+     *
+     * @return the filter initialization parameter map
+     */
     public Map<String,String> getFilterInitParameterMap() {
         return Collections.unmodifiableMap(filterDef.getParameterMap());
     }
@@ -329,8 +336,12 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /*
-     * Log objects are not Serializable.
+    /**
+     * Restores the transient log field after deserialization.
+     *
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the log class cannot be found
+     * @throws IOException if an I/O error occurs
      */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

@@ -29,6 +29,9 @@ import org.apache.catalina.User;
  */
 public abstract class AbstractUser implements User {
 
+    /** Constructs a new AbstractUser. */
+    protected AbstractUser() {}
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -94,7 +97,9 @@ public abstract class AbstractUser implements User {
 
 
     /**
-     * Make the principal name the same as the group name.
+     * Make the principal name the same as the user name.
+     *
+     * @return the user name
      */
     @Override
     public String getName() {

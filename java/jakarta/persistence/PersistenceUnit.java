@@ -21,11 +21,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies a persistence unit for use with an entity bean or other managed class. Used to inject an
+ * EntityManagerFactory into a Jakarta EE managed component.
+ */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface PersistenceUnit {
+
+    /**
+     * The name used to look up the EntityManagerFactory.
+     *
+     * @return the lookup name
+     */
     String name() default "";
 
+    /**
+     * The unit name of the persistence unit.
+     *
+     * @return the persistence unit name
+     */
     String unitName() default "";
 }

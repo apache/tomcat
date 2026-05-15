@@ -156,12 +156,16 @@ public interface PushBuilder {
     String getSessionId();
 
     /**
+     * Returns the set of names of HTTP headers that will be used the next time {@code push()} is called.
+     *
      * @return The current set of names of HTTP headers to be used the next time {@code push()} is called.
      */
     Set<String> getHeaderNames();
 
     /**
-     * Obtain a value for the given HTTP header. TODO Servlet 4.0 Clarify the behaviour of this method
+     * Obtain a value for the given HTTP header. If the push builder has not had this header set, the return value is
+     * <code>null</code>. If the push builder has had this header set multiple times, the value returned is
+     * implementation-specific.
      *
      * @param name The name of the header whose value is to be returned
      *

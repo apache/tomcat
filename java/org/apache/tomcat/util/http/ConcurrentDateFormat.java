@@ -35,6 +35,13 @@ public class ConcurrentDateFormat {
     private final TimeZone timezone;
     private final Queue<SimpleDateFormat> queue = new ConcurrentLinkedQueue<>();
 
+    /**
+     * Creates a thread-safe date formatter with the specified format, locale, and timezone.
+     *
+     * @param format the date format pattern
+     * @param locale the locale to use for formatting
+     * @param timezone the time zone to use for formatting
+     */
     public ConcurrentDateFormat(String format, Locale locale, TimeZone timezone) {
         this.format = format;
         this.locale = locale;
@@ -43,6 +50,12 @@ public class ConcurrentDateFormat {
         queue.add(initial);
     }
 
+    /**
+     * Formats the given date into a string using the configured format pattern.
+     *
+     * @param date the date to format
+     * @return the formatted date string
+     */
     public String format(Date date) {
         SimpleDateFormat sdf = queue.poll();
         if (sdf == null) {
@@ -53,6 +66,13 @@ public class ConcurrentDateFormat {
         return result;
     }
 
+    /**
+     * Parses the given string into a date using the configured format pattern.
+     *
+     * @param source the string to parse
+     * @return the parsed date
+     * @throws ParseException if the string cannot be parsed
+     */
     public Date parse(String source) throws ParseException {
         SimpleDateFormat sdf = queue.poll();
         if (sdf == null) {

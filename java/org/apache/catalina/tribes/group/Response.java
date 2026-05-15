@@ -27,26 +27,55 @@ public class Response {
     private Member source;
     private Serializable message;
 
+    /**
+     * Default constructor.
+     */
     public Response() {
     }
 
+    /**
+     * Constructor with source and message.
+     *
+     * @param source The source member
+     * @param message The message
+     */
     public Response(Member source, Serializable message) {
         this.source = source;
         this.message = message;
     }
 
+    /**
+     * Set the source member.
+     *
+     * @param source The source member
+     */
     public void setSource(Member source) {
         this.source = source;
     }
 
+    /**
+     * Set the message.
+     *
+     * @param message The message
+     */
     public void setMessage(Serializable message) {
         this.message = message;
     }
 
+    /**
+     * Get the source member.
+     *
+     * @return The source member
+     */
     public Member getSource() {
         return source;
     }
 
+    /**
+     * Get the message.
+     *
+     * @return The message
+     */
     public Serializable getMessage() {
         return message;
     }

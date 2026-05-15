@@ -35,6 +35,8 @@ public interface User extends Principal {
 
 
     /**
+     * Returns the full name of this user.
+     *
      * @return the full name of this user.
      */
     String getFullName();
@@ -49,12 +51,16 @@ public interface User extends Principal {
 
 
     /**
+     * Returns the set of {@link Group}s to which this user belongs.
+     *
      * @return the set of {@link Group}s to which this user belongs.
      */
     Iterator<Group> getGroups();
 
 
     /**
+     * Returns the logon password of this user.
+     *
      * @return the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded
      *             by curly braces, such as <code>{md5}xxxxx</code>.
      */
@@ -71,18 +77,24 @@ public interface User extends Principal {
 
 
     /**
+     * Returns the set of {@link Role}s assigned specifically to this user.
+     *
      * @return the set of {@link Role}s assigned specifically to this user.
      */
     Iterator<Role> getRoles();
 
 
     /**
+     * Returns the {@link UserDatabase} within which this User is defined.
+     *
      * @return the {@link UserDatabase} within which this User is defined.
      */
     UserDatabase getUserDatabase();
 
 
     /**
+     * Returns the logon username of this user.
+     *
      * @return the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
      */
     String getUsername();

@@ -247,6 +247,12 @@ class Http2Parser {
             } else {
                 buffer.get(optional);
             }
+            /*
+             * The optional padLength byte and priority bytes (if any) don't count towards the payload size when
+             * comparing payload size to padLength as required by RFC 9113, section 6.2.
+             */
+            payloadSize -= optionalLen;
+
             if (padding) {
                 padLength = ByteUtil.getOneByte(optional, 0);
                 if (padLength >= payloadSize) {
@@ -255,11 +261,10 @@ class Http2Parser {
                             Http2Error.PROTOCOL_ERROR);
                 }
             }
-
-            // Ignore RFC 7450 priority data if present
-
-            payloadSize -= optionalLen;
+            // The padding does not count towards the size of payload that is read below.
             payloadSize -= padLength;
+
+            // Any RFC 7450 priority data was read into the byte[] optional above. It is ignored.
         }
 
         readHeaderPayload(streamId, payloadSize, buffer);
@@ -299,8 +304,11 @@ class Http2Parser {
 
         long errorCode = ByteUtil.getFourBytes(payload, 0);
         output.reset(streamId, errorCode);
+
         headersCurrentStream = -1;
         headersEndStream = false;
+        // Force clearing of header buffer as there may be data left over
+        afterHeadersCompleteCleanUp(true);
     }
 
 
@@ -523,6 +531,8 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new ConnectionException(sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
                         Http2Error.COMPRESSION_ERROR, hpe);
+            } catch (IllegalArgumentException iae) {
+                throw new StreamException("Invalid headers", Http2Error.PROTOCOL_ERROR, streamId, iae);
             }
 
             // switches to write mode
@@ -635,12 +645,6 @@ class Http2Parser {
                     Http2Error.COMPRESSION_ERROR);
         }
 
-        /*
-         * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
-         * HPack decoder does not retain a reference to this stream. This aids GC.
-         */
-        hpackDecoder.clearHeaderEmitter();
-
         synchronized (output) {
             output.headersEnd(streamId, headersEndStream);
 
@@ -649,10 +653,24 @@ class Http2Parser {
             }
         }
 
+        // We know from test above that buffer is empty so no need to force it to be cleared
+        afterHeadersCompleteCleanUp(false);
+    }
+
+
+    protected void afterHeadersCompleteCleanUp(boolean forceClear) {
         // Reset size for new request if the buffer was previously expanded
         if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
             headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
+        } else if (forceClear) {
+            headerReadBuffer.clear();
         }
+
+        /*
+         * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
+         * HPack decoder does not retain a reference to this stream. This aids GC.
+         */
+        hpackDecoder.clearHeaderEmitter();
     }
 
 
@@ -744,10 +762,31 @@ class Http2Parser {
          */
         boolean fill(boolean block, byte[] data, int offset, int length) throws IOException;
 
+        /**
+         * Convenience overload that fills the entire byte array.
+         *
+         * @param block  Should the first read into the provided buffer be a blocking read or not
+         * @param data   Buffer to fill
+         *
+         * @return {@code true} if the buffer was filled otherwise {@code false}
+         *
+         * @throws IOException If an I/O occurred while obtaining data with which to fill the buffer
+         */
         default boolean fill(boolean block, byte[] data) throws IOException {
             return fill(block, data, 0, data.length);
         }
 
+        /**
+         * Convenience overload that fills a {@link ByteBuffer}.
+         *
+         * @param block  Should the first read into the provided buffer be a blocking read or not
+         * @param data   Buffer to fill
+         * @param len    Number of bytes to read
+         *
+         * @return {@code true} if the buffer was filled otherwise {@code false}
+         *
+         * @throws IOException If an I/O occurred while obtaining data with which to fill the buffer
+         */
         default boolean fill(boolean block, ByteBuffer data, int len) throws IOException {
             boolean result = fill(block, data.array(), data.arrayOffset() + data.position(), len);
             if (result) {

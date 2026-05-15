@@ -20,6 +20,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 env:
   LC_ALL: en_US.UTF-8
 
@@ -45,7 +48,7 @@ jobs:
 
     - name: Upload logs
       if: ${{ !cancelled() }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: JDK25-macos-latest-logs
         path: |

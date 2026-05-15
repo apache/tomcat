@@ -80,6 +80,9 @@ Generic types
 Annotations
  - All                                  - W
    ([x] on all additional check boxes)
+   except the following:
+
+   - Unhandled token in '@SupressWar... - I
 
 Null analysis
  - Null pointer access                  - W

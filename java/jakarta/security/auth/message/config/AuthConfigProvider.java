@@ -20,11 +20,41 @@ import javax.security.auth.callback.CallbackHandler;
 
 import jakarta.security.auth.message.AuthException;
 
+/**
+ * Provides {@link ClientAuthConfig} and {@link ServerAuthConfig} instances to JASPIC authentication modules. An
+ * AuthConfigProvider is responsible for loading authentication configuration from a source (e.g., a configuration
+ * file, database, or service) and making it available to the authentication modules.
+ */
 public interface AuthConfigProvider {
 
+    /**
+     * Returns the client-side authentication configuration for the specified layer and application context.
+     *
+     * @param layer      the message layer
+     * @param appContext the application context
+     * @param handler    the callback handler for obtaining sensitive configuration data
+     *
+     * @return the ClientAuthConfig, or {@code null} if no configuration is available
+     *
+     * @throws AuthException if an error occurs while retrieving the configuration
+     */
     ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException;
 
+    /**
+     * Returns the server-side authentication configuration for the specified layer and application context.
+     *
+     * @param layer      the message layer
+     * @param appContext the application context
+     * @param handler    the callback handler for obtaining sensitive configuration data
+     *
+     * @return the ServerAuthConfig, or {@code null} if no configuration is available
+     *
+     * @throws AuthException if an error occurs while retrieving the configuration
+     */
     ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException;
 
+    /**
+     * Refreshes the configuration, reloading any changed settings from the underlying source.
+     */
     void refresh();
 }

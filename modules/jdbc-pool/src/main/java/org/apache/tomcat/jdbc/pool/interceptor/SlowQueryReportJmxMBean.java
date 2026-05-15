@@ -18,6 +18,14 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.OpenDataException;
 
+/**
+ * JMX MBean interface for exposing slow query statistics via JMX.
+ */
 public interface SlowQueryReportJmxMBean {
+    /**
+     * Returns slow query statistics as JMX CompositeData.
+     * @return array of composite data representing slow query statistics
+     * @throws OpenDataException if the composite data cannot be created
+     */
     CompositeData[] getSlowQueriesCD() throws OpenDataException;
 }

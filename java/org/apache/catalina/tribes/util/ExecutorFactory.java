@@ -26,9 +26,32 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Factory for creating thread pool executors for Tribes clustering.
+ */
 public class ExecutorFactory {
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(ExecutorFactory.class);
 
+    /**
+     * Default constructor for ExecutorFactory.
+     */
+    public ExecutorFactory() {
+        // NO-OP
+    }
+
+    /**
+     * Creates a new thread pool executor with the specified parameters.
+     *
+     * @param minThreads  The minimum number of threads
+     * @param maxThreads  The maximum number of threads
+     * @param maxIdleTime The maximum idle time for threads
+     * @param unit        The time unit for maxIdleTime
+     *
+     * @return the new thread pool executor
+     */
     public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit) {
         TaskQueue taskqueue = new TaskQueue();
         ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit, taskqueue);
@@ -36,6 +59,17 @@ public class ExecutorFactory {
         return service;
     }
 
+    /**
+     * Creates a new thread pool executor with the specified parameters and thread factory.
+     *
+     * @param minThreads     The minimum number of threads
+     * @param maxThreads     The maximum number of threads
+     * @param maxIdleTime    The maximum idle time for threads
+     * @param unit           The time unit for maxIdleTime
+     * @param threadFactory  The thread factory to use
+     *
+     * @return the new thread pool executor
+     */
     public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         TaskQueue taskqueue = new TaskQueue();

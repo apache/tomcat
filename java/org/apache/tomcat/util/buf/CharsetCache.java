@@ -24,6 +24,9 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Cache for Charset instances.
+ */
 public class CharsetCache {
 
     /* Note: Package private to enable testing without reflection */
@@ -165,6 +168,9 @@ public class CharsetCache {
 
     private final ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
 
+    /**
+     * Creates a new CharsetCache and pre-populates it with the initial charsets.
+     */
     public CharsetCache() {
         // Pre-populate the cache
         for (String charsetName : INITIAL_CHARSETS) {
@@ -186,6 +192,13 @@ public class CharsetCache {
     }
 
 
+    /**
+     * Retrieves the charset for the given name.
+     *
+     * @param charsetName the name of the charset
+     *
+     * @return the charset, or {@code null} if not available
+     */
     public Charset getCharset(String charsetName) {
         String lcCharsetName = charsetName.toLowerCase(Locale.ENGLISH);
 

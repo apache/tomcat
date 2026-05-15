@@ -68,6 +68,9 @@ import org.apache.juli.logging.LogFactory;
 public class GroupChannel extends ChannelInterceptorBase implements ManagedChannel, JmxChannel, GroupChannelMBean {
 
     private static final Log log = LogFactory.getLog(GroupChannel.class);
+    /**
+     * StringManager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(GroupChannel.class);
 
     /**
@@ -86,6 +89,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Internal heartbeat future
      */
     protected ScheduledFuture<?> heartbeatFuture = null;
+    /**
+     * Monitor future for periodic heartbeat checks.
+     */
     protected ScheduledFuture<?> monitorFuture;
 
     /**
@@ -428,6 +434,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     }
 
+    /**
+     * Flag indicating whether this channel owns the utility executor.
+     */
     protected boolean ownExecutor = false;
 
     @Override
@@ -450,6 +459,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
     }
 
+    /**
+     * Starts or restarts the internal heartbeat scheduler.
+     */
     protected void startHeartbeat() {
         if (heartbeat && (heartbeatFuture == null || heartbeatFuture.isDone())) {
             if (heartbeatFuture != null && heartbeatFuture.isDone()) {
@@ -687,6 +699,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         private final ChannelInterceptor end;
         private ChannelInterceptor start;
 
+        /**
+     * Creates an InterceptorIterator.
+     *
+     * @param start The first interceptor to iterate from
+     * @param end   The end marker interceptor (not included in iteration)
+     */
         public InterceptorIterator(ChannelInterceptor start, ChannelInterceptor end) {
             this.end = end;
             this.start = start;
@@ -714,14 +732,16 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     /**
-     * <p>
-     * Title: Internal heartbeat runnable
-     * </p>
-     * <p>
-     * Description: if <code>Channel.getHeartbeat()==true</code> then a thread of this class is created
-     * </p>
+     * Internal heartbeat runnable.
      */
     public class HeartbeatRunnable implements Runnable {
+        /**
+         * Default constructor for HeartbeatRunnable.
+         */
+        public HeartbeatRunnable() {
+            super();
+        }
+
         @Override
         public void run() {
             heartbeat();

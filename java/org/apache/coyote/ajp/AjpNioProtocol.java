@@ -36,6 +36,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     // ------------------------------------------------------------ Constructor
 
+    /** Constructs a new AjpNioProtocol. */
     public AjpNioProtocol() {
         super(new NioEndpoint());
     }

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,6 +52,9 @@ import org.apache.tomcat.dbcp.dbcp2.Utils;
  */
 public class BasicManagedDataSource extends BasicDataSource {
 
+    /** Default constructor. */
+    public BasicManagedDataSource() { }
+
     /** Transaction Registry */
     private TransactionRegistry transactionRegistry;
 
@@ -68,7 +71,7 @@ public class BasicManagedDataSource extends BasicDataSource {
     private transient TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
     @Override
-    protected ConnectionFactory createConnectionFactory() throws SQLException {
+    protected synchronized ConnectionFactory createConnectionFactory() throws SQLException {
         if (transactionManager == null) {
             throw new SQLException("Transaction manager must be set before a connection can be created");
         }
@@ -108,7 +111,7 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     @Override
-    protected DataSource createDataSourceInstance() throws SQLException {
+    protected synchronized DataSource createDataSourceInstance() throws SQLException {
         final PoolingDataSource<PoolableConnection> pds = new ManagedDataSource<>(getConnectionPool(),
                 transactionRegistry);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());

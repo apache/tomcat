@@ -55,6 +55,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorQueryTask extends JMXAccessorTask {
 
+    /**
+     * Constructs a new JMXAccessorQueryTask.
+     */
+    public JMXAccessorQueryTask() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     private boolean attributebinding = false;
@@ -62,14 +68,18 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attributebinding.
+     * Get the attribute binding flag.
+     *
+     * @return the attribute binding flag
      */
     public boolean isAttributebinding() {
         return attributebinding;
     }
 
     /**
-     * @param attributeBinding The attributebinding to set.
+     * Set the attribute binding flag.
+     *
+     * @param attributeBinding the flag to set
      */
     public void setAttributebinding(boolean attributeBinding) {
         this.attributebinding = attributeBinding;
@@ -128,6 +138,13 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
         return null;
     }
 
+    /**
+     * Bind MBean attributes to Ant properties.
+     *
+     * @param jmxServerConnection the JMX server connection
+     * @param pname the property name prefix
+     * @param oname the MBean object name
+     */
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {
         try {
             MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);

@@ -20,8 +20,23 @@ import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.jasper.tagplugins.jstl.Util;
 
+/**
+ * Tag plugin for the JSTL {@code <c:set>} tag. Generates optimized Java source
+ * code to set a variable in a scope or set a property on a target object.
+ */
 public class Set implements TagPlugin {
 
+    /**
+     * Construct a new Set tag plugin instance.
+     */
+    public Set() {
+    }
+
+    /**
+     * Generate the Java source code equivalent of the {@code <c:set>} tag.
+     *
+     * @param ctxt the tag plugin context used to generate Java source
+     */
     @Override
     public void doTag(TagPluginContext ctxt) {
 

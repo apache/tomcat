@@ -18,22 +18,35 @@ package org.apache.tomcat.jni;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when a required native library cannot be found.
+ */
 public class LibraryNotFoundError extends UnsatisfiedLinkError {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The names of the libraries that failed to load.
+     */
     private final String libraryNames;
 
     /**
+     * Constructs an instance with the given library names and error messages.
+     *
      * @param libraryNames A list of the file names of the native libraries that failed to load
-     * @param errors       A list of the error messages received when trying to load each of the libraries
+     * @param errors A list of the error messages received when trying to load each of the libraries
      */
     public LibraryNotFoundError(String libraryNames, String errors) {
         super(errors);
         this.libraryNames = libraryNames;
     }
 
+    /**
+     * Returns the names of the libraries that failed to load.
+     *
+     * @return the library names
+     */
     public String getLibraryNames() {
         return libraryNames;
     }

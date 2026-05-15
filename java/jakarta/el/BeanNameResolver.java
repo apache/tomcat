@@ -18,11 +18,18 @@ package jakarta.el;
 
 /**
  * Base implementation that provides a minimal default implementation that is intended to be extended by application
- * developers.
+ * developers. Subclasses define the logic for resolving bean names to bean instances, checking read-only status,
+ * and determining whether new beans can be created.
  *
  * @since EL 3.0
  */
 public abstract class BeanNameResolver {
+
+    /**
+     * Default constructor for subclasses.
+     */
+    public BeanNameResolver() {
+    }
 
     /**
      * Can this resolver resolve the given bean name?

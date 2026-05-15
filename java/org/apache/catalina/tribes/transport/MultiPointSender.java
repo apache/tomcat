@@ -20,6 +20,9 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 
+/**
+ * Multi-point sender interface.
+ */
 public interface MultiPointSender extends DataSender {
 
     /**

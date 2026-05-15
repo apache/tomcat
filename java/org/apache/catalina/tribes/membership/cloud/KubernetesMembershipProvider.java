@@ -43,8 +43,16 @@ import org.apache.tomcat.util.json.JSONParser;
  * A {@link org.apache.catalina.tribes.MembershipProvider} that uses Kubernetes API to retrieve the members of a
  * cluster.<br>
  */
-
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
+
+    /**
+     * Default constructor.
+     */
+    public KubernetesMembershipProvider() {
+    }
+
+    private static final String IPV6_URL = "%s://[%s]:%s/api/%s/namespaces/%s/pods";
+    private static final String URL = "%s://%s:%s/api/%s/namespaces/%s/pods";
 
     private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
 
@@ -122,7 +130,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         namespace = URLEncoder.encode(namespace, StandardCharsets.UTF_8);
         labels = labels == null ? null : URLEncoder.encode(labels, StandardCharsets.UTF_8);
 
-        url = String.format("%s://%s:%s/api/%s/namespaces/%s/pods", protocol, masterHost, masterPort, ver, namespace);
+        String urlFormat = URL;
+        if (masterHost != null && masterHost.indexOf(':') != -1) {
+            // [] must be used around raw IPv6
+            urlFormat = IPV6_URL;
+        }
+        url = String.format(urlFormat, protocol, masterHost, masterPort, ver, namespace);
         if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
@@ -187,6 +200,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
     }
 
 
+    /**
+     * Parses the pod data from the given reader and populates the members list.
+     *
+     * @param reader The reader with pod data
+     * @param members The list to populate with members
+     */
     @SuppressWarnings("unchecked")
     protected void parsePods(Reader reader, List<MemberImpl> members) {
         JSONParser parser = new JSONParser(reader);

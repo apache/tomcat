@@ -37,6 +37,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
@@ -44,27 +45,60 @@ import org.apache.tomcat.util.scan.JarFactory;
  */
 public abstract class Compiler {
 
+    /**
+     * Default constructor for Compiler.
+     */
+    public Compiler() {
+    }
+
     private final Log log = LogFactory.getLog(Compiler.class); // must not be static
 
     // ----------------------------------------------------- Instance Variables
 
+    /**
+     * The JSP compilation context.
+     */
     protected JspCompilationContext ctxt;
 
+    /**
+     * The error dispatcher.
+     */
     protected ErrorDispatcher errDispatcher;
 
+    /**
+     * The page information.
+     */
     protected PageInfo pageInfo;
 
+    /**
+     * The JSP servlet wrapper.
+     */
     protected JspServletWrapper jsw;
 
+    /**
+     * The tag file processor.
+     */
     protected TagFileProcessor tfp;
 
+    /**
+     * The compilation options.
+     */
     protected Options options;
 
+    /**
+     * The page nodes.
+     */
     protected Node.Nodes pageNodes;
 
 
     // ------------------------------------------------------------ Constructor
 
+    /**
+     * Initializes the compiler with the given compilation context and servlet wrapper.
+     *
+     * @param ctxt the JSP compilation context
+     * @param jsw the JSP servlet wrapper
+     */
     public void init(JspCompilationContext ctxt, JspServletWrapper jsw) {
         this.jsw = jsw;
         this.ctxt = ctxt;
@@ -74,6 +108,13 @@ public abstract class Compiler {
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Returns the source map for the specified class.
+     *
+     * @param className the class name
+     *
+     * @return the source map, or {@code null} if not available
+     */
     public SmapStratum getSmap(String className) {
 
         Map<String,SmapStratum> smaps = ctxt.getRuntimeContext().getSmaps();
@@ -474,7 +515,35 @@ public abstract class Compiler {
                 String key = include.getKey();
                 URL includeUrl;
                 long includeLastModified;
-                if (key.startsWith("jar:jar:")) {
+                if (key.startsWith("uri:")) {
+                    // Key is a stable taglib URI used for TLDs in JARs outside
+                    // the web application (avoids baking absolute paths into the
+                    // generated code). Two forms exist:
+                    //   "uri:<taglib-uri>"           – the JAR file itself
+                    //   "uri:<taglib-uri>!/<entry>"  – a TLD entry within the JAR
+                    int bangSlash = key.indexOf("!/");
+                    String tagUri = bangSlash < 0
+                            ? key.substring(4)
+                            : key.substring(4, bangSlash);
+                    TldCache tldCache = ctxt.getOptions().getTldCache();
+                    TldResourcePath tldPath = tldCache.getTldResourcePath(tagUri);
+                    if (tldPath == null) {
+                        return true;
+                    }
+                    try (Jar jar = tldPath.openJar()) {
+                        if (jar == null) {
+                            return true;
+                        }
+                        if (bangSlash < 0) {
+                            // JAR-level key: check the JAR file's last-modified
+                            includeLastModified = jar.getLastModified();
+                        } else {
+                            // TLD-entry key: check the entry's last-modified within the JAR
+                            String entryName = key.substring(bangSlash + 2);
+                            includeLastModified = jar.getLastModified(entryName);
+                        }
+                    }
+                } else if (key.startsWith("jar:jar:")) {
                     // Assume we constructed this correctly
                     int entryStart = key.lastIndexOf("!/");
                     String entry = key.substring(entryStart + 2);
@@ -515,6 +584,8 @@ public abstract class Compiler {
     }
 
     /**
+     * Returns the error dispatcher.
+     *
      * @return the error dispatcher.
      */
     public ErrorDispatcher getErrorDispatcher() {
@@ -522,12 +593,19 @@ public abstract class Compiler {
     }
 
     /**
+     * Returns the page information.
+     *
      * @return the info about the page under compilation
      */
     public PageInfo getPageInfo() {
         return pageInfo;
     }
 
+    /**
+     * Returns the JSP compilation context.
+     *
+     * @return the compilation context
+     */
     public JspCompilationContext getCompilationContext() {
         return ctxt;
     }
@@ -555,6 +633,9 @@ public abstract class Compiler {
         }
     }
 
+    /**
+     * Remove generated class files.
+     */
     public void removeGeneratedClassFiles() {
         try {
             File classFile = new File(ctxt.getClassFileName());

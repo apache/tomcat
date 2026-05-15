@@ -46,13 +46,24 @@ import org.apache.catalina.tribes.Member;
  * @see org.apache.catalina.tribes.Member
  */
 public class AbsoluteOrder {
+    /**
+     * The comparator for absolute order.
+     */
     public static final AbsoluteComparator comp = new AbsoluteComparator();
 
+    /**
+     * Protected constructor.
+     */
     protected AbsoluteOrder() {
         super();
     }
 
 
+    /**
+     * Sort the members in absolute order.
+     *
+     * @param members The members to sort
+     */
     public static void absoluteOrder(Member[] members) {
         if (members == null || members.length <= 1) {
             return;
@@ -60,6 +71,11 @@ public class AbsoluteOrder {
         Arrays.sort(members, comp);
     }
 
+    /**
+     * Sort the members in absolute order.
+     *
+     * @param members The members to sort
+     */
     public static void absoluteOrder(List<Member> members) {
         if (members == null || members.size() <= 1) {
             return;
@@ -67,10 +83,19 @@ public class AbsoluteOrder {
         members.sort(comp);
     }
 
+    /**
+     * A comparator for absolute ordering of members.
+     */
     public static class AbsoluteComparator implements Comparator<Member>, Serializable {
 
         @Serial
         private static final long serialVersionUID = 1L;
+
+        /**
+         * Default constructor.
+         */
+        public AbsoluteComparator() {
+        }
 
         @Override
         public int compare(Member m1, Member m2) {
@@ -84,18 +109,46 @@ public class AbsoluteOrder {
             return result;
         }
 
+        /**
+         * Compare the IP addresses of two members.
+         *
+         * @param m1 First member
+         * @param m2 Second member
+         * @return comparison result
+         */
         public int compareIps(Member m1, Member m2) {
             return compareBytes(m1.getHost(), m2.getHost());
         }
 
+        /**
+         * Compare the ports of two members.
+         *
+         * @param m1 First member
+         * @param m2 Second member
+         * @return comparison result
+         */
         public int comparePorts(Member m1, Member m2) {
             return compareInts(m1.getPort(), m2.getPort());
         }
 
+        /**
+         * Compare the unique IDs of two members.
+         *
+         * @param m1 First member
+         * @param m2 Second member
+         * @return comparison result
+         */
         public int compareIds(Member m1, Member m2) {
             return compareBytes(m1.getUniqueId(), m2.getUniqueId());
         }
 
+        /**
+         * Compare two byte arrays.
+         *
+         * @param d1 First byte array
+         * @param d2 Second byte array
+         * @return comparison result
+         */
         protected int compareBytes(byte[] d1, byte[] d2) {
             int result = 0;
             if (d1.length == d2.length) {
@@ -110,10 +163,24 @@ public class AbsoluteOrder {
             return result;
         }
 
+        /**
+         * Compare two bytes.
+         *
+         * @param b1 First byte
+         * @param b2 Second byte
+         * @return comparison result
+         */
         protected int compareBytes(byte b1, byte b2) {
             return compareInts(b1, b2);
         }
 
+        /**
+         * Compare two integers.
+         *
+         * @param b1 First integer
+         * @param b2 Second integer
+         * @return comparison result
+         */
         protected int compareInts(int b1, int b2) {
             return Integer.compare(b1, b2);
         }

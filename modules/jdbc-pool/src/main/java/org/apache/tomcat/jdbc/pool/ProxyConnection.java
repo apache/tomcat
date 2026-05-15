@@ -34,26 +34,50 @@ import javax.sql.XAConnection;
  */
 public class ProxyConnection extends JdbcInterceptor {
 
+    /** The underlying pooled connection. */
     protected PooledConnection connection = null;
 
+    /** The parent connection pool. */
     protected ConnectionPool pool = null;
 
+    /**
+     * Returns the underlying pooled connection.
+     * @return the pooled connection
+     */
     public PooledConnection getConnection() {
         return connection;
     }
 
+    /**
+     * Sets the underlying pooled connection.
+     * @param connection the pooled connection
+     */
     public void setConnection(PooledConnection connection) {
         this.connection = connection;
     }
 
+    /**
+     * Returns the parent connection pool.
+     * @return the connection pool
+     */
     public ConnectionPool getPool() {
         return pool;
     }
 
+    /**
+     * Sets the parent connection pool.
+     * @param pool the connection pool
+     */
     public void setPool(ConnectionPool pool) {
         this.pool = pool;
     }
 
+    /**
+     * Creates a new ProxyConnection wrapping the given pooled connection.
+     * @param parent the parent connection pool
+     * @param con the pooled connection
+     * @param useEquals whether to use equals for method comparison
+     */
     protected ProxyConnection(ConnectionPool parent, PooledConnection con,
             boolean useEquals) {
         pool = parent;
@@ -67,6 +91,11 @@ public class ProxyConnection extends JdbcInterceptor {
         this.connection = con;
     }
 
+    /**
+     * Checks whether this proxy wraps the given interface.
+     * @param iface the interface to check
+     * @return true if this proxy wraps the given interface
+     */
     public boolean isWrapperFor(Class<?> iface) {
         if (iface == XAConnection.class && connection.getXAConnection()!=null) {
             return true;
@@ -76,6 +105,12 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
 
+    /**
+     * Unwraps the connection to the given interface.
+     * @param iface the interface to unwrap to
+     * @return the unwrapped connection
+     * @throws SQLException if the connection does not wrap the given interface
+     */
     public Object unwrap(Class<?> iface) throws SQLException {
         if (iface == PooledConnection.class) {
             return connection;
@@ -141,14 +176,26 @@ public class ProxyConnection extends JdbcInterceptor {
         }
     }
 
+    /**
+     * Returns true if the underlying connection has been closed or discarded.
+     * @return true if closed or discarded
+     */
     public boolean isClosed() {
         return connection==null || connection.isDiscarded();
     }
 
+    /**
+     * Returns the delegate pooled connection.
+     * @return the delegate pooled connection
+     */
     public PooledConnection getDelegateConnection() {
         return connection;
     }
 
+    /**
+     * Returns the parent connection pool.
+     * @return the parent connection pool
+     */
     public ConnectionPool getParentPool() {
         return pool;
     }

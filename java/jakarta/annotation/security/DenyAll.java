@@ -23,6 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Indicates that all access to the annotated enterprise bean or business method
+ * is denied. When applied at the class level, all security roles are prohibited
+ * from invoking any business method of the bean. When applied at the method level,
+ * the specified method is inaccessible to all roles. This annotation takes
+ * precedence over {@link PermitAll} and {@link RolesAllowed}.
+ *
  * @since Common Annotations 1.0
  */
 @Documented

@@ -20,6 +20,9 @@ on:
   schedule:
     - cron: 53 5 * * 0
 
+permissions:
+  contents: read
+
 jobs:
   coverity:
     runs-on: ubuntu-latest

@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+/**
+ * Defines the progress state of a sendfile operation.
+ */
 public enum SendfileState {
 
     /**

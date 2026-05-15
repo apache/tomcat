@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -114,7 +115,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer);
+                String headerValue = readHpackString(buffer, false);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -128,7 +129,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer);
+                String headerValue = readHpackString(buffer, false);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -141,7 +142,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer);
+                String headerValue = readHpackString(buffer, false);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -202,11 +203,11 @@ public class HpackDecoder {
         } else if (index != 0) {
             return handleIndexedHeaderName(index);
         } else {
-            return readHpackString(buffer);
+            return readHpackString(buffer, true);
         }
     }
 
-    private String readHpackString(ByteBuffer buffer) throws HpackException {
+    private String readHpackString(ByteBuffer buffer, boolean isFieldName) throws HpackException {
         if (!buffer.hasRemaining()) {
             return null;
         }
@@ -218,18 +219,34 @@ public class HpackDecoder {
         }
         boolean huffman = (data & 0b10000000) != 0;
         if (huffman) {
-            return readHuffmanString(length, buffer);
+            return readHuffmanString(length, buffer, isFieldName);
         }
         StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
-            stringBuilder.append((char) buffer.get());
+            char c = (char) (buffer.get() & 0xFF);
+            if (isFieldName) {
+                if (HttpParser.isToken(c) && !Character.isUpperCase(c)) {
+                    stringBuilder.append(c);
+                } else {
+                    throw new IllegalArgumentException(
+                            sm.getString("hpackdecoder.illegalCharacterName", Character.toString(c)));
+                }
+            } else {
+                if ((i == 0 || i == length - 1) && HttpParser.isFieldVChar(c) ||
+                        i > 0 && i < length - 1 && HttpParser.isFieldContent(c)) {
+                    stringBuilder.append(c);
+                } else {
+                    throw new IllegalArgumentException(
+                            sm.getString("hpackdecoder.illegalCharacterValue", Character.toString(c)));
+                }
+            }
         }
         return stringBuilder.toString();
     }
 
-    private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
+    private String readHuffmanString(int length, ByteBuffer buffer, boolean isFieldName) throws HpackException {
         StringBuilder stringBuilder = new StringBuilder(length);
-        HPackHuffman.decode(buffer, length, stringBuilder);
+        HPackHuffman.decode(buffer, length, stringBuilder, isFieldName);
         return stringBuilder.toString();
     }
 
@@ -238,11 +255,7 @@ public class HpackDecoder {
             return Hpack.STATIC_TABLE[index].name;
         } else {
             // index is 1 based
-            if (index > Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
-                throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
-                        Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));
-            }
-            int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
+            int adjustedIndex = getRealIndex(index);
             Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
                 throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
@@ -262,7 +275,8 @@ public class HpackDecoder {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {
             addStaticTableEntry(index);
         } else {
-            int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
+            // index is 1 based
+            int adjustedIndex = getRealIndex(index);
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
             }
@@ -282,15 +296,15 @@ public class HpackDecoder {
      * @return the real index into the array
      */
     int getRealIndex(int index) throws HpackException {
-        // the index is one based, but our table is zero based, hence -1
-        // also because of our ring buffer set up the indexes are reversed
+        int dynamicIndex = index - Hpack.STATIC_TABLE_LENGTH;
+        // The index is one based, but our table is zero based
+        // Also, because of our ring buffer set up, the indexes are reversed
         // index = 1 is at position firstSlotPosition + filledSlots
-        int realIndex = (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
-        if (realIndex < 0) {
+        if (dynamicIndex < 1 || dynamicIndex > filledTableSlots) {
             throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
                     Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));
         }
-        return realIndex;
+        return (firstSlotPosition + (filledTableSlots - dynamicIndex)) % headerTable.length;
     }
 
     private void addStaticTableEntry(int index) throws HpackException {

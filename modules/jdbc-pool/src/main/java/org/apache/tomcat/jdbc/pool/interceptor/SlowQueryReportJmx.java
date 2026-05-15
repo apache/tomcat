@@ -44,45 +44,92 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 /**
- * Publishes data to JMX and provides notifications
- * when failures happen.
+ * JMX-enabled slow query report interceptor.
+ * Publishes slow and failed query statistics to JMX and provides
+ * notifications when slow or failed queries are detected.
  *
  */
 public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean{
+    /**
+     * Notification type for slow query events.
+     */
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
+    /**
+     * Notification type for failed query events.
+     */
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
 
+    /**
+     * Property key for overriding the JMX object name.
+     */
     public static final String objectNameAttribute = "objectName";
 
+    /**
+     * Composite type used for JMX query statistics data.
+     */
     protected static volatile CompositeType SLOW_QUERY_TYPE;
 
     private static final Log log = LogFactory.getLog(SlowQueryReportJmx.class);
 
+    /**
+     * Creates a new SlowQueryReportJmx instance.
+     */
+    public SlowQueryReportJmx() {
+    }
 
+    /**
+     * Registry of JMX MBeans for each connection pool.
+     */
     protected static final ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
             new ConcurrentHashMap<>();
 
 
     //==============================JMX STUFF========================
+    /**
+     * Notification broadcaster support for JMX notifications.
+     */
     protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
 
+    /**
+     * Adds a notification listener.
+     * @param listener the listener to add
+     * @param filter the notification filter
+     * @param handback the handback object
+     * @throws IllegalArgumentException if the listener is null
+     */
     @Override
     public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws IllegalArgumentException {
         notifier.addNotificationListener(listener, filter, handback);
     }
 
 
+    /**
+     * Returns information about the notifications this MBean can send.
+     * @return an array of MBeanNotificationInfo objects
+     */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
         return notifier.getNotificationInfo();
     }
 
+    /**
+     * Removes a notification listener.
+     * @param listener the listener to remove
+     * @throws ListenerNotFoundException if the listener was not previously added
+     */
     @Override
     public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener);
 
     }
 
+    /**
+     * Removes a notification listener with the given filter and handback.
+     * @param listener the listener to remove
+     * @param filter the notification filter
+     * @param handback the handback object
+     * @throws ListenerNotFoundException if the listener was not previously added
+     */
     @Override
     public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener, filter, handback);
@@ -92,14 +139,30 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     //==============================JMX STUFF========================
 
+    /**
+     * The name of the connection pool.
+     */
     protected String poolName = null;
 
+    /**
+     * Atomic sequence counter for notifications.
+     */
     protected static final AtomicLong notifySequence = new AtomicLong(0);
 
+    /**
+     * Whether to send notifications to the pool.
+     */
     protected boolean notifyPool = true;
 
+    /**
+     * The connection pool reference.
+     */
     protected ConnectionPool pool = null;
 
+    /**
+     * Returns the composite type used for JMX query statistics.
+     * @return the composite type, or {@code null} if initialization failed
+     */
     protected static CompositeType getCompositeType() {
         if (SLOW_QUERY_TYPE==null) {
             try {
@@ -116,6 +179,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         return SLOW_QUERY_TYPE;
     }
 
+    /**
+     * Resets this interceptor for a new connection, registering JMX if applicable.
+     * @param parent the connection pool
+     * @param con the pooled connection
+     */
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
@@ -127,6 +195,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
 
+    /**
+     * Called when the connection pool is closed; deregisters JMX.
+     * @param pool the connection pool being closed
+     */
     @Override
     public void poolClosed(ConnectionPool pool) {
         this.poolName = pool.getName();
@@ -134,6 +206,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         super.poolClosed(pool);
     }
 
+    /**
+     * Called when the connection pool is started.
+     * @param pool the connection pool being started
+     */
     @Override
     public void poolStarted(ConnectionPool pool) {
         this.pool = pool;
@@ -141,6 +217,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         this.poolName = pool.getName();
     }
 
+    /**
+     * Reports a failed query and sends a JMX notification if logging is enabled.
+     * @param query the SQL query
+     * @param args the query arguments
+     * @param name the connection pool name
+     * @param start the start time in milliseconds
+     * @param t the throwable that caused the failure
+     * @return the formatted query string
+     */
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         query = super.reportFailedQuery(query, args, name, start, t);
@@ -150,6 +235,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         return query;
     }
 
+    /**
+     * Sends a JMX notification for the given query and notification type.
+     * @param query the SQL query string
+     * @param type the notification type (slow or failed query)
+     */
     protected void notifyJmx(String query, String type) {
         try {
             long sequence = notifySequence.incrementAndGet();
@@ -177,6 +267,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
     }
 
+    /**
+     * Reports a slow query and sends a JMX notification if logging is enabled.
+     * @param query the SQL query
+     * @param args the query arguments
+     * @param name the connection pool name
+     * @param start the start time in milliseconds
+     * @param delta the elapsed time in milliseconds
+     * @return the formatted query string
+     */
     @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         query = super.reportSlowQuery(query, args, name, start, delta);
@@ -204,10 +303,18 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
 
+    /**
+     * Returns whether notifications are sent to the pool.
+     * @return true if notifications are sent to the pool
+     */
     public boolean isNotifyPool() {
         return notifyPool;
     }
 
+    /**
+     * Sets whether notifications are sent to the pool.
+     * @param notifyPool true if notifications should be sent to the pool
+     */
     public void setNotifyPool(boolean notifyPool) {
         this.notifyPool = notifyPool;
     }
@@ -249,6 +356,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         return result;
     }
 
+    /**
+     * Deregisters this interceptor from JMX.
+     */
     protected void deregisterJmx() {
         try {
             if (mbeans.remove(poolName)!=null) {
@@ -262,6 +372,13 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
 
+    /**
+     * Returns the JMX ObjectName for the given class and pool name.
+     * @param clazz the interceptor class
+     * @param poolName the name of the connection pool
+     * @return the JMX ObjectName
+     * @throws MalformedObjectNameException if the object name is malformed
+     */
     public ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
         ObjectName oname;
         Map<String,InterceptorProperty> properties = getProperties();
@@ -273,6 +390,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         return oname;
     }
 
+    /**
+     * Registers this interceptor with JMX.
+     */
     protected void registerJmx() {
         try {
             //only if we notify the pool itself
@@ -291,6 +411,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
     }
 
+    /**
+     * Sets the interceptor properties, including the notifyPool flag.
+     * @param properties the interceptor properties
+     */
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);

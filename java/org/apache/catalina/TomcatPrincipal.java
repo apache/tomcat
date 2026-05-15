@@ -28,12 +28,16 @@ import org.ietf.jgss.GSSCredential;
 public interface TomcatPrincipal extends Principal {
 
     /**
-     * @return The authenticated Principal to be exposed to applications.
+     * Returns the authenticated principal to be exposed to applications.
+     *
+     * @return The authenticated principal to be exposed to applications
      */
     Principal getUserPrincipal();
 
     /**
-     * @return The user's delegated credentials.
+     * Returns the user's delegated GSS credentials.
+     *
+     * @return The user's delegated credentials
      */
     GSSCredential getGssCredential();
 

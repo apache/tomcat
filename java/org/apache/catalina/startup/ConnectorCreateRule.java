@@ -36,7 +36,18 @@ import org.xml.sax.Attributes;
  */
 public class ConnectorCreateRule extends Rule {
 
+    /**
+     * Creates a new ConnectorCreateRule instance.
+     */
+    public ConnectorCreateRule() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(ConnectorCreateRule.class);
+
+    /**
+     * String manager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(ConnectorCreateRule.class);
     // --------------------------------------------------------- Public Methods
 

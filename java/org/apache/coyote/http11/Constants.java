@@ -23,6 +23,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public final class Constants {
 
+    /**
+     * Default connection timeout in milliseconds.
+     */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
 
 
@@ -75,15 +78,45 @@ public final class Constants {
 
 
     /* Various constant "strings" */
+    /**
+     * Connection header name.
+     */
     public static final String CONNECTION = "Connection";
+    /**
+     * Connection close value.
+     */
     public static final String CLOSE = "close";
+    /**
+     * Keep-alive header value token.
+     */
     public static final String KEEP_ALIVE_HEADER_VALUE_TOKEN = "keep-alive";
+    /**
+     * Chunked transfer encoding value.
+     */
     public static final String CHUNKED = "chunked";
+    /**
+     * HTTP 100 Continue response bytes.
+     */
     public static final byte[] ACK_BYTES = ByteChunk.convertToBytes("HTTP/1.1 100 " + CRLF + CRLF);
+    /**
+     * Transfer-Encoding header name.
+     */
     public static final String TRANSFERENCODING = "Transfer-Encoding";
+    /**
+     * Keep-Alive header name.
+     */
     public static final String KEEP_ALIVE_HEADER_NAME = "Keep-Alive";
+    /**
+     * HTTP 200 OK response bytes.
+     */
     public static final byte[] _200_BYTES = ByteChunk.convertToBytes("200");
+    /**
+     * HTTP 400 Bad Request response bytes.
+     */
     public static final byte[] _400_BYTES = ByteChunk.convertToBytes("400");
+    /**
+     * HTTP 404 Not Found response bytes.
+     */
     public static final byte[] _404_BYTES = ByteChunk.convertToBytes("404");
 
 
@@ -127,5 +160,15 @@ public final class Constants {
      * HTTP/1.1.
      */
     public static final String HTTP_11 = "HTTP/1.1";
+    /**
+     * HTTP/1.1 protocol version bytes.
+     */
     public static final byte[] HTTP_11_BYTES = ByteChunk.convertToBytes(HTTP_11);
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

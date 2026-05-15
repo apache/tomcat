@@ -71,6 +71,9 @@ public class CoyoteAdapter implements Adapter {
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY = EnumSet.of(SessionTrackingMode.SSL);
 
+    /**
+     * The note index used to store the Request and Response objects on the coyote request and response.
+     */
     public static final int ADAPTER_NOTES = 1;
 
 
@@ -555,9 +558,10 @@ public class CoyoteAdapter implements Adapter {
     protected boolean postParseRequest(org.apache.coyote.Request req, Request request, org.apache.coyote.Response res,
             Response response) throws IOException, ServletException {
 
-        // If the processor has set the scheme (AJP does this, HTTP does this if
-        // SSL is enabled) use this to set the secure flag as well. If the
-        // processor hasn't set it, use the settings from the connector
+        /*
+         * If the processor has set the scheme (AJP and HTTP/2 do this, HTTP/1.x does this if SSL is enabled), use this
+         * to set the secure flag as well. If the processor hasn't set it, use the settings from the connector.
+         */
         if (req.scheme().isNull()) {
             // Use connector scheme and secure configuration, (defaults to
             // "http" and false respectively)
@@ -1109,6 +1113,8 @@ public class CoyoteAdapter implements Adapter {
      */
     public static boolean normalize(MessageBytes uriMB, boolean allowBackslash) {
 
+        // Keep behaviour aligned with RequestUtil.normalize()
+
         ByteChunk uriBC = uriMB.getByteChunk();
         final byte[] b = uriBC.getBytes();
         final int start = uriBC.getStart();
@@ -1283,7 +1289,7 @@ public class CoyoteAdapter implements Adapter {
                     byte b2 = bytes[pos + 2];
                     pos += 3;
                     int decoded = (HexUtils.getDec(b1) << 4) + HexUtils.getDec(b2);
-                    if (decoded < 20 || decoded == 0x7F || decoded == 0x2F) {
+                    if (decoded < 0x20 || decoded == 0x7F || decoded == 0x2F) {
                         return true;
                     }
                 } else {

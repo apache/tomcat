@@ -73,6 +73,12 @@ public class SessionUtils {
         return guessLocaleFromSession(in_session.getSession());
     }
 
+    /**
+     * Try to get user locale from the HttpSession, if possible.
+     *
+     * @param in_session The HTTP session
+     * @return the locale, or {@code null} if it cannot be determined
+     */
     public static Locale guessLocaleFromSession(final HttpSession in_session) {
         if (null == in_session) {
             return null;
@@ -222,6 +228,12 @@ public class SessionUtils {
     }
 
 
+    /**
+     * Returns the time in milliseconds that the session has been active.
+     *
+     * @param in_session The session
+     * @return the active time in milliseconds, or -1 if the session is invalidated
+     */
     public static long getUsedTimeForSession(Session in_session) {
         try {
             return in_session.getThisAccessedTime() - in_session.getCreationTime();
@@ -231,6 +243,12 @@ public class SessionUtils {
         }
     }
 
+    /**
+     * Returns the remaining time-to-live for the session in milliseconds.
+     *
+     * @param in_session The session
+     * @return the remaining TTL in milliseconds, or -1 if the session is invalidated
+     */
     public static long getTTLForSession(Session in_session) {
         try {
             return 1000L * in_session.getMaxInactiveInterval() -
@@ -241,6 +259,12 @@ public class SessionUtils {
         }
     }
 
+    /**
+     * Returns the time in milliseconds since the session was last accessed.
+     *
+     * @param in_session The session
+     * @return the inactive time in milliseconds, or -1 if the session is invalidated
+     */
     public static long getInactiveTimeForSession(Session in_session) {
         try {
             return System.currentTimeMillis() - in_session.getThisAccessedTime();

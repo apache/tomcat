@@ -23,9 +23,14 @@ package org.apache.tomcat.util.digester;
 public interface DocumentProperties {
 
     /**
-     * The character encoding used by the source XML document.
+     * Interface for objects that can receive the character encoding used by the source XML document.
      */
     interface Charset {
+        /**
+         * Set the character encoding used by the source XML document.
+         *
+         * @param charset The character encoding
+         */
         void setCharset(java.nio.charset.Charset charset);
     }
 }

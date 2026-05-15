@@ -18,10 +18,16 @@ package org.apache.catalina.util;
 
 import jakarta.servlet.FilterConfig;
 
+/**
+ * Defines the contract for a rate limiter that tracks and limits the number of
+ * requests per time window for a given identifier.
+ */
 public interface RateLimiter {
 
     /**
-     * @return the actual duration of a time window in seconds
+     * Returns the actual duration of a time window in seconds.
+     *
+     * @return the duration in seconds
      */
     int getDuration();
 
@@ -33,7 +39,9 @@ public interface RateLimiter {
     void setDuration(int duration);
 
     /**
-     * @return the maximum number of requests allowed per time window
+     * Returns the maximum number of requests allowed per time window.
+     *
+     * @return the maximum number of requests
      */
     int getRequests();
 
@@ -66,7 +74,9 @@ public interface RateLimiter {
     void setFilterConfig(FilterConfig filterConfig);
 
     /**
-     * @return name of RateLimit policy
+     * Returns the name of the rate limit policy.
+     *
+     * @return the policy name
      */
     String getPolicyName();
 
@@ -78,7 +88,10 @@ public interface RateLimiter {
     void setPolicyName(String name);
 
     /**
-     * @return full representation of current policy
+     * Returns the full representation of the current rate limit policy in the
+     * format defined by the IETF draft for RateLimit header fields.
+     *
+     * @return the policy representation string
      *
      * @see <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for
      *          HTTP (draft)</a>

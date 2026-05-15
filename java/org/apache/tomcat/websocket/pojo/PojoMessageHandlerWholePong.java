@@ -26,6 +26,17 @@ import jakarta.websocket.Session;
  */
 public class PojoMessageHandlerWholePong extends PojoMessageHandlerWholeBase<PongMessage> {
 
+    /**
+     * Create a whole pong message handler.
+     *
+     * @param pojo          POJO instance
+     * @param method        Method to invoke
+     * @param session       WebSocket session
+     * @param params        Pre-populated parameter array
+     * @param indexPayload  Index of the payload parameter
+     * @param convert       Convert the message before passing to the method
+     * @param indexSession  Index of the session parameter
+     */
     public PojoMessageHandlerWholePong(Object pojo, Method method, Session session, Object[] params, int indexPayload,
             boolean convert, int indexSession) {
         super(pojo, method, session, params, indexPayload, convert, indexSession, -1);

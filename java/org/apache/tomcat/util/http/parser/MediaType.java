@@ -22,15 +22,43 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Represents a parsed media type.
+ */
 public class MediaType {
 
+    /**
+     * The media type.
+     */
     private final String type;
+    /**
+     * The media subtype.
+     */
     private final String subtype;
+    /**
+     * The parameters.
+     */
     private final LinkedHashMap<String,String> parameters;
+    /**
+     * The charset.
+     */
     private final String charset;
+    /**
+     * The string representation without charset.
+     */
     private volatile String noCharset;
+    /**
+     * The string representation with charset.
+     */
     private volatile String withCharset;
 
+    /**
+     * Constructor.
+     *
+     * @param type the media type
+     * @param subtype the media subtype
+     * @param parameters the parameters
+     */
     protected MediaType(String type, String subtype, LinkedHashMap<String,String> parameters) {
         this.type = type;
         this.subtype = subtype;
@@ -43,22 +71,43 @@ public class MediaType {
         this.charset = cs;
     }
 
+    /**
+     * Get the media type.
+     * @return the type
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Get the media subtype.
+     * @return the subtype
+     */
     public String getSubtype() {
         return subtype;
     }
 
+    /**
+     * Get the charset.
+     * @return the charset
+     */
     public String getCharset() {
         return charset;
     }
 
+    /**
+     * Get the number of parameters.
+     * @return the parameter count
+     */
     public int getParameterCount() {
         return parameters.size();
     }
 
+    /**
+     * Get the value of a parameter.
+     * @param parameter the parameter name
+     * @return the parameter value
+     */
     public String getParameterValue(String parameter) {
         return parameters.get(parameter.toLowerCase(Locale.ENGLISH));
     }
@@ -90,6 +139,10 @@ public class MediaType {
         return withCharset;
     }
 
+    /**
+     * Get the string representation without charset.
+     * @return the string representation
+     */
     public String toStringNoCharset() {
         if (noCharset == null) {
             synchronized (this) {

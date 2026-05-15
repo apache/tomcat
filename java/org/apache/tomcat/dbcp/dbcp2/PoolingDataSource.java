@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -129,7 +129,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Returns a {@link java.sql.Connection} from my pool, according to the contract specified by
+     * Returns a {@link Connection} from my pool, according to the contract specified by
      * {@link ObjectPool#borrowObject}.
      */
     @Override
@@ -163,7 +163,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     public Connection getConnection(final String userName, final String password) throws SQLException {
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * Throws {@link UnsupportedOperationException}.

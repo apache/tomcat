@@ -22,18 +22,59 @@ import java.nio.charset.Charset;
  * Resolver abstract class.
  */
 public abstract class Resolver {
+    /**
+     * Default constructor.
+     */
+    public Resolver() {
+    }
 
+    /**
+     * Resolve a key to a string value.
+     *
+     * @param key The key to resolve
+     * @return The resolved string value
+     */
     public abstract String resolve(String key);
 
+    /**
+     * Resolve an environment variable key to a string value.
+     *
+     * @param key The key to resolve
+     * @return The resolved string value
+     */
     public String resolveEnv(String key) {
         return System.getProperty(key);
     }
 
+    /**
+     * Resolve an SSL variable key to a string value.
+     *
+     * @param key The key to resolve
+     * @return The resolved string value
+     */
     public abstract String resolveSsl(String key);
 
+    /**
+     * Resolve an HTTP header key to a string value.
+     *
+     * @param key The key to resolve
+     * @return The resolved string value
+     */
     public abstract String resolveHttp(String key);
 
+    /**
+     * Resolve a resource check.
+     *
+     * @param type The type of resource check (0=directory, 1=file, 2=non-empty file)
+     * @param name The resource name
+     * @return True if the resource matches the specified type
+     */
     public abstract boolean resolveResource(int type, String name);
 
+    /**
+     * Return the URI character set.
+     *
+     * @return The URI character set
+     */
     public abstract Charset getUriCharset();
 }

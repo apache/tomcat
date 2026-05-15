@@ -39,6 +39,11 @@ public abstract class AbstractInputStreamJar implements Jar {
     private Boolean multiRelease = null;
     private Map<String,String> mrMap = null;
 
+    /**
+     * Constructs a new {@code AbstractInputStreamJar} for the specified JAR file URL.
+     *
+     * @param jarFileUrl The URL for the JAR file
+     */
     public AbstractInputStreamJar(URL jarFileUrl) {
         this.jarFileURL = jarFileUrl;
     }
@@ -172,6 +177,9 @@ public abstract class AbstractInputStreamJar implements Jar {
     }
 
 
+    /**
+     * Closes the JAR input stream if it is open.
+     */
     protected void closeStream() {
         if (jarInputStream != null) {
             try {
@@ -183,6 +191,13 @@ public abstract class AbstractInputStreamJar implements Jar {
     }
 
 
+    /**
+     * Creates a new {@link NonClosingJarInputStream} for reading this JAR.
+     *
+     * @return a new {@code NonClosingJarInputStream}
+     *
+     * @throws IOException If an I/O error occurs while creating the input stream
+     */
     protected abstract NonClosingJarInputStream createJarInputStream() throws IOException;
 
 

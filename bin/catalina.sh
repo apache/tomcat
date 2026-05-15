@@ -564,7 +564,9 @@ elif [ "$1" = "configtest" ] ; then
 elif [ "$1" = "version" ] ; then
 
    eval "\"$_RUNJAVA\"" "$JAVA_OPTS" \
-         -classpath "\"$CATALINA_HOME/lib/catalina.jar\"" \
+         -classpath "\"$CATALINA_HOME/bin/tomcat-juli.jar:$CATALINA_HOME/lib/*\"" \
+         -Dcatalina.home="\"$CATALINA_HOME\"" \
+         -Dcatalina.base="\"$CATALINA_BASE\"" \
          org.apache.catalina.util.ServerInfo
 
 else

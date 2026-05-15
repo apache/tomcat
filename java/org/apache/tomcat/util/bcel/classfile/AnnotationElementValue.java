@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+/**
+ * Element value that represents an annotation.
+ */
 public class AnnotationElementValue extends ElementValue {
     // For annotation element values, this is the annotation
     private final AnnotationEntry annotationEntry;
@@ -28,6 +31,11 @@ public class AnnotationElementValue extends ElementValue {
         this.annotationEntry = annotationEntry;
     }
 
+    /**
+     * Gets the annotation entry.
+     *
+     * @return the annotation entry.
+     */
     public AnnotationEntry getAnnotationEntry() {
         return annotationEntry;
     }

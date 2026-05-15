@@ -51,19 +51,30 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     private static final Log log = LogFactory.getLog(ProxyErrorReportValve.class);
 
     /**
+     * Default constructor.
+     */
+    public ProxyErrorReportValve() {
+        super();
+    }
+
+    /**
      * Use a redirect or proxy the response to the specified location. Default to redirect.
      */
     protected boolean useRedirect = true;
 
     /**
-     * @return the useRedirect
+     * Returns whether a redirect is used to send the error report to the specified location.
+     *
+     * @return {@code true} if a redirect is used, {@code false} if a proxy is used
      */
     public boolean getUseRedirect() {
         return this.useRedirect;
     }
 
     /**
-     * @param useRedirect the useRedirect to set
+     * Sets whether to use a redirect or proxy for the error report.
+     *
+     * @param useRedirect {@code true} to use a redirect, {@code false} to use a proxy
      */
     public void setUseRedirect(boolean useRedirect) {
         this.useRedirect = useRedirect;
@@ -75,14 +86,18 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     protected boolean usePropertiesFile = false;
 
     /**
-     * @return the usePropertiesFile
+     * Returns whether a properties file is used to determine the redirect URLs.
+     *
+     * @return {@code true} if a properties file is used, {@code false} otherwise
      */
     public boolean getUsePropertiesFile() {
         return this.usePropertiesFile;
     }
 
     /**
-     * @param usePropertiesFile the usePropertiesFile to set
+     * Sets whether to use a properties file for the redirect URLs.
+     *
+     * @param usePropertiesFile {@code true} to use a properties file, {@code false} otherwise
      */
     public void setUsePropertiesFile(boolean usePropertiesFile) {
         this.usePropertiesFile = usePropertiesFile;
@@ -106,6 +121,13 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         return redirectUrl;
     }
 
+    /**
+     * Reports the error by redirecting or proxying to the configured error URL.
+     *
+     * @param request the servlet request
+     * @param response the servlet response
+     * @param throwable the exception that caused the error, or {@code null}
+     */
     @Override
     protected void report(Request request, Response response, Throwable throwable) {
 

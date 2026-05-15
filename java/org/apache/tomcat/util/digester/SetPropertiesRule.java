@@ -32,16 +32,36 @@ import org.xml.sax.Attributes;
 
 public class SetPropertiesRule extends Rule {
 
+    /**
+     * Callback interface for objects that need to be notified when all XML
+     * attributes have been processed by this rule.
+     */
     public interface Listener {
+        /**
+         * Called after all XML attributes have been set as properties on the
+         * target object.
+         */
         void endSetPropertiesRule();
     }
 
+    /**
+     * The set of property names to exclude from processing, or {@code null} if all properties should be processed.
+     */
     protected final HashMap<String,String> excludes;
 
+    /**
+     * Create a new SetPropertiesRule that will process all attributes.
+     */
     public SetPropertiesRule() {
         excludes = null;
     }
 
+    /**
+     * Create a new SetPropertiesRule that will exclude the specified property
+     * names from being set.
+     *
+     * @param exclude the property names to exclude
+     */
     public SetPropertiesRule(String[] exclude) {
         excludes = new HashMap<>();
         for (String s : exclude) {

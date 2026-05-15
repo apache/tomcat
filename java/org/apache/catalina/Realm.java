@@ -36,7 +36,9 @@ import org.ietf.jgss.GSSName;
 public interface Realm extends Contained {
 
     /**
-     * @return the CredentialHandler configured for this Realm.
+     * Returns the CredentialHandler configured for this Realm.
+     *
+     * @return the CredentialHandler configured for this Realm
      */
     CredentialHandler getCredentialHandler();
 

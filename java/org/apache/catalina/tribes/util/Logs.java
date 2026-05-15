@@ -20,8 +20,17 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Simple class that holds references to global loggers
+ * Simple class that holds references to global loggers.
  */
 public class Logs {
+    /**
+     * Default constructor.
+     */
+    public Logs() {
+    }
+
+    /**
+     * The global messages logger.
+     */
     public static final Log MESSAGES = LogFactory.getLog("org.apache.catalina.tribes.MESSAGES");
 }

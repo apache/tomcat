@@ -57,9 +57,21 @@ public class SSLHostConfig implements Serializable {
     // Must be lowercase. SSL host names are always stored using lower case as
     // they are case-insensitive but are used by case-sensitive code such as
     // keys in Maps.
+    /**
+     * Default SSL host name.
+     */
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
+    /**
+     * Set of all SSL protocols.
+     */
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
-    public static final String DEFAULT_TLS_CIPHERS_12 = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    /**
+     * Default cipher list for TLS 1.2 and below.
+     */
+    public static final String DEFAULT_TLS_CIPHERS_12 = "HIGH:!aNULL:!eNULL:!DES:!RC4:!MD5:!kRSA";
+    /**
+     * Default cipher suite list for TLS 1.3.
+     */
     public static final String DEFAULT_TLS_CIPHERS_13 = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256";
     /**
      * Default cipher list for TLS 1.2 and below.
@@ -79,111 +91,292 @@ public class SSLHostConfig implements Serializable {
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_3);
     }
 
+    /**
+     * The detected configuration type (JSSE or OpenSSL).
+     */
     private Type configType = null;
+    /**
+     * The detected trust configuration type (JSSE or OpenSSL).
+     */
     private Type trustConfigType = null;
 
+    /**
+     * The name of the virtual host.
+     */
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
+    /**
+     * The native OpenSSL configuration context pointer.
+     */
     private transient volatile Long openSslConfContext = Long.valueOf(0);
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is here at the virtual host level. JSSE can't so the
     // reference is held on the certificate.
+    /**
+     * The native OpenSSL SSL context pointer.
+     */
     private transient volatile Long openSslContext = Long.valueOf(0);
 
+    /**
+     * Whether TLS 1.3 renegotiation is available.
+     */
     private boolean tls13RenegotiationAvailable = false;
 
     // Configuration properties
 
     // Internal
+    /**
+     * The ciphers enabled by the SSL engine.
+     */
     private String[] enabledCiphers;
+    /**
+     * The protocols enabled by the SSL engine.
+     */
     private String[] enabledProtocols;
+    /**
+     * The JMX object name.
+     */
     private ObjectName oname;
     // Need to know if TLS 1.3 has been explicitly requested as a warning needs
     // to generated if it is explicitly requested for a JVM that does not
     // support it. Uses a set so it is extensible for TLS 1.4 etc.
+    /**
+     * The set of protocols explicitly requested by the user.
+     */
     private final Set<String> explicitlyRequestedProtocols = new HashSet<>();
     // Nested
+    /**
+     * The default certificate configuration.
+     */
     private SSLHostConfigCertificate defaultCertificate = null;
+    /**
+     * The set of certificate configurations.
+     */
     private final Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
     // Common
+    /**
+     * The path to the certificate revocation list file.
+     */
     private String certificateRevocationListFile;
+    /**
+     * The client certificate verification mode.
+     */
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
+    /**
+     * The depth for certificate chain verification.
+     */
     private int certificateVerificationDepth = 10;
     // Used to track if certificateVerificationDepth has been explicitly set
+    /**
+     * Whether the certificate verification depth was explicitly configured.
+     */
     private boolean certificateVerificationDepthConfigured = false;
+    /**
+     * The cipher configuration for TLS 1.2 and below (OpenSSL format).
+     */
     private String ciphers = DEFAULT_TLS_CIPHERS_12;
+    /**
+     * The cipher suite configuration for TLS 1.3.
+     */
     private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
+    /**
+     * The parsed cipher list for TLS 1.2 and below.
+     */
     private LinkedHashSet<Cipher> cipherList = null;
+    /**
+     * The parsed cipher suite list for TLS 1.3.
+     */
     private LinkedHashSet<Cipher> cipherSuiteList = null;
+    /**
+     * The JSSE cipher names derived from the configuration.
+     */
     private List<String> jsseCipherNames = null;
+    /**
+     * Whether to honor the server's cipher order preference.
+     */
     private boolean honorCipherOrder = false;
+    /**
+     * Whether OCSP stapling is enabled.
+     */
     private boolean ocspEnabled = false;
+    /**
+     * Whether OCSP soft fail is enabled.
+     */
     private boolean ocspSoftFail = true;
+    /**
+     * The OCSP request timeout in milliseconds.
+     */
     private int ocspTimeout = 15000;
+    /**
+     * The OCSP verification flags.
+     */
     private int ocspVerifyFlags = 0;
+    /**
+     * The set of enabled SSL/TLS protocols.
+     */
     private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
+    /**
+     * The SSL session cache size.
+     */
     private int sessionCacheSize = -1;
+    /**
+     * The SSL session timeout in seconds.
+     */
     private int sessionTimeout = 86400;
     // JSSE
+    /**
+     * The key manager algorithm.
+     */
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    /**
+     * Whether CRL/OCSP revocation checking is enabled.
+     */
     private boolean revocationEnabled = false;
+    /**
+     * The JSSE SSL protocol name.
+     */
     private String sslProtocol = Constants.SSL_PROTO_TLS;
+    /**
+     * The trust manager class name.
+     */
     private String trustManagerClassName;
+    /**
+     * The truststore algorithm.
+     */
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+    /**
+     * The truststore file path.
+     */
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    /**
+     * The truststore password.
+     */
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+    /**
+     * The truststore provider.
+     */
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
+    /**
+     * The truststore type.
+     */
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    /**
+     * The truststore instance.
+     */
     private transient KeyStore truststore = null;
-    private String groups = null;
+    /**
+     * The configured TLS named groups.
+     */
+    private String groups = System.getProperty("jdk.tls.namedGroups");
+    /**
+     * The parsed group list.
+     */
     private LinkedHashSet<Group> groupList = null;
     // OpenSSL
+    /**
+     * The path to the certificate revocation list directory.
+     */
     private String certificateRevocationListPath;
+    /**
+     * The path to the CA certificate file.
+     */
     private String caCertificateFile;
+    /**
+     * The path to the CA certificate directory.
+     */
     private String caCertificatePath;
+    /**
+     * Whether TLS compression is disabled.
+     */
     private boolean disableCompression = true;
+    /**
+     * Whether TLS session tickets are disabled.
+     */
     private boolean disableSessionTickets = false;
+    /**
+     * Whether insecure renegotiation is allowed.
+     */
     private boolean insecureRenegotiation = false;
+    /**
+     * The OpenSSL configuration.
+     */
     private OpenSSLConf openSslConf = null;
 
+    /**
+     * Default constructor.
+     */
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols(Constants.SSL_PROTO_ALL);
     }
 
 
+    /**
+     * Returns whether TLS 1.3 renegotiation is available.
+     *
+     * @return {@code true} if TLS 1.3 renegotiation is available
+     */
     public boolean isTls13RenegotiationAvailable() {
         return tls13RenegotiationAvailable;
     }
 
 
+    /**
+     * Sets whether TLS 1.3 renegotiation is available.
+     *
+     * @param tls13RenegotiationAvailable {@code true} if TLS 1.3 renegotiation is available
+     */
     public void setTls13RenegotiationAvailable(boolean tls13RenegotiationAvailable) {
         this.tls13RenegotiationAvailable = tls13RenegotiationAvailable;
     }
 
 
+    /**
+     * Returns the OpenSSL configuration context pointer.
+     *
+     * @return the OpenSSL configuration context pointer
+     */
     public Long getOpenSslConfContext() {
         return openSslConfContext;
     }
 
 
+    /**
+     * Sets the OpenSSL configuration context pointer.
+     *
+     * @param openSslConfContext the OpenSSL configuration context pointer
+     */
     public void setOpenSslConfContext(Long openSslConfContext) {
         this.openSslConfContext = openSslConfContext;
     }
 
 
+    /**
+     * Returns the OpenSSL context pointer.
+     *
+     * @return the OpenSSL context pointer
+     */
     public Long getOpenSslContext() {
         return openSslContext;
     }
 
 
+    /**
+     * Sets the OpenSSL context pointer.
+     *
+     * @param openSslContext the OpenSSL context pointer
+     */
     public void setOpenSslContext(Long openSslContext) {
         this.openSslContext = openSslContext;
     }
 
 
-    // Expose in String form for JMX
+    /**
+     * Expose in String form for JMX.
+     *
+     * @return the configuration type as a string
+     */
     public String getConfigType() {
         return configType.name();
     }
@@ -235,6 +428,8 @@ public class SSLHostConfig implements Serializable {
     // ----------------------------------------------------- Internal properties
 
     /**
+     * Returns the protocols enabled for this TLS virtual host.
+     *
      * @see SSLUtil#getEnabledProtocols()
      *
      * @return The protocols enabled for this TLS virtual host
@@ -244,12 +439,19 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Sets the protocols enabled for this TLS virtual host.
+     *
+     * @param enabledProtocols the protocols to enable
+     */
     public void setEnabledProtocols(String[] enabledProtocols) {
         this.enabledProtocols = enabledProtocols;
     }
 
 
     /**
+     * Returns the ciphers enabled for this TLS virtual host.
+     *
      * @see SSLUtil#getEnabledCiphers()
      *
      * @return The ciphers enabled for this TLS virtual host
@@ -259,16 +461,31 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Sets the ciphers enabled for this TLS virtual host.
+     *
+     * @param enabledCiphers the ciphers to enable
+     */
     public void setEnabledCiphers(String[] enabledCiphers) {
         this.enabledCiphers = enabledCiphers;
     }
 
 
+    /**
+     * Returns the JMX object name.
+     *
+     * @return the object name
+     */
     public ObjectName getObjectName() {
         return oname;
     }
 
 
+    /**
+     * Sets the JMX object name.
+     *
+     * @param oname the object name
+     */
     public void setObjectName(ObjectName oname) {
         this.oname = oname;
     }
@@ -286,6 +503,11 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Adds a certificate to this SSL host configuration.
+     *
+     * @param certificate the certificate to add
+     */
     public void addCertificate(SSLHostConfigCertificate certificate) {
         // Need to make sure that if there is more than one certificate, none of
         // them have a type of undefined.
@@ -305,11 +527,21 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the OpenSSL configuration.
+     *
+     * @return the OpenSSL configuration
+     */
     public OpenSSLConf getOpenSslConf() {
         return openSslConf;
     }
 
 
+    /**
+     * Sets the OpenSSL configuration.
+     *
+     * @param conf the OpenSSL configuration
+     */
     public void setOpenSslConf(OpenSSLConf conf) {
         if (conf == null) {
             throw new IllegalArgumentException(sm.getString("sslHostConfig.opensslconf.null"));
@@ -320,11 +552,22 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the set of certificates.
+     *
+     * @return the certificates
+     */
     public Set<SSLHostConfigCertificate> getCertificates() {
         return getCertificates(false);
     }
 
 
+    /**
+     * Returns the set of certificates, optionally creating a default if empty.
+     *
+     * @param createDefaultIfEmpty {@code true} to create a default certificate if the set is empty
+     * @return the certificates
+     */
     public Set<SSLHostConfigCertificate> getCertificates(boolean createDefaultIfEmpty) {
         if (certificates.isEmpty() && createDefaultIfEmpty) {
             registerDefaultCertificate();
@@ -335,16 +578,31 @@ public class SSLHostConfig implements Serializable {
 
     // ----------------------------------------- Common configuration properties
 
+    /**
+     * Sets the certificate revocation list file.
+     *
+     * @param certificateRevocationListFile the certificate revocation list file
+     */
     public void setCertificateRevocationListFile(String certificateRevocationListFile) {
         this.certificateRevocationListFile = certificateRevocationListFile;
     }
 
 
+    /**
+     * Returns the certificate revocation list file.
+     *
+     * @return the certificate revocation list file
+     */
     public String getCertificateRevocationListFile() {
         return certificateRevocationListFile;
     }
 
 
+    /**
+     * Sets the certificate verification mode.
+     *
+     * @param certificateVerification the certificate verification mode
+     */
     public void setCertificateVerification(String certificateVerification) {
         try {
             this.certificateVerification = CertificateVerification.fromString(certificateVerification);
@@ -357,32 +615,62 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the certificate verification mode.
+     *
+     * @return the certificate verification mode
+     */
     public CertificateVerification getCertificateVerification() {
         return certificateVerification;
     }
 
 
+    /**
+     * Sets the certificate verification mode as a string.
+     *
+     * @param certificateVerification the certificate verification mode
+     */
     public void setCertificateVerificationAsString(String certificateVerification) {
         setCertificateVerification(certificateVerification);
     }
 
 
+    /**
+     * Returns the certificate verification mode as a string.
+     *
+     * @return the certificate verification mode as a string
+     */
     public String getCertificateVerificationAsString() {
         return certificateVerification.toString();
     }
 
 
+    /**
+     * Sets the certificate verification depth.
+     *
+     * @param certificateVerificationDepth the certificate verification depth
+     */
     public void setCertificateVerificationDepth(int certificateVerificationDepth) {
         this.certificateVerificationDepth = certificateVerificationDepth;
         certificateVerificationDepthConfigured = true;
     }
 
 
+    /**
+     * Returns the certificate verification depth.
+     *
+     * @return the certificate verification depth
+     */
     public int getCertificateVerificationDepth() {
         return certificateVerificationDepth;
     }
 
 
+    /**
+     * Returns whether the certificate verification depth has been configured.
+     *
+     * @return {@code true} if the certificate verification depth has been configured
+     */
     public boolean isCertificateVerificationDepthConfigured() {
         return certificateVerificationDepthConfigured;
     }
@@ -449,6 +737,8 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
+     * Returns the cipher (TLSv1.2 and below) configuration.
+     *
      * @return An OpenSSL cipher string for the current configuration.
      */
     public String getCiphers() {
@@ -456,6 +746,11 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the list of configured ciphers.
+     *
+     * @return the cipher list
+     */
     public LinkedHashSet<Cipher> getCipherList() {
         if (cipherList == null) {
             cipherList = OpenSSLCipherConfigurationParser.parse(getCiphers());
@@ -466,13 +761,13 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Obtain the list of JSSE cipher names for the current configuration. Ciphers included in the configuration but not
-     * supported by JSSE will be excluded from this list.
+     * supported by JSSE will be excluded from this list. TLS 1.3 ciphers will be first in the list.
      *
      * @return A list of the JSSE cipher names
      */
     public List<String> getJsseCipherNames() {
         if (jsseCipherNames == null) {
-            Set<Cipher> jsseCiphers = new HashSet<>();
+            Set<Cipher> jsseCiphers = new LinkedHashSet<>();
             jsseCiphers.addAll(getCipherSuiteList());
             jsseCiphers.addAll(getCipherList());
             jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(jsseCiphers);
@@ -542,22 +837,39 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Sets whether to honor the cipher order.
+     *
+     * @param honorCipherOrder {@code true} to honor the cipher order
+     */
     public void setHonorCipherOrder(boolean honorCipherOrder) {
         this.honorCipherOrder = honorCipherOrder;
     }
 
 
+    /**
+     * Returns whether to honor the cipher order.
+     *
+     * @return {@code true} to honor the cipher order
+     */
     public boolean getHonorCipherOrder() {
         return honorCipherOrder;
     }
 
 
+    /**
+     * Sets the host name.
+     *
+     * @param hostName the host name
+     */
     public void setHostName(String hostName) {
         this.hostName = hostName.toLowerCase(Locale.ENGLISH);
     }
 
 
     /**
+     * Returns the host name associated with this SSL configuration.
+     *
      * @return The host name associated with this SSL configuration - always in lower case.
      */
     public String getHostName() {
@@ -565,46 +877,91 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns whether OCSP is enabled.
+     *
+     * @return {@code true} if OCSP is enabled
+     */
     public boolean getOcspEnabled() {
         return ocspEnabled;
     }
 
 
+    /**
+     * Sets whether OCSP is enabled.
+     *
+     * @param ocspEnabled {@code true} if OCSP is enabled
+     */
     public void setOcspEnabled(boolean ocspEnabled) {
         this.ocspEnabled = ocspEnabled;
     }
 
 
+    /**
+     * Returns whether OCSP soft fail is enabled.
+     *
+     * @return {@code true} if OCSP soft fail is enabled
+     */
     public boolean getOcspSoftFail() {
         return ocspSoftFail;
     }
 
 
+    /**
+     * Sets whether OCSP soft fail is enabled.
+     *
+     * @param ocspSoftFail {@code true} if OCSP soft fail is enabled
+     */
     public void setOcspSoftFail(boolean ocspSoftFail) {
         this.ocspSoftFail = ocspSoftFail;
     }
 
 
+    /**
+     * Returns the OCSP timeout.
+     *
+     * @return the OCSP timeout
+     */
     public int getOcspTimeout() {
         return ocspTimeout;
     }
 
 
+    /**
+     * Sets the OCSP timeout.
+     *
+     * @param ocspTimeout the OCSP timeout
+     */
     public void setOcspTimeout(int ocspTimeout) {
         this.ocspTimeout = ocspTimeout;
     }
 
 
+    /**
+     * Returns the OCSP verify flags.
+     *
+     * @return the OCSP verify flags
+     */
     public int getOcspVerifyFlags() {
         return ocspVerifyFlags;
     }
 
 
+    /**
+     * Sets the OCSP verify flags.
+     *
+     * @param ocspVerifyFlags the OCSP verify flags
+     */
     public void setOcspVerifyFlags(int ocspVerifyFlags) {
         this.ocspVerifyFlags = ocspVerifyFlags;
     }
 
 
+    /**
+     * Sets the protocols to be used.
+     *
+     * @param input the protocol string
+     */
     public void setProtocols(String input) {
         protocols.clear();
         explicitlyRequestedProtocols.clear();
@@ -659,6 +1016,11 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the configured protocols.
+     *
+     * @return the protocols
+     */
     public Set<String> getProtocols() {
         return protocols;
     }
@@ -669,27 +1031,49 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Sets the session cache size.
+     *
+     * @param sessionCacheSize the session cache size
+     */
     public void setSessionCacheSize(int sessionCacheSize) {
         this.sessionCacheSize = sessionCacheSize;
     }
 
 
+    /**
+     * Returns the session cache size.
+     *
+     * @return the session cache size
+     */
     public int getSessionCacheSize() {
         return sessionCacheSize;
     }
 
 
+    /**
+     * Sets the session timeout.
+     *
+     * @param sessionTimeout the session timeout
+     */
     public void setSessionTimeout(int sessionTimeout) {
         this.sessionTimeout = sessionTimeout;
     }
 
 
+    /**
+     * Returns the session timeout.
+     *
+     * @return the session timeout
+     */
     public int getSessionTimeout() {
         return sessionTimeout;
     }
 
 
     /**
+     * Returns the configured named groups.
+     *
      * @return the configured named groups
      */
     public String getGroups() {
@@ -700,26 +1084,36 @@ public class SSLHostConfig implements Serializable {
     /**
      * Set the enabled named groups.
      *
-     * @param groupsString the case sensitive comma separated list of groups
+     * @param groups the case sensitive comma separated list of groups
      */
-    public void setGroups(String groupsString) {
-        if (groupsString != null) {
-            LinkedHashSet<Group> groupList = new LinkedHashSet<>();
-            String[] groupNames = groupsString.split(",");
-            for (String groupName : groupNames) {
-                Group group = Group.valueOf(groupName.trim());
-                groupList.add(group);
-            }
-            this.groups = groupsString;
-            this.groupList = groupList;
-        }
+    public void setGroups(String groups) {
+        this.groups = groups;
+        this.groupList = null;
     }
 
 
     /**
+     * Returns the parsed group list.
+     *
      * @return the groupList
      */
     public LinkedHashSet<Group> getGroupList() {
+        if (groupList == null) {
+            String groups = this.groups;
+            if (groups != null) {
+                LinkedHashSet<Group> groupList = new LinkedHashSet<>();
+                String[] groupNames = groups.split(",");
+                for (String groupName : groupNames) {
+                    try {
+                        Group group = Group.valueOf(groupName.trim());
+                        groupList.add(group);
+                    } catch (IllegalArgumentException e) {
+                        log.warn(sm.getString("sslHostConfig.unknownGroup", groupName));
+                    }
+                }
+                this.groupList = groupList;
+            }
+        }
         return this.groupList;
     }
 
@@ -727,89 +1121,169 @@ public class SSLHostConfig implements Serializable {
     // ---------------------------------- JSSE specific configuration properties
 
 
+    /**
+     * Sets the key manager algorithm.
+     *
+     * @param keyManagerAlgorithm the key manager algorithm
+     */
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
         setProperty("keyManagerAlgorithm", Type.JSSE);
         this.keyManagerAlgorithm = keyManagerAlgorithm;
     }
 
 
+    /**
+     * Returns the key manager algorithm.
+     *
+     * @return the key manager algorithm
+     */
     public String getKeyManagerAlgorithm() {
         return keyManagerAlgorithm;
     }
 
 
+    /**
+     * Sets whether revocation checking is enabled.
+     *
+     * @param revocationEnabled {@code true} if revocation checking is enabled
+     */
     public void setRevocationEnabled(boolean revocationEnabled) {
         setProperty("revocationEnabled", Type.JSSE);
         this.revocationEnabled = revocationEnabled;
     }
 
 
+    /**
+     * Returns whether revocation checking is enabled.
+     *
+     * @return {@code true} if revocation checking is enabled
+     */
     public boolean getRevocationEnabled() {
         return revocationEnabled;
     }
 
 
+    /**
+     * Sets the SSL protocol.
+     *
+     * @param sslProtocol the SSL protocol
+     */
     public void setSslProtocol(String sslProtocol) {
         setProperty("sslProtocol", Type.JSSE);
         this.sslProtocol = sslProtocol;
     }
 
 
+    /**
+     * Returns the SSL protocol.
+     *
+     * @return the SSL protocol
+     */
     public String getSslProtocol() {
         return sslProtocol;
     }
 
 
+    /**
+     * Sets the trust manager class name.
+     *
+     * @param trustManagerClassName the trust manager class name
+     */
     public void setTrustManagerClassName(String trustManagerClassName) {
         setTrustProperty("trustManagerClassName", Type.JSSE);
         this.trustManagerClassName = trustManagerClassName;
     }
 
 
+    /**
+     * Returns the trust manager class name.
+     *
+     * @return the trust manager class name
+     */
     public String getTrustManagerClassName() {
         return trustManagerClassName;
     }
 
 
+    /**
+     * Sets the truststore algorithm.
+     *
+     * @param truststoreAlgorithm the truststore algorithm
+     */
     public void setTruststoreAlgorithm(String truststoreAlgorithm) {
         setTrustProperty("truststoreAlgorithm", Type.JSSE);
         this.truststoreAlgorithm = truststoreAlgorithm;
     }
 
 
+    /**
+     * Returns the truststore algorithm.
+     *
+     * @return the truststore algorithm
+     */
     public String getTruststoreAlgorithm() {
         return truststoreAlgorithm;
     }
 
 
+    /**
+     * Sets the truststore file.
+     *
+     * @param truststoreFile the truststore file
+     */
     public void setTruststoreFile(String truststoreFile) {
         setTrustProperty("truststoreFile", Type.JSSE);
         this.truststoreFile = truststoreFile;
     }
 
 
+    /**
+     * Returns the truststore file.
+     *
+     * @return the truststore file
+     */
     public String getTruststoreFile() {
         return truststoreFile;
     }
 
 
+    /**
+     * Sets the truststore password.
+     *
+     * @param truststorePassword the truststore password
+     */
     public void setTruststorePassword(String truststorePassword) {
         setTrustProperty("truststorePassword", Type.JSSE);
         this.truststorePassword = truststorePassword;
     }
 
 
+    /**
+     * Returns the truststore password.
+     *
+     * @return the truststore password
+     */
     public String getTruststorePassword() {
         return truststorePassword;
     }
 
 
+    /**
+     * Sets the truststore provider.
+     *
+     * @param truststoreProvider the truststore provider
+     */
     public void setTruststoreProvider(String truststoreProvider) {
         setTrustProperty("truststoreProvider", Type.JSSE);
         this.truststoreProvider = truststoreProvider;
     }
 
 
+    /**
+     * Returns the truststore provider.
+     *
+     * @return the truststore provider
+     */
     public String getTruststoreProvider() {
         if (truststoreProvider == null) {
             Set<SSLHostConfigCertificate> certificates = getCertificates();
@@ -823,12 +1297,22 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+ /**
+     * Sets the truststore type.
+     *
+     * @param truststoreType the truststore type
+     */
     public void setTruststoreType(String truststoreType) {
         setTrustProperty("truststoreType", Type.JSSE);
         this.truststoreType = truststoreType;
     }
 
 
+    /**
+     * Returns the truststore type.
+     *
+     * @return the truststore type
+     */
     public String getTruststoreType() {
         if (truststoreType == null) {
             Set<SSLHostConfigCertificate> certificates = getCertificates();
@@ -847,12 +1331,24 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Sets the truststore.
+     *
+     * @param truststore the truststore
+     */
     public void setTrustStore(KeyStore truststore) {
         setTrustProperty("trustStore", Type.JSSE);
         this.truststore = truststore;
     }
 
 
+    /**
+     * Returns the truststore.
+     *
+     * @return the truststore
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public KeyStore getTruststore() throws IOException {
         KeyStore result = truststore;
         if (result == null) {
@@ -881,17 +1377,32 @@ public class SSLHostConfig implements Serializable {
 
     // ------------------------------- OpenSSL specific configuration properties
 
+    /**
+     * Sets the certificate revocation list path.
+     *
+     * @param certificateRevocationListPath the certificate revocation list path
+     */
     public void setCertificateRevocationListPath(String certificateRevocationListPath) {
         setProperty("certificateRevocationListPath", Type.OPENSSL);
         this.certificateRevocationListPath = certificateRevocationListPath;
     }
 
 
+    /**
+     * Returns the certificate revocation list path.
+     *
+     * @return the certificate revocation list path
+     */
     public String getCertificateRevocationListPath() {
         return certificateRevocationListPath;
     }
 
 
+    /**
+     * Sets the CA certificate file.
+     *
+     * @param caCertificateFile the CA certificate file
+     */
     public void setCaCertificateFile(String caCertificateFile) {
         if (setTrustProperty("caCertificateFile", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
@@ -903,11 +1414,21 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the CA certificate file.
+     *
+     * @return the CA certificate file
+     */
     public String getCaCertificateFile() {
         return caCertificateFile;
     }
 
 
+    /**
+     * Sets the CA certificate path.
+     *
+     * @param caCertificatePath the CA certificate path
+     */
     public void setCaCertificatePath(String caCertificatePath) {
         if (setTrustProperty("caCertificatePath", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
@@ -919,39 +1440,74 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the CA certificate path.
+     *
+     * @return the CA certificate path
+     */
     public String getCaCertificatePath() {
         return caCertificatePath;
     }
 
 
+    /**
+     * Sets whether compression is disabled.
+     *
+     * @param disableCompression {@code true} if compression is disabled
+     */
     public void setDisableCompression(boolean disableCompression) {
         setProperty("disableCompression", Type.OPENSSL);
         this.disableCompression = disableCompression;
     }
 
 
+    /**
+     * Returns whether compression is disabled.
+     *
+     * @return {@code true} if compression is disabled
+     */
     public boolean getDisableCompression() {
         return disableCompression;
     }
 
 
+    /**
+     * Sets whether session tickets are disabled.
+     *
+     * @param disableSessionTickets {@code true} if session tickets are disabled
+     */
     public void setDisableSessionTickets(boolean disableSessionTickets) {
         setProperty("disableSessionTickets", Type.OPENSSL);
         this.disableSessionTickets = disableSessionTickets;
     }
 
 
+    /**
+     * Returns whether session tickets are disabled.
+     *
+     * @return {@code true} if session tickets are disabled
+     */
     public boolean getDisableSessionTickets() {
         return disableSessionTickets;
     }
 
 
+    /**
+     * Sets whether insecure renegotiation is allowed.
+     *
+     * @param insecureRenegotiation {@code true} if insecure renegotiation is allowed
+     */
     public void setInsecureRenegotiation(boolean insecureRenegotiation) {
         setProperty("insecureRenegotiation", Type.OPENSSL);
         this.insecureRenegotiation = insecureRenegotiation;
     }
 
 
+    /**
+     * Returns whether insecure renegotiation is allowed.
+     *
+     * @return {@code true} if insecure renegotiation is allowed
+     */
     public boolean getInsecureRenegotiation() {
         return insecureRenegotiation;
     }
@@ -959,6 +1515,13 @@ public class SSLHostConfig implements Serializable {
 
     // --------------------------------------------------------- Support methods
 
+    /**
+     * Returns the set of certificates that expire before the given date.
+     *
+     * @param date the date to check against
+     *
+     * @return the set of certificates expiring before the given date
+     */
     public Set<X509Certificate> certificatesExpiringBefore(Date date) {
         Set<X509Certificate> result = new HashSet<>();
         Set<SSLHostConfigCertificate> sslHostConfigCertificates = getCertificates();
@@ -983,6 +1546,15 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Adjusts a relative path to an absolute path based on the CATALINA_BASE property.
+     *
+     * @param path the path to adjust
+     *
+     * @return the adjusted path
+     *
+     * @throws FileNotFoundException if the file does not exist
+     */
     public static String adjustRelativePath(String path) throws FileNotFoundException {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
@@ -1004,28 +1576,72 @@ public class SSLHostConfig implements Serializable {
 
     // ----------------------------------------------------------- Inner classes
 
+    /**
+     * SSL configuration type.
+     */
     public enum Type {
+        /**
+         * JSSE configuration.
+         */
         JSSE,
+        /**
+         * OpenSSL configuration.
+         */
         OPENSSL
     }
 
 
+    /**
+     * Certificate verification levels.
+     */
     public enum CertificateVerification {
+        /**
+         * No certificate verification.
+         */
         NONE(false),
+        /**
+         * Optional verification without CA check.
+         */
         OPTIONAL_NO_CA(true),
+        /**
+         * Optional verification.
+         */
         OPTIONAL(true),
+        /**
+         * Required verification.
+         */
         REQUIRED(false);
 
+        /**
+         * Whether the verification is optional.
+         */
         private final boolean optional;
 
+        /**
+         * Constructor.
+         *
+         * @param optional whether the verification is optional
+         */
         CertificateVerification(boolean optional) {
             this.optional = optional;
         }
 
+        /**
+         * Returns whether this verification level is optional.
+         *
+         * @return {@code true} if optional
+         */
         public boolean isOptional() {
             return optional;
         }
 
+        /**
+         * Creates a CertificateVerification from a string value.
+         *
+         * @param value the string value
+         *
+         * @return the corresponding CertificateVerification
+         */
         public static CertificateVerification fromString(String value) {
             if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "require".equalsIgnoreCase(value) ||
                     "required".equalsIgnoreCase(value)) {

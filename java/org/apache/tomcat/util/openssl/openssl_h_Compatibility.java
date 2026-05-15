@@ -22,7 +22,6 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version;
 import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version_num;
-import static org.apache.tomcat.util.openssl.openssl_h.SSL_get1_peer_certificate;
 
 /**
  * Methods used present in older OpenSSL versions but not in the current major version or OpenSSL derivatives.
@@ -31,6 +30,7 @@ import static org.apache.tomcat.util.openssl.openssl_h.SSL_get1_peer_certificate
 public class openssl_h_Compatibility {
 
     public static final boolean OPENSSL;
+    public static final boolean OPENSSL1;
     public static final boolean OPENSSL3;
     public static final boolean BORINGSSL;
     public static final boolean LIBRESSL;
@@ -41,6 +41,7 @@ public class openssl_h_Compatibility {
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
+        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x3000000fL;
         OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
@@ -149,22 +150,23 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 SSL_get_peer_certificate
     public static MemorySegment SSL_get_peer_certificate(MemorySegment s) {
         if (OPENSSL3) {
-            return SSL_get1_peer_certificate(s);
-        } else {
-            class Holder {
-                static final String NAME = "SSL_get_peer_certificate";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
-                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            // This could be using SSL_get1_peer_certificate instead, as all the other implementations
+            // use SSL_get_peer_certificate which is equivalent to SSL_get1_peer_certificate
+            return MemorySegment.NULL;
+        }
+        class Holder {
+            static final String NAME = "SSL_get_peer_certificate";
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME, s);
             }
-            var mh$ = Holder.MH;
-            try {
-                if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, s);
-                }
-                return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
-            } catch (Throwable ex$) {
-                throw new AssertionError("should not reach here", ex$);
-            }
+            return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 

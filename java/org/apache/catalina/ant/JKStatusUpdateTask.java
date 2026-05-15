@@ -57,7 +57,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     private String workerLb;
 
     /**
-     *
+     * Constructs a new JKStatusUpdateTask.
      */
     public JKStatusUpdateTask() {
         super();
@@ -65,182 +65,234 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the internalid.
+     * Get the internal ID.
+     *
+     * @return the internal ID
      */
     public int getInternalid() {
         return internalid;
     }
 
     /**
-     * @param internalid The internalid to set.
+     * Set the internal ID.
+     *
+     * @param internalid the internal ID to set
      */
     public void setInternalid(int internalid) {
         this.internalid = internalid;
     }
 
     /**
-     * @return Returns the lbForceSession.
+     * Get the lbForceSession flag.
+     *
+     * @return the lbForceSession flag
      */
     public Boolean getLbForceSession() {
         return lbForceSession;
     }
 
     /**
-     * @param lbForceSession The lbForceSession to set.
+     * Set the lbForceSession flag.
+     *
+     * @param lbForceSession the value to set
      */
     public void setLbForceSession(Boolean lbForceSession) {
         this.lbForceSession = lbForceSession;
     }
 
     /**
-     * @return Returns the lbRecovertime.
+     * Get the lbRecovertime value.
+     *
+     * @return the lbRecovertime value
      */
     public Integer getLbRecovertime() {
         return lbRecovertime;
     }
 
     /**
-     * @param lbRecovertime The lbRecovertime to set.
+     * Set the lbRecovertime value.
+     *
+     * @param lbRecovertime the value to set
      */
     public void setLbRecovertime(Integer lbRecovertime) {
         this.lbRecovertime = lbRecovertime;
     }
 
     /**
-     * @return Returns the lbRetries.
+     * Get the lbRetries value.
+     *
+     * @return the lbRetries value
      */
     public Integer getLbRetries() {
         return lbRetries;
     }
 
     /**
-     * @param lbRetries The lbRetries to set.
+     * Set the lbRetries value.
+     *
+     * @param lbRetries the value to set
      */
     public void setLbRetries(Integer lbRetries) {
         this.lbRetries = lbRetries;
     }
 
     /**
-     * @return Returns the lbStickySession.
+     * Get the lbStickySession flag.
+     *
+     * @return the lbStickySession flag
      */
     public Boolean getLbStickySession() {
         return lbStickySession;
     }
 
     /**
-     * @param lbStickySession The lbStickySession to set.
+     * Set the lbStickySession flag.
+     *
+     * @param lbStickySession the value to set
      */
     public void setLbStickySession(Boolean lbStickySession) {
         this.lbStickySession = lbStickySession;
     }
 
     /**
-     * @return Returns the worker.
+     * Get the worker name.
+     *
+     * @return the worker name
      */
     public String getWorker() {
         return worker;
     }
 
     /**
-     * @param worker The worker to set.
+     * Set the worker name.
+     *
+     * @param worker the worker name to set
      */
     public void setWorker(String worker) {
         this.worker = worker;
     }
 
     /**
-     * @return Returns the workerType.
+     * Get the worker type.
+     *
+     * @return the worker type
      */
     public String getWorkerType() {
         return workerType;
     }
 
     /**
-     * @param workerType The workerType to set.
+     * Set the worker type.
+     *
+     * @param workerType the worker type to set
      */
     public void setWorkerType(String workerType) {
         this.workerType = workerType;
     }
 
     /**
-     * @return Returns the workerLb.
+     * Get the worker load balancing configuration.
+     *
+     * @return the worker load balancing configuration
      */
     public String getWorkerLb() {
         return workerLb;
     }
 
     /**
-     * @param workerLb The workerLb to set.
+     * Set the worker load balancing configuration.
+     *
+     * @param workerLb the value to set
      */
     public void setWorkerLb(String workerLb) {
         this.workerLb = workerLb;
     }
 
     /**
-     * @return Returns the workerClusterDomain.
+     * Get the worker cluster domain.
+     *
+     * @return the worker cluster domain
      */
     public String getWorkerClusterDomain() {
         return workerClusterDomain;
     }
 
     /**
-     * @param workerClusterDomain The workerClusterDomain to set.
+     * Set the worker cluster domain.
+     *
+     * @param workerClusterDomain the value to set
      */
     public void setWorkerClusterDomain(String workerClusterDomain) {
         this.workerClusterDomain = workerClusterDomain;
     }
 
     /**
-     * @return Returns the workerDisabled.
+     * Get the worker disabled flag.
+     *
+     * @return the worker disabled flag
      */
     public Boolean getWorkerDisabled() {
         return workerDisabled;
     }
 
     /**
-     * @param workerDisabled The workerDisabled to set.
+     * Set the worker disabled flag.
+     *
+     * @param workerDisabled the value to set
      */
     public void setWorkerDisabled(Boolean workerDisabled) {
         this.workerDisabled = workerDisabled;
     }
 
     /**
-     * @return Returns the workerStopped.
+     * Get the worker stopped flag.
+     *
+     * @return the worker stopped flag
      */
     public Boolean getWorkerStopped() {
         return workerStopped;
     }
 
     /**
-     * @param workerStopped The workerStopped to set.
+     * Set the worker stopped flag.
+     *
+     * @param workerStopped the value to set
      */
     public void setWorkerStopped(Boolean workerStopped) {
         this.workerStopped = workerStopped;
     }
 
     /**
-     * @return Returns the workerLoadFactor.
+     * Get the worker load factor.
+     *
+     * @return the worker load factor
      */
     public Integer getWorkerLoadFactor() {
         return workerLoadFactor;
     }
 
     /**
-     * @param workerLoadFactor The workerLoadFactor to set.
+     * Set the worker load factor.
+     *
+     * @param workerLoadFactor the value to set
      */
     public void setWorkerLoadFactor(Integer workerLoadFactor) {
         this.workerLoadFactor = workerLoadFactor;
     }
 
     /**
-     * @return Returns the workerRedirect.
+     * Get the worker redirect target.
+     *
+     * @return the worker redirect target
      */
     public String getWorkerRedirect() {
         return workerRedirect;
     }
 
     /**
-     * @param workerRedirect The workerRedirect to set.
+     * Set the worker redirect target.
+     *
+     * @param workerRedirect the value to set
      */
     public void setWorkerRedirect(String workerRedirect) {
         this.workerRedirect = workerRedirect;

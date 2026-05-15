@@ -44,8 +44,14 @@ import org.apache.tools.ant.types.FileSet;
  * While originally written to address an issue with Javadoc output, this task takes a generic approach that could be
  * used with any archive. The task takes a set of zip (or jar, war etc) files as its input and sets the last modified
  * time of every file in the archive to be the same as the last modified time of the archive.
- */
+  */
 public class RepeatableArchive extends Task {
+
+    /**
+     * Default constructor.
+     */
+    public RepeatableArchive() {
+    }
 
     private final List<FileSet> filesets = new ArrayList<>();
 
@@ -62,11 +68,21 @@ public class RepeatableArchive extends Task {
     }
 
 
+    /**
+     * Set the datetime string.
+     *
+     * @param datetime the datetime string
+     */
     public void setDatetime(String datetime) {
         this.datetime = datetime;
     }
 
 
+    /**
+     * Set the datetime pattern.
+     *
+     * @param pattern the datetime pattern
+     */
     public void setPattern(String pattern) {
         this.pattern = pattern;
     }

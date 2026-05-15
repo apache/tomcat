@@ -124,6 +124,13 @@ public class FilterUtil {
     }
 
 
+    /**
+     * Returns the request path from the dispatcher request path attribute.
+     *
+     * @param request The servlet request
+     *
+     * @return The request path, or {@code null} if not available
+     */
     public static String getRequestPath(ServletRequest request) {
         String result = null;
         Object attribute = request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);

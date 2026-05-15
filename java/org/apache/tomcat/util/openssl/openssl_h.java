@@ -5946,50 +5946,50 @@ public class openssl_h {
         }
     }
 
-    private static class SSL_get1_peer_certificate {
+    private static class SSL_get0_peer_certificate {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get1_peer_certificate");
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get0_peer_certificate");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
      * Function descriptor for:
-     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get0_peer_certificate(const SSL *s)
      * }
      */
-    public static FunctionDescriptor SSL_get1_peer_certificate$descriptor() {
-        return SSL_get1_peer_certificate.DESC;
+    public static FunctionDescriptor SSL_get0_peer_certificate$descriptor() {
+        return SSL_get0_peer_certificate.DESC;
     }
 
     /**
      * Downcall method handle for:
-     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get0_peer_certificate(const SSL *s)
      * }
      */
-    public static MethodHandle SSL_get1_peer_certificate$handle() {
-        return SSL_get1_peer_certificate.HANDLE;
+    public static MethodHandle SSL_get0_peer_certificate$handle() {
+        return SSL_get0_peer_certificate.HANDLE;
     }
 
     /**
      * Address for:
-     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get0_peer_certificate(const SSL *s)
      * }
      */
-    public static MemorySegment SSL_get1_peer_certificate$address() {
-        return SSL_get1_peer_certificate.ADDR;
+    public static MemorySegment SSL_get0_peer_certificate$address() {
+        return SSL_get0_peer_certificate.ADDR;
     }
 
     /**
-     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get0_peer_certificate(const SSL *s)
      * }
      */
-    public static MemorySegment SSL_get1_peer_certificate(MemorySegment s) {
-        var mh$ = SSL_get1_peer_certificate.HANDLE;
+    public static MemorySegment SSL_get0_peer_certificate(MemorySegment s) {
+        var mh$ = SSL_get0_peer_certificate.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("SSL_get1_peer_certificate", s);
+                traceDowncall("SSL_get0_peer_certificate", s);
             }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {

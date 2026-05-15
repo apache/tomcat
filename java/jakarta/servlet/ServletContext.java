@@ -551,7 +551,7 @@ public interface ServletContext {
      *
      * @since Servlet 3.0
      */
-    Map<String,? extends ServletRegistration> getServletRegistrations();
+    Map<String, ? extends ServletRegistration> getServletRegistrations();
 
     /**
      * Add filter to context.
@@ -644,11 +644,11 @@ public interface ServletContext {
     <T extends Filter> T createFilter(Class<T> c) throws ServletException;
 
     /**
-     * TODO SERVLET3 - Add comments
+     * Returns the {@link FilterRegistration} for the given filter, or <code>null</code> if no such filter exists.
      *
-     * @param filterName TODO
+     * @param filterName The name of the filter for which to return the registration
      *
-     * @return TODO
+     * @return The {@link FilterRegistration} for the given filter, or <code>null</code> if no such filter exists
      *
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -663,7 +663,10 @@ public interface ServletContext {
     FilterRegistration getFilterRegistration(String filterName);
 
     /**
-     * @return TODO
+     * Returns an immutable Map of all the filter registrations for this web application, where the key is the filter
+     * name and the value is the {@link FilterRegistration} object.
+     *
+     * @return An immutable Map of all the filter registrations for this web application
      *
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -673,12 +676,15 @@ public interface ServletContext {
      *                                           {@link ServletContextListener} defined in a TLD would not be able to
      *                                           use this method.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
-    Map<String,? extends FilterRegistration> getFilterRegistrations();
+    Map<String, ? extends FilterRegistration> getFilterRegistrations();
 
     /**
-     * @return TODO
+     * Returns the {@link SessionCookieConfig} object for this web application, which can be used to configure the
+     * session tracking cookie.
+     *
+     * @return The {@link SessionCookieConfig} object for this web application
      *
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -688,7 +694,7 @@ public interface ServletContext {
      *                                           {@link ServletContextListener} defined in a TLD would not be able to
      *                                           use this method.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     SessionCookieConfig getSessionCookieConfig();
 
@@ -735,10 +741,20 @@ public interface ServletContext {
     Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
 
     /**
-     * TODO SERVLET3 - Add comments
+     * Adds a listener to this web application. The listener instance will be created by the container using the
+     * no-argument constructor of the given class.
      *
-     * @param className TODO
+     * @param className The fully qualified class name of the listener to add
      *
+     * @throws ClassCastException            If the class name does not implement {@link EventListener} or a
+     *                                           subinterface recognized by the servlet container, or if a non-standard
+     *                                           listener type is not packaged in a JAR file with a
+     *                                           <code>listener</code> element in the <code>META-INF/services</code>
+     *                                           directory
+     * @throws IllegalArgumentException      If the lifecycle of a listener prohibits addition at runtime, or if the
+     *                                           class has a {@link jakarta.servlet.annotation.WebListener} annotation
+     *                                           that conflicts with the programmatic addition
+     * @throws IllegalStateException         If the context has already been initialised
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *                                           method of a {@link ServletContextListener} that was not defined in a
@@ -752,11 +768,20 @@ public interface ServletContext {
     void addListener(String className);
 
     /**
-     * TODO SERVLET3 - Add comments
+     * Adds the given listener instance to this web application.
      *
-     * @param <T> TODO
-     * @param t   TODO
+     * @param <T> The type of listener being added
+     * @param t   The listener instance to add
      *
+     * @throws ClassCastException            If the class of the listener instance does not implement
+     *                                           {@link EventListener} or a subinterface recognized by the servlet
+     *                                           container, or if a non-standard listener type is not packaged in a JAR
+     *                                           file with a <code>listener</code> element in the
+     *                                           <code>META-INF/services</code> directory
+     * @throws IllegalArgumentException      If the lifecycle of a listener prohibits addition at runtime, or if the
+     *                                           class has a {@link jakarta.servlet.annotation.WebListener} annotation
+     *                                           that conflicts with the programmatic addition
+     * @throws IllegalStateException         If the context has already been initialised
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *                                           method of a {@link ServletContextListener} that was not defined in a
@@ -770,10 +795,19 @@ public interface ServletContext {
     <T extends EventListener> void addListener(T t);
 
     /**
-     * TODO SERVLET3 - Add comments
+     * Adds a listener to this web application. The listener instance will be created by the container using the
+     * no-argument constructor of the given class.
      *
-     * @param listenerClass TODO
+     * @param listenerClass The class of the listener to add
      *
+     * @throws ClassCastException            If the class does not implement {@link EventListener} or a subinterface
+     *                                           recognized by the servlet container, or if a non-standard listener type
+     *                                           is not packaged in a JAR file with a <code>listener</code> element in
+     *                                           the <code>META-INF/services</code> directory
+     * @throws IllegalArgumentException      If the lifecycle of a listener prohibits addition at runtime, or if the
+     *                                           class has a {@link jakarta.servlet.annotation.WebListener} annotation
+     *                                           that conflicts with the programmatic addition
+     * @throws IllegalStateException         If the context has already been initialised
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *                                           method of a {@link ServletContextListener} that was not defined in a
@@ -787,14 +821,15 @@ public interface ServletContext {
     void addListener(Class<? extends EventListener> listenerClass);
 
     /**
-     * TODO SERVLET3 - Add comments
+     * Creates a new instance of the given listener class, using the web application class loader.
      *
-     * @param <T> TODO
-     * @param c   TODO
+     * @param <T> The type of listener being created
+     * @param c   The class of the listener to create
      *
-     * @return TODO
+     * @return The new listener instance
      *
-     * @throws ServletException              TODO
+     * @throws ServletException              If the listener cannot be instantiated, e.g., if the class does not have a
+     *                                           no-argument constructor, or if instantiation fails for any other reason
      * @throws UnsupportedOperationException If called from a
      *                                           {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *                                           method of a {@link ServletContextListener} that was not defined in a
@@ -808,9 +843,12 @@ public interface ServletContext {
     <T extends EventListener> T createListener(Class<T> c) throws ServletException;
 
     /**
-     * @return TODO
+     * Returns the {@link JspConfigDescriptor} for this web application, which provides access to the JSP configuration
+     * elements such as taglib and jsp-property-group declarations.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @return The {@link JspConfigDescriptor} for this web application
+     *
+     * @since Servlet 3.0
      */
     JspConfigDescriptor getJspConfigDescriptor();
 

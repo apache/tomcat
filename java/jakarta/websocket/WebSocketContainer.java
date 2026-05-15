@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+/**
+ * Provides the ability to create new WebSocket client connections.
+ */
 public interface WebSocketContainer {
 
     /**
@@ -36,8 +39,27 @@ public interface WebSocketContainer {
      */
     void setAsyncSendTimeout(long timeout);
 
+    /**
+     * Creates a new connection to the WebSocket server endpoint.
+     *
+     * @param endpoint The POJO endpoint instance that will handle responses from the server
+     * @param path     The full URL of the WebSocket endpoint to connect to
+     * @return The WebSocket session for the connection
+     * @throws DeploymentException If the connection cannot be established
+     * @throws IOException         If an I/O error occurred while trying to establish the connection
+     */
     Session connectToServer(Object endpoint, URI path) throws DeploymentException, IOException;
 
+    /**
+     * Creates a new connection to the WebSocket server endpoint.
+     *
+     * @param annotatedEndpointClass The annotated endpoint class. An instance of this class will be
+     *                                   created to handle responses from the server
+     * @param path                   The full URL of the WebSocket endpoint to connect to
+     * @return The WebSocket session for the connection
+     * @throws DeploymentException If the connection cannot be established
+     * @throws IOException         If an I/O error occurred while trying to establish the connection
+     */
     Session connectToServer(Class<?> annotatedEndpointClass, URI path) throws DeploymentException, IOException;
 
     /**

@@ -35,6 +35,13 @@ public abstract class HttpFilter extends GenericFilter {
     private static final long serialVersionUID = 1L;
 
     /**
+      * Constructs a new HttpFilter.
+      */
+    public HttpFilter() {
+        // NO-OP
+    }
+
+    /**
      * {@inheritDoc} This implementation tests the request and response to see if they are instances of
      * {@link HttpServletRequest} and {@link HttpServletResponse} respectively. If they are then they are passed to
      * {@link #doFilter(HttpServletRequest, HttpServletResponse, FilterChain)}. If not, a {@link ServletException} is

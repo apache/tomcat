@@ -22,6 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Container annotation that holds multiple {@link DataSourceDefinition} annotations.
+ * This annotation is used to group several data source definitions when applied to
+ * the same type, following the standard Java annotation repetition pattern.
+ *
  * @since Common Annotations 1.1
  */
 @Target(ElementType.TYPE)
@@ -29,7 +33,9 @@ import java.lang.annotation.Target;
 public @interface DataSourceDefinitions {
 
     /**
-     * @return a DataSourceDefinition[]
+     * Specifies the array of data source definitions contained within this container annotation.
+     *
+     * @return the array of {@link DataSourceDefinition} annotations
      */
     DataSourceDefinition[] value();
 }

@@ -22,5 +22,10 @@ package org.apache.jasper.runtime;
  */
 public interface JspSourceDirectives {
 
+    /**
+     * Returns whether an error should be raised when an EL expression is not found.
+     *
+     * @return whether error on EL not found is enabled
+     */
     boolean getErrorOnELNotFound();
 }

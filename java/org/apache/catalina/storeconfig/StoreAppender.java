@@ -33,6 +33,12 @@ import org.apache.tomcat.util.security.Escape;
 public class StoreAppender {
 
     /**
+     * Default constructor.
+     */
+    public StoreAppender() {
+    }
+
+    /**
      * The set of classes that represent persistable properties.
      */
     private static final Class<?>[] persistables = { String.class, Integer.class, Integer.TYPE, Boolean.class,

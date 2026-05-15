@@ -23,17 +23,49 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  */
 public class Constants {
 
+    /**
+     * Prevents instantiation.
+     */
+    private Constants() {
+    }
+
+    /**
+     * The fully qualified name of this package.
+     */
     public static final String Package = "org.apache.catalina.tribes.transport";
 
+    /**
+     * Default buffer size for cluster messages.
+     */
     public static final int DEFAULT_CLUSTER_MSG_BUFFER_SIZE = 65536;
+
+    /**
+     * Default buffer size for cluster acknowledgements.
+     */
     public static final int DEFAULT_CLUSTER_ACK_BUFFER_SIZE = 25188;
 
     /*
      * Do not change any of these values!
      */
+
+    /**
+     * Acknowledgement data bytes.
+     */
     public static final byte[] ACK_DATA = new byte[] { 6, 2, 3 };
+
+    /**
+     * Failed acknowledgement data bytes.
+     */
     public static final byte[] FAIL_ACK_DATA = new byte[] { 11, 0, 5 };
+
+    /**
+     * Acknowledgement command data package.
+     */
     public static final byte[] ACK_COMMAND = XByteBuffer.createDataPackage(ACK_DATA);
+
+    /**
+     * Failed acknowledgement command data package.
+     */
     public static final byte[] FAIL_ACK_COMMAND = XByteBuffer.createDataPackage(FAIL_ACK_DATA);
 
 }

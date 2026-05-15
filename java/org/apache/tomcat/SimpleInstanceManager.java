@@ -25,15 +25,24 @@ import javax.naming.NamingException;
  */
 public class SimpleInstanceManager implements InstanceManager {
 
+    /**
+     * Creates a new SimpleInstanceManager.
+     */
     public SimpleInstanceManager() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException,
             InstantiationException, NoSuchMethodException {
         return prepareInstance(clazz.getConstructor().newInstance());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException,
             NamingException, InstantiationException, ClassNotFoundException, NoSuchMethodException {
@@ -41,6 +50,9 @@ public class SimpleInstanceManager implements InstanceManager {
         return prepareInstance(clazz.getConstructor().newInstance());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object newInstance(String fqcn, ClassLoader classLoader)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
@@ -49,11 +61,17 @@ public class SimpleInstanceManager implements InstanceManager {
         return prepareInstance(clazz.getConstructor().newInstance());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException {
         // NO-OP
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException {
     }
