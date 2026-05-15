@@ -666,9 +666,9 @@ public abstract class AbstractEndpoint<S, U> {
             byte[] certBytes = certificate.getEncoded();
             // SHA-256 fingerprint
             sb.append("\nSHA-256 fingerprint: ");
-            MessageDigest sha512Digest = MessageDigest.getInstance("SHA-256");
-            sha512Digest.update(certBytes);
-            sb.append(HexUtils.toHexString(sha512Digest.digest()));
+            MessageDigest sha256Digest = MessageDigest.getInstance("SHA-256");
+            sha256Digest.update(certBytes);
+            sb.append(HexUtils.toHexString(sha256Digest.digest()));
             // SHA-1 fingerprint
             sb.append("\nSHA-1 fingerprint: ");
             MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
