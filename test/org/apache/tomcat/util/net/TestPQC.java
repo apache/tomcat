@@ -217,7 +217,7 @@ public class TestPQC extends TomcatBaseTest {
                     "PQC requires OpenSSL 3.5+, found version 0x" + Integer.toHexString(AprStatus.getOpenSSLVersion()),
                     AprStatus.getOpenSSLVersion() >= 0x30500000);
         } else if ("OpenSSL-FFM".equals(connectorName)) {
-            Assume.assumeTrue("PQC requires OpenSSL 3.5+, found version " + OpenSSLStatus.getVersion(),
+            Assume.assumeTrue("PQC requires OpenSSL 3.5+, found version 0x" + Long.toHexString(OpenSSLStatus.getVersion()),
                     OpenSSLStatus.getMajorVersion() > 3 ||
                         OpenSSLStatus.getMajorVersion() == 3 && OpenSSLStatus.getMinorVersion() >= 5);
         } else {
