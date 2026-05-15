@@ -430,7 +430,9 @@ public abstract class AbstractEndpoint<S, U> {
             throw new IllegalArgumentException(sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
         SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
-        unregisterJmx(sslHostConfig);
+        if (sslHostConfig == null) {
+            unregisterJmx(sslHostConfig);
+        }
         return sslHostConfig;
     }
 
