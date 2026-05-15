@@ -135,6 +135,10 @@
         membership is configured without a trust store as all certificates will
         be trusted in this configuration. (markt)
       </fix>
+      <fix>
+        Ensure listeners are correctly added and removed when configuring the
+        channel coordinator. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
