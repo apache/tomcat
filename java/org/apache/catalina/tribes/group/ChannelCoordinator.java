@@ -239,6 +239,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             }
             if (Channel.MBR_RX_SEQ == (svc & Channel.MBR_RX_SEQ)) {
                 membershipService.stop(MembershipService.MBR_RX);
+                if (membershipService instanceof McastService) {
+                    ((McastService) membershipService).setMessageListener(null);
+                }
                 membershipService.setMembershipListener(null);
                 valid = true;
 
@@ -294,7 +297,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      *
      * @return the cluster receiver
      */
-    public ChannelReceiver getClusterReceiver() {
+    public synchronized ChannelReceiver getClusterReceiver() {
         return clusterReceiver;
     }
 
@@ -312,7 +315,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      *
      * @return the membership service
      */
-    public MembershipService getMembershipService() {
+    public synchronized MembershipService getMembershipService() {
         return membershipService;
     }
 
@@ -325,14 +328,15 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         if (startLevel != 0) {
             throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
         }
-        if (clusterReceiver != null) {
-            this.clusterReceiver = clusterReceiver;
+        if (this.clusterReceiver == clusterReceiver) {
+            return;
+        }
+        if (this.clusterReceiver != null) {
+            this.clusterReceiver.setMessageListener(null);
+        }
+        this.clusterReceiver = clusterReceiver;
+        if (this.clusterReceiver != null) {
             this.clusterReceiver.setMessageListener(this);
-        } else {
-            if (this.clusterReceiver != null) {
-                this.clusterReceiver.setMessageListener(null);
-            }
-            this.clusterReceiver = null;
         }
     }
 
@@ -357,8 +361,22 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         if (startLevel != 0) {
             throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
         }
+        if (this.membershipService == membershipService) {
+            return;
+        }
+        if (this.membershipService != null) {
+            this.membershipService.setMembershipListener(null);
+            if (this.membershipService instanceof McastService) {
+                ((McastService) this.membershipService).setMessageListener(null);
+            }
+        }
         this.membershipService = membershipService;
-        this.membershipService.setMembershipListener(this);
+        if (this.membershipService != null) {
+            this.membershipService.setMembershipListener(this);
+            if (this.membershipService instanceof McastService) {
+                ((McastService) this.membershipService).setMessageListener(this);
+            }
+        }
     }
 
     @Override
