@@ -35,10 +35,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
@@ -80,6 +83,11 @@ public class TestPQC extends TomcatBaseTest {
         connector.addSslHostConfig(sslHostConfig);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+        if ("OpenSSL".equals(connectorName)) {
+            // getOpenSSLVersion() requires that the listener has been initialised
+            tomcat.getServer().findLifecycleListeners()[0].lifecycleEvent(
+                    new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
+        }
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -202,13 +210,19 @@ public class TestPQC extends TomcatBaseTest {
 
 
     private void assumePQCSupported() {
-        if (!useOpenSSL) {
+        if ("JSSE".equals(connectorName)) {
             Assume.assumeTrue("JSSE does not yet support PQC", false);
+        } else if ("OpenSSL".equals(connectorName)) {
+            Assume.assumeTrue(
+                    "PQC requires OpenSSL 3.5+, found version 0x" + Integer.toHexString(AprStatus.getOpenSSLVersion()),
+                    AprStatus.getOpenSSLVersion() >= 0x30500000);
+        } else if ("OpenSSL-FFM".equals(connectorName)) {
+            Assume.assumeTrue("PQC requires OpenSSL 3.5+, found version " + OpenSSLStatus.getVersion(),
+                    OpenSSLStatus.getMajorVersion() > 3 ||
+                        OpenSSLStatus.getMajorVersion() == 3 && OpenSSLStatus.getMinorVersion() >= 5);
+        } else {
+            Assert.fail("Unknown connector");
         }
-
-        Assume.assumeTrue("PQC requires OpenSSL 3.5+",
-                OpenSSLStatus.getMajorVersion() > 3 ||
-                    OpenSSLStatus.getMajorVersion() == 3 && OpenSSLStatus.getMinorVersion() >= 5);
     }
 
     private File[] configureHostMLDSA(String algorithm) throws Exception {
