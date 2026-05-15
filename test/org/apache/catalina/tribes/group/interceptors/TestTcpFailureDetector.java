@@ -71,7 +71,7 @@ public class TestTcpFailureDetector {
         clear();
         channel1.start(Channel.DEFAULT);
         channel2.start(Channel.DEFAULT);
-        //Thread.sleep(1000);
+        Thread.sleep(1000);
         Assert.assertEquals("Expecting member count to be equal",mbrlist1.members.size(),mbrlist2.members.size());
         channel2.stop(Channel.SND_RX_SEQ);
         ByteMessage msg = new ByteMessage(new byte[1024]);
@@ -129,7 +129,7 @@ public class TestTcpFailureDetector {
         clear();
         channel1.start(Channel.DEFAULT);
         channel2.start(Channel.DEFAULT);
-        //Thread.sleep(1000);
+        Thread.sleep(1000);
         Assert.assertEquals("Expecting member count to be equal",mbrlist1.members.size(),mbrlist2.members.size());
         channel2.stop(Channel.MBR_TX_SEQ);
         ByteMessage msg = new ByteMessage(new byte[1024]);
