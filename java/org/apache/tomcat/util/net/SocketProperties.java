@@ -304,7 +304,7 @@ public class SocketProperties {
      * @return the OOBINLINE value
      */
     public boolean getOoBInline() {
-        return ooBInline.booleanValue();
+        return ooBInline == null ? false : ooBInline.booleanValue();
     }
 
     /**
@@ -312,7 +312,7 @@ public class SocketProperties {
      * @return the bandwidth preference value
      */
     public int getPerformanceBandwidth() {
-        return performanceBandwidth.intValue();
+        return performanceBandwidth == null ? 0 : performanceBandwidth.intValue();
     }
 
     /**
@@ -320,7 +320,7 @@ public class SocketProperties {
      * @return the connection time preference value
      */
     public int getPerformanceConnectionTime() {
-        return performanceConnectionTime.intValue();
+        return performanceConnectionTime == null ? 0 : performanceConnectionTime.intValue();
     }
 
     /**
@@ -328,7 +328,7 @@ public class SocketProperties {
      * @return the latency preference value
      */
     public int getPerformanceLatency() {
-        return performanceLatency.intValue();
+        return performanceLatency == null ? 0 : performanceLatency.intValue();
     }
 
     /**
@@ -336,7 +336,7 @@ public class SocketProperties {
      * @return the receive buffer size
      */
     public int getRxBufSize() {
-        return rxBufSize.intValue();
+        return rxBufSize == null ? 0 : rxBufSize.intValue();
     }
 
     /**
@@ -344,7 +344,7 @@ public class SocketProperties {
      * @return the keep-alive value
      */
     public boolean getSoKeepAlive() {
-        return soKeepAlive.booleanValue();
+        return soKeepAlive == null ? false : soKeepAlive.booleanValue();
     }
 
     /**
@@ -352,7 +352,7 @@ public class SocketProperties {
      * @return {@code true} if SO_LINGER is enabled
      */
     public boolean getSoLingerOn() {
-        return soLingerOn.booleanValue();
+        return soLingerOn == null ? false : soLingerOn.booleanValue();
     }
 
     /**
@@ -360,7 +360,7 @@ public class SocketProperties {
      * @return the linger timeout value
      */
     public int getSoLingerTime() {
-        return soLingerTime.intValue();
+        return soLingerTime == null ? 0 : soLingerTime.intValue();
     }
 
     /**
@@ -368,7 +368,7 @@ public class SocketProperties {
      * @return the reuse address value
      */
     public boolean getSoReuseAddress() {
-        return soReuseAddress.booleanValue();
+        return soReuseAddress == null ? false : soReuseAddress.booleanValue();
     }
 
     /**
@@ -376,7 +376,7 @@ public class SocketProperties {
      * @return the socket timeout value
      */
     public int getSoTimeout() {
-        return soTimeout.intValue();
+        return soTimeout == null ? 0 : soTimeout.intValue();
     }
 
     /**
@@ -384,7 +384,7 @@ public class SocketProperties {
      * @return the TCP no delay value
      */
     public boolean getTcpNoDelay() {
-        return tcpNoDelay.booleanValue();
+        return tcpNoDelay == null ? false : tcpNoDelay.booleanValue();
     }
 
     /**
@@ -392,7 +392,7 @@ public class SocketProperties {
      * @return the send buffer size
      */
     public int getTxBufSize() {
-        return txBufSize.intValue();
+        return txBufSize == null ? 0 : txBufSize.intValue();
     }
 
     /**
