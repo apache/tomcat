@@ -126,6 +126,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                  */
                 sslHostConfig.setOpenSslConf(new OpenSSLConf());
             }
+            // Groups list is also passed via OpenSSLConf
+            if (sslHostConfig.getOpenSslConf() == null && sslHostConfig.getGroupList() != null) {
+                sslHostConfig.setOpenSslConf(new OpenSSLConf());
+            }
             if (sslHostConfig.getOpenSslConf() != null) {
                 try {
                     if (log.isTraceEnabled()) {
@@ -411,6 +415,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         Integer.toString(sslHostConfig.getOcspTimeout())));
                 sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_VERIFY_FLAGS,
                         Integer.toString(sslHostConfig.getOcspVerifyFlags())));
+            }
+
+            if (sslHostConfig.getGroupList() != null) {
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS,
+                        sslHostConfig.getGroups().replace(',', ':')));
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {

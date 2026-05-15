@@ -34,6 +34,10 @@ public class OpenSSLConfCmd implements Serializable {
     /** Sets OCSP verify flags. */
     public static final String OCSP_VERIFY_FLAGS = "OCSP_VERIFY_FLAGS";
 
+    // Standard commands used internally by Tomcat. May also be used by users.
+    /** Sets TLS groups. */
+    public static final String GROUPS = "groups";
+
     @Serial
     private static final long serialVersionUID = 1L;
 
