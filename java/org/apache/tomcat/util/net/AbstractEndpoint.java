@@ -393,7 +393,7 @@ public abstract class AbstractEndpoint<S, U> {
         if (replace) {
             SSLHostConfig previous = sslHostConfigs.put(key, sslHostConfig);
             if (previous != null) {
-                unregisterJmx(sslHostConfig);
+                unregisterJmx(previous);
             }
             registerJmx(sslHostConfig);
 
