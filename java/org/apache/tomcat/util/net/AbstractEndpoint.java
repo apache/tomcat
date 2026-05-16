@@ -407,7 +407,7 @@ public abstract class AbstractEndpoint<S, U> {
                 setDefaultSslHostConfig(sslHostConfig);
             }
             if (previous != null) {
-                unregisterJmx(sslHostConfig);
+                unregisterJmx(previous);
             }
             registerJmx(sslHostConfig);
 
