@@ -139,6 +139,12 @@
         than using OpenSSL's default TLS groups when using Tomcat Native with
         OpenSSL based connectors. (markt)
       </fix>
+      <fix>
+        For HTTP/2, ensure that any in progress request body reads are cancelled
+        if the container resets the associated stream. This prevents delays
+        waiting for reads to time out when it is known that no more data will be
+        received. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
