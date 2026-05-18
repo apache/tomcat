@@ -371,6 +371,10 @@
         Manager: Add checks to ensure that the requested context path for a
         deployed WAR, directory or descriptor file is valid. (markt)
       </add>
+      <add>
+        Documentation: Expand the description of some of the attributes of the
+        <code>CrawlerSessionManagerValve</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
