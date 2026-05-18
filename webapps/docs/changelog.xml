@@ -226,6 +226,10 @@
         <bug>70038</bug>: <code>Cookie.clone()</code> should also clone internal
         attribute map. (markt)
       </fix>
+      <scode>
+        Remove unnecessary code from the SSI processing engine that was
+        duplicating some of the normalisation checks. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
