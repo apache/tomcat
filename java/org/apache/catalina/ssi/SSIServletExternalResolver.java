@@ -491,12 +491,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
      */
     protected ServletContextAndPath getServletContextAndPathFromNonVirtualPath(String nonVirtualPath)
             throws IOException {
-        if (nonVirtualPath.startsWith("/") || nonVirtualPath.startsWith("\\")) {
+        if (nonVirtualPath.startsWith("/")) {
             throw new IOException(sm.getString("ssiServletExternalResolver.absoluteNonVirtualPath", nonVirtualPath));
-        }
-        if (nonVirtualPath.contains("../")) {
-            throw new IOException(
-                    sm.getString("ssiServletExternalResolver.pathTraversalNonVirtualPath", nonVirtualPath));
         }
         return new ServletContextAndPath(context, getAbsolutePath(nonVirtualPath));
     }
@@ -513,7 +509,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
      */
     protected ServletContextAndPath getServletContextAndPathFromVirtualPath(String virtualPath) throws IOException {
 
-        if (!virtualPath.startsWith("/") && !virtualPath.startsWith("\\")) {
+        if (!virtualPath.startsWith("/")) {
             return new ServletContextAndPath(context, getAbsolutePath(virtualPath));
         }
 
