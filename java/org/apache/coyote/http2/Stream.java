@@ -1512,6 +1512,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                         inBuffer.position(0);
                         inBuffer.limit(inBuffer.limit() - unreadByteCount);
                     }
+                    inBuffer.notifyAll();
                 }
                 // Do this outside of the sync because:
                 // - it doesn't need to be inside the sync
