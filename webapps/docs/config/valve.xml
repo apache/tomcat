@@ -2556,16 +2556,23 @@
       </attribute>
 
       <attribute name="crawlerIps" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that client
-        IP is matched against to determine if a request is from a web crawler.
-        By default such regular expression is not set.</p>
+        <p>Regular expression (using <code>java.util.regex</code>) that the
+        client IP is matched against to determine if a request is from a web
+        crawler. An IP match alone is sufficient for the request to be
+        considered to be from a web crawler. It is not necessary for any other
+        check to indicate that the request is from a web crawler. By default
+        such regular expression is not set and no IP check is performed.</p>
       </attribute>
 
       <attribute name="crawlerUserAgents" required="false">
         <p>Regular expression (using <code>java.util.regex</code>) that the user
         agent HTTP request header is matched against to determine if a request
-        is from a web crawler. If not set, the default of
-        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is used.</p>
+        is from a web crawler. An user agent match alone is sufficient for the
+        request to be considered to be from a web crawler. It is not necessary
+        for any other check to indicate that the request is from a web crawler.
+        If not set, the default of
+        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is
+        used.</p>
       </attribute>
 
       <attribute name="hostAware" required="false">
