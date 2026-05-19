@@ -171,7 +171,16 @@ class Http2Parser {
                     Integer.toString(dataLength), padding));
         }
 
-        ByteBuffer dest = output.startRequestBodyFrame(streamId, dataLength, endOfStream);
+        ByteBuffer dest;
+        try {
+            dest = output.startRequestBodyFrame(streamId, dataLength, endOfStream);
+        } catch (StreamException se) {
+            swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
+            if (Flags.hasPadding(flags)) {
+                swallowPayload(streamId, FrameType.DATA.getId(), padLength, true, buffer);
+            }
+            throw se;
+        }
         if (dest == null) {
             swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
             // Process padding before sending any notifications in case padding
@@ -811,7 +820,7 @@ class Http2Parser {
 
         void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception, IOException;
 
-        void receivedEndOfStream(int streamId) throws ConnectionException;
+        void receivedEndOfStream(int streamId) throws Http2Exception;
 
         /**
          * Notification triggered when the parser swallows some or all of a DATA frame payload without writing it to the
