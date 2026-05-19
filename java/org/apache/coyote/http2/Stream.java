@@ -376,6 +376,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             headerState = HEADER_STATE_REGULAR;
         }
 
+        if (headerState == HEADER_STATE_TRAILER && !handler.getProtocol().isTrailerHeaderAllowed(name)) {
+            // Processing trailers and the header is not in the allowed list
+            return;
+        }
+
         switch (name) {
             case ":method": {
                 if (coyoteRequest.getMethod() == null) {
@@ -491,9 +496,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 break;
             }
             default: {
-                if (headerState == HEADER_STATE_TRAILER && !handler.getProtocol().isTrailerHeaderAllowed(name)) {
-                    break;
-                }
                 if ("expect".equals(name) && "100-continue".equals(value)) {
                     coyoteRequest.setExpectation(true);
                 }
