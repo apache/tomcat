@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.ProtocolException;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
@@ -34,15 +33,16 @@ import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
 class Http2AsyncParser extends Http2Parser {
 
-    private final AsyncOutput output;
     private final SocketWrapperBase<?> socketWrapper;
+    private final Http2AsyncUpgradeHandler upgradeHandler;
     private volatile Throwable error = null;
 
-    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper) {
+    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper,
+            Http2AsyncUpgradeHandler upgradeHandler) {
         super(connectionId, input, output);
         this.socketWrapper = socketWrapper;
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
-        this.output = (AsyncOutput) output;
+        this.upgradeHandler = upgradeHandler;
     }
 
 
@@ -121,12 +121,13 @@ class Http2AsyncParser extends Http2Parser {
                     socketWrapper.unRead(payload);
                 }
                 // Finish processing the connection
-                output.processConnectionCallback(webConnection, stream);
+                upgradeHandler.processConnectionCallback(webConnection, stream);
             } else {
-                output.closeConnection(new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
+                upgradeHandler
+                        .closeConnection(new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
             }
             // Continue reading frames
-            output.upgradeDispatch(SocketEvent.OPEN_READ);
+            upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
         }
     }
 
@@ -280,7 +281,7 @@ class Http2AsyncParser extends Http2Parser {
                                     readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
                             }
                         }
-                        if (!output.isOverheadLimitExceeded()) {
+                        if (!upgradeHandler.isOverheadLimitExceeded()) {
                             // See if there is a new 9 byte header and continue parsing if possible
                             if (payload.remaining() >= 9) {
                                 int position = payload.position();
@@ -318,7 +319,7 @@ class Http2AsyncParser extends Http2Parser {
             if (state == CompletionState.DONE) {
                 // The call was not completed inline, so must start reading new frames
                 // or process the stream exception
-                output.upgradeDispatch(SocketEvent.OPEN_READ);
+                upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
             }
         }
 
@@ -330,24 +331,9 @@ class Http2AsyncParser extends Http2Parser {
                 log.debug(sm.getString("http2Parser.error", connectionId, Integer.valueOf(streamId), frameType), e);
             }
             if (state == null || state == CompletionState.DONE) {
-                output.upgradeDispatch(SocketEvent.ERROR);
+                upgradeHandler.upgradeDispatch(SocketEvent.ERROR);
             }
         }
-
-    }
-
-    /**
-     * Interface that must be implemented to receive notifications from the parser as it processes incoming frames.
-     */
-    interface AsyncOutput extends Output {
-
-        boolean isOverheadLimitExceeded();
-
-        AbstractEndpoint.Handler.SocketState upgradeDispatch(SocketEvent status);
-
-        void closeConnection(Http2Exception ce);
-
-        void processConnectionCallback(WebConnection webConnection, Stream stream);
 
     }
 
