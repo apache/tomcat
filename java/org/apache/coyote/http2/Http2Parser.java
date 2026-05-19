@@ -678,6 +678,9 @@ class Http2Parser {
         /*
          * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
          * HPack decoder does not retain a reference to this stream. This aids GC.
+         *
+         * If the connection was created via an upgrade from HTTP/1.1 it is possible to reach this point before any
+         * HTTP/2 headers frames have been received which means hpackDecoder will still be null as lazy init is used.
          */
         HpackDecoder hpackDecoder = this.hpackDecoder;
         if (hpackDecoder != null) {
