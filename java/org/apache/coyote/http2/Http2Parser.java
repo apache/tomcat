@@ -679,7 +679,10 @@ class Http2Parser {
          * Clear the reference to the stream in the HPack decoder now that the headers have been processed so that the
          * HPack decoder does not retain a reference to this stream. This aids GC.
          */
-        hpackDecoder.clearHeaderEmitter();
+        HpackDecoder hpackDecoder = this.hpackDecoder;
+        if (hpackDecoder != null) {
+            hpackDecoder.clearHeaderEmitter();
+        }
     }
 
 
