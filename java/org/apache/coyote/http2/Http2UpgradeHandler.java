@@ -1780,7 +1780,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void receivedEndOfStream(int streamId) throws ConnectionException {
+    public void receivedEndOfStream(int streamId) throws Http2Exception {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream stream) {
@@ -1789,7 +1789,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void receivedEndOfStream(Stream stream) throws ConnectionException {
+    private void receivedEndOfStream(Stream stream) throws Http2Exception {
         stream.receivedEndOfStream();
         if (!stream.isActive()) {
             decrementActiveRemoteStreamCount(stream);
