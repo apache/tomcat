@@ -45,8 +45,8 @@ class Http2Parser {
     protected final Input input;
     private final Output output;
     private final byte[] frameHeaderBuffer = new byte[9];
+    private final HpackDecoder hpackDecoder;
 
-    private volatile HpackDecoder hpackDecoder;
     private volatile ByteBuffer headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
@@ -55,6 +55,7 @@ class Http2Parser {
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;
+        this.hpackDecoder = output.getHpackDecoder();
     }
 
 
@@ -229,9 +230,6 @@ class Http2Parser {
 
         headersEndStream = Flags.isEndOfStream(flags);
 
-        if (hpackDecoder == null) {
-            hpackDecoder = output.getHpackDecoder();
-        }
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
         } catch (StreamException se) {
