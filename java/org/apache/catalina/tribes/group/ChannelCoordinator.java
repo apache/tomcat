@@ -381,6 +381,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
 
     @Override
     public void heartbeat() {
+        ChannelSender clusterSender = this.clusterSender;
         if (clusterSender != null) {
             clusterSender.heartbeat();
         }
