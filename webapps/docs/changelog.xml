@@ -149,6 +149,9 @@
         Ensure that malformed HTTP/2 messages that should trigger a stream reset
         do so, rather than triggered a connection close. (markt)
       </fix>
+      <fix>
+        Improve enforcement of header trailer allow list for HTTP/2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
