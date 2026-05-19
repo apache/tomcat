@@ -152,6 +152,10 @@
       <fix>
         Improve enforcement of header trailer allow list for HTTP/2. (remm)
       </fix>
+      <fix>
+        <bug>70050</bug>: Avoid NPE when no header frame is processed in HTTP/2,
+        following refactor clean-up of header buffer. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
