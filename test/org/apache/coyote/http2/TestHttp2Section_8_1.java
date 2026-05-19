@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.ContinueResponseTiming;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
