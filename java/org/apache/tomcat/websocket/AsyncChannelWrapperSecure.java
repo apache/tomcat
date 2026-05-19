@@ -479,7 +479,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
         @Override
         public final boolean isDone() {
-            return completionLatch.getCount() > 0;
+            return completionLatch.getCount() == 0;
         }
 
         @Override
