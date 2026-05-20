@@ -163,6 +163,9 @@
         Properly use <code>pollerThreadPriority</code> for the NIO poller
         thread. (remm)
       </fix>
+      <fix>
+        Fix <code>MessageByte.equals</code> if called on a null MB. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
