@@ -18,6 +18,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -32,11 +33,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.unittest.TesterLogValidationFilter;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestErrorReportValve extends TomcatBaseTest {
@@ -262,5 +265,81 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
+    @Test
+    public void testLogOnErrorEnabled() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Setup ErrorReportValve with logOnError enabled
+        Host host = tomcat.getHost();
+        ErrorReportValve errorReportValve = new ErrorReportValve();
+        errorReportValve.setLogOnError(true);
+        host.getPipeline().addValve(errorReportValve);
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "errorServlet", new ErrorServlet());
+        ctx.addServletMappingDecoded("/", "errorServlet");
+
+        tomcat.start();
+
+        // Setup log filter to capture error logs
+        TesterLogValidationFilter filter = TesterLogValidationFilter.add(
+                Level.SEVERE,
+                "Error page generated for request",
+                null,
+                host.getLogName());
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        getUrl("http://localhost:" + getPort(), res, null);
+
+        // Verify error page was generated
+        Assert.assertTrue(res.toString().contains(
+                "<p><b>" + sm.getString("errorReportValve.message") + "</b> " + ErrorServlet.ERROR_TEXT + "</p>"));
+
+        // Verify error was logged
+        int messageCount = filter.getMessageCount();
+        Assert.assertTrue("Error should be logged when logOnError is enabled",
+                messageCount > 0);
+    }
+
+    @Test
+    public void testLogOnErrorDisabled() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Setup ErrorReportValve with logOnError disabled (default)
+        Host host = tomcat.getHost();
+        ErrorReportValve errorReportValve = new ErrorReportValve();
+        errorReportValve.setLogOnError(false);
+        host.getPipeline().addValve(errorReportValve);
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "errorServlet", new ErrorServlet());
+        ctx.addServletMappingDecoded("/", "errorServlet");
+
+        tomcat.start();
+
+        // Setup log filter to capture error logs
+        TesterLogValidationFilter filter = TesterLogValidationFilter.add(
+                Level.SEVERE,
+                "Error page generated for request",
+                null,
+                host.getLogName());
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        getUrl("http://localhost:" + getPort(), res, null);
+
+        // Verify error page was generated
+        Assert.assertTrue(res.toString().contains(
+                "<p><b>" + sm.getString("errorReportValve.message") + "</b> " + ErrorServlet.ERROR_TEXT + "</p>"));
+
+        // Verify error was NOT logged
+        Assert.assertEquals("Error should NOT be logged when logOnError is disabled",
+                0, filter.getMessageCount());
+    }
 
 }
