@@ -186,7 +186,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         /*
          * Reauthentication using the cached user name and password (if any) is not enabled for SPNEGO authentication.
-         * This is because the delegated credentials will nto be available unless a normal SPNEGO authentication takes
+         * This is because the delegated credentials will not be available unless a normal SPNEGO authentication takes
          * place.
          *
          * Reauthentication was introduced to handle the case where the Realm took additional actions on authentication.
@@ -226,7 +226,17 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         byte[] encoded = new byte[authorizationBC.getLength()];
         System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(), encoded, 0,
                 authorizationBC.getLength());
-        byte[] decoded = Base64.getDecoder().decode(encoded);
+        byte[] decoded;
+        try {
+            decoded = Base64.getDecoder().decode(encoded);
+        } catch (IllegalArgumentException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("spnegoAuthenticator.authHeaderInvalidToken"));
+            }
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
 
         if (decoded.length == 0) {
             if (log.isDebugEnabled()) {
