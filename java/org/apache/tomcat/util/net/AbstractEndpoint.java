@@ -515,6 +515,9 @@ public abstract class AbstractEndpoint<S, U> {
      * @param hostName The SSL host for which the configuration should be reloaded. This must match a current SSL host
      */
     public void reloadSslHostConfig(String hostName) {
+        if (hostName == null) {
+            throw new IllegalArgumentException(sm.getString("endpoint.unknownSslHostName", ""));
+        }
         // Host names are case-insensitive but stored/processed in lower case
         // internally because they are used as keys in a ConcurrentMap where
         // keys are compared in a case-sensitive manner.
