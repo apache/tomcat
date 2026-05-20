@@ -650,6 +650,26 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
+     * Returns the unique index for this connector.
+     * @return the index
+     */
+    public int getNameIndex() {
+        // Try shortcut that should work for nearly all uses first as it does
+        // not use reflection and is therefore faster.
+        if (protocolHandler instanceof AbstractProtocol<?>) {
+            return ((AbstractProtocol<?>) protocolHandler).getNameIndex();
+        }
+        // Fall back for custom protocol handlers not based on AbstractProtocol
+        Object index = getProperty("NameIndex");
+        if (index instanceof Integer) {
+            return ((Integer) index).intValue();
+        }
+        // Usually means an invalid protocol has been configured.
+        return 0;
+    }
+
+
+    /**
      * Returns the port number on which this connector is configured to listen for requests.
      * The special value of 0 means select a random free port when the socket is bound.
      * @return the configured port number
@@ -730,7 +750,18 @@ public class Connector extends LifecycleMBeanBase {
      * @return the actual local port number
      */
     public int getLocalPort() {
-        return ((Integer) getProperty("localPort")).intValue();
+        // Try shortcut that should work for nearly all uses first as it does
+        // not use reflection and is therefore faster.
+        if (protocolHandler instanceof AbstractProtocol<?>) {
+            return ((AbstractProtocol<?>) protocolHandler).getLocalPort();
+        }
+        // Fall back for custom protocol handlers not based on AbstractProtocol
+        Object port = getProperty("localPort");
+        if (port instanceof Integer) {
+            return ((Integer) port).intValue();
+        }
+        // Usually means an invalid protocol has been configured.
+        return 0;
     }
 
 
@@ -987,7 +1018,9 @@ public class Connector extends LifecycleMBeanBase {
      * @param sslHostConfig the SSL host configuration to add
      */
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
-        protocolHandler.addSslHostConfig(sslHostConfig);
+        if (protocolHandler != null) {
+            protocolHandler.addSslHostConfig(sslHostConfig);
+        }
     }
 
 
@@ -996,7 +1029,11 @@ public class Connector extends LifecycleMBeanBase {
      * @return array of SSL host configurations
      */
     public SSLHostConfig[] findSslHostConfigs() {
-        return protocolHandler.findSslHostConfigs();
+        if (protocolHandler != null) {
+            return protocolHandler.findSslHostConfigs();
+        } else {
+            return new SSLHostConfig[0];
+        }
     }
 
 
@@ -1005,7 +1042,9 @@ public class Connector extends LifecycleMBeanBase {
      * @param upgradeProtocol the upgrade protocol to add
      */
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
-        protocolHandler.addUpgradeProtocol(upgradeProtocol);
+        if (protocolHandler != null) {
+            protocolHandler.addUpgradeProtocol(upgradeProtocol);
+        }
     }
 
 
@@ -1014,7 +1053,11 @@ public class Connector extends LifecycleMBeanBase {
      * @return array of upgrade protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols() {
-        return protocolHandler.findUpgradeProtocols();
+        if (protocolHandler != null) {
+            return protocolHandler.findUpgradeProtocols();
+        } else {
+            return new UpgradeProtocol[0];
+        }
     }
 
 
@@ -1144,7 +1187,7 @@ public class Connector extends LifecycleMBeanBase {
                 sb.append(port);
             } else {
                 sb.append("auto-");
-                sb.append(getProperty("nameIndex"));
+                sb.append(Integer.valueOf(getNameIndex()));
             }
             String address = "";
             if (addressObj instanceof InetAddress) {
@@ -1322,7 +1365,7 @@ public class Connector extends LifecycleMBeanBase {
                     sb.append(port);
                 } else {
                     sb.append("auto-");
-                    sb.append(getProperty("nameIndex"));
+                    sb.append(Integer.valueOf(getNameIndex()));
                 }
             }
         } else {
