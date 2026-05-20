@@ -162,8 +162,14 @@ public class JsonFormatter extends OneLineFormatter {
                     if (popular > 0) {
                         escaped.append('\\').append(popular);
                     } else {
-                        escaped.append("\\u");
-                        escaped.append(String.format("%04X", Integer.valueOf(c)));
+                        int v = c;
+
+                        escaped.append("\\u")
+                                .append(Character.forDigit((v >>> 12) & 0xF, 16))
+                                .append(Character.forDigit((v >>> 8) & 0xF, 16))
+                                .append(Character.forDigit((v >>> 4) & 0xF, 16))
+                                .append(Character.forDigit(v & 0xF, 16))
+                                ;
                     }
                 }
             }
