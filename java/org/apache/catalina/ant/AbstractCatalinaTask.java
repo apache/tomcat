@@ -225,8 +225,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             throws BuildException {
 
         InputStreamReader reader = null;
+        Authenticator defaultAuthenticator = null;
         try {
             // Set up authorization with our credentials
+            defaultAuthenticator = Authenticator.getDefault();
             Authenticator.setDefault(new TaskAuthenticator(username, password));
 
             // Create a connection for this command
@@ -312,6 +314,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 handleErrorOutput(e.getMessage());
             }
         } finally {
+            try {
+                Authenticator.setDefault(defaultAuthenticator);
+            } catch (Exception ioe) {
+                // Ignore
+            }
             closeRedirector();
             if (reader != null) {
                 try {

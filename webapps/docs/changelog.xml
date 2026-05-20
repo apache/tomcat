@@ -428,6 +428,9 @@
         to make it easier to see when it's not used by the suite. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Restore default authenticator after executing an Ant task. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
