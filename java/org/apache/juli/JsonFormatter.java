@@ -141,14 +141,14 @@ public class JsonFormatter extends OneLineFormatter {
          *
          * @return the escaped char sequence corresponding to the specified range
          */
-        public static CharSequence escape(CharSequence input, int off, int length) {
+        public static CharSequence escape(CharSequence input, final int off, final int length) {
             /*
              * While any character MAY be escaped, only U+0000 to U+001F (control characters), U+0022 (quotation mark)
              * and U+005C (reverse solidus) MUST be escaped.
              */
             StringBuilder escaped = null;
             int lastUnescapedStart = off;
-            int end = off + length;
+            final int end = off + length;
             for (int i = off; i < end; i++) {
                 char c = input.charAt(i);
                 if (c < 0x20 || c == 0x22 || c == 0x5c || Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
@@ -172,7 +172,7 @@ public class JsonFormatter extends OneLineFormatter {
                 if (off == 0 && length == input.length()) {
                     return input;
                 } else {
-                    return input.subSequence(off, length + off);
+                    return input.subSequence(off, end);
                 }
             } else {
                 if (lastUnescapedStart < end) {
