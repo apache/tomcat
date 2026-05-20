@@ -864,7 +864,7 @@ public class Response implements HttpServletResponse {
     @Override
     public Collection<String> getHeaders(String name) {
         if (name == null || name.isEmpty()) {
-            return Set.of();
+            return new HashSet<>();
         }
         // Need special handling for Content-Type and Content-Length due to
         // special handling of these in coyoteResponse
