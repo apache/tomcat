@@ -133,6 +133,10 @@
       <fix>
         Cleaner handling of invalid SPNEGO tokens. (remm)
       </fix>
+      <fix>
+        Avoid some NPEs in the Connector class on an uninitialize protocol.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
