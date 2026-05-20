@@ -53,7 +53,24 @@ public class TestJsonFormatter {
         @SuppressWarnings("unchecked")
         ArrayList<Object> trace = (ArrayList<Object>) json.get("throwable");
         Assert.assertEquals(trace.get(0), "java.lang.IllegalStateException: Bad state");
-
     }
 
+    @Test
+    public void testEscaping() {
+        String[][] tests = new String[][] {
+            new String[] { "x", "x" }, // Don't escape
+            new String[] { "/", "/" }, // Don't escape
+            new String[] { "\\", "\\\\" },
+            new String[] { "\"", "\\\"" },
+            new String[] { "\n", "\\n" },
+            new String[] { "\r", "\\r" },
+            new String[] { "\u000B", "\\u000b" }
+        };
+
+        for (String[] test : tests) {
+            CharSequence result = JsonFormatter.JSONFilter.escape(test[0]);
+
+            Assert.assertEquals(test[1], String.valueOf(result));
+        }
+    }
 }
