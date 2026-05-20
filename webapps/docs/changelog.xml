@@ -203,6 +203,10 @@
       <fix>
         Wrong references to jakarta instead of javax. (remm)
       </fix>
+      <fix>
+        Restore default authenticator to nullafter executing an Ant task.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

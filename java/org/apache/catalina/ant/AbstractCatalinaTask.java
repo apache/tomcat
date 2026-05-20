@@ -317,6 +317,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 handleErrorOutput(e.getMessage());
             }
         } finally {
+            try {
+                Authenticator.setDefault(null);
+            } catch (Exception e) {
+                // Ignore
+            }
             closeRedirector();
             if (reader != null) {
                 try {
