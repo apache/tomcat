@@ -148,7 +148,8 @@ public class JsonFormatter extends OneLineFormatter {
              */
             StringBuilder escaped = null;
             int lastUnescapedStart = off;
-            for (int i = off; i < length; i++) {
+            int end = off + length;
+            for (int i = off; i < end; i++) {
                 char c = input.charAt(i);
                 if (c < 0x20 || c == 0x22 || c == 0x5c || Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
                     if (escaped == null) {
@@ -174,8 +175,8 @@ public class JsonFormatter extends OneLineFormatter {
                     return input.subSequence(off, length + off);
                 }
             } else {
-                if (lastUnescapedStart < length) {
-                    escaped.append(input.subSequence(lastUnescapedStart, length));
+                if (lastUnescapedStart < end) {
+                    escaped.append(input.subSequence(lastUnescapedStart, end));
                 }
                 return escaped.toString();
             }

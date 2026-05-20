@@ -64,4 +64,13 @@ public class TestJsonFormatter {
 
         Assert.assertEquals("56789", result.toString());
     }
+
+    @Test
+    public void testEscapeBeginningOfLimitedRange() {
+        String input = "01234\"6789";
+
+        CharSequence result = JsonFormatter.JSONFilter.escape(input, 5, 5);
+
+        Assert.assertEquals("\\\"6789", result.toString());
+    }
 }
