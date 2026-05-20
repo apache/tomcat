@@ -5024,7 +5024,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             try {
                 instanceManager.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("standardContext.backgroundProcess.instanceManager", resources), e);
+                log.warn(sm.getString("standardContext.backgroundProcess.instanceManager", instanceManager), e);
             }
         }
         super.backgroundProcess();
