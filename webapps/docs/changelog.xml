@@ -202,6 +202,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Restore default authenticator after executing an Ant task. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.55 (schultz)" rtext="2026-05-11">
   <subsection name="Catalina">
