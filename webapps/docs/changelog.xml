@@ -226,7 +226,7 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        Restore default authenticator after executing an Ant task. (remm)
+        Use per connection authenticator when executing an Ant task. (remm/markt)
       </fix>
     </changelog>
   </subsection>
