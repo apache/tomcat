@@ -481,8 +481,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (mb.type == T_BYTES && type == T_CHARS) {
             return mb.byteC.equals(charC);
         }
-        // can't happen
-        return true;
+        return (mb.type == T_NULL && type == T_NULL);
     }
 
 
@@ -642,7 +641,11 @@ public final class MessageBytes implements Cloneable, Serializable {
             buf[end++] = (byte) '0';
         }
         if (l < 0) {
-            current = -l;
+            if (l == Long.MIN_VALUE) {
+                current = Long.MAX_VALUE;
+            } else {
+                current = -l;
+            }
             buf[end++] = (byte) '-';
         }
         while (current > 0) {
