@@ -133,6 +133,9 @@
         Avoid some NPEs in the Connector class on an uninitialize protocol.
         (remm)
       </fix>
+      <fix>
+        Incorrect session average life calculation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
