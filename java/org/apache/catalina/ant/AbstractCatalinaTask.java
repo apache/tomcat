@@ -225,12 +225,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             throws BuildException {
 
         InputStreamReader reader = null;
-        Authenticator defaultAuthenticator = null;
         try {
-            // Set up authorization with our credentials
-            defaultAuthenticator = Authenticator.getDefault();
-            Authenticator.setDefault(new TaskAuthenticator(username, password));
-
             // Create a connection for this command
             URI uri = new URI(url + command);
             URLConnection conn = uri.parseServerAuthority().toURL().openConnection();
@@ -240,8 +235,13 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setAllowUserInteraction(false);
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
+
+            // Set up authorization with our credentials
+            Authenticator authenticator = new TaskAuthenticator(username, password);
+            hconn.setAuthenticator(authenticator);
+
             if (istream != null) {
-                preAuthenticate();
+                preAuthenticate(authenticator);
 
                 hconn.setDoOutput(true);
                 hconn.setRequestMethod(Method.PUT);
@@ -314,11 +314,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 handleErrorOutput(e.getMessage());
             }
         } finally {
-            try {
-                Authenticator.setDefault(defaultAuthenticator);
-            } catch (Exception e) {
-                // Ignore
-            }
             closeRedirector();
             if (reader != null) {
                 try {
@@ -344,10 +339,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * the above two are not compatible. When the request is made, the resulting 401 triggers an exception because, when
      * using streams, the InputStream is no longer available to send with the repeated request that now includes the
      * appropriate Authorization header. The hack is to make a simple OPTIONS request- i.e. without a request body. This
-     * triggers authentication and the requirement to authenticate for this host is cached and used to provide an
-     * appropriate Authorization when the next request is made (that includes a request body).
+     * triggers authentication and the requirement to authenticate for this host is cached in the Authenticator and used
+     * to provide an appropriate Authorization when the next request is made (that includes a request body).
      */
-    private void preAuthenticate() throws IOException, URISyntaxException {
+    private void preAuthenticate(Authenticator authenticator) throws IOException, URISyntaxException {
 
         // Create a connection for this command
         URI uri = new URI(url);
@@ -359,6 +354,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
         hconn.setDoOutput(false);
+        hconn.setAuthenticator(authenticator);
         hconn.setRequestMethod(Method.OPTIONS);
         hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
