@@ -73,18 +73,20 @@ public class JdkLoggerFormatter extends Formatter {
         long time = record.getMillis();
         String message = formatMessage(record);
 
-
+        if (null == name) {
+            name = "";
+        }
         if (name.indexOf('.') >= 0) {
             name = name.substring(name.lastIndexOf('.') + 1);
         }
 
         // Use a string buffer for better performance
+        String timeStr = String.valueOf(time);
         StringBuilder buf = new StringBuilder();
-
-        buf.append(time);
+        buf.append(timeStr);
 
         // pad to 8 to make it more readable
-        for (int i = 0; i < 8 - buf.length(); i++) {
+        for (int i = 0; i < 8 - timeStr.length(); i++) {
             buf.append(' ');
         }
 
@@ -116,7 +118,7 @@ public class JdkLoggerFormatter extends Formatter {
         buf.append(' ');
 
         // pad to 20 chars
-        for (int i = 0; i < 8 - buf.length(); i++) {
+        for (int i = 0; i < 20 - (name.length() + 1); i++) {
             buf.append(' ');
         }
 
