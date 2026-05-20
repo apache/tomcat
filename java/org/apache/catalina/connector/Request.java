@@ -1388,6 +1388,9 @@ public class Request implements HttpServletRequest {
 
     @Override
     public void removeAttribute(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("coyoteRequest.setAttribute.namenull"));
+        }
         // Remove the specified attribute
         // Pass special attributes to the native layer
         if (name.startsWith("org.apache.tomcat.")) {

@@ -258,6 +258,7 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void sendEarlyHints() {
+        checkFacade();
         response.sendEarlyHints();
     }
 

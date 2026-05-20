@@ -788,6 +788,9 @@ public class Response implements HttpServletResponse {
 
     @Override
     public String getHeader(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
         // Need special handling for Content-Type and Content-Length due to
         // special handling of these in coyoteResponse
         char cc = name.charAt(0);
@@ -831,6 +834,9 @@ public class Response implements HttpServletResponse {
 
     @Override
     public Collection<String> getHeaders(String name) {
+        if (name == null || name.isEmpty()) {
+            return Set.of();
+        }
         // Need special handling for Content-Type and Content-Length due to
         // special handling of these in coyoteResponse
         char cc = name.charAt(0);
@@ -1034,6 +1040,9 @@ public class Response implements HttpServletResponse {
 
     @Override
     public boolean containsHeader(String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
         // Need special handling for Content-Type and Content-Length due to
         // special handling of these in coyoteResponse
         char cc = name.charAt(0);
