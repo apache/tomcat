@@ -213,6 +213,22 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             return;
         }
 
+        // Start the new component if necessary
+        if (valve == null) {
+            return;
+        }
+        if (valve instanceof Contained) {
+            ((Contained) valve).setContainer(this.container);
+        }
+        if (getState().isAvailable() && valve instanceof Lifecycle) {
+            try {
+                ((Lifecycle) valve).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardPipeline.basic.start"), e);
+                return;
+            }
+        }
+
         // Stop the old component if necessary
         if (oldBasic != null) {
             if (getState().isAvailable() && (oldBasic instanceof Lifecycle)) {
@@ -228,22 +244,6 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                 }
-            }
-        }
-
-        // Start the new component if necessary
-        if (valve == null) {
-            return;
-        }
-        if (valve instanceof Contained) {
-            ((Contained) valve).setContainer(this.container);
-        }
-        if (getState().isAvailable() && valve instanceof Lifecycle) {
-            try {
-                ((Lifecycle) valve).start();
-            } catch (LifecycleException e) {
-                log.error(sm.getString("standardPipeline.basic.start"), e);
-                return;
             }
         }
 
