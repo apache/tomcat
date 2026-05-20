@@ -195,7 +195,6 @@ public class JsonFormatter extends OneLineFormatter {
             switch (c) {
                 case '"':
                 case '\\':
-                case '/':
                     return c;
                 case 0x8:
                     return 'b';
