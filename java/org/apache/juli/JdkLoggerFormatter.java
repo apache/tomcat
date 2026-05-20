@@ -73,18 +73,21 @@ public class JdkLoggerFormatter extends Formatter {
         long time = record.getMillis();
         String message = formatMessage(record);
 
-
+        if (name == null) {
+            name = "";
+        }
         if (name.indexOf('.') >= 0) {
             name = name.substring(name.lastIndexOf('.') + 1);
         }
 
         // Use a string buffer for better performance
+        String timeStr = String.valueOf(time);
         StringBuilder buf = new StringBuilder();
 
-        buf.append(time);
+        buf.append(timeStr);
 
         // pad to 8 to make it more readable
-        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
+        buf.append(" ".repeat(Math.max(0, 8 - timeStr.length())));
 
         // Append a readable representation of the log level.
         switch (level) {
@@ -108,13 +111,12 @@ public class JdkLoggerFormatter extends Formatter {
                 buf.append("   ");
         }
 
-
         // Append the name of the log instance if so configured
         buf.append(name);
         buf.append(' ');
 
         // pad to 20 chars
-        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
+        buf.append(" ".repeat(Math.max(0, 20 - (name.length() + 1))));
 
         // Append the message
         buf.append(LogUtil.escape(message));
