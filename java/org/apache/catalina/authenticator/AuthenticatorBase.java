@@ -633,7 +633,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             }
             if (!realm.hasResourcePermission(request, response, constraints, this.context)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("authenticator.userPermissionFail", request.getUserPrincipal().getName()));
+                    log.debug(sm.getString("authenticator.userPermissionFail",
+                            request.getUserPrincipal() == null ? "" : request.getUserPrincipal().getName()));
                 }
                 /*
                  * ASSERT: AccessControl method has already set the appropriate HTTP status code, so we do not have to
