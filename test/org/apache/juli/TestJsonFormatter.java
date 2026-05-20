@@ -56,4 +56,12 @@ public class TestJsonFormatter {
 
     }
 
+    @Test
+    public void testEscapeLatterHalf() {
+        String input = "0123456789";
+
+        CharSequence result = JsonFormatter.JSONFilter.escape(input, 5, 5);
+
+        Assert.assertEquals("56789", result.toString());
+    }
 }

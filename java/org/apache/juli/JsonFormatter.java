@@ -171,7 +171,7 @@ public class JsonFormatter extends OneLineFormatter {
                 if (off == 0 && length == input.length()) {
                     return input;
                 } else {
-                    return input.subSequence(off, length - off);
+                    return input.subSequence(off, length + off);
                 }
             } else {
                 if (lastUnescapedStart < length) {
