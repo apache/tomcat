@@ -299,7 +299,9 @@ public abstract class BaseRedirectorHelperTask extends Task {
     @Override
     protected void handleFlush(String output) {
         handleOutput(output);
-        redirectOutPrintStream.flush();
+        if (redirectOutput) {
+            redirectOutPrintStream.flush();
+        }
     }
 
 
@@ -332,7 +334,9 @@ public abstract class BaseRedirectorHelperTask extends Task {
     @Override
     protected void handleErrorFlush(String output) {
         handleErrorOutput(output);
-        redirectErrPrintStream.flush();
+        if (redirectOutput) {
+            redirectErrPrintStream.flush();
+        }
     }
 
 
