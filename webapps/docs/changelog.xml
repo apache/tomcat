@@ -329,6 +329,9 @@
       <fix>
         Fix EL standalone interface bean properties discovery. (remm)
       </fix>
+      <fix>
+        Fix possible EL argument mismatch when it was set to null. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
