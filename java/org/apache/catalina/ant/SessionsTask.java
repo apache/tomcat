@@ -63,7 +63,7 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
         StringBuilder buffer = super.createQueryString(command);
         if (path != null && idle != null) {
             buffer.append("&idle=");
-            buffer.append(this.idle);
+            buffer.append(Integer.valueOf(idle));
         }
         return buffer;
     }
