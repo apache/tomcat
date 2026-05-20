@@ -157,6 +157,14 @@ public class TestAstLambdaExpression {
 
 
     @Test
+    public void testNested08() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("(x -> (x -> x)(null))(42)", Integer.class);
+        Assert.assertNull(result);
+    }
+
+
+    @Test
     public void testLambdaAsFunction01() {
         ELProcessor processor = new ELProcessor();
         Object result =
