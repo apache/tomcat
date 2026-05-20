@@ -263,6 +263,7 @@ if ""%1"" == ""run"" goto doRun
 if ""%1"" == ""start"" goto doStart
 if ""%1"" == ""stop"" goto doStop
 if ""%1"" == ""configtest"" goto doConfigTest
+if ""%1"" == ""config-validate"" goto doConfigValidate
 if ""%1"" == ""version"" goto doVersion
 
 echo Usage:  catalina ( commands ... )
@@ -273,6 +274,7 @@ echo   run               Start Catalina in the current window
 echo   start             Start Catalina in a separate window
 echo   stop              Stop Catalina
 echo   configtest        Run a basic syntax check on server.xml
+echo   config-validate   Run configuration validators with detailed output
 echo   version           What version of tomcat are you running?
 goto end
 
@@ -300,7 +302,19 @@ goto execCmd
 
 :doConfigTest
 shift
-set ACTION=configtest
+rem Check if --validate-only argument is present
+if ""%1"" == ""--validate-only"" (
+    set ACTION=config-validate
+    shift
+) else (
+    set ACTION=configtest
+)
+set CATALINA_OPTS=
+goto execCmd
+
+:doConfigValidate
+shift
+set ACTION=config-validate
 set CATALINA_OPTS=
 goto execCmd
 

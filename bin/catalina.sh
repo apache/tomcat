@@ -549,17 +549,34 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "configtest" ] ; then
 
+    # Check if --validate-only argument is present
+    if [ "$2" = "--validate-only" ] ; then
+        COMMAND="config-validate"
+    else
+        COMMAND="configtest"
+    fi
+
     eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
-      org.apache.catalina.startup.Bootstrap configtest
+      org.apache.catalina.startup.Bootstrap "$COMMAND"
     result=$?
-    if [ $result -ne 0 ]; then
+    if [ $result -ne 0 ] && [ "$COMMAND" = "configtest" ]; then
         echo "Configuration error detected!"
     fi
     exit $result
+
+elif [ "$1" = "config-validate" ] ; then
+
+    eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
+      -classpath "\"$CLASSPATH\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
+      org.apache.catalina.startup.Bootstrap config-validate
+    exit $?
 
 elif [ "$1" = "version" ] ; then
 
