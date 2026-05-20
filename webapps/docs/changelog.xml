@@ -163,6 +163,10 @@
         <bug>70050</bug>: Avoid NPE when no header frame is processed in HTTP/2,
         following refactor clean-up of header buffer. (remm)
       </fix>
+      <fix>
+        Properly use <code>pollerThreadPriority</code> for the NIO poller
+        thread. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
