@@ -1187,7 +1187,7 @@ public class Connector extends LifecycleMBeanBase {
                 sb.append(port);
             } else {
                 sb.append("auto-");
-                sb.append(Integer.valueOf(getNameIndex()));
+                sb.append(getNameIndex());
             }
             String address = "";
             if (addressObj instanceof InetAddress) {
@@ -1365,7 +1365,7 @@ public class Connector extends LifecycleMBeanBase {
                     sb.append(port);
                 } else {
                     sb.append("auto-");
-                    sb.append(Integer.valueOf(getNameIndex()));
+                    sb.append(getNameIndex());
                 }
             }
         } else {
