@@ -336,6 +336,7 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     public void sendEarlyHints() {
+        checkFacade();
         response.sendEarlyHints();
     }
 

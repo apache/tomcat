@@ -727,7 +727,7 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public String[] findAliases() {
         synchronized (aliasesLock) {
-            return this.aliases;
+            return this.aliases.clone();
         }
     }
 
@@ -828,7 +828,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public String[] getAliases() {
         synchronized (aliasesLock) {
-            return aliases;
+            return aliases.clone();
         }
     }
 
