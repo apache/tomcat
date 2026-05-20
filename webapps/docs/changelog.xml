@@ -447,7 +447,7 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Restore default authenticator after executing an Ant task. (remm)
+        Use per connection authenticator when executing an Ant task. (remm)
       </fix>
     </changelog>
   </subsection>
