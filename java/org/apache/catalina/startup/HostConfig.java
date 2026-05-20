@@ -730,9 +730,7 @@ public class HostConfig implements LifecycleListener {
             addGlobalRedeployResources(deployedApp);
         }
 
-        if (host.findChild(context.getName()) != null) {
-            deployed.put(context.getName(), deployedApp);
-        }
+        deployed.put(context.getName(), deployedApp);
 
         if (log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.deployDescriptor.finished", contextXml.getAbsolutePath(),
