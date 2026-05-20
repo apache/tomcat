@@ -261,13 +261,14 @@ public class BasicAuthenticator extends AuthenticatorBase {
         private byte[] parseBase64() throws IllegalArgumentException {
             byte[] encoded = new byte[base64blobLength];
             System.arraycopy(authorization.getBuffer(), base64blobOffset, encoded, 0, base64blobLength);
-            byte[] decoded = Base64.getDecoder().decode(encoded);
-            // restore original offset
-            authorization.setStart(initialOffset);
-            if (decoded == null) {
-                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"));
+            try {
+                byte[] decoded = Base64.getDecoder().decode(encoded);
+                // restore original offset
+                authorization.setStart(initialOffset);
+                return decoded;
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"), e);
             }
-            return decoded;
         }
 
         /*
