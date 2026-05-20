@@ -111,8 +111,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             log.trace(sm.getString("asyncContextImpl.fireOnComplete"));
         }
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
+        Context context = this.context;
 
-        ClassLoader oldCL = context.bind(null);
+        ClassLoader oldCL = null;
+        if (context != null) {
+            oldCL = context.bind(null);
+        }
         try {
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
@@ -123,9 +127,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
-            context.fireRequestDestroyEvent(request.getRequest());
+            if (context != null) {
+                context.fireRequestDestroyEvent(request.getRequest());
+            }
             clearServletRequestResponse();
-            context.unbind(oldCL);
+            if (context != null) {
+                context.unbind(oldCL);
+            }
         }
     }
 
@@ -145,7 +153,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("asyncContextImpl.fireOnTimeout"));
             }
-            ClassLoader oldCL = context.bind(null);
+            ClassLoader oldCL = null;
+            if (context != null) {
+                oldCL = context.bind(null);
+            }
             try {
                 List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
@@ -158,7 +169,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
                 request.getCoyoteRequest().action(ActionCode.ASYNC_IS_TIMINGOUT, result);
             } finally {
-                context.unbind(oldCL);
+                if (context != null) {
+                    context.unbind(oldCL);
+                }
             }
         }
         return !result.get();
@@ -180,7 +193,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (cpath.length() > 1) {
             path = path.substring(cpath.length());
         }
-        if (!context.getDispatchersUseEncodedPaths()) {
+        Context context = this.context;
+        if (context == null || context.getDispatchersUseEncodedPaths()) {
             path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
         }
         dispatch(path);
@@ -273,7 +287,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         check();
         T listener;
         try {
-            listener = (T) context.getInstanceManager().newInstance(clazz.getName(), clazz.getClassLoader());
+            Context context = this.context;
+            if (context != null) {
+                listener = (T) context.getInstanceManager().newInstance(clazz.getName(), clazz.getClassLoader());
+            } else {
+                listener = (T) Class.forName(clazz.getName(), true, clazz.getClassLoader()).getConstructor().newInstance();
+            }
         } catch (ReflectiveOperationException | NamingException e) {
             throw new ServletException(e);
         } catch (Exception e) {
@@ -477,10 +496,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
-            Host host = (Host) context.getParent();
-            Valve stdHostValve = host.getPipeline().getBasic();
-            if (stdHostValve instanceof StandardHostValve) {
-                ((StandardHostValve) stdHostValve).throwable(request, request.getResponse(), t);
+            Context context = this.context;
+            if (context != null) {
+                Host host = (Host) context.getParent();
+                Valve stdHostValve = host.getPipeline().getBasic();
+                if (stdHostValve instanceof StandardHostValve) {
+                    ((StandardHostValve) stdHostValve).throwable(request, request.getResponse(), t);
+                }
             }
 
             request.getCoyoteRequest().action(ActionCode.ASYNC_IS_ERROR, result);
@@ -501,13 +523,19 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void incrementInProgressAsyncCount() {
-        context.incrementInProgressAsyncCount();
+        Context context = this.context;
+        if (context != null) {
+            context.incrementInProgressAsyncCount();
+        }
     }
 
 
     @Override
     public void decrementInProgressAsyncCount() {
-        context.decrementInProgressAsyncCount();
+        Context context = this.context;
+        if (context != null) {
+            context.decrementInProgressAsyncCount();
+        }
     }
 
 
