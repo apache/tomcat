@@ -1024,18 +1024,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
         // Init
         int counter = 0;
-        int result = 0;
+        long sum = 0;
 
         // Calculate average
         for (SessionTiming timing : copy) {
             if (timing != null) {
-                int timeAlive = timing.duration();
                 counter++;
-                // Very careful not to overflow - probably not necessary
-                result = (result * ((counter - 1) / counter)) + (timeAlive / counter);
+                sum += timing.duration();
             }
         }
-        return result;
+        return counter > 0 ? (int) (sum / counter) : 0;
     }
 
 
