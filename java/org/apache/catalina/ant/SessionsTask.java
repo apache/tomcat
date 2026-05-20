@@ -30,12 +30,12 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
     }
 
     /**
-     * Minimum idle time in seconds for sessions to be included in the response.
+     * Minimum idle time in minutes for sessions to be included in the response.
      */
     protected String idle = null;
 
     /**
-     * Returns the minimum idle time in seconds for sessions to be included.
+     * Returns the minimum idle time in minutes for sessions to be included.
      *
      * @return the minimum idle time
      */
@@ -44,7 +44,7 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
     }
 
     /**
-     * Sets the minimum idle time in seconds for sessions to be included.
+     * Sets the minimum idle time in minutes for sessions to be included.
      *
      * @param idle the minimum idle time
      */
