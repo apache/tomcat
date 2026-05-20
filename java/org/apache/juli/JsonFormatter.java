@@ -194,7 +194,7 @@ public class JsonFormatter extends OneLineFormatter {
 
         private static char getPopularChar(char c) {
             return switch (c) {
-                case '"', '\\', '/' -> c;
+                case '"', '\\' -> c;
                 case 0x8 -> 'b';
                 case 0xc -> 'f';
                 case 0xa -> 'n';
