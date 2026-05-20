@@ -262,7 +262,7 @@ public abstract class ELContext {
     public Object getLambdaArgument(String name) {
         for (Map<String,Object> arguments : getLambdaArguments()) {
             Object result = arguments.get(name);
-            if (result != null) {
+            if (result != null || arguments.containsKey(name)) {
                 return result;
             }
         }
