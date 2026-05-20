@@ -63,7 +63,11 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
         StringBuilder buffer = super.createQueryString(command);
         if (path != null && idle != null) {
             buffer.append("&idle=");
-            buffer.append(Integer.valueOf(idle));
+            try {
+                buffer.append(Integer.valueOf(idle));
+            } catch (NumberFormatException nfe) {
+                throw new BuildException("Invalid 'idle' attribute (must be an integer): [" + idle + "]",  nfe);
+            }
         }
         return buffer;
     }
