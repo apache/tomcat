@@ -136,6 +136,10 @@
       <fix>
         Incorrect session average life calculation. (remm)
       </fix>
+      <fix>
+        Improve robustness on using <code>Pipeline.setBasic</code> on a running
+        pipeline. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
