@@ -181,7 +181,7 @@ class BeanSupportStandalone extends BeanSupport {
         private void populateFromInterfaces(Class<?> aClass) {
             Class<?>[] interfaces = aClass.getInterfaces();
             for (Class<?> ifs : interfaces) {
-                PropertyDescriptor[] pds = getPropertyDescriptors(type);
+                PropertyDescriptor[] pds = getPropertyDescriptors(ifs);
                 for (PropertyDescriptor pd : pds) {
                     if (!this.properties.containsKey(pd.getName())) {
                         this.properties.put(pd.getName(), new BeanPropertyStandalone(this.type, pd));
