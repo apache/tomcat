@@ -249,6 +249,9 @@
         similar to what is done for servlets, as required by the servlet
         specification. (remm)
       </fix>
+      <fix>
+        Fix container event cleanups in some edge cases. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
