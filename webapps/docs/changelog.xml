@@ -197,6 +197,10 @@
       <fix>
         Fix <code>MessageByte.equals</code> if called on a null MB. (remm)
       </fix>
+      <fix>
+        Call the delegate key manager in JSSE to retrieve the server key.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
