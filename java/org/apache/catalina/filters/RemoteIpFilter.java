@@ -511,11 +511,6 @@ public class RemoteIpFilter extends GenericFilter {
         protected String scheme;
 
         /**
-         * Whether the request is secure.
-         */
-        protected boolean secure;
-
-        /**
          * The server name.
          */
         protected String serverName;
@@ -537,7 +532,6 @@ public class RemoteIpFilter extends GenericFilter {
             this.remoteAddr = request.getRemoteAddr();
             this.remoteHost = request.getRemoteHost();
             this.scheme = request.getScheme();
-            this.secure = request.isSecure();
             this.serverName = request.getServerName();
             this.serverPort = request.getServerPort();
 
