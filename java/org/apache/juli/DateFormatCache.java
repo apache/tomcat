@@ -62,6 +62,8 @@ public class DateFormatCache {
      * Replace the millisecond formatting character 'S' by some dummy characters in order to make the resulting
      * formatted time stamps cacheable. Our consumer might choose to replace the dummy chars with the actual
      * milliseconds because that's relatively cheap.
+     * @param format the format
+     * @return the replacement format
      */
     protected static String tidyFormat(String format) {
         final int length = format.length();
