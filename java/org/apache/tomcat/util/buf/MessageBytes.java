@@ -623,17 +623,14 @@ public final class MessageBytes implements Cloneable, Serializable {
             buf[end++] = (byte) '0';
         }
         if (l < 0) {
-            if (l == Long.MIN_VALUE) {
-                current = Long.MAX_VALUE;
-            } else {
-                current = -l;
-            }
             buf[end++] = (byte) '-';
+        } else {
+            current = -l;
         }
-        while (current > 0) {
+        while (current < 0) {
             int digit = (int) (current % 10);
             current = current / 10;
-            buf[end++] = HexUtils.getHex(digit);
+            buf[end++] = HexUtils.getHex(-digit);
         }
         byteC.setStart(0);
         byteC.setEnd(end);
