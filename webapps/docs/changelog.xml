@@ -229,6 +229,10 @@
         Documentation: Expand the description of some of the attributes of the
         <code>CrawlerSessionManagerValve</code>. (markt)
       </add>
+      <fix>
+        Documentation: Clearer description and correct documented default for
+        <code>ocspSoftFail</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
