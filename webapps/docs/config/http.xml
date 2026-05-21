@@ -1373,12 +1373,14 @@
     </attribute>
 
     <attribute name="ocspSoftFail" required="false">
-      <p>By default, if an OCSP check fails for any reason the associated TLS
-      handhskae will also fail and a TLS connection will not be established. If
-      this attribute is set to <code>true</code>, OCSP checks that fail but do
-      not return an explicit failure status to Tomcat (e.g. the OCSP check times
-      out) will not cause the TLS handshake to fail.</p>
-      <p>If not specified, the default value of <code>false</code> will be
+      <p>If an OCSP responder returns an error, the TLS handshake will always
+      fail and a TLS connection will not be established. If the OCSP responder
+      is unreachable or otherwise unavailable, this setting determines whether
+      the handshake completes or fails. If <code>true</code>, the handskahe will
+      complete and a TLS connection will be established when the OCSP responder
+      is unavailable. If <code>false</code>, the handshake will fail and no TLS
+      connection will be established.</p>
+      <p>If not specified, the default value of <code>true</code> will be
       used.</p>
     </attribute>
 
