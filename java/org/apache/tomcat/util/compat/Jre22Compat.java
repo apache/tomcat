@@ -16,10 +16,6 @@
  */
 package org.apache.tomcat.util.compat;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * JRE 22 compatibility implementation.
  */
@@ -31,26 +27,11 @@ public class Jre22Compat extends Jre21Compat {
     public Jre22Compat() {
     }
 
-    private static final Log log = LogFactory.getLog(Jre22Compat.class);
-    private static final StringManager sm = StringManager.getManager(Jre22Compat.class);
-
     private static final boolean supported;
 
 
     static {
-        // Note: FFM is the main new feature from Java 22, but it was previously
-        // present as a preview. As a result, it is more accurate to test for another
-        // new class
-        Class<?> c1 = null;
-        try {
-            c1 = Class.forName("java.text.ListFormat");
-        } catch (ClassNotFoundException e) {
-            // Must be pre-Java 22
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jre22Compat.javaPre22"), e);
-            }
-        }
-        supported = (c1 != null);
+        supported = Runtime.version().feature() > 21;
     }
 
     static boolean isSupported() {
