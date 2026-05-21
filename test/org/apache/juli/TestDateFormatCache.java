@@ -106,4 +106,61 @@ public class TestDateFormatCache {
         return sdf.format(new Date(secs * 1000));
     }
 
+    @Test
+    public void replacesUnquotedS() {
+        Assert.assertEquals(
+            "HH:mm:ss.###",
+            DateFormatCache.tidyFormat("HH:mm:ss.SSS")
+        );
+    }
+
+    @Test
+    public void doesNotReplaceQuotedS() {
+        Assert.assertEquals(
+            "HH:mm:ss.'SSS'",
+            DateFormatCache.tidyFormat("HH:mm:ss.'SSS'")
+        );
+    }
+
+    @Test
+    public void handlesEscapedQuoteInsideLiteral() {
+        Assert.assertEquals(
+            "'o''clock' ###",
+            DateFormatCache.tidyFormat("'o''clock' SSS")
+        );
+    }
+
+    @Test
+    public void doesNotReplaceSInsideLiteralAfterEscapedQuote() {
+        Assert.assertEquals(
+            "'abc''SSS'",
+            DateFormatCache.tidyFormat("'abc''SSS'")
+        );
+    }
+
+    @Test
+    public void handlesMultipleLiteralSections() {
+        Assert.assertEquals(
+            "'foo' ### 'bar'",
+            DateFormatCache.tidyFormat("'foo' SSS 'bar'")
+        );
+    }
+
+    @Test
+    public void handlesEscapedQuoteOutsideLiteral() {
+        Assert.assertEquals(
+            "'' ###",
+            DateFormatCache.tidyFormat("'' SSS")
+        );
+    }
+
+    @Test
+    public void complexQuoteScenario() {
+        Assert.assertEquals(
+            "'Start' ### 'o''clock' ### '' 'End'",
+            DateFormatCache.tidyFormat(
+                "'Start' SSS 'o''clock' SSS '' 'End'"
+            )
+        );
+    }
 }
