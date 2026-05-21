@@ -144,6 +144,11 @@
         Improve robustness on using <code>Pipeline.setBasic</code> on a running
         pipeline. (remm)
       </fix>
+      <fix>
+        Avoid any init parameter updates when conflicts are found for filters,
+        similar to what is done for servlets, as required by the servlet
+        specification. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
