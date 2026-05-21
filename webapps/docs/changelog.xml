@@ -260,6 +260,10 @@
       <fix>
         Fix hour unit used by <code>ExpiresFilter</code>. (remm)
       </fix>
+      <fix>
+        Remove exception swallowing in <code>DataSourceStore</code> to align
+        it with <code>FileStore</code> and avoid session loss on errors. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
