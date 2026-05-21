@@ -466,7 +466,7 @@ public class ExpiresFilter extends FilterBase {
         /** Day duration unit. */
         DAY(Calendar.DAY_OF_YEAR),
         /** Hour duration unit. */
-        HOUR(Calendar.HOUR),
+        HOUR(Calendar.HOUR_OF_DAY),
         /** Minute duration unit. */
         MINUTE(Calendar.MINUTE),
         /** Month duration unit. */
@@ -606,9 +606,11 @@ public class ExpiresFilter extends FilterBase {
         @Override
         public void addDateHeader(String name, long date) {
             super.addDateHeader(name, date);
-            if (!lastModifiedHeaderSet) {
-                this.lastModifiedHeader = date;
-                this.lastModifiedHeaderSet = true;
+            if (HEADER_LAST_MODIFIED.equalsIgnoreCase(name)) {
+                if (!lastModifiedHeaderSet) {
+                    this.lastModifiedHeader = date;
+                    this.lastModifiedHeaderSet = true;
+                }
             }
         }
 
