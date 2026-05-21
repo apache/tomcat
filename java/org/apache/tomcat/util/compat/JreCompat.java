@@ -30,7 +30,6 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
-    private static final boolean jre24Available;
     private static final boolean jre22Available;
 
     static {
@@ -47,17 +46,11 @@ public class JreCompat {
 
         // This is Tomcat 12.0.x with a minimum Java version of Java 21.
         // Look for the highest supported JVM first
-        if (Jre24Compat.isSupported()) {
-            instance = new Jre24Compat();
-            jre24Available = true;
-            jre22Available = true;
-        } else if (Jre22Compat.isSupported()) {
+        if (Jre22Compat.isSupported()) {
             instance = new Jre22Compat();
-            jre24Available = false;
             jre22Available = true;
         } else {
             instance = new JreCompat();
-            jre24Available = false;
             jre22Available = false;
         }
     }
@@ -90,15 +83,5 @@ public class JreCompat {
      */
     public static boolean isJre22Available() {
         return jre22Available;
-    }
-
-
-    /**
-     * Check if JRE 24 is available.
-     *
-     * @return {@code true} if JRE 24 is available
-     */
-    public static boolean isJre24Available() {
-        return jre24Available;
     }
 }
