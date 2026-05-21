@@ -132,7 +132,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.isShutdown();
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -142,7 +142,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.isTerminated();
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -158,7 +158,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.submit(task);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -168,7 +168,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.submit(task, result);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -178,7 +178,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.submit(task);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -188,7 +188,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.invokeAll(tasks);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -199,7 +199,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.invokeAll(tasks, timeout, unit);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -209,7 +209,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.invokeAny(tasks);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 
@@ -220,7 +220,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         if (executor != null) {
             return executor.invokeAny(tasks, timeout, unit);
         } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
         }
     }
 }
