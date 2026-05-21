@@ -198,6 +198,8 @@ public class DataSourceStore extends JDBCStore {
     @Override
     public void remove(String id) throws IOException {
 
+        SQLException sqlException = null;
+
         int numberOfTries = 2;
         while (numberOfTries > 0) {
             Connection _conn = getConnection();
@@ -211,11 +213,18 @@ public class DataSourceStore extends JDBCStore {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
+                // Keep the first exception just in case
+                if (sqlException == null) {
+                    sqlException = e;
+                }
             } finally {
                 release(_conn);
             }
             numberOfTries--;
+        }
+
+        if (sqlException != null) {
+            throw new IOException(sm.getString(getStoreName() + ".SQLException"), sqlException);
         }
 
         if (manager.getContext().getLogger().isTraceEnabled()) {
@@ -272,8 +281,17 @@ public class DataSourceStore extends JDBCStore {
         String saveSql = "INSERT INTO " + sessionTable + " (" + sessionIdCol + ", " + sessionAppCol + ", " +
                 sessionDataCol + ", " + sessionValidCol + ", " + sessionMaxInactiveCol + ", " + sessionLastAccessedCol +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
+        SQLException sqlException = null;
 
         synchronized (session) {
+
+            // First serialize session
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
+                ((StandardSession) session).writeObjectData(oos);
+            }
+            byte[] obs = bos.toByteArray();
+
             int numberOfTries = 2;
             while (numberOfTries > 0) {
                 Connection _conn = getConnection();
@@ -285,11 +303,6 @@ public class DataSourceStore extends JDBCStore {
                     // Remove session if it exists and insert again.
                     remove(session.getIdInternal(), _conn);
 
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
-                        ((StandardSession) session).writeObjectData(oos);
-                    }
-                    byte[] obs = bos.toByteArray();
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                             InputStream in = new BufferedInputStream(bis, size);
@@ -303,16 +316,22 @@ public class DataSourceStore extends JDBCStore {
                         preparedSaveSql.execute();
                         // Break out after the finally block
                         numberOfTries = 0;
+                        sqlException = null;
                     }
                 } catch (SQLException e) {
-                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
-                } catch (IOException ignore) {
-                    // Ignore
+                    // Keep the first exception just in case
+                    if (sqlException == null) {
+                        sqlException = e;
+                    }
                 } finally {
                     release(_conn);
                 }
                 numberOfTries--;
             }
+        }
+
+        if (sqlException != null) {
+            throw new IOException(sm.getString(getStoreName() + ".SQLException"), sqlException);
         }
 
         if (manager.getContext().getLogger().isTraceEnabled()) {
