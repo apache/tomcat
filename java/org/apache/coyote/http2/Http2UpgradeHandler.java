@@ -294,8 +294,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     }
                     remoteSettings.set(key, value);
                 }
-            } catch (Http2Exception e) {
-                throw new ProtocolException(sm.getString("upgradeHandler.upgrade.fail", connectionId));
+            } catch (IllegalArgumentException | Http2Exception e) {
+                throw new ProtocolException(sm.getString("upgradeHandler.upgrade.fail", connectionId), e);
             }
         }
 
