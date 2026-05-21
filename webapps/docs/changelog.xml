@@ -249,6 +249,10 @@
         Documentation: Clearer description and correct documented default for
         <code>ocspSoftFail</code>. (markt)
       </fix>
+      <fix>
+        Fix double escaping in the context names for the JSON mode of the
+        manager servlet. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
