@@ -194,7 +194,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             path = path.substring(cpath.length());
         }
         Context context = this.context;
-        if (context == null || context.getDispatchersUseEncodedPaths()) {
+        if (context != null && !context.getDispatchersUseEncodedPaths()) {
             path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
         }
         dispatch(path);
