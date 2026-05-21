@@ -705,7 +705,7 @@ public final class ByteChunk extends AbstractChunk {
         }
         int off = start;
         for (int i = 0; i < len; i++) {
-            if (Ascii.toLower(b[off++]) != Ascii.toLower(s.charAt(i))) {
+            if (s.charAt(i) > 0xff || Ascii.toLower(b[off++]) != Ascii.toLower(s.charAt(i))) {
                 return false;
             }
         }
