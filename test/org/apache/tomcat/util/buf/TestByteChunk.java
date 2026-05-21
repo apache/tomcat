@@ -143,6 +143,14 @@ public class TestByteChunk {
         Assert.assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
     }
 
+    @Test
+    public void testEqualsIgnoreCase() {
+        byte[] bytes = "Hello".getBytes();
+        ByteChunk bc = new ByteChunk();
+        bc.setBytes(bytes, 0, bytes.length);
+        Assert.assertTrue(bc.equalsIgnoreCase("heLLo"));
+        Assert.assertFalse(bc.equalsIgnoreCase("\u8a48\u8a65\u8a6c\u8a6c\u8a6f"));
+    }
 
     @Test
     public void testSerialization() throws Exception {
