@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.buf;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestMessageBytes {
@@ -65,5 +66,14 @@ public class TestMessageBytes {
         mb.setString("foo");
         mb.recycle();
         mb.toChars();
+    }
+
+
+    @Test
+    public void testEqualsNullNull() {
+        MessageBytes mb1 = MessageBytes.newInstance();
+        MessageBytes mb2 = MessageBytes.newInstance();
+
+        Assert.assertTrue(mb1.equals(mb2));
     }
 }

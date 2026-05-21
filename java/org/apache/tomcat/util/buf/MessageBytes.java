@@ -456,19 +456,25 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return true if equal
      */
     public boolean equals(MessageBytes mb) {
+        // MessageBytes can be one of four types so there are 4 * 4 = 16 possible combinations.
+
+        // If either instance is a String, use equals(String)
         if (type == T_STR) {
             return mb.equals(strValue);
         }
-
-        if (mb.type != T_CHARS && mb.type != T_BYTES) {
-            // it's a string or int/date string value
-            return equals(mb.toString());
+        if (mb.type == T_STR) {
+            return equals(mb.strValue);
         }
 
-        // mb is either CHARS or BYTES.
-        // this is either CHARS or BYTES
-        // Deal with the 4 cases ( in fact 3, one is symmetric)
+        // If either instance is null, use isNull
+        if (type == T_NULL) {
+            return mb.isNull();
+        }
+        if (mb.type == T_NULL) {
+            return isNull();
+        }
 
+        // At this point both instances are either T_BYTES or T_CHARS
         if (mb.type == T_CHARS && type == T_CHARS) {
             return charC.equals(mb.charC);
         }
@@ -481,7 +487,9 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (mb.type == T_BYTES && type == T_CHARS) {
             return mb.byteC.equals(charC);
         }
-        return (mb.type == T_NULL && type == T_NULL);
+
+        // Impossible to reach this point
+        return false;
     }
 
 
