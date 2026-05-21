@@ -153,6 +153,10 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
             }
         } else if (child instanceof Host || child instanceof Engine) {
             child.removeContainerListener(this);
+            Container[] children = child.findChildren();
+            for (Container current : children) {
+                processContainerRemoveChild(current);
+            }
         }
     }
 
