@@ -1005,7 +1005,10 @@ public class Connector extends LifecycleMBeanBase {
      * @return the executor name, or {@link #INTERNAL_EXECUTOR_NAME} if using the internal executor
      */
     public String getExecutorName() {
-        Object obj = protocolHandler.getExecutor();
+        Object obj = null;
+        if (protocolHandler != null) {
+            obj = protocolHandler.getExecutor();
+        }
         if (obj instanceof org.apache.catalina.Executor) {
             return ((org.apache.catalina.Executor) obj).getName();
         }
