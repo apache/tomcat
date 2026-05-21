@@ -198,8 +198,10 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
 
         // Have to add in a separate loop since spec requires no updates at all
         // if there is an issue
-        for (Map.Entry<String,String> entry : initParameters.entrySet()) {
-            setInitParameter(entry.getKey(), entry.getValue());
+        if (conflicts.isEmpty()) {
+            for (Map.Entry<String,String> entry : initParameters.entrySet()) {
+                setInitParameter(entry.getKey(), entry.getValue());
+            }
         }
 
         return conflicts;
