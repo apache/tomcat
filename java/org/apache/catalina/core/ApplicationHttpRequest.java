@@ -547,9 +547,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 other = super.getSession(true);
             }
             if (other != null) {
+                Manager manager = context.getManager();
+                if (manager == null) {
+                    return null;
+                }
                 Session localSession = null;
                 try {
-                    localSession = context.getManager().findSession(other.getId());
+                    localSession = manager.findSession(other.getId());
                     if (localSession != null && !localSession.isValid()) {
                         localSession = null;
                     }
@@ -557,7 +561,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     // Ignore
                 }
                 if (localSession == null && create) {
-                    localSession = context.getManager().createSession(other.getId());
+                    localSession = manager.createSession(other.getId());
                 }
                 if (localSession != null) {
                     localSession.access();
