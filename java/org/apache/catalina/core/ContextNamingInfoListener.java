@@ -118,7 +118,7 @@ public class ContextNamingInfoListener implements LifecycleListener {
         ce.setType("java.lang.String");
         ce.setValue(value);
         if (log.isDebugEnabled()) {
-            log.info(sm.getString("contextNamingInfoListener.envEntry", name, value));
+            log.debug(sm.getString("contextNamingInfoListener.envEntry", name, value));
         }
         context.getNamingResources().addEnvironment(ce);
     }
