@@ -86,6 +86,9 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         // Anti click-jacking
         StringBuilder cjValue = new StringBuilder(antiClickJackingOption.headerValue);
         if (antiClickJackingOption == XFrameOption.ALLOW_FROM) {
+            if (antiClickJackingUri == null) {
+                throw new IllegalArgumentException(sm.getString("httpHeaderSecurityFilter.nullAntiClickJackingUri"));
+            }
             cjValue.append(' ');
             cjValue.append(antiClickJackingUri);
         }
@@ -270,7 +273,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
      * @return the ALLOW_FROM URI
      */
     public String getAntiClickJackingUri() {
-        return antiClickJackingUri.toString();
+        return antiClickJackingUri != null ? antiClickJackingUri.toString() : null;
     }
 
 
