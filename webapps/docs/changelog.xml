@@ -144,6 +144,14 @@
       <fix>
         Fix container event cleanups in some edge cases. (remm)
       </fix>
+      <fix>
+        Check for last-modified header in <code>ExpiresFilter</code> when a
+        servlet uses <code>addDateHader</code> to avoid wrongly considering
+        it has been set. (remm)
+      </fix>
+      <fix>
+        Fix hour unit used by <code>ExpiresFilter</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
