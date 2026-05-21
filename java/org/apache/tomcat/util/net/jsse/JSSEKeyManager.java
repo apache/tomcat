@@ -73,8 +73,8 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
             return serverKeyAlias;
         }
 
-        if (delegate instanceof X509ExtendedKeyManager extendedKeyManager) {
-            return extendedKeyManager.chooseEngineServerAlias(keyType, issuers, engine);
+        if (delegate instanceof X509ExtendedKeyManager) {
+            return ((X509ExtendedKeyManager) delegate).chooseEngineServerAlias(keyType, issuers, engine);
         } else {
             return super.chooseEngineServerAlias(keyType, issuers, engine);
         }
