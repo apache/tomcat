@@ -858,7 +858,7 @@ public class StatusTransformer {
             // for now we don't write out the context in XML
         } else if (mode == 2) {
             indent(writer, 2).append('{').println();
-            appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
+            appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(name)).append(',');
             appendJSonValue(writer, "state", mBeanServer.getAttribute(objectName, "stateName"));
             writer.append(',');
             appendJSonValue(writer, "startTime",
