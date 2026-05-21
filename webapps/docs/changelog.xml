@@ -164,6 +164,10 @@
         Remove exception swallowing in <code>DataSourceStore</code> to align
         it with <code>FileStore</code> and avoid session loss on errors. (remm)
       </fix>
+      <fix>
+        Add support for single-quote escaped literal as well as quoted literals
+        in <code>DateFormatCache</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

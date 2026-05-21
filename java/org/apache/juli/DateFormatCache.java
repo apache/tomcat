@@ -63,22 +63,33 @@ public class DateFormatCache {
      * formatted time stamps cacheable. Our consumer might choose to replace the dummy chars with the actual
      * milliseconds because that's relatively cheap.
      */
-    private String tidyFormat(String format) {
-        boolean escape = false;
+    protected static String tidyFormat(String format) {
+        final int length = format.length();
         StringBuilder result = new StringBuilder();
-        int len = format.length();
-        char x;
-        for (int i = 0; i < len; i++) {
-            x = format.charAt(i);
-            if (escape || x != 'S') {
-                result.append(x);
-            } else {
-                result.append(MSEC_PATTERN);
+        boolean literalMode = false;
+
+        for (int i = 0; i < length; i++) {
+            char c = format.charAt(i);
+
+            if (c == '\'') {
+                // Handle escaped quote ('') which isn't the same as entering literal-mode
+                if (i + 1 < length && format.charAt(i + 1) == '\'') {
+                    result.append("''");
+                    i++; // consume second quote
+                } else {
+                    literalMode = !literalMode;
+                    result.append(c);
+                }
+                continue;
             }
-            if (x == '\'') {
-                escape = !escape;
+
+            if (!literalMode && c == 'S') {
+                result.append(MSEC_PATTERN);
+            } else {
+                result.append(c);
             }
         }
+
         return result.toString();
     }
 
