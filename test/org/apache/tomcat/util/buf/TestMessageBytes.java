@@ -76,4 +76,23 @@ public class TestMessageBytes {
 
         Assert.assertTrue(mb1.equals(mb2));
     }
+
+
+    @Test
+    public void testSetLong() {
+        doTestSetLong(0);
+        doTestSetLong(-1);
+        doTestSetLong(1);
+        doTestSetLong(-12345);
+        doTestSetLong(12345);
+        doTestSetLong(Long.MIN_VALUE);
+        doTestSetLong(Long.MAX_VALUE);
+    }
+
+
+    private void doTestSetLong(long l) {
+        MessageBytes mb = MessageBytes.newInstance();
+        mb.setLong(l);
+        Assert.assertEquals(mb.toStringType(), Long.toString(l));
+    }
 }
