@@ -614,21 +614,31 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         trailerFrameHeader[4] = 0x04;
         writeFrame(trailerFrameHeader, trailerPayload);
 
-        // Expect 2 window updates and a reset due to a protocol error - any order
-        parser.readFrame();
-        parser.readFrame();
-        parser.readFrame();
+        // Expect 2 window updates and a reset due to a protocol error. Order may vary.
+        boolean skip = true;
+        while (skip) {
+            parser.readFrame();
+            if (output.getTrace().contains("WindowSize")) {
+                // Ignore the window updates
+                output.clearTrace();
+            } else {
+                skip = false;
+            }
+        }
         Assert.assertTrue(output.getTrace(), output.getTrace().contains("3-RST-[1]"));
-        output.clearTrace();
 
         // Ensure connection is still valid
         sendSimpleGetRequest(5);
         // Read headers
-        // In async mode, may see multiple resets for Stream 3
-        boolean skip = true;
+        // In async mode, may see multiple resets for Stream 3 and/or further window updates
+        skip = true;
         while (skip) {
             parser.readFrame();
             if (output.getTrace().startsWith("3-RST")) {
+                // Ignore additional resets for stream 3
+                output.clearTrace();
+            } else if (output.getTrace().contains("WindowSize")) {
+                // Ignore the window updates
                 output.clearTrace();
             } else {
                 skip = false;
