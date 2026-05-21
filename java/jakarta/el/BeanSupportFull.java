@@ -48,7 +48,9 @@ class BeanSupportFull extends BeanSupport {
                  * This bug is fixed in Java 21 b21. This workaround can be removed once the minimum Java version is 21.
                  * Populating from any interfaces causes default methods to be included.
                  */
-                populateFromInterfaces(type);
+                if (Runtime.version().feature() < 21) {
+                    populateFromInterfaces(type);
+                }
             } catch (IntrospectionException ie) {
                 throw new ELException(ie);
             }
