@@ -892,7 +892,12 @@ public class HTMLManagerServlet extends ManagerServlet {
                     smClient.getString("managerServlet.noContext", Escape.htmlElementContent(cn.getDisplayName())));
         }
         Manager manager = ctxt.getManager();
-        List<Session> sessions = new ArrayList<>(Arrays.asList(manager.findSessions()));
+        List<Session> sessions;
+        if (manager == null) {
+            sessions = Collections.emptyList();
+        } else {
+            sessions = new ArrayList<>(Arrays.asList(manager.findSessions()));
+        }
         if (manager instanceof DistributedManager && showProxySessions) {
             // Add dummy proxy sessions
             Set<String> sessionIds = ((DistributedManager) manager).getSessionIdsFull();

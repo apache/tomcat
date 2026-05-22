@@ -1052,8 +1052,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
                 List<String> parts;
                 if (context.getState().isAvailable()) {
-                    parts = Arrays.asList(displayPath, "running", "" + context.getManager().findSessions().length,
-                            context.getDocBase());
+                    int sessionCount = 0;
+                    Manager manager = context.getManager();
+                    if (manager != null) {
+                        sessionCount = manager.findSessions().length;
+                    }
+                    parts = Arrays.asList(displayPath, "running", "" + sessionCount, context.getDocBase());
                 } else {
                     parts = Arrays.asList(displayPath, "stopped", "0", context.getDocBase());
                 }
