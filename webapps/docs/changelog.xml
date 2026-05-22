@@ -172,6 +172,10 @@
         On JAAS logout, clear out role principals on the subject that were
         added on commit, as recommended by the JAAS specification. (remm)
       </fix>
+      <fix>
+        <code>MemoryRealm</code> should not add a dummy role when none is
+        specified in the configuration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
