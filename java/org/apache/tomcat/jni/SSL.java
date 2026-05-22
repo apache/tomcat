@@ -687,7 +687,7 @@ public final class SSL {
     public static final int SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL = 1;
 
     /**
-     * Return OpenSSL version number (compile time version, if version < 1.1.0).
+     * Return OpenSSL version number (compile time version, if version &lt; 1.1.0).
      *
      * @return OpenSSL version number
      */
