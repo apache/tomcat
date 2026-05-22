@@ -225,6 +225,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 ((Lifecycle) valve).start();
             } catch (LifecycleException e) {
                 log.error(sm.getString("standardPipeline.basic.start"), e);
+                cleanupValve(valve);
                 return;
             }
         }
@@ -277,6 +278,8 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                     ((Lifecycle) valve).start();
                 } catch (LifecycleException e) {
                     log.error(sm.getString("standardPipeline.valve.start"), e);
+                    cleanupValve(valve);
+                    return;
                 }
             }
         }
@@ -363,18 +366,25 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             first = null;
         }
 
+        cleanupValve(valve);
+
+        container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
+    }
+
+
+    /*
+     * Performs any necessary clean-up after a Valve failed to be set/added or is removed
+     */
+    private void cleanupValve(Valve valve) {
         if (valve instanceof Contained) {
             ((Contained) valve).setContainer(null);
         }
 
         if (valve instanceof Lifecycle) {
-            // Stop this valve if necessary
-            if (getState().isAvailable()) {
-                try {
-                    ((Lifecycle) valve).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardPipeline.valve.stop"), e);
-                }
+            try {
+                ((Lifecycle) valve).stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardPipeline.valve.stop"), e);
             }
             try {
                 ((Lifecycle) valve).destroy();
@@ -382,8 +392,6 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 log.error(sm.getString("standardPipeline.valve.destroy"), e);
             }
         }
-
-        container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
     }
 
 
