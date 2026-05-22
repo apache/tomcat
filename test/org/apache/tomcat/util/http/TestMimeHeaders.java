@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -107,4 +108,14 @@ public class TestMimeHeaders {
         }
         Assert.assertFalse(names.hasMoreElements());
     }
-}
+
+
+    @Test
+    public void testSetValueBytesIgnoresCase01() throws UnsupportedEncodingException {
+        MimeHeaders mh = new MimeHeaders();
+
+        byte[] bytes = HEADER_NAME_UC_STRING.getBytes("utf-8");
+        mh.setValue(HEADER_NAME_UC_STRING).setBytes(bytes, 0, bytes.length);
+        Assert.assertTrue(mh.getValue(HEADER_NAME_UC_STRING).equalsIgnoreCase(HEADER_NAME_MIXED_STRING));
+        Assert.assertFalse(mh.getValue(HEADER_NAME_UC_STRING).equalsIgnoreCase("\u8a54\u8a45\u8a53\u8a54"));
+    }}

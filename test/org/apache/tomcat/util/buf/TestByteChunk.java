@@ -179,4 +179,14 @@ public class TestByteChunk {
         // immediately after a call to recycle().
         Assert.assertNull(bc.toString());
     }
+
+
+    @Test
+    public void testEqualsIgnoreCase() {
+        byte[] bytes = "Hello".getBytes();
+        ByteChunk bc = new ByteChunk();
+        bc.setBytes(bytes, 0, bytes.length);
+        Assert.assertTrue(bc.equalsIgnoreCase("heLLo"));
+        Assert.assertFalse(bc.equalsIgnoreCase("\u8a48\u8a65\u8a6c\u8a6c\u8a6f"));
+    }
 }
