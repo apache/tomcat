@@ -156,7 +156,7 @@ public class MemoryRealm extends RealmBase {
 
         // Accumulate the list of roles for this user
         List<String> list = new ArrayList<>();
-        if (roles != null && !roles.isBlank()) {
+        if (roles != null && roles.trim().length() > 0) {
             roles += ",";
             while (true) {
                 int comma = roles.indexOf(',');
