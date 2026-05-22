@@ -160,6 +160,10 @@
         Add support for single-quote escaped literal as well as quoted literals
         in <code>DateFormatCache</code>. (schultz)
       </fix>
+      <fix>
+        On JAAS logout, clear out role principals on the subject that were
+        added on commit, as recommended by the JAAS specification. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
