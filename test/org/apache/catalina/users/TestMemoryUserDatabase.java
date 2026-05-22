@@ -64,23 +64,47 @@ public class TestMemoryUserDatabase {
     }
 
     @Test
-    public void testLoadUserDatabase()
-        throws Exception {
+    public void testLoadUserDatabase() throws Exception {
+        validateCleanTestDatabase();
+    }
+
+
+    private void validateCleanTestDatabase() {
         assertPrincipalNames(new String[] { "testrole", "otherrole"}, db.getRoles());
         assertPrincipalNames(new String[] { "testgroup", "othergroup"}, db.getGroups());
 
         Iterator<User> users = db.getUsers();
 
         Assert.assertTrue("No users found", users.hasNext());
+        int userCount = 0;
 
-        User user = users.next();
+        while (users.hasNext()) {
+            User user = users.next();
+            userCount++;
 
-        Assert.assertEquals("admin", user.getName());
-        Assert.assertNull(user.getFullName());
-        Assert.assertEquals("sekr3t", user.getPassword());
+            switch (user.getName()) {
+                case "admin": {
+                    Assert.assertNull(user.getFullName());
+                    Assert.assertEquals("sekr3t", user.getPassword());
 
-        assertPrincipalNames(new String[] { "testrole", "otherrole"}, user.getRoles());
-        assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
+                    assertPrincipalNames(new String[] { "testrole", "otherrole"}, user.getRoles());
+                    assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
+                    break;
+                }
+                case "otheruser": {
+                    Assert.assertNull(user.getFullName());
+                    Assert.assertEquals("sekr3t2", user.getPassword());
+
+                    assertPrincipalNames(new String[0], user.getRoles());
+                    assertPrincipalNames(new String[0] , user.getGroups());
+                    break;
+                }
+                default:
+                    Assert.fail("Unexpected user: [" + user.getName() + "]");
+            }
+        }
+
+        Assert.assertEquals("Unexpected number of users in test database", 2, userCount);
     }
 
     public void testReloadUserDatabase()
@@ -167,18 +191,7 @@ public class TestMemoryUserDatabase {
             }
         }
 
-        users = db.getUsers();
-
-        Assert.assertTrue("No users found", users.hasNext());
-
-        User user = users.next();
-
-        Assert.assertEquals("admin", user.getName());
-        Assert.assertNull(user.getFullName());
-        Assert.assertEquals("sekr3t", user.getPassword());
-
-        assertPrincipalNames(new String[] { "testrole", "otherrole"}, user.getRoles());
-        assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
+        validateCleanTestDatabase();
     }
 
     @Test
