@@ -145,7 +145,7 @@ public class Asn1Parser {
      */
     public void parseFullLength() {
         int len = parseLength();
-        if (len + pos != source.length) {
+        if (source.length - pos != len) {
             throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(len),
                     Integer.valueOf(source.length - pos)));
         }
@@ -161,10 +161,18 @@ public class Asn1Parser {
         int len = next();
         if (len > 127) {
             int bytes = len - 128;
+            if (bytes > 4) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+                        Integer.valueOf(source.length - pos)));
+            }
             len = 0;
             for (int i = 0; i < bytes; i++) {
                 len = len << 8;
                 len = len + next();
+            }
+            if (len < 0) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+                        Integer.valueOf(source.length - pos)));
             }
         }
         /*
@@ -174,6 +182,10 @@ public class Asn1Parser {
          */
         if (nestedSequenceEndPositions.peekLast() != null && nestedSequenceEndPositions.peekLast().intValue() == -1) {
             nestedSequenceEndPositions.pollLast();
+            if (source.length - pos < len) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+                        Integer.valueOf(source.length - pos)));
+            }
             nestedSequenceEndPositions.addLast(Integer.valueOf(pos + len));
         }
         return len;
@@ -245,7 +257,12 @@ public class Asn1Parser {
         parseTag(tag);
         int len = parseLength();
         byte[] result = new byte[len];
-        System.arraycopy(source, pos, result, 0, result.length);
+        if (pos + result.length <= source.length) {
+            System.arraycopy(source, pos, result, 0, result.length);
+        } else {
+            throw new IllegalArgumentException(sm.getString("asn1Parser.truncatedData", Integer.valueOf(result.length),
+                    Integer.valueOf(source.length - pos)));
+        }
         pos += result.length;
         return result;
     }
