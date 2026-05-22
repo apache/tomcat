@@ -166,15 +166,17 @@ public class MemoryRealm extends RealmBase {
 
         // Accumulate the list of roles for this user
         List<String> list = new ArrayList<>();
-        roles += ",";
-        while (true) {
-            int comma = roles.indexOf(',');
-            if (comma < 0) {
-                break;
+        if (roles != null && !roles.isBlank()) {
+            roles += ",";
+            while (true) {
+                int comma = roles.indexOf(',');
+                if (comma < 0) {
+                    break;
+                }
+                String role = roles.substring(0, comma).trim();
+                list.add(role);
+                roles = roles.substring(comma + 1);
             }
-            String role = roles.substring(0, comma).trim();
-            list.add(role);
-            roles = roles.substring(comma + 1);
         }
 
         // Construct and cache the Principal for this user
