@@ -656,24 +656,24 @@ public class StatusTransformer {
                 }
                 writer.write("\"");
                 writer.write(" remoteAddr=\"" +
-                        Escape.htmlElementContent(mBeanServer.getAttribute(pName, "remoteAddr")) + "\"");
+                        Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "remoteAddr"))) + "\"");
                 writer.write(" virtualHost=\"" +
-                        Escape.htmlElementContent(mBeanServer.getAttribute(pName, "virtualHost")) + "\"");
+                        Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "virtualHost"))) + "\"");
 
                 if (showRequest) {
                     writer.write(
-                            " method=\"" + Escape.htmlElementContent(mBeanServer.getAttribute(pName, "method")) + "\"");
+                            " method=\"" + Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "method"))) + "\"");
                     writer.write(" currentUri=\"" +
-                            Escape.htmlElementContent(mBeanServer.getAttribute(pName, "currentUri")) + "\"");
+                            Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "currentUri"))) + "\"");
 
                     String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
                     if (queryString != null && !queryString.isEmpty()) {
-                        writer.write(" currentQueryString=\"" + Escape.htmlElementContent(queryString) + "\"");
+                        writer.write(" currentQueryString=\"" + Escape.xml(queryString) + "\"");
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
                     writer.write(" protocol=\"" +
-                            Escape.htmlElementContent(mBeanServer.getAttribute(pName, "protocol")) + "\"");
+                            Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "protocol"))) + "\"");
                 } else {
                     writer.write(" method=\"&#63;\"");
                     writer.write(" currentUri=\"&#63;\"");
