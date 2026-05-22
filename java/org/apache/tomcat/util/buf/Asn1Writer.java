@@ -57,6 +57,10 @@ public class Asn1Writer {
      * @return the DER-encoded INTEGER bytes
      */
     public static byte[] writeInteger(int value) {
+        if (value < 0) {
+            throw new IllegalArgumentException();
+        }
+
         // How many bytes required to write the value? No more than 4 for int.
         int valueSize = 1;
         while ((value >> (valueSize * 8)) > 0) {
