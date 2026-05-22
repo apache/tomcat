@@ -238,5 +238,6 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         if (log.isTraceEnabled()) {
             log.trace("Destroying MBeans for Global JNDI Resources");
         }
+        // FIXME: Implement removing MBeans
     }
 }

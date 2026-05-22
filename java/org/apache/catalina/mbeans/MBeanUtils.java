@@ -725,6 +725,8 @@ public class MBeanUtils {
      */
     static void destroyMBeanUserDatabase(String userDatabase) throws Exception {
 
+        // FIXME: UserDatabase MBean management could be improved
+
         ObjectName query;
         Set<ObjectName> results;
 
