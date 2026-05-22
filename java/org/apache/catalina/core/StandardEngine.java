@@ -322,7 +322,16 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     // ----------------------------------------------------------- Inner classes
+    /**
+     * No-op implementation of AccessLog used as a placeholder when access logging is not configured.
+     */
     protected static final class NoopAccessLog implements AccessLog {
+
+        /**
+         * Default constructor for no-op access log.
+         */
+        public NoopAccessLog() {
+        }
 
         @Override
         public void log(Request request, Response response, long time) {
@@ -342,6 +351,9 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
     }
 
+    /**
+     * Listener that manages access log configuration for engine, host, and context lifecycle events.
+     */
     protected static final class AccessLogListener
             implements PropertyChangeListener, LifecycleListener, ContainerListener {
 
@@ -350,12 +362,22 @@ public class StandardEngine extends ContainerBase implements Engine {
         private final Context context;
         private volatile boolean disabled = false;
 
+        /**
+         * Creates a new AccessLogListener for the given engine, host, and context.
+         *
+         * @param engine The engine to monitor
+         * @param host The host to monitor, or null
+         * @param context The context to monitor, or null
+         */
         public AccessLogListener(StandardEngine engine, Host host, Context context) {
             this.engine = engine;
             this.host = host;
             this.context = context;
         }
 
+        /**
+         * Installs this listener on the configured engine, host, and context.
+         */
         public void install() {
             engine.addPropertyChangeListener(this);
             if (host != null) {

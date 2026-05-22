@@ -18,23 +18,45 @@ package jakarta.el;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a method referenced in an EL expression cannot be found on the target object.
+ */
 public class MethodNotFoundException extends ELException {
 
     @Serial
     private static final long serialVersionUID = -3631968116081480328L;
 
+    /**
+     * Constructs a MethodNotFoundException with no detail message.
+     */
     public MethodNotFoundException() {
         super();
     }
 
+    /**
+     * Constructs a MethodNotFoundException with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public MethodNotFoundException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a MethodNotFoundException with the specified cause.
+     *
+     * @param cause the cause of this exception
+     */
     public MethodNotFoundException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a MethodNotFoundException with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the cause of this exception
+     */
     public MethodNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }

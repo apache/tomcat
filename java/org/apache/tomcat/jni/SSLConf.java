@@ -16,7 +16,17 @@
  */
 package org.apache.tomcat.jni;
 
+/**
+ * JNI bindings for OpenSSL SSL_CONF operations.
+ */
 public final class SSLConf {
+
+    /**
+     * Default constructor. This class provides only static methods.
+     */
+    public SSLConf() {
+        super();
+    }
 
     /**
      * Create a new SSL_CONF context.

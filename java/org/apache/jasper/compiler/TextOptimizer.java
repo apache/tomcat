@@ -21,9 +21,15 @@ import org.apache.jasper.Options;
 import org.apache.jasper.TrimSpacesOption;
 
 /**
- * Optimizes text in JSP pages.
+ * Provides optimizations for text nodes in JSP pages.
  */
 public class TextOptimizer {
+
+    /**
+     * Constructs a new TextOptimizer. This utility class should not be instantiated.
+     */
+    public TextOptimizer() {
+    }
 
     /**
      * A visitor to concatenate contiguous template texts.
@@ -119,6 +125,14 @@ public class TextOptimizer {
 
     }
 
+    /**
+     * Concatenates contiguous text nodes in the given page to reduce the number of
+     * write operations in the generated servlet code.
+     *
+     * @param compiler the JSP compiler
+     * @param page the page node tree
+     * @throws JasperException if an error occurs during optimization
+     */
     public static void concatenate(Compiler compiler, Node.Nodes page) throws JasperException {
 
         TextCatVisitor v = new TextCatVisitor(compiler);

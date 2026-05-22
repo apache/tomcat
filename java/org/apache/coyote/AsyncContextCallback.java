@@ -22,6 +22,9 @@ package org.apache.coyote;
  * org.apache.catalina package.
  */
 public interface AsyncContextCallback {
+    /**
+     * Fires the onComplete event to the associated async context.
+     */
     void fireOnComplete();
 
     /**

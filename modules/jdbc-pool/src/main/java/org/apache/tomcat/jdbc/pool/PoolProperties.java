@@ -30,65 +30,133 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Implementation of {@link PoolConfiguration} that holds the configuration
+ * properties for a connection pool.
+ */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
     private static final long serialVersionUID = -8519283440854213745L;
     private static final Log log = LogFactory.getLog(PoolProperties.class);
 
+    /**
+     * Constructs a PoolProperties with default values.
+     */
+    public PoolProperties() {
+    }
+
+    /**
+     * Default maximum number of active connections.
+     */
     public static final int DEFAULT_MAX_ACTIVE = 100;
 
+    /**
+     * Counter for tracking the number of pools created.
+     */
     protected static final AtomicInteger poolCounter = new AtomicInteger(0);
+    /** Database-specific properties. */
     private volatile Properties dbProperties = new Properties();
+    /** The JDBC connection URL. */
     private volatile String url = null;
+    /** The JDBC driver class name. */
     private volatile String driverClassName = null;
+    /** The default auto-commit setting for connections. */
     private volatile Boolean defaultAutoCommit = null;
+    /** The default read-only setting for connections. */
     private volatile Boolean defaultReadOnly = null;
+    /** The default transaction isolation level. */
     private volatile int defaultTransactionIsolation = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
+    /** The default catalog for connections. */
     private volatile String defaultCatalog = null;
+    /** Additional connection properties. */
     private volatile String connectionProperties;
+    /** The initial number of connections in the pool. */
     private volatile int initialSize = 10;
+    /** The maximum number of active connections. */
     private volatile int maxActive = DEFAULT_MAX_ACTIVE;
+    /** The maximum number of idle connections. */
     private volatile int maxIdle = maxActive;
+    /** The minimum number of idle connections. */
     private volatile int minIdle = initialSize;
+    /** The maximum wait time in milliseconds for a connection. */
     private volatile int maxWait = 30000;
+    /** The SQL query used for validation. */
     private volatile String validationQuery;
+    /** The validation query timeout in seconds. */
     private volatile int validationQueryTimeout = -1;
+    /** The fully qualified class name of the validator. */
     private volatile String validatorClassName;
+    /** The validator instance. */
     private transient volatile Validator validator;
+    /** Whether to validate connections on borrow. */
     private volatile boolean testOnBorrow = false;
+    /** Whether to validate connections on return. */
     private volatile boolean testOnReturn = false;
+    /** Whether to validate idle connections. */
     private volatile boolean testWhileIdle = false;
+    /** The time between eviction runs in milliseconds. */
     private volatile int timeBetweenEvictionRunsMillis = 5000;
+    /** The number of connections to test per eviction run. */
     private volatile int numTestsPerEvictionRun;
+    /** The minimum idle time before a connection is eligible for eviction. */
     private volatile int minEvictableIdleTimeMillis = 60000;
+    /** Whether to allow access to the underlying connection. */
     private volatile boolean accessToUnderlyingConnectionAllowed = true;
+    /** Whether to remove abandoned connections. */
     private volatile boolean removeAbandoned = false;
+    /** The timeout in seconds for abandoned connection removal. */
     private volatile int removeAbandonedTimeout = 60;
+    /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
+    /** The pool name. */
     private volatile String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+"-"+System.identityHashCode(PoolProperties.class)+"]";
+    /** The database password. */
     private volatile String password;
+    /** The database username. */
     private volatile String username;
+    /** The validation interval in milliseconds. */
     private volatile long validationInterval = 3000;
+    /** Whether JMX registration is enabled. */
     private volatile boolean jmxEnabled = true;
+    /** The SQL to execute on connection creation. */
     private volatile String initSQL;
+    /** Whether to validate connections on creation. */
     private volatile boolean testOnConnect =false;
+    /** The JDBC interceptors configuration. */
     private volatile String jdbcInterceptors=null;
+    /** Whether to use a fair queue for connection requests. */
     private volatile boolean fairQueue = true;
+    /** Whether to use equals for object comparison. */
     private volatile boolean useEquals = true;
+    /** The percentage threshold for abandoning connections. */
     private volatile int abandonWhenPercentageFull = 0;
+    /** The maximum age of a connection in milliseconds. */
     private volatile long maxAge = 0;
+    /** Whether to use locking for thread safety. */
     private volatile boolean useLock = false;
+    /** The interceptor definitions. */
     private volatile InterceptorDefinition[] interceptors = null;
+    /** The suspect timeout in seconds. */
     private volatile int suspectTimeout = 0;
+    /** The underlying data source. */
     private volatile Object dataSource = null;
+    /** The JNDI name of the data source. */
     private volatile String dataSourceJNDI = null;
+    /** Whether alternate usernames are allowed. */
     private volatile boolean alternateUsernameAllowed = false;
+    /** Whether to commit on connection return. */
     private volatile boolean commitOnReturn = false;
+    /** Whether to rollback on connection return. */
     private volatile boolean rollbackOnReturn = false;
+    /** Whether to use a disposable connection facade. */
     private volatile boolean useDisposableConnectionFacade = true;
+    /** Whether to log validation errors. */
     private volatile boolean logValidationErrors = false;
+    /** Whether to propagate interrupt state. */
     private volatile boolean propagateInterruptState = false;
+    /** Whether to ignore exceptions during pre-load. */
     private volatile boolean ignoreExceptionOnPreLoad = false;
+    /** Whether to use a statement facade. */
     private volatile boolean useStatementFacade = true;
 
     @Override
@@ -636,6 +704,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         return buf.toString();
     }
 
+    /**
+     * Returns the current pool counter value.
+     * @return the pool counter value
+     */
     public static int getPoolCounter() {
         return poolCounter.get();
     }
@@ -690,36 +762,78 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Definition of a JDBC interceptor with its configuration properties.
+     */
     public static class InterceptorDefinition implements Serializable {
         private static final long serialVersionUID = 1L;
+        /**
+         * Interceptor class name.
+         */
         protected String className;
+        /**
+         * Map of interceptor properties.
+         */
         protected Map<String,InterceptorProperty> properties = new HashMap<>();
+        /**
+         * Cached interceptor class.
+         */
         protected volatile Class<?> clazz = null;
+        /**
+         * Constructs an InterceptorDefinition with the given class name.
+         * @param className the interceptor class name
+         */
         public InterceptorDefinition(String className) {
             this.className = className;
         }
 
+        /**
+         * Constructs an InterceptorDefinition with the given class.
+         * @param cl the interceptor class
+         */
         public InterceptorDefinition(Class<?> cl) {
             this(cl.getName());
             clazz = cl;
         }
 
+        /**
+         * Returns the interceptor class name.
+         * @return the class name
+         */
         public String getClassName() {
             return className;
         }
+        /**
+         * Adds a property with the given name and value.
+         * @param name the property name
+         * @param value the property value
+         */
         public void addProperty(String name, String value) {
             InterceptorProperty p = new InterceptorProperty(name,value);
             addProperty(p);
         }
 
+        /**
+         * Adds the given interceptor property.
+         * @param p the property to add
+         */
         public void addProperty(InterceptorProperty p) {
             properties.put(p.getName(), p);
         }
 
+        /**
+         * Returns the map of interceptor properties.
+         * @return the properties map
+         */
         public Map<String,InterceptorProperty> getProperties() {
             return properties;
         }
 
+        /**
+         * Returns the interceptor class, loading it if necessary.
+         * @return the interceptor class
+         * @throws ClassNotFoundException if the class cannot be found
+         */
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
@@ -747,22 +861,49 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
     }
 
+    /**
+     * Represents a property for a JDBC interceptor.
+     */
     public static class InterceptorProperty implements Serializable {
         private static final long serialVersionUID = 1L;
+        /**
+         * Property name.
+         */
         String name;
+        /**
+         * Property value.
+         */
         String value;
+        /**
+         * Constructs an InterceptorProperty with the given name and value.
+         * @param name the property name
+         * @param value the property value
+         */
         public InterceptorProperty(String name, String value) {
             assert(name!=null);
             this.name = name;
             this.value = value;
         }
+        /**
+         * Returns the property name.
+         * @return the property name
+         */
         public String getName() {
             return name;
         }
+        /**
+         * Returns the property value.
+         * @return the property value
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * Returns the property value as a boolean.
+         * @param def the default value if the property is null or invalid
+         * @return the boolean value
+         */
         public boolean getValueAsBoolean(boolean def) {
             if (value==null) {
                 return def;
@@ -776,6 +917,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             return def;
         }
 
+        /**
+         * Returns the property value as an int.
+         * @param def the default value if the property is null or invalid
+         * @return the int value
+         */
         public int getValueAsInt(int def) {
             if (value==null) {
                 return def;
@@ -788,6 +934,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a long.
+         * @param def the default value if the property is null or invalid
+         * @return the long value
+         */
         public long getValueAsLong(long def) {
             if (value==null) {
                 return def;
@@ -799,6 +950,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a byte.
+         * @param def the default value if the property is null or invalid
+         * @return the byte value
+         */
         public byte getValueAsByte(byte def) {
             if (value==null) {
                 return def;
@@ -810,6 +966,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a short.
+         * @param def the default value if the property is null or invalid
+         * @return the short value
+         */
         public short getValueAsShort(short def) {
             if (value==null) {
                 return def;
@@ -821,6 +982,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a float.
+         * @param def the default value if the property is null or invalid
+         * @return the float value
+         */
         public float getValueAsFloat(float def) {
             if (value==null) {
                 return def;
@@ -832,6 +998,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a double.
+         * @param def the default value if the property is null or invalid
+         * @return the double value
+         */
         public double getValueAsDouble(double def) {
             if (value==null) {
                 return def;
@@ -843,6 +1014,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
 
+        /**
+         * Returns the property value as a char.
+         * @param def the default value if the property is null or invalid
+         * @return the char value
+         */
         public char getValueAschar(char def) {
             if (value==null) {
                 return def;
@@ -934,6 +1110,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Parses a property string into a Properties object.
+     * @param propText the property string with semicolon-separated key=value pairs
+     * @param props the Properties object to populate, or null to create a new one
+     * @return the populated Properties object
+     */
     public static Properties getProperties(String propText, Properties props) {
         if (props==null) {
             props = new Properties();

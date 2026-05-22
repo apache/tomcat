@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.21 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.22 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -121,6 +121,18 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        Lower the log level to debug when OpenSSL initialization fails in
+        <code>OpenSSLLifecycleListener</code> to avoid stack traces
+        when <code>libssl.so</code> is not present and to align the behavior
+        of the <code>isAvailable()</code> check with the
+        <code>AprLifecycleListener</code> and gracefully fail when natives
+        are not present. (csutherl)
+      </fix>
+      <fix>
+        Prevent duplicate log messages when clustering JARs are not present on
+        startup. (csutherl)
+      </fix>
       <add>
         Add the Jakarta EE 12 XML schemas. (markt)
       </add>
@@ -154,6 +166,13 @@
         resources by name, align the behaviour with the JRE class loaders and
         always return <code>null</code> if the provided name starts with
         <code>/</code>. (markt)
+      </fix>
+      <fix>
+        Update <code>StoreRegistry</code> to dynamically load optional clustering
+        classes rather than statically referencing them. This matches the pattern
+        used in <code>Catalina.addClusterRuleSet()</code> and prevents
+        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
+        is configured but clustering classes are not available. (csutherl)
       </fix>
       <update>
         Update the default value for the <code>allowPostAsGet</code>
@@ -192,42 +211,62 @@
         Add constants to <code>HttpServletResponse</code> for the HTTP status
         codes defined in RFC 6585. (markt)
       </scode>
+      <add>
+        Enhance <code>version.sh</code> and <code>version.bat</code> to display
+        APR, Tomcat Native, and OpenSSL version information (both APR and FFM
+        implementations), along with version compatibility warnings and
+        third-party library version information. (csutherl)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Add support for literal <code>'%'</code> characters in access log
+        output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
+      </add>
+      <fix>
+        <bug>70038</bug>: <code>Cookie.clone()</code> should also clone internal
+        attribute map. (markt)
+      </fix>
       <scode>
-        Refactor generation of the remote user element in the access log to
-        remove unnecessary code. (markt)
+        Remove unnecessary code from the SSI processing engine that was
+        duplicating some of the normalisation checks. (markt)
       </scode>
       <fix>
-        Fix a regression in the previous release that meant <code>?-</code>
-        could appear in the access log rather than <code>?</code> when the query
-        string was present but empty. (markt)
+        Cleaner handling of invalid SPNEGO tokens. (remm)
       </fix>
       <fix>
-        Align the escaping in <code>ExtendedAccessLogValve</code> with the other
-        <code>AccessLogValve</code> implementations. (markt)
+        Avoid some NPEs in the Connector class on an uninitialize protocol.
+        (remm)
       </fix>
       <fix>
-        <bug>70000</bug>: fix duplication of special headers in the response
-        after commit, following fix for <bug>69967</bug>. (remm)
+        Incorrect session average life calculation. (remm)
       </fix>
       <fix>
-        Correct the handling of URIs mapped to a security constraint that only
-        specifies the special <code>**</code> role for all authenticated users.
-        Requests without authentication were receiving 403 responses rather than
-        401 responses. (markt)
+        Improve robustness on using <code>Pipeline.setBasic</code> on a running
+        pipeline. (remm)
       </fix>
       <fix>
-        Fix a race condition in <code>StandardContext.getServletContext()</code>
-        that could cause the <code>jakarta.servlet.context.tempdir</code>
-        attribute to be lost during a context reload. Make the
-        <code>context</code> field volatile and use locking to
-        ensure only one <code>ApplicationContext</code> instance is created.
-        (dsoumis)
+        Avoid any init parameter updates when conflicts are found for filters,
+        similar to what is done for servlets, as required by the servlet
+        specification. (remm)
       </fix>
       <fix>
-        Update the Windows authentication (kerberos) documentation to reflect
-        that both Java and Windows are removing / have removed support for
-        RC4-HMAC. The guide now uses AES256-SHA1. (markt)
+        Fix container event cleanups in some edge cases. (remm)
+      </fix>
+      <fix>
+        Check for last-modified header in <code>ExpiresFilter</code> when a
+        servlet uses <code>addDateHader</code> to avoid wrongly considering
+        it has been set. (remm)
+      </fix>
+      <fix>
+        Fix hour unit used by <code>ExpiresFilter</code>. (remm)
+      </fix>
+      <fix>
+        Remove exception swallowing in <code>DataSourceStore</code> to align
+        it with <code>FileStore</code> and avoid session loss on errors. (remm)
+      </fix>
+      <fix>
+        On JAAS logout, clear out role principals on the subject that were
+        added on commit, as recommended by the JAAS specification. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -261,60 +300,45 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Log a suitable warning if an encrypted PEM file is detected using an
+        insecure form for encryption. (markt)
+      </add>
       <fix>
-        Avoid various edge cases if <code>Content-Length</code> is set via
-        <code>setHeader(String,String)</code> or
-        <code>addHeader(String,String)</code> with an invalid value by always
-        clearing the previous value whether the new value is valid or not and
-        ignoring any invalid new value. (markt)
-      </fix>
-      <scode>
-        Refactor the calculation of the real index in the HPACK dynamic header
-        table implementation to reduce code duplication. (markt)
-      </scode>
-      <fix>
-        Fix various minor issues with some HTTP/2 stream error messages for
-        HTTP/2. (markt)
+        If TLS groups have been configured, use the configured groups rather
+        than using OpenSSL's default TLS groups when using Tomcat Native with
+        OpenSSL based connectors. (markt)
       </fix>
       <fix>
-        Consistently reject URIs containing <code>NULL</code> bytes when
-        normalizing. (markt)
+        For HTTP/2, ensure that any in progress request body reads are cancelled
+        if the container resets the associated stream. This prevents delays
+        waiting for reads to time out when it is known that no more data will be
+        received. (markt)
       </fix>
       <fix>
-        Fix a few minor memory leaks on error paths reading TLS keys and
-        certificates when using FFM. (markt)
+        Ensure that malformed HTTP/2 messages that should trigger a stream reset
+        do so, rather than triggered a connection close. (markt)
       </fix>
       <fix>
-        Refactor clean-up after HTTP/2 headers have been processed to aid GC
-        after a stream reset. (markt)
+        Improve enforcement of header trailer allow list for HTTP/2. (remm)
       </fix>
       <fix>
-        Align HTTP/2 trailer fields with HTTP/1.1 and filter out any fields
-        not permitted in trailers. (markt)
+        <bug>70050</bug>: Avoid NPE when no header frame is processed in HTTP/2,
+        following refactor clean-up of header buffer. (remm)
       </fix>
       <fix>
-        Free private keys after use in FFM based connector configuration.
-        (markt)
+        Properly use <code>pollerThreadPriority</code> for the NIO poller
+        thread. (remm)
       </fix>
       <fix>
-        Correct an unlikely edge-case parsing bug in the HTTP/2 HPACK header
-        decoding that could result in a valid header triggering an unexpected
-        connection close. (markt)
+        Fix <code>MessageByte.equals</code> if called on a null MB. (remm)
       </fix>
       <fix>
-        Refactor HTTP/2 HPACK encoding so field names are only converted to
-        lower case once during the encoding process. (markt)
+        Call the delegate key manager in JSSE to retrieve the server key.
+        (remm)
       </fix>
       <fix>
-        Add TLS 1.3 groups added in OpenSSL 4.0. (remm)
-      </fix>
-      <fix>
-        Add validation that the HTTP/2 <code>:scheme</code> pseudo-header is
-        consistent with the use (or not) of TLS. (markt)
-      </fix>
-      <fix>
-        Correct the  validation of pseudo headers and CONNECT requests to align
-        Tomcat's behaviour with RFC 9113, section 8.5. (markt)
+        Avoid overflow scenarios in Asn1Parser. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -326,7 +350,7 @@
       </add>
       <add>
         Extend the existing <code>+=</code> operator in Jakarta Expression
-        Language to support merging <code>Map</code>Map and <code>Set</code>Set
+        Language to support merging <code>Map</code> and <code>Set</code>
         and concatenating <code>List</code>s. (markt)
       </add>
       <update>
@@ -355,8 +379,7 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
-        by Jan Luehe. (remm)
+        Fix possible EL argument mismatch when it was set to null. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -367,6 +390,15 @@
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Expand wording and increase visibility of log message when cloud
+        membership is configured without a trust store as all certificates will
+        be trusted in this configuration. (markt)
+      </fix>
+      <fix>
+        Ensure listeners are correctly added and removed when configuring the
+        channel coordinator. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -398,11 +430,40 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Incorrect <code>Future.isDone()</code> return by
+        <code>AsyncChannelWrapperSecure</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <update>
+        Drop session handling dedicated to extracting the locale from Tapestry
+        attributes, used for locale session sorting in the manager webapp.
+        (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Manager: Add checks to ensure that any uploaded files are uploaded to
+        the expected location. (markt)
+      </add>
+      <add>
+        Manager: Add checks to ensure that the requested context path for a
+        deployed WAR, directory or descriptor file is valid. (markt)
+      </add>
+      <add>
+        Documentation: Expand the description of some of the attributes of the
+        <code>CrawlerSessionManagerValve</code>. (markt)
+      </add>
+      <fix>
+        Documentation: Clearer description and correct documented default for
+        <code>ocspSoftFail</code>. (markt)
+      </fix>
+      <fix>
+        Fix double escaping in the context names for the JSON mode of the
+        manager servlet. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
@@ -430,17 +491,8 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>69993</bug>: Update the URL to the CDDL 1.0 license. (markt)
+        Use per connection authenticator when executing an Ant task. (remm)
       </fix>
-      <update>
-        Update Byte Buddy to 1.18.8. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 13.4.1. (markt)
-      </update>
-      <update>
-        Update Bouncy Castle to 1.84. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>

@@ -32,7 +32,10 @@ import java.util.Set;
 public interface Pipeline extends Contained {
 
     /**
-     * @return the Valve instance that has been distinguished as the basic Valve for this Pipeline (if any).
+     * Returns the basic Valve for this Pipeline. The basic Valve is always executed last in the pipeline
+     * and is responsible for processing the request and creating the response.
+     *
+     * @return the basic Valve for this Pipeline, or {@code null} if none has been set
      */
     Valve getBasic();
 
@@ -74,8 +77,10 @@ public interface Pipeline extends Contained {
 
 
     /**
-     * @return the array of Valves in the pipeline associated with this Container, including the basic Valve (if any).
-     *             If there are no such Valves, a zero-length array is returned.
+     * Returns all Valves in the pipeline, including the basic Valve. Valves are returned in the order
+     * they will be executed, with the basic Valve last.
+     *
+     * @return the array of Valves in the pipeline, or an empty array if no Valves are configured
      */
     Valve[] getValves();
 
@@ -95,7 +100,10 @@ public interface Pipeline extends Contained {
 
 
     /**
-     * @return the Valve instance that has been distinguished as the basic Valve for this Pipeline (if any).
+     * Returns the first Valve in the pipeline. This is the Valve that will be executed first
+     * when a request enters the pipeline.
+     *
+     * @return the first Valve in the pipeline, or {@code null} if the pipeline is empty
      */
     Valve getFirst();
 

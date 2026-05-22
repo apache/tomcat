@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -323,14 +322,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             log.trace(sm.getString("stream.header.debug", getConnectionId(), getIdAsString(), name, value));
         }
 
-        // Header names must be lowercase
-        if (!name.toLowerCase(Locale.US).equals(name)) {
-            headerException =
-                    new StreamException(sm.getString("stream.header.case", getConnectionId(), getIdAsString(), name),
-                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
-            // No need for further processing. The stream will be reset.
-            return;
-        }
+        // Field header names being all lower case is enforced in HpackDecoder.
 
         if (HTTP_CONNECTION_SPECIFIC_HEADERS.contains(name)) {
             headerException = new StreamException(
@@ -376,6 +368,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         if (headerState == HEADER_STATE_PSEUDO && !pseudoHeader) {
             headerState = HEADER_STATE_REGULAR;
+        }
+
+        if (headerState == HEADER_STATE_TRAILER && !handler.getProtocol().isTrailerHeaderAllowed(name)) {
+            // Processing trailers and the header is not in the allowed list
+            return;
         }
 
         switch (name) {
@@ -492,9 +489,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 break;
             }
             default: {
-                if (headerState == HEADER_STATE_TRAILER && !handler.getProtocol().isTrailerHeaderAllowed(name)) {
-                    break;
-                }
                 if ("expect".equals(name) && "100-continue".equals(value)) {
                     coyoteRequest.setExpectation(true);
                 }
@@ -708,22 +702,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    final void receivedStartOfHeaders(boolean headersEndStream) throws Http2Exception {
+    final void receivedStartOfHeaders(boolean headersEndStream) {
         if (headerState == HEADER_STATE_START) {
             headerState = HEADER_STATE_PSEUDO;
             handler.getHpackDecoder().setMaxHeaderCount(handler.getProtocol().getMaxHeaderCount());
             handler.getHpackDecoder().setMaxHeaderSize(handler.getProtocol().getMaxHeaderSize());
         } else if (headerState == HEADER_STATE_PSEUDO || headerState == HEADER_STATE_REGULAR) {
             // Trailer headers MUST include the end of stream flag
-            if (headersEndStream) {
-                headerState = HEADER_STATE_TRAILER;
-                handler.getHpackDecoder().setMaxHeaderCount(handler.getProtocol().getMaxTrailerCount());
-                handler.getHpackDecoder().setMaxHeaderSize(handler.getProtocol().getMaxTrailerSize());
-            } else {
-                throw new ConnectionException(
+            if (!headersEndStream) {
+                headerException = new StreamException(
                         sm.getString("stream.trailerHeader.noEndOfStream", getConnectionId(), getIdAsString()),
-                        Http2Error.PROTOCOL_ERROR);
+                        Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
+            // Always process headers to keep HPack encoder/decoder in sync
+            headerState = HEADER_STATE_TRAILER;
+            handler.getHpackDecoder().setMaxHeaderCount(handler.getProtocol().getMaxTrailerCount());
+            handler.getHpackDecoder().setMaxHeaderSize(handler.getProtocol().getMaxTrailerSize());
         }
         // Parser will catch attempt to send a headers frame after the stream
         // has closed.
@@ -736,20 +730,20 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         contentLengthReceived += dataLength;
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
-            throw new ConnectionException(
+            throw new StreamException(
                     sm.getString("stream.header.contentLength", getConnectionId(), getIdAsString(),
                             Long.valueOf(contentLengthHeader), Long.valueOf(contentLengthReceived)),
-                    Http2Error.PROTOCOL_ERROR);
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
         }
     }
 
 
-    final void receivedEndOfStream() throws ConnectionException {
+    final void receivedEndOfStream() throws Http2Exception {
         if (isContentLengthInconsistent()) {
-            throw new ConnectionException(
+            throw new StreamException(
                     sm.getString("stream.header.contentLength", getConnectionId(), getIdAsString(),
                             Long.valueOf(coyoteRequest.getContentLengthLong()), Long.valueOf(contentLengthReceived)),
-                    Http2Error.PROTOCOL_ERROR);
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
         }
         state.receivedEndOfStream();
         inputBuffer.notifyEof();
@@ -1520,6 +1514,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                         inBuffer.position(0);
                         inBuffer.limit(inBuffer.limit() - unreadByteCount);
                     }
+                    inBuffer.notifyAll();
                 }
                 // Do this outside of the sync because:
                 // - it doesn't need to be inside the sync

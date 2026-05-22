@@ -38,6 +38,12 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class CheckEol extends Task {
 
+    /**
+     * Creates a new CheckEol task.
+     */
+    public CheckEol() {
+    }
+
     /** The files to be checked */
     private final List<FileSet> filesets = new ArrayList<>();
 

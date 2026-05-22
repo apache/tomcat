@@ -75,6 +75,8 @@ public interface ClusterManager extends Manager {
     void setName(String name);
 
     /**
+     * Returns the cluster associated with this manager.
+     *
      * @return the cluster associated with this manager
      */
     CatalinaCluster getCluster();
@@ -111,11 +113,15 @@ public interface ClusterManager extends Manager {
     ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException;
 
     /**
+     * Returns whether listeners are notified on replication.
+     *
      * @return {@code true} if listeners are notified on replication
      */
     boolean isNotifyListenersOnReplication();
 
     /**
+     * Creates a clone of this manager from a template configuration.
+     *
      * @return a clone of a template manager configuration
      */
     ClusterManager cloneFromTemplate();

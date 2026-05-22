@@ -44,7 +44,9 @@ public final class ConstantInteger extends Constant {
 
 
     /**
-     * @return data, i.e., 4 bytes.
+     * Get the 4-byte integer value stored in this constant pool entry.
+     *
+     * @return the integer value
      */
     public int getBytes() {
         return bytes;

@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
 
+/**
+ * Represents a parsed Content-Range HTTP header value as defined by RFC 9110.
+ */
 public class ContentRange {
 
     private final String units;
@@ -28,6 +31,14 @@ public class ContentRange {
     private final long length;
 
 
+    /**
+     * Creates a new ContentRange with the specified values.
+     *
+     * @param units  the range units (e.g., "bytes"), lowercased
+     * @param start  the start position of the range
+     * @param end    the end position of the range
+     * @param length the total length of the resource
+     */
     public ContentRange(String units, long start, long end, long length) {
         // Units are lower case (RFC 9110, section 14.1)
         if (units == null) {
@@ -42,23 +53,40 @@ public class ContentRange {
 
 
     /**
-     * @return rangeUnits in lower case.
+     * Returns the range units (e.g., "bytes") in lower case.
+     *
+     * @return the range units, or {@code null} if not set
      */
     public String getUnits() {
         return units;
     }
 
 
+    /**
+     * Returns the start position of the content range.
+     *
+     * @return the start position
+     */
     public long getStart() {
         return start;
     }
 
 
+    /**
+     * Returns the end position of the content range.
+     *
+     * @return the end position
+     */
     public long getEnd() {
         return end;
     }
 
 
+    /**
+     * Returns the total length of the resource.
+     *
+     * @return the total resource length
+     */
     public long getLength() {
         return length;
     }
@@ -122,7 +150,9 @@ public class ContentRange {
 
 
     /**
-     * @return <code>true</code> if the content range is valid, per RFC 9110 section 14.4
+     * Validates this content range according to RFC 9110 section 14.4.
+     *
+     * @return {@code true} if start &gt;= 0, end &gt;= start, and length &gt; end
      */
     public boolean isValid() {
         return start >= 0 && end >= start && length > end;

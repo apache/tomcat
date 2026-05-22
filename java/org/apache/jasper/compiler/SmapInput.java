@@ -16,5 +16,11 @@
  */
 package org.apache.jasper.compiler;
 
+/**
+ * Represents a mapping entry from a generated Java file line number
+ * back to the original JSP source file and line number.
+ * @param fileName the name of the source file
+ * @param lineNumber the line number in the source file
+ */
 public record SmapInput(String fileName, int lineNumber) {
 }

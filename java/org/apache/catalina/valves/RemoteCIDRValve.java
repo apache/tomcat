@@ -32,6 +32,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
 
+/**
+ * A valve that restricts access based on the remote client's IP address or CIDR block.
+ */
 public final class RemoteCIDRValve extends RequestFilterValve {
 
     /**
@@ -50,6 +53,9 @@ public final class RemoteCIDRValve extends RequestFilterValve {
     private final List<NetMask> deny = new ArrayList<>();
 
 
+    /**
+     * Default constructor.
+     */
     public RemoteCIDRValve() {
     }
 

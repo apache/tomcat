@@ -43,14 +43,30 @@ import org.apache.tomcat.util.net.openssl.ciphers.EncryptionLevel;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of the Resolver interface for the rewrite valve.
+ */
 public class ResolverImpl extends Resolver {
 
     private static final StringManager sm = StringManager.getManager(ResolverImpl.class);
 
+    /**
+     * The request being processed.
+     */
     protected final Request request;
+
+    /**
+     * The container log for debug output.
+     */
     private final Log containerLog;
 
 
+    /**
+     * Construct a new resolver for the given request.
+     *
+     * @param request      The request being processed
+     * @param containerLog The container log for debug output
+     */
     public ResolverImpl(Request request, Log containerLog) {
         this.request = request;
         this.containerLog = containerLog;

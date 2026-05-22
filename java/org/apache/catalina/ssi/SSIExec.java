@@ -30,10 +30,25 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSIExec implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIExec.class);
+
+    /**
+     * Default constructor.
+     */
+    public SSIExec() {
+    }
+    /**
+     * Helper instance for processing CGI includes.
+     */
     protected final SSIInclude ssiInclude = new SSIInclude();
+    /**
+     * Size of the buffer used for reading command output.
+     */
     protected static final int BUFFER_SIZE = 1024;
 
 
+    /**
+     * Processes the exec directive to run CGI scripts or system commands.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

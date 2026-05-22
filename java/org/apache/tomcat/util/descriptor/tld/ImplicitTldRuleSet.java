@@ -27,6 +27,12 @@ import org.xml.sax.Attributes;
  */
 public class ImplicitTldRuleSet implements RuleSet {
 
+    /**
+     * Creates a new instance of the implicit TLD rule set.
+     */
+    public ImplicitTldRuleSet() {
+    }
+
     private static final StringManager sm = StringManager.getManager(ImplicitTldRuleSet.class);
 
     private static final String PREFIX = "taglib";

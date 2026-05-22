@@ -112,6 +112,7 @@ public class TestJAASRealm extends TomcatBaseTest {
         Assert.assertTrue(p instanceof GenericPrincipal);
         GenericPrincipal gp = (GenericPrincipal) p;
         Assert.assertTrue(gp.hasRole("testrole"));
+        gp.logout();
     }
 
 }

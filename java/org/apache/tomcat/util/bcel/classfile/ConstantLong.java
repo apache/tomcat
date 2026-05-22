@@ -44,7 +44,9 @@ public final class ConstantLong extends Constant {
 
 
     /**
-     * @return data, i.e., 8 bytes.
+     * Get the 8-byte long value stored in this constant pool entry.
+     *
+     * @return the long value
      */
     public long getBytes() {
         return bytes;

@@ -24,6 +24,9 @@ import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Parses HTTP request and response headers from a byte buffer.
+ */
 public class HttpHeaderParser {
 
     private static final StringManager sm = StringManager.getManager(HttpHeaderParser.class);
@@ -44,6 +47,13 @@ public class HttpHeaderParser {
     private byte chr = 0;
 
 
+    /**
+     * Creates a new header parser.
+     *
+     * @param source       The data source for header bytes
+     * @param headers      The mime headers to populate
+     * @param tolerantEol  Whether to tolerate non-standard line endings
+     */
     public HttpHeaderParser(HeaderDataSource source, MimeHeaders headers, boolean tolerantEol) {
         this.source = source;
         this.headers = headers;
@@ -51,6 +61,9 @@ public class HttpHeaderParser {
     }
 
 
+    /**
+     * Resets the parser state for reuse.
+     */
     public void recycle() {
         chr = 0;
         prevChr = 0;
@@ -295,13 +308,28 @@ public class HttpHeaderParser {
     }
 
 
+    /**
+     * Possible return values from {@link #parseHeader()}.
+     */
     public enum HeaderParseStatus {
+        /**
+         * All headers have been parsed and the end of the header block has been reached.
+         */
         DONE,
+        /**
+         * A header has been parsed and there are more headers to parse.
+         */
         HAVE_MORE_HEADERS,
+        /**
+         * Not enough data is available to complete parsing. More data must be read before parsing can continue.
+         */
         NEED_MORE_DATA
     }
 
 
+    /**
+     * Possible parser positions during header parsing.
+     */
     public enum HeaderParsePosition {
         /**
          * Start of a new header. A CRLF here means that there are no more headers. Any other character starts a header
@@ -379,6 +407,9 @@ public class HttpHeaderParser {
     }
 
 
+    /**
+     * Provides access to the header data buffer for the parser.
+     */
     public interface HeaderDataSource {
         /**
          * Read more data into the header buffer. The implementation is expected to determine if blocking or not

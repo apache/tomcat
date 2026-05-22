@@ -31,9 +31,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HandlesTypes {
 
-    /**
-     * @return array of classes
-     */
+   /**
+      * Declares the classes handled by the {@link jakarta.servlet.ServletContainerInitializer}.
+      *
+      * @return array of classes
+      */
     Class<?>[] value();
 
 }

@@ -36,6 +36,11 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
 
     private final Thread.Builder threadBuilder;
 
+    /**
+     * Constructs a new VirtualThreadExecutor.
+     *
+     * @param namePrefix The name prefix for virtual threads
+     */
     public VirtualThreadExecutor(String namePrefix) {
         threadBuilder = Thread.ofVirtual().name(namePrefix, 0);
     }

@@ -18,6 +18,9 @@ package org.apache.catalina.ha.deploy;
 
 import java.io.File;
 
+/**
+ * Interface for listening to file changes in a deployment directory.
+ */
 public interface FileChangeListener {
 
     /**

@@ -52,6 +52,12 @@ public class WsHandshakeRequest implements HandshakeRequest {
     private volatile HttpServletRequest request;
 
 
+    /**
+     * Constructs a new WsHandshakeRequest.
+     *
+     * @param request    The HTTP servlet request
+     * @param pathParams The path parameters
+     */
     public WsHandshakeRequest(HttpServletRequest request, Map<String,String> pathParams) {
 
         this.request = request;

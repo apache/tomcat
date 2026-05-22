@@ -44,6 +44,12 @@ import org.ietf.jgss.GSSName;
  */
 public class CombinedRealm extends RealmBase {
 
+    /**
+     * Default constructor for CombinedRealm.
+     */
+    public CombinedRealm() {
+    }
+
     private static final Log log = LogFactory.getLog(CombinedRealm.class);
 
     /**
@@ -67,7 +73,9 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * @return the array of Realms that this Realm is wrapping
+     * Returns the JMX ObjectNames of the realms that this realm is wrapping.
+     *
+     * @return the array of realm ObjectNames
      */
     public ObjectName[] getRealms() {
         ObjectName[] result = new ObjectName[realms.size()];
@@ -81,7 +89,9 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * @return the array of Realms contained by this Realm.
+     * Returns the array of Realm instances contained by this realm.
+     *
+     * @return the array of nested realms
      */
     public Realm[] getNestedRealms() {
         return realms.toArray(new Realm[0]);

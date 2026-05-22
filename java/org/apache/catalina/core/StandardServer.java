@@ -432,6 +432,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
+     * Return the period between two lifecycle events, in seconds.
+     *
      * @return The period between two lifecycle events, in seconds
      */
     public int getPeriodicEventDelay() {
@@ -479,6 +481,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         support.firePropertyChange("service", null, service);
     }
 
+    /**
+     * Stop the await thread by closing the await socket and interrupting the thread.
+     */
     public void stopAwait() {
         stopAwait = true;
         Thread t = awaitThread;
@@ -662,6 +667,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     }
 
     /**
+     * Return the JMX ObjectNames for all configured services.
+     *
      * @return the JMX service names.
      */
     public ObjectName[] getServiceNames() {

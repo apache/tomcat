@@ -33,22 +33,46 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> implements Retryabl
 
     @Serial
     private static final long serialVersionUID = 1L;
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(TaskQueue.class);
 
+    /**
+     * The parent thread pool executor.
+     */
     private transient volatile ThreadPoolExecutor parent = null;
 
+    /**
+     * Constructs a new TaskQueue with default capacity.
+     */
     public TaskQueue() {
         super();
     }
 
+    /**
+     * Constructs a new TaskQueue with the given capacity.
+     *
+     * @param capacity the queue capacity
+     */
     public TaskQueue(int capacity) {
         super(capacity);
     }
 
+    /**
+     * Constructs a new TaskQueue containing the elements in the given collection.
+     *
+     * @param c the collection of initial elements
+     */
     public TaskQueue(Collection<? extends Runnable> c) {
         super(c);
     }
 
+    /**
+     * Sets the parent thread pool executor for this queue.
+     *
+     * @param tp the parent executor
+     */
     public void setParent(ThreadPoolExecutor tp) {
         parent = tp;
     }

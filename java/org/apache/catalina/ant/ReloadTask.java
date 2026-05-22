@@ -28,6 +28,12 @@ import org.apache.tools.ant.BuildException;
 public class ReloadTask extends AbstractCatalinaCommandTask {
 
     /**
+     * Default constructor.
+     */
+    public ReloadTask() {
+    }
+
+    /**
      * Execute the requested operation.
      *
      * @exception BuildException if an error occurs

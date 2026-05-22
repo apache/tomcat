@@ -20,7 +20,16 @@ import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.jasper.tagplugins.jstl.Util;
 
+/**
+ * Tag plugin for the JSTL {@code <c:import>} tag. Generates optimized Java source for importing resources.
+ */
 public class Import implements TagPlugin {
+
+    /**
+     * Creates a new instance of the Import tag plugin.
+     */
+    public Import() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

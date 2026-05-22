@@ -16,61 +16,172 @@
  */
 package org.apache.tomcat.jni;
 
+/**
+ * JNI bindings for OpenSSL SSL functionality.
+ */
 public final class SSL {
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private SSL() {
+    }
 
     /*
      * Type definitions mostly from mod_ssl
+     */
+    /**
+     * Unset value.
      */
     public static final int UNSET = -1;
     /*
      * Define the certificate algorithm types
      */
+    /**
+     * Unknown algorithm type.
+     */
     public static final int SSL_ALGO_UNKNOWN = 0;
+    /**
+     * RSA algorithm type.
+     */
     public static final int SSL_ALGO_RSA = (1 << 0);
+    /**
+     * DSA algorithm type.
+     */
     public static final int SSL_ALGO_DSA = (1 << 1);
+    /**
+     * All algorithm types.
+     */
     public static final int SSL_ALGO_ALL = (SSL_ALGO_RSA | SSL_ALGO_DSA);
 
+    /**
+     * RSA algorithm index.
+     */
     public static final int SSL_AIDX_RSA = 0;
+    /**
+     * DSA algorithm index.
+     */
     public static final int SSL_AIDX_DSA = 1;
+    /**
+     * ECC algorithm index.
+     */
     public static final int SSL_AIDX_ECC = 3;
+    /**
+     * Maximum algorithm index.
+     */
     public static final int SSL_AIDX_MAX = 4;
     /*
      * Define IDs for the temporary RSA keys and DH params
      */
 
+    /**
+     * 512-bit temporary RSA key.
+     */
     public static final int SSL_TMP_KEY_RSA_512 = 0;
+    /**
+     * 1024-bit temporary RSA key.
+     */
     public static final int SSL_TMP_KEY_RSA_1024 = 1;
+    /**
+     * 2048-bit temporary RSA key.
+     */
     public static final int SSL_TMP_KEY_RSA_2048 = 2;
+    /**
+     * 4096-bit temporary RSA key.
+     */
     public static final int SSL_TMP_KEY_RSA_4096 = 3;
+    /**
+     * 512-bit temporary DH key.
+     */
     public static final int SSL_TMP_KEY_DH_512 = 4;
+    /**
+     * 1024-bit temporary DH key.
+     */
     public static final int SSL_TMP_KEY_DH_1024 = 5;
+    /**
+     * 2048-bit temporary DH key.
+     */
     public static final int SSL_TMP_KEY_DH_2048 = 6;
+    /**
+     * 4096-bit temporary DH key.
+     */
     public static final int SSL_TMP_KEY_DH_4096 = 7;
+    /**
+     * Maximum temporary key ID.
+     */
     public static final int SSL_TMP_KEY_MAX = 8;
 
     /*
      * Define the SSL options
      */
+    /**
+     * No SSL options.
+     */
     public static final int SSL_OPT_NONE = 0;
+    /**
+     * SSL option for relative settings.
+     */
     public static final int SSL_OPT_RELSET = (1 << 0);
+    /**
+     * SSL option for standard environment variables.
+     */
     public static final int SSL_OPT_STDENVVARS = (1 << 1);
+    /**
+     * SSL option for exporting certificate data.
+     */
     public static final int SSL_OPT_EXPORTCERTDATA = (1 << 3);
+    /**
+     * SSL option for fake basic authentication.
+     */
     public static final int SSL_OPT_FAKEBASICAUTH = (1 << 4);
+    /**
+     * SSL option for strict require.
+     */
     public static final int SSL_OPT_STRICTREQUIRE = (1 << 5);
+    /**
+     * SSL option for optional renegotiation.
+     */
     public static final int SSL_OPT_OPTRENEGOTIATE = (1 << 6);
+    /**
+     * All SSL options combined.
+     */
     public static final int SSL_OPT_ALL = (SSL_OPT_STDENVVARS | SSL_OPT_EXPORTCERTDATA | SSL_OPT_FAKEBASICAUTH |
             SSL_OPT_STRICTREQUIRE | SSL_OPT_OPTRENEGOTIATE);
 
     /*
      * Define the SSL Protocol options
      */
+    /**
+     * No protocol options.
+     */
     public static final int SSL_PROTOCOL_NONE = 0;
+    /**
+     * SSLv2 protocol.
+     */
     public static final int SSL_PROTOCOL_SSLV2 = (1 << 0);
+    /**
+     * SSLv3 protocol.
+     */
     public static final int SSL_PROTOCOL_SSLV3 = (1 << 1);
+    /**
+     * TLSv1.0 protocol.
+     */
     public static final int SSL_PROTOCOL_TLSV1 = (1 << 2);
+    /**
+     * TLSv1.1 protocol.
+     */
     public static final int SSL_PROTOCOL_TLSV1_1 = (1 << 3);
+    /**
+     * TLSv1.2 protocol.
+     */
     public static final int SSL_PROTOCOL_TLSV1_2 = (1 << 4);
+    /**
+     * TLSv1.3 protocol.
+     */
     public static final int SSL_PROTOCOL_TLSV1_3 = (1 << 5);
+    /**
+     * All TLS protocol versions combined.
+     */
     public static final int SSL_PROTOCOL_ALL =
             (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 | SSL_PROTOCOL_TLSV1_2 | SSL_PROTOCOL_TLSV1_3);
 
@@ -78,30 +189,87 @@ public final class SSL {
     /*
      * Define the SSL verify levels
      */
+    /**
+     * Client verification unset.
+     */
     public static final int SSL_CVERIFY_UNSET = UNSET;
+    /**
+     * No client certificate verification.
+     */
     public static final int SSL_CVERIFY_NONE = 0;
+    /**
+     * Optional client certificate verification.
+     */
     public static final int SSL_CVERIFY_OPTIONAL = 1;
+    /**
+     * Required client certificate verification.
+     */
     public static final int SSL_CVERIFY_REQUIRE = 2;
+    /**
+     * Optional client certificate verification without CA requirement.
+     */
     public static final int SSL_CVERIFY_OPTIONAL_NO_CA = 3;
 
     /*
      * Use either SSL_VERIFY_NONE or SSL_VERIFY_PEER, the last 2 options are 'ored' with SSL_VERIFY_PEER if they are
      * desired
      */
+    /**
+     * No peer verification.
+     */
     public static final int SSL_VERIFY_NONE = 0;
+    /**
+     * Verify peer certificate.
+     */
     public static final int SSL_VERIFY_PEER = 1;
+    /**
+     * Fail if no peer certificate is presented.
+     */
     public static final int SSL_VERIFY_FAIL_IF_NO_PEER_CERT = 2;
+    /**
+     * Only verify client certificate once per session.
+     */
     public static final int SSL_VERIFY_CLIENT_ONCE = 4;
+    /**
+     * Strict peer verification including certificate requirement.
+     */
     public static final int SSL_VERIFY_PEER_STRICT = (SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
 
+    /**
+     * Workaround for Microsoft session ID bug.
+     */
     public static final int SSL_OP_MICROSOFT_SESS_ID_BUG = 0x00000001;
+    /**
+     * Workaround for Netscape challenge bug.
+     */
     public static final int SSL_OP_NETSCAPE_CHALLENGE_BUG = 0x00000002;
+    /**
+     * Workaround for Netscape cipher change bug.
+     */
     public static final int SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG = 0x00000008;
+    /**
+     * Workaround for SSLREF2 certificate type reuse bug.
+     */
     public static final int SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG = 0x00000010;
+    /**
+     * Workaround for Microsoft SSLv3 buffer bug.
+     */
     public static final int SSL_OP_MICROSOFT_BIG_SSLV3_BUFFER = 0x00000020;
+    /**
+     * Workaround for MSIE SSLv2 RSA padding bug.
+     */
     public static final int SSL_OP_MSIE_SSLV2_RSA_PADDING = 0x00000040;
+    /**
+     * Workaround for SSLeay 0.8.0 client DH bug.
+     */
     public static final int SSL_OP_SSLEAY_080_CLIENT_DH_BUG = 0x00000080;
+    /**
+     * Workaround for TLS D5 bug.
+     */
     public static final int SSL_OP_TLS_D5_BUG = 0x00000100;
+    /**
+     * Workaround for TLS block padding bug.
+     */
     public static final int SSL_OP_TLS_BLOCK_PADDING_BUG = 0x00000200;
 
     /*
@@ -109,28 +277,55 @@ public final class SSL {
      * application protocol) the workaround is not needed. Unfortunately some broken SSL/TLS implementations cannot
      * handle it at all, which is why we include it in SSL_OP_ALL.
      */
+    /**
+     * Disable empty fragment insertion for CBC vulnerability workaround.
+     */
     public static final int SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS = 0x00000800;
 
     /*
      * SSL_OP_ALL: various bug workarounds that should be rather harmless. This used to be 0x000FFFFFL before 0.9.7.
      */
+    /**
+     * All bug workaround options combined.
+     */
     public static final int SSL_OP_ALL = 0x00000FFF;
-    /* As server, disallow session resumption on renegotiation */
+/* As server, disallow session resumption on renegotiation */
+    /**
+     * Disallow session resumption on renegotiation.
+     */
     public static final int SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 0x00010000;
     /* Don't use compression even if supported */
+    /**
+     * Disable compression.
+     */
     public static final int SSL_OP_NO_COMPRESSION = 0x00020000;
     /* Permit unsafe legacy renegotiation */
+    /**
+     * Allow unsafe legacy renegotiation.
+     */
     public static final int SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION = 0x00040000;
     /* If set, always create a new key when using tmp_eddh parameters */
+    /**
+     * Always create a new key when using ECDH parameters.
+     */
     public static final int SSL_OP_SINGLE_ECDH_USE = 0x00080000;
     /* If set, always create a new key when using tmp_dh parameters */
+    /**
+     * Always create a new key when using DH parameters.
+     */
     public static final int SSL_OP_SINGLE_DH_USE = 0x00100000;
     /*
      * Set to always use the tmp_rsa key when doing RSA operations, even when this violates protocol specs
      */
+    /**
+     * Always use ephemeral RSA key for RSA operations.
+     */
     public static final int SSL_OP_EPHEMERAL_RSA = 0x00200000;
     /*
      * Set on servers to choose the cipher according to the server's preferences
+     */
+    /**
+     * Server prefers its own cipher order.
      */
     public static final int SSL_OP_CIPHER_SERVER_PREFERENCE = 0x00400000;
     /*
@@ -138,111 +333,353 @@ public final class SSL {
      * premaster secret, even when TLSv1.0 (version 3.1) was announced in the client hello. Normally this is forbidden
      * to prevent version rollback attacks.
      */
+    /**
+     * Allow TLS rollback bug workaround.
+     */
     public static final int SSL_OP_TLS_ROLLBACK_BUG = 0x00800000;
 
+    /**
+     * Disable SSLv2 protocol.
+     */
     public static final int SSL_OP_NO_SSLv2 = 0x01000000;
+    /**
+     * Disable SSLv3 protocol.
+     */
     public static final int SSL_OP_NO_SSLv3 = 0x02000000;
+    /**
+     * Disable TLSv1.0 protocol.
+     */
     public static final int SSL_OP_NO_TLSv1 = 0x04000000;
+    /**
+     * Disable TLSv1.2 protocol.
+     */
     public static final int SSL_OP_NO_TLSv1_2 = 0x08000000;
+    /**
+     * Disable TLSv1.1 protocol.
+     */
     public static final int SSL_OP_NO_TLSv1_1 = 0x10000000;
 
+    /**
+     * Disable TLS session tickets.
+     */
     public static final int SSL_OP_NO_TICKET = 0x00004000;
 
+    /**
+     * Workaround for Netscape CA DN bug.
+     */
     public static final int SSL_OP_NETSCAPE_CA_DN_BUG = 0x20000000;
+    /**
+     * Workaround for Netscape demo cipher change bug.
+     */
     public static final int SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG = 0x40000000;
 
+    /**
+     * Undefined certificate format.
+     */
     public static final int SSL_CRT_FORMAT_UNDEF = 0;
+    /**
+     * ASN.1 certificate format.
+     */
     public static final int SSL_CRT_FORMAT_ASN1 = 1;
+    /**
+     * Text certificate format.
+     */
     public static final int SSL_CRT_FORMAT_TEXT = 2;
+    /**
+     * PEM certificate format.
+     */
     public static final int SSL_CRT_FORMAT_PEM = 3;
+    /**
+     * Netscape certificate format.
+     */
     public static final int SSL_CRT_FORMAT_NETSCAPE = 4;
+    /**
+     * PKCS12 certificate format.
+     */
     public static final int SSL_CRT_FORMAT_PKCS12 = 5;
+    /**
+     * S/MIME certificate format.
+     */
     public static final int SSL_CRT_FORMAT_SMIME = 6;
+    /**
+     * Engine certificate format.
+     */
     public static final int SSL_CRT_FORMAT_ENGINE = 7;
 
+    /**
+     * Client SSL mode.
+     */
     public static final int SSL_MODE_CLIENT = 0;
+    /**
+     * Server SSL mode.
+     */
     public static final int SSL_MODE_SERVER = 1;
+    /**
+     * Combined client and server SSL mode.
+     */
     public static final int SSL_MODE_COMBINED = 2;
 
+    /**
+     * Configuration flag for command line.
+     */
     public static final int SSL_CONF_FLAG_CMDLINE = 0x0001;
+    /**
+     * Configuration flag for file.
+     */
     public static final int SSL_CONF_FLAG_FILE = 0x0002;
+    /**
+     * Configuration flag for client.
+     */
     public static final int SSL_CONF_FLAG_CLIENT = 0x0004;
+    /**
+     * Configuration flag for server.
+     */
     public static final int SSL_CONF_FLAG_SERVER = 0x0008;
+    /**
+     * Configuration flag to show errors.
+     */
     public static final int SSL_CONF_FLAG_SHOW_ERRORS = 0x0010;
+    /**
+     * Configuration flag for certificate context.
+     */
     public static final int SSL_CONF_FLAG_CERTIFICATE = 0x0020;
 
+    /**
+     * Unknown configuration type.
+     */
     public static final int SSL_CONF_TYPE_UNKNOWN = 0x0000;
+    /**
+     * String configuration type.
+     */
     public static final int SSL_CONF_TYPE_STRING = 0x0001;
+    /**
+     * File configuration type.
+     */
     public static final int SSL_CONF_TYPE_FILE = 0x0002;
+    /**
+     * Directory configuration type.
+     */
     public static final int SSL_CONF_TYPE_DIR = 0x0003;
 
+    /**
+     * Shutdown type unset.
+     */
     public static final int SSL_SHUTDOWN_TYPE_UNSET = 0;
+    /**
+     * Standard shutdown type.
+     */
     public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
+    /**
+     * Unclean shutdown type.
+     */
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN = 2;
+    /**
+     * Accurate shutdown type.
+     */
     public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
+    /**
+     * Info flag for session ID.
+     */
     public static final int SSL_INFO_SESSION_ID = 0x0001;
+    /**
+     * Info flag for cipher name.
+     */
     public static final int SSL_INFO_CIPHER = 0x0002;
+    /**
+     * Info flag for cipher effective key size.
+     */
     public static final int SSL_INFO_CIPHER_USEKEYSIZE = 0x0003;
+    /**
+     * Info flag for cipher algorithm key size.
+     */
     public static final int SSL_INFO_CIPHER_ALGKEYSIZE = 0x0004;
+    /**
+     * Info flag for cipher version.
+     */
     public static final int SSL_INFO_CIPHER_VERSION = 0x0005;
+    /**
+     * Info flag for cipher description.
+     */
     public static final int SSL_INFO_CIPHER_DESCRIPTION = 0x0006;
+    /**
+     * Info flag for protocol version.
+     */
     public static final int SSL_INFO_PROTOCOL = 0x0007;
 
     /*
      * To obtain the CountryName of the Client Certificate Issuer use the SSL_INFO_CLIENT_I_DN + SSL_INFO_DN_COUNTRYNAME
      */
+    /**
+     * Info flag for client subject distinguished name.
+     */
     public static final int SSL_INFO_CLIENT_S_DN = 0x0010;
+    /**
+     * Info flag for client issuer distinguished name.
+     */
     public static final int SSL_INFO_CLIENT_I_DN = 0x0020;
+    /**
+     * Info flag for server subject distinguished name.
+     */
     public static final int SSL_INFO_SERVER_S_DN = 0x0040;
+    /**
+     * Info flag for server issuer distinguished name.
+     */
     public static final int SSL_INFO_SERVER_I_DN = 0x0080;
 
+    /**
+     * DN field for country name.
+     */
     public static final int SSL_INFO_DN_COUNTRYNAME = 0x0001;
+    /**
+     * DN field for state or province name.
+     */
     public static final int SSL_INFO_DN_STATEORPROVINCENAME = 0x0002;
+    /**
+     * DN field for locality name.
+     */
     public static final int SSL_INFO_DN_LOCALITYNAME = 0x0003;
+    /**
+     * DN field for organization name.
+     */
     public static final int SSL_INFO_DN_ORGANIZATIONNAME = 0x0004;
+    /**
+     * DN field for organizational unit name.
+     */
     public static final int SSL_INFO_DN_ORGANIZATIONALUNITNAME = 0x0005;
+    /**
+     * DN field for common name.
+     */
     public static final int SSL_INFO_DN_COMMONNAME = 0x0006;
+    /**
+     * DN field for title.
+     */
     public static final int SSL_INFO_DN_TITLE = 0x0007;
+    /**
+     * DN field for initials.
+     */
     public static final int SSL_INFO_DN_INITIALS = 0x0008;
+    /**
+     * DN field for given name.
+     */
     public static final int SSL_INFO_DN_GIVENNAME = 0x0009;
+    /**
+     * DN field for surname.
+     */
     public static final int SSL_INFO_DN_SURNAME = 0x000A;
+    /**
+     * DN field for description.
+     */
     public static final int SSL_INFO_DN_DESCRIPTION = 0x000B;
+    /**
+     * DN field for unique identifier.
+     */
     public static final int SSL_INFO_DN_UNIQUEIDENTIFIER = 0x000C;
+    /**
+     * DN field for email address.
+     */
     public static final int SSL_INFO_DN_EMAILADDRESS = 0x000D;
 
+    /**
+     * Info flag for client certificate version.
+     */
     public static final int SSL_INFO_CLIENT_M_VERSION = 0x0101;
+    /**
+     * Info flag for client certificate serial number.
+     */
     public static final int SSL_INFO_CLIENT_M_SERIAL = 0x0102;
+    /**
+     * Info flag for client certificate validity start.
+     */
     public static final int SSL_INFO_CLIENT_V_START = 0x0103;
+    /**
+     * Info flag for client certificate validity end.
+     */
     public static final int SSL_INFO_CLIENT_V_END = 0x0104;
+    /**
+     * Info flag for client certificate signature algorithm.
+     */
     public static final int SSL_INFO_CLIENT_A_SIG = 0x0105;
+    /**
+     * Info flag for client certificate public key algorithm.
+     */
     public static final int SSL_INFO_CLIENT_A_KEY = 0x0106;
+    /**
+     * Info flag for client certificate data.
+     */
     public static final int SSL_INFO_CLIENT_CERT = 0x0107;
+    /**
+     * Info flag for client certificate validity remaining.
+     */
     public static final int SSL_INFO_CLIENT_V_REMAIN = 0x0108;
 
+    /**
+     * Info flag for server certificate version.
+     */
     public static final int SSL_INFO_SERVER_M_VERSION = 0x0201;
+    /**
+     * Info flag for server certificate serial number.
+     */
     public static final int SSL_INFO_SERVER_M_SERIAL = 0x0202;
+    /**
+     * Info flag for server certificate validity start.
+     */
     public static final int SSL_INFO_SERVER_V_START = 0x0203;
+    /**
+     * Info flag for server certificate validity end.
+     */
     public static final int SSL_INFO_SERVER_V_END = 0x0204;
+    /**
+     * Info flag for server certificate signature algorithm.
+     */
     public static final int SSL_INFO_SERVER_A_SIG = 0x0205;
+    /**
+     * Info flag for server certificate public key algorithm.
+     */
     public static final int SSL_INFO_SERVER_A_KEY = 0x0206;
+    /**
+     * Info flag for server certificate data.
+     */
     public static final int SSL_INFO_SERVER_CERT = 0x0207;
     /*
      * Return client certificate chain. Add certificate chain number to that flag (0 ... verify depth)
      */
+    /**
+     * Info flag for client certificate chain.
+     */
     public static final int SSL_INFO_CLIENT_CERT_CHAIN = 0x0400;
 
     /* Only support OFF and SERVER for now */
+    /**
+     * Session cache disabled.
+     */
     public static final long SSL_SESS_CACHE_OFF = 0x0000;
+    /**
+     * Session cache enabled for server.
+     */
     public static final long SSL_SESS_CACHE_SERVER = 0x0002;
 
+    /**
+     * Do not advertise protocol on selector failure.
+     */
     public static final int SSL_SELECTOR_FAILURE_NO_ADVERTISE = 0;
+    /**
+     * Choose last protocol on selector failure.
+     */
     public static final int SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL = 1;
 
-    /* Return OpenSSL version number (run time version) */
+    /**
+     * Return OpenSSL version number (run time version).
+     *
+     * @return OpenSSL version number
+     */
     public static native int version();
 
-    /* Return OpenSSL version string (run time version) */
+    /**
+     * Return OpenSSL version string (run time version).
+     *
+     * @return OpenSSL version string
+     */
     public static native String versionString();
 
     /**
@@ -303,17 +740,50 @@ public final class SSL {
      * Begin Twitter API additions
      */
 
+    /**
+     * Shutdown has been sent.
+     */
     public static final int SSL_SENT_SHUTDOWN = 1;
+    /**
+     * Shutdown has been received.
+     */
     public static final int SSL_RECEIVED_SHUTDOWN = 2;
 
+    /**
+     * No SSL error.
+     */
     public static final int SSL_ERROR_NONE = 0;
+    /**
+     * SSL library error.
+     */
     public static final int SSL_ERROR_SSL = 1;
+    /**
+     * SSL operation would block reading.
+     */
     public static final int SSL_ERROR_WANT_READ = 2;
+    /**
+     * SSL operation would block writing.
+     */
     public static final int SSL_ERROR_WANT_WRITE = 3;
+    /**
+     * SSL operation wants X.509 lookup.
+     */
     public static final int SSL_ERROR_WANT_X509_LOOKUP = 4;
+    /**
+     * SSL syscall error.
+     */
     public static final int SSL_ERROR_SYSCALL = 5; /* look at error stack/return value/errno */
+    /**
+     * SSL connection closed cleanly (zero return).
+     */
     public static final int SSL_ERROR_ZERO_RETURN = 6;
+    /**
+     * SSL operation wants connect.
+     */
     public static final int SSL_ERROR_WANT_CONNECT = 7;
+    /**
+     * SSL operation wants accept.
+     */
     public static final int SSL_ERROR_WANT_ACCEPT = 8;
 
     /**

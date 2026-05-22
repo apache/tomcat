@@ -43,6 +43,7 @@ public class B2CConverter {
 
 
     // Protected so unit tests can use it
+    /** Maximum size for leftover bytes used for incomplete characters during decoding. */
     protected static final int LEFTOVER_SIZE = 9;
 
     /**
@@ -78,10 +79,21 @@ public class B2CConverter {
      */
     private final ByteBuffer leftovers;
 
+    /**
+     * Constructs a B2CConverter for the given charset, reporting errors on malformed input.
+     *
+     * @param charset the charset to use for decoding
+     */
     public B2CConverter(Charset charset) {
         this(charset, false);
     }
 
+    /**
+     * Constructs a B2CConverter for the given charset.
+     *
+     * @param charset the charset to use for decoding
+     * @param replaceOnError if {@code true}, replace malformed/unmappable input; otherwise report errors
+     */
     public B2CConverter(Charset charset, boolean replaceOnError) {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
@@ -253,6 +265,11 @@ public class B2CConverter {
     }
 
 
+    /**
+     * Returns the charset used by this converter.
+     *
+     * @return the charset
+     */
     public Charset getCharset() {
         return decoder.charset();
     }

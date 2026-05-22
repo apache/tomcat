@@ -21,5 +21,15 @@ package org.apache.tomcat.util.threads;
  */
 public final class Constants {
 
+    /**
+     * Default thread renewal delay in milliseconds.
+     */
     public static final long DEFAULT_THREAD_RENEWAL_DELAY = 1000L;
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

@@ -16,20 +16,68 @@
  */
 package org.apache.tomcat.util.net.openssl.ciphers;
 
+/**
+ * Enumeration of authentication types used in OpenSSL cipher specifications.
+ */
 public enum Authentication {
-    RSA /* RSA auth */,
-    DSS /* DSS auth */,
-    aNULL /* no auth (i.e. use ADH or AECDH) */,
-    DH /* Fixed DH auth (kDHd or kDHr) */,
-    ECDH /* Fixed ECDH auth (kECDHe or kECDHr) */,
-    KRB5 /* KRB5 auth */,
-    ECDSA /* ECDSA auth */,
-    PSK /* PSK auth */,
-    GOST94 /* GOST R 34.10-94 signature auth */,
-    GOST01 /* GOST R 34.10-2001 */,
-    FZA /* Fortezza */,
-    SRP /* Secure Remote Password */,
-    EdDSA /* EdDSA */,
-    MLDSA /* ML-DSA */,
-    ANY /* TLS 1.3 */
+    /**
+     * RSA authentication.
+     */
+    RSA,
+    /**
+     * DSS authentication.
+     */
+    DSS,
+    /**
+     * No authentication (i.e. use ADH or AECDH).
+     */
+    aNULL,
+    /**
+     * Fixed DH authentication (kDHd or kDHr).
+     */
+    DH,
+    /**
+     * Fixed ECDH authentication (kECDHe or kECDHr).
+     */
+    ECDH,
+    /**
+     * KRB5 authentication.
+     */
+    KRB5,
+    /**
+     * ECDSA authentication.
+     */
+    ECDSA,
+    /**
+     * PSK authentication.
+     */
+    PSK,
+    /**
+     * GOST R 34.10-94 signature authentication.
+     */
+    GOST94,
+    /**
+     * GOST R 34.10-2001 authentication.
+     */
+    GOST01,
+    /**
+     * Fortezza authentication.
+     */
+    FZA,
+    /**
+     * Secure Remote Password authentication.
+     */
+    SRP,
+    /**
+     * EdDSA authentication.
+     */
+    EdDSA,
+    /**
+     * ML-DSA authentication.
+     */
+    MLDSA,
+    /**
+     * Any authentication (TLS 1.3).
+     */
+    ANY
 }

@@ -23,6 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Specifies the security roles that are allowed to access the annotated enterprise
+ * bean or business method. When applied at the class level, only the listed roles
+ * may invoke any business method of the bean. When applied at the method level,
+ * only the listed roles may invoke the specified method. This annotation is
+ * mutually exclusive with {@link PermitAll} and {@link DenyAll}.
+ *
  * @since Common Annotations 1.0
  */
 @Documented
@@ -31,7 +37,11 @@ import java.lang.annotation.Target;
 public @interface RolesAllowed {
 
     /**
-     * @return a String[] of the allowed roles
+     * Specifies the security role names that are authorized to access the
+     * annotated component or method. Only callers assigned one of these roles
+     * will be permitted access.
+     *
+     * @return the array of authorized role names
      */
     String[] value();
 }

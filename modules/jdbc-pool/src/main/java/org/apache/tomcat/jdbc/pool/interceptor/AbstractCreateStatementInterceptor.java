@@ -33,11 +33,29 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * {@link #createStatement(Object, Method, Object[], Object, long)} method.
  */
 public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor {
+    /**
+     * {@link java.sql.Connection#createStatement()}
+     */
     protected static final String CREATE_STATEMENT = "createStatement";
+    /**
+     * Index for {@link #CREATE_STATEMENT} in {@link #STATEMENT_TYPES}
+     */
     protected static final int CREATE_STATEMENT_IDX = 0;
+    /**
+     * {@link java.sql.Connection#prepareStatement(String)}
+     */
     protected static final String PREPARE_STATEMENT = "prepareStatement";
+    /**
+     * Index for {@link #PREPARE_STATEMENT} in {@link #STATEMENT_TYPES}
+     */
     protected static final int PREPARE_STATEMENT_IDX = 1;
+    /**
+     * {@link java.sql.Connection#prepareCall(String)}
+     */
     protected static final String PREPARE_CALL = "prepareCall";
+    /**
+     * Index for {@link #PREPARE_CALL} in {@link #STATEMENT_TYPES}
+     */
     protected static final int PREPARE_CALL_IDX = 2;
 
     /**
@@ -55,16 +73,40 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      */
     protected static final String GET_STATEMENT = "getStatement";
 
+    /**
+     * Index for {@link #GET_STATEMENT} in {@link #STATEMENT_TYPES}
+     */
     protected static final int RESULTSET_IDX = 3;
 
+    /**
+     * Array of statement type method names
+     */
     protected static final String[] STATEMENT_TYPES = { CREATE_STATEMENT, PREPARE_STATEMENT, PREPARE_CALL };
+    /**
+     * Count of statement types in {@link #STATEMENT_TYPES}
+     */
     protected static final int STATEMENT_TYPE_COUNT = STATEMENT_TYPES.length;
 
+    /**
+     * {@link java.sql.Statement#execute}
+     */
     protected static final String EXECUTE = "execute";
+    /**
+     * {@link java.sql.Statement#executeQuery}
+     */
     protected static final String EXECUTE_QUERY = "executeQuery";
+    /**
+     * {@link java.sql.Statement#executeUpdate}
+     */
     protected static final String EXECUTE_UPDATE = "executeUpdate";
+    /**
+     * {@link java.sql.Statement#executeBatch()}
+     */
     protected static final String EXECUTE_BATCH = "executeBatch";
 
+    /**
+     * Array of execute type method names
+     */
     protected static final String[] EXECUTE_TYPES = { EXECUTE, EXECUTE_QUERY, EXECUTE_UPDATE, EXECUTE_BATCH };
 
     /**
@@ -72,6 +114,9 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      */
     protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT + 1];
 
+    /**
+     * Default constructor
+     */
     public AbstractCreateStatementInterceptor() {
         super();
     }
@@ -165,7 +210,7 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
         return process(EXECUTE_TYPES, method, process);
     }
 
-    /*
+    /**
      * Returns true if the method that is being invoked matches one of the method names passed in
      *
      * @param names list of method names that we want to intercept

@@ -24,6 +24,9 @@ import java.io.IOException;
  * of incoming messages.
  */
 public interface ChannelReceiver extends Heartbeat {
+    /**
+     * Maximum UDP packet size.
+     */
     int MAX_UDP_SIZE = 65535;
 
     /**

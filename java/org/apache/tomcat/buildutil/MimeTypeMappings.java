@@ -32,8 +32,22 @@ import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.InputSource;
 
+/**
+ * Build utility for MIME type mappings.
+ */
 public class MimeTypeMappings {
 
+    /**
+     * Default constructor.
+     */
+    public MimeTypeMappings() {
+    }
+
+    /**
+     * Main entry point.
+     * @param args the command line arguments
+     * @throws Exception if an error occurs
+     */
     public static void main(String... args) throws Exception {
         InputSource globalWebXml = new InputSource(new File("conf/web.xml").getAbsoluteFile().toURI().toString());
 

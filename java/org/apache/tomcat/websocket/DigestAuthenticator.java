@@ -31,8 +31,18 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class DigestAuthenticator extends Authenticator {
 
+    /**
+     * Construct a new DigestAuthenticator.
+     */
+    public DigestAuthenticator() {
+        super();
+    }
+
     private static final StringManager sm = StringManager.getManager(DigestAuthenticator.class);
 
+    /**
+     * Name of the DIGEST authentication scheme.
+     */
     public static final String schemeName = "digest";
     private static final Object cnonceGeneratorLock = new Object();
     private static volatile SecureRandom cnonceGenerator;
@@ -40,8 +50,8 @@ public class DigestAuthenticator extends Authenticator {
     private long cNonce;
 
     @Override
-    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
-            String userRealm) throws AuthenticationException {
+    public String getAuthorization(String method, String requestUri, String authenticateHeader, String userName,
+            String userPassword, String userRealm) throws AuthenticationException {
 
         validateUsername(userName);
         validatePassword(userPassword);
@@ -79,8 +89,8 @@ public class DigestAuthenticator extends Authenticator {
 
         try {
             challenge.append("response=\"");
-            challenge.append(
-                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm));
+            challenge.append(calculateRequestDigest(method, requestUri, userName, userPassword, realm, nonce,
+                    messageQop, algorithm));
             challenge.append("\",");
         }
 
@@ -89,7 +99,9 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         challenge.append("algorithm=").append(algorithm).append(",");
-        challenge.append("opaque=\"").append(opaque).append("\",");
+        if (opaque != null) {
+            challenge.append("opaque=\"").append(opaque).append("\",");
+        }
 
         if (!messageQop.isEmpty()) {
             challenge.append("qop=\"").append(messageQop).append("\"");
@@ -101,8 +113,8 @@ public class DigestAuthenticator extends Authenticator {
 
     }
 
-    private String calculateRequestDigest(String requestUri, String userName, String password, String realm,
-            String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
+    private String calculateRequestDigest(String method, String requestUri, String userName, String password,
+            String realm, String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
 
         boolean session = false;
         if (algorithm.endsWith("-sess")) {
@@ -123,7 +135,7 @@ public class DigestAuthenticator extends Authenticator {
          * If the "qop" value is "auth-int", then A2 is: A2 = Method ":" digest-uri-value ":" H(entity-body) since we do
          * not have an entity-body, A2 = Method ":" digest-uri-value for auth and auth_int
          */
-        String A2 = "GET:" + requestUri;
+        String A2 = method + ":" + requestUri;
 
         preDigest.append(encode(algorithm, A1));
         preDigest.append(':');

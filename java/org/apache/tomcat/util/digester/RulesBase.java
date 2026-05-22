@@ -37,6 +37,12 @@ import java.util.List;
  */
 public class RulesBase implements Rules {
 
+    /**
+     * Default constructor.
+     */
+    public RulesBase() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**

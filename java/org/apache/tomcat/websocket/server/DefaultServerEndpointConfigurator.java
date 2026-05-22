@@ -26,8 +26,18 @@ import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpointConfig;
 
+/**
+ * Default implementation of {@link ServerEndpointConfig.Configurator} for WebSocket server endpoints.
+ */
+@SuppressWarnings("javadoc") // Eclipse bug - the Javadoc is fine
 @aQute.bnd.annotation.spi.ServiceProvider(value = ServerEndpointConfig.Configurator.class)
 public class DefaultServerEndpointConfigurator extends ServerEndpointConfig.Configurator {
+
+    /**
+     * Default constructor.
+     */
+    public DefaultServerEndpointConfigurator() {
+    }
 
     @Override
     public <T> T getEndpointInstance(Class<T> clazz) throws InstantiationException {

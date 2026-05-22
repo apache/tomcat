@@ -20,14 +20,27 @@ import java.io.Serial;
 
 import org.apache.catalina.tribes.Member;
 
+/**
+ * Base implementation of {@link ClusterMessage} providing common fields and methods
+ * for cluster messages.
+ */
 public abstract class ClusterMessageBase implements ClusterMessage {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The timestamp of this message.
+     */
     private long timestamp;
+    /**
+     * The member associated with this message.
+     */
     protected transient Member address;
 
+    /**
+     * Default constructor for ClusterMessageBase.
+     */
     public ClusterMessageBase() {
         // NO-OP
     }

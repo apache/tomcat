@@ -16,22 +16,64 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+/**
+ * MBean interface for managing the {@link EncryptInterceptor} configuration and status.
+ */
 public interface EncryptInterceptorMBean {
 
-    // Config
+    /**
+     * Returns the option flag for the encryption interceptor.
+     *
+     * @return the option flag value
+     */
     int getOptionFlag();
 
+    /**
+     * Sets the option flag for the encryption interceptor.
+     *
+     * @param optionFlag the option flag value
+     */
     void setOptionFlag(int optionFlag);
 
+    /**
+     * Sets the encryption algorithm to use.
+     *
+     * @param algorithm the encryption algorithm in algorithm/mode/padding format
+     */
     void setEncryptionAlgorithm(String algorithm);
 
+    /**
+     * Returns the encryption algorithm currently in use.
+     *
+     * @return the encryption algorithm string
+     */
     String getEncryptionAlgorithm();
 
+    /**
+     * Sets the encryption key as raw bytes.
+     *
+     * @param key the encryption key bytes
+     */
     void setEncryptionKey(byte[] key);
 
+    /**
+     * Returns the encryption key as raw bytes.
+     *
+     * @return the encryption key bytes
+     */
     byte[] getEncryptionKey();
 
+    /**
+     * Sets the JCA provider name for cryptographic operations.
+     *
+     * @param provider the JCA provider name
+     */
     void setProviderName(String provider);
 
+    /**
+     * Returns the JCA provider name for cryptographic operations.
+     *
+     * @return the JCA provider name, or {@code null} for default
+     */
     String getProviderName();
 }

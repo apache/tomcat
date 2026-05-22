@@ -21,6 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotates a method on a POJO endpoint to handle the open event. The annotated method
+ * will be called when a new WebSocket session is established.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface OnOpen {

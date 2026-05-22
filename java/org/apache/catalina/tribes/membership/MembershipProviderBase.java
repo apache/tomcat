@@ -24,12 +24,33 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipProvider;
 import org.apache.catalina.tribes.MembershipService;
 
+/**
+ * Base implementation for membership providers.
+ */
 public abstract class MembershipProviderBase implements MembershipProvider {
 
+    /**
+     * Default constructor.
+     */
+    public MembershipProviderBase() {
+    }
+
+    /**
+     * The membership.
+     */
     protected Membership membership;
+    /**
+     * The membership listener.
+     */
     protected MembershipListener membershipListener;
+    /**
+     * The membership service.
+     */
     protected MembershipService service;
     // The event notification executor
+    /**
+     * The event notification executor.
+     */
     protected ScheduledExecutorService executor;
 
     @Override

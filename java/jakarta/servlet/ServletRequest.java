@@ -441,54 +441,66 @@ public interface ServletRequest {
     int getLocalPort();
 
     /**
-     * @return TODO
+     * Returns the {@link ServletContext} to which this servlet belongs.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @return the ServletContext associated with this request
+     *
+     * @since Servlet 3.0
      */
     ServletContext getServletContext();
 
     /**
-     * @return TODO
+     * Initiates asynchronous processing for this request. The asynchronous processing is performed using the current
+     * request and response objects.
      *
-     * @throws IllegalStateException If async is not supported for this request
+     * @return an {@link AsyncContext} instance for managing the asynchronous processing
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @throws IllegalStateException if async is not supported for this request
+     *
+     * @since Servlet 3.0
      */
     AsyncContext startAsync() throws IllegalStateException;
 
     /**
-     * @param servletRequest  The ServletRequest with which to initialise the asynchronous context
-     * @param servletResponse The ServletResponse with which to initialise the asynchronous context
+     * Initiates asynchronous processing for this request using the specified request and response objects.
      *
-     * @return TODO
+     * @param servletRequest  the ServletRequest with which to initialise the asynchronous context
+     * @param servletResponse the ServletResponse with which to initialise the asynchronous context
      *
-     * @throws IllegalStateException If async is not supported for this request
+     * @return an {@link AsyncContext} instance for managing the asynchronous processing
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @throws IllegalStateException if async is not supported for this request
+     *
+     * @since Servlet 3.0
      */
     AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
             throws IllegalStateException;
 
     /**
-     * @return TODO
+     * Returns whether asynchronous processing has been started for this request.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @return {@code true} if asynchronous processing has been started, {@code false} otherwise
+     *
+     * @since Servlet 3.0
      */
     boolean isAsyncStarted();
 
     /**
-     * @return TODO
+     * Returns whether asynchronous processing is supported for this request and has not already been started.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @return {@code true} if asynchronous processing is supported and has not yet been started, {@code false}
+     *             otherwise
+     *
+     * @since Servlet 3.0
      */
     boolean isAsyncSupported();
 
     /**
-     * Get the current AsyncContext.
+     * Returns the current {@link AsyncContext} associated with this request.
      *
-     * @return The current AsyncContext
+     * @return the current AsyncContext
      *
-     * @throws IllegalStateException if the request is not in asynchronous mode (i.e. @link #isAsyncStarted() is
+     * @throws IllegalStateException if the request is not in asynchronous mode (i.e. {@link #isAsyncStarted()} is
      *                                   {@code false})
      *
      * @since Servlet 3.0
@@ -496,9 +508,12 @@ public interface ServletRequest {
     AsyncContext getAsyncContext();
 
     /**
-     * @return TODO
+     * Returns the {@link DispatcherType} that represents the type of dispatch (REQUEST, FORWARD, INCLUDE, ERROR, or
+     * ASYNC) through which this request was initiated.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @return the DispatcherType for this request
+     *
+     * @since Servlet 3.0
      */
     DispatcherType getDispatcherType();
 

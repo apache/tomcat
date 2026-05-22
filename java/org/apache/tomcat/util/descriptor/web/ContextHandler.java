@@ -33,6 +33,12 @@ public class ContextHandler extends ResourceBase {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextHandler.
+     */
+    public ContextHandler() {
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -41,10 +47,20 @@ public class ContextHandler extends ResourceBase {
      */
     private String handlerclass = null;
 
+    /**
+     * Returns the Handler reference class.
+     *
+     * @return the handler class name
+     */
     public String getHandlerclass() {
         return this.handlerclass;
     }
 
+    /**
+     * Sets the Handler reference class.
+     *
+     * @param handlerclass the handler class name
+     */
     public void setHandlerclass(String handlerclass) {
         this.handlerclass = handlerclass;
     }
@@ -59,14 +75,31 @@ public class ContextHandler extends ResourceBase {
      */
     private final Map<String,String> soapHeaders = new HashMap<>();
 
+    /**
+     * Returns the iterator of local parts for SOAP headers.
+     *
+     * @return iterator of local part names
+     */
     public Iterator<String> getLocalparts() {
         return soapHeaders.keySet().iterator();
     }
 
+    /**
+     * Returns the namespace URI for the given local part.
+     *
+     * @param localpart the local part name
+     * @return the namespace URI
+     */
     public String getNamespaceuri(String localpart) {
         return soapHeaders.get(localpart);
     }
 
+    /**
+     * Adds a SOAP header with the given local part and namespace URI.
+     *
+     * @param localpart the local part name
+     * @param namespaceuri the namespace URI
+     */
     public void addSoapHeaders(String localpart, String namespaceuri) {
         soapHeaders.put(localpart, namespaceuri);
     }
@@ -86,14 +119,30 @@ public class ContextHandler extends ResourceBase {
      */
     private final List<String> soapRoles = new ArrayList<>();
 
+    /**
+     * Returns the SOAP role at the given index.
+     *
+     * @param i the index
+     * @return the SOAP role
+     */
     public String getSoapRole(int i) {
         return this.soapRoles.get(i);
     }
 
+    /**
+     * Returns the number of SOAP roles.
+     *
+     * @return the SOAP roles count
+     */
     public int getSoapRolesSize() {
         return this.soapRoles.size();
     }
 
+    /**
+     * Adds a SOAP role.
+     *
+     * @param soapRole the SOAP role to add
+     */
     public void addSoapRole(String soapRole) {
         this.soapRoles.add(soapRole);
     }
@@ -103,14 +152,30 @@ public class ContextHandler extends ResourceBase {
      */
     private final List<String> portNames = new ArrayList<>();
 
+    /**
+     * Returns the port name at the given index.
+     *
+     * @param i the index
+     * @return the port name
+     */
     public String getPortName(int i) {
         return this.portNames.get(i);
     }
 
+    /**
+     * Returns the number of port names.
+     *
+     * @return the port names count
+     */
     public int getPortNamesSize() {
         return this.portNames.size();
     }
 
+    /**
+     * Adds a port name.
+     *
+     * @param portName the port name to add
+     */
     public void addPortName(String portName) {
         this.portNames.add(portName);
     }

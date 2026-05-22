@@ -83,11 +83,25 @@ public class HandlerRef extends AbstractRef {
     public static final String HANDLER_PORTNAME = "handlerportname";
 
 
+    /**
+     * Create a new HandlerRef with the specified reference name and handler class.
+     *
+     * @param refname      The reference name
+     * @param handlerClass The handler class name
+     */
     public HandlerRef(String refname, String handlerClass) {
         this(refname, handlerClass, null, null);
     }
 
 
+    /**
+     * Create a new HandlerRef with the specified parameters.
+     *
+     * @param refname           The reference name
+     * @param handlerClass      The handler class name
+     * @param factory           The factory class name
+     * @param factoryLocation   The factory location
+     */
     public HandlerRef(String refname, String handlerClass, String factory, String factoryLocation) {
         super(refname, factory, factoryLocation);
         StringRefAddr refAddr;

@@ -27,9 +27,26 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.Membership;
 
+/**
+ * Utility class for array operations in the Tribes clustering framework.
+ */
 public class Arrays {
+    /** Prevents instantiation. */
+    private Arrays() {}
+
+    /** String manager for this class. */
     protected static final StringManager sm = StringManager.getManager(Arrays.class);
 
+    /**
+     * Checks if a byte array contains a key at a given offset.
+     *
+     * @param source the source byte array
+     * @param srcoffset the offset in the source array
+     * @param key the key byte array to search for
+     * @param keyoffset the offset in the key array
+     * @param length the length of the data to compare
+     * @return {@code true} if the key is found at the given offset
+     */
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if (srcoffset < 0 || srcoffset >= source.length) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.srcoffset.outOfBounds"));
@@ -52,14 +69,37 @@ public class Arrays {
         return match;
     }
 
+    /**
+     * Converts a byte array to a string representation.
+     *
+     * @param data the byte array
+     * @return the string representation
+     */
     public static String toString(byte[] data) {
         return toString(data, 0, data != null ? data.length : 0);
     }
 
+    /**
+     * Converts a portion of a byte array to a string representation.
+     *
+     * @param data the byte array
+     * @param offset the starting offset
+     * @param length the number of elements
+     * @return the string representation
+     */
     public static String toString(byte[] data, int offset, int length) {
         return toString(data, offset, length, false);
     }
 
+    /**
+     * Converts a portion of a byte array to a string representation, optionally treating bytes as unsigned.
+     *
+     * @param data the byte array
+     * @param offset the starting offset
+     * @param length the number of elements
+     * @param unsigned {@code true} to treat bytes as unsigned
+     * @return the string representation
+     */
     public static String toString(byte[] data, int offset, int length, boolean unsigned) {
         StringBuilder buf = new StringBuilder("{");
         if (data != null && length > 0) {
@@ -80,10 +120,24 @@ public class Arrays {
         return buf.toString();
     }
 
+    /**
+     * Converts an object array to a string representation.
+     *
+     * @param data the object array
+     * @return the string representation
+     */
     public static String toString(Object[] data) {
         return toString(data, 0, data != null ? data.length : 0);
     }
 
+    /**
+     * Converts a portion of an object array to a string representation.
+     *
+     * @param data the object array
+     * @param offset the starting offset
+     * @param length the number of elements
+     * @return the string representation
+     */
     public static String toString(Object[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if (data != null && length > 0) {
@@ -96,10 +150,24 @@ public class Arrays {
         return buf.toString();
     }
 
+    /**
+     * Converts a member array to a string of member names.
+     *
+     * @param data the member array
+     * @return the string of member names
+     */
     public static String toNameString(Member[] data) {
         return toNameString(data, 0, data != null ? data.length : 0);
     }
 
+    /**
+     * Converts a portion of a member array to a string of member names.
+     *
+     * @param data the member array
+     * @param offset the starting offset
+     * @param length the number of elements
+     * @return the string of member names
+     */
     public static String toNameString(Member[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if (data != null && length > 0) {
@@ -112,6 +180,12 @@ public class Arrays {
         return buf.toString();
     }
 
+    /**
+     * Sums all elements of an integer array.
+     *
+     * @param data the integer array
+     * @return the sum of all elements
+     */
     public static int add(int[] data) {
         int result = 0;
         for (int datum : data) {
@@ -120,18 +194,44 @@ public class Arrays {
         return result;
     }
 
+    /**
+     * Extracts a UniqueId from a ChannelMessage.
+     *
+     * @param msg the channel message
+     * @return the unique ID
+     */
     public static UniqueId getUniqudId(ChannelMessage msg) {
         return new UniqueId(msg.getUniqueId());
     }
 
+    /**
+     * Creates a UniqueId from a byte array.
+     *
+     * @param data the byte array
+     * @return the unique ID
+     */
     public static UniqueId getUniqudId(byte[] data) {
         return new UniqueId(data);
     }
 
+    /**
+     * Compares two byte arrays for equality.
+     *
+     * @param o1 the first byte array
+     * @param o2 the second byte array
+     * @return {@code true} if the arrays are equal
+     */
     public static boolean equals(byte[] o1, byte[] o2) {
         return java.util.Arrays.equals(o1, o2);
     }
 
+    /**
+     * Compares two object arrays for equality.
+     *
+     * @param o1 the first object array
+     * @param o2 the second object array
+     * @return {@code true} if the arrays are equal
+     */
     public static boolean equals(Object[] o1, Object[] o2) {
         boolean result = o1.length == o2.length;
         if (result) {
@@ -142,12 +242,26 @@ public class Arrays {
         return result;
     }
 
+    /**
+     * Checks if two member arrays contain the same members.
+     *
+     * @param m1 the first member array
+     * @param m2 the second member array
+     * @return {@code true} if both arrays contain the same members
+     */
     public static boolean sameMembers(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
         return equals(m1, m2);
     }
 
+    /**
+     * Merges two member arrays, removing duplicates.
+     *
+     * @param m1 the first member array
+     * @param m2 the second member array
+     * @return the merged member array
+     */
     public static Member[] merge(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
@@ -162,12 +276,26 @@ public class Arrays {
         return result;
     }
 
+    /**
+     * Adds all members from an array to a Membership.
+     *
+     * @param mbrship the membership to add members to
+     * @param m the member array
+     */
     public static void fill(Membership mbrship, Member[] m) {
         for (Member member : m) {
             mbrship.addMember(member);
         }
     }
 
+    /**
+     * Returns members in the complete set that are not in the local set.
+     *
+     * @param complete the complete membership
+     * @param local the local membership
+     * @param ignore the member to ignore
+     * @return the difference as a member array
+     */
     public static Member[] diff(Membership complete, Membership local, Member ignore) {
         List<Member> result = new ArrayList<>();
         Member[] comp = complete.getMembers();
@@ -182,10 +310,24 @@ public class Arrays {
         return result.toArray(new Member[0]);
     }
 
+    /**
+     * Removes a single member from an array.
+     *
+     * @param all the member array
+     * @param remove the member to remove
+     * @return the array with the member removed
+     */
     public static Member[] remove(Member[] all, Member remove) {
         return extract(all, new Member[] { remove });
     }
 
+    /**
+     * Removes specified members from an array.
+     *
+     * @param all the member array
+     * @param remove the members to remove
+     * @return the array with specified members removed
+     */
     public static Member[] extract(Member[] all, Member[] remove) {
         List<Member> alist = java.util.Arrays.asList(all);
         ArrayList<Member> list = new ArrayList<>(alist);
@@ -195,6 +337,13 @@ public class Arrays {
         return list.toArray(new Member[0]);
     }
 
+    /**
+     * Finds the index of a member in an array.
+     *
+     * @param member the member to find
+     * @param members the member array
+     * @return the index, or -1 if not found
+     */
     public static int indexOf(Member member, Member[] members) {
         int result = -1;
         for (int i = 0; (result == -1) && (i < members.length); i++) {
@@ -205,6 +354,13 @@ public class Arrays {
         return result;
     }
 
+    /**
+     * Finds the index of the next member after the given one.
+     *
+     * @param member the current member
+     * @param members the member array
+     * @return the next index, wrapping to 0 if at end, or -1 if empty
+     */
     public static int nextIndex(Member member, Member[] members) {
         int idx = indexOf(member, members) + 1;
         if (idx >= members.length) {
@@ -214,6 +370,12 @@ public class Arrays {
         return idx;
     }
 
+    /**
+     * Computes a hash code for a byte array.
+     *
+     * @param a the byte array
+     * @return the hash code
+     */
     public static int hashCode(byte[] a) {
         if (a == null) {
             return 0;
@@ -226,6 +388,12 @@ public class Arrays {
         return result;
     }
 
+    /**
+     * Parses a byte array from its string representation.
+     *
+     * @param value the string representation
+     * @return the byte array
+     */
     public static byte[] fromString(String value) {
         if (value == null) {
             return null;
@@ -242,6 +410,12 @@ public class Arrays {
     }
 
 
+    /**
+     * Converts a string to a byte array using ISO-8859-1 encoding.
+     *
+     * @param s the string to convert
+     * @return the byte array
+     */
     public static byte[] convert(String s) {
         return s.getBytes(StandardCharsets.ISO_8859_1);
     }

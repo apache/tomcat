@@ -44,6 +44,12 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     private static final Log log = LogFactory.getLog(DataSourceUserDatabase.class);
     private static final StringManager sm = StringManager.getManager(DataSourceUserDatabase.class);
 
+    /**
+     * Create a new DataSourceUserDatabase.
+     *
+     * @param dataSource The data source to use
+     * @param id The unique identifier for this user database
+     */
     public DataSourceUserDatabase(DataSource dataSource, String id) {
         this.dataSource = dataSource;
         this.id = id;
@@ -61,16 +67,43 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      */
     protected final String id;
 
+    /**
+     * Users that have been created but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,User> createdUsers = new ConcurrentHashMap<>();
+    /**
+     * Users that have been modified but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,User> modifiedUsers = new ConcurrentHashMap<>();
+    /**
+     * Users that have been removed but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,User> removedUsers = new ConcurrentHashMap<>();
 
+    /**
+     * Groups that have been created but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Group> createdGroups = new ConcurrentHashMap<>();
+    /**
+     * Groups that have been modified but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Group> modifiedGroups = new ConcurrentHashMap<>();
+    /**
+     * Groups that have been removed but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Group> removedGroups = new ConcurrentHashMap<>();
 
+    /**
+     * Roles that have been created but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Role> createdRoles = new ConcurrentHashMap<>();
+    /**
+     * Roles that have been modified but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Role> modifiedRoles = new ConcurrentHashMap<>();
+    /**
+     * Roles that have been removed but not yet persisted.
+     */
     protected final ConcurrentHashMap<String,Role> removedRoles = new ConcurrentHashMap<>();
 
 
@@ -242,7 +275,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the name of the JNDI JDBC DataSource.
+     * Return the name of the JNDI JDBC DataSource.
+     *
+     * @return the DataSource name
      */
     public String getDataSourceName() {
         return dataSourceName;
@@ -251,14 +286,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the name of the JNDI JDBC DataSource.
      *
-     * @param dataSourceName the name of the JNDI JDBC DataSource
+     * @param dataSourceName the name of the JNDI JDBC DataSource to use
      */
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
     }
 
     /**
-     * @return the column in the user role table that names a role.
+     * Return the column in the user role table that names a role.
+     *
+     * @return the role name column
      */
     public String getRoleNameCol() {
         return roleNameCol;
@@ -267,14 +304,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the column in the user role table that names a role.
      *
-     * @param roleNameCol The column name
+     * @param roleNameCol The column name to use
      */
     public void setRoleNameCol(String roleNameCol) {
         this.roleNameCol = roleNameCol;
     }
 
     /**
-     * @return the column in the user table that holds the user's credentials.
+     * Return the column in the user table that holds the user's credentials.
+     *
+     * @return the credentials column
      */
     public String getUserCredCol() {
         return userCredCol;
@@ -283,14 +322,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the column in the user table that holds the user's credentials.
      *
-     * @param userCredCol The column name
+     * @param userCredCol The column name to use
      */
     public void setUserCredCol(String userCredCol) {
         this.userCredCol = userCredCol;
     }
 
     /**
-     * @return the column in the user table that holds the user's name.
+     * Return the column in the user table that holds the user's name.
+     *
+     * @return the user name column
      */
     public String getUserNameCol() {
         return userNameCol;
@@ -299,14 +340,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the column in the user table that holds the user's name.
      *
-     * @param userNameCol The column name
+     * @param userNameCol The column name to use
      */
     public void setUserNameCol(String userNameCol) {
         this.userNameCol = userNameCol;
     }
 
     /**
-     * @return the table that holds the relation between user's and roles.
+     * Return the table that holds the relation between user's and roles.
+     *
+     * @return the user-role table name
      */
     public String getUserRoleTable() {
         return userRoleTable;
@@ -315,14 +358,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the table that holds the relation between user's and roles.
      *
-     * @param userRoleTable The table name
+     * @param userRoleTable The table name to use
      */
     public void setUserRoleTable(String userRoleTable) {
         this.userRoleTable = userRoleTable;
     }
 
     /**
-     * @return the table that holds user data
+     * Return the table that holds user data.
+     *
+     * @return the user table name
      */
     public String getUserTable() {
         return userTable;
@@ -331,7 +376,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * Set the table that holds user data.
      *
-     * @param userTable The table name
+     * @param userTable The table name to use
      */
     public void setUserTable(String userTable) {
         this.userTable = userTable;
@@ -339,112 +384,144 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
 
     /**
-     * @return the roleAndGroupDescriptionCol
+     * Return the column name used for role and group descriptions.
+     *
+     * @return the role and group description column name
      */
     public String getRoleAndGroupDescriptionCol() {
         return this.roleAndGroupDescriptionCol;
     }
 
     /**
-     * @param roleAndGroupDescriptionCol the roleAndGroupDescriptionCol to set
+     * Set the column name used for role and group descriptions.
+     *
+     * @param roleAndGroupDescriptionCol the column name to use
      */
     public void setRoleAndGroupDescriptionCol(String roleAndGroupDescriptionCol) {
         this.roleAndGroupDescriptionCol = roleAndGroupDescriptionCol;
     }
 
     /**
-     * @return the groupNameCol
+     * Return the column name used for group names.
+     *
+     * @return the group name column
      */
     public String getGroupNameCol() {
         return this.groupNameCol;
     }
 
     /**
-     * @param groupNameCol the groupNameCol to set
+     * Set the column name used for group names.
+     *
+     * @param groupNameCol the column name to use
      */
     public void setGroupNameCol(String groupNameCol) {
         this.groupNameCol = groupNameCol;
     }
 
     /**
-     * @return the userFullNameCol
+     * Return the column name used for user full names.
+     *
+     * @return the user full name column
      */
     public String getUserFullNameCol() {
         return this.userFullNameCol;
     }
 
     /**
-     * @param userFullNameCol the userFullNameCol to set
+     * Set the column name used for user full names.
+     *
+     * @param userFullNameCol the column name to use
      */
     public void setUserFullNameCol(String userFullNameCol) {
         this.userFullNameCol = userFullNameCol;
     }
 
     /**
-     * @return the userGroupTable
+     * Return the table that holds the relation between users and groups.
+     *
+     * @return the user-group table name
      */
     public String getUserGroupTable() {
         return this.userGroupTable;
     }
 
     /**
-     * @param userGroupTable the userGroupTable to set
+     * Set the table that holds the relation between users and groups.
+     *
+     * @param userGroupTable the table name to use
      */
     public void setUserGroupTable(String userGroupTable) {
         this.userGroupTable = userGroupTable;
     }
 
     /**
-     * @return the groupRoleTable
+     * Return the table that holds the relation between groups and roles.
+     *
+     * @return the group-role table name
      */
     public String getGroupRoleTable() {
         return this.groupRoleTable;
     }
 
     /**
-     * @param groupRoleTable the groupRoleTable to set
+     * Set the table that holds the relation between groups and roles.
+     *
+     * @param groupRoleTable the table name to use
      */
     public void setGroupRoleTable(String groupRoleTable) {
         this.groupRoleTable = groupRoleTable;
     }
 
     /**
-     * @return the groupTable
+     * Return the table that holds group data.
+     *
+     * @return the group table name
      */
     public String getGroupTable() {
         return this.groupTable;
     }
 
     /**
-     * @param groupTable the groupTable to set
+     * Set the table that holds group data.
+     *
+     * @param groupTable the table name to use
      */
     public void setGroupTable(String groupTable) {
         this.groupTable = groupTable;
     }
 
     /**
-     * @return the roleTable
+     * Return the table that holds role data.
+     *
+     * @return the role table name
      */
     public String getRoleTable() {
         return this.roleTable;
     }
 
     /**
-     * @param roleTable the roleTable to set
+     * Set the table that holds role data.
+     *
+     * @param roleTable the table name to use
      */
     public void setRoleTable(String roleTable) {
         this.roleTable = roleTable;
     }
 
     /**
-     * @return the readonly
+     * Return whether the user database is read only.
+     *
+     * @return true if the database is read only
      */
     public boolean getReadonly() {
         return this.readonly;
     }
 
     /**
-     * @param readonly the readonly to set
+     * Set whether the user database is read only.
+     *
+     * @param readonly true to make the database read only
      */
     public void setReadonly(boolean readonly) {
         this.readonly = readonly;
@@ -675,6 +752,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
     }
 
+    /**
+     * Find a group by name using the provided database connection.
+     *
+     * @param dbConnection The database connection to use
+     * @param groupName The name of the group to find
+     * @return the group, or null if not found
+     */
     public Group findGroupInternal(Connection dbConnection, String groupName) {
         Group group = null;
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedGroup)) {
@@ -754,6 +838,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
     }
 
+    /**
+     * Find a role by name using the provided database connection.
+     *
+     * @param dbConnection The database connection to use
+     * @param roleName The name of the role to find
+     * @return the role, or null if not found
+     */
     public Role findRoleInternal(Connection dbConnection, String roleName) {
         Role role = null;
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRole)) {
@@ -809,6 +900,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
     }
 
+    /**
+     * Find a user by name using the provided database connection.
+     *
+     * @param dbConnection The database connection to use
+     * @param userName The name of the user to find
+     * @return the user, or null if not found
+     */
     public User findUserInternal(Connection dbConnection, String userName) {
         String dbCredentials = null;
         String fullName = null;
@@ -1120,6 +1218,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
     }
 
+    /**
+     * Save all pending changes to the database using the provided connection.
+     *
+     * @param dbConnection The database connection to use
+     */
     protected void saveInternal(Connection dbConnection) {
 
         StringBuilder temp = null;

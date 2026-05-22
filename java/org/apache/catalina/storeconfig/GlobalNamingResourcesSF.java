@@ -26,6 +26,13 @@ import org.apache.juli.logging.LogFactory;
  * store server.xml GlobalNamingResource.
  */
 public class GlobalNamingResourcesSF extends StoreFactoryBase {
+    /**
+     * Default constructor for GlobalNamingResourcesSF.
+     */
+    public GlobalNamingResourcesSF() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(GlobalNamingResourcesSF.class);
 
     @Override

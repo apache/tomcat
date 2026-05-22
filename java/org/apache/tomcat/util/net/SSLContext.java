@@ -33,19 +33,61 @@ import javax.net.ssl.TrustManager;
  */
 public interface SSLContext {
 
+    /**
+     * Initializes the SSL context with the given key managers, trust managers, and random number generator.
+     *
+     * @param kms The key managers
+     * @param tms The trust managers
+     * @param sr The secure random number generator
+     * @throws KeyManagementException if initialization fails
+     */
     void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) throws KeyManagementException;
 
+    /**
+     * Destroys this SSL context and releases any associated resources.
+     */
     void destroy();
 
+    /**
+     * Returns the server session context.
+     *
+     * @return The server session context
+     */
     SSLSessionContext getServerSessionContext();
 
+    /**
+     * Creates a new SSL engine.
+     *
+     * @return The new SSL engine
+     */
     SSLEngine createSSLEngine();
 
+    /**
+     * Returns the server socket factory.
+     *
+     * @return The server socket factory
+     */
     SSLServerSocketFactory getServerSocketFactory();
 
+    /**
+     * Returns the supported SSL parameters.
+     *
+     * @return The supported SSL parameters
+     */
     SSLParameters getSupportedSSLParameters();
 
+    /**
+     * Returns the certificate chain for the given alias.
+     *
+     * @param alias The alias
+     * @return The certificate chain
+     */
     X509Certificate[] getCertificateChain(String alias);
 
+    /**
+     * Returns the accepted issuers.
+     *
+     * @return The accepted issuers
+     */
     X509Certificate[] getAcceptedIssuers();
 }

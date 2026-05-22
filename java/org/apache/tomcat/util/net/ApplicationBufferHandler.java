@@ -23,8 +23,14 @@ import java.nio.ByteBuffer;
  */
 public interface ApplicationBufferHandler {
 
+    /**
+     * Empty byte buffer constant.
+     */
     ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
+    /**
+     * No-op implementation of the buffer handler.
+     */
     ApplicationBufferHandler EMPTY = new ApplicationBufferHandler() {
         @Override
         public void expand(int newSize) {
@@ -48,6 +54,8 @@ public interface ApplicationBufferHandler {
     void setByteBuffer(ByteBuffer buffer);
 
     /**
+     * Returns the current byte buffer.
+     *
      * @return the byte buffer
      */
     ByteBuffer getByteBuffer();

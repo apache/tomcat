@@ -57,40 +57,34 @@ public class TestDateFormatCache {
             dfc.getFormat(secs * 1000);
             expected[secs] = generateExpected(sdf, secs);
         }
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Cause the cache to roll-around by one and then confirm
         dfc.getFormat(cacheSize * 1000);
         expected[0] = generateExpected(sdf, cacheSize);
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Jump 2 ahead and then confirm (skipped value should be null)
         dfc.getFormat((cacheSize + 2) * 1000);
         expected[1] = null;
         expected[2] = generateExpected(sdf, cacheSize + 2);
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Back 1 to fill in the gap
         dfc.getFormat((cacheSize + 1) * 1000);
         expected[1] = generateExpected(sdf, cacheSize + 1);
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Return to 1 and confirm skipped value is null
         dfc.getFormat(1 * 1000);
         expected[1] = generateExpected(sdf, 1);
         expected[2] = null;
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Go back one further
         dfc.getFormat(0);
         expected[0] = generateExpected(sdf, 0);
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
 
         // Jump ahead far enough that the entire cache will need to be cleared
         dfc.getFormat(42 * 1000);
@@ -98,12 +92,46 @@ public class TestDateFormatCache {
             expected[i] = null;
         }
         expected[0] = generateExpected(sdf, 42);
-        Assert.assertArrayEquals(expected,
-                (String[]) dfcCacheArray.get(dfcCache));
+        Assert.assertArrayEquals(expected, (String[]) dfcCacheArray.get(dfcCache));
     }
 
     private String generateExpected(SimpleDateFormat sdf, long secs) {
         return sdf.format(new Date(secs * 1000));
     }
 
+    @Test
+    public void replacesUnquotedS() {
+        Assert.assertEquals("HH:mm:ss.###", DateFormatCache.tidyFormat("HH:mm:ss.SSS"));
+    }
+
+    @Test
+    public void doesNotReplaceQuotedS() {
+        Assert.assertEquals("HH:mm:ss.'SSS'", DateFormatCache.tidyFormat("HH:mm:ss.'SSS'"));
+    }
+
+    @Test
+    public void handlesEscapedQuoteInsideLiteral() {
+        Assert.assertEquals("'o''clock' ###", DateFormatCache.tidyFormat("'o''clock' SSS"));
+    }
+
+    @Test
+    public void doesNotReplaceSInsideLiteralAfterEscapedQuote() {
+        Assert.assertEquals("'abc''SSS'", DateFormatCache.tidyFormat("'abc''SSS'"));
+    }
+
+    @Test
+    public void handlesMultipleLiteralSections() {
+        Assert.assertEquals("'foo' ### 'bar'", DateFormatCache.tidyFormat("'foo' SSS 'bar'"));
+    }
+
+    @Test
+    public void handlesEscapedQuoteOutsideLiteral() {
+        Assert.assertEquals("'' ###", DateFormatCache.tidyFormat("'' SSS"));
+    }
+
+    @Test
+    public void complexQuoteScenario() {
+        Assert.assertEquals("'Start' ### 'o''clock' ### '' 'End'",
+                DateFormatCache.tidyFormat("'Start' SSS 'o''clock' SSS '' 'End'"));
+    }
 }

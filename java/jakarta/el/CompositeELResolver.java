@@ -20,6 +20,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * ELResolver that delegates to an ordered list of other ELResolvers. When a property operation is performed, each
+ * contained resolver is invoked in order until one resolves the property. This is the standard mechanism for
+ * building a resolver chain in an EL context.
+ */
 public class CompositeELResolver extends ELResolver {
 
     private static final Class<?> SCOPED_ATTRIBUTE_EL_RESOLVER;
@@ -62,6 +67,9 @@ public class CompositeELResolver extends ELResolver {
     private int typeConvertersSize;
     private ELResolver[] typeConverters;
 
+    /**
+     * Constructs an empty CompositeELResolver. Use {@link #add(ELResolver)} to add resolvers to the chain.
+     */
     public CompositeELResolver() {
         resolversSize = 0;
         resolvers = new ELResolver[8];
@@ -70,6 +78,13 @@ public class CompositeELResolver extends ELResolver {
         typeConverters = new ELResolver[0];
     }
 
+    /**
+     * Adds an ELResolver to the end of the resolver chain.
+     *
+     * @param elResolver the resolver to add
+     *
+     * @throws NullPointerException if elResolver is {@code null}
+     */
     public void add(ELResolver elResolver) {
         Objects.requireNonNull(elResolver);
 

@@ -25,8 +25,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
 
+/**
+ * Utility class for importing translated properties files.
+ */
 public class Import {
 
+    /**
+     * Creates a new instance of the Import utility.
+     */
+    public Import() {
+    }
+
+    /**
+     * Main entry point for importing translations.
+     *
+     * @param args command line arguments
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String... args) throws IOException {
         File root = new File(Constants.STORAGE_DIR);
 

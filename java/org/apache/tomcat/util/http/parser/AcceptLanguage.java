@@ -22,25 +22,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Represents a single language entry from an Accept-Language header.
+ */
 public class AcceptLanguage {
 
     private final Locale locale;
     private final double quality;
 
+    /**
+     * Constructs a new AcceptLanguage.
+     *
+     * @param locale The locale of this language entry
+     * @param quality The quality value for this language entry
+     */
     protected AcceptLanguage(Locale locale, double quality) {
         this.locale = locale;
         this.quality = quality;
     }
 
+    /**
+     * Returns the locale.
+     *
+     * @return The locale of this language entry
+     */
     public Locale getLocale() {
         return locale;
     }
 
+    /**
+     * Returns the quality value.
+     *
+     * @return The quality value of this language entry
+     */
     public double getQuality() {
         return quality;
     }
 
 
+    /**
+     * Parses an Accept-Language header value.
+     *
+     * @param input The StringReader containing the header value
+     * @return A list of AcceptLanguage entries sorted by quality
+     * @throws IOException If an I/O error occurs while reading the input
+     */
     public static List<AcceptLanguage> parse(StringReader input) throws IOException {
 
         List<AcceptLanguage> result = new ArrayList<>();

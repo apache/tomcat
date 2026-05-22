@@ -18,23 +18,47 @@ package jakarta.websocket;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when an encoder fails to encode an object as a WebSocket message.
+ */
 public class EncodeException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The object that could not be encoded.
+     */
     private final Object object;
 
+    /**
+     * Creates an EncodeException with the specified object and detail message.
+     *
+     * @param object  The object that could not be encoded
+     * @param message The detail message
+     */
     public EncodeException(Object object, String message) {
         super(message);
         this.object = object;
     }
 
+    /**
+     * Creates an EncodeException with the specified object, detail message, and cause.
+     *
+     * @param object  The object that could not be encoded
+     * @param message The detail message
+     * @param cause   The underlying cause of the exception
+     */
     public EncodeException(Object object, String message, Throwable cause) {
         super(message, cause);
         this.object = object;
     }
 
+    /**
+     * Returns the object that could not be encoded.
+     *
+     * @return The object that could not be encoded
+     */
     public Object getObject() {
         return this.object;
     }

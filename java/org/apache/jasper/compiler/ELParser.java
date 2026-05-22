@@ -47,6 +47,12 @@ public class ELParser {
     private static final String[] reservedWords = { "and", "div", "empty", "eq", "false", "ge", "gt", "instanceof",
             "le", "lt", "mod", "ne", "not", "null", "or", "true" };
 
+    /**
+     * Creates a new EL parser for the given expression.
+     *
+     * @param expression the EL expression to parse
+     * @param isDeferredSyntaxAllowedAsLiteral whether deferred syntax is allowed as a literal
+     */
     public ELParser(String expression, boolean isDeferredSyntaxAllowedAsLiteral) {
         index = 0;
         this.expression = expression;
@@ -514,6 +520,11 @@ public class ELParser {
         }
     }
 
+    /**
+     * Returns the type of the parsed EL expression.
+     *
+     * @return the expression type character
+     */
     public char getType() {
         return type;
     }

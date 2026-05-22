@@ -27,7 +27,6 @@ import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
-import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestAstIdentifier {
 
@@ -62,7 +61,7 @@ public class TestAstIdentifier {
          *
          * In Java 24, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeFalse(JreCompat.isJre24Available());
+        Assume.assumeTrue(Runtime.version().feature() < 24);
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierStart(i)) {
                 testIdentifier((char) i, 'b');
@@ -87,7 +86,7 @@ public class TestAstIdentifier {
          *
          * In Java 24, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeFalse(JreCompat.isJre24Available());
+        Assume.assumeTrue(Runtime.version().feature() < 24);
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierPart(i)) {
                 testIdentifier('b', (char) i);

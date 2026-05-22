@@ -32,6 +32,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class UDecoder {
 
+    /**
+     * Constructs a new UDecoder. This utility class should not be instantiated.
+     */
+    public UDecoder() {
+    }
+
     private static final StringManager sm = StringManager.getManager(UDecoder.class);
 
     private static class DecodeException extends CharConversionException {

@@ -79,7 +79,16 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NamingContextListener implements LifecycleListener, PropertyChangeListener {
 
+    /**
+     * Default constructor.
+     */
+    public NamingContextListener() {
+    }
+
     private static final Log log = LogFactory.getLog(NamingContextListener.class);
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(NamingContextListener.class);
 
 
@@ -146,8 +155,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return whether or not an attempt to modify the JNDI context will trigger an exception or if the request will be
-     *             ignored.
+     * Return whether or not an attempt to modify the JNDI context will trigger an exception.
+     *
+     * @return whether or not an attempt to modify the JNDI context will trigger an exception
      */
     public boolean getExceptionOnFailedWrite() {
         return exceptionOnFailedWrite;
@@ -166,7 +176,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * @return the "name" property.
+     * Return the "name" property.
+     *
+     * @return the "name" property
      */
     public String getName() {
         return this.name;
@@ -184,7 +196,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * @return the naming environment context.
+     * Return the naming environment context.
+     *
+     * @return the naming environment context
      */
     public javax.naming.Context getEnvContext() {
         return this.envCtx;

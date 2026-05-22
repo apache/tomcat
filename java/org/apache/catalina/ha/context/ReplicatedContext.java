@@ -38,11 +38,27 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Replicated context that supports session replication across cluster nodes.
+ */
 public class ReplicatedContext extends StandardContext implements MapOwner {
+    /**
+     * Options for sending map updates.
+     */
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     private static final Log log = LogFactory.getLog(ReplicatedContext.class);
+    /**
+     * Default replication timeout in milliseconds.
+     */
     protected static final long DEFAULT_REPL_TIMEOUT = 15000;// 15 seconds
     private static final StringManager sm = StringManager.getManager(ReplicatedContext.class);
+
+    /**
+     * Default constructor.
+     */
+    public ReplicatedContext() {
+        super();
+    }
 
     /**
      * Start this component and implement the requirements of
@@ -89,14 +105,29 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
 
+    /**
+     * Set the options for sending map updates.
+     *
+     * @param mapSendOptions the send options
+     */
     public void setMapSendOptions(int mapSendOptions) {
         this.mapSendOptions = mapSendOptions;
     }
 
+    /**
+     * Return the options for sending map updates.
+     *
+     * @return the send options
+     */
     public int getMapSendOptions() {
         return mapSendOptions;
     }
 
+    /**
+     * Return the class loaders to use for serialization.
+     *
+     * @return the class loaders
+     */
     public ClassLoader[] getClassLoaders() {
         Loader loader;
         ClassLoader classLoader = null;
@@ -133,13 +164,29 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
 
+    /**
+     * Application context implementation for replicated contexts.
+     */
     protected static class ReplApplContext extends ApplicationContext {
+        /**
+         * Map for Tomcat-specific attributes that should not be replicated.
+         */
         protected final Map<String,Object> tomcatAttributes = new ConcurrentHashMap<>();
 
+        /**
+         * Create a new instance.
+         *
+         * @param context the replicated context
+         */
         public ReplApplContext(ReplicatedContext context) {
             super(context);
         }
 
+        /**
+         * Return the parent replicated context.
+         *
+         * @return the parent context
+         */
         protected ReplicatedContext getParent() {
             return (ReplicatedContext) getContext();
         }
@@ -149,10 +196,20 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             return super.getFacade();
         }
 
+        /**
+         * Return the attribute map.
+         *
+         * @return the attribute map
+         */
         public Map<String,Object> getAttributeMap() {
             return this.attributes;
         }
 
+        /**
+         * Set the attribute map.
+         *
+         * @param map the new attribute map
+         */
         public void setAttributeMap(Map<String,Object> map) {
             this.attributes = map;
         }
@@ -201,9 +258,22 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         }
     }
 
+    /**
+     * Enumeration that combines multiple enumerations into one.
+     *
+     * @param <T> the type of elements
+     */
     protected static class MultiEnumeration<T> implements Enumeration<T> {
+        /**
+         * The enumerations to combine.
+         */
         private final Enumeration<T>[] enumerations;
 
+        /**
+         * Create a new instance.
+         *
+         * @param enumerations the enumerations to combine
+         */
         public MultiEnumeration(Enumeration<T>[] enumerations) {
             this.enumerations = enumerations;
         }

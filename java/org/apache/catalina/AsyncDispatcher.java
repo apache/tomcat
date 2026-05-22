@@ -22,6 +22,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
+/**
+ * Interface for performing asynchronous dispatch operations within the container.
+ */
 public interface AsyncDispatcher {
 
     /**

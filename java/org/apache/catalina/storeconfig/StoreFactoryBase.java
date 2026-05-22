@@ -27,6 +27,12 @@ import org.apache.tomcat.util.res.StringManager;
  * StoreFactory saves special elements. Output was generate with StoreAppenders.
  */
 public class StoreFactoryBase implements IStoreFactory {
+    /**
+     * Constructs a new StoreFactoryBase with default settings.
+     */
+    public StoreFactoryBase() {
+    }
+
     private static final Log log = LogFactory.getLog(StoreFactoryBase.class);
 
     private StoreRegistry registry;
@@ -44,6 +50,9 @@ public class StoreFactoryBase implements IStoreFactory {
     private static final String info = "org.apache.catalina.config.StoreFactoryBase/1.0";
 
     /**
+     * Returns descriptive information about this Factory implementation and the corresponding version number, in the
+     * format <code>&lt;description&gt;/&lt;version&gt;</code>.
+     *
      * @return descriptive information about this Factory implementation and the corresponding version number, in the
      *             format <code>&lt;description&gt;/&lt;version&gt;</code>.
      */

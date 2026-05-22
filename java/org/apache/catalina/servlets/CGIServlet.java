@@ -207,6 +207,12 @@ public final class CGIServlet extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public CGIServlet() {
+    }
+
     private static final Set<String> DEFAULT_SUPER_METHODS = new HashSet<>();
     private static final Pattern DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN;
     private static final String ALLOW_ANY_PATTERN = ".*";
@@ -241,8 +247,9 @@ public final class CGIServlet extends HttpServlet {
     /** the encoding to use for parameters */
     private String parameterEncoding = System.getProperty("file.encoding", "UTF-8");
 
-    /* The HTTP methods this Servlet will pass to the CGI script */
+    /** The HTTP methods this servlet will pass to the CGI script. */
     private final Set<String> cgiMethods = new HashSet<>();
+    /** Whether all HTTP methods are allowed for CGI scripts. */
     private boolean cgiMethodsAll = false;
 
     private transient WebResourceRoot resources = null;

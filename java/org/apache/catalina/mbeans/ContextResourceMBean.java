@@ -32,6 +32,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
+    /**
+     * Default constructor for ContextResourceMBean.
+     */
+    public ContextResourceMBean() {
+    }
+
     private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
 
     @Override

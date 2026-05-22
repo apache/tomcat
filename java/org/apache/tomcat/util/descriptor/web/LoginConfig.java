@@ -71,10 +71,20 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     private String authMethod = null;
 
+    /**
+     * Get the authentication method.
+     *
+     * @return the authMethod
+     */
     public String getAuthMethod() {
         return this.authMethod;
     }
 
+    /**
+     * Set the authentication method.
+     *
+     * @param authMethod the authMethod to set
+     */
     public void setAuthMethod(String authMethod) {
         this.authMethod = authMethod;
     }
@@ -85,10 +95,20 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     private String errorPage = null;
 
+    /**
+     * Get the error page URI.
+     *
+     * @return the errorPage
+     */
     public String getErrorPage() {
         return this.errorPage;
     }
 
+    /**
+     * Set the error page URI.
+     *
+     * @param errorPage the errorPage to set
+     */
     public void setErrorPage(String errorPage) {
         this.errorPage = UDecoder.URLDecode(errorPage, getCharset());
     }
@@ -99,10 +119,20 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     private String loginPage = null;
 
+    /**
+     * Get the login page URI.
+     *
+     * @return the loginPage
+     */
     public String getLoginPage() {
         return this.loginPage;
     }
 
+    /**
+     * Set the login page URI.
+     *
+     * @param loginPage the loginPage to set
+     */
     public void setLoginPage(String loginPage) {
         this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
     }
@@ -113,10 +143,20 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     private String realmName = null;
 
+    /**
+     * Get the realm name.
+     *
+     * @return the realmName
+     */
     public String getRealmName() {
         return this.realmName;
     }
 
+    /**
+     * Set the realm name.
+     *
+     * @param realmName the realmName to set
+     */
     public void setRealmName(String realmName) {
         this.realmName = realmName;
     }

@@ -348,7 +348,9 @@ public interface PoolConfiguration {
     void setPassword(String password);
 
     /**
-     * @see #getName()
+     * Returns the name of the connection pool. This is the same value as
+     * returned by {@link #getName()}.
+     *
      * @return the pool name
      */
     String getPoolName();
@@ -553,6 +555,9 @@ public interface PoolConfiguration {
     void setValidatorClassName(String className);
 
     /**
+     * Returns the validator object used for connection validation. May be null
+     * if the pool is using a standard validation query instead.
+     *
      * @return the optional validator object - may be null
      */
     Validator getValidator();
@@ -820,8 +825,10 @@ public interface PoolConfiguration {
     void setCommitOnReturn(boolean commitOnReturn);
 
     /**
-     * @see PoolConfiguration#setCommitOnReturn(boolean)
-     * @return <code>true</code> if the pool should commit when a connection is returned to it
+     * Returns whether the pool commits any pending transaction when a connection
+     * is returned. See {@link PoolConfiguration#setCommitOnReturn(boolean)} for details.
+     *
+     * @return {@code true} if the pool should commit when a connection is returned to it
      */
     boolean getCommitOnReturn();
 
@@ -835,8 +842,10 @@ public interface PoolConfiguration {
     void setRollbackOnReturn(boolean rollbackOnReturn);
 
     /**
-     * @see PoolConfiguration#setRollbackOnReturn(boolean)
-     * @return <code>true</code> if the pool should rollback when a connection is returned to it
+     * Returns whether the pool rolls back any pending transaction when a connection
+     * is returned. See {@link PoolConfiguration#setRollbackOnReturn(boolean)} for details.
+     *
+     * @return {@code true} if the pool should rollback when a connection is returned to it
      */
     boolean getRollbackOnReturn();
 
@@ -891,8 +900,10 @@ public interface PoolConfiguration {
     void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad);
 
     /**
-     * @return <code>true</code> to ignore exceptions
-     * @see PoolConfiguration#setIgnoreExceptionOnPreLoad(boolean)
+     * Returns whether exceptions during connection creation at pool initialization
+     * should be ignored. See {@link PoolConfiguration#setIgnoreExceptionOnPreLoad(boolean)} for details.
+     *
+     * @return {@code true} to ignore exceptions during pre-load
      */
     boolean isIgnoreExceptionOnPreLoad();
 

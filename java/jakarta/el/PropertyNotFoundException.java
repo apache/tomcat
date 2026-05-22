@@ -18,23 +18,50 @@ package jakarta.el;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when a property is not found during EL evaluation.
+ * <p>
+ * This exception is raised when an expression attempts to access a property
+ * that does not exist on the target object.
+ *
+ * @since EL 2.1
+ */
 public class PropertyNotFoundException extends ELException {
 
     @Serial
     private static final long serialVersionUID = -3799200961303506745L;
 
+    /**
+     * Constructs a new instance with no detail message or cause.
+     */
     public PropertyNotFoundException() {
         super();
     }
 
+    /**
+     * Constructs a new instance with the specified detail message and no cause.
+     *
+     * @param message the detail message
+     */
     public PropertyNotFoundException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new instance with the specified cause and no detail message.
+     *
+     * @param cause the underlying cause
+     */
     public PropertyNotFoundException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new instance with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the underlying cause
+     */
     public PropertyNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }

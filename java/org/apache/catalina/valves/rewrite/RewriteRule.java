@@ -22,18 +22,56 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a rewrite rule for URL rewriting.
+ */
 public class RewriteRule {
 
+    /**
+     * Default constructor.
+     */
+    public RewriteRule() {
+    }
+
+    /**
+     * The conditions associated with this rule.
+     */
     protected RewriteCond[] conditions = new RewriteCond[0];
 
+    /**
+     * The compiled pattern for matching.
+     */
     protected ThreadLocal<Pattern> pattern = new ThreadLocal<>();
+
+    /**
+     * The substitution to apply.
+     */
     protected Substitution substitution = null;
 
+    /**
+     * The pattern string.
+     */
     protected String patternString = null;
+
+    /**
+     * The substitution string.
+     */
     protected String substitutionString = null;
+
+    /**
+     * The flags string.
+     */
     protected String flagsString = null;
+
+    /**
+     * Whether the pattern is positive (true) or negated (false).
+     */
     protected boolean positive = true;
 
+    /**
+     * Parse the rule using the provided rewrite maps.
+     * @param maps the rewrite maps
+     */
     public void parse(Map<String,RewriteMap> maps) {
         // Parse the substitution
         if (!"-".equals(substitutionString)) {
@@ -73,6 +111,10 @@ public class RewriteRule {
         }
     }
 
+    /**
+     * Add a condition to this rule.
+     * @param condition the condition to add
+     */
     public void addCondition(RewriteCond condition) {
         RewriteCond[] conditions = Arrays.copyOf(this.conditions, this.conditions.length + 1);
         conditions[this.conditions.length] = condition;
@@ -159,6 +201,9 @@ public class RewriteRule {
     }
 
 
+    /**
+     * Whether to escape back references.
+     */
     private boolean escapeBackReferences = false;
 
     /**
@@ -176,14 +221,50 @@ public class RewriteRule {
      * cookie in minutes, and the optional path is the path of the cookie
      */
     protected boolean cookie = false;
+
+    /**
+     * The cookie name.
+     */
     protected String cookieName = null;
+
+    /**
+     * The cookie value.
+     */
     protected String cookieValue = null;
+
+    /**
+     * The cookie domain.
+     */
     protected String cookieDomain = null;
+
+    /**
+     * The cookie lifetime.
+     */
     protected int cookieLifetime = -1;
+
+    /**
+     * The cookie path.
+     */
     protected String cookiePath = null;
+
+    /**
+     * Whether the cookie is secure.
+     */
     protected boolean cookieSecure = false;
+
+    /**
+     * Whether the cookie is HTTP only.
+     */
     protected boolean cookieHttpOnly = false;
+
+    /**
+     * The cookie substitution.
+     */
     protected Substitution cookieSubstitution = null;
+
+    /**
+     * The cookie result.
+     */
     protected ThreadLocal<String> cookieResult = new ThreadLocal<>();
 
     /**
@@ -191,9 +272,25 @@ public class RewriteRule {
      * references $N and %N which will be expanded. Multiple env flags are allowed.
      */
     protected boolean env = false;
+
+    /**
+     * The environment variable names.
+     */
     protected ArrayList<String> envName = new ArrayList<>();
+
+    /**
+     * The environment variable values.
+     */
     protected ArrayList<String> envValue = new ArrayList<>();
+
+    /**
+     * The environment substitutions.
+     */
     protected ArrayList<Substitution> envSubstitution = new ArrayList<>();
+
+    /**
+     * The environment results.
+     */
     protected ArrayList<ThreadLocal<String>> envResult = new ArrayList<>();
 
     /**
@@ -289,6 +386,10 @@ public class RewriteRule {
      * to provide the 'L' flag.
      */
     protected boolean redirect = false;
+
+    /**
+     * The redirect HTTP status code.
+     */
     protected int redirectCode = 0;
 
     /**
@@ -304,6 +405,10 @@ public class RewriteRule {
      * are called with the .phps extension: RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]
      */
     protected boolean type = false;
+
+    /**
+     * The MIME type value.
+     */
     protected String typeValue = null;
 
     /**
@@ -311,286 +416,573 @@ public class RewriteRule {
      */
     protected boolean valveSkip = false;
 
+   /**
+     * Get whether back references are escaped.
+     * @return true if back references are escaped
+     */
     public boolean isEscapeBackReferences() {
         return escapeBackReferences;
     }
 
+    /**
+     * Set whether back references are escaped.
+     * @param escapeBackReferences true to escape back references
+     */
     public void setEscapeBackReferences(boolean escapeBackReferences) {
         this.escapeBackReferences = escapeBackReferences;
     }
 
+    /**
+     * Get whether this rule is chained.
+     * @return true if chained
+     */
     public boolean isChain() {
         return chain;
     }
 
+    /**
+     * Set whether this rule is chained.
+     * @param chain true to chain with the next rule
+     */
     public void setChain(boolean chain) {
         this.chain = chain;
     }
 
+    /**
+     * Get the conditions for this rule.
+     * @return the conditions array
+     */
     public RewriteCond[] getConditions() {
         return conditions;
     }
 
+    /**
+     * Set the conditions for this rule.
+     * @param conditions the conditions array
+     */
     public void setConditions(RewriteCond[] conditions) {
         this.conditions = conditions;
     }
 
+    /**
+     * Get whether the cookie flag is set.
+     * @return true if cookie flag is set
+     */
     public boolean isCookie() {
         return cookie;
     }
 
+    /**
+     * Set the cookie flag.
+     * @param cookie true to set the cookie flag
+     */
     public void setCookie(boolean cookie) {
         this.cookie = cookie;
     }
 
+    /**
+     * Get the cookie name.
+     * @return the cookie name
+     */
     public String getCookieName() {
         return cookieName;
     }
 
+    /**
+     * Set the cookie name.
+     * @param cookieName the cookie name
+     */
     public void setCookieName(String cookieName) {
         this.cookieName = cookieName;
     }
 
+    /**
+     * Get the cookie value.
+     * @return the cookie value
+     */
     public String getCookieValue() {
         return cookieValue;
     }
 
+    /**
+     * Set the cookie value.
+     * @param cookieValue the cookie value
+     */
     public void setCookieValue(String cookieValue) {
         this.cookieValue = cookieValue;
     }
 
+    /**
+     * Get the cookie result.
+     * @return the cookie result
+     */
     public String getCookieResult() {
         return cookieResult.get();
     }
 
+    /**
+     * Get whether the env flag is set.
+     * @return true if env flag is set
+     */
     public boolean isEnv() {
         return env;
     }
 
+    /**
+     * Get the number of environment variables.
+     * @return the number of environment variables
+     */
     public int getEnvSize() {
         return envName.size();
     }
 
+    /**
+     * Set the env flag.
+     * @param env true to set the env flag
+     */
     public void setEnv(boolean env) {
         this.env = env;
     }
 
+    /**
+     * Get the name of an environment variable.
+     * @param i the index
+     * @return the environment variable name
+     */
     public String getEnvName(int i) {
         return envName.get(i);
     }
 
+    /**
+     * Add an environment variable name.
+     * @param envName the name to add
+     */
     public void addEnvName(String envName) {
         this.envName.add(envName);
     }
 
+    /**
+     * Get the value of an environment variable.
+     * @param i the index
+     * @return the environment variable value
+     */
     public String getEnvValue(int i) {
         return envValue.get(i);
     }
 
+    /**
+     * Add an environment variable value.
+     * @param envValue the value to add
+     */
     public void addEnvValue(String envValue) {
         this.envValue.add(envValue);
     }
 
+    /**
+     * Get the result of an environment variable substitution.
+     * @param i the index
+     * @return the environment variable result
+     */
     public String getEnvResult(int i) {
         return envResult.get(i).get();
     }
 
+    /**
+     * Get whether the forbidden flag is set.
+     * @return true if forbidden flag is set
+     */
     public boolean isForbidden() {
         return forbidden;
     }
 
+    /**
+     * Set the forbidden flag.
+     * @param forbidden true to set the forbidden flag
+     */
     public void setForbidden(boolean forbidden) {
         this.forbidden = forbidden;
     }
 
+    /**
+     * Get whether the gone flag is set.
+     * @return true if gone flag is set
+     */
     public boolean isGone() {
         return gone;
     }
 
+    /**
+     * Set the gone flag.
+     * @param gone true to set the gone flag
+     */
     public void setGone(boolean gone) {
         this.gone = gone;
     }
 
+    /**
+     * Get whether the last flag is set.
+     * @return true if last flag is set
+     */
     public boolean isLast() {
         return last;
     }
 
+    /**
+     * Set the last flag.
+     * @param last true to set the last flag
+     */
     public void setLast(boolean last) {
         this.last = last;
     }
 
+    /**
+     * Get whether the next flag is set.
+     * @return true if next flag is set
+     */
     public boolean isNext() {
         return next;
     }
 
+    /**
+     * Set the next flag.
+     * @param next true to set the next flag
+     */
     public void setNext(boolean next) {
         this.next = next;
     }
 
+    /**
+     * Get whether the nocase flag is set.
+     * @return true if nocase flag is set
+     */
     public boolean isNocase() {
         return nocase;
     }
 
+    /**
+     * Set the nocase flag.
+     * @param nocase true to set the nocase flag
+     */
     public void setNocase(boolean nocase) {
         this.nocase = nocase;
     }
 
+    /**
+     * Get whether the noescape flag is set.
+     * @return true if noescape flag is set
+     */
     public boolean isNoescape() {
         return noescape;
     }
 
+    /**
+     * Set the noescape flag.
+     * @param noescape true to set the noescape flag
+     */
     public void setNoescape(boolean noescape) {
         this.noescape = noescape;
     }
 
+    /**
+     * Get whether the nosubreq flag is set.
+     * @return true if nosubreq flag is set
+     */
     public boolean isNosubreq() {
         return nosubreq;
     }
 
+    /**
+     * Set the nosubreq flag.
+     * @param nosubreq true to set the nosubreq flag
+     */
     public void setNosubreq(boolean nosubreq) {
         this.nosubreq = nosubreq;
     }
 
+    /**
+     * Get whether the qsappend flag is set.
+     * @return true if qsappend flag is set
+     */
     public boolean isQsappend() {
         return qsappend;
     }
 
+    /**
+     * Set the qsappend flag.
+     * @param qsappend true to set the qsappend flag
+     */
     public void setQsappend(boolean qsappend) {
         this.qsappend = qsappend;
     }
 
+    /**
+     * Get whether the qsdiscard flag is set.
+     * @return true if qsdiscard flag is set
+     */
     public final boolean isQsdiscard() {
         return qsdiscard;
     }
 
+    /**
+     * Set the qsdiscard flag.
+     * @param qsdiscard true to set the qsdiscard flag
+     */
     public final void setQsdiscard(boolean qsdiscard) {
         this.qsdiscard = qsdiscard;
     }
 
+    /**
+     * Get whether the redirect flag is set.
+     * @return true if redirect flag is set
+     */
     public boolean isRedirect() {
         return redirect;
     }
 
+    /**
+     * Set the redirect flag.
+     * @param redirect true to set the redirect flag
+     */
     public void setRedirect(boolean redirect) {
         this.redirect = redirect;
     }
 
+    /**
+     * Get the redirect HTTP status code.
+     * @return the redirect code
+     */
     public int getRedirectCode() {
         return redirectCode;
     }
 
+    /**
+     * Set the redirect HTTP status code.
+     * @param redirectCode the redirect code
+     */
     public void setRedirectCode(int redirectCode) {
         this.redirectCode = redirectCode;
     }
 
+    /**
+     * Get the number of rules to skip.
+     * @return the skip count
+     */
     public int getSkip() {
         return skip;
     }
 
+    /**
+     * Set the number of rules to skip.
+     * @param skip the number of rules to skip
+     */
     public void setSkip(int skip) {
         this.skip = skip;
     }
 
+    /**
+     * Get the substitution.
+     * @return the substitution
+     */
     public Substitution getSubstitution() {
         return substitution;
     }
 
+    /**
+     * Set the substitution.
+     * @param substitution the substitution
+     */
     public void setSubstitution(Substitution substitution) {
         this.substitution = substitution;
     }
 
+    /**
+     * Get whether the type flag is set.
+     * @return true if type flag is set
+     */
     public boolean isType() {
         return type;
     }
 
+    /**
+     * Set the type flag.
+     * @param type true to set the type flag
+     */
     public void setType(boolean type) {
         this.type = type;
     }
 
+    /**
+     * Get the MIME type value.
+     * @return the MIME type value
+     */
     public String getTypeValue() {
         return typeValue;
     }
 
+    /**
+     * Set the MIME type value.
+     * @param typeValue the MIME type value
+     */
     public void setTypeValue(String typeValue) {
         this.typeValue = typeValue;
     }
 
+    /**
+     * Get the pattern string.
+     * @return the pattern string
+     */
     public String getPatternString() {
         return patternString;
     }
 
+    /**
+     * Set the pattern string.
+     * @param patternString the pattern string
+     */
     public void setPatternString(String patternString) {
         this.patternString = patternString;
     }
 
+    /**
+     * Get the substitution string.
+     * @return the substitution string
+     */
     public String getSubstitutionString() {
         return substitutionString;
     }
 
+    /**
+     * Set the substitution string.
+     * @param substitutionString the substitution string
+     */
     public void setSubstitutionString(String substitutionString) {
         this.substitutionString = substitutionString;
     }
 
+    /**
+     * Get the flags string.
+     * @return the flags string
+     */
     public final String getFlagsString() {
         return flagsString;
     }
 
+    /**
+     * Set the flags string.
+     * @param flagsString the flags string
+     */
     public final void setFlagsString(String flagsString) {
         this.flagsString = flagsString;
     }
 
+    /**
+     * Get whether the host flag is set.
+     * @return true if host flag is set
+     */
     public boolean isHost() {
         return host;
     }
 
+    /**
+     * Set the host flag.
+     * @param host true to set the host flag
+     */
     public void setHost(boolean host) {
         this.host = host;
     }
 
+    /**
+     * Get the cookie domain.
+     * @return the cookie domain
+     */
     public String getCookieDomain() {
         return cookieDomain;
     }
 
+    /**
+     * Set the cookie domain.
+     * @param cookieDomain the cookie domain
+     */
     public void setCookieDomain(String cookieDomain) {
         this.cookieDomain = cookieDomain;
     }
 
+    /**
+     * Get the cookie lifetime.
+     * @return the cookie lifetime in minutes
+     */
     public int getCookieLifetime() {
         return cookieLifetime;
     }
 
+    /**
+     * Set the cookie lifetime.
+     * @param cookieLifetime the cookie lifetime in minutes
+     */
     public void setCookieLifetime(int cookieLifetime) {
         this.cookieLifetime = cookieLifetime;
     }
 
+    /**
+     * Get the cookie path.
+     * @return the cookie path
+     */
     public String getCookiePath() {
         return cookiePath;
     }
 
+    /**
+     * Set the cookie path.
+     * @param cookiePath the cookie path
+     */
     public void setCookiePath(String cookiePath) {
         this.cookiePath = cookiePath;
     }
 
+    /**
+     * Get whether the cookie secure flag is set.
+     * @return true if cookie secure flag is set
+     */
     public boolean isCookieSecure() {
         return cookieSecure;
     }
 
+    /**
+     * Set the cookie secure flag.
+     * @param cookieSecure true to set the cookie secure flag
+     */
     public void setCookieSecure(boolean cookieSecure) {
         this.cookieSecure = cookieSecure;
     }
 
+    /**
+     * Get whether the cookie HTTP only flag is set.
+     * @return true if cookie HTTP only flag is set
+     */
     public boolean isCookieHttpOnly() {
         return cookieHttpOnly;
     }
 
+    /**
+     * Set the cookie HTTP only flag.
+     * @param cookieHttpOnly true to set the cookie HTTP only flag
+     */
     public void setCookieHttpOnly(boolean cookieHttpOnly) {
         this.cookieHttpOnly = cookieHttpOnly;
     }
 
+    /**
+     * Get whether the valve skip flag is set.
+     * @return true if valve skip flag is set
+     */
     public boolean isValveSkip() {
         return this.valveSkip;
     }
 
+    /**
+     * Set the valve skip flag.
+     * @param valveSkip true to set the valve skip flag
+     */
     public void setValveSkip(boolean valveSkip) {
         this.valveSkip = valveSkip;
     }

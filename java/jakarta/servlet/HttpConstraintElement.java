@@ -89,27 +89,27 @@ public class HttpConstraintElement {
     }
 
     /**
-     * TODO
+     * Returns the empty role semantic for this constraint.
      *
-     * @return TODO
+     * @return The empty role semantic for this constraint
      */
     public EmptyRoleSemantic getEmptyRoleSemantic() {
         return emptyRoleSemantic;
     }
 
     /**
-     * TODO
+     * Returns the transport guarantee for this constraint.
      *
-     * @return TODO
+     * @return The transport guarantee for this constraint
      */
     public TransportGuarantee getTransportGuarantee() {
         return transportGuarantee;
     }
 
     /**
-     * TODO
+     * Returns the roles allowed for this constraint.
      *
-     * @return TODO
+     * @return The roles allowed for this constraint
      */
     public String[] getRolesAllowed() {
         return rolesAllowed;

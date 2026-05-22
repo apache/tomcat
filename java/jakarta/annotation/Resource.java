@@ -48,7 +48,10 @@ public @interface Resource {
     }
 
     /**
-     * @return a String with the name of the resource
+     * Specifies the logical name of the resource. If not specified, the container
+     * derives the name from the field or method to which the annotation is applied.
+     *
+     * @return the logical name of the resource
      */
     String name() default "";
 
@@ -60,29 +63,49 @@ public @interface Resource {
     Class<?> type() default Object.class;
 
     /**
-     * @return the AuthenticationType of the resource default CONTAINER
+     * Specifies the authentication type for the resource. Container authentication
+     * means the container handles authentication, while application authentication
+     * means the application code is responsible for authentication.
+     *
+     * @return the authentication type, defaulting to {@link AuthenticationType#CONTAINER}
      */
     AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
 
     /**
-     * @return true (default) if the resource is shareable, or false if not
+     * Indicates whether the resource can be shared among multiple injection points.
+     * When true, the same resource instance may be injected into multiple components.
+     * When false, each injection point receives a distinct resource instance.
+     *
+     * @return true if the resource is shareable across injection points, false otherwise
      */
     boolean shareable() default true;
 
     /**
-     * @return a string with the description for the resource
+     * Provides a human-readable description of the resource for documentation
+     * and administrative purposes.
+     *
+     * @return the resource description
      */
     String description() default "";
 
     /**
-     * @return a string with the mappedName of the resource
+     * Specifies a product-dependent name for the resource, allowing the container
+     * to map the logical resource name to a physical resource in a vendor-specific
+     * manner. This is typically used for environment-specific configuration.
+     *
+     * @return the product-specific mapped name for the resource
      */
     String mappedName() default "";
 
     /**
+     * Specifies the JNDI lookup name for the resource. This attribute allows
+     * explicit control over the JNDI name used to locate the resource, overriding
+     * the default name derivation. The lookup name is typically prefixed with
+     * "java:comp/env/" for component environment entries.
+     *
      * @since Common Annotations 1.1
      *
-     * @return The name of the entry, if any, to use for this resource
+     * @return the JNDI lookup name for the resource
      */
     String lookup() default "";
 }

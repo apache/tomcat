@@ -50,22 +50,45 @@ public class HealthCheckValve extends ValveBase {
      */
     protected boolean checkContainersAvailable = true;
 
+    /**
+     * Construct a new HealthCheckValve.
+     */
     public HealthCheckValve() {
         super(true);
     }
 
+    /**
+     * Get the health check path.
+     *
+     * @return the health check path
+     */
     public final String getPath() {
         return path;
     }
 
+    /**
+     * Set the health check path.
+     *
+     * @param path the health check path
+     */
     public final void setPath(String path) {
         this.path = path;
     }
 
+    /**
+     * Get whether to check if all child containers are available.
+     *
+     * @return {@code true} if child container availability is checked
+     */
     public boolean getCheckContainersAvailable() {
         return this.checkContainersAvailable;
     }
 
+    /**
+     * Set whether to check if all child containers are available.
+     *
+     * @param checkContainersAvailable the new value
+     */
     public void setCheckContainersAvailable(boolean checkContainersAvailable) {
         this.checkContainersAvailable = checkContainersAvailable;
     }
@@ -92,6 +115,13 @@ public class HealthCheckValve extends ValveBase {
         }
     }
 
+    /**
+     * Recursively check if the given container and all its children are available.
+     *
+     * @param container the container to check
+     *
+     * @return {@code true} if the container and all its children are available
+     */
     protected boolean isAvailable(Container container) {
         for (Container child : container.findChildren()) {
             if (!isAvailable(child)) {

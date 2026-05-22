@@ -22,6 +22,12 @@ package org.apache.tomcat.util.bcel;
 public final class Const {
 
     /**
+     * Prevents instantiation.
+     */
+    private Const() {
+    }
+
+    /**
      * Java class file format Magic number: {@value}.
      *
      * @see <a href="https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.1-200-A"> The ClassFile

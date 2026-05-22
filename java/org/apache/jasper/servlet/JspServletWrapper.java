@@ -92,8 +92,13 @@ public class JspServletWrapper {
     private final boolean unloadByCount;
     private final boolean unloadByIdle;
 
-    /*
-     * JspServletWrapper for JSP pages.
+    /**
+     * Constructs a JspServletWrapper for JSP pages.
+     *
+     * @param config The servlet config
+     * @param options The options
+     * @param jspUri The JSP URI
+     * @param rctxt The runtime context
      */
     public JspServletWrapper(ServletConfig config, Options options, String jspUri, JspRuntimeContext rctxt) {
 
@@ -107,8 +112,15 @@ public class JspServletWrapper {
         ctxt = new JspCompilationContext(jspUri, options, config.getServletContext(), this, rctxt);
     }
 
-    /*
-     * JspServletWrapper for tag files.
+    /**
+     * Constructs a JspServletWrapper for tag files.
+     *
+     * @param servletContext The servlet context
+     * @param options The options
+     * @param tagFilePath The tag file path
+     * @param tagInfo The tag info
+     * @param rctxt The runtime context
+     * @param tagJar The tag JAR
      */
     public JspServletWrapper(ServletContext servletContext, Options options, String tagFilePath, TagInfo tagInfo,
             JspRuntimeContext rctxt, Jar tagJar) {
@@ -124,14 +136,29 @@ public class JspServletWrapper {
         ctxt = new JspCompilationContext(jspUri, tagInfo, options, servletContext, this, rctxt, tagJar);
     }
 
+    /**
+     * Returns the JSP compilation context.
+     *
+     * @return the compilation context
+     */
     public JspCompilationContext getJspEngineContext() {
         return ctxt;
     }
 
+    /**
+     * Sets the reload flag.
+     *
+     * @param reload The reload flag
+     */
     public void setReload(boolean reload) {
         this.reload = reload;
     }
 
+    /**
+     * Returns the reload flag.
+     *
+     * @return the reload flag
+     */
     public boolean getReload() {
         return reload;
     }
@@ -140,6 +167,12 @@ public class JspServletWrapper {
         return reload && !ctxt.getRuntimeContext().isCompileCheckInProgress();
     }
 
+    /**
+     * Gets the servlet, compiling and loading it if necessary.
+     *
+     * @return the servlet
+     * @throws ServletException if an error occurs
+     */
     public Servlet getServlet() throws ServletException {
         /*
          * DCL on 'reload' requires that 'reload' be volatile (this also forces a read memory barrier, ensuring the new
@@ -182,6 +215,11 @@ public class JspServletWrapper {
         return theServlet;
     }
 
+    /**
+     * Returns the servlet context.
+     *
+     * @return the servlet context
+     */
     public ServletContext getServletContext() {
         return ctxt.getServletContext();
     }
@@ -315,26 +353,61 @@ public class JspServletWrapper {
         return null;
     }
 
+    /**
+     * Returns whether this wrapper is for a tag file.
+     *
+     * @return {@code true} if this is a tag file
+     */
     public boolean isTagFile() {
         return this.isTagFile;
     }
 
+    /**
+     * Increments and returns the trip count.
+     *
+     * @return the trip count before incrementing
+     */
     public int incTripCount() {
         return tripCount++;
     }
 
+    /**
+     * Decrements and returns the trip count.
+     *
+     * @return the trip count after decrementing
+     */
     public int decTripCount() {
         return tripCount--;
     }
 
+    /**
+     * Returns the JSP URI.
+     *
+     * @return the JSP URI
+     */
     public String getJspUri() {
         return jspUri;
     }
 
+    /**
+     * Returns the unload handle for managing JSP unloading.
+     *
+     * @return the unload handle
+     */
     public FastRemovalDequeue<JspServletWrapper>.Entry getUnloadHandle() {
         return unloadHandle;
     }
 
+    /**
+     * Services the request, compiling and loading the servlet if necessary.
+     *
+     * @param request The HTTP request
+     * @param response The HTTP response
+     * @param precompile Whether this is a precompile-only request
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs
+     * @throws FileNotFoundException if the JSP file is not found
+     */
     public void service(HttpServletRequest request, HttpServletResponse response, boolean precompile)
             throws ServletException, IOException, FileNotFoundException {
 
@@ -459,6 +532,9 @@ public class JspServletWrapper {
         }
     }
 
+    /**
+     * Destroys the wrapped servlet, if any.
+     */
     public void destroy() {
         if (theServlet != null) {
             try {
@@ -480,21 +556,27 @@ public class JspServletWrapper {
     }
 
     /**
-     * @return Returns the lastModificationTest.
+     * Returns the timestamp of the last modification test.
+     *
+     * @return the timestamp of the last modification test
      */
     public long getLastModificationTest() {
         return lastModificationTest;
     }
 
     /**
-     * @param lastModificationTest The lastModificationTest to set.
+     * Sets the timestamp of the last modification test.
+     *
+     * @param lastModificationTest The timestamp to set
      */
     public void setLastModificationTest(long lastModificationTest) {
         this.lastModificationTest = lastModificationTest;
     }
 
     /**
-     * @return the lastUsageTime.
+     * Returns the timestamp of the last usage.
+     *
+     * @return the timestamp of the last usage
      */
     public long getLastUsageTime() {
         return lastUsageTime;

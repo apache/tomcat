@@ -29,6 +29,13 @@ package org.apache.catalina.session;
  */
 public final class PersistentManager extends PersistentManagerBase {
 
+    /**
+     * Construct a new {@code PersistentManager} instance.
+     */
+    public PersistentManager() {
+        // NO-OP
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**

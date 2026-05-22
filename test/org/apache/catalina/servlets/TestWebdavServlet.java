@@ -75,6 +75,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-specialpath"+UUID.randomUUID());
+        tempWebapp.deleteOnExit();
         Assert.assertTrue("Failed to mkdirs on "+tempWebapp.getCanonicalPath(),tempWebapp.mkdirs());
         Assert.assertTrue(new File(tempWebapp,"WEB-INF").mkdir());
         Assert.assertTrue(new File(tempWebapp,"META-INF").mkdir());
@@ -297,6 +298,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-properties");
+        tempWebapp.deleteOnExit();
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
         Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
@@ -441,6 +443,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-webapp");
+        tempWebapp.deleteOnExit();
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
         Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
@@ -922,6 +925,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-subpath");
+        tempWebapp.deleteOnExit();
         File subPath = new File(tempWebapp, "aaa");
         Assert.assertTrue(subPath.mkdirs());
 
@@ -1018,6 +1022,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-lock");
+        tempWebapp.deleteOnExit();
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
         Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
@@ -1405,6 +1410,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-if");
+        tempWebapp.deleteOnExit();
         File folder = new File(tempWebapp, "/myfolder/myfolder2/myfolder4/myfolder5");
         Assert.assertTrue(folder.mkdirs());
         File file = new File(folder, "myfile.txt");
@@ -1535,6 +1541,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // Create a temp webapp that can be safely written to
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-store");
+        tempWebapp.deleteOnExit();
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
         Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
@@ -1565,6 +1572,82 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertTrue(client.getResponseBody().contains(">testvalue</mytestproperty>"));
         validateXml(client.getResponseBody());
     }
+
+
+    /*
+     * Only tests LOCK bodies exceeding limit. Other tests cover valid LOCK bodies.
+     */
+    @Test
+    public void testLockBodyLimit() throws Exception {
+        doTestLimit("LOCK", LOCK_BODY);
+    }
+
+
+    /*
+     * Only tests PROPFIND bodies exceeding limit. Other tests cover valid PROPFIND bodies.
+     */
+    @Test
+    public void testPropFindBodyLimit() throws Exception {
+        doTestLimit("PROPFIND", PROPFIND_PROP);
+    }
+
+
+    private void doTestLimit(String method, String requestBody) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("secret", "foo");
+        webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("useStrongETags", "true");
+        webdavServlet.addInitParameter("maxRequestBodySize", "10");
+
+        ctxt.addServletMappingDecoded("/*", "webdav");
+        tomcat.start();
+
+        // With content length
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                method + " / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + requestBody.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    requestBody
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_REQUEST_TOO_LONG, client.getStatusCode());
+
+        // Without content length
+        client.reset();
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                method + " / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Transfer-Encoding: chunked" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    Integer.toHexString(requestBody.length()) + CRLF +
+                    requestBody + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_REQUEST_TOO_LONG, client.getStatusCode());
+    }
+
 
     public static class CustomPropertyStore implements PropertyStore {
 

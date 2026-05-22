@@ -25,6 +25,13 @@ package org.apache.el.util;
 public class ExceptionUtils {
 
     /**
+     * Default constructor. This class is not intended to be instantiated.
+     */
+    public ExceptionUtils() {
+        // NO-OP
+    }
+
+    /**
      * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
      *
      * @param t the Throwable to check

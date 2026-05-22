@@ -62,9 +62,15 @@ import org.apache.tomcat.util.res.StringManager;
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 
     /*--Static Variables----------------------------------------*/
+    /**
+     * Logger for this valve.
+     */
     public static final Log log = LogFactory.getLog(JvmRouteBinderValve.class);
 
     // ------------------------------------------------------ Constructor
+    /**
+     * Default constructor.
+     */
     public JvmRouteBinderValve() {
         super(true);
     }
@@ -91,6 +97,9 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      */
     protected long numberOfSessions = 0;
 
+    /**
+     * The session ID attribute name.
+     */
     protected String sessionIdAttribute = "org.apache.catalina.ha.session.JvmRouteOriginalSessionID";
 
 
@@ -115,21 +124,27 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * @return Returns the number of migrated sessions.
+     * Returns the number of migrated sessions.
+     *
+     * @return the number of migrated sessions
      */
     public long getNumberOfSessions() {
         return numberOfSessions;
     }
 
     /**
-     * @return Returns the enabled.
+     * Returns whether this valve is enabled.
+     *
+     * @return {@code true} if this valve is enabled
      */
     public boolean getEnabled() {
         return enabled;
     }
 
     /**
-     * @param enabled The enabled to set.
+     * Sets whether this valve is enabled.
+     *
+     * @param enabled {@code true} to enable this valve
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;

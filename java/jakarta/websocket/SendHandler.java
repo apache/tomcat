@@ -16,7 +16,15 @@
  */
 package jakarta.websocket;
 
+/**
+ * Callback interface for handling the result of an asynchronous WebSocket message send operation.
+ */
 public interface SendHandler {
 
+    /**
+     * Called when the asynchronous send operation completes.
+     *
+     * @param result The result of the send operation
+     */
     void onResult(SendResult result);
 }

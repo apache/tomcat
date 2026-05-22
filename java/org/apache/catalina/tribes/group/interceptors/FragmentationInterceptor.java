@@ -41,12 +41,28 @@ import org.apache.juli.logging.LogFactory;
  * of a MB)</b><br>
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase implements FragmentationInterceptorMBean {
+    /**
+     * Creates a new FragmentationInterceptor instance.
+     */
+    public FragmentationInterceptor() {
+        // Default constructor
+    }
+
     private static final Log log = LogFactory.getLog(FragmentationInterceptor.class);
+    /**
+     * String manager for internationalization support.
+     */
     protected static final StringManager sm = StringManager.getManager(FragmentationInterceptor.class);
 
+    /**
+     * Map of fragment keys to their fragment collections for reassembly.
+     */
     protected final HashMap<FragKey,FragCollection> fragpieces = new HashMap<>();
     private int maxSize = 1024 * 100;
     private long expire = 1000 * 60; // one minute expiration
+    /**
+     * Flag indicating whether deep cloning is enabled for fragments.
+     */
     protected final boolean deepclone = true;
 
 
@@ -75,6 +91,14 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
     }
 
 
+    /**
+     * Gets the fragment collection for the given key, creating one if it does not exist.
+     *
+     * @param key The fragment key
+     * @param msg The channel message used to initialize a new collection if needed
+     *
+     * @return The fragment collection for the given key
+     */
     public FragCollection getFragCollection(FragKey key, ChannelMessage msg) {
         FragCollection coll = fragpieces.get(key);
         if (coll == null) {
@@ -89,10 +113,20 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         return coll;
     }
 
+    /**
+     * Removes the fragment collection for the given key.
+     *
+     * @param key The fragment key to remove
+     */
     public void removeFragCollection(FragKey key) {
         fragpieces.remove(key);
     }
 
+    /**
+     * Reassembles a fragmented message from its parts.
+     *
+     * @param msg The channel message fragment to process
+     */
     public void defrag(ChannelMessage msg) {
         FragKey key = new FragKey(msg.getUniqueId());
         FragCollection coll = getFragCollection(key, msg);
@@ -106,6 +140,15 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         }
     }
 
+    /**
+     * Fragments a large message into smaller pieces and sends them.
+     *
+     * @param destination The destination members
+     * @param msg The channel message to fragment
+     * @param payload The interceptor payload
+     *
+     * @throws ChannelException if an error occurs during fragmentation
+     */
     public void frag(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         int size = msg.getMessage().getLength();
 
@@ -176,11 +219,19 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         this.expire = expire;
     }
 
+    /**
+     * Collection that holds the fragments of a message for reassembly.
+     */
     public static class FragCollection {
         private final long received = System.currentTimeMillis();
         private final ChannelMessage msg;
         private final XByteBuffer[] frags;
 
+        /**
+         * Creates a new fragment collection for the given message.
+         *
+         * @param msg The channel message containing fragment metadata
+         */
         public FragCollection(ChannelMessage msg) {
             // get the total messages
             int count = XByteBuffer.toInt(msg.getMessage().getBytesDirect(), msg.getMessage().getLength() - 4);
@@ -188,6 +239,11 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             this.msg = msg;
         }
 
+        /**
+         * Adds a fragment message to this collection.
+         *
+         * @param msg The fragment message to add
+         */
         public void addMessage(ChannelMessage msg) {
             // remove the total messages
             msg.getMessage().trim(4);
@@ -199,6 +255,11 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
         }
 
+        /**
+         * Checks if all fragments have been received.
+         *
+         * @return {@code true} if all fragments are present
+         */
         public boolean complete() {
             boolean result = true;
             for (int i = 0; (i < frags.length) && (result); i++) {
@@ -207,6 +268,13 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             return result;
         }
 
+        /**
+         * Assembles all fragments into a single complete message.
+         *
+         * @return The assembled channel message
+         *
+         * @throws IllegalStateException if not all fragments have been received
+         */
         public ChannelMessage assemble() {
             if (!complete()) {
                 throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
@@ -223,15 +291,30 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             return msg;
         }
 
+        /**
+         * Checks if this fragment collection has expired.
+         *
+         * @param expire The expiration time in milliseconds
+         *
+         * @return {@code true} if the collection has expired
+         */
         public boolean expired(long expire) {
             return (System.currentTimeMillis() - received) > expire;
         }
     }
 
+    /**
+     * Key used to identify a set of fragments belonging to the same original message.
+     */
     public static class FragKey {
         private final byte[] uniqueId;
         private final long received = System.currentTimeMillis();
 
+        /**
+         * Creates a new fragment key with the given unique identifier.
+         *
+         * @param id The unique identifier for the message
+         */
         public FragKey(byte[] id) {
             this.uniqueId = id;
         }
@@ -251,6 +334,13 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
         }
 
+        /**
+         * Checks if this fragment key has expired.
+         *
+         * @param expire The expiration time in milliseconds
+         *
+         * @return {@code true} if the key has expired
+         */
         public boolean expired(long expire) {
             return (System.currentTimeMillis() - received) > expire;
         }

@@ -31,11 +31,20 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Service that manages static membership for a cluster channel.
+ */
 public class StaticMembershipService extends MembershipServiceBase implements StaticMembershipServiceMBean {
 
     private static final Log log = LogFactory.getLog(StaticMembershipService.class);
+    /**
+     * String manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    /**
+     * List of static members configured for this service.
+     */
     protected final ArrayList<StaticMember> staticMembers = new ArrayList<>();
     private StaticMember localMember;
     private StaticMembershipProvider provider;
@@ -45,6 +54,9 @@ public class StaticMembershipService extends MembershipServiceBase implements St
      */
     private ObjectName oname = null;
 
+    /**
+     * Default constructor.
+     */
     public StaticMembershipService() {
         // default values
         setDefaults(this.properties);
@@ -69,6 +81,11 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         }
     }
 
+    /**
+     * Builds and configures the membership provider.
+     * @return the configured membership provider
+     * @throws Exception if initialization fails
+     */
     protected StaticMembershipProvider buildMembershipProvider() throws Exception {
         StaticMembershipProvider provider = new StaticMembershipProvider();
         provider.setChannel(channel);
@@ -135,18 +152,34 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return provider;
     }
 
+    /**
+     * Returns the list of static members.
+     * @return the static members list
+     */
     public ArrayList<StaticMember> getStaticMembers() {
         return staticMembers;
     }
 
+    /**
+     * Adds a static member to the cluster.
+     * @param member the member to add
+     */
     public void addStaticMember(StaticMember member) {
         staticMembers.add(member);
     }
 
+    /**
+     * Removes a static member from the cluster.
+     * @param member the member to remove
+     */
     public void removeStaticMember(StaticMember member) {
         staticMembers.remove(member);
     }
 
+    /**
+     * Sets the local member for this service.
+     * @param member the local member
+     */
     public void setLocalMember(StaticMember member) {
         this.localMember = member;
         localMember.setLocal(true);
@@ -158,6 +191,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return Long.parseLong(expirationTime);
     }
 
+    /**
+     * Sets the member expiration time in milliseconds.
+     * @param expirationTime the expiration time
+     */
     public void setExpirationTime(long expirationTime) {
         properties.setProperty("expirationTime", String.valueOf(expirationTime));
     }
@@ -168,6 +205,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return Integer.parseInt(connectTimeout);
     }
 
+    /**
+     * Sets the connection timeout in milliseconds.
+     * @param connectTimeout the connection timeout
+     */
     public void setConnectTimeout(int connectTimeout) {
         properties.setProperty("connectTimeout", String.valueOf(connectTimeout));
     }
@@ -178,6 +219,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return Long.parseLong(rpcTimeout);
     }
 
+    /**
+     * Sets the RPC timeout in milliseconds.
+     * @param rpcTimeout the RPC timeout
+     */
     public void setRpcTimeout(long rpcTimeout) {
         properties.setProperty("rpcTimeout", String.valueOf(rpcTimeout));
     }
@@ -188,6 +233,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return Boolean.parseBoolean(useThread);
     }
 
+    /**
+     * Sets whether to use a background thread for pinging.
+     * @param useThread true to use a background thread
+     */
     public void setUseThread(boolean useThread) {
         properties.setProperty("useThread", String.valueOf(useThread));
     }
@@ -198,6 +247,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         return Long.parseLong(pingInterval);
     }
 
+    /**
+     * Sets the ping interval in milliseconds.
+     * @param pingInterval the ping interval
+     */
     public void setPingInterval(long pingInterval) {
         properties.setProperty("pingInterval", String.valueOf(pingInterval));
     }
@@ -208,6 +261,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         this.properties = properties;
     }
 
+    /**
+     * Sets default property values.
+     * @param properties the properties to configure
+     */
     protected void setDefaults(Properties properties) {
         // default values
         if (properties.getProperty("expirationTime") == null) {

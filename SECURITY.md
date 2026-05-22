@@ -116,7 +116,7 @@ Allow reasonable time (typically 90+ days) for fix development. We'll work with 
 - HTTP/AJP connector data from clients
 - Malicious requests via supported protocols
 
-See the full [security model](https://tomcat.apache.org/security-model.html) for details.
+See the full [**threat model and security policy**](https://tomcat.apache.org/security-model.html) for details.
 
 ## Published Vulnerabilities & Updates
 

@@ -53,10 +53,12 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the available date/time for this servlet, in milliseconds since the epoch. If this date/time is in the
-     *             future, any request for this servlet will return an SC_SERVICE_UNAVAILABLE error. If it is zero, the
-     *             servlet is currently available. A value equal to Long.MAX_VALUE is considered to mean that
-     *             unavailability is permanent.
+     * Returns the available date/time for this servlet, in milliseconds since the epoch. If this date/time is in the
+     * future, any request for this servlet will return an SC_SERVICE_UNAVAILABLE error. If it is zero, the
+     * servlet is currently available. A value equal to Long.MAX_VALUE is considered to mean that
+     * unavailability is permanent.
+     *
+     * @return the available date/time in milliseconds since the epoch
      */
     long getAvailable();
 
@@ -72,7 +74,9 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the load-on-startup order value (negative value means load on first call).
+     * Returns the load-on-startup order value (negative value means load on first call).
+     *
+     * @return the load-on-startup order value
      */
     int getLoadOnStartup();
 
@@ -86,7 +90,9 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the run-as identity for this servlet.
+     * Returns the run-as identity for this servlet.
+     *
+     * @return the run-as identity
      */
     String getRunAs();
 
@@ -100,7 +106,9 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the fully qualified servlet class name for this servlet.
+     * Returns the fully qualified servlet class name for this servlet.
+     *
+     * @return the servlet class name
      */
     String getServletClass();
 
@@ -124,14 +132,19 @@ public interface Wrapper extends Container {
     String[] getServletMethods() throws ServletException;
 
 
-    /**
-     * @return <code>true</code> if this Servlet is currently unavailable.
+   /**
+     * Returns whether this Servlet is currently unavailable.
+     *
+     * @return <code>true</code> if this Servlet is currently unavailable
      */
     boolean isUnavailable();
 
 
+
     /**
-     * @return the associated Servlet instance.
+     * Returns the associated Servlet instance.
+     *
+     * @return the associated Servlet instance
      */
     Servlet getServlet();
 
@@ -195,37 +208,45 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the value for the specified initialization parameter name, if any; otherwise return <code>null</code>.
+     * Returns the value for the specified initialization parameter name, if any; otherwise return <code>null</code>.
      *
      * @param name Name of the requested initialization parameter
+     * @return the initialization parameter value
      */
     String findInitParameter(String name);
 
 
     /**
-     * @return the names of all defined initialization parameters for this servlet.
+     * Returns the names of all defined initialization parameters for this servlet.
+     *
+     * @return the initialization parameter names
      */
     String[] findInitParameters();
 
 
     /**
-     * @return the mappings associated with this wrapper.
+     * Returns the mappings associated with this wrapper.
+     *
+     * @return the URL mappings
      */
     String[] findMappings();
 
 
     /**
-     * @return the security role link for the specified security role reference name, if any; otherwise return
-     *             <code>null</code>.
+     * Returns the security role link for the specified security role reference name, if any; otherwise return
+     * <code>null</code>.
      *
      * @param name Security role reference used within this servlet
+     * @return the security role link
      */
     String findSecurityReference(String name);
 
 
     /**
+     * Finds all security role references associated with this servlet.
+     *
      * @return the array of security role reference names associated with this servlet, if any; otherwise return a
-     *             zero-length array.
+     *             zero-length array
      */
     String[] findSecurityReferences();
 
@@ -291,8 +312,10 @@ public interface Wrapper extends Container {
 
 
     /**
+     * Returns the multipart configuration for the associated Servlet.
+     *
      * @return the multipart configuration for the associated Servlet. If no multipart configuration has been defined,
-     *             then <code>null</code> will be returned.
+     *             then <code>null</code> will be returned
      */
     MultipartConfigElement getMultipartConfigElement();
 

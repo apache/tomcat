@@ -43,6 +43,12 @@ import javax.sql.DataSource;
  */
 public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
+    /**
+     * Default constructor.
+     */
+    public DataSourceUserDatabaseFactory() {
+    }
+
 
     // --------------------------------------------------------- Public Methods
 

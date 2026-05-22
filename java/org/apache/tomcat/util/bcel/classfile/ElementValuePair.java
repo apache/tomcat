@@ -39,11 +39,21 @@ public class ElementValuePair {
         this.elementValue = ElementValue.readElementValue(file, constantPool);
     }
 
+    /**
+     * Returns the element name as a string.
+     *
+     * @return the element name
+     */
     public String getNameString() {
         final ConstantUtf8 c = (ConstantUtf8) constantPool.getConstant(elementNameIndex, Const.CONSTANT_Utf8);
         return c.getBytes();
     }
 
+    /**
+     * Returns the element value.
+     *
+     * @return the element value
+     */
     public final ElementValue getValue() {
         return elementValue;
     }

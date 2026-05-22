@@ -29,16 +29,29 @@ import jakarta.el.MethodNotFoundException;
 import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 
+/**
+ * Wrapper around a MethodExpression that adds JSP-specific error tracking with marks.
+ * Implements Externalizable for serialization support.
+ */
 public final class JspMethodExpression extends MethodExpression implements Externalizable {
 
     private String mark;
 
     private MethodExpression target;
 
+    /**
+     * Default constructor required by Externalizable.
+     */
     public JspMethodExpression() {
         super();
     }
 
+    /**
+     * Creates a new JspMethodExpression wrapping the given target expression.
+     *
+     * @param mark the mark for error tracking
+     * @param target the underlying MethodExpression to wrap
+     */
     public JspMethodExpression(String mark, MethodExpression target) {
         this.target = target;
         this.mark = mark;

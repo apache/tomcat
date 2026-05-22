@@ -44,8 +44,17 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class MBeanUtils {
 
+    /**
+     * Default constructor.
+     */
+    public MBeanUtils() {
+    }
+
     // ------------------------------------------------------- Static Variables
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MBeanUtils.class);
 
     /**
@@ -713,6 +722,8 @@ public class MBeanUtils {
      * @exception Exception if an MBean cannot be deregistered
      */
     static void destroyMBeanUserDatabase(String userDatabase) throws Exception {
+
+        // FIXME: UserDatabase MBean management could be improved
 
         ObjectName query;
         Set<ObjectName> results;

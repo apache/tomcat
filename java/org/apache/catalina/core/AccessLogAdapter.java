@@ -30,11 +30,21 @@ public class AccessLogAdapter implements AccessLog {
 
     private AccessLog[] logs;
 
+    /**
+     * Constructs a new adapter wrapping a single access log.
+     *
+     * @param log The access log to wrap
+     */
     public AccessLogAdapter(AccessLog log) {
         Objects.requireNonNull(log);
         logs = new AccessLog[] { log };
     }
 
+    /**
+     * Adds an access log to this adapter.
+     *
+     * @param log The access log to add
+     */
     public void add(AccessLog log) {
         Objects.requireNonNull(log);
         AccessLog[] newArray = Arrays.copyOf(logs, logs.length + 1);

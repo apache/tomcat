@@ -32,6 +32,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Cluster session manager that provides backup session replication. Each session has one primary and one backup node.
+ */
 public class BackupManager extends ClusterManagerBase implements MapOwner, DistributedManager {
 
     private final Log log = LogFactory.getLog(BackupManager.class); // must not be static
@@ -41,6 +44,9 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
      */
     protected static final StringManager sm = StringManager.getManager(BackupManager.class);
 
+    /**
+     * Default replication timeout in milliseconds.
+     */
     protected static final long DEFAULT_REPL_TIMEOUT = 15000;// 15 seconds
 
     /**
@@ -148,6 +154,11 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
         setState(LifecycleState.STARTING);
     }
 
+    /**
+     * Returns the name of the replication map.
+     *
+     * @return the map name
+     */
     public String getMapName() {
         String name = cluster.getManagerName(getName(), this) + "-" + "map";
         if (log.isTraceEnabled()) {
@@ -183,10 +194,20 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
         this.name = name;
     }
 
+    /**
+     * Sets the channel send options for the replication map.
+     *
+     * @param mapSendOptions the send options as an integer flag
+     */
     public void setMapSendOptions(int mapSendOptions) {
         this.mapSendOptions = mapSendOptions;
     }
 
+    /**
+     * Sets the channel send options for the replication map from a string.
+     *
+     * @param mapSendOptions the send options as a comma-separated string
+     */
     public void setMapSendOptions(String mapSendOptions) {
 
         int value = Channel.parseSendOptions(mapSendOptions);
@@ -195,6 +216,11 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
         }
     }
 
+    /**
+     * Returns the channel send options for the replication map.
+     *
+     * @return the send options as an integer flag
+     */
     public int getMapSendOptions() {
         return mapSendOptions;
     }
@@ -208,26 +234,56 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
         return Channel.getSendOptionsAsString(mapSendOptions);
     }
 
+    /**
+     * Sets the RPC timeout for replication messages.
+     *
+     * @param rpcTimeout the timeout in milliseconds
+     */
     public void setRpcTimeout(long rpcTimeout) {
         this.rpcTimeout = rpcTimeout;
     }
 
+    /**
+     * Returns the RPC timeout for replication messages.
+     *
+     * @return the timeout in milliseconds
+     */
     public long getRpcTimeout() {
         return rpcTimeout;
     }
 
+    /**
+     * Sets whether to terminate the map on start failure.
+     *
+     * @param terminateOnStartFailure {@code true} to terminate on start failure
+     */
     public void setTerminateOnStartFailure(boolean terminateOnStartFailure) {
         this.terminateOnStartFailure = terminateOnStartFailure;
     }
 
+    /**
+     * Returns whether the map will terminate on start failure.
+     *
+     * @return {@code true} if the map will terminate on start failure
+     */
     public boolean isTerminateOnStartFailure() {
         return terminateOnStartFailure;
     }
 
+    /**
+     * Returns the access timeout for the replication map.
+     *
+     * @return the access timeout in milliseconds
+     */
     public long getAccessTimeout() {
         return accessTimeout;
     }
 
+    /**
+     * Sets the access timeout for the replication map.
+     *
+     * @param accessTimeout the access timeout in milliseconds
+     */
     public void setAccessTimeout(long accessTimeout) {
         this.accessTimeout = accessTimeout;
     }

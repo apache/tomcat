@@ -75,10 +75,20 @@ public class ParserController implements TagConstants {
         this.err = compiler.getErrorDispatcher();
     }
 
+    /**
+     * Returns the JSP compilation context associated with this parser controller.
+     *
+     * @return the JSP compilation context
+     */
     public JspCompilationContext getJspCompilationContext() {
         return ctxt;
     }
 
+    /**
+     * Returns the compiler associated with this parser controller.
+     *
+     * @return the compiler
+     */
     public Compiler getCompiler() {
         return compiler;
     }

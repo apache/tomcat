@@ -27,6 +27,12 @@ import org.xml.sax.Attributes;
  */
 public abstract class AbstractObjectCreationFactory implements ObjectCreationFactory {
 
+    /**
+     * Constructs a new instance of this factory.
+     */
+    public AbstractObjectCreationFactory() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 

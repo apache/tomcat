@@ -27,7 +27,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Base class for CSRF prevention filters.
+ */
 public abstract class CsrfPreventionFilterBase extends FilterBase {
+
+    /**
+     * Default constructor.
+     */
+    public CsrfPreventionFilterBase() {
+    }
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
@@ -45,7 +54,9 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
     }
 
     /**
-     * @return response status code that is used to reject denied request.
+     * Get the HTTP status code used to reject denied requests.
+     *
+     * @return The response status code that is used to reject denied requests
      */
     public int getDenyStatus() {
         return denyStatus;
@@ -123,6 +134,13 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         return buffer.toString();
     }
 
+    /**
+     * Get the requested path from the given request.
+     *
+     * @param request The HTTP servlet request
+     *
+     * @return The requested path
+     */
     protected String getRequestedPath(HttpServletRequest request) {
         String path = request.getServletPath();
         if (request.getPathInfo() != null) {

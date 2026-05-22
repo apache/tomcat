@@ -23,31 +23,74 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents a Transfer-Encoding value with optional parameters and quality factor.
+ */
 public class TE {
 
+    /**
+     * The encoding name.
+     */
     private final String encoding;
+
+    /**
+     * The parameters associated with this encoding.
+     */
     private final Map<String,String> parameters;
+
+    /**
+     * The quality factor for this encoding.
+     */
     private final double quality;
 
+    /**
+     * Constructs a new TE instance.
+     *
+     * @param encoding the encoding name
+     * @param parameters the parameters
+     * @param quality the quality factor
+     */
     protected TE(String encoding, Map<String,String> parameters, double quality) {
         this.encoding = encoding;
         this.parameters = parameters;
         this.quality = quality;
     }
 
+    /**
+     * Returns the encoding name.
+     *
+     * @return the encoding name
+     */
     public String getEncoding() {
         return encoding;
     }
 
+    /**
+     * Returns the parameters for this encoding.
+     *
+     * @return the parameters map
+     */
     public Map<String,String> getParameters() {
         return parameters;
     }
 
+    /**
+     * Returns the quality factor.
+     *
+     * @return the quality factor
+     */
     public double getQuality() {
         return quality;
     }
 
 
+    /**
+     * Parses a Transfer-Encoding header value into a list of TE instances.
+     *
+     * @param input the input reader containing the header value
+     * @return the list of parsed TE values
+     * @throws IOException if a parsing error occurs
+     */
     public static List<TE> parse(StringReader input) throws IOException {
 
         List<TE> result = new ArrayList<>();

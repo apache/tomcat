@@ -39,6 +39,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class JavaCompiler extends Compiler {
 
+    /**
+     * Constructs a new JavaCompiler.
+     */
+    public JavaCompiler() {
+    }
+
     private final Log log = LogFactory.getLog(JavaCompiler.class); // must not be static
 
     @Override

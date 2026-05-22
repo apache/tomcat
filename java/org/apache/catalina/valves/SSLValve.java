@@ -74,60 +74,130 @@ public class SSLValve extends ValveBase {
     private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
 
     // ------------------------------------------------------ Constructor
+    /**
+     * Default constructor.
+     */
     public SSLValve() {
         super(true);
     }
 
 
+    /**
+     * Returns the header name used to retrieve the client certificate.
+     *
+     * @return The client certificate header name
+     */
     public String getSslClientCertHeader() {
         return sslClientCertHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the client certificate.
+     *
+     * @param sslClientCertHeader The client certificate header name
+     */
     public void setSslClientCertHeader(String sslClientCertHeader) {
         this.sslClientCertHeader = sslClientCertHeader;
     }
 
+    /**
+     * Returns the header name used to retrieve the escaped client certificate.
+     *
+     * @return The escaped client certificate header name
+     */
     public String getSslClientEscapedCertHeader() {
         return sslClientEscapedCertHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the escaped client certificate.
+     *
+     * @param sslClientEscapedCertHeader The escaped client certificate header name
+     */
     public void setSslClientEscapedCertHeader(String sslClientEscapedCertHeader) {
         this.sslClientEscapedCertHeader = sslClientEscapedCertHeader;
     }
 
+    /**
+     * Returns the header name used to retrieve the secure protocol.
+     *
+     * @return The secure protocol header name
+     */
     public String getSslSecureProtocolHeader() {
         return sslSecureProtocolHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the secure protocol.
+     *
+     * @param sslSecureProtocolHeader The secure protocol header name
+     */
     public void setSslSecureProtocolHeader(String sslSecureProtocolHeader) {
         this.sslSecureProtocolHeader = sslSecureProtocolHeader;
     }
 
+    /**
+     * Returns the header name used to retrieve the cipher suite.
+     *
+     * @return The cipher header name
+     */
     public String getSslCipherHeader() {
         return sslCipherHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the cipher suite.
+     *
+     * @param sslCipherHeader The cipher header name
+     */
     public void setSslCipherHeader(String sslCipherHeader) {
         this.sslCipherHeader = sslCipherHeader;
     }
 
+    /**
+     * Returns the header name used to retrieve the SSL session ID.
+     *
+     * @return The session ID header name
+     */
     public String getSslSessionIdHeader() {
         return sslSessionIdHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the SSL session ID.
+     *
+     * @param sslSessionIdHeader The session ID header name
+     */
     public void setSslSessionIdHeader(String sslSessionIdHeader) {
         this.sslSessionIdHeader = sslSessionIdHeader;
     }
 
+    /**
+     * Returns the header name used to retrieve the cipher key size.
+     *
+     * @return The cipher key size header name
+     */
     public String getSslCipherUserKeySizeHeader() {
         return sslCipherUserKeySizeHeader;
     }
 
+    /**
+     * Sets the header name used to retrieve the cipher key size.
+     *
+     * @param sslCipherUserKeySizeHeader The cipher key size header name
+     */
     public void setSslCipherUserKeySizeHeader(String sslCipherUserKeySizeHeader) {
         this.sslCipherUserKeySizeHeader = sslCipherUserKeySizeHeader;
     }
 
 
+    /**
+     * Retrieves the value of the specified header from the request, handling null and "(null)" values.
+     *
+     * @param request The request object
+     * @param header The header name to retrieve
+     * @return The header value, or null if not present or equal to "(null)"
+     */
     public String mygetHeader(Request request, String header) {
         String strcert0 = request.getHeader(header);
         if (strcert0 == null) {

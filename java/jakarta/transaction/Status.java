@@ -16,15 +16,48 @@
  */
 package jakarta.transaction;
 
+/**
+ * Defines the set of status constants for a transaction.
+ */
 public interface Status {
+    /**
+     * The transaction is active and work is in progress.
+     */
     int STATUS_ACTIVE = 0;
+    /**
+     * The transaction has been marked for rollback only.
+     */
     int STATUS_MARKED_ROLLBACK = 1;
+    /**
+     * The transaction resources have been prepared and are awaiting completion.
+     */
     int STATUS_PREPARED = 2;
+    /**
+     * The transaction has been committed successfully.
+     */
     int STATUS_COMMITTED = 3;
+    /**
+     * The transaction has been rolled back.
+     */
     int STATUS_ROLLEDBACK = 4;
+    /**
+     * The transaction status is unknown.
+     */
     int STATUS_UNKNOWN = 5;
+    /**
+     * There is no active transaction for the current thread.
+     */
     int STATUS_NO_TRANSACTION = 6;
+    /**
+     * The transaction manager is in the process of preparing the transaction resources.
+     */
     int STATUS_PREPARING = 7;
+    /**
+     * The transaction manager is in the process of committing the transaction.
+     */
     int STATUS_COMMITTING = 8;
+    /**
+     * The transaction manager is in the process of rolling back the transaction.
+     */
     int STATUS_ROLLING_BACK = 9;
 }

@@ -43,6 +43,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ExpandWar {
 
+    /**
+     * Default constructor for ExpandWar.
+     */
+    public ExpandWar() {
+        // NO-OP
+    }
+
     private static final Log log = LogFactory.getLog(ExpandWar.class);
 
     /**

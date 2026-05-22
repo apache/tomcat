@@ -30,11 +30,33 @@ import jakarta.servlet.jsp.tagext.JspTag;
  */
 public abstract class JspFragmentHelper extends JspFragment {
 
+    /**
+     * Discriminator value used to identify the specific fragment within a multi-fragment class.
+     */
     protected final int discriminator;
+
+    /**
+     * The JSP context associated with this fragment.
+     */
     protected final JspContext jspContext;
+
+    /**
+     * The page context associated with this fragment, cast from the JSP context.
+     */
     protected final PageContext _jspx_page_context;
+
+    /**
+     * The parent tag that owns this fragment.
+     */
     protected final JspTag parentTag;
 
+    /**
+     * Creates a new JspFragmentHelper instance.
+     *
+     * @param discriminator the fragment discriminator value
+     * @param jspContext the JSP context for this fragment
+     * @param parentTag the parent tag
+     */
     public JspFragmentHelper(int discriminator, JspContext jspContext, JspTag parentTag) {
         this.discriminator = discriminator;
         this.jspContext = jspContext;
@@ -51,6 +73,11 @@ public abstract class JspFragmentHelper extends JspFragment {
         return this.jspContext;
     }
 
+    /**
+     * Returns the parent tag that owns this fragment.
+     *
+     * @return the parent tag
+     */
     public JspTag getParentTag() {
         return this.parentTag;
     }

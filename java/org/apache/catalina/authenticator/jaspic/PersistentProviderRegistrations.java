@@ -183,19 +183,41 @@ public final class PersistentProviderRegistrations {
     }
 
 
+    /**
+     * Container for JASPIC provider registrations loaded from the configuration file.
+     */
     public static class Providers {
         private final List<Provider> providers = new ArrayList<>();
 
+        /**
+         * Constructs a new Providers instance.
+         */
+        public Providers() {
+        }
+
+        /**
+         * Adds a provider to the list of registered providers.
+         *
+         * @param provider the provider to add
+         */
         public void addProvider(Provider provider) {
             providers.add(provider);
         }
 
+        /**
+         * Returns the list of registered providers.
+         *
+         * @return the list of registered providers
+         */
         public List<Provider> getProviders() {
             return providers;
         }
     }
 
 
+    /**
+     * Represents a single JASPIC provider registration.
+     */
     public static class Provider {
         private String className;
         private String layer;
@@ -203,43 +225,89 @@ public final class PersistentProviderRegistrations {
         private String description;
         private final Map<String,String> properties = new HashMap<>();
 
+        /**
+         * Constructs a new Provider instance.
+         */
+        public Provider() {
+        }
 
+        /**
+         * Returns the class name of the provider.
+         *
+         * @return the class name
+         */
         public String getClassName() {
             return className;
         }
 
+        /**
+         * Sets the class name of the provider.
+         *
+         * @param className the class name
+         */
         public void setClassName(String className) {
             this.className = className;
         }
 
-
+        /**
+         * Returns the layer of the provider.
+         *
+         * @return the layer
+         */
         public String getLayer() {
             return layer;
         }
 
+        /**
+         * Sets the layer of the provider.
+         *
+         * @param layer the layer
+         */
         public void setLayer(String layer) {
             this.layer = layer;
         }
 
-
+        /**
+         * Returns the application context of the provider.
+         *
+         * @return the application context
+         */
         public String getAppContext() {
             return appContext;
         }
 
+        /**
+         * Sets the application context of the provider.
+         *
+         * @param appContext the application context
+         */
         public void setAppContext(String appContext) {
             this.appContext = appContext;
         }
 
-
+        /**
+         * Returns the description of the provider.
+         *
+         * @return the description
+         */
         public String getDescription() {
             return description;
         }
 
+        /**
+         * Sets the description of the provider.
+         *
+         * @param description the description
+         */
         public void setDescription(String description) {
             this.description = description;
         }
 
-
+        /**
+         * Adds a property to the provider.
+         *
+         * @param property the property to add
+         */
         public void addProperty(Property property) {
             properties.put(property.getName(), property.getValue());
         }
@@ -260,30 +328,62 @@ public final class PersistentProviderRegistrations {
             properties.put(name, value);
         }
 
+        /**
+         * Returns the properties of the provider.
+         *
+         * @return the properties
+         */
         public Map<String,String> getProperties() {
             return properties;
         }
     }
 
 
+    /**
+     * Represents a name-value property within a JASPIC provider registration.
+     */
     public static class Property {
         private String name;
         private String value;
 
+        /**
+         * Constructs a new Property instance.
+         */
+        public Property() {
+        }
 
+        /**
+         * Returns the name of the property.
+         *
+         * @return the name
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Sets the name of the property.
+         *
+         * @param name the name
+         */
         public void setName(String name) {
             this.name = name;
         }
 
-
+        /**
+         * Returns the value of the property.
+         *
+         * @return the value
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * Sets the value of the property.
+         *
+         * @param value the value
+         */
         public void setValue(String value) {
             this.value = value;
         }

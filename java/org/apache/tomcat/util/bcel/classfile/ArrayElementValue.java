@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+/**
+ * Element value that represents an array of element values.
+ */
 public class ArrayElementValue extends ElementValue
 {
     // For array types, this is the array
@@ -29,6 +32,11 @@ public class ArrayElementValue extends ElementValue
         this.elementValues = elementValues != null ? elementValues : EMPTY_ARRAY;
     }
 
+    /**
+     * Returns the array of element values.
+     *
+     * @return the array of element values
+     */
     public ElementValue[] getElementValuesArray() {
         return elementValues;
     }

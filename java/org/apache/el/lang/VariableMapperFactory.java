@@ -21,11 +21,27 @@ import jakarta.el.VariableMapper;
 
 import org.apache.el.util.MessageFactory;
 
+/**
+ * Factory for creating variable mappers that track variable resolutions.
+ */
 public class VariableMapperFactory extends VariableMapper {
 
+    /**
+     * The target variable mapper to delegate to.
+     */
     private final VariableMapper target;
+    /**
+     * The momento mapper that tracks resolved variables.
+     */
     private VariableMapper momento;
 
+    /**
+     * Constructs a new VariableMapperFactory.
+     *
+     * @param target The target variable mapper to delegate to
+     *
+     * @throws NullPointerException if target is null
+     */
     public VariableMapperFactory(VariableMapper target) {
         if (target == null) {
             throw new NullPointerException(MessageFactory.get("error.noVariableMapperTarget"));
@@ -33,6 +49,11 @@ public class VariableMapperFactory extends VariableMapper {
         this.target = target;
     }
 
+    /**
+     * Returns the momento mapper containing all resolved variables.
+     *
+     * @return the momento mapper, or {@code null} if no variables have been resolved
+     */
     public VariableMapper create() {
         return this.momento;
     }

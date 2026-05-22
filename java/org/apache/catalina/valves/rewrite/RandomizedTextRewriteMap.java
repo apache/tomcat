@@ -33,6 +33,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class RandomizedTextRewriteMap implements RewriteMap {
 
+    /**
+     * StringManager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(RandomizedTextRewriteMap.class);
 
     private static final Random random = new Random();
@@ -77,12 +80,27 @@ public class RandomizedTextRewriteMap implements RewriteMap {
         }
     }
 
+    /**
+     * Sets optional parameters for the map. This implementation does not support
+     * additional parameters and always throws an exception.
+     *
+     * @param params the optional parameter
+     * @return never returns, always throws {@link IllegalArgumentException}
+     */
     @Override
     public String setParameters(String params) {
         throw new IllegalArgumentException(
                 StringManager.getManager(RewriteMap.class).getString("rewriteMap.tooManyParameters"));
     }
 
+    /**
+     * Looks up a key in the map and returns the mapped value. If the map was
+     * created with random mode enabled and the value contains multiple options
+     * separated by '|', a random option is returned.
+     *
+     * @param key the key to look up
+     * @return the mapped value or {@code null} if the key is not found
+     */
     @Override
     public String lookup(String key) {
         String[] possibleValues = map.get(key);

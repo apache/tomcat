@@ -27,6 +27,9 @@ import org.apache.tomcat.JarScanFilter;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.util.file.Matcher;
 
+/**
+ * Standard implementation of JarScanFilter that provides configuration for JAR scanning filters.
+ */
 public class StandardJarScanFilter implements JarScanFilter {
 
     private final ReadWriteLock configurationLock = new ReentrantReadWriteLock();
@@ -89,11 +92,21 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
 
+    /**
+     * Returns the TLD skip pattern.
+     *
+     * @return the TLD skip pattern
+     */
     public String getTldSkip() {
         return tldSkip;
     }
 
 
+    /**
+     * Sets the TLD skip pattern.
+     *
+     * @param tldSkip the TLD skip pattern
+     */
     public void setTldSkip(String tldSkip) {
         this.tldSkip = tldSkip;
         Lock writeLock = configurationLock.writeLock();
@@ -106,11 +119,21 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
 
+    /**
+     * Returns the TLD scan pattern.
+     *
+     * @return the TLD scan pattern
+     */
     public String getTldScan() {
         return tldScan;
     }
 
 
+    /**
+     * Sets the TLD scan pattern.
+     *
+     * @param tldScan the TLD scan pattern
+     */
     public void setTldScan(String tldScan) {
         this.tldScan = tldScan;
         Lock writeLock = configurationLock.writeLock();
@@ -129,21 +152,41 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
 
+    /**
+     * Returns whether default TLD scanning is enabled.
+     *
+     * @return true if default TLD scanning is enabled
+     */
     public boolean isDefaultTldScan() {
         return defaultTldScan;
     }
 
 
+    /**
+     * Sets whether default TLD scanning is enabled.
+     *
+     * @param defaultTldScan true to enable default TLD scanning
+     */
     public void setDefaultTldScan(boolean defaultTldScan) {
         this.defaultTldScan = defaultTldScan;
     }
 
 
+    /**
+     * Returns the pluggability skip pattern.
+     *
+     * @return the pluggability skip pattern
+     */
     public String getPluggabilitySkip() {
         return pluggabilitySkip;
     }
 
 
+    /**
+     * Sets the pluggability skip pattern.
+     *
+     * @param pluggabilitySkip the pluggability skip pattern
+     */
     public void setPluggabilitySkip(String pluggabilitySkip) {
         this.pluggabilitySkip = pluggabilitySkip;
         Lock writeLock = configurationLock.writeLock();
@@ -156,11 +199,21 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
 
+    /**
+     * Returns the pluggability scan pattern.
+     *
+     * @return the pluggability scan pattern
+     */
     public String getPluggabilityScan() {
         return pluggabilityScan;
     }
 
 
+    /**
+     * Sets the pluggability scan pattern.
+     *
+     * @param pluggabilityScan the pluggability scan pattern
+     */
     public void setPluggabilityScan(String pluggabilityScan) {
         this.pluggabilityScan = pluggabilityScan;
         Lock writeLock = configurationLock.writeLock();
@@ -173,11 +226,21 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
 
+    /**
+     * Returns whether default pluggability scanning is enabled.
+     *
+     * @return true if default pluggability scanning is enabled
+     */
     public boolean isDefaultPluggabilityScan() {
         return defaultPluggabilityScan;
     }
 
 
+    /**
+     * Sets whether default pluggability scanning is enabled.
+     *
+     * @param defaultPluggabilityScan true to enable default pluggability scanning
+     */
     public void setDefaultPluggabilityScan(boolean defaultPluggabilityScan) {
         this.defaultPluggabilityScan = defaultPluggabilityScan;
     }

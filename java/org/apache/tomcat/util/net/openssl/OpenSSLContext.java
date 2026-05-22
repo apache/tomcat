@@ -60,6 +60,9 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * OpenSSL implementation of the SSL context.
+ */
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final Log log = LogFactory.getLog(OpenSSLContext.class);
@@ -70,6 +73,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
     private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
 
+    /**
+     * X509 certificate factory instance.
+     */
     static final CertificateFactory X509_CERT_FACTORY;
     static {
         try {
@@ -93,6 +99,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final OpenSSLState state;
     private final Cleanable cleanable;
 
+    /**
+     * Constructs an OpenSSLContext for the given certificate and protocols.
+     *
+     * @param certificate The SSL host config certificate
+     * @param negotiableProtocols The list of negotiable protocols
+     * @throws SSLException if initialization fails
+     */
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols) throws SSLException {
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
@@ -111,6 +124,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                  * If OpenSSL managed trust is used, an instance of OpenSSLConf is required to pass OCSP configuration
                  * parameters to Tomcat Native. Create one if one hasn't already been created.
                  */
+                sslHostConfig.setOpenSslConf(new OpenSSLConf());
+            }
+            // Groups list is also passed via OpenSSLConf
+            if (sslHostConfig.getOpenSslConf() == null && sslHostConfig.getGroupList() != null) {
                 sslHostConfig.setOpenSslConf(new OpenSSLConf());
             }
             if (sslHostConfig.getOpenSslConf() != null) {
@@ -184,11 +201,21 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
+    /**
+     * Returns the currently enabled SSL/TLS protocol.
+     *
+     * @return The enabled protocol
+     */
     public String getEnabledProtocol() {
         return enabledProtocol;
     }
 
 
+    /**
+     * Sets the enabled SSL/TLS protocol.
+     *
+     * @param protocol The protocol to enable, or null for the default
+     */
     public void setEnabledProtocol(String protocol) {
         enabledProtocol = (protocol == null) ? defaultProtocol : protocol;
     }
@@ -200,6 +227,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
+    /**
+     * Checks the OpenSSL configuration commands against the given context.
+     *
+     * @param conf The OpenSSL configuration
+     * @param cctx The OpenSSL context
+     * @return true if all commands are valid
+     * @throws Exception if an error occurs
+     */
     protected static boolean checkConf(OpenSSLConf conf, long cctx) throws Exception {
         boolean result = true;
         OpenSSLConfCmd cmd;
@@ -237,6 +272,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
+    /**
+     * Applies the OpenSSL configuration commands to the given context.
+     *
+     * @param conf The OpenSSL configuration
+     * @param cctx The OpenSSL context
+     * @param ctx The SSL context
+     * @return true if all commands were applied successfully
+     * @throws Exception if an error occurs
+     */
     protected static boolean applyConf(OpenSSLConf conf, long cctx, long ctx) throws Exception {
         boolean result = true;
         SSLConf.assign(cctx, ctx);
@@ -373,6 +417,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         Integer.toString(sslHostConfig.getOcspVerifyFlags())));
             }
 
+            if (sslHostConfig.getGroupList() != null) {
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS,
+                        sslHostConfig.getGroups().replace(',', ':')));
+            }
+
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
                 List<String> protocols = new ArrayList<>(negotiableProtocols);
                 protocols.add("http/1.1");
@@ -443,6 +492,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
+    /**
+     * Adds a certificate to this SSL context.
+     *
+     * @param certificate The certificate to add
+     * @throws Exception if an error occurs
+     */
     public void addCertificate(SSLHostConfigCertificate certificate) throws Exception {
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {

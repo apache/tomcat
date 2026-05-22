@@ -49,6 +49,12 @@ import org.apache.juli.logging.Log;
 public class DataSourceStore extends StoreBase {
 
     /**
+     * Default constructor.
+     */
+    public DataSourceStore() {
+    }
+
+    /**
      * Context name associated with this Store
      */
     private String name = null;
@@ -114,7 +120,9 @@ public class DataSourceStore extends StoreBase {
     // -------------------------------------------------------------- Properties
 
     /**
-     * @return the name for this instance (built from container name)
+     * Return the name for this instance, built from the container name.
+     *
+     * @return the instance name
      */
     public String getName() {
         if (name == null) {
@@ -155,7 +163,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the table for this Store.
+     * Return the table for this Store.
+     *
+     * @return the table name
      */
     public String getSessionTable() {
         return sessionTable;
@@ -173,7 +183,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the web application name column for the table.
+     * Return the web application name column for the table.
+     *
+     * @return the column name
      */
     public String getSessionAppCol() {
         return this.sessionAppCol;
@@ -191,7 +203,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the Id column for the table.
+     * Return the Id column for the table.
+     *
+     * @return the column name
      */
     public String getSessionIdCol() {
         return this.sessionIdCol;
@@ -209,7 +223,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the data column for the table
+     * Return the data column for the table.
+     *
+     * @return the column name
      */
     public String getSessionDataCol() {
         return this.sessionDataCol;
@@ -227,7 +243,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the {@code Is Valid} column
+     * Return the {@code Is Valid} column.
+     *
+     * @return the column name
      */
     public String getSessionValidCol() {
         return this.sessionValidCol;
@@ -245,7 +263,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the {@code Max Inactive} column
+     * Return the {@code Max Inactive} column.
+     *
+     * @return the column name
      */
     public String getSessionMaxInactiveCol() {
         return this.sessionMaxInactiveCol;
@@ -263,7 +283,9 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the {@code Last Accessed} column
+     * Return the {@code Last Accessed} column.
+     *
+     * @return the column name
      */
     public String getSessionLastAccessedCol() {
         return this.sessionLastAccessedCol;
@@ -283,14 +305,18 @@ public class DataSourceStore extends StoreBase {
     }
 
     /**
-     * @return the name of the JNDI DataSource-factory
+     * Return the name of the JNDI DataSource-factory.
+     *
+     * @return the JNDI name
      */
     public String getDataSourceName() {
         return this.dataSourceName;
     }
 
     /**
-     * @return if the datasource will be looked up in the webapp JNDI Context.
+     * Return whether the datasource will be looked up in the webapp JNDI Context.
+     *
+     * @return true if the datasource is looked up in the webapp JNDI Context
      */
     public boolean getLocalDataSource() {
         return localDataSource;
@@ -454,6 +480,8 @@ public class DataSourceStore extends StoreBase {
     @Override
     public void remove(String id) throws IOException {
 
+        SQLException sqlException = null;
+
         int numberOfTries = 2;
         while (numberOfTries > 0) {
             Connection _conn = getConnection();
@@ -467,11 +495,18 @@ public class DataSourceStore extends StoreBase {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
+                // Keep the first exception just in case
+                if (sqlException == null) {
+                    sqlException = e;
+                }
             } finally {
                 release(_conn);
             }
             numberOfTries--;
+        }
+
+        if (sqlException != null) {
+            throw new IOException(sm.getString("dataSourceStore.SQLException"), sqlException);
         }
 
         if (manager.getContext().getLogger().isTraceEnabled()) {
@@ -528,8 +563,17 @@ public class DataSourceStore extends StoreBase {
         String saveSql = "INSERT INTO " + sessionTable + " (" + sessionIdCol + ", " + sessionAppCol + ", " +
                 sessionDataCol + ", " + sessionValidCol + ", " + sessionMaxInactiveCol + ", " + sessionLastAccessedCol +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
+        SQLException sqlException = null;
 
         synchronized (session) {
+
+            // First serialize session
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
+                ((StandardSession) session).writeObjectData(oos);
+            }
+            byte[] obs = bos.toByteArray();
+
             int numberOfTries = 2;
             while (numberOfTries > 0) {
                 Connection _conn = getConnection();
@@ -541,11 +585,6 @@ public class DataSourceStore extends StoreBase {
                     // Remove session if it exists and insert again.
                     remove(session.getIdInternal(), _conn);
 
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
-                        ((StandardSession) session).writeObjectData(oos);
-                    }
-                    byte[] obs = bos.toByteArray();
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                             InputStream in = new BufferedInputStream(bis, size);
@@ -559,16 +598,22 @@ public class DataSourceStore extends StoreBase {
                         preparedSaveSql.execute();
                         // Break out after the finally block
                         numberOfTries = 0;
+                        sqlException = null;
                     }
                 } catch (SQLException e) {
-                    manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
-                } catch (IOException ioe) {
-                    // Ignore
+                    // Keep the first exception just in case
+                    if (sqlException == null) {
+                        sqlException = e;
+                    }
                 } finally {
                     release(_conn);
                 }
                 numberOfTries--;
             }
+        }
+
+        if (sqlException != null) {
+            throw new IOException(sm.getString("dataSourceStore.SQLException"), sqlException);
         }
 
         if (manager.getContext().getLogger().isTraceEnabled()) {

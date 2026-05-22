@@ -31,6 +31,12 @@ public final class ELContextWrapper extends ELContext {
     private final ELContext target;
     private final FunctionMapper fnMapper;
 
+    /**
+     * Construct a new ELContextWrapper.
+     *
+     * @param target The target ELContext to wrap
+     * @param fnMapper The function mapper to use
+     */
     public ELContextWrapper(ELContext target, FunctionMapper fnMapper) {
         this.target = target;
         this.fnMapper = fnMapper;

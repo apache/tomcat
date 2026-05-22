@@ -16,6 +16,9 @@
  */
 package org.apache.el.util;
 
+/**
+ * Utility class for validation operations related to EL identifiers.
+ */
 public class Validation {
 
     /*

@@ -28,6 +28,12 @@ import org.apache.coyote.http11.OutputFilter;
  */
 public class IdentityOutputFilter implements OutputFilter {
 
+    /**
+     * Creates a new instance of the identity output filter.
+     */
+    public IdentityOutputFilter() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**

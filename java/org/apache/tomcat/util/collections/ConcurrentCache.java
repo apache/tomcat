@@ -20,6 +20,14 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A thread-safe cache that uses an eden space backed by a {@link ConcurrentHashMap}
+ * and a long-term space backed by a {@link WeakHashMap}. When the eden space exceeds
+ * the configured size, its contents are promoted to the long-term space.
+ *
+ * @param <K> the key type
+ * @param <V> the value type
+ */
 public final class ConcurrentCache<K, V> {
 
     private final int size;
@@ -28,12 +36,24 @@ public final class ConcurrentCache<K, V> {
 
     private final Map<K,V> longterm;
 
+    /**
+     * Creates a new cache with the specified eden space size.
+     *
+     * @param size the maximum size of the eden space before promotion to long-term storage
+     */
     public ConcurrentCache(int size) {
         this.size = size;
         this.eden = new ConcurrentHashMap<>(size);
         this.longterm = new WeakHashMap<>(size);
     }
 
+    /**
+     * Retrieves a value from the cache. If found in the long-term store, it is
+     * promoted to the eden space for faster subsequent access.
+     *
+     * @param k the key to look up
+     * @return the cached value, or {@code null} if not found
+     */
     public V get(K k) {
         V v = this.eden.get(k);
         if (v == null) {
@@ -47,6 +67,13 @@ public final class ConcurrentCache<K, V> {
         return v;
     }
 
+    /**
+     * Stores a value in the cache. If the eden space is full, all eden entries
+     * are promoted to the long-term store before adding the new entry.
+     *
+     * @param k the key
+     * @param v the value to cache
+     */
     public void put(K k, V v) {
         if (this.eden.size() >= size) {
             synchronized (longterm) {

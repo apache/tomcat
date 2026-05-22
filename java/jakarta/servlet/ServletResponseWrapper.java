@@ -221,7 +221,8 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * TODO SERVLET3 - Add comments
+     * If the response wrapped by this wrapper, or a wrapper used in the construction of this wrapper, instances the
+     * given response, then return <code>true</code>. Otherwise return <code>false</code>.
      *
      * @param wrapped The response to compare to the wrapped response
      *
@@ -241,7 +242,8 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * TODO SERVLET3 - Add comments
+     * If the response wrapped by this wrapper, or a wrapper used in the construction of this wrapper, is an instance of
+     * the type given, then return <code>true</code>. Otherwise return <code>false</code>.
      *
      * @param wrappedType The class to compare to the class of the wrapped response
      *

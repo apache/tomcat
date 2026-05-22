@@ -28,6 +28,12 @@ import org.apache.tools.ant.BuildException;
 public class UndeployTask extends AbstractCatalinaCommandTask {
 
     /**
+     * Constructs a new UndeployTask.
+     */
+    public UndeployTask() {
+    }
+
+    /**
      * Execute the requested operation.
      *
      * @exception BuildException if an error occurs

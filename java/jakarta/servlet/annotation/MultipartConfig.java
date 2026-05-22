@@ -41,22 +41,31 @@ import java.lang.annotation.Target;
 public @interface MultipartConfig {
 
     /**
+     * Specifies the location in which the Container stores temporary files.
+     *
      * @return location in which the Container stores temporary files
      */
     String location() default "";
 
     /**
+     * Specifies the maximum size allowed for uploaded files.
+     *
      * @return the maximum size allowed for uploaded files (in bytes)
      */
     long maxFileSize() default -1L;
 
     /**
+     * Specifies the maximum size of the request allowed for {@code
+     * multipart/form-data}.
+     *
      * @return the maximum size of the request allowed for {@code
      *         multipart/form-data}
      */
     long maxRequestSize() default -1L;
 
     /**
+     * Specifies the size threshold in bytes after which the file will be written to disk.
+     *
      * @return the size threshold at which the file will be written to the disk
      */
     int fileSizeThreshold() default 0;

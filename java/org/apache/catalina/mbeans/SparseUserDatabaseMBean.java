@@ -43,6 +43,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SparseUserDatabaseMBean extends BaseModelMBean {
 
+    /**
+     * Default constructor required for JMX instantiation.
+     */
+    public SparseUserDatabaseMBean() {
+        super();
+    }
+
     private static final StringManager sm = StringManager.getManager(SparseUserDatabaseMBean.class);
 
     // ----------------------------------------------------- Instance Variables
@@ -86,7 +93,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     // ------------------------------------------------------------- Attributes
 
     /**
-     * @return the MBean Names of all groups defined in this database.
+     * Return the MBean Names of all groups defined in this database.
+     *
+     * @return the MBean Names of all groups defined in this database
      */
     public String[] getGroups() {
         UserDatabase database = (UserDatabase) this.resource;
@@ -101,7 +110,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * @return the MBean Names of all roles defined in this database.
+     * Return the MBean Names of all roles defined in this database.
+     *
+     * @return the MBean Names of all roles defined in this database
      */
     public String[] getRoles() {
         UserDatabase database = (UserDatabase) this.resource;
@@ -116,7 +127,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * @return the MBean Names of all users defined in this database.
+     * Return the MBean Names of all users defined in this database.
+     *
+     * @return the MBean Names of all users defined in this database
      */
     public String[] getUsers() {
         UserDatabase database = (UserDatabase) this.resource;

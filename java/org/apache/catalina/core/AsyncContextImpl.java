@@ -21,6 +21,7 @@ import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.NamingException;
@@ -50,10 +51,35 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implementation of {@link AsyncContext} that manages the lifecycle of an asynchronous request processing operation.
+ * Each instance is associated with a single request object. If an asynchronous request starts multiple cycles of
+ * asynchronous processing, the AsyncContextImpl is re-used for all cycles. Once complete is called or an async dispatch
+ * does not trigger a new asynchronous request the AsyncContextImpl is recycled and discarded. It is not re-used.
+ * <p>
+ * There is a concurrency risk that comes from applications retaining references to an AsyncContext in non-container
+ * threads and trying to use those references beyond the point the references are valid. This has most frequently been
+ * observed at shutdown but shutdown is an instance of the more general case of the async request timing out, Tomcat
+ * cleaning it up but the application continuing to process on a non-container thread. Other application bugs can have
+ * similar results.
+ * <p>
+ * To mitigate against concurrency issues:
+ * <ul>
+ * <li>AsyncContext methods that can be called by an application take local copies of any instance variables used,
+ *     validate the instance is in a valid state and then execute the method.</li>
+ * <li>AsyncContext methods that can only be called by Tomcat internal methods don't check state on the basis that
+ *     Tomcat manages state and only calls those methods when the state is valid.</li>
+ * <li>To avoid concurrency issues with the state of the local variables, a dedicated atomic flag
+ *     {@code hasBeenRecycled} tracks whether recycled has been called.</li>
+ * </ul>
+ */
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
 
+    /**
+     * String manager for localized log messages.
+     */
     protected static final StringManager sm = StringManager.getManager(AsyncContextImpl.class);
 
     /*
@@ -64,19 +90,50 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
      */
     private final Object asyncContextLock = new Object();
 
+    /*
+     * Used to provide a thread-safe way to check the recycled status and, by implication, the validity of any local
+     * copies taken before the check was made.
+     */
+    private final AtomicBoolean hasBeenRecycled = new AtomicBoolean(false);
+
+    /*
+     * The request object with which this instance is associated.
+     */
+    private volatile Request request;
+
+    /*
+     * The asynchronous request information used to start the most recent asynchronous processing.
+     */
+    private volatile Context context = null;
     private volatile ServletRequest servletRequest = null;
     private volatile ServletResponse servletResponse = null;
-    private final List<AsyncListenerWrapper> listeners = new ArrayList<>();
-    private boolean hasOriginalRequestAndResponse = true;
+
+    /*
+     * Per asynchronous cycle fields.
+     */
+    private final List<AsyncListenerWrapper> listeners = new CopyOnWriteArrayList<>();
     private volatile Runnable dispatch = null;
-    private Context context = null;
     // Default of 30000 (30s) is set by the connector
     private long timeout = -1;
-    private AsyncEvent event = null;
-    private volatile Request request;
+
+    /*
+     * Basis for async events that are passed to listeners
+     */
+    private volatile AsyncEvent event = null;
+
+    /*
+     * Internal flags.
+     */
+    private volatile boolean hasOriginalRequestAndResponse = true;
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
+
+    /**
+     * Constructs an AsyncContextImpl for the given request.
+     *
+     * @param request The request associated with this async context
+     */
     public AsyncContextImpl(Request request) {
         this.request = request;
         if (log.isTraceEnabled()) {
@@ -89,6 +146,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isTraceEnabled()) {
             logDebug("complete   ");
         }
+        Request request = this.request;
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
     }
@@ -98,11 +156,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("asyncContextImpl.fireOnComplete"));
         }
-        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
 
         ClassLoader oldCL = context.bind(null);
         try {
-            for (AsyncListenerWrapper listener : listenersCopy) {
+            for (AsyncListenerWrapper listener : listeners) {
                 try {
                     listener.fireOnComplete(event);
                 } catch (Throwable t) {
@@ -118,11 +179,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    /**
+     * Fires the timeout event for this async context.
+     *
+     * @return {@code true} if the timeout was handled successfully
+     */
     public boolean timeout() {
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
-        // Avoids NPEs during shutdown. A call to recycle will null this field.
-        Context context = this.context;
 
         if (result.get()) {
             if (log.isTraceEnabled()) {
@@ -130,8 +198,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             }
             ClassLoader oldCL = context.bind(null);
             try {
-                List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
-                for (AsyncListenerWrapper listener : listenersCopy) {
+                for (AsyncListenerWrapper listener : listeners) {
                     try {
                         listener.fireOnTimeout(event);
                     } catch (Throwable t) {
@@ -149,9 +216,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch() {
-        check();
         String path;
         String pathInfo;
+        Request request = this.request;
+        Context context = this.context;
+        // Calls check() so local copies are validated
         ServletRequest servletRequest = getRequest();
         if (servletRequest instanceof HttpServletRequest sr) {
             path = sr.getServletPath();
@@ -171,7 +240,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch(String path) {
-        check();
         dispatch(getRequest().getServletContext(), path);
     }
 
@@ -181,6 +249,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             if (log.isTraceEnabled()) {
                 logDebug("dispatch   ");
             }
+            Request request = this.request;
             check();
             if (dispatch != null) {
                 throw new IllegalStateException(sm.getString("asyncContextImpl.dispatchingStarted"));
@@ -199,7 +268,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
             this.dispatch = new AsyncRunnable(request, applicationDispatcher, servletRequest, servletResponse);
-            this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
+            request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
         }
     }
@@ -227,6 +296,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isTraceEnabled()) {
             logDebug("start      ");
         }
+        // Local copy in case of concurrent recycling
+        Context context = this.context;
+        // Ensures local copy is valid
         check();
         Runnable wrapper = new RunnableWrapper(run, context, this.request.getCoyoteRequest());
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
@@ -253,6 +325,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException {
+        // Local copy in case of concurrent recycling
+        Context context = this.context;
+        // Ensures local copy is valid
         check();
         T listener;
         try {
@@ -266,16 +341,21 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return listener;
     }
 
+    /**
+     * Recycles this async context, resetting all internal state for reuse.
+     */
     public void recycle() {
         if (log.isTraceEnabled()) {
             logDebug("recycle    ");
         }
+        // hasBeenRecycled MUST be set to true before any fields are recycled to avoid race conditions.
+        hasBeenRecycled.set(true);
+        request = null;
         context = null;
         dispatch = null;
         event = null;
         hasOriginalRequestAndResponse = true;
         listeners.clear();
-        request = null;
         clearServletRequestResponse();
         timeout = -1;
         hasErrorProcessingStarted.set(false);
@@ -287,14 +367,27 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         servletResponse = null;
     }
 
+    /**
+     * Checks whether async processing has been started for this context.
+     *
+     * @return {@code true} if async processing has started
+     */
     public boolean isStarted() {
-        AtomicBoolean result = new AtomicBoolean(false);
         Request request = this.request;
         check();
+        AtomicBoolean result = new AtomicBoolean(false);
         request.getCoyoteRequest().action(ActionCode.ASYNC_IS_STARTED, result);
         return result.get();
     }
 
+    /**
+     * Initializes this async context with the given parameters and fires onStartAsync events.
+     *
+     * @param context The context for this async operation
+     * @param request The servlet request
+     * @param response The servlet response
+     * @param originalRequestResponse {@code true} if the request/response are the original ones
+     */
     public void setStarted(Context context, ServletRequest request, ServletResponse response,
             boolean originalRequestResponse) {
 
@@ -330,10 +423,20 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return hasOriginalRequestAndResponse;
     }
 
+    /**
+     * Performs the internal dispatch for the pending async dispatch operation.
+     *
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void doInternalDispatch() throws ServletException, IOException {
         if (log.isTraceEnabled()) {
             logDebug("intDispatch");
         }
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
         try {
             Runnable runnable = dispatch;
             dispatch = null;
@@ -389,7 +492,17 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    /**
+     * Sets the error state and optionally fires onError events to all registered listeners.
+     *
+     * @param t The throwable that caused the error, or {@code null}
+     * @param fireOnError {@code true} if onError should be fired to listeners
+     */
     public void setErrorState(Throwable t, boolean fireOnError) {
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
         if (!hasErrorProcessingStarted.compareAndSet(false, true)) {
             // Skip duplicate error processing
             return;
@@ -418,7 +531,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             }
         }
 
-
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_IS_ERROR, result);
         if (result.get()) {
@@ -432,10 +544,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
-            Host host = (Host) context.getParent();
-            Valve stdHostValve = host.getPipeline().getBasic();
-            if (stdHostValve instanceof StandardHostValve) {
-                ((StandardHostValve) stdHostValve).throwable(request, request.getResponse(), t);
+            Context context = this.context;
+            if (context != null) {
+                Host host = (Host) context.getParent();
+                Valve stdHostValve = host.getPipeline().getBasic();
+                if (stdHostValve instanceof StandardHostValve) {
+                    ((StandardHostValve) stdHostValve).throwable(request, request.getResponse(), t);
+                }
             }
 
             request.getCoyoteRequest().action(ActionCode.ASYNC_IS_ERROR, result);
@@ -456,12 +571,20 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void incrementInProgressAsyncCount() {
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
         context.incrementInProgressAsyncCount();
     }
 
 
     @Override
     public void decrementInProgressAsyncCount() {
+        /*
+         * Tomcat internal method. Not exposed to applications. Only called when valid to do so. No need to protect
+         * against invalid internal state.
+         */
         context.decrementInProgressAsyncCount();
     }
 
@@ -472,6 +595,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         String rpHashCode;
         String stage;
         StringBuilder uri = new StringBuilder();
+        Request request = this.request;
         if (request == null) {
             rHashCode = "null";
             crHashCode = "null";
@@ -520,10 +644,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private void check() {
         Request request = this.request;
-        if (request == null) {
+        if (hasBeenRecycled.get()) {
             // AsyncContext has been recycled and should not be being used
             throw new IllegalStateException(sm.getString("asyncContextImpl.requestEnded"));
         }
+        // Local copy of request (and any other local copies taken before the check above) must be valid.
         if (hasOnErrorReturned.get() && !request.getCoyoteRequest().isRequestThread()) {
             /*
              * Non-container thread is trying to use the AsyncContext after an error has occurred and the call to
@@ -587,6 +712,5 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispatchError"), e);
             }
         }
-
     }
 }

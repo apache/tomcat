@@ -41,6 +41,8 @@ import java.lang.annotation.Target;
 public @interface WebListener {
 
     /**
+     * Provides a description of the listener.
+     *
      * @return description of the listener, if present
      */
     String value() default "";

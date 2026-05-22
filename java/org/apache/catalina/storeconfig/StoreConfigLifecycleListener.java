@@ -37,6 +37,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StoreConfigLifecycleListener implements LifecycleListener {
 
+    /**
+     * Constructs a new StoreConfigLifecycleListener with default settings.
+     */
+    public StoreConfigLifecycleListener() {
+    }
+
     private static final Log log = LogFactory.getLog(StoreConfigLifecycleListener.class);
     private static final StringManager sm = StringManager.getManager(StoreConfigLifecycleListener.class);
 
@@ -117,6 +123,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Returns the store config instance.
      * @return the store config instance
      */
     public IStoreConfig getStoreConfig() {
@@ -124,6 +131,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Sets the store config instance.
      * @param storeConfig The storeConfig to set.
      */
     public void setStoreConfig(IStoreConfig storeConfig) {
@@ -131,6 +139,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Returns the fully qualified class name of the StoreConfig implementation.
+     *
      * @return the main store config class name
      */
     public String getStoreConfigClass() {
@@ -138,6 +148,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Sets the fully qualified class name of the StoreConfig implementation.
+     *
      * @param storeConfigClass The storeConfigClass to set.
      */
     public void setStoreConfigClass(String storeConfigClass) {
@@ -145,6 +157,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Returns the name of the StoreRegistry MBean.
+     *
      * @return the store registry
      */
     public String getStoreRegistry() {
@@ -152,6 +166,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
+     * Sets the name of the StoreRegistry MBean.
+     *
      * @param storeRegistry The storeRegistry to set.
      */
     public void setStoreRegistry(String storeRegistry) {

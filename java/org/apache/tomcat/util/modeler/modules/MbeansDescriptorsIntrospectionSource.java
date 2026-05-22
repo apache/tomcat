@@ -38,7 +38,19 @@ import org.apache.tomcat.util.modeler.ParameterInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Source for creating MBean descriptors through introspection.
+ */
 public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
+    /**
+     * Default constructor.
+     */
+    public MbeansDescriptorsIntrospectionSource() {
+    }
+
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
     private static final StringManager sm = StringManager.getManager(MbeansDescriptorsIntrospectionSource.class);
 
@@ -46,6 +58,11 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     private String type;
     private final List<ObjectName> mbeans = new ArrayList<>();
 
+    /**
+     * Set the registry.
+     *
+     * @param reg the registry to set
+     */
     public void setRegistry(Registry reg) {
         this.registry = reg;
     }
@@ -59,6 +76,11 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
         this.type = type;
     }
 
+    /**
+     * Set the source.
+     *
+     * @param source the source to set
+     */
     public void setSource(Object source) {
         this.source = source;
     }
@@ -72,6 +94,11 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
         return mbeans;
     }
 
+    /**
+     * Execute the descriptor loading.
+     *
+     * @throws Exception if an error occurs
+     */
     public void execute() throws Exception {
         if (registry == null) {
             registry = Registry.getRegistry(null);

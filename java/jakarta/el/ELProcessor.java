@@ -22,6 +22,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Provides a simple API for evaluating EL expressions in a standalone environment. This class wraps an
+ * {@link ELManager} and provides methods for evaluating expressions, defining beans and functions, and managing
+ * variables. It is the primary entry point for applications that use the EL API outside of a Jakarta EE container.
+ *
  * @since EL 3.0
  */
 public class ELProcessor {
@@ -44,31 +48,82 @@ public class ELProcessor {
     private final ELContext context = manager.getELContext();
     private final ExpressionFactory factory = ELManager.getExpressionFactory();
 
+    /**
+     * Constructs an ELProcessor with a default {@link ELManager} and {@link StandardELContext}.
+     * The processor is ready to evaluate expressions immediately after construction.
+     */
+    public ELProcessor() {
+    }
 
+    /**
+     * Returns the {@link ELManager} that manages the EL context, resolvers, functions, and
+     * variables for this processor.
+     *
+     * @return the ELManager instance
+     */
     public ELManager getELManager() {
         return manager;
     }
 
-
+    /**
+     * Evaluates the given EL expression and returns the result as the requested type.
+     * The expression is automatically wrapped in {@literal ${}} delimiters before evaluation.
+     *
+     * @param <T>        the expected result type
+     * @param expression the EL expression to evaluate
+     *
+     * @return the result of evaluating the expression, coerced to the requested type
+     *
+     * @throws ELException if the expression cannot be evaluated
+     */
     public <T> T eval(String expression) {
         @SuppressWarnings("unchecked")
         T result = (T) getValue(expression, Object.class);
         return result;
     }
 
-
+    /**
+     * Evaluates the given EL expression and returns the result coerced to the expected type.
+     * The expression is automatically wrapped in {@literal ${}} delimiters before evaluation.
+     *
+     * @param <T>            the expected result type
+     * @param expression     the EL expression to evaluate
+     * @param expectedType   the class of the expected result type
+     *
+     * @return the result of evaluating the expression, coerced to the expected type
+     *
+     * @throws ELException if the expression cannot be evaluated
+     */
     public <T> T getValue(String expression, Class<T> expectedType) {
         ValueExpression ve = factory.createValueExpression(context, bracket(expression), expectedType);
         return ve.getValue(context);
     }
 
-
+    /**
+     * Evaluates the given EL expression and sets the result to the specified value.
+     * This is used for EL assignment expressions. The expression is automatically wrapped
+     * in {@literal ${}} delimiters before evaluation.
+     *
+     * @param expression the EL expression to evaluate
+     * @param value      the value to assign
+     *
+     * @throws ELException if the expression cannot be evaluated or the target is not writable
+     */
     public void setValue(String expression, Object value) {
         ValueExpression ve = factory.createValueExpression(context, bracket(expression), Object.class);
         ve.setValue(context, value);
     }
 
-
+    /**
+     * Registers a variable in the EL context. The variable is associated with the result
+     * of evaluating the given expression. Passing a {@code null} expression removes the
+     * variable from the context.
+     *
+     * @param variable   the variable name
+     * @param expression the EL expression to associate with the variable, or {@code null} to remove
+     *
+     * @throws ELException if the expression cannot be evaluated
+     */
     public void setVariable(String variable, String expression) {
         if (expression == null) {
             manager.setVariable(variable, null);
@@ -78,7 +133,20 @@ public class ELProcessor {
         }
     }
 
-
+    /**
+     * Registers a function in the EL context by looking up the static method in the given class.
+     * The method name may include a return type and parameter signature in the format
+     * {@code returnType methodName(paramTypes)}. The function is then callable in EL expressions
+     * as {@code prefix:function(args)}.
+     *
+     * @param prefix     the namespace prefix for the function
+     * @param function   the local function name, or empty to use the method name
+     * @param className  the fully qualified name of the class containing the static method
+     * @param methodName the method name, optionally with return type and parameter signature
+     *
+     * @throws ClassNotFoundException  if the class cannot be found or is not public
+     * @throws NoSuchMethodException   if the method cannot be found or is not a public static method
+     */
     public void defineFunction(String prefix, String function, String className, String methodName)
             throws ClassNotFoundException, NoSuchMethodException {
 
@@ -188,6 +256,14 @@ public class ELProcessor {
     }
 
 
+    /**
+     * Defines or removes a bean accessible by name in EL expressions. When a non-null bean
+     * is provided, it is stored under the given name. When {@code null} is provided, the
+     * bean with the given name is removed.
+     *
+     * @param name the bean name
+     * @param bean the bean object to define, or {@code null} to remove the bean
+     */
     public void defineBean(String name, Object bean) {
         manager.defineBean(name, bean);
     }

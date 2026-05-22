@@ -23,11 +23,28 @@ import java.util.TreeSet;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
+/**
+ * Represents a class in the reflection-based property setter/getter code
+ * generation system. Tracks properties, parent/child class relationships,
+ * and generates optimized reflection-free property access code.
+ */
 public final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
+    /**
+     * Variable name used in generated code for the target object.
+     */
     static final String OBJECT_VAR_NAME = "o";
+    /**
+     * Variable name used in generated code for the property name.
+     */
     static final String NAME_VAR_NAME = "name";
+    /**
+     * Variable name used in generated code for the property value.
+     */
     static final String VALUE_VAR_NAME = "value";
+    /**
+     * Variable name used in generated code for the setProperty flag.
+     */
     static final String SETP_VAR_NAME = "invokeSetProperty";
 
     private final SetPropertyClass parent;
@@ -73,18 +90,34 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return parent == null;
     }
 
+    /**
+     * Returns the set of child classes registered under this class.
+     * @return the child classes
+     */
     public Set<SetPropertyClass> getChildren() {
         return children;
     }
 
+    /**
+     * Returns the set of reflection properties for this class.
+     * @return the reflection properties
+     */
     public Set<ReflectionProperty> getProperties() {
         return properties;
     }
 
+    /**
+     * Returns the generic setProperty method if one exists.
+     * @return the generic setProperty method, or {@code null}
+     */
     public Method getGenericSetPropertyMethod() {
         return genericSetPropertyMethod;
     }
 
+    /**
+     * Returns the generic getProperty method if one exists.
+     * @return the generic getProperty method, or {@code null}
+     */
     public Method getGenericGetPropertyMethod() {
         return genericGetPropertyMethod;
     }
@@ -108,10 +141,18 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return clazz.hashCode();
     }
 
+    /**
+     * Returns the parent class.
+     * @return the parent class, or {@code null} if this is the root class
+     */
     public SetPropertyClass getParent() {
         return parent;
     }
 
+    /**
+     * Returns the {@link Class} represented by this instance.
+     * @return the represented class
+     */
     public Class<?> getClazz() {
         return clazz;
     }
@@ -121,11 +162,22 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return "SetPropertyClass{" + "clazz=" + clazz.getName() + '}';
     }
 
+    /**
+     * Add a property to this class.
+     *
+     * @param property the property to add
+     */
     public void addProperty(ReflectionProperty property) {
         properties.add(property);
     }
 
 
+    /**
+     * Generate a Java code snippet to set the given property value.
+     *
+     * @param property the property to generate code for
+     * @return the generated code snippet, or {@code null} if no setter is available
+     */
     public String generateSetPropertyMethod(ReflectionProperty property) {
         // this property has a setProperty method
         if (property.hasSetPropertySetter()) {
@@ -141,6 +193,12 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return null;
     }
 
+    /**
+     * Generate a Java code snippet to get the given property value.
+     *
+     * @param property the property to generate code for
+     * @return the generated code snippet, or {@code null} if no getter is available
+     */
     public String generateGetPropertyMethod(ReflectionProperty property) {
         // this property has a getProperty method
         if (property.hasGetPropertyGetter()) {
@@ -156,6 +214,12 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return null;
     }
 
+    /**
+     * Generate a complete setProperty method for this class with switch-case
+     * statements for each known property.
+     *
+     * @return the generated Java source code
+     */
     public String generateSetPropertyForMethod() {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(1))
@@ -243,6 +307,13 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                 getGenericSetPropertyMethod() != null ? "true;" : "false;";
     }
 
+    /**
+     * Generate a switch case statement that invokes the setProperty method for
+     * this class.
+     *
+     * @param level the indentation level
+     * @return the generated Java source code
+     */
     public String generateInvocationSetForPropertyCaseStatement(int level) {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(level))
@@ -258,6 +329,12 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         //@formatter:on
     }
 
+    /**
+     * Generate a method invocation string for the setProperty method of this
+     * class, suitable for use from a parent class.
+     *
+     * @return the generated method invocation string
+     */
     public String generateParentSetPropertyForMethodInvocation() {
         String[] classParts = clazz.getName().split("\\.|\\$");
         StringBuilder methodInvocation = new StringBuilder("setPropertyFor");
@@ -278,6 +355,11 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         //@formatter:on
     }
 
+    /**
+     * Generate the method header for the setProperty method for this class.
+     *
+     * @return the generated method header string
+     */
     public String generatesSetPropertyForMethodHeader() {
         String[] classParts = clazz.getName().split("\\.|\\$");
         StringBuilder methodInvocation = new StringBuilder("private static boolean setPropertyFor");
@@ -298,6 +380,13 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         //@formatter:on
     }
 
+    /**
+     * Generate a switch case statement that invokes the getProperty method for
+     * this class.
+     *
+     * @param level the indentation level
+     * @return the generated Java source code
+     */
     public String generateInvocationGetForPropertyCaseStatement(int level) {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(level))
@@ -316,6 +405,12 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         //@formatter:on
     }
 
+    /**
+     * Generate a method invocation string for the getProperty method of this
+     * class, suitable for use from a parent class.
+     *
+     * @return the generated method invocation string
+     */
     public String generateParentGetPropertyForMethodInvocation() {
         String[] classParts = clazz.getName().split("\\.|\\$");
         StringBuilder methodInvocation = new StringBuilder("getPropertyFor");
@@ -332,6 +427,11 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         //@formatter:on
     }
 
+    /**
+     * Generate the method header for the getProperty method for this class.
+     *
+     * @return the generated method header string
+     */
     public String generatesGetPropertyForMethodHeader() {
         String[] classParts = clazz.getName().split("\\.|\\$");
         StringBuilder methodInvocation = new StringBuilder("private static Object getPropertyFor");
@@ -356,6 +456,12 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     }
 
 
+    /**
+     * Generate a complete getProperty method for this class with switch-case
+     * statements for each known property.
+     *
+     * @return the generated Java source code
+     */
     public String generateGetPropertyForMethod() {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(1))

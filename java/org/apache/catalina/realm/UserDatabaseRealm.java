@@ -44,6 +44,12 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class UserDatabaseRealm extends RealmBase {
 
+    /**
+     * Constructs a new UserDatabaseRealm.
+     */
+    public UserDatabaseRealm() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -72,7 +78,9 @@ public class UserDatabaseRealm extends RealmBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the global JNDI name of the <code>UserDatabase</code> resource we will be using.
+     * Returns the global JNDI name of the <code>UserDatabase</code> resource we will be using.
+     *
+     * @return the global JNDI name of the <code>UserDatabase</code> resource we will be using
      */
     public String getResourceName() {
         return resourceName;
@@ -90,6 +98,8 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
+     * Returns whether a static principal disconnected from the database is used.
+     *
      * @return the useStaticPrincipal flag
      */
     public boolean getUseStaticPrincipal() {
@@ -160,6 +170,13 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    /**
+     * Returns the roles associated with the given user, including roles from groups.
+     *
+     * @param user The user to get roles for
+     *
+     * @return Array of role names
+     */
     public static String[] getRoles(User user) {
         Set<String> roles = new HashSet<>();
         Iterator<Role> uroles = user.getRoles();
@@ -270,11 +287,21 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    /**
+     * Principal implementation backed by a live {@link UserDatabase}. Roles are fetched from the database
+     * on each call rather than cached at construction time.
+     */
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         @Serial
         private static final long serialVersionUID = 1L;
         private final transient UserDatabase database;
 
+        /**
+         * Constructs a new UserDatabasePrincipal.
+         *
+         * @param user     The user
+         * @param database The user database
+         */
         public UserDatabasePrincipal(User user, UserDatabase database) {
             super(user.getName());
             this.database = database;

@@ -24,6 +24,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.catalina.webresources.war.Handler;
 
+/**
+ * Factory for URL stream handlers that supports the war and classpath protocols.
+ */
 public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
     private static final String WAR_PROTOCOL = "war";
@@ -123,6 +126,11 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
     }
 
 
+    /**
+     * Returns whether this factory has been registered as the global URL stream handler factory.
+     *
+     * @return true if registered
+     */
     public boolean isRegistered() {
         return registered;
     }

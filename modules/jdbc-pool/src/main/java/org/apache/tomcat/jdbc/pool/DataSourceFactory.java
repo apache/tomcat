@@ -53,82 +53,278 @@ import org.apache.juli.logging.LogFactory;
  * </ol>
  */
 public class DataSourceFactory implements ObjectFactory {
+    /**
+     * Default constructor.
+     */
+    public DataSourceFactory() {
+    }
+
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
+    /**
+     * Property name for defaultAutoCommit.
+     */
     protected static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
+
+    /**
+     * Property name for defaultReadOnly.
+     */
     protected static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
+
+    /**
+     * Property name for defaultTransactionIsolation.
+     */
     protected static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
+
+    /**
+     * Property name for defaultCatalog.
+     */
     protected static final String PROP_DEFAULTCATALOG = "defaultCatalog";
 
+    /**
+     * Property name for driverClassName.
+     */
     protected static final String PROP_DRIVERCLASSNAME = "driverClassName";
+
+    /**
+     * Property name for password.
+     */
     protected static final String PROP_PASSWORD = "password";
+
+    /**
+     * Property name for url.
+     */
     protected static final String PROP_URL = "url";
+
+    /**
+     * Property name for username.
+     */
     protected static final String PROP_USERNAME = "username";
 
+    /**
+     * Property name for maxActive.
+     */
     protected static final String PROP_MAXACTIVE = "maxActive";
+
+    /**
+     * Property name for maxIdle.
+     */
     protected static final String PROP_MAXIDLE = "maxIdle";
+
+    /**
+     * Property name for minIdle.
+     */
     protected static final String PROP_MINIDLE = "minIdle";
+
+    /**
+     * Property name for initialSize.
+     */
     protected static final String PROP_INITIALSIZE = "initialSize";
+
+    /**
+     * Property name for maxWait.
+     */
     protected static final String PROP_MAXWAIT = "maxWait";
+
+    /**
+     * Property name for maxAge.
+     */
     protected static final String PROP_MAXAGE = "maxAge";
 
+    /**
+     * Property name for testOnBorrow.
+     */
     protected static final String PROP_TESTONBORROW = "testOnBorrow";
+
+    /**
+     * Property name for testOnReturn.
+     */
     protected static final String PROP_TESTONRETURN = "testOnReturn";
+
+    /**
+     * Property name for testWhileIdle.
+     */
     protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
+
+    /**
+     * Property name for testOnConnect.
+     */
     protected static final String PROP_TESTONCONNECT = "testOnConnect";
+
+    /**
+     * Property name for validationQuery.
+     */
     protected static final String PROP_VALIDATIONQUERY = "validationQuery";
+
+    /**
+     * Property name for validationQueryTimeout.
+     */
     protected static final String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
+
+    /**
+     * Property name for validatorClassName.
+     */
     protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
 
+    /**
+     * Property name for numTestsPerEvictionRun.
+     */
     protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
+
+    /**
+     * Property name for timeBetweenEvictionRunsMillis.
+     */
     protected static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
+
+    /**
+     * Property name for minEvictableIdleTimeMillis.
+     */
     protected static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
 
+    /**
+     * Property name for accessToUnderlyingConnectionAllowed.
+     */
     protected static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
 
+    /**
+     * Property name for removeAbandoned.
+     */
     protected static final String PROP_REMOVEABANDONED = "removeAbandoned";
+
+    /**
+     * Property name for removeAbandonedTimeout.
+     */
     protected static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
+
+    /**
+     * Property name for logAbandoned.
+     */
     protected static final String PROP_LOGABANDONED = "logAbandoned";
+
+    /**
+     * Property name for abandonWhenPercentageFull.
+     */
     protected static final String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
 
+    /**
+     * Property name for poolPreparedStatements.
+     */
     protected static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
+
+    /**
+     * Property name for maxOpenPreparedStatements.
+     */
     protected static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
+
+    /**
+     * Property name for connectionProperties.
+     */
     protected static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
+    /**
+     * Property name for initSQL.
+     */
     protected static final String PROP_INITSQL = "initSQL";
+
+    /**
+     * Property name for jdbcInterceptors.
+     */
     protected static final String PROP_INTERCEPTORS = "jdbcInterceptors";
+
+    /**
+     * Property name for validationInterval.
+     */
     protected static final String PROP_VALIDATIONINTERVAL = "validationInterval";
+
+    /**
+     * Property name for jmxEnabled.
+     */
     protected static final String PROP_JMX_ENABLED = "jmxEnabled";
+
+    /**
+     * Property name for fairQueue.
+     */
     protected static final String PROP_FAIR_QUEUE = "fairQueue";
 
+    /**
+     * Property name for useEquals.
+     */
     protected static final String PROP_USE_EQUALS = "useEquals";
+
+    /**
+     * Property name for useLock.
+     */
     protected static final String PROP_USE_CON_LOCK = "useLock";
 
+    /**
+     * Property name for dataSource.
+     */
     protected static final String PROP_DATASOURCE= "dataSource";
+
+    /**
+     * Property name for dataSourceJNDI.
+     */
     protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
 
+    /**
+     * Property name for suspectTimeout.
+     */
     protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
 
+    /**
+     * Property name for alternateUsernameAllowed.
+     */
     protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
 
+    /**
+     * Property name for commitOnReturn.
+     */
     protected static final String PROP_COMMITONRETURN = "commitOnReturn";
+
+    /**
+     * Property name for rollbackOnReturn.
+     */
     protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
 
+    /**
+     * Property name for useDisposableConnectionFacade.
+     */
     protected static final String PROP_USEDISPOSABLECONNECTIONFACADE = "useDisposableConnectionFacade";
 
+    /**
+     * Property name for logValidationErrors.
+     */
     protected static final String PROP_LOGVALIDATIONERRORS = "logValidationErrors";
 
+    /**
+     * Property name for propagateInterruptState.
+     */
     protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
 
+    /**
+     * Property name for ignoreExceptionOnPreLoad.
+     */
     protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
 
+    /**
+     * Property name for useStatementFacade.
+     */
     protected static final String PROP_USESTATEMENTFACADE = "useStatementFacade";
 
+    /**
+     * Value indicating an unknown transaction isolation level.
+     */
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
+    /**
+     * Property name for the JMX object name.
+     */
     public static final String OBJECT_NAME = "object_name";
 
 
+    /**
+     * Array of all supported property names.
+     */
     protected static final String[] ALL_PROPERTIES = {
         PROP_DEFAULTAUTOCOMMIT,
         PROP_DEFAULTREADONLY,
@@ -242,6 +438,13 @@ public class DataSourceFactory implements ObjectFactory {
         return createDataSource(properties,nameCtx,XA);
     }
 
+    /**
+     * Parse the given properties into a PoolConfiguration.
+     *
+     * @param properties The properties to parse
+     *
+     * @return The configured PoolConfiguration
+     */
     public static PoolConfiguration parsePoolProperties(Properties properties) {
         PoolConfiguration poolProperties = new PoolProperties();
         String value = null;
@@ -546,6 +749,16 @@ public class DataSourceFactory implements ObjectFactory {
     public DataSource createDataSource(Properties properties) throws Exception {
         return createDataSource(properties,null,false);
     }
+   /**
+     * Creates and configures a {@link DataSource} instance based on the given properties.
+     *
+     * @param properties The datasource configuration properties
+     * @param context    The JNDI context
+     * @param XA         {@code true} to create an XA data source
+     *
+     * @return The configured datasource
+     * @throws Exception if an error occurs creating the data source
+     */
     public DataSource createDataSource(Properties properties,Context context, boolean XA) throws Exception {
         PoolConfiguration poolProperties = parsePoolProperties(properties);
         if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
@@ -560,6 +773,12 @@ public class DataSourceFactory implements ObjectFactory {
         return dataSource;
     }
 
+   /**
+     * Perform a JNDI lookup for the data source.
+     *
+     * @param context        The JNDI context
+     * @param poolProperties The pool configuration
+     */
     public void performJNDILookup(Context context, PoolConfiguration poolProperties) {
         Object jndiDS = null;
         try {

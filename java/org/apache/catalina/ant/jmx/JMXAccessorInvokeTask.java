@@ -86,6 +86,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorInvokeTask extends JMXAccessorTask {
 
+    /**
+     * Constructs a new JMXAccessorInvokeTask.
+     */
+    public JMXAccessorInvokeTask() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -95,32 +101,45 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the operation.
+     * Get the MBean operation name.
+     *
+     * @return the operation name
      */
     public String getOperation() {
         return operation;
     }
 
     /**
-     * @param operation The operation to set.
+     * Set the MBean operation name.
+     *
+     * @param operation the operation to set
      */
     public void setOperation(String operation) {
         this.operation = operation;
     }
 
+    /**
+     * Add an argument for the MBean operation.
+     *
+     * @param arg the argument to add
+     */
     public void addArg(Arg arg) {
         args.add(arg);
     }
 
     /**
-     * @return Returns the args.
+     * Get the arguments for the MBean operation.
+     *
+     * @return the arguments
      */
     public List<Arg> getArgs() {
         return args;
     }
 
     /**
-     * @param args The args to set.
+     * Set the arguments for the MBean operation.
+     *
+     * @param args the arguments to set
      */
     public void setArgs(List<Arg> args) {
         this.args = args;

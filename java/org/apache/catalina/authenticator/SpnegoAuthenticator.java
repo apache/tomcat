@@ -49,31 +49,62 @@ import org.ietf.jgss.Oid;
  */
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Default constructor.
+     */
+    public SpnegoAuthenticator() {
+    }
+
     private final Log log = LogFactory.getLog(SpnegoAuthenticator.class); // must not be static
     private static final String AUTH_HEADER_VALUE_NEGOTIATE = "Negotiate";
 
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
 
+    /**
+     * Returns the JAAS login configuration name.
+     *
+     * @return the login configuration name
+     */
     public String getLoginConfigName() {
         return loginConfigName;
     }
 
+    /**
+     * Sets the JAAS login configuration name.
+     *
+     * @param loginConfigName the login configuration name
+     */
     public void setLoginConfigName(String loginConfigName) {
         this.loginConfigName = loginConfigName;
     }
 
     private boolean storeDelegatedCredential = true;
 
+    /**
+     * Returns whether delegated credentials should be stored in the subject.
+     *
+     * @return {@code true} if delegated credentials are stored
+     */
     public boolean isStoreDelegatedCredential() {
         return storeDelegatedCredential;
     }
 
+    /**
+     * Sets whether delegated credentials should be stored in the subject.
+     *
+     * @param storeDelegatedCredential {@code true} to store delegated credentials
+     */
     public void setStoreDelegatedCredential(boolean storeDelegatedCredential) {
         this.storeDelegatedCredential = storeDelegatedCredential;
     }
 
     private Pattern noKeepAliveUserAgents = null;
 
+    /**
+     * Returns the regex pattern for user agents that should not use keep-alive connections.
+     *
+     * @return the regex pattern, or {@code null} if not configured
+     */
     public String getNoKeepAliveUserAgents() {
         Pattern p = noKeepAliveUserAgents;
         if (p == null) {
@@ -83,6 +114,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
     }
 
+    /**
+     * Sets the regex pattern for user agents that should not use keep-alive connections.
+     *
+     * @param noKeepAliveUserAgents the regex pattern, or {@code null} to disable
+     */
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
         if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.isEmpty()) {
             this.noKeepAliveUserAgents = null;
@@ -150,7 +186,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         /*
          * Reauthentication using the cached user name and password (if any) is not enabled for SPNEGO authentication.
-         * This is because the delegated credentials will nto be available unless a normal SPNEGO authentication takes
+         * This is because the delegated credentials will not be available unless a normal SPNEGO authentication takes
          * place.
          *
          * Reauthentication was introduced to handle the case where the Realm took additional actions on authentication.
@@ -190,7 +226,17 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         byte[] encoded = new byte[authorizationBC.getLength()];
         System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(), encoded, 0,
                 authorizationBC.getLength());
-        byte[] decoded = Base64.getDecoder().decode(encoded);
+        byte[] decoded;
+        try {
+            decoded = Base64.getDecoder().decode(encoded);
+        } catch (IllegalArgumentException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("spnegoAuthenticator.authHeaderInvalidToken"));
+            }
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
 
         if (decoded.length == 0) {
             if (log.isDebugEnabled()) {

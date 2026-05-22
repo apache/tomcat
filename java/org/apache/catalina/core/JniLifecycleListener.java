@@ -35,7 +35,17 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JniLifecycleListener implements LifecycleListener {
 
+    /**
+     * Constructs a new JniLifecycleListener.
+     */
+    public JniLifecycleListener() {
+    }
+
     private static final Log log = LogFactory.getLog(JniLifecycleListener.class);
+
+    /**
+     * StringManager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(JniLifecycleListener.class);
 
     private String libraryName = "";
@@ -58,6 +68,11 @@ public class JniLifecycleListener implements LifecycleListener {
         }
     }
 
+    /**
+     * Set the name of the library to load.
+     *
+     * @param libraryName the library name
+     */
     public void setLibraryName(String libraryName) {
 
         if (!this.libraryPath.isEmpty()) {
@@ -67,10 +82,20 @@ public class JniLifecycleListener implements LifecycleListener {
         this.libraryName = libraryName;
     }
 
+    /**
+     * Get the name of the library to load.
+     *
+     * @return the library name
+     */
     public String getLibraryName() {
         return libraryName;
     }
 
+    /**
+     * Set the path of the library to load.
+     *
+     * @param libraryPath the library path
+     */
     public void setLibraryPath(String libraryPath) {
 
         if (!this.libraryName.isEmpty()) {
@@ -80,6 +105,11 @@ public class JniLifecycleListener implements LifecycleListener {
         this.libraryPath = libraryPath;
     }
 
+    /**
+     * Get the path of the library to load.
+     *
+     * @return the library path
+     */
     public String getLibraryPath() {
         return libraryPath;
     }

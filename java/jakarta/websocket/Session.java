@@ -24,6 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Represents a WebSocket session, which is the WebSocket connection between a client and a server.
+ * A session is created when a WebSocket connection is established and is used to send and receive
+ * messages.
+ */
 public interface Session extends Closeable {
 
     /**
@@ -46,18 +51,54 @@ public interface Session extends Closeable {
      */
     void addMessageHandler(MessageHandler handler) throws IllegalStateException;
 
+    /**
+     * Returns the set of message handlers currently registered on this session.
+     *
+     * @return The set of registered message handlers
+     */
     Set<MessageHandler> getMessageHandlers();
 
+    /**
+     * Removes the specified message handler from this session.
+     *
+     * @param listener The message handler to remove
+     */
     void removeMessageHandler(MessageHandler listener);
 
+    /**
+     * Returns the version of the WebSocket protocol in use for this session.
+     *
+     * @return The protocol version
+     */
     String getProtocolVersion();
 
+    /**
+     * Returns the sub-protocol negotiated for this session, or {@code null} if no sub-protocol
+     * was negotiated.
+     *
+     * @return The negotiated sub-protocol
+     */
     String getNegotiatedSubprotocol();
 
+    /**
+     * Returns the list of extensions negotiated for this session.
+     *
+     * @return The list of negotiated extensions
+     */
     List<Extension> getNegotiatedExtensions();
 
+    /**
+     * Returns whether this session is using a secure connection (wss://).
+     *
+     * @return {@code true} if the connection is secure
+     */
     boolean isSecure();
 
+    /**
+     * Returns whether this session is currently open.
+     *
+     * @return {@code true} if the session is open
+     */
     boolean isOpen();
 
     /**
@@ -104,8 +145,19 @@ public interface Session extends Closeable {
      */
     int getMaxTextMessageBufferSize();
 
+    /**
+     * Returns the asynchronous remote endpoint for this session, used for non-blocking message
+     * sending.
+     *
+     * @return The asynchronous remote endpoint
+     */
     RemoteEndpoint.Async getAsyncRemote();
 
+    /**
+     * Returns the synchronous remote endpoint for this session, used for blocking message sending.
+     *
+     * @return The synchronous remote endpoint
+     */
     RemoteEndpoint.Basic getBasicRemote();
 
     /**
@@ -135,16 +187,47 @@ public interface Session extends Closeable {
      */
     void close(CloseReason closeReason) throws IOException;
 
+    /**
+     * Returns the URI of the request that initiated this WebSocket session.
+     *
+     * @return The request URI
+     */
     URI getRequestURI();
 
+    /**
+     * Returns the query parameters from the request that initiated this WebSocket session.
+     *
+     * @return The query parameter map
+     */
     Map<String,List<String>> getRequestParameterMap();
 
+    /**
+     * Returns the query string from the request that initiated this WebSocket session.
+     *
+     * @return The query string
+     */
     String getQueryString();
 
+    /**
+     * Returns the path parameters extracted from the request URI using the endpoint's URI template.
+     *
+     * @return The path parameter map
+     */
     Map<String,String> getPathParameters();
 
+    /**
+     * Returns a map of user properties associated with this session.
+     *
+     * @return The user properties map
+     */
     Map<String,Object> getUserProperties();
 
+    /**
+     * Returns the principal of the user associated with this session, or {@code null} if the
+     * user is not authenticated.
+     *
+     * @return The user principal
+     */
     Principal getUserPrincipal();
 
     /**

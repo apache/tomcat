@@ -28,6 +28,12 @@ public class ContextResourceLink extends ResourceBase {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor for ContextResourceLink.
+     */
+    public ContextResourceLink() {
+    }
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -39,18 +45,38 @@ public class ContextResourceLink extends ResourceBase {
      */
     private String factory = null;
 
+    /**
+     * Returns the global name of this resource.
+     *
+     * @return the global resource name
+     */
     public String getGlobal() {
         return this.global;
     }
 
+    /**
+     * Sets the global name of this resource.
+     *
+     * @param global the global resource name
+     */
     public void setGlobal(String global) {
         this.global = global;
     }
 
+    /**
+     * Returns the factory to be used for creating the object.
+     *
+     * @return the factory class name
+     */
     public String getFactory() {
         return factory;
     }
 
+    /**
+     * Sets the factory to be used for creating the object.
+     *
+     * @param factory the factory class name
+     */
     public void setFactory(String factory) {
         this.factory = factory;
     }

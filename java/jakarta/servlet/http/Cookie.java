@@ -340,7 +340,12 @@ public class Cookie implements Cloneable, Serializable {
     @Override
     public Object clone() {
         try {
-            return super.clone();
+            Cookie clone = (Cookie) super.clone();
+            if (attributes != null) {
+                clone.attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+                clone.attributes.putAll(attributes);
+            }
+            return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }

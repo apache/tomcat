@@ -36,6 +36,13 @@ import java.util.Objects;
 public class RecordELResolver extends ELResolver {
 
     /**
+     * Constructs a new instance of the resolver.
+     */
+    public RecordELResolver() {
+        super();
+    }
+
+    /**
      * If the base object is an instance of {@link Record}, returns the value of the given field of this {@link Record}.
      * <p>
      * If the base object is an instance of {@link Record}, the {@code propertyResolved} property of the provided

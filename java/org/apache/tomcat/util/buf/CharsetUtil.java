@@ -23,6 +23,9 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+/**
+ * Utility methods for charset operations.
+ */
 public class CharsetUtil {
 
     private CharsetUtil() {
@@ -30,6 +33,13 @@ public class CharsetUtil {
     }
 
 
+    /**
+     * Checks if the given charset is a superset of ASCII.
+     *
+     * @param charset the charset to check
+     *
+     * @return true if the charset is an ASCII superset
+     */
     public static boolean isAsciiSuperset(Charset charset) {
         // Bytes 0x00 to 0x7F must decode to the first 128 Unicode characters
         CharsetDecoder decoder = charset.newDecoder();

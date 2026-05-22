@@ -56,12 +56,24 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
+    /**
+     * Default buffer size in bytes.
+     */
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     // The buffer can be used for byte[] and char[] reading
     // ( this is needed to support ServletInputStream and BufferedReader )
+    /**
+     * Initial state before any read operation.
+     */
     public final int INITIAL_STATE = 0;
+    /**
+     * State when reading character data.
+     */
     public final int CHAR_STATE = 1;
+    /**
+     * State when reading byte data.
+     */
     public final int BYTE_STATE = 2;
 
 
@@ -199,6 +211,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    /**
+     * Returns the number of bytes or characters available in the buffer.
+     *
+     * @return the number of bytes or characters available
+     */
     public int available() {
         int available = availableInThisBuffer();
         if (available == 0) {
@@ -220,11 +237,21 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    /**
+     * Sets the read listener for async request processing.
+     *
+     * @param listener the read listener to set
+     */
     public void setReadListener(ReadListener listener) {
         coyoteRequest.setReadListener(listener);
     }
 
 
+    /**
+     * Checks if all data has been read from the input buffer.
+     *
+     * @return {@code true} if all data has been read
+     */
     public boolean isFinished() {
         int available = 0;
         if (state == BYTE_STATE) {
@@ -240,6 +267,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    /**
+     * Checks if the input buffer is ready for reading.
+     *
+     * @return {@code true} if the buffer is ready
+     */
     public boolean isReady() {
         if (coyoteRequest.getReadListener() == null) {
             if (log.isDebugEnabled()) {
@@ -332,6 +364,13 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    /**
+     * Reads a single byte from the buffer.
+     *
+     * @return the byte read, or -1 if end of stream
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public int readByte() throws IOException {
         throwIfClosed();
 
@@ -342,6 +381,17 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    /**
+     * Reads bytes into the specified array.
+     *
+     * @param b the buffer into which the data is read
+     * @param off the start offset in the destination array
+     * @param len the maximum number of bytes to read
+     *
+     * @return the number of bytes read, or -1 if end of stream
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public int read(byte[] b, int off, int len) throws IOException {
         throwIfClosed();
 
@@ -387,6 +437,13 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     // ------------------------------------------------- Chars Handling Methods
 
+    /**
+     * Reads characters from the byte buffer using the current converter.
+     *
+     * @return the number of characters read, or -1 if end of stream
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public int realReadChars() throws IOException {
         checkConverter();
 
@@ -542,6 +599,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         }
     }
 
+    /**
+     * Ensures a byte-to-char converter is available, initializing one if necessary.
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public void checkConverter() throws IOException {
         if (conv != null) {
             return;

@@ -39,6 +39,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
+    /**
+     * Constructs a new abstract archive resource set.
+     */
+    protected AbstractArchiveResourceSet() {
+        super();
+    }
+
     private static final Log log = LogFactory.getLog(AbstractArchiveResourceSet.class);
 
     private URL baseUrl;

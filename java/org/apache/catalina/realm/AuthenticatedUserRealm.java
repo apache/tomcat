@@ -29,6 +29,12 @@ import java.security.Principal;
  */
 public class AuthenticatedUserRealm extends RealmBase {
 
+    /**
+     * Constructs a new AuthenticatedUserRealm.
+     */
+    public AuthenticatedUserRealm() {
+    }
+
     @Override
     protected String getPassword(String username) {
         // Passwords never need validating so always return null

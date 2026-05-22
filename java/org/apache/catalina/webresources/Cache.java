@@ -30,9 +30,15 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Cache for web resources managed by a StandardRoot.
+ */
 public class Cache {
 
     private static final Log log = LogFactory.getLog(Cache.class);
+    /**
+     * String manager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(Cache.class);
 
     private static final long TARGET_FREE_PERCENT_GET = 5;
@@ -54,10 +60,22 @@ public class Cache {
 
     private final ConcurrentMap<String,CachedResource> resourceCache = new ConcurrentHashMap<>();
 
+    /**
+     * Constructs a cache for the given root.
+     *
+     * @param root the standard root
+     */
     public Cache(StandardRoot root) {
         this.root = root;
     }
 
+    /**
+     * Retrieves a single resource from the cache.
+     *
+     * @param path resource path
+     * @param useClassLoaderResources whether to use class loader resources
+     * @return the web resource
+     */
     protected WebResource getResource(String path, boolean useClassLoaderResources) {
 
         if (noCache(path)) {
@@ -149,6 +167,13 @@ public class Cache {
         return cacheEntry;
     }
 
+    /**
+     * Retrieves multiple resources from the cache.
+     *
+     * @param path resource path
+     * @param useClassLoaderResources whether to use class loader resources
+     * @return the web resources
+     */
     protected WebResource[] getResources(String path, boolean useClassLoaderResources) {
         lookupCount.increment();
 
@@ -211,6 +236,9 @@ public class Cache {
         return cacheEntry.getWebResources();
     }
 
+    /**
+     * Performs background cache maintenance, evicting expired entries.
+     */
     protected void backgroundProcess() {
         // Create an ordered set of all cached resources with the least recently
         // used first. This is a background process so we can afford to take the
@@ -275,40 +303,85 @@ public class Cache {
         }
     }
 
+    /**
+     * Returns the cache strategy.
+     *
+     * @return the cache strategy
+     */
     public CacheStrategy getCacheStrategy() {
         return cacheStrategy;
     }
 
+    /**
+     * Sets the cache strategy.
+     *
+     * @param cacheStrategy the cache strategy
+     */
     public void setCacheStrategy(CacheStrategy cacheStrategy) {
         this.cacheStrategy = cacheStrategy;
     }
 
+    /**
+     * Returns the time-to-live for cached entries.
+     *
+     * @return the TTL in milliseconds
+     */
     public long getTtl() {
         return ttl;
     }
 
+    /**
+     * Sets the time-to-live for cached entries.
+     *
+     * @param ttl the TTL in milliseconds
+     */
     public void setTtl(long ttl) {
         this.ttl = ttl;
     }
 
+    /**
+     * Returns the maximum cache size in kilobytes.
+     *
+     * @return the maximum size in KB
+     */
     public long getMaxSize() {
         // Internally bytes, externally kilobytes
         return maxSize / 1024;
     }
 
+    /**
+     * Sets the maximum cache size in kilobytes.
+     *
+     * @param maxSize the maximum size in KB
+     */
     public void setMaxSize(long maxSize) {
         // Internally bytes, externally kilobytes
         this.maxSize = maxSize * 1024;
     }
 
+    /**
+     * Returns the total number of cache lookups.
+     *
+     * @return the lookup count
+     */
     public long getLookupCount() {
         return lookupCount.sum();
     }
 
+    /**
+     * Returns the total number of cache hits.
+     *
+     * @return the hit count
+     */
     public long getHitCount() {
         return hitCount.sum();
     }
 
+    /**
+     * Sets the maximum size of a single cached object in kilobytes.
+     *
+     * @param objectMaxSize the maximum object size in KB
+     */
     public void setObjectMaxSize(int objectMaxSize) {
         if (objectMaxSize * 1024L > Integer.MAX_VALUE) {
             log.warn(sm.getString("cache.objectMaxSizeTooBigBytes", Integer.valueOf(objectMaxSize)));
@@ -319,11 +392,21 @@ public class Cache {
         }
     }
 
+    /**
+     * Returns the maximum size of a single cached object in kilobytes.
+     *
+     * @return the maximum object size in KB
+     */
     public int getObjectMaxSize() {
         // Internally bytes, externally kilobytes
         return objectMaxSize / 1024;
     }
 
+    /**
+     * Returns the maximum size of a single cached object in bytes.
+     *
+     * @return the maximum object size in bytes
+     */
     public int getObjectMaxSizeBytes() {
         return objectMaxSize;
     }
@@ -340,11 +423,19 @@ public class Cache {
         }
     }
 
+    /**
+     * Clears all entries from the cache.
+     */
     public void clear() {
         resourceCache.clear();
         size.set(0);
     }
 
+    /**
+     * Returns the current cache size in kilobytes.
+     *
+     * @return the current size in KB
+     */
     public long getSize() {
         return size.get() / 1024;
     }

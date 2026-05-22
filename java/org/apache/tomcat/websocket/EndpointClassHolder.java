@@ -24,6 +24,9 @@ import jakarta.websocket.Endpoint;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Holds a reference to a WebSocket endpoint class for later instantiation.
+ */
 public class EndpointClassHolder implements ClientEndpointHolder {
 
     private static final StringManager sm = StringManager.getManager(EndpointClassHolder.class);
@@ -31,6 +34,11 @@ public class EndpointClassHolder implements ClientEndpointHolder {
     private final Class<? extends Endpoint> clazz;
 
 
+    /**
+     * Creates a new holder for the specified endpoint class.
+     *
+     * @param clazz The endpoint class to hold
+     */
     public EndpointClassHolder(Class<? extends Endpoint> clazz) {
         this.clazz = clazz;
     }

@@ -48,6 +48,13 @@ import org.apache.tomcat.jdbc.pool.ClassLoaderUtil;
  *
  */
 public class GenericNamingResourcesFactory implements ObjectFactory {
+    /**
+     * Creates a new GenericNamingResourcesFactory instance.
+     */
+    public GenericNamingResourcesFactory() {
+        // Default constructor
+    }
+
     private static final Log log = LogFactory.getLog(GenericNamingResourcesFactory.class);
 
     @Override
@@ -224,6 +231,13 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         return false;
     }
 
+    /**
+     * Capitalizes the first character of the given string.
+     *
+     * @param name The string to capitalize
+     *
+     * @return The capitalized string, or the original if null or empty
+     */
     public static String capitalize(String name) {
         if (name == null || name.length() == 0) {
             return name;

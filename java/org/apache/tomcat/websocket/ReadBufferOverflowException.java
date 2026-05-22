@@ -19,17 +19,32 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.io.Serial;
 
+/**
+ * Exception thrown when the WebSocket buffer size is insufficient.
+ */
 public class ReadBufferOverflowException extends IOException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** The minimum buffer size required. */
     private final int minBufferSize;
 
+    /**
+     * Constructs a {@code ReadBufferOverflowException} with the specified
+     * minimum buffer size.
+     *
+     * @param minBufferSize The minimum buffer size required
+     */
     public ReadBufferOverflowException(int minBufferSize) {
         this.minBufferSize = minBufferSize;
     }
 
+    /**
+     * Returns the minimum buffer size required to handle the data.
+     *
+     * @return The minimum buffer size
+     */
     public int getMinBufferSize() {
         return minBufferSize;
     }

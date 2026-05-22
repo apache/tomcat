@@ -34,12 +34,35 @@ import java.util.logging.LogRecord;
  */
 public class JdkLoggerFormatter extends Formatter {
 
-    // values from JDK Level
+    /**
+     * Constructs a new JdkLoggerFormatter.
+     */
+    public JdkLoggerFormatter() {
+    }
+
+    /**
+     * Log level value for TRACE.
+     */
     public static final int LOG_LEVEL_TRACE = 400;
+    /**
+     * Log level value for DEBUG.
+     */
     public static final int LOG_LEVEL_DEBUG = 500;
+    /**
+     * Log level value for INFO.
+     */
     public static final int LOG_LEVEL_INFO = 800;
+    /**
+     * Log level value for WARN.
+     */
     public static final int LOG_LEVEL_WARN = 900;
+    /**
+     * Log level value for ERROR.
+     */
     public static final int LOG_LEVEL_ERROR = 1000;
+    /**
+     * Log level value for FATAL.
+     */
     public static final int LOG_LEVEL_FATAL = 1000;
 
     @Override
@@ -50,18 +73,21 @@ public class JdkLoggerFormatter extends Formatter {
         long time = record.getMillis();
         String message = formatMessage(record);
 
-
+        if (name == null) {
+            name = "";
+        }
         if (name.indexOf('.') >= 0) {
             name = name.substring(name.lastIndexOf('.') + 1);
         }
 
         // Use a string buffer for better performance
+        String timeStr = String.valueOf(time);
         StringBuilder buf = new StringBuilder();
 
-        buf.append(time);
+        buf.append(timeStr);
 
         // pad to 8 to make it more readable
-        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
+        buf.append(" ".repeat(Math.max(0, 8 - timeStr.length())));
 
         // Append a readable representation of the log level.
         switch (level) {
@@ -85,13 +111,12 @@ public class JdkLoggerFormatter extends Formatter {
                 buf.append("   ");
         }
 
-
         // Append the name of the log instance if so configured
         buf.append(name);
         buf.append(' ');
 
         // pad to 20 chars
-        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
+        buf.append(" ".repeat(Math.max(0, 20 - (name.length() + 1))));
 
         // Append the message
         buf.append(LogUtil.escape(message));

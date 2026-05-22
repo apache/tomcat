@@ -23,13 +23,29 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Return the result associated with the supplied Server Variable.
+ * Implements the Server-side #echo command.
  */
 public class SSIEcho implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIEcho.class);
+
+    /**
+     * Default constructor.
+     */
+    public SSIEcho() {
+    }
+    /**
+     * Default encoding for echo output.
+     */
     protected static final String DEFAULT_ENCODING = SSIMediator.ENCODING_ENTITY;
+    /**
+     * Value returned when a requested variable is not found.
+     */
     protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
+    /**
+     * Processes the echo directive to output the value of a server variable.
+     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {
@@ -63,6 +79,12 @@ public class SSIEcho implements SSICommand {
     }
 
 
+    /**
+     * Checks if the given encoding name is one of the supported encodings.
+     *
+     * @param encoding the encoding name to check
+     * @return true if the encoding is valid
+     */
     protected boolean isValidEncoding(String encoding) {
         return encoding.equalsIgnoreCase(SSIMediator.ENCODING_URL) ||
                 encoding.equalsIgnoreCase(SSIMediator.ENCODING_ENTITY) ||

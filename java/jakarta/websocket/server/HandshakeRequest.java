@@ -28,17 +28,51 @@ import java.util.Map;
  */
 public interface HandshakeRequest {
 
+    /**
+     * Name of the Sec-WebSocket-Key HTTP header.
+     */
     String SEC_WEBSOCKET_KEY = "Sec-WebSocket-Key";
+    /**
+     * Name of the Sec-WebSocket-Protocol HTTP header.
+     */
     String SEC_WEBSOCKET_PROTOCOL = "Sec-WebSocket-Protocol";
+    /**
+     * Name of the Sec-WebSocket-Version HTTP header.
+     */
     String SEC_WEBSOCKET_VERSION = "Sec-WebSocket-Version";
+    /**
+     * Name of the Sec-WebSocket-Extensions HTTP header.
+     */
     String SEC_WEBSOCKET_EXTENSIONS = "Sec-WebSocket-Extensions";
 
+    /**
+     * Returns the HTTP headers from the handshake request.
+     *
+     * @return The HTTP headers
+     */
     Map<String,List<String>> getHeaders();
 
+    /**
+     * Returns the principal of the user associated with this request, or {@code null} if the
+     * user is not authenticated.
+     *
+     * @return The user principal
+     */
     Principal getUserPrincipal();
 
+    /**
+     * Returns the URI of the handshake request.
+     *
+     * @return The request URI
+     */
     URI getRequestURI();
 
+    /**
+     * Returns whether the user associated with this request is in the given role.
+     *
+     * @param role The role to check
+     * @return {@code true} if the user is in the specified role
+     */
     boolean isUserInRole(String role);
 
     /**
@@ -49,8 +83,18 @@ public interface HandshakeRequest {
      */
     Object getHttpSession();
 
+    /**
+     * Returns the query parameters from the handshake request.
+     *
+     * @return The query parameter map
+     */
     Map<String,List<String>> getParameterMap();
 
+    /**
+     * Returns the query string from the handshake request.
+     *
+     * @return The query string
+     */
     String getQueryString();
 
     /**

@@ -18,15 +18,26 @@ package jakarta.transaction;
 
 import java.io.Serial;
 
+/**
+ * Thrown when an operation is attempted on a transaction that has been rolled back.
+ */
 public class TransactionRolledbackException extends java.rmi.RemoteException {
 
     @Serial
     private static final long serialVersionUID = -3142798139623020577L;
 
+    /**
+     * Constructs a {@code TransactionRolledbackException} with no detail message.
+     */
     public TransactionRolledbackException() {
         super();
     }
 
+    /**
+     * Constructs a {@code TransactionRolledbackException} with the specified detail message.
+     *
+     * @param msg the detail message
+     */
     public TransactionRolledbackException(String msg) {
         super(msg);
     }

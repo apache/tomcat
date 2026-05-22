@@ -36,6 +36,12 @@ import jakarta.servlet.http.HttpSession;
 public class SessionInitializerFilter implements Filter {
 
     /**
+     * Default constructor.
+     */
+    public SessionInitializerFilter() {
+    }
+
+    /**
      * Calls {@link HttpServletRequest}'s getSession() to initialize the HttpSession and continues processing the chain.
      *
      * @param request  The request to process
@@ -50,7 +56,9 @@ public class SessionInitializerFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        ((HttpServletRequest) request).getSession();
+        if (request instanceof HttpServletRequest hrequest) {
+            hrequest.getSession();
+        }
 
         chain.doFilter(request, response);
     }

@@ -83,6 +83,12 @@ public class CorsFilter extends GenericFilter {
 
     private transient Log log = LogFactory.getLog(CorsFilter.class); // must not be static
 
+    /**
+     * Default constructor.
+     */
+    public CorsFilter() {
+    }
+
 
     /**
      * A {@link Collection} of origins consisting of zero or more origins that are allowed access to the resource.
@@ -764,9 +770,14 @@ public class CorsFilter extends GenericFilter {
     }
 
 
-    /*
+    /**
+     * Restores the transient log field after deserialization.
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
+     *
+     * @param ois the object input stream
+     * @throws ClassNotFoundException if the log class cannot be found
+     * @throws IOException if an I/O error occurs
      */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

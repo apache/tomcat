@@ -30,6 +30,9 @@ import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
 
+/**
+ * A literal value expression that represents a constant value.
+ */
 public final class ValueExpressionLiteral extends ValueExpression implements Externalizable {
 
     @Serial
@@ -40,10 +43,19 @@ public final class ValueExpressionLiteral extends ValueExpression implements Ext
 
     private Class<?> expectedType;
 
+    /**
+     * Constructs a new ValueExpressionLiteral for deserialization.
+     */
     public ValueExpressionLiteral() {
         super();
     }
 
+    /**
+     * Constructs a new ValueExpressionLiteral.
+     *
+     * @param value        The literal value
+     * @param expectedType The expected return type
+     */
     public ValueExpressionLiteral(Object value, Class<?> expectedType) {
         this.value = value;
         this.expectedType = expectedType;
@@ -102,6 +114,13 @@ public final class ValueExpressionLiteral extends ValueExpression implements Ext
         return (obj instanceof ValueExpressionLiteral && this.equals((ValueExpressionLiteral) obj));
     }
 
+    /**
+     * Compares this literal value expression with another for equality.
+     *
+     * @param ve The other literal value expression
+     *
+     * @return {@code true} if the values are equal, {@code false} otherwise
+     */
     public boolean equals(ValueExpressionLiteral ve) {
         return (ve != null &&
                 (this.value != null && ve.value != null && (this.value == ve.value || this.value.equals(ve.value))));

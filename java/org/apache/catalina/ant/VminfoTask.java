@@ -25,6 +25,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class VminfoTask extends AbstractCatalinaTask {
 
+    /**
+     * Constructs a new VminfoTask.
+     */
+    public VminfoTask() {
+    }
+
     // Public Methods
 
     /**

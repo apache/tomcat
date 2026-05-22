@@ -51,6 +51,12 @@ import javax.management.loading.ClassLoaderRepository;
  */
 public class NoDescriptorRegistry extends Registry {
 
+    /**
+     * Constructs a new NoDescriptorRegistry instance.
+     */
+    public NoDescriptorRegistry() {
+    }
+
     private final MBeanServer mBeanServer = new NoJmxMBeanServer();
     private final ManagedBean defaultMBean = new PassthroughMBean();
 

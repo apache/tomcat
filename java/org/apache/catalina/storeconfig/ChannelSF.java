@@ -32,6 +32,12 @@ import org.apache.catalina.tribes.MembershipService;
 public class ChannelSF extends StoreFactoryBase {
 
     /**
+     * Creates a new ChannelSF.
+     */
+    public ChannelSF() {
+    }
+
+    /**
      * Store the specified Channel children.
      * <p>
      * {@inheritDoc}

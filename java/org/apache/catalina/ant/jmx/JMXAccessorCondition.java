@@ -81,6 +81,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorCondition extends JMXAccessorConditionBase {
 
+    /**
+     * Constructs a new JMXAccessorCondition.
+     */
+    public JMXAccessorCondition() {
+    }
+
     // ----------------------------------------------------- Instance Variables
 
     private String operation = "==";
@@ -92,35 +98,45 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     // ----------------------------------------------------- Properties
 
     /**
-     * @return Returns the operation.
+     * Get the comparison operation.
+     *
+     * @return the operation
      */
     public String getOperation() {
         return operation;
     }
 
     /**
-     * @param operation The operation to set.
+     * Set the comparison operation.
+     *
+     * @param operation the operation to set
      */
     public void setOperation(String operation) {
         this.operation = operation;
     }
 
     /**
-     * @return Returns the type.
+     * Get the data type for comparison.
+     *
+     * @return the type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * @param type The type to set.
+     * Set the data type for comparison.
+     *
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     * @return Returns the ifCondition.
+     * Get the if condition property name.
+     *
+     * @return the if condition property name
      */
     public String getIf() {
         return ifCondition;
@@ -136,7 +152,9 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     }
 
     /**
-     * @return Returns the unlessCondition.
+     * Get the unless condition property name.
+     *
+     * @return the unless condition property name
      */
     public String getUnless() {
         return unlessCondition;

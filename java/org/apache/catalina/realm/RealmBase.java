@@ -61,6 +61,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.ConstantTime;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -175,11 +176,24 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected List<String> userAttributesList = null;
 
 
-    // ------------------------------------------------------------- Properties
+    // ---------------------------------------------------- Constructors
 
     /**
+     * Construct a new instance of this Realm with the default properties.
+     */
+    public RealmBase() {
+        super();
+    }
+
+
+    // ----------------------------------------------------- Properties
+
+    /**
+     * Returns the HTTP status code used when the container needs to issue an HTTP redirect to meet the requirements of
+     * a configured transport guarantee.
+     *
      * @return The HTTP status code used when the container needs to issue an HTTP redirect to meet the requirements of
-     *             a configured transport guarantee.
+     *             a configured transport guarantee
      */
     public int getTransportGuaranteeRedirectStatus() {
         return transportGuaranteeRedirectStatus;
@@ -286,18 +300,33 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         this.x509UsernameRetrieverClassName = className;
     }
 
+    /**
+     * When processing users authenticated via the GSS-API, should any &quot;@...&quot; be stripped from the end of the
+     * username?
+     *
+     * @return {@code true} when the &quot;@...&quot; suffix should be stripped
+     */
     public boolean isStripRealmForGss() {
         return stripRealmForGss;
     }
 
 
+    /**
+     * Set whether any &quot;@...&quot; should be stripped from the end of the username when processing users
+     * authenticated via the GSS-API.
+     *
+     * @param stripRealmForGss {@code true} to strip the &quot;@...&quot; suffix
+     */
     public void setStripRealmForGss(boolean stripRealmForGss) {
         this.stripRealmForGss = stripRealmForGss;
     }
 
 
     /**
-     * @return the comma separated names of user attributes to additionally query from realm
+     * Returns the comma separated names of user attributes to additionally query from the realm. These will be
+     * provided to the user through the created Principal's <i>attributes</i> map.
+     *
+     * @return The comma separated names of user attributes to additionally query from the realm
      */
     public String getUserAttributes() {
         return userAttributes;
@@ -416,7 +445,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     "digestA2:" + digestA2 + " Server digest:" + serverDigest);
         }
 
-        if (serverDigest.equals(clientDigest)) {
+        if (ConstantTime.equals(serverDigest, clientDigest, true)) {
             return getPrincipal(username);
         }
 
@@ -658,8 +687,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                         constraints[i].included(uri, method));
             }
 
-            boolean matched = false;
-            int pos = -1;
             for (int j = 0; j < collection.length; j++) {
                 String[] patterns = collection[j].findPatterns();
 
@@ -669,6 +696,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     continue;
                 }
 
+                boolean matched = false;
                 for (int k = 0; k < patterns.length && !matched; k++) {
                     String pattern = patterns[k];
                     if (pattern.startsWith("*.")) {
@@ -678,19 +706,18 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                                 uri.length() - dot == pattern.length() - 1) {
                             if (pattern.regionMatches(1, uri, dot, uri.length() - dot)) {
                                 matched = true;
-                                pos = j;
                             }
                         }
                     }
                 }
-            }
-            if (matched) {
-                found = true;
-                if (collection[pos].findMethod(method)) {
-                    if (results == null) {
-                        results = new ArrayList<>();
+                if (matched) {
+                    found = true;
+                    if (collection[j].findMethod(method)) {
+                        if (results == null) {
+                            results = new ArrayList<>();
+                        }
+                        results.add(constraints[i]);
                     }
-                    results.add(constraints[i]);
                 }
             }
         }
@@ -1095,6 +1122,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     // ------------------------------------------------------ Protected Methods
 
+    /**
+     * Check whether the current credential handler uses the specified message digest algorithm.
+     *
+     * @param algorithm The name of the message digest algorithm to check
+     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler}
+     *             using the specified algorithm
+     */
     protected boolean hasMessageDigest(String algorithm) {
         CredentialHandler ch = credentialHandler;
         if (ch instanceof MessageDigestCredentialHandler) {
@@ -1121,12 +1155,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @return the digest for the specified user
      */
     protected String getDigest(String username, String realmName, String algorithm) {
-        if (hasMessageDigest(algorithm)) {
-            // Use pre-generated digest
-            return getPassword(username);
+        String password = getPassword(username);
+
+        // Short-cut null password case
+        if (password == null) {
+            return null;
         }
 
-        String digestValue = username + ":" + realmName + ":" + getPassword(username);
+        if (hasMessageDigest(algorithm)) {
+            // Use pre-generated digest
+            return password;
+        }
+
+        String digestValue = username + ":" + realmName + ":" + password;
 
         byte[] valueBytes;
         try {
@@ -1478,21 +1519,42 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         return container.getDomain();
     }
 
+    /**
+     * The path used in the JMX object name for this realm.
+     */
     protected String realmPath = "/realm0";
 
+    /**
+     * Return the path used in the JMX object name for this realm.
+     *
+     * @return The realm path
+     */
     public String getRealmPath() {
         return realmPath;
     }
 
+    /**
+     * Set the path used in the JMX object name for this realm.
+     *
+     * @param theRealmPath The realm path to use
+     */
     public void setRealmPath(String theRealmPath) {
         realmPath = theRealmPath;
     }
 
+    /**
+     * Return the suffix for the JMX object name, based on the realm path.
+     *
+     * @return The suffix string for the JMX object name
+     */
     protected String getRealmSuffix() {
         return ",realmPath=" + getRealmPath();
     }
 
 
+    /**
+     * Defines the mode for handling the {@code *.roles} special role.
+     */
     protected static class AllRolesMode {
 
         private final String name;

@@ -23,17 +23,34 @@ import javax.naming.Context;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 
+/**
+ * Abstract base class for {@link Reference} implementations used by the naming
+ * context. Provides a default factory class name lookup mechanism.
+ */
 public abstract class AbstractRef extends Reference {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
 
+    /**
+     * Constructs a new <code>AbstractRef</code> with the specified class name.
+     *
+     * @param className The non-null class name
+     */
     public AbstractRef(String className) {
         super(className);
     }
 
 
+    /**
+     * Constructs a new <code>AbstractRef</code> with the specified class name,
+     * factory class name, and factory location.
+     *
+     * @param className The non-null class name
+     * @param factory The factory class name
+     * @param factoryLocation The factory location
+     */
     public AbstractRef(String className, String factory, String factoryLocation) {
         super(className, factory, factoryLocation);
     }
@@ -55,6 +72,11 @@ public abstract class AbstractRef extends Reference {
     }
 
 
+    /**
+     * Returns the default factory class name.
+     *
+     * @return the default factory class name
+     */
     protected abstract String getDefaultFactoryClassName();
 
 

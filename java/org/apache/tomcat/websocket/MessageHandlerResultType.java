@@ -16,8 +16,14 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Types of message handler results.
+ */
 public enum MessageHandlerResultType {
+    /** Binary message. */
     BINARY,
+    /** Text message. */
     TEXT,
+    /** Pong message. */
     PONG
 }

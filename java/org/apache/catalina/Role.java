@@ -35,13 +35,15 @@ public interface Role extends Principal {
 
 
     /**
-     * @return the description of this role.
+     * Gets the description of this role.
+     *
+     * @return The description of this role
      */
     String getDescription();
 
 
     /**
-     * Set the description of this role.
+     * Sets the description of this role.
      *
      * @param description The new description
      */
@@ -49,13 +51,15 @@ public interface Role extends Principal {
 
 
     /**
-     * @return the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
+     * Gets the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
+     *
+     * @return The role name
      */
     String getRolename();
 
 
     /**
-     * Set the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
+     * Sets the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
      *
      * @param rolename The new role name
      */
@@ -63,7 +67,9 @@ public interface Role extends Principal {
 
 
     /**
-     * @return the {@link UserDatabase} within which this Role is defined.
+     * Gets the {@link UserDatabase} within which this Role is defined.
+     *
+     * @return The UserDatabase within which this Role is defined
      */
     UserDatabase getUserDatabase();
 

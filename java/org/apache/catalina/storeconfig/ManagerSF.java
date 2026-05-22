@@ -29,6 +29,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ManagerSF extends StoreFactoryBase {
 
+    /**
+     * Default constructor.
+     */
+    public ManagerSF() {
+    }
+
     private static final Log log = LogFactory.getLog(ManagerSF.class);
 
     @Override

@@ -45,7 +45,21 @@ public interface Authenticator {
      */
     boolean authenticate(Request request, HttpServletResponse response) throws IOException;
 
+    /**
+     * Logs in the specified user for the given request.
+     *
+     * @param userName the user name
+     * @param password the password
+     * @param request the request being processed
+     *
+     * @throws ServletException if a login error occurs
+     */
     void login(String userName, String password, Request request) throws ServletException;
 
+    /**
+     * Logs out the user associated with the given request.
+     *
+     * @param request the request being processed
+     */
     void logout(Request request);
 }

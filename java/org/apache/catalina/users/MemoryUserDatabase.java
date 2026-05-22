@@ -169,7 +169,9 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * @return the relative or absolute pathname to the persistent storage file.
+     * Return the relative or absolute pathname to the persistent storage file.
+     *
+     * @return the relative or absolute pathname to the persistent storage file
      */
     public String getPathname() {
         return this.pathname;
@@ -189,6 +191,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
+     * Return the readonly status of the user database.
+     *
      * @return the readonly status of the user database
      */
     public boolean getReadonly() {
@@ -206,11 +210,21 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
+    /**
+     * Get whether to watch the source file for changes.
+     *
+     * @return the watchSource
+     */
     public boolean getWatchSource() {
         return watchSource;
     }
 
 
+    /**
+     * Set whether to watch the source file for changes.
+     *
+     * @param watchSource the watchSource to set
+     */
     public void setWatchSource(boolean watchSource) {
         this.watchSource = watchSource;
     }

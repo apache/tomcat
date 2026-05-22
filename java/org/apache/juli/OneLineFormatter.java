@@ -65,6 +65,9 @@ public class OneLineFormatter extends Formatter {
     private volatile MillisHandling millisHandling = MillisHandling.APPEND;
 
 
+    /**
+     * Constructs a OneLineFormatter with the default time format from the log manager properties.
+     */
     public OneLineFormatter() {
         String timeFormat = LogManager.getLogManager().getProperty(OneLineFormatter.class.getName() + ".timeFormat");
         if (timeFormat == null) {
@@ -157,6 +160,12 @@ public class OneLineFormatter extends Formatter {
         return sb.toString();
     }
 
+    /**
+     * Resolves the thread name for a log record, handling async handler cases.
+     *
+     * @param record The log record
+     * @return The resolved thread name
+     */
     protected String resolveThreadName(LogRecord record) {
         final String threadName = Thread.currentThread().getName();
         if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
@@ -168,6 +177,12 @@ public class OneLineFormatter extends Formatter {
         }
     }
 
+    /**
+     * Adds a formatted timestamp to the given buffer.
+     *
+     * @param buf The string builder to append to
+     * @param timestamp The timestamp in milliseconds
+     */
     protected void addTimestamp(StringBuilder buf, long timestamp) {
         String cachedTimeStamp = localDateCache.get().getFormat(timestamp);
         if (millisHandling == MillisHandling.NONE) {

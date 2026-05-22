@@ -62,6 +62,15 @@ import org.w3c.dom.Node;
  */
 public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
 
+    /**
+     * Default constructor.
+     */
+    public DataSourcePropertyStore() {
+    }
+
+    /**
+     * The string manager for this package.
+     */
     protected static final StringManager sm = StringManager.getManager(DataSourcePropertyStore.class);
     private final Log log = LogFactory.getLog(DataSourcePropertyStore.class);
 
@@ -89,28 +98,36 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
     private final Lock dbWriteLock = dbLock.writeLock();
 
     /**
-     * @return the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
+     * Return the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
+     *
+     * @return the DataSource JNDI name
      */
     public String getDataSourceName() {
         return this.dataSourceName;
     }
 
     /**
-     * @param dataSourceName the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
+     * Set the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
+     *
+     * @param dataSourceName the DataSource JNDI name
      */
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
     }
 
     /**
-     * @return the table name that will be used in the database
+     * Return the table name that will be used in the database.
+     *
+     * @return the table name
      */
     public String getTableName() {
         return this.tableName;
     }
 
     /**
-     * @param tableName the table name to use in the database
+     * Set the table name to use in the database.
+     *
+     * @param tableName the table name
      */
     public void setTableName(String tableName) {
         this.tableName = tableName;

@@ -19,18 +19,31 @@ package jakarta.el;
 import java.io.Serial;
 import java.util.EventObject;
 
+/**
+ * Event object passed to {@link ELContextListener} instances when an EL context is created or
+ * released. The source of this event is the {@link ELContext} that was created or released.
+ *
+ * @since EL 2.1
+ */
 public class ELContextEvent extends EventObject {
 
     @Serial
     private static final long serialVersionUID = 1255131906285426769L;
 
     /**
+     * Constructs an ELContextEvent with the specified ELContext as its source.
+     *
      * @param source The EL context that was the source of this event
      */
     public ELContextEvent(ELContext source) {
         super(source);
     }
 
+    /**
+     * Returns the ELContext that is the source of this event.
+     *
+     * @return the ELContext associated with this event
+     */
     public ELContext getELContext() {
         return (ELContext) this.getSource();
     }

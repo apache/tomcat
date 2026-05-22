@@ -33,6 +33,13 @@ public class ReferenceCountedJar implements Jar {
     private Jar wrappedJar;
     private int referenceCount = 0;
 
+    /**
+     * Creates a new reference-counted wrapper for the JAR at the given URL.
+     *
+     * @param url the URL of the JAR file
+     *
+     * @throws IOException if the JAR cannot be opened
+     */
     public ReferenceCountedJar(URL url) throws IOException {
         this.url = url;
         open();

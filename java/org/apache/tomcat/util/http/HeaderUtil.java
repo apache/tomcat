@@ -20,6 +20,9 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Utility methods for HTTP header processing.
+ */
 public class HeaderUtil {
 
     private static final Set<String> disallowedTrailerFieldNames = new HashSet<>();
@@ -43,6 +46,13 @@ public class HeaderUtil {
     }
 
 
+    /**
+     * Check if the specified header name is disallowed in HTTP trailers.
+     *
+     * @param headerName The header name to check
+     *
+     * @return {@code true} if the header is disallowed in trailers
+     */
     public static boolean isHeaderDisallowedInTrailers(String headerName) {
         return disallowedTrailerFieldNames.contains(headerName.toLowerCase(Locale.ENGLISH));
     }

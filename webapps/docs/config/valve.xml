@@ -282,12 +282,13 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
+    <li><b><code>%%</code></b> - Literal '%' character</li>
     <li><b><code>%a</code></b> - Remote IP address.
         See also <code>%{xxx}a</code> below.</li>
     <li><b><code>%A</code></b> - Local IP address</li>
     <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
-    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%D</code></b> - Time taken to process the request, in microseconds</li>
     <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
     <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
@@ -2393,16 +2394,23 @@
       </attribute>
 
       <attribute name="crawlerIps" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that client
-        IP is matched against to determine if a request is from a web crawler.
-        By default such regular expression is not set.</p>
+        <p>Regular expression (using <code>java.util.regex</code>) that the
+        client IP is matched against to determine if a request is from a web
+        crawler. An IP match alone is sufficient for the request to be
+        considered to be from a web crawler. It is not necessary for any other
+        check to indicate that the request is from a web crawler. By default
+        such regular expression is not set and no IP check is performed.</p>
       </attribute>
 
       <attribute name="crawlerUserAgents" required="false">
         <p>Regular expression (using <code>java.util.regex</code>) that the user
         agent HTTP request header is matched against to determine if a request
-        is from a web crawler. If not set, the default of
-        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is used.</p>
+        is from a web crawler. An user agent match alone is sufficient for the
+        request to be considered to be from a web crawler. It is not necessary
+        for any other check to indicate that the request is from a web crawler.
+        If not set, the default of
+        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is
+        used.</p>
       </attribute>
 
       <attribute name="hostAware" required="false">

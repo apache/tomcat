@@ -25,7 +25,16 @@ import javax.management.ObjectName;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 
+/**
+ * Base class for JMX accessor conditions.
+ */
 public abstract class JMXAccessorConditionBase extends ProjectComponent implements Condition {
+
+    /**
+     * Constructs a new JMXAccessorConditionBase.
+     */
+    public JMXAccessorConditionBase() {
+    }
 
     private String url = null;
     private String host = "localhost";
@@ -38,124 +47,162 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
     private String ref = "jmx.server";
 
     /**
-     * @return Returns the attribute.
+     * Get the attribute name.
+     *
+     * @return the attribute name
      */
     public String getAttribute() {
         return attribute;
     }
 
     /**
-     * @param attribute The attribute to set.
+     * Set the attribute name.
+     *
+     * @param attribute the attribute name to set
      */
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
 
     /**
-     * @return Returns the host.
+     * Get the JMX host.
+     *
+     * @return the JMX host
      */
     public String getHost() {
         return host;
     }
 
     /**
-     * @param host The host to set.
+     * Set the JMX host.
+     *
+     * @param host the host to set
      */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * @return Returns the name.
+     * Get the MBean object name.
+     *
+     * @return the MBean object name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param objectName The name to set.
+     * Set the MBean object name.
+     *
+     * @param objectName the name to set
      */
     public void setName(String objectName) {
         this.name = objectName;
     }
 
     /**
-     * @return Returns the password.
+     * Get the JMX password.
+     *
+     * @return the JMX password
      */
     public String getPassword() {
         return password;
     }
 
     /**
-     * @param password The password to set.
+     * Set the JMX password.
+     *
+     * @param password the password to set
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * @return Returns the port.
+     * Get the JMX port.
+     *
+     * @return the JMX port
      */
     public String getPort() {
         return port;
     }
 
     /**
-     * @param port The port to set.
+     * Set the JMX port.
+     *
+     * @param port the port to set
      */
     public void setPort(String port) {
         this.port = port;
     }
 
     /**
-     * @return Returns the url.
+     * Get the JMX URL.
+     *
+     * @return the JMX URL
      */
     public String getUrl() {
         return url;
     }
 
     /**
-     * @param url The url to set.
+     * Set the JMX URL.
+     *
+     * @param url the URL to set
      */
     public void setUrl(String url) {
         this.url = url;
     }
 
     /**
-     * @return Returns the username.
+     * Get the JMX username.
+     *
+     * @return the JMX username
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * @param username The username to set.
+     * Set the JMX username.
+     *
+     * @param username the username to set
      */
     public void setUsername(String username) {
         this.username = username;
     }
 
     /**
-     * @return Returns the value.
+     * Get the expected attribute value.
+     *
+     * @return the expected attribute value
      */
     public String getValue() {
         return value;
     }
 
-    // The setter for the "value" attribute
+    /**
+     * Set the expected attribute value.
+     *
+     * @param value the value to set
+     */
     public void setValue(String value) {
         this.value = value;
     }
 
     /**
-     * @return Returns the ref.
+     * Get the project reference for the JMX connection.
+     *
+     * @return the project reference
      */
     public String getRef() {
         return ref;
     }
 
     /**
-     * @param refId The ref to set.
+     * Set the project reference for the JMX connection.
+     *
+     * @param refId the reference to set
      */
     public void setRef(String refId) {
         this.ref = refId;

@@ -18,10 +18,23 @@ package org.apache.catalina.webresources;
 
 import org.apache.catalina.WebResourceRoot;
 
+/**
+ * A virtual resource that represents a directory entry created on-the-fly.
+ */
 public class VirtualResource extends EmptyResource {
 
+    /**
+     * The name of the virtual resource.
+     */
     private final String name;
 
+    /**
+     * Constructs a new VirtualResource.
+     *
+     * @param root       The root resource set
+     * @param webAppPath The web application path
+     * @param name       The resource name
+     */
     public VirtualResource(WebResourceRoot root, String webAppPath, String name) {
         super(root, webAppPath);
         this.name = name;

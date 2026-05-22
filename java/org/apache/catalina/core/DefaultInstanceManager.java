@@ -50,6 +50,10 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.ManagedConcurrentWeakHashMap;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Default implementation of {@link InstanceManager} that handles annotation-based
+ * dependency injection for EJB, JPA, and web service references.
+ */
 public class DefaultInstanceManager implements InstanceManager {
 
     // Used when there are no annotations in a class
@@ -91,12 +95,39 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
+    /**
+     * The context associated with this instance manager.
+     */
     private final Context context;
+
+    /**
+     * The injection map for JNDI resource lookups.
+     */
     private final Map<String,Map<String,String>> injectionMap;
+
+    /**
+     * The class loader for loading application classes.
+     */
     protected final ClassLoader classLoader;
+
+    /**
+     * The class loader for loading container classes.
+     */
     protected final ClassLoader containerClassLoader;
+
+    /**
+     * Whether to perform privileged operations.
+     */
     protected final boolean privileged;
+
+    /**
+     * Whether to ignore annotations during injection.
+     */
     protected final boolean ignoreAnnotations;
+
+    /**
+     * Whether metadata is complete (no annotation scanning required).
+     */
     protected final boolean metadataComplete;
     private final Set<String> restrictedClasses;
     private final ManagedConcurrentWeakHashMap<Class<?>,AnnotationCacheEntry[]> annotationCache =
@@ -104,6 +135,14 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Map<String,String> postConstructMethods;
     private final Map<String,String> preDestroyMethods;
 
+    /**
+     * Create a new DefaultInstanceManager.
+     *
+     * @param context The context associated with this instance manager
+     * @param injectionMap The injection map for JNDI resource lookups
+     * @param catalinaContext The Catalina context for configuration
+     * @param containerClassLoader The container class loader
+     */
     public DefaultInstanceManager(Context context, Map<String,Map<String,String>> injectionMap,
             org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -452,6 +491,14 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
+    /**
+     * Load a class, performing a privileged check if necessary.
+     *
+     * @param className The name of the class to load
+     * @param classLoader The class loader to use
+     * @return the loaded class
+     * @throws ClassNotFoundException if the class cannot be found
+     */
     protected Class<?> loadClassMaybePrivileged(final String className, final ClassLoader classLoader)
             throws ClassNotFoundException {
         Class<?> clazz = loadClass(className, classLoader);
@@ -459,6 +506,14 @@ public class DefaultInstanceManager implements InstanceManager {
         return clazz;
     }
 
+    /**
+     * Load a class using the appropriate class loader.
+     *
+     * @param className The name of the class to load
+     * @param classLoader The class loader to use
+     * @return the loaded class
+     * @throws ClassNotFoundException if the class cannot be found
+     */
     protected Class<?> loadClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
         if (className.startsWith("org.apache.catalina")) {
             return containerClassLoader.loadClass(className);

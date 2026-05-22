@@ -29,12 +29,21 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Gzip output filter.
+ * Gzip output filter that compresses response data using the GZIP algorithm.
  */
 public class GzipOutputFilter implements OutputFilter {
 
+    /**
+     * Logger for this filter.
+     */
     protected static final Log log = LogFactory.getLog(GzipOutputFilter.class);
     private static final StringManager sm = StringManager.getManager(GzipOutputFilter.class);
+
+    /**
+     * Constructs a new GzipOutputFilter.
+     */
+    public GzipOutputFilter() {
+    }
 
 
     // ----------------------------------------------------- Instance Variables
@@ -139,8 +148,20 @@ public class GzipOutputFilter implements OutputFilter {
     // ------------------------------------------- FakeOutputStream Inner Class
 
 
+    /**
+     * Internal output stream that writes data to the underlying buffer.
+     */
     protected class FakeOutputStream extends OutputStream {
+        /**
+         * Single-byte buffer used for writing individual bytes.
+         */
         protected final ByteBuffer outputChunk = ByteBuffer.allocate(1);
+
+        /**
+         * Constructs a new FakeOutputStream.
+         */
+        public FakeOutputStream() {
+        }
 
         @Override
         public void write(int b) throws IOException {

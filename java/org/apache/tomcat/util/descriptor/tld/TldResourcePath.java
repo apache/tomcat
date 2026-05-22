@@ -125,6 +125,12 @@ public class TldResourcePath {
         }
     }
 
+    /**
+     * Opens the JAR file that contains this resource, if any.
+     *
+     * @return the JAR, or null if this is not a JAR entry
+     * @throws IOException if an I/O error occurs
+     */
     public Jar openJar() throws IOException {
         if (entryName == null) {
             return null;

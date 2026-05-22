@@ -52,6 +52,9 @@ import org.apache.juli.logging.LogFactory;
 public class EncryptInterceptor extends ChannelInterceptorBase implements EncryptInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(EncryptInterceptor.class);
+    /**
+     * String manager for internationalized messages.
+     */
     protected static final StringManager sm = StringManager.getManager(EncryptInterceptor.class);
 
     private static final String DEFAULT_ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
@@ -64,6 +67,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
     private BaseEncryptionManager encryptionManager;
 
+    /**
+     * Creates a new encryption interceptor with default settings.
+     */
     public EncryptInterceptor() {
     }
 
@@ -198,11 +204,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     }
 
     /**
-     * Gets the encryption key being used for encryption and decryption. The key is encoded using hex-encoding where
-     * e.g. the byte <code>0xab</code> will be shown as "ab". The length of the string in characters will be twice the
-     * length of the key in bytes.
+     * Sets the encryption key using a hex-encoded string. Each pair of hex characters represents one byte of the key.
      *
-     * @param keyBytes The encryption key.
+     * @param keyBytes The hex-encoded encryption key.
      */
     public void setEncryptionKey(String keyBytes) {
         this.encryptionKeyString = keyBytes;
@@ -233,10 +237,20 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         return encryptionKeyBytes;
     }
 
+    /**
+     * Returns the hex-encoded encryption key string.
+     *
+     * @return the hex-encoded encryption key, or {@code null} if not set
+     */
     public String getEncryptionKeyString() {
         return encryptionKeyString;
     }
 
+    /**
+     * Sets the hex-encoded encryption key string.
+     *
+     * @param encryptionKeyString the hex-encoded encryption key
+     */
     public void setEncryptionKeyString(String encryptionKeyString) {
         setEncryptionKey(encryptionKeyString);
     }

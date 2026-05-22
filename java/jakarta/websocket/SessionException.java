@@ -18,20 +18,38 @@ package jakarta.websocket;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when an error occurs on a WebSocket session.
+ */
 public class SessionException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The session on which the error occurred.
+     */
     private final Session session;
 
 
+    /**
+     * Creates a SessionException with the specified detail message, cause, and session.
+     *
+     * @param message The detail message
+     * @param cause   The underlying cause of the exception
+     * @param session The session on which the error occurred
+     */
     public SessionException(String message, Throwable cause, Session session) {
         super(message, cause);
         this.session = session;
     }
 
 
+    /**
+     * Returns the session on which the error occurred.
+     *
+     * @return The session
+     */
     public Session getSession() {
         return session;
     }

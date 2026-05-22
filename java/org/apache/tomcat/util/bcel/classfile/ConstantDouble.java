@@ -44,7 +44,9 @@ public final class ConstantDouble extends Constant {
 
 
     /**
-     * @return data, i.e., 8 bytes.
+     * Get the 8-byte double value stored in this constant pool entry.
+     *
+     * @return the double value
      */
     public double getBytes() {
         return bytes;

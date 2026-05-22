@@ -42,33 +42,8 @@ class BeanSupportFull extends BeanSupport {
                 for (PropertyDescriptor pd : pds) {
                     this.properties.put(pd.getName(), new BeanPropertyFull(type, pd));
                 }
-                /*
-                 * https://bugs.openjdk.org/browse/JDK-8071693 - Introspector ignores default interface methods.
-                 *
-                 * This bug is fixed in Java 21 b21. This workaround can be removed once the minimum Java version is 21.
-                 * Populating from any interfaces causes default methods to be included.
-                 */
-                populateFromInterfaces(type);
             } catch (IntrospectionException ie) {
                 throw new ELException(ie);
-            }
-        }
-
-        private void populateFromInterfaces(Class<?> aClass) throws IntrospectionException {
-            Class<?>[] interfaces = aClass.getInterfaces();
-            for (Class<?> ifs : interfaces) {
-                BeanInfo info = Introspector.getBeanInfo(ifs);
-                PropertyDescriptor[] pds = info.getPropertyDescriptors();
-                for (PropertyDescriptor pd : pds) {
-                    if (!this.properties.containsKey(pd.getName())) {
-                        this.properties.put(pd.getName(), new BeanPropertyFull(this.type, pd));
-                    }
-                }
-                populateFromInterfaces(ifs);
-            }
-            Class<?> superclass = aClass.getSuperclass();
-            if (superclass != null) {
-                populateFromInterfaces(superclass);
             }
         }
     }

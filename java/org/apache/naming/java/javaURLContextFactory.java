@@ -44,10 +44,19 @@ public class javaURLContextFactory implements ObjectFactory, InitialContextFacto
 
     // ----------------------------------------------------------- Constructors
 
+    /**
+     * Constructs a new javaURLContextFactory.
+     */
+    public javaURLContextFactory() {
+    }
+
 
     // -------------------------------------------------------------- Constants
 
 
+    /**
+     * The name of the initial context.
+     */
     public static final String MAIN = "initialContext";
 
 

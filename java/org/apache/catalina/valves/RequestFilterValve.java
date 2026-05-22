@@ -56,7 +56,9 @@ import org.apache.juli.logging.Log;
  */
 public abstract class RequestFilterValve extends ValveBase {
 
-    // ------------------------------------------------------ Constructor
+    /**
+     * Default constructor.
+     */
     public RequestFilterValve() {
         super(true);
     }
@@ -220,6 +222,8 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
+     * Return the HTTP response status code used to reject denied requests.
+     *
      * @return response status code that is used to reject denied request.
      */
     public int getDenyStatus() {
@@ -238,6 +242,8 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
+     * Return whether a denied request is handled by setting an invalid authentication header.
+     *
      * @return <code>true</code> if a deny is handled by setting an invalid auth header.
      */
     public boolean getInvalidAuthenticationWhenDeny() {
@@ -362,6 +368,11 @@ public abstract class RequestFilterValve extends ValveBase {
     }
 
 
+    /**
+     * Returns the logger instance used by this valve.
+     *
+     * @return the logger
+     */
     protected abstract Log getLog();
 
 

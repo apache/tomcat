@@ -28,5 +28,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface PathParam {
+
+    /**
+     * The name of the path parameter from the URI template.
+     *
+     * @return The path parameter name
+     */
     String value();
 }

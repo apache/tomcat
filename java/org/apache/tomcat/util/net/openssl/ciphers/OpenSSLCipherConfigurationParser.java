@@ -41,6 +41,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class OpenSSLCipherConfigurationParser {
 
+    /**
+     * Constructs an OpenSSLCipherConfigurationParser.
+     */
+    public OpenSSLCipherConfigurationParser() {
+    }
+
     private static final Log log = LogFactory.getLog(OpenSSLCipherConfigurationParser.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLCipherConfigurationParser.class);
 
@@ -700,6 +706,12 @@ public class OpenSSLCipherConfigurationParser {
         return result;
     }
 
+    /**
+     * Parses an OpenSSL cipher expression into a set of ciphers.
+     *
+     * @param expression The cipher expression to parse
+     * @return The set of matching ciphers
+     */
     public static LinkedHashSet<Cipher> parse(String expression) {
         if (!initialized) {
             init();
@@ -776,6 +788,12 @@ public class OpenSSLCipherConfigurationParser {
         return ciphers;
     }
 
+    /**
+     * Converts a collection of OpenSSL ciphers to their JSSE names.
+     *
+     * @param ciphers The OpenSSL ciphers to convert
+     * @return The list of JSSE cipher names
+     */
     public static List<String> convertForJSSE(Collection<Cipher> ciphers) {
         List<String> result = new ArrayList<>(ciphers.size());
         for (Cipher cipher : ciphers) {
@@ -871,6 +889,9 @@ public class OpenSSLCipherConfigurationParser {
         return builder.substring(0, builder.length() - 1);
     }
 
+    /**
+     * Prints usage information for the command-line tool.
+     */
     public static void usage() {
         System.out
                 .println("Usage: java " + OpenSSLCipherConfigurationParser.class.getName() + " [options] cipher spec");
@@ -884,6 +905,12 @@ public class OpenSSLCipherConfigurationParser {
         System.out.println(" -v          Provide detailed cipher listing");
     }
 
+    /**
+     * Main entry point for the cipher configuration parser tool.
+     *
+     * @param args Command line arguments
+     * @throws Exception if an error occurs
+     */
     public static void main(String[] args) throws Exception {
         boolean verbose = false;
         boolean useOpenSSLNames = false;

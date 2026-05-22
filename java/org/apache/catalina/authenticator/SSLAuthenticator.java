@@ -45,6 +45,13 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
  */
 public class SSLAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Default constructor.
+     */
+    public SSLAuthenticator() {
+        super();
+    }
+
     private final Log log = LogFactory.getLog(SSLAuthenticator.class); // must not be static
 
     /**

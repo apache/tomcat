@@ -32,17 +32,47 @@ import org.xml.sax.SAXException;
  * Parses a Tag Library Descriptor.
  */
 public class TldParser {
+    /**
+     * The logger for this parser.
+     */
     private final Log log = LogFactory.getLog(TldParser.class); // must not be static
+
+    /**
+     * The digester used to parse TLD XML.
+     */
     private final Digester digester;
 
+    /**
+     * Creates a new TldParser with default rules.
+     *
+     * @param namespaceAware whether namespace processing is enabled
+     * @param validation whether XML validation is enabled
+     * @param blockExternal whether external entities should be blocked
+     */
     public TldParser(boolean namespaceAware, boolean validation, boolean blockExternal) {
         this(namespaceAware, validation, new TldRuleSet(), blockExternal);
     }
 
+    /**
+     * Creates a new TldParser with the specified rule set.
+     *
+     * @param namespaceAware whether namespace processing is enabled
+     * @param validation whether XML validation is enabled
+     * @param ruleSet the rule set for parsing
+     * @param blockExternal whether external entities should be blocked
+     */
     public TldParser(boolean namespaceAware, boolean validation, RuleSet ruleSet, boolean blockExternal) {
         digester = DigesterFactory.newDigester(validation, namespaceAware, ruleSet, blockExternal);
     }
 
+    /**
+     * Parses a TLD from the given resource path.
+     *
+     * @param path the TLD resource path
+     * @return the parsed tag library XML
+     * @throws IOException if an I/O error occurs
+     * @throws SAXException if a parsing error occurs
+     */
     public TaglibXml parse(TldResourcePath path) throws IOException, SAXException {
         Thread currentThread = Thread.currentThread();
         ClassLoader original = currentThread.getContextClassLoader();
@@ -71,6 +101,11 @@ public class TldParser {
         }
     }
 
+    /**
+     * Sets the class loader used for parsing.
+     *
+     * @param classLoader the class loader
+     */
     public void setClassLoader(ClassLoader classLoader) {
         digester.setClassLoader(classLoader);
     }

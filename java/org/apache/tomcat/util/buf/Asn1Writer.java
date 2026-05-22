@@ -16,8 +16,23 @@
  */
 package org.apache.tomcat.util.buf;
 
+/**
+ * Utility class for writing ASN.1 DER-encoded data structures.
+ */
 public class Asn1Writer {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Asn1Writer() {
+    }
+
+    /**
+     * Writes an ASN.1 SEQUENCE containing the given components.
+     *
+     * @param components the component byte arrays to include in the sequence
+     * @return the DER-encoded SEQUENCE bytes
+     */
     public static byte[] writeSequence(byte[]... components) {
         int len = 0;
         for (byte[] component : components) {
@@ -35,7 +50,17 @@ public class Asn1Writer {
     }
 
 
+    /**
+     * Writes an ASN.1 INTEGER value.
+     *
+     * @param value the integer value to encode
+     * @return the DER-encoded INTEGER bytes
+     */
     public static byte[] writeInteger(int value) {
+        if (value < 0) {
+            throw new IllegalArgumentException();
+        }
+
         // How many bytes required to write the value? No more than 4 for int.
         int valueSize = 1;
         while ((value >> (valueSize * 8)) > 0) {
@@ -54,10 +79,23 @@ public class Asn1Writer {
         return writeTag((byte) 0x02, valueBytes);
     }
 
+    /**
+     * Writes an ASN.1 OCTET STRING value.
+     *
+     * @param data the octet string bytes to encode
+     * @return the DER-encoded OCTET STRING bytes
+     */
     public static byte[] writeOctetString(byte[] data) {
         return writeTag((byte) 0x04, data);
     }
 
+    /**
+     * Writes an ASN.1 tag with the given data.
+     *
+     * @param tagId the ASN.1 tag identifier byte
+     * @param data the data bytes to encode
+     * @return the DER-encoded tag and data bytes
+     */
     public static byte[] writeTag(byte tagId, byte[] data) {
         int dataSize = data.length;
         // How many bytes to write the length?

@@ -21,7 +21,17 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * An executor service that runs tasks inline on the calling thread. Useful for testing
+ * and scenarios where asynchronous execution is not required.
+ */
 public class InlineExecutorService extends AbstractExecutorService {
+
+    /**
+     * Creates a new inline executor service.
+     */
+    public InlineExecutorService() {
+    }
 
     private volatile boolean shutdown;
     private volatile boolean taskRunning;

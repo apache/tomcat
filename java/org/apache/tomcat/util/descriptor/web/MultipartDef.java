@@ -28,46 +28,96 @@ public class MultipartDef implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
+    public MultipartDef() {
+    }
+
     // ------------------------------------------------------------- Properties
+    /**
+     * The location for temporary file storage.
+     */
     private String location;
 
+    /**
+     * Get the location.
+     * @return the location
+     */
     public String getLocation() {
         return location;
     }
 
+    /**
+     * Set the location.
+     * @param location the location
+     */
     public void setLocation(String location) {
         this.location = location;
     }
 
 
+    /**
+     * The maximum allowed file size.
+     */
     private String maxFileSize;
 
+    /**
+     * Get the maximum file size.
+     * @return the maximum file size
+     */
     public String getMaxFileSize() {
         return maxFileSize;
     }
 
+    /**
+     * Set the maximum file size.
+     * @param maxFileSize the maximum file size
+     */
     public void setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
     }
 
 
+    /**
+     * The maximum allowed request size.
+     */
     private String maxRequestSize;
 
+    /**
+     * Get the maximum request size.
+     * @return the maximum request size
+     */
     public String getMaxRequestSize() {
         return maxRequestSize;
     }
 
+    /**
+     * Set the maximum request size.
+     * @param maxRequestSize the maximum request size
+     */
     public void setMaxRequestSize(String maxRequestSize) {
         this.maxRequestSize = maxRequestSize;
     }
 
 
+    /**
+     * The file size threshold for switching to disk storage.
+     */
     private String fileSizeThreshold;
 
+    /**
+     * Get the file size threshold.
+     * @return the file size threshold
+     */
     public String getFileSizeThreshold() {
         return fileSizeThreshold;
     }
 
+    /**
+     * Set the file size threshold.
+     * @param fileSizeThreshold the file size threshold
+     */
     public void setFileSizeThreshold(String fileSizeThreshold) {
         this.fileSizeThreshold = fileSizeThreshold;
     }

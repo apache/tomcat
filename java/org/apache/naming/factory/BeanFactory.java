@@ -60,6 +60,9 @@ import org.apache.naming.StringManager;
  */
 public class BeanFactory implements ObjectFactory {
 
+    /** Default constructor. */
+    public BeanFactory() { }
+
     private static final StringManager sm = StringManager.getManager(BeanFactory.class);
 
     private final Log log = LogFactory.getLog(BeanFactory.class); // Not static

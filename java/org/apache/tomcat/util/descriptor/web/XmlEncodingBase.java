@@ -24,9 +24,20 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class XmlEncodingBase {
 
+    /**
+     * Default constructor.
+     */
+    public XmlEncodingBase() {
+    }
+
     private Charset charset = StandardCharsets.UTF_8;
 
 
+    /**
+     * Set the character encoding of the XML source used to populate this object.
+     *
+     * @param charset The character encoding
+     */
     public void setCharset(Charset charset) {
         this.charset = charset;
     }

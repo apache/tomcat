@@ -93,10 +93,20 @@ public final class Mark {
     }
 
 
+    /**
+     * Get the line number.
+     *
+     * @return the line number
+     */
     public int getLineNumber() {
         return line;
     }
 
+    /**
+     * Get the column number.
+     *
+     * @return the column number
+     */
     public int getColumnNumber() {
         return col;
     }
@@ -106,6 +116,11 @@ public final class Mark {
         return getFile() + "(" + line + "," + col + ")";
     }
 
+    /**
+     * Get the file name.
+     *
+     * @return the file name
+     */
     public String getFile() {
         return this.fileName;
     }

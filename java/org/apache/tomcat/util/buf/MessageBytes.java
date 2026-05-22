@@ -40,8 +40,14 @@ public final class MessageBytes implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     // primary type ( whatever is set as original value )
+    /**
+     * The primary data type of this MessageBytes instance.
+     */
     private int type = T_NULL;
 
+    /**
+     * Type is NULL.
+     */
     public static final int T_NULL = 0;
     /**
      * getType() is T_STR if the object used to create the MessageBytes was a String.
@@ -56,17 +62,35 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public static final int T_CHARS = 3;
 
+    /**
+     * Empty character array.
+     */
     public static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
+    /**
+     * The cached hash code value.
+     */
     private int hashCode = 0;
     // did we compute the hashcode ?
+    /**
+     * Whether the hash code has been computed.
+     */
     private boolean hasHashCode = false;
 
     // Internal objects to represent array + offset, and specific methods
+    /**
+     * The internal byte chunk for byte array representation.
+     */
     private final ByteChunk byteC = new ByteChunk();
+    /**
+     * The internal char chunk for character array representation.
+     */
     private final CharChunk charC = new CharChunk();
 
     // String
+    /**
+     * The cached string value.
+     */
     private String strValue;
 
     /**
@@ -89,6 +113,10 @@ public final class MessageBytes implements Cloneable, Serializable {
         return super.clone();
     }
 
+    /**
+     * Check if the message bytes is null.
+     * @return true if null
+     */
     public boolean isNull() {
         return type == T_NULL;
     }
@@ -241,7 +269,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /**
-     * @return the Charset used for string&lt;-&gt;byte conversions.
+     * Return the Charset used for string&lt;-&gt;byte conversions.
+     *
+     * @return the Charset used for string&lt;-&gt;byte conversions
      */
     public Charset getCharset() {
         return byteC.getCharset();
@@ -396,20 +426,31 @@ public final class MessageBytes implements Cloneable, Serializable {
         return false;
     }
 
+    /**
+     * Compare this message bytes to another.
+     * @param mb the other message bytes
+     * @return true if equal
+     */
     public boolean equals(MessageBytes mb) {
+        // MessageBytes can be one of four types so there are 4 * 4 = 16 possible combinations.
+
+        // If either instance is a String, use equals(String)
         if (type == T_STR) {
             return mb.equals(strValue);
         }
-
-        if (mb.type != T_CHARS && mb.type != T_BYTES) {
-            // it's a string or int/date string value
-            return equals(mb.toString());
+        if (mb.type == T_STR) {
+            return equals(mb.strValue);
         }
 
-        // mb is either CHARS or BYTES.
-        // this is either CHARS or BYTES
-        // Deal with the 4 cases ( in fact 3, one is symmetric)
+        // If either instance is null, use isNull
+        if (type == T_NULL) {
+            return mb.isNull();
+        }
+        if (mb.type == T_NULL) {
+            return isNull();
+        }
 
+        // At this point both instances are either T_BYTES or T_CHARS
         if (mb.type == T_CHARS && type == T_CHARS) {
             return charC.equals(mb.charC);
         }
@@ -422,14 +463,16 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (mb.type == T_BYTES && type == T_CHARS) {
             return mb.byteC.equals(charC);
         }
-        // can't happen
-        return true;
+
+        // Impossible to reach this point
+        return false;
     }
 
 
     /**
-     * @return <code>true</code> if the message bytes starts with the specified string.
+     * Check if the message bytes starts with the specified string, ignoring case.
      *
+     * @return <code>true</code> if the message bytes starts with the specified string
      * @param s   the string
      * @param pos The start position
      */
@@ -490,6 +533,12 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // Inefficient initial implementation. Will be replaced on the next
     // round of tune-up
+    /**
+     * Find the index of a string.
+     * @param s the string
+     * @param starting the starting position
+     * @return the index
+     */
     public int indexOf(String s, int starting) {
         toString();
         return strValue.indexOf(s, starting);
@@ -497,10 +546,21 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // Inefficient initial implementation. Will be replaced on the next
     // round of tune-up
+    /**
+     * Find the index of a string.
+     * @param s the string
+     * @return the index
+     */
     public int indexOf(String s) {
         return indexOf(s, 0);
     }
 
+    /**
+     * Find the index of a string, ignoring case.
+     * @param s the string
+     * @param starting the starting position
+     * @return the index
+     */
     public int indexOfIgnoreCase(String s, int starting) {
         toString();
         String upper = strValue.toUpperCase(Locale.ENGLISH);
@@ -539,7 +599,13 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     // efficient long
+    /**
+     * The cached long value.
+     */
     private long longValue;
+    /**
+     * Whether the long value has been computed.
+     */
     private boolean hasLongValue = false;
 
     /**
@@ -557,13 +623,14 @@ public final class MessageBytes implements Cloneable, Serializable {
             buf[end++] = (byte) '0';
         }
         if (l < 0) {
-            current = -l;
             buf[end++] = (byte) '-';
+        } else {
+            current = -l;
         }
-        while (current > 0) {
+        while (current < 0) {
             int digit = (int) (current % 10);
             current = current / 10;
-            buf[end++] = HexUtils.getHex(digit);
+            buf[end++] = HexUtils.getHex(-digit);
         }
         byteC.setStart(0);
         byteC.setEnd(end);

@@ -20,7 +20,16 @@ import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.jasper.tagplugins.jstl.Util;
 
+/**
+ * Tag plugin for the JSTL &lt;c:remove&gt; tag.
+ */
 public class Remove implements TagPlugin {
+
+    /**
+     * Default constructor.
+     */
+    public Remove() {
+    }
 
     @Override
     public void doTag(TagPluginContext ctxt) {

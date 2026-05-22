@@ -142,7 +142,15 @@ public class FileItemIteratorImpl implements FileItemIterator {
         findNextItem();
     }
 
-    protected void init(final FileUploadBase fileUploadBase, @SuppressWarnings("unused") final RequestContext pRequestContext)
+    /**
+     * Initializes the multipart stream for processing the request.
+     *
+     * @param fileUploadBase The file upload base configuration
+     * @param pRequestContext The request context - unused
+     * @throws FileUploadException If the request content type is invalid or size exceeds limits
+     * @throws IOException If an I/O error occurs
+     */
+    protected void init(final FileUploadBase fileUploadBase, final RequestContext pRequestContext)
             throws FileUploadException, IOException {
         final String contentType = ctx.getContentType();
         if ((null == contentType)
@@ -201,6 +209,13 @@ public class FileItemIteratorImpl implements FileItemIterator {
         multiPartStream.setPartHeaderSizeMax(fileUploadBase.getPartHeaderSizeMax());
     }
 
+    /**
+     * Returns the underlying MultipartStream, initializing it if necessary.
+     *
+     * @return The MultipartStream for this iterator
+     * @throws FileUploadException If the request content type is invalid or size exceeds limits
+     * @throws IOException If an I/O error occurs
+     */
     public MultipartStream getMultiPartStream() throws FileUploadException, IOException {
         if (multiPartStream == null) {
             init(fileUploadBase, ctx);

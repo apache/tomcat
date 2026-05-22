@@ -66,6 +66,8 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     void pause();
 
     /**
+     * Checks if the handler is able to process asynchronous IO.
+     *
      * @return {@code true} if able to process asynchronous IO, default is {@code false}
      */
     default boolean hasAsyncIO() {
@@ -73,6 +75,8 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     }
 
     /**
+     * Returns the associated upgrade information used to collect statistics for the connection.
+     *
      * @return the associated upgrade information used to collect statistics for the connection
      */
     default UpgradeInfo getUpgradeInfo() {

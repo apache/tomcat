@@ -26,6 +26,12 @@ import javax.naming.NamingException;
  */
 public class NameParserImpl implements NameParser {
 
+    /**
+     * Default constructor.
+     */
+    public NameParserImpl() {
+    }
+
 
     // ----------------------------------------------------- NameParser Methods
 

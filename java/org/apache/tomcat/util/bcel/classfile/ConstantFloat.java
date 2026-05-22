@@ -44,7 +44,9 @@ public final class ConstantFloat extends Constant {
 
 
     /**
-     * @return data, i.e., 4 bytes.
+     * Get the 4-byte float value stored in this constant pool entry.
+     *
+     * @return the float value
      */
     public float getBytes() {
         return bytes;

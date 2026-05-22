@@ -27,6 +27,12 @@ import org.apache.tools.ant.BuildException;
 public abstract class AbstractCatalinaCommandTask extends AbstractCatalinaTask {
 
     /**
+     * Create a new instance.
+     */
+    public AbstractCatalinaCommandTask() {
+    }
+
+    /**
      * The context path of the web application we are managing.
      */
     protected String path = null;

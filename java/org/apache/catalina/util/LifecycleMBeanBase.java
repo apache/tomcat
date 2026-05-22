@@ -27,7 +27,16 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation of MBean registration for lifecycle components.
+ */
 public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEnabled {
+
+    /**
+     * Default constructor.
+     */
+    public LifecycleMBeanBase() {
+    }
 
     private static final Log log = LogFactory.getLog(LifecycleMBeanBase.class);
 

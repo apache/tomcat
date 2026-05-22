@@ -20,7 +20,15 @@ import java.nio.ByteBuffer;
 
 import jakarta.websocket.PongMessage;
 
+/**
+ * WebSocket pong message containing application data.
+ * @param applicationData the application data buffer
+ */
 public record WsPongMessage(ByteBuffer applicationData) implements PongMessage {
+    /**
+     * Creates a pong message, copying the application data.
+     * @param applicationData the application data buffer
+     */
     public WsPongMessage(ByteBuffer applicationData) {
         byte[] dst = new byte[applicationData.limit()];
         applicationData.get(dst);

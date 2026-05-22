@@ -35,6 +35,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class LifecycleBase implements Lifecycle {
 
+    /**
+     * Default constructor.
+     */
+    public LifecycleBase() {
+    }
+
     private static final Log log = LogFactory.getLog(LifecycleBase.class);
 
     private static final StringManager sm = StringManager.getManager(LifecycleBase.class);

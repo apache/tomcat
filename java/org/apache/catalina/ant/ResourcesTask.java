@@ -29,6 +29,11 @@ import org.apache.tools.ant.BuildException;
  * @since 4.1
  */
 public class ResourcesTask extends AbstractCatalinaTask {
+    /**
+     * Default constructor.
+     */
+    public ResourcesTask() {
+    }
 
 
     // ------------------------------------------------------------- Properties
@@ -39,10 +44,20 @@ public class ResourcesTask extends AbstractCatalinaTask {
      */
     protected String type = null;
 
+    /**
+     * Return the fully qualified class name of the resource type being requested.
+     *
+     * @return The fully qualified class name of the resource type
+     */
     public String getType() {
         return this.type;
     }
 
+    /**
+     * Set the fully qualified class name of the resource type being requested.
+     *
+     * @param type The fully qualified class name of the resource type
+     */
     public void setType(String type) {
         this.type = type;
     }

@@ -51,6 +51,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.Asn1Writer;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -64,6 +66,7 @@ import org.ietf.jgss.Oid;
  */
 public class PEMFile {
 
+    private static final Log log = LogFactory.getLog(PEMFile.class);
     private static final StringManager sm = StringManager.getManager(PEMFile.class);
 
     private static final byte[] OID_EC_PUBLIC_KEY =
@@ -106,6 +109,15 @@ public class PEMFile {
         OID_TO_ALGORITHM.put("60864801650304012a", Algorithm.AES256_CBC_PAD);
     }
 
+    /**
+     * Converts an X509 certificate to PEM format.
+     *
+     * @param certificate The certificate to convert
+     *
+     * @return The PEM-encoded certificate string
+     *
+     * @throws CertificateEncodingException If the certificate cannot be encoded
+     */
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + System.lineSeparator() +
                 Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) + Part.END_BOUNDARY +
@@ -115,26 +127,74 @@ public class PEMFile {
     private final List<X509Certificate> certificates = new ArrayList<>();
     private PrivateKey privateKey;
 
+    /**
+     * Returns the list of X509 certificates loaded from this PEM file.
+     *
+     * @return the list of X509 certificates
+     */
     public List<X509Certificate> getCertificates() {
         return certificates;
     }
 
+    /**
+     * Returns the private key loaded from this PEM file.
+     *
+     * @return the private key, or null if no private key was loaded
+     */
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
 
+    /**
+     * Construct a PEMFile from the given file without a password.
+     *
+     * @param filename The path to the PEM file
+     *
+     * @throws IOException              If the file cannot be read
+     * @throws GeneralSecurityException If the file cannot be parsed
+     */
     public PEMFile(String filename) throws IOException, GeneralSecurityException {
         this(filename, null);
     }
 
+    /**
+     * Construct a PEMFile from the given file with the given password.
+     *
+     * @param filename The path to the PEM file
+     * @param password The password to decrypt any encrypted private key
+     *
+     * @throws IOException              If the file cannot be read
+     * @throws GeneralSecurityException If the file cannot be parsed
+     */
     public PEMFile(String filename, String password) throws IOException, GeneralSecurityException {
         this(filename, password, null);
     }
 
+    /**
+     * Construct a PEMFile from the given file with the given password and key algorithm.
+     *
+     * @param filename     The path to the PEM file
+     * @param password     The password to decrypt any encrypted private key
+     * @param keyAlgorithm The key algorithm, or null to auto-detect
+     *
+     * @throws IOException              If the file cannot be read
+     * @throws GeneralSecurityException If the file cannot be parsed
+     */
     public PEMFile(String filename, String password, String keyAlgorithm) throws IOException, GeneralSecurityException {
         this(filename, ConfigFileLoader.getSource().getResource(filename).getInputStream(), password, keyAlgorithm);
     }
 
+    /**
+     * Construct a PEMFile from the given file with the password read from a separate file.
+     *
+     * @param filename         The path to the PEM file
+     * @param password         The password to decrypt any encrypted private key
+     * @param passwordFilename The path to the file containing the password
+     * @param keyAlgorithm     The key algorithm, or null to auto-detect
+     *
+     * @throws IOException              If the file cannot be read
+     * @throws GeneralSecurityException If the file cannot be parsed
+     */
     public PEMFile(String filename, String password, String passwordFilename, String keyAlgorithm)
             throws IOException, GeneralSecurityException {
         this(filename, ConfigFileLoader.getSource().getResource(filename).getInputStream(), password, passwordFilename,
@@ -143,12 +203,25 @@ public class PEMFile {
                 keyAlgorithm);
     }
 
+    /**
+     * Construct a PEMFile from the given input stream with the given password and key algorithm.
+     *
+     * @param filename     The filename to mention in error messages
+     * @param fileStream   The input stream containing the PEM data
+     * @param password     The password to decrypt any encrypted private key
+     * @param keyAlgorithm The key algorithm, or null to auto-detect
+     *
+     * @throws IOException              If the stream cannot be read
+     * @throws GeneralSecurityException If the data cannot be parsed
+     */
     public PEMFile(String filename, InputStream fileStream, String password, String keyAlgorithm)
             throws IOException, GeneralSecurityException {
         this(filename, fileStream, password, null, null, keyAlgorithm);
     }
 
     /**
+     * Construct a PEMFile from the given input stream with the given password and key algorithm.
+     *
      * @param filename           the filename to mention in error messages, not used for anything else.
      * @param fileStream         the stream containing the pem(s).
      * @param password           password to load the pem objects.
@@ -300,18 +373,21 @@ public class PEMFile {
                             secretKeyAlgorithm = "DES";
                             cipherTransformation = "DES/CBC/PKCS5Padding";
                             keyLength = 8;
+                            log.error(sm.getString("pemFile.encryption.broken", filename, algorithm));
                             break;
                         }
                         case "DES-EDE3-CBC": {
                             secretKeyAlgorithm = "DESede";
                             cipherTransformation = "DESede/CBC/PKCS5Padding";
                             keyLength = 24;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
                         case "AES-256-CBC": {
                             secretKeyAlgorithm = "AES";
                             cipherTransformation = "AES/CBC/PKCS5Padding";
                             keyLength = 32;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
                         default:
@@ -431,6 +507,7 @@ public class PEMFile {
                         throw new NoSuchAlgorithmException(
                                 sm.getString("pemFile.unknownEncryptionAlgorithm", toDottedOidString(oidCipher)));
                     }
+                    log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
 
                     byte[] iv = p.parseOctetString();
 

@@ -83,6 +83,9 @@ public class LoadBalancerDrainingValve extends ValveBase {
      */
     private String _ignoreCookieValue;
 
+    /**
+     * Default constructor.
+     */
     public LoadBalancerDrainingValve() {
         super(true); // Supports async
     }

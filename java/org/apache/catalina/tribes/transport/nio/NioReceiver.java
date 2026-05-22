@@ -41,6 +41,9 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * NIO-based receiver for cluster communication.
+ */
 public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMBean {
 
     private static final Log log = LogFactory.getLog(NioReceiver.class);
@@ -56,8 +59,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
+    /**
+     * Queue of events to be processed by the selector thread.
+     */
     protected final Deque<Runnable> events = new ConcurrentLinkedDeque<>();
 
+    /**
+     * Default constructor.
+     */
     public NioReceiver() {
     }
 
@@ -110,6 +119,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     }
 
 
+    /**
+     * Binds the server socket and datagram channels to their respective ports.
+     *
+     * @throws IOException If binding fails
+     */
     protected void bind() throws IOException {
         // allocate an unbound server socket channel
         serverChannel = ServerSocketChannel.open();
@@ -143,6 +157,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         datagramChannel.socket().setTrafficClass(getSoTrafficClass());
     }
 
+    /**
+     * Adds a runnable event to the selector's event queue.
+     *
+     * @param event The event to add
+     */
     public void addEvent(Runnable event) {
         Selector selector = this.selector.get();
         if (selector != null) {
@@ -156,6 +175,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
     }
 
+    /**
+     * Processes all pending events in the event queue.
+     */
     public void events() {
         if (events.isEmpty()) {
             return;
@@ -173,6 +195,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
     }
 
+    /**
+     * Handles a cancelled selection key by closing associated channels and cleaning up resources.
+     *
+     * @param key The cancelled selection key
+     */
     public static void cancelledKey(SelectionKey key) {
         ObjectReader reader = (ObjectReader) key.attachment();
         if (reader != null) {
@@ -209,8 +236,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     }
 
+    /**
+     * Timestamp of the last socket timeout check.
+     */
     protected long lastCheck = System.currentTimeMillis();
 
+    /**
+     * Checks for socket timeouts and handles expired connections.
+     */
     protected void socketTimeouts() {
         long now = System.currentTimeMillis();
         if ((now - lastCheck) < getSelectorTimeout()) {

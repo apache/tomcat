@@ -53,6 +53,12 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorGetTask extends JMXAccessorTask {
 
+    /**
+     * Constructs a new JMXAccessorGetTask.
+     */
+    public JMXAccessorGetTask() {
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -61,14 +67,18 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attribute.
+     * Get the MBean attribute name.
+     *
+     * @return the attribute name
      */
     public String getAttribute() {
         return attribute;
     }
 
     /**
-     * @param attribute The attribute to set.
+     * Set the MBean attribute name.
+     *
+     * @param attribute the attribute to set
      */
     public void setAttribute(String attribute) {
         this.attribute = attribute;

@@ -30,6 +30,13 @@ import org.apache.naming.StringManager;
  */
 public class EjbFactory extends FactoryBase {
 
+    /**
+     * Construct a new EjbFactory.
+     */
+    public EjbFactory() {
+        super();
+    }
+
     private static final StringManager sm = StringManager.getManager(EjbFactory.class);
 
     @Override

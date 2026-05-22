@@ -35,9 +35,15 @@ import org.apache.el.lang.EvaluationContext;
  */
 public class ReflectionUtil {
 
+    /**
+     * Names of Java primitive types.
+     */
     protected static final String[] PRIMITIVE_NAMES =
             new String[] { "boolean", "byte", "char", "double", "float", "int", "long", "short", "void" };
 
+    /**
+     * Class objects for Java primitive types, in the same order as {@link #PRIMITIVE_NAMES}.
+     */
     protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class, byte.class, char.class, double.class,
             float.class, int.class, long.class, short.class, Void.TYPE };
 
@@ -45,6 +51,15 @@ public class ReflectionUtil {
         super();
     }
 
+    /**
+     * Loads a class by name, supporting primitive types and array notation.
+     *
+     * @param name the class name to load
+     *
+     * @return the Class object, or {@code null} if the name is empty
+     *
+     * @throws ClassNotFoundException if the class cannot be found
+     */
     public static Class<?> forName(String name) throws ClassNotFoundException {
         if (null == name || name.isEmpty()) {
             return null;
@@ -62,6 +77,13 @@ public class ReflectionUtil {
         return c;
     }
 
+    /**
+     * Looks up a primitive class by name.
+     *
+     * @param name the primitive type name
+     *
+     * @return the corresponding Class object, or {@code null} if not a primitive
+     */
     protected static Class<?> forNamePrimitive(String name) {
         if (name.length() <= 8) {
             int p = Arrays.binarySearch(PRIMITIVE_NAMES, name);

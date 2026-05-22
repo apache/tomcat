@@ -42,6 +42,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class SmapUtil {
 
+    /**
+     * Default constructor.
+     */
+    public SmapUtil() {
+    }
+
     private static final Charset SMAP_ENCODING = StandardCharsets.UTF_8;
 
 
@@ -111,6 +117,12 @@ public class SmapUtil {
         return smapInfo;
     }
 
+    /**
+     * Installs SMAP data into the compiled class files by writing the SourceDebugExtension
+     * attribute.
+     * @param smapInfo the SMAP data keyed by fully qualified class name
+     * @throws IOException if an I/O error occurs while writing class files
+     */
     public static void installSmap(Map<String,SmapStratum> smapInfo) throws IOException {
         if (smapInfo == null) {
             return;
@@ -422,6 +434,13 @@ public class SmapUtil {
         }
     }
 
+    /**
+     * Traverses the JSP AST nodes and populates the given SmapStratum with line mapping data.
+     * @param nodes the root JSP AST nodes
+     * @param s the stratum to populate with line mappings
+     * @param innerClassMap map to collect SMAP data for inner classes
+     * @param breakAtLF whether to generate a mapping for each line feed in template text
+     */
     public static void evaluateNodes(Node.Nodes nodes, SmapStratum s, HashMap<String,SmapStratum> innerClassMap,
             boolean breakAtLF) {
         try {
@@ -656,6 +675,13 @@ public class SmapUtil {
         }
     }
 
+    /**
+     * Loads SMAP data for the given class by reading the embedded SourceDebugExtension
+     * attribute from the class file or an external .smap resource.
+     * @param className the fully qualified class name
+     * @param cl the class loader to use for loading the resource
+     * @return the parsed SmapStratum, or {@code null} if no SMAP data is found
+     */
     public static SmapStratum loadSmap(String className, ClassLoader cl) {
         // Extract SMAP from class file. First line "SMAP" is not included
         String smap = getSmap(className, cl);

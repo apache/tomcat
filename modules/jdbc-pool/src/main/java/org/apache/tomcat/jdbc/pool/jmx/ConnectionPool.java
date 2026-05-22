@@ -34,6 +34,11 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
 
+/**
+ * JMX MBean wrapper for a {@link org.apache.tomcat.jdbc.pool.ConnectionPool}.
+ * Provides management and monitoring capabilities for connection pool statistics,
+ * operations, and configuration.
+ */
 public class ConnectionPool extends NotificationBroadcasterSupport
         implements ConnectionPoolMBean, MBeanRegistration {
 
@@ -62,19 +67,39 @@ public class ConnectionPool extends NotificationBroadcasterSupport
      */
     private ObjectName oname = null;
 
+    /**
+     * Creates a new JMX wrapper for the given connection pool.
+     *
+     * @param pool the connection pool to wrap
+     */
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
         super();
         this.pool = pool;
     }
 
+    /**
+     * Returns the underlying connection pool instance.
+     *
+     * @return the wrapped connection pool
+     */
     public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
         return pool;
     }
 
+    /**
+     * Returns the pool configuration for the wrapped connection pool.
+     *
+     * @return the pool configuration properties
+     */
     public PoolConfiguration getPoolProperties() {
         return pool.getPoolProperties();
     }
 
+    /**
+     * Returns the JMX ObjectName under which this MBean is registered.
+     *
+     * @return the JMX ObjectName, or {@code null} if not yet registered
+     */
     public ObjectName getObjectName() {
         return oname;
     }
@@ -101,13 +126,37 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     //=================================================================
     //       NOTIFICATION INFO
     //=================================================================
+   /**
+     * Notification type sent when pool initialization fails.
+     */
     public static final String NOTIFY_INIT = "INIT FAILED";
+    /**
+     * Notification type sent when a connection cannot be established.
+     */
     public static final String NOTIFY_CONNECT = "CONNECTION FAILED";
+    /**
+     * Notification type sent when a connection is abandoned.
+     */
     public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
+    /**
+     * Notification type sent when a slow query is detected.
+     */
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
+    /**
+     * Notification type sent when a query fails.
+     */
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
+    /**
+     * Notification type sent when a connection is suspected of being abandoned.
+     */
     public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNECTION ABANDONED";
+    /**
+     * Notification type sent when the pool is empty and no connections are available.
+     */
     public static final String POOL_EMPTY = "POOL EMPTY";
+    /**
+     * Notification type sent when a previously suspect connection is returned to the pool.
+     */
     public static final String SUSPECT_RETURNED_NOTIFICATION = "SUSPECT CONNECTION RETURNED";
 
     @Override
@@ -124,6 +173,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport
         return aug;
     }
 
+    /**
+     * Returns the default notification info describing all notification types
+     * that this MBean can send.
+     *
+     * @return array of MBeanNotificationInfo describing supported notifications
+     */
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
         String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION,
                 FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION, POOL_EMPTY, SUSPECT_RETURNED_NOTIFICATION};
@@ -161,10 +216,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport
 
     }
 
+    /**
+     * Adds a local notification listener that receives pool notifications
+     * without requiring JMX registration.
+     *
+     * @param list the notification listener to add
+     */
     public void addListener(NotificationListener list) {
         listeners.add(list);
     }
 
+    /**
+     * Removes a local notification listener from the pool.
+     * @param list the notification listener to remove
+     * @return {@code true} if the listener was removed
+     */
     public boolean removeListener(NotificationListener list) {
         return listeners.remove(list);
     }

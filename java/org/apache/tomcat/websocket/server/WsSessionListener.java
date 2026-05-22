@@ -19,6 +19,10 @@ package org.apache.tomcat.websocket.server;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 
+/**
+ * Listener for HTTP session events to manage authenticated WebSocket sessions.
+ * @param wsServerContainer the server container
+ */
 public record WsSessionListener(WsServerContainer wsServerContainer) implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {

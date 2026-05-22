@@ -30,6 +30,9 @@ import org.apache.catalina.tribes.Member;
  */
 public class Membership implements Cloneable {
 
+    /**
+     * Empty member array.
+     */
     protected static final Member[] EMPTY_MEMBERS = new Member[0];
 
     // Non-final to support clone()
@@ -94,14 +97,29 @@ public class Membership implements Cloneable {
         this(local, Comparator.comparingLong(Member::getMemberAliveTime).reversed(), includeLocal);
     }
 
+    /**
+     * Constructs a new membership.
+     * @param local the local member
+     */
     public Membership(Member local) {
         this(local, false);
     }
 
+    /**
+     * Constructs a new membership.
+     * @param local the local member
+     * @param comp the comparator
+     */
     public Membership(Member local, Comparator<Member> comp) {
         this(local, comp, false);
     }
 
+    /**
+     * Constructs a new membership.
+     * @param local the local member
+     * @param comp the comparator
+     * @param includeLocal whether to include the local member
+     */
     public Membership(Member local, Comparator<Member> comp, boolean includeLocal) {
         this.local = local;
         this.memberComparator = comp;
@@ -259,6 +277,11 @@ public class Membership implements Cloneable {
     }
 
 
+    /**
+     * Get a member by reference.
+     * @param mbr the member reference
+     * @return the member or null if not found
+     */
     public Member getMember(Member mbr) {
         Member[] members = this.members;
         for (Member member : members) {
@@ -269,6 +292,11 @@ public class Membership implements Cloneable {
         return null;
     }
 
+    /**
+     * Check if the membership contains a member.
+     * @param mbr the member
+     * @return true if the member is present
+     */
     public boolean contains(Member mbr) {
         return getMember(mbr) != null;
     }
@@ -286,13 +314,23 @@ public class Membership implements Cloneable {
     // --------------------------------------------- Inner Class
 
     /**
-     * Inner class that represents a member entry
+     * Entry for a member in the membership.
      */
     public static class MbrEntry {
 
+        /**
+         * The member.
+         */
         protected final Member mbr;
+        /**
+         * The last time we heard from this member.
+         */
         protected long lastHeardFrom;
 
+        /**
+         * Constructor.
+         * @param mbr the member
+         */
         public MbrEntry(Member mbr) {
             this.mbr = mbr;
         }

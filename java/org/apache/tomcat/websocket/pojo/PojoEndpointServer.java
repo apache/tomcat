@@ -28,6 +28,12 @@ import jakarta.websocket.server.ServerEndpointConfig;
  */
 public class PojoEndpointServer extends PojoEndpointBase {
 
+    /**
+     * Constructs a new PojoEndpointServer.
+     *
+     * @param pathParameters the path parameters for the endpoint
+     * @param pojo the POJO instance annotated with {@code @ServerEndpoint}
+     */
     public PojoEndpointServer(Map<String,String> pathParameters, Object pojo) {
         super(pathParameters);
         setPojo(pojo);

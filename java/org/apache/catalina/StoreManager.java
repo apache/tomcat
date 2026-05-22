@@ -22,6 +22,8 @@ package org.apache.catalina;
 public interface StoreManager extends DistributedManager {
 
     /**
+     * Returns the Store object which manages persistent Session storage for this Manager.
+     *
      * @return the Store object which manages persistent Session storage for this Manager.
      */
     Store getStore();

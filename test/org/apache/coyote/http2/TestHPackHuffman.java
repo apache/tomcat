@@ -38,7 +38,7 @@ public class TestHPackHuffman {
         buf.get();
 
         StringBuilder target = new StringBuilder();
-        HPackHuffman.decode(buf, buf.remaining(), target);
+        HPackHuffman.decode(buf, buf.remaining(), target, false);
 
         Assert.assertEquals("Value changed after encode/decode roundtrip", data, target.toString());
     }

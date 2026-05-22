@@ -20,6 +20,12 @@ package org.apache.tomcat.util.buf;
  * This class implements some basic ASCII character handling functions.
  */
 public final class Ascii {
+    /**
+     * Prevents instantiation.
+     */
+    private Ascii() {
+    }
+
     /*
      * Character translation tables.
      */

@@ -25,11 +25,27 @@ import java.security.Permission;
 import org.apache.tomcat.util.buf.UriUtil;
 
 
+/**
+ * URL connection for WAR resources that wraps a JAR URL connection.
+ */
 public class WarURLConnection extends URLConnection {
 
+    /**
+     * The wrapped JAR URL connection.
+     */
     private final URLConnection wrappedJarUrlConnection;
+    /**
+     * Whether this connection has been established.
+     */
     private boolean connected;
 
+    /**
+     * Constructs a new WarURLConnection.
+     *
+     * @param url The URL to connect to
+     *
+     * @throws IOException If an I/O error occurs
+     */
     protected WarURLConnection(URL url) throws IOException {
         super(url);
         URL innerJarUrl = UriUtil.warToJar(url);

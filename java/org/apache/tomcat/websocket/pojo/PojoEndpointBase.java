@@ -46,11 +46,22 @@ public abstract class PojoEndpointBase extends Endpoint {
     private PojoMethodMapping methodMapping;
 
 
+    /**
+     * Constructs a new PojoEndpointBase.
+     *
+     * @param pathParameters the path parameters for the endpoint
+     */
     protected PojoEndpointBase(Map<String,String> pathParameters) {
         this.pathParameters = pathParameters;
     }
 
 
+    /**
+     * Handles the WebSocket session open event by adding message handlers and invoking the onOpen method.
+     *
+     * @param session the WebSocket session
+     * @param config the endpoint configuration
+     */
     protected final void doOnOpen(Session session, EndpointConfig config) {
         PojoMethodMapping methodMapping = getMethodMapping();
         Object pojo = getPojo();
@@ -132,19 +143,38 @@ public abstract class PojoEndpointBase extends Endpoint {
         }
     }
 
+    /**
+     * Returns the POJO instance wrapped by this endpoint.
+     *
+     * @return the POJO instance
+     */
     protected Object getPojo() {
         return pojo;
     }
 
+    /**
+     * Sets the POJO instance wrapped by this endpoint.
+     *
+     * @param pojo the POJO instance
+     */
     protected void setPojo(Object pojo) {
         this.pojo = pojo;
     }
 
-
+    /**
+     * Returns the method mapping for this endpoint.
+     *
+     * @return the method mapping
+     */
     protected PojoMethodMapping getMethodMapping() {
         return methodMapping;
     }
 
+    /**
+     * Sets the method mapping for this endpoint.
+     *
+     * @param methodMapping the method mapping
+     */
     protected void setMethodMapping(PojoMethodMapping methodMapping) {
         this.methodMapping = methodMapping;
     }

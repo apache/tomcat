@@ -16,7 +16,24 @@
  */
 package jakarta.el;
 
+/**
+ * Base class for resolvers that resolve property references during EL expression evaluation.
+ * An ELResolver is responsible for resolving a property on a base object, determining its type,
+ * setting its value, and reporting whether it is read-only. Resolvers are chained together in
+ * an {@link ELContext}, and each resolver in the chain attempts to resolve the property until
+ * one succeeds. Implementations include {@link ListELResolver}, {@link MapELResolver}, and
+ * custom resolvers for application-specific object models.
+ *
+ * @since EL 2.1
+ */
 public abstract class ELResolver {
+
+    /**
+     * Constructs an ELResolver. Subclasses should invoke this constructor to initialize
+     * the base resolver state.
+     */
+    public ELResolver() {
+    }
 
     /**
      * Obtain the value of the given property on the given object using the given context.

@@ -80,7 +80,9 @@ public interface ClusterDeployer extends ChannelListener {
     void backgroundProcess();
 
     /**
-     * @return the cluster the is associated with
+     * Returns the cluster associated with this deployer.
+     *
+     * @return the cluster
      */
     CatalinaCluster getCluster();
 

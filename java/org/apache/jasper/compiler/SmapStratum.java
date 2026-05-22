@@ -28,6 +28,12 @@ public class SmapStratum {
      * Represents a single LineSection in an SMAP, associated with a particular stratum.
      */
     public static class LineInfo {
+        /**
+         * Creates a new LineInfo instance with default values.
+         */
+        public LineInfo() {
+        }
+
         private int inputStartLine = -1;
         private int outputStartLine = -1;
         private int lineFileID = 0;
@@ -35,6 +41,10 @@ public class SmapStratum {
         private int outputLineIncrement = 1;
         private boolean lineFileIDSet = false;
 
+        /**
+         * Sets the starting line number in the input source file.
+         * @param inputStartLine the starting input line number (must be non-negative)
+         */
         public void setInputStartLine(int inputStartLine) {
             if (inputStartLine < 0) {
                 throw new IllegalArgumentException(
@@ -43,6 +53,10 @@ public class SmapStratum {
             this.inputStartLine = inputStartLine;
         }
 
+        /**
+         * Sets the starting line number in the output generated file.
+         * @param outputStartLine the starting output line number (must be non-negative)
+         */
         public void setOutputStartLine(int outputStartLine) {
             if (outputStartLine < 0) {
                 throw new IllegalArgumentException(
@@ -67,6 +81,10 @@ public class SmapStratum {
             this.lineFileIDSet = true;
         }
 
+        /**
+         * Sets the number of consecutive input lines covered by this mapping.
+         * @param inputLineCount the number of input lines (must be non-negative)
+         */
         public void setInputLineCount(int inputLineCount) {
             if (inputLineCount < 0) {
                 throw new IllegalArgumentException(
@@ -75,6 +93,10 @@ public class SmapStratum {
             this.inputLineCount = inputLineCount;
         }
 
+        /**
+         * Sets the number of output lines generated per input line.
+         * @param outputLineIncrement the output line increment (must be non-negative)
+         */
         public void setOutputLineIncrement(int outputLineIncrement) {
             if (outputLineIncrement < 0) {
                 throw new IllegalArgumentException(
@@ -83,13 +105,18 @@ public class SmapStratum {
             this.outputLineIncrement = outputLineIncrement;
         }
 
+        /**
+         * Calculates the maximum output line number covered by this mapping.
+         * @return the maximum output line number
+         */
         public int getMaxOutputLineNumber() {
             return outputStartLine + inputLineCount * outputLineIncrement;
         }
 
         /**
-         * @return the current LineInfo as a String, print all values only when appropriate (but LineInfoID if and only
-         *             if it's been specified, as its necessity is sensitive to context).
+         * Returns the current LineInfo as a String, printing all values only when appropriate
+         * (but LineInfoID if and only if it's been specified, as its necessity is sensitive to context).
+         * @return the SMAP string representation of this line info
          */
         public String getString() {
             if (inputStartLine == -1 || outputStartLine == -1) {
@@ -111,12 +138,22 @@ public class SmapStratum {
             return out.toString();
         }
 
+        /**
+         * Returns the SMAP string representation of this line info.
+         * @return the SMAP string representation
+         */
         @Override
         public String toString() {
             return getString();
         }
     }
 
+
+    /**
+     * Creates a new empty SmapStratum.
+     */
+    public SmapStratum() {
+    }
 
     private final List<String> fileNameList = new ArrayList<>();
     private final List<String> filePathList = new ArrayList<>();
@@ -237,32 +274,57 @@ public class SmapStratum {
     }
 
 
+    /**
+     * Adds a pre-configured LineInfo to this stratum's line data.
+     * @param li the line info to add
+     */
     public void addLineInfo(LineInfo li) {
         lineData.add(li);
     }
 
 
+    /**
+     * Sets the name of the output .java file for the SMAP header.
+     * @param outputFileName the output Java file name
+     */
     public void setOutputFileName(String outputFileName) {
         this.outputFileName = outputFileName;
     }
 
 
+    /**
+     * Sets the name of the output .class file for the SMAP.
+     * @param classFileName the output class file name
+     */
     public void setClassFileName(String classFileName) {
         this.classFileName = classFileName;
     }
 
 
+    /**
+     * Returns the name of the output .class file.
+     * @return the class file name
+     */
     public String getClassFileName() {
         return classFileName;
     }
 
 
+    /**
+     * Returns the SMAP string representation of this stratum.
+     * @return the SMAP string representation
+     */
     @Override
     public String toString() {
         return getSmapStringInternal();
     }
 
 
+    /**
+     * Generates the complete SMAP string representation of this stratum.
+     * @return the SMAP string
+     * @throws IllegalStateException if the output file name has not been set
+     */
     public String getSmapString() {
 
         if (outputFileName == null) {
@@ -317,6 +379,12 @@ public class SmapStratum {
     }
 
 
+    /**
+     * Maps a generated Java file line number back to the original JSP source
+     * file and line number.
+     * @param outputLineNumber the line number in the generated Java file
+     * @return the corresponding source file and line number
+     */
     public SmapInput getInputLineNumber(int outputLineNumber) {
         // For a given Java line number, provide the associated line number
         // in the JSP/tag source

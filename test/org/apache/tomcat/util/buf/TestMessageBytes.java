@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.buf;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestMessageBytes {
@@ -65,5 +66,33 @@ public class TestMessageBytes {
         mb.setString("foo");
         mb.recycle();
         mb.toChars();
+    }
+
+
+    @Test
+    public void testEqualsNullNull() {
+        MessageBytes mb1 = MessageBytes.newInstance();
+        MessageBytes mb2 = MessageBytes.newInstance();
+
+        Assert.assertTrue(mb1.equals(mb2));
+    }
+
+
+    @Test
+    public void testSetLong() {
+        doTestSetLong(0);
+        doTestSetLong(-1);
+        doTestSetLong(1);
+        doTestSetLong(-12345);
+        doTestSetLong(12345);
+        doTestSetLong(Long.MIN_VALUE);
+        doTestSetLong(Long.MAX_VALUE);
+    }
+
+
+    private void doTestSetLong(long l) {
+        MessageBytes mb = MessageBytes.newInstance();
+        mb.setLong(l);
+        Assert.assertEquals(mb.toStringType(), Long.toString(l));
     }
 }

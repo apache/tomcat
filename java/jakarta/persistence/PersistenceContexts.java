@@ -21,9 +21,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Groups multiple PersistenceContext annotations for injection into a single component.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface PersistenceContexts {
+    /**
+     * The array of PersistenceContext annotations.
+     *
+     * @return the persistence contexts
+     */
     PersistenceContext[] value();
 }

@@ -18,8 +18,22 @@ package org.apache.tomcat.websocket;
 
 import jakarta.websocket.MessageHandler;
 
+/**
+ * Interface for message handlers that wrap another message handler.
+ */
 public interface WrappedMessageHandler {
+    /**
+     * Returns the maximum message size supported by this handler.
+     *
+     * @return the maximum message size
+     */
     long getMaxMessageSize();
 
+    /**
+     * Returns the wrapped message handler, or {@code null} if the underlying POJO
+     * is not a message handler.
+     *
+     * @return the wrapped message handler
+     */
     MessageHandler getWrappedHandler();
 }

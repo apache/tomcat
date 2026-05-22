@@ -65,6 +65,12 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     private SSLSession session;
     private final Map<String,List<String>> additionalAttributes;
 
+    /**
+     * Constructs an instance for the given SSL session.
+     *
+     * @param session The SSL session
+     * @param additionalAttributes Additional SSL attributes
+     */
     public JSSESupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         this.session = session;
         this.additionalAttributes = additionalAttributes;
@@ -181,6 +187,11 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
 
+    /**
+     * Sets the SSL session for this support object.
+     *
+     * @param session The SSL session
+     */
     public void setSession(SSLSession session) {
         this.session = session;
     }

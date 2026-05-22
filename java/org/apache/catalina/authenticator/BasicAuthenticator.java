@@ -37,17 +37,33 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 
+    /**
+     * Default constructor.
+     */
+    public BasicAuthenticator() {
+    }
+
     private final Log log = LogFactory.getLog(BasicAuthenticator.class); // must not be static
 
     private Charset charset = StandardCharsets.UTF_8;
     private String charsetString = "UTF-8";
 
 
+    /**
+     * Returns the character set used for encoding credentials.
+     *
+     * @return the character set name
+     */
     public String getCharset() {
         return charsetString;
     }
 
 
+    /**
+     * Sets the character set used for encoding credentials.
+     *
+     * @param charsetString the character set name
+     */
     public void setCharset(String charsetString) {
         // Only acceptable options are null, "" or "UTF-8" (case-insensitive)
         if (charsetString == null || charsetString.isEmpty()) {
@@ -199,13 +215,14 @@ public class BasicAuthenticator extends AuthenticatorBase {
         private byte[] parseBase64() throws IllegalArgumentException {
             byte[] encoded = new byte[base64blobLength];
             System.arraycopy(authorization.getBuffer(), base64blobOffset, encoded, 0, base64blobLength);
-            byte[] decoded = Base64.getDecoder().decode(encoded);
-            // restore original offset
-            authorization.setStart(initialOffset);
-            if (decoded == null) {
-                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"));
+            try {
+                byte[] decoded = Base64.getDecoder().decode(encoded);
+                // restore original offset
+                authorization.setStart(initialOffset);
+                return decoded;
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"), e);
             }
-            return decoded;
         }
 
         /*

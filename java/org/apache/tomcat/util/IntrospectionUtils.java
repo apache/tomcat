@@ -37,6 +37,12 @@ public final class IntrospectionUtils {
     private static final StringManager sm = StringManager.getManager(IntrospectionUtils.class);
 
     /**
+     * Constructs a new IntrospectionUtils. This constructor is private to prevent instantiation.
+     */
+    private IntrospectionUtils() {
+    }
+
+    /**
      * Find a method with the right name If found, call the method ( if param is int or boolean we'll convert value to
      * the right type before) - that means you can have setDebug(1).
      *
@@ -50,10 +56,29 @@ public final class IntrospectionUtils {
         return setProperty(o, name, value, true, null);
     }
 
+    /**
+     * Set a property on the given object.
+     *
+     * @param o the object to set the property on
+     * @param name the property name
+     * @param value the property value
+     * @param invokeSetProperty whether to invoke setProperty as a fallback
+     * @return {@code true} if the operation was successful
+     */
     public static boolean setProperty(Object o, String name, String value, boolean invokeSetProperty) {
         return setProperty(o, name, value, invokeSetProperty, null);
     }
 
+    /**
+     * Set a property on the given object, tracking the actual method called.
+     *
+     * @param o the object to set the property on
+     * @param name the property name
+     * @param value the property value
+     * @param invokeSetProperty whether to invoke setProperty as a fallback
+     * @param actualMethod StringBuilder to append the actual method call to, or {@code null}
+     * @return {@code true} if the operation was successful
+     */
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value, boolean invokeSetProperty,
             StringBuilder actualMethod) {
@@ -220,9 +245,10 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * @param s the input string
+     * Escapes special characters in a string for use in generated code.
      *
-     * @return escaped string, per Java rule
+     * @param s the input string
+     * @return the escaped string with double quotes, backslashes, newlines and carriage returns escaped
      */
     public static String escape(String s) {
 
@@ -248,6 +274,13 @@ public final class IntrospectionUtils {
         return b.toString();
     }
 
+    /**
+     * Get the value of a property from the given object.
+     *
+     * @param o the object to get the property from
+     * @param name the property name
+     * @return the property value, or {@code null} if not found
+     */
     public static Object getProperty(Object o, String name) {
         if (XReflectionIntrospectionUtils.isEnabled()) {
             return XReflectionIntrospectionUtils.getPropertyInternal(o, name);
@@ -411,12 +444,21 @@ public final class IntrospectionUtils {
     }
 
     // -------------------- other utils --------------------
+    /**
+     * Clear the internal method cache.
+     */
     public static void clear() {
         objectMethods.clear();
     }
 
     private static final Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
 
+    /**
+     * Find all public methods of the given class, using a cache for performance.
+     *
+     * @param c the class
+     * @return the array of methods
+     */
     public static Method[] findMethods(Class<?> c) {
         Method[] methods = objectMethods.get(c);
         if (methods != null) {
@@ -428,6 +470,14 @@ public final class IntrospectionUtils {
         return methods;
     }
 
+    /**
+     * Find a specific method by name and parameter types.
+     *
+     * @param c the class
+     * @param name the method name
+     * @param params the parameter types, or {@code null} for no parameters
+     * @return the matching method, or {@code null} if not found
+     */
     public static Method findMethod(Class<?> c, String name, Class<?>[] params) {
         Method[] methods = findMethods(c);
         for (Method method : methods) {
@@ -458,6 +508,17 @@ public final class IntrospectionUtils {
         return null;
     }
 
+    /**
+     * Call a method with a single parameter on the given target object.
+     *
+     * @param target the target object
+     * @param methodN the method name
+     * @param param1 the parameter value
+     * @param typeParam1 the parameter type name, or {@code null} to infer from the parameter
+     * @param cl the class loader to use for loading the parameter type
+     * @return the result of the method call
+     * @throws Exception if the method cannot be found or invoked
+     */
     public static Object callMethod1(Object target, String methodN, Object param1, String typeParam1, ClassLoader cl)
             throws Exception {
         if (target == null || methodN == null || param1 == null) {
@@ -487,6 +548,16 @@ public final class IntrospectionUtils {
         }
     }
 
+    /**
+     * Call a method with multiple parameters on the given target object.
+     *
+     * @param target the target object
+     * @param methodN the method name
+     * @param params the parameter values
+     * @param typeParams the parameter types
+     * @return the result of the method call, or {@code null} if the method cannot be found
+     * @throws Exception if the method cannot be invoked
+     */
     public static Object callMethodN(Object target, String methodN, Object[] params, Class<?>[] typeParams)
             throws Exception {
         Method m = findMethod(target.getClass(), methodN, typeParams);
@@ -518,6 +589,14 @@ public final class IntrospectionUtils {
         }
     }
 
+    /**
+     * Convert a string value to the specified type.
+     *
+     * @param object the string value to convert
+     * @param paramType the target type
+     * @return the converted object
+     * @throws IllegalArgumentException if conversion fails
+     */
     public static Object convert(String object, Class<?> paramType) {
         Object result = null;
         switch (paramType.getName()) {
@@ -595,7 +674,17 @@ public final class IntrospectionUtils {
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
+    /**
+     * Interface for a source of named properties used during introspection.
+     */
     public interface PropertySource {
+        /**
+         * Returns the value of the property with the specified key.
+         *
+         * @param key The property key
+         *
+         * @return the property value, or {@code null} if not found
+         */
         String getProperty(String key);
     }
 }

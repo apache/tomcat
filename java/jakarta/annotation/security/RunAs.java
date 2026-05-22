@@ -23,6 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Defines the run-as security role for an enterprise bean. The container assumes
+ * the specified role as the caller identity for all business method invocations
+ * made by the bean, regardless of the actual caller's identity. This allows the
+ * bean to access resources with a consistent security context.
+ *
  * @since Common Annotations 1.0
  */
 @Documented
@@ -31,7 +36,10 @@ import java.lang.annotation.Target;
 public @interface RunAs {
 
     /**
-     * @return a String with the value for RunAs
+     * Specifies the security role name that the container should assume as the
+     * caller identity when executing business methods on behalf of this component.
+     *
+     * @return the run-as role name
      */
     String value();
 }

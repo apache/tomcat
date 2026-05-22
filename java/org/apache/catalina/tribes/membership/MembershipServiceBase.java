@@ -25,13 +25,28 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipService;
 
+/**
+ * Base implementation for membership services.
+ */
 public abstract class MembershipServiceBase implements MembershipService, MembershipListener {
+
+    /**
+     * Default constructor.
+     */
+    public MembershipServiceBase() {
+    }
 
     /**
      * The implementation specific properties
      */
     protected Properties properties = new Properties();
+    /**
+     * The membership listener.
+     */
     protected volatile MembershipListener listener;
+    /**
+     * The channel.
+     */
     protected Channel channel;
 
     @Override

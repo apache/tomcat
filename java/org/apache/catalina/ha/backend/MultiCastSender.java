@@ -31,6 +31,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class MultiCastSender implements Sender {
 
+    /**
+     * Default constructor.
+     */
+    public MultiCastSender() {
+    }
+
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
     private static final StringManager sm = StringManager.getManager(MultiCastSender.class);
 

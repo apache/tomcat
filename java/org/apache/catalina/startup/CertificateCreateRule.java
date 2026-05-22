@@ -27,6 +27,12 @@ import org.xml.sax.Attributes;
  */
 public class CertificateCreateRule extends Rule {
 
+    /**
+     * Default constructor.
+     */
+    public CertificateCreateRule() {
+    }
+
     @Override
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
         SSLHostConfig sslHostConfig = (SSLHostConfig) digester.peek();

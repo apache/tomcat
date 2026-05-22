@@ -25,11 +25,25 @@ import java.util.Properties;
  */
 public class BackportTranslations extends BackportBase {
 
+    /**
+     * Entry point for the translations back-port tool.
+     *
+     * @param args command line arguments; a single argument specifying the target directory
+     *
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String... args) throws IOException {
         BackportTranslations backport = new BackportTranslations(args);
         backport.execute();
     }
 
+    /**
+     * Constructs a BackportTranslations instance.
+     *
+     * @param args command line arguments; a single argument specifying the target directory
+     *
+     * @throws IOException if an I/O error occurs
+     */
     protected BackportTranslations(String[] args) throws IOException {
         super(args);
     }

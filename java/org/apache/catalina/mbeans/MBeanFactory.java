@@ -48,10 +48,25 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Factory for creating MBeans.
+ */
 public class MBeanFactory {
 
+    /**
+     * Default constructor.
+     */
+    public MBeanFactory() {
+    }
+
+    /**
+     * The log instance for this class.
+     */
     private static final Log log = LogFactory.getLog(MBeanFactory.class);
 
+    /**
+     * The string manager for this class.
+     */
     protected static final StringManager sm = StringManager.getManager(MBeanFactory.class);
 
     /**
@@ -828,9 +843,11 @@ public class MBeanFactory {
         Container container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (Valve valve : valves) {
-            ObjectName voname = ((JmxEnabled) valve).getObjectName();
-            if (voname.equals(oname)) {
-                container.getPipeline().removeValve(valve);
+            if (valve instanceof JmxEnabled) {
+                ObjectName voname = ((JmxEnabled) valve).getObjectName();
+                if (voname.equals(oname)) {
+                    container.getPipeline().removeValve(valve);
+                }
             }
         }
     }

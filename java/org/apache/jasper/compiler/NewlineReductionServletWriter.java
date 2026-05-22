@@ -30,6 +30,11 @@ public class NewlineReductionServletWriter extends ServletWriter {
 
     private boolean lastWriteWasNewline;
 
+    /**
+     * Creates a new newline-reducing servlet writer.
+     *
+     * @param writer The underlying PrintWriter
+     */
     public NewlineReductionServletWriter(PrintWriter writer) {
         super(writer);
     }

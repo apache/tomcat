@@ -23,12 +23,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Represents the value of an HTTP Range header.
+ */
 public class Ranges {
 
     private final String units;
     private final List<Entry> entries;
 
 
+    /**
+     * Creates a new Ranges instance.
+     *
+     * @param units the range units (e.g., "bytes"), or null
+     * @param entries the list of range entries
+     */
     public Ranges(String units, List<Entry> entries) {
         // Units are lower case (RFC 9110, section 14.1)
         if (units == null) {
@@ -40,32 +49,61 @@ public class Ranges {
     }
 
 
+    /**
+     * Returns the list of range entries.
+     *
+     * @return an unmodifiable list of range entries
+     */
     public List<Entry> getEntries() {
         return entries;
     }
 
+    /**
+     * Returns the range units (e.g., "bytes").
+     *
+     * @return the range units, or null if not specified
+     */
     public String getUnits() {
         return units;
     }
 
 
+    /**
+     * Represents a single range entry with a start and end position.
+     */
     public static class Entry {
 
         private final long start;
         private final long end;
 
 
+        /**
+         * Creates a new range entry.
+         *
+         * @param start the start position of the range
+         * @param end the end position of the range, or -1 if absent
+         */
         public Entry(long start, long end) {
             this.start = start;
             this.end = end;
         }
 
 
+        /**
+         * Returns the start position of the range.
+         *
+         * @return the start position
+         */
         public long getStart() {
             return start;
         }
 
 
+        /**
+         * Returns the end position of the range.
+         *
+         * @return the end position, or -1 if absent
+         */
         public long getEnd() {
             return end;
         }

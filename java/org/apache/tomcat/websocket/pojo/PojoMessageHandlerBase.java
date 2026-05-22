@@ -43,15 +43,58 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
     private final Log log = LogFactory.getLog(PojoMessageHandlerBase.class); // must not be static
     private static final StringManager sm = StringManager.getManager(PojoMessageHandlerBase.class);
 
+    /**
+     * The POJO instance that contains the message handler method.
+     */
     protected final Object pojo;
+
+    /**
+     * The method to invoke when a message is received.
+     */
     protected final Method method;
+
+    /**
+     * The WebSocket session associated with this handler.
+     */
     protected final Session session;
+
+    /**
+     * The parameter array used for method invocation.
+     */
     protected final Object[] params;
+
+    /**
+     * The index in the params array where the payload is stored.
+     */
     protected final int indexPayload;
+
+    /**
+     * Whether the message payload should be converted to the method parameter type.
+     */
     protected final boolean convert;
+
+    /**
+     * The index in the params array where the session is stored.
+     */
     protected final int indexSession;
+
+    /**
+     * The maximum message size supported by this handler.
+     */
     protected final long maxMessageSize;
 
+    /**
+     * Constructs a new PojoMessageHandlerBase.
+     *
+     * @param pojo the POJO instance containing the message handler method
+     * @param method the method to invoke when a message is received
+     * @param session the WebSocket session
+     * @param params the parameter array for method invocation
+     * @param indexPayload the index in the params array for the payload
+     * @param convert whether to convert the payload to the method parameter type
+     * @param indexSession the index in the params array for the session
+     * @param maxMessageSize the maximum message size
+     */
     public PojoMessageHandlerBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
             boolean convert, int indexSession, long maxMessageSize) {
         this.pojo = pojo;
@@ -73,6 +116,12 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
     }
 
 
+    /**
+     * Processes the result of a POJO message handler method invocation by sending it back
+     * to the remote endpoint.
+     *
+     * @param result the result object to send
+     */
     protected final void processResult(Object result) {
         if (result == null) {
             return;
@@ -112,6 +161,11 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
     }
 
 
+    /**
+     * Handles an {@link InvocationTargetException} that occurred during POJO method invocation.
+     *
+     * @param e the invocation target exception
+     */
     protected final void handlePojoMethodInvocationTargetException(InvocationTargetException e) {
         /*
          * This is a failure during the execution of onMessage. This does not normally need to trigger the failure of

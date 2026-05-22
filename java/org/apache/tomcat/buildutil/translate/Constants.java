@@ -16,17 +16,48 @@
  */
 package org.apache.tomcat.buildutil.translate;
 
+/**
+ * Constants for the translation build utility.
+ */
 public class Constants {
 
+    /**
+     * Prefix for localization string files.
+     */
     public static final String L10N_PREFIX = "LocalStrings";
+    /**
+     * Suffix for localization properties files.
+     */
     public static final String L10N_SUFFIX = ".properties";
 
+    /**
+     * Directories to search for source files.
+     */
     public static final String[] SEARCH_DIRS = new String[] { "java", "webapps" };
 
+    /**
+     * Directory for storing translation settings.
+     */
     public static final String STORAGE_DIR = ".settings/translations";
 
+    /**
+     * Marker to indicate the end of a package.
+     */
     public static final String END_PACKAGE_MARKER = ".zzz.";
 
+    /**
+     * Substring identifying Java EE packages.
+     */
     public static final String JAVA_EE_SUBSTRING = "java.javax";
+    /**
+     * Substring identifying Jakarta EE packages.
+     */
     public static final String JAKARTA_EE_SUBSTRING = "java.jakarta";
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {
+        // Hide default constructor
+    }
 }

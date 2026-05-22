@@ -18,5 +18,10 @@ package org.apache.tomcat.websocket;
 
 import jakarta.websocket.MessageHandler;
 
+/**
+ * Result of a message handler operation.
+ * @param handler the message handler
+ * @param type the result type
+ */
 public record MessageHandlerResult(MessageHandler handler, MessageHandlerResultType type) {
 }

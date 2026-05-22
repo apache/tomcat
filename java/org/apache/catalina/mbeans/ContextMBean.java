@@ -25,7 +25,17 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
+/**
+ * A <strong>ModelMBean</strong> implementation for the
+ * <code>org.apache.catalina.Context</code> component.
+ */
 public class ContextMBean extends BaseCatalinaMBean<Context> {
+
+    /**
+     * Default constructor for ContextMBean.
+     */
+    public ContextMBean() {
+    }
 
     /**
      * Return the set of application parameters for this application.

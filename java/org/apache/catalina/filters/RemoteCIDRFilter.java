@@ -33,7 +33,16 @@ import org.apache.catalina.util.NetMaskSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * A servlet filter that restricts access to resources based on the remote client's IP address or CIDR block.
+ */
 public final class RemoteCIDRFilter extends FilterBase {
+
+    /**
+     * Default constructor.
+     */
+    public RemoteCIDRFilter() {
+    }
 
     /**
      * text/plain MIME type: this is the MIME type we return when a {@link ServletResponse} is not an

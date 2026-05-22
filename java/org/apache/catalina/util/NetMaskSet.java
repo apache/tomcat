@@ -35,6 +35,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NetMaskSet {
 
+    /**
+     * Default constructor.
+     */
+    public NetMaskSet() {
+    }
+
     private static final StringManager sm = StringManager.getManager(NetMaskSet.class);
 
     private final Set<NetMask> netmasks = new HashSet<>();
@@ -163,6 +169,15 @@ public class NetMaskSet {
     }
 
 
+    /**
+     * Parses a comma-separated list of IP addresses and CIDR ranges into a NetMaskSet.
+     *
+     * @param input The comma-separated string of IP addresses and CIDR ranges
+     *
+     * @return A new NetMaskSet containing the parsed entries
+     *
+     * @throws IllegalArgumentException If the input contains invalid entries
+     */
     public static NetMaskSet parse(String input) {
         NetMaskSet result = new NetMaskSet();
 
