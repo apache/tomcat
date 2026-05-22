@@ -96,11 +96,11 @@ public class TestServerInfo {
      * @throws Exception if the test experiences an unexpected error
      */
     @Test
-    public void testIsTomcatCoreJarWithJakartaSymbolicName() throws Exception {
-        withTestJar("test-jakarta-api.jar", manifest -> {
+    public void testIsTomcatCoreJarWithJavaxSymbolicName() throws Exception {
+        withTestJar("test-javax-api.jar", manifest -> {
             manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-            manifest.getMainAttributes().putValue("Bundle-SymbolicName", "jakarta.servlet.api");
-        }, jar -> Assert.assertTrue("Should identify jakarta.* as core JAR",
+            manifest.getMainAttributes().putValue("Bundle-SymbolicName", "javax.servlet.api");
+        }, jar -> Assert.assertTrue("Should identify javax.* as core JAR",
                 invokeIsTomcatCoreJar(jar)));
     }
 
