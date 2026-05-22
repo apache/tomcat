@@ -27,6 +27,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Wrapper around a <code>javax.servlet.ServletRequest</code> that transforms an application request object (which might
  * be the original one passed to a servlet, or might be based on the 2.3
@@ -38,6 +40,8 @@ import javax.servlet.ServletRequestWrapper;
  * two classes in synchronization when making changes!
  */
 class ApplicationRequest extends ServletRequestWrapper {
+
+    private static final StringManager sm = StringManager.getManager(ApplicationRequest.class);
 
     /**
      * The set of attribute names that are special for request dispatchers.
@@ -85,6 +89,9 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public Object getAttribute(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("applicationHttpRequest.nullAttributeName"));
+        }
         synchronized (attributes) {
             return attributes.get(name);
         }
@@ -126,6 +133,9 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public void setAttribute(String name, Object value) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("applicationHttpRequest.nullAttributeName"));
+        }
         synchronized (attributes) {
             attributes.put(name, value);
             if (!isSpecial(name)) {
@@ -145,7 +155,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     @Deprecated
     protected boolean isSpecial(String name) {
         // Performance - see BZ 68089
-        if (name.length() < shortestSpecialNameLength) {
+        if (name == null || name.length() < shortestSpecialNameLength) {
             return false;
         }
         return specialsSet.contains(name);

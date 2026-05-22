@@ -225,7 +225,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public Object getAttribute(String name) {
 
-        if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("applicationHttpRequest.nullAttributeName"));
+        } else if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
             return dispatcherType;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             if (requestDispatcherPath != null) {
@@ -293,7 +295,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public void setAttribute(String name, Object value) {
 
-        if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("applicationHttpRequest.nullAttributeName"));
+        } else if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
             dispatcherType = (DispatcherType) value;
             return;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
@@ -797,7 +801,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected boolean setSpecial(String name, Object value) {
         // Performance - see BZ 68089
-        if (name.length() < shortestSpecialNameLength) {
+        if (name ==  null || name.length() < shortestSpecialNameLength) {
             return false;
         }
         Integer index = specialsMap.get(name);

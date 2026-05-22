@@ -960,6 +960,10 @@ public class Request implements HttpServletRequest {
 
     @Override
     public Object getAttribute(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("request.nullAttributeName"));
+        }
+
         // Special attributes
         SpecialAttributeAdapter adapter = specialAttributes.get(name);
         if (adapter != null) {
@@ -1486,7 +1490,7 @@ public class Request implements HttpServletRequest {
     @Override
     public void removeAttribute(String name) {
         if (name == null) {
-            throw new IllegalArgumentException(sm.getString("coyoteRequest.setAttribute.namenull"));
+            throw new IllegalArgumentException(sm.getString("request.nullAttributeName"));
         }
         // Remove the specified attribute
         // Pass special attributes to the native layer
@@ -1507,16 +1511,14 @@ public class Request implements HttpServletRequest {
 
     @Override
     public void setAttribute(String name, Object value) {
-
-        // Name cannot be null
-        if (name == null) {
-            throw new IllegalArgumentException(sm.getString("coyoteRequest.setAttribute.namenull"));
-        }
-
         // Null value is the same as removeAttribute()
         if (value == null) {
             removeAttribute(name);
             return;
+        }
+
+        if (name == null) {
+            throw new IllegalArgumentException(sm.getString("request.nullAttributeName"));
         }
 
         // Special attributes
