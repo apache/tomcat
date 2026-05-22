@@ -585,7 +585,7 @@ public class StatusTransformer {
      * @return the name without the port for the auto connectors
      */
     protected static String getConnectorName(String name) {
-        if (name.indexOf("-auto-") > 0) {
+        if (name.indexOf("-auto-") > 0 && name.startsWith("\"")) {
             return name.substring(0, name.lastIndexOf("-")) + "\"";
         } else {
             return name;
