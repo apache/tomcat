@@ -44,8 +44,6 @@ public class JspHelper {
 
     /**
      * Try to get user locale from the session, if possible.
-     * <p>
-     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3 and Struts 1.x
      *
      * @param in_session Session from which the locale should be guessed
      *

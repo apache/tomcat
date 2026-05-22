@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.manager.util;
 
-import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,7 +27,6 @@ import javax.security.auth.Subject;
 import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Session;
-import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Utility methods on HttpSessions.
@@ -62,8 +60,7 @@ public class SessionUtils {
 
     /**
      * Try to get user locale from the session, if possible. IMPLEMENTATION NOTE: this method has explicit support for
-     * Tapestry 3, Struts 1.x and Spring JSF check the browser meta tag "accept languages" to choose what language to
-     * display.
+     * Spring JSF check the browser meta tag "accept languages" to choose what language to display.
      *
      * @param in_session The session
      *
@@ -102,38 +99,6 @@ public class SessionUtils {
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
-                }
-            }
-
-            if (null != locale) {
-                return locale;
-            }
-
-            // Tapestry 3.0: Engine stored in session under "org.apache.tapestry.engine:" + config.getServletName()
-            // TODO: Tapestry 4+
-            final List<Object> tapestryArray = new ArrayList<>();
-            for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
-                String name = enumeration.nextElement();
-                if (name.contains("tapestry") && name.contains("engine") && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
-                    tapestryArray.add(in_session.getAttribute(name));
-                }
-            }
-            if (tapestryArray.size() == 1) {
-                // found a potential Engine! Let's call getLocale() on it.
-                Object probableEngine = tapestryArray.getFirst();
-                if (null != probableEngine) {
-                    try {
-                        Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[]) null);//$NON-NLS-1$
-                        // Call the property getter and return the value
-                        Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
-                        if (possibleLocale instanceof Locale) {
-                            locale = (Locale) possibleLocale;
-                        }
-                    } catch (Exception e) {
-                        Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
-                        ExceptionUtils.handleThrowable(t);
-                        // stay silent
-                    }
                 }
             }
 

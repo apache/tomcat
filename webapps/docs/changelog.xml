@@ -431,6 +431,11 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <update>
+        Drop session handling dedicated to extracting the locale from Tapestry
+        attributes, used for locale session sorting in the manager webapp.
+        (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <add>
         Manager: Add checks to ensure that any uploaded files are uploaded to
