@@ -209,6 +209,9 @@
         Call the delegate key manager in JSSE to retrieve the server key.
         (remm)
       </fix>
+      <fix>
+        Avoid overflow scenarios in Asn1Parser. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
