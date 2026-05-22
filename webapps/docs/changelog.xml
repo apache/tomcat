@@ -264,6 +264,10 @@
         Remove exception swallowing in <code>DataSourceStore</code> to align
         it with <code>FileStore</code> and avoid session loss on errors. (remm)
       </fix>
+      <fix>
+        On JAAS logout, clear out role principals on the subject that were
+        added on commit, as recommended by the JAAS specification. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
