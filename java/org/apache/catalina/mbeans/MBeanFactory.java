@@ -843,9 +843,11 @@ public class MBeanFactory {
         Container container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (Valve valve : valves) {
-            ObjectName voname = ((JmxEnabled) valve).getObjectName();
-            if (voname.equals(oname)) {
-                container.getPipeline().removeValve(valve);
+            if (valve instanceof JmxEnabled) {
+                ObjectName voname = ((JmxEnabled) valve).getObjectName();
+                if (voname.equals(oname)) {
+                    container.getPipeline().removeValve(valve);
+                }
             }
         }
     }
