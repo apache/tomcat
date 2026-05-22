@@ -646,7 +646,19 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
             }
         }
         // Read body
-        parser.readFrame();
+        skip = true;
+        while (skip) {
+            parser.readFrame();
+            if (output.getTrace().startsWith("3-RST")) {
+                // Ignore additional resets for stream 3
+                output.clearTrace();
+            } else if (output.getTrace().contains("WindowSize")) {
+                // Ignore the window updates
+                output.clearTrace();
+            } else {
+                skip = false;
+            }
+        }
         Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
     }
 
@@ -739,7 +751,19 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
             }
         }
         // Read body
-        parser.readFrame();
+        skip = true;
+        while (skip) {
+            parser.readFrame();
+            if (output.getTrace().startsWith("3-RST")) {
+                // Ignore additional resets for stream 3
+                output.clearTrace();
+            } else if (output.getTrace().contains("WindowSize")) {
+                // Ignore the window updates
+                output.clearTrace();
+            } else {
+                skip = false;
+            }
+        }
         Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
     }
 }
