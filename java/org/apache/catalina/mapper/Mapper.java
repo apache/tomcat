@@ -1379,8 +1379,20 @@ public final class Mapper {
             len = end - start;
         }
         for (int i = 0; (i < len) && (result == 0); i++) {
-            int nameLower = Ascii.toLower(c[i + start]);
-            int compareLower = Ascii.toLower(compareTo.charAt(i));
+            char cName = c[i + start];
+            char cCompare = compareTo.charAt(i);
+            int nameLower;
+            int compareLower;
+            if (cName > 0xFF) {
+                nameLower = Character.toLowerCase(cName);
+            } else {
+                nameLower = Ascii.toLower(cName);
+            }
+            if (cCompare > 0xFF) {
+                compareLower = Character.toLowerCase(cCompare);
+            } else {
+                compareLower = Ascii.toLower(compareTo.charAt(i));
+            }
             if (nameLower > compareLower) {
                 result = 1;
             } else if (nameLower < compareLower) {
