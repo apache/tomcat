@@ -27,7 +27,7 @@ import java.util.logging.LogRecord;
  *  log4j.appender.A1=org.apache.log4j.ConsoleAppender
  *  log4j.appender.A1.layout=org.apache.log4j.PatternLayout
  *  log4j.appender.A1.Target=System.err
- *  log4j.appender.A1.layout.ConversionPattern=%r %-15.15c{2} %-1.1p %m %n
+ *  log4j.appender.A1.layout.ConversionPattern=%r %-20.20c{2} %-1.1p %m %n
  * </pre>
  *
  * Example: 1130122891846 Http11BaseProtocol I Initializing Coyote HTTP/1.1 on http-8800
@@ -81,13 +81,9 @@ public class JdkLoggerFormatter extends Formatter {
         }
 
         // Use a string buffer for better performance
-        String timeStr = String.valueOf(time);
         StringBuilder buf = new StringBuilder();
 
-        buf.append(timeStr);
-
-        // pad to 8 to make it more readable
-        buf.append(" ".repeat(Math.max(0, 8 - timeStr.length())));
+        buf.append(time);
 
         // Append a readable representation of the log level.
         switch (level) {
