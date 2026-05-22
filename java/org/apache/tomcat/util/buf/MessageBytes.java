@@ -511,9 +511,17 @@ public final class MessageBytes implements Cloneable, Serializable {
                 }
 
                 for (int i = 0; i < s.length(); i++) {
-                    if (Ascii.toLower(s.charAt(i)) != Ascii.toLower(strValue.charAt(pos + i))) {
+                    char c1 = s.charAt(i);
+                    char c2 = strValue.charAt(pos + i);
+                    // Use ASCII short-cut if possible
+                    if (c1 > 0xFF || c2 > 0xFF) {
+                        if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+                            return false;
+                        }
+                    } else if (Ascii.toLower(c1) != Ascii.toLower(c2)) {
                         return false;
                     }
+
                 }
                 return true;
             case T_CHARS:

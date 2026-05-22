@@ -500,7 +500,14 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         }
         int off = start;
         for (int i = 0; i < len; i++) {
-            if (Ascii.toLower(c[off++]) != Ascii.toLower(s.charAt(i))) {
+            char c1 = c[off++];
+            char c2 = s.charAt(i);
+            // Use ASCII short-cut if possible
+            if (c1 > 0xFF || c2 > 0xFF) {
+                if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+                    return false;
+                }
+            } else if (Ascii.toLower(c1) != Ascii.toLower(c2)) {
                 return false;
             }
         }
@@ -590,7 +597,14 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         }
         int off = start + pos;
         for (int i = 0; i < len; i++) {
-            if (Ascii.toLower(c[off++]) != Ascii.toLower(s.charAt(i))) {
+            char c1 = c[off++];
+            char c2 = s.charAt(i);
+            // Use ASCII short-cut if possible
+            if (c1 > 0xFF || c2 > 0xFF) {
+                if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+                    return false;
+                }
+            } else if (Ascii.toLower(c1) != Ascii.toLower(c2)) {
                 return false;
             }
         }

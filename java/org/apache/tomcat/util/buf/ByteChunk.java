@@ -705,7 +705,7 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Compares the message bytes to the specified String object.
      * <p>
-     * NOTE: This only works for characters in the range 0-127.
+     * NOTE: This only works for characters in the range 0-255.
      *
      * @param s the String to compare
      *
@@ -719,7 +719,8 @@ public final class ByteChunk extends AbstractChunk {
         }
         int off = start;
         for (int i = 0; i < len; i++) {
-            if (Ascii.toLower(b[off++]) != Ascii.toLower(s.charAt(i))) {
+            char c = s.charAt(i);
+            if (c > 0xFF || Ascii.toLower(b[off++]) != Ascii.toLower(c)) {
                 return false;
             }
         }
@@ -874,7 +875,7 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Returns true if the buffer starts with the specified string when tested in a case-insensitive manner.
      * <p>
-     * NOTE: This only works for characters in the range 0-127.
+     * NOTE: This only works for characters in the range 0-255.
      *
      * @param s   the string
      * @param pos The position
@@ -889,7 +890,8 @@ public final class ByteChunk extends AbstractChunk {
         }
         int off = start + pos;
         for (int i = 0; i < len; i++) {
-            if (Ascii.toLower(b[off++]) != Ascii.toLower(s.charAt(i))) {
+            char c = s.charAt(i);
+            if (c > 0xFF || Ascii.toLower(b[off++]) != Ascii.toLower(c)) {
                 return false;
             }
         }
