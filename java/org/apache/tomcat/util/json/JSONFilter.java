@@ -126,7 +126,6 @@ public class JSONFilter {
         switch (c) {
             case '"':
             case '\\':
-            case '/':
                 return c;
             case 0x8:
                 return 'b';
@@ -142,5 +141,4 @@ public class JSONFilter {
                 return 0;
         }
     }
-
 }
