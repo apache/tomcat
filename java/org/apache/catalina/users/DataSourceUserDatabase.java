@@ -920,6 +920,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     if (userFullNameCol != null) {
                         fullName = rs.getString(2);
                     }
+                } else {
+                    return null;
                 }
 
                 dbCredentials = (dbCredentials != null) ? dbCredentials.trim() : null;
