@@ -172,6 +172,10 @@
         <code>MemoryRealm</code> should not add a dummy role when none is
         specified in the configuration. (remm)
       </fix>
+      <fix>
+        <code>DataSourceUserDatabase</code> should return a null principal on
+        a non existing user. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

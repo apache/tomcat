@@ -158,6 +158,7 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
         // Manager role cannot be saved, but remains valid in memory
         managerRole = db.findRole("manager");
         Assert.assertFalse("Unexpected role for user", tomcatUser.isInRole(managerRole));
+        Assert.assertNull(db.findUser("foo"));
 
         db.close();
 
