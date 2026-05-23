@@ -1146,7 +1146,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 if (realmAlgorithm.equals(algorithm)) {
                     return true;
                 } else {
-                    log.debug(sm.getString("relamBase.digestMismatch", algorithm, realmAlgorithm));
+                    log.debug(sm.getString("realmBase.digestMismatch", algorithm, realmAlgorithm));
                 }
             }
         }
