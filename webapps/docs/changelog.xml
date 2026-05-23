@@ -172,6 +172,9 @@
         <code>DataSourceUserDatabase</code> should return a null principal on
         a non existing user. (remm)
       </fix>
+      <fix>
+        Fix shared lock expiration in WebDAV. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

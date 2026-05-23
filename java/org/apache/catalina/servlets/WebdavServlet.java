@@ -367,7 +367,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // Check expiration of all locks
         for (LockInfo currentLock : sharedLocks.values()) {
             if (currentLock.hasExpired()) {
-                sharedLocks.remove(currentLock.path);
+                sharedLocks.remove(currentLock.token);
             }
         }
         for (LockInfo currentLock : resourceLocks.values()) {
