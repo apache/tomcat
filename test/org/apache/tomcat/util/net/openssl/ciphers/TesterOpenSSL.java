@@ -382,6 +382,7 @@ public class TesterOpenSSL {
 
         String errorText = stderr.getText();
         if (errorText.length() > 0) {
+            System.err.println(cmd);
             System.err.println(errorText);
         }
 
