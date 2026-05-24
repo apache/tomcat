@@ -134,30 +134,6 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String DHE = "DHE";
     /**
-     * Cipher suites using DH key agreement and DH certificates signed by CAs with RSA keys.
-     */
-    private static final String kDHr = "kDHr";
-    /**
-     * Cipher suites using DH key agreement and DH certificates signed by CAs with DSS keys.
-     */
-    private static final String kDHd = "kDHd";
-    /**
-     * Cipher suites using DH key agreement and DH certificates signed by CAs with RSA or DSS keys.
-     */
-    private static final String kDH = "kDH";
-    /**
-     * Cipher suites using fixed ECDH key agreement signed by CAs with RSA keys.
-     */
-    private static final String kECDHr = "kECDHr";
-    /**
-     * Cipher suites using fixed ECDH key agreement signed by CAs with ECDSA keys.
-     */
-    private static final String kECDHe = "kECDHe";
-    /**
-     * Cipher suites using fixed ECDH key agreement signed by CAs with RSA and ECDSA keys or either respectively.
-     */
-    private static final String kECDH = "kECDH";
-    /**
      * Cipher suites using ephemeral ECDH key agreement, including anonymous cipher suites.
      */
     private static final String kEECDH = "kEECDH";
@@ -189,14 +165,6 @@ public class OpenSSLCipherConfigurationParser {
      * Cipher suites using DSS authentication, i.e. the certificates carry DSS keys.
      */
     private static final String aDSS = "aDSS";
-    /**
-     * Cipher suites effectively using DH authentication, i.e. the certificates carry DH keys.
-     */
-    private static final String aDH = "aDH";
-    /**
-     * Cipher suites effectively using ECDH authentication, i.e. the certificates carry ECDH keys.
-     */
-    private static final String aECDH = "aECDH";
     /**
      * Cipher suites effectively using ECDSA authentication, i.e. the certificates carry ECDSA keys.
      */
@@ -437,15 +405,7 @@ public class OpenSSLCipherConfigurationParser {
         edh.removeAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
         addListAlias(EDH, edh);
         addListAlias(DHE, edh);
-        addListAlias(kDHr, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHr)));
-        addListAlias(kDHd, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHd)));
-        addListAlias(kDH,
-                filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd))));
 
-        addListAlias(kECDHr, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHr)));
-        addListAlias(kECDHe, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHe)));
-        addListAlias(kECDH,
-                filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr))));
         addListAlias(ECDH, filterByKeyExchange(allCiphers,
                 new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr, KeyExchange.EECDH))));
         addListAlias(kECDHE, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH)));
@@ -460,10 +420,8 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(EECDH, eecdh);
         addListAlias(aDSS, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DSS)));
         aliases.put(DSS, aliases.get(aDSS));
-        addListAlias(aDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DH)));
         Set<Cipher> aecdh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH));
         addListAlias(AECDH, filterByAuthentication(aecdh, Collections.singleton(Authentication.aNULL)));
-        addListAlias(aECDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDH)));
         addListAlias(ECDSA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDSA)));
         aliases.put(aECDSA, aliases.get(ECDSA));
         addListAlias(Constants.SSL_PROTO_TLSv1_2,

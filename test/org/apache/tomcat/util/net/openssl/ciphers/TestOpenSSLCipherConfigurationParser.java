@@ -131,42 +131,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testkDHr() throws Exception {
-        testSpecification("kDHr");
-    }
-
-
-    @Test
-    public void testkDHd() throws Exception {
-        testSpecification("kDHd");
-    }
-
-
-    @Test
-    public void testkDH() throws Exception {
-        testSpecification("kDH");
-    }
-
-
-    @Test
-    public void testkECDHr() throws Exception {
-        testSpecification("kECDHr");
-    }
-
-
-    @Test
-    public void testkECDHe() throws Exception {
-        testSpecification("kECDHe");
-    }
-
-
-    @Test
-    public void testkECDH() throws Exception {
-        testSpecification("kECDH");
-    }
-
-
-    @Test
     public void testkEECDH() throws Exception {
         testSpecification("kEECDH");
     }
@@ -205,18 +169,6 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testaDSS() throws Exception {
         testSpecification("aDSS");
-    }
-
-
-    @Test
-    public void testaDH() throws Exception {
-        testSpecification("aDH");
-    }
-
-
-    @Test
-    public void testaECDH() throws Exception {
-        testSpecification("aECDH");
     }
 
 
