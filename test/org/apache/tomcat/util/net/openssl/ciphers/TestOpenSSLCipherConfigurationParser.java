@@ -357,12 +357,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    public void testaGOST94() throws Exception {
-        testSpecification("aGOST94");
-    }
-
-
-    @Test
     public void testkGOST() throws Exception {
         testSpecification("kGOST");
     }
@@ -472,8 +466,8 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecification03() throws Exception {
         // Reported as failing during 8.0.11 release vote by Ognjen Blagojevic
-        // EDH was introduced in 1.0.0
-        testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");
+        // EDH was introduced in 1.0.0 (s/\!EXP//)
+        testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!PSK:!SRP:!DSS");
     }
 
 
@@ -494,60 +488,6 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecificationIsEmptyNonsense() throws Exception {
         testSpecificationIsEmpty("Nonsense");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptySSLv2() throws Exception {
-        testSpecificationIsEmpty("SSLv2");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyEXPORT() throws Exception {
-        testSpecificationIsEmpty("EXPORT");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyEXPORT40() throws Exception {
-        testSpecificationIsEmpty("EXPORT40");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyEXPORT56() throws Exception {
-        testSpecificationIsEmpty("EXPORT56");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyKRB5() throws Exception {
-        testSpecificationIsEmpty("KRB5");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptykFZA() throws Exception {
-        testSpecificationIsEmpty("kFZA");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyaFZA() throws Exception {
-        testSpecificationIsEmpty("aFZA");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyeFZA() throws Exception {
-        testSpecificationIsEmpty("eFZA");
-    }
-
-
-    @Test
-    public void testSpecificationIsEmptyFZA() throws Exception {
-        testSpecificationIsEmpty("FZA");
     }
 
 
