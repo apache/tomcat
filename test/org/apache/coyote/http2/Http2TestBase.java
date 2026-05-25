@@ -1043,6 +1043,30 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void filterTrace(StringBuilder filteredTrace, int filteredFrameCountTarget, String... ignores) throws IOException,
+            Http2Exception {
+        output.clearTrace();
+        int filteredFrameCount = 0;
+
+        while (filteredFrameCount < filteredFrameCountTarget) {
+            parser.readFrame();
+            String singleFrameTrace = output.getTrace();
+            boolean keep = true;
+            for (String ignore : ignores) {
+                if (singleFrameTrace.contains(ignore)) {
+                    keep = false;
+                    break;
+                }
+            }
+            if (keep) {
+                filteredTrace.append(singleFrameTrace);
+                filteredFrameCount++;
+            }
+            output.clearTrace();
+        }
+    }
+
+
     static void setOneBytes(byte[] output, int firstByte, int value) {
         output[firstByte] = (byte) (value & 0xFF);
     }
