@@ -1328,9 +1328,11 @@ public class DefaultServlet extends HttpServlet {
         // Look for 4-byte BOMs
         int b3 = bom[3] & 0xFF;
         if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
+            skip(is, 4, stripBom);
             return Charset.forName("UTF-32BE");
         }
         if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
+            skip(is, 4, stripBom);
             return Charset.forName("UTF-32LE");
         }
 
