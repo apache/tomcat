@@ -329,7 +329,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         }
         for (Session session : sessions) {
             if (!session.isValid()) {
-                expiredSessions.incrementAndGet();
                 expireHere++;
             }
         }
@@ -654,7 +653,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
         ((StandardSession) session).passivate();
         writeSession(session);
-        super.remove(session, true);
+        super.remove(session, false);
         session.recycle();
 
     }
