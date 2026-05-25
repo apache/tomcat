@@ -175,6 +175,10 @@
       <fix>
         Fix shared lock expiration in WebDAV. (remm)
       </fix>
+      <fix>
+        Inaccurate session exipration statistics when using the persistent
+        manager. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
