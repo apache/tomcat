@@ -615,51 +615,19 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         writeFrame(trailerFrameHeader, trailerPayload);
 
         // Expect 2 window updates and a reset due to a protocol error. Order may vary.
-        boolean skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        Assert.assertTrue(output.getTrace(), output.getTrace().contains("3-RST-[1]"));
-        output.clearTrace();
+        StringBuilder filteredTrace = new StringBuilder();
+        filterTrace(filteredTrace, 1, "WindowSize");
+        String actual = filteredTrace.toString();
+        Assert.assertTrue(actual, actual.toString().contains("3-RST-[1]"));
 
         // Ensure connection is still valid
         sendSimpleGetRequest(5);
-        // Read headers
-        // In async mode, may see multiple resets for Stream 3 and/or further window updates
-        skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().startsWith("3-RST")) {
-                // Ignore additional resets for stream 3
-                output.clearTrace();
-            } else if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        // Read body
-        skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().startsWith("3-RST")) {
-                // Ignore additional resets for stream 3
-                output.clearTrace();
-            } else if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+        // Expect 2 frames: headers and body.
+        // In async mode, may see multiple resets for Stream 3 and/or remaining window updates.
+        filteredTrace = new StringBuilder();
+        filterTrace(filteredTrace, 2, "WindowSize", "3-RST");
+        actual = filteredTrace.toString();
+        Assert.assertEquals(actual, getSimpleResponseTrace(5), actual);
     }
 
 
@@ -720,50 +688,18 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         writeFrame(dataFrameHeader, dataPayload);
 
         // Expect 2 window updates and a reset due to a protocol error. Order may vary.
-        boolean skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        Assert.assertTrue(output.getTrace(), output.getTrace().contains("3-RST-[1]"));
-        output.clearTrace();
+        StringBuilder filteredTrace = new StringBuilder();
+        filterTrace(filteredTrace, 1, "WindowSize");
+        String actual = filteredTrace.toString();
+        Assert.assertTrue(actual, actual.toString().contains("3-RST-[1]"));
 
         // Ensure connection is still valid
         sendSimpleGetRequest(5);
-        // Read headers
-        // In async mode, may see multiple resets for Stream 3 and/or further window updates
-        skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().startsWith("3-RST")) {
-                // Ignore additional resets for stream 3
-                output.clearTrace();
-            } else if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        // Read body
-        skip = true;
-        while (skip) {
-            parser.readFrame();
-            if (output.getTrace().startsWith("3-RST")) {
-                // Ignore additional resets for stream 3
-                output.clearTrace();
-            } else if (output.getTrace().contains("WindowSize")) {
-                // Ignore the window updates
-                output.clearTrace();
-            } else {
-                skip = false;
-            }
-        }
-        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+        // Expect 2 frames: headers and body.
+        // In async mode, may see multiple resets for Stream 3 and/or remaining window updates.
+        filteredTrace = new StringBuilder();
+        filterTrace(filteredTrace, 2, "WindowSize", "3-RST");
+        actual = filteredTrace.toString();
+        Assert.assertEquals(actual, getSimpleResponseTrace(5), actual);
     }
 }
