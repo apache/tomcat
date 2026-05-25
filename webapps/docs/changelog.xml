@@ -183,6 +183,9 @@
         Inaccurate session exipration statistics when using the persistent
         manager. (remm)
       </fix>
+      <fix>
+        Skip BOM when serving files with UTF-32 encoding. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
