@@ -701,8 +701,7 @@ public final class EmbeddedServletOptions implements Options {
             scratchDir = (File) context.getAttribute(ServletContext.TEMPDIR);
         }
         if (scratchDir == null) {
-            log.fatal(Localizer.getMessage("jsp.error.no.scratch.dir"));
-            return;
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.no.scratch.dir"));
         }
 
         if (!(scratchDir.exists() && scratchDir.canRead() && scratchDir.canWrite() && scratchDir.isDirectory())) {
