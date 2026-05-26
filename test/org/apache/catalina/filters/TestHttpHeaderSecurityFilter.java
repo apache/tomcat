@@ -171,6 +171,17 @@ public class TestHttpHeaderSecurityFilter {
         filter.init(TesterFilterConfigs.generateFilterConfig(filterDef));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testAntiClickJackingNoUri() throws ServletException {
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("antiClickJackingOption", "ALLOW-FROM");
+
+        HttpHeaderSecurityFilter filter = new HttpHeaderSecurityFilter();
+        filterDef.setFilterName(HttpHeaderSecurityFilter.class.getName());
+        filterDef.setFilterClass(HttpHeaderSecurityFilter.class.getName());
+        filter.init(TesterFilterConfigs.generateFilterConfig(filterDef));
+    }
+
     private HttpServletResponse doFilter(FilterDef filterDef, boolean secure)
         throws ServletException, IOException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
