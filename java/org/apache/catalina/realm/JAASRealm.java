@@ -643,7 +643,7 @@ public class JAASRealm extends RealmBase {
                 return this.jaasConfiguration;
             }
         } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex.getCause());
+            throw new RuntimeException(ExceptionUtils.unwrapInvocationTargetException(ex));
         } catch (SecurityException | URISyntaxException | ReflectiveOperationException | IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         }
