@@ -156,6 +156,9 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
         Assert.assertFalse("Unexpected role for user", tomcatUser.isInRole(managerRole));
         Assert.assertNull(db.findUser("foo"));
 
+        Iterator<Role> roles = db.getRoles();
+        Assert.assertTrue("No roles found", roles.hasNext());
+
         db.close();
 
     }
