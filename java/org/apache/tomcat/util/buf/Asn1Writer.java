@@ -16,10 +16,14 @@
  */
 package org.apache.tomcat.util.buf;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Utility class for writing ASN.1 DER-encoded data structures.
  */
 public class Asn1Writer {
+
+    private static final StringManager sm = StringManager.getManager(Asn1Writer.class);
 
     /**
      * Private constructor to prevent instantiation.
@@ -58,7 +62,7 @@ public class Asn1Writer {
      */
     public static byte[] writeInteger(int value) {
         if (value < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("asn1Writer.negativeInteger", Integer.valueOf(value)));
         }
 
         // How many bytes required to write the value? No more than 4 for int.
