@@ -86,7 +86,8 @@ public class GenericRole<UD extends UserDatabase> extends AbstractRole {
     public boolean equals(Object obj) {
         if (obj instanceof GenericRole) {
             GenericRole<?> role = (GenericRole<?>) obj;
-            return role.database == database && rolename.equals(role.getRolename());
+            return role.database == database &&
+                    ((rolename == null && role.getRolename() == null) || rolename.equals(role.getRolename()));
         }
         return super.equals(obj);
     }
