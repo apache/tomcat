@@ -416,19 +416,35 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.setCACertificate(state.ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
-                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.NO_OCSP_CHECK,
-                        Boolean.toString(!sslHostConfig.getOcspEnabled())));
-                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_SOFT_FAIL,
-                        Boolean.toString(sslHostConfig.getOcspSoftFail())));
-                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_TIMEOUT,
-                        Integer.toString(sslHostConfig.getOcspTimeout())));
-                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_VERIFY_FLAGS,
-                        Integer.toString(sslHostConfig.getOcspVerifyFlags())));
+                boolean foundOcspConfig = false;
+                for (OpenSSLConfCmd command : sslHostConfig.getOpenSslConf().getCommands()) {
+                    if (OpenSSLConfCmd.NO_OCSP_CHECK.equals(command.getName())) {
+                        foundOcspConfig = true;
+                    }
+                }
+                if (!foundOcspConfig) {
+                    sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.NO_OCSP_CHECK,
+                            Boolean.toString(!sslHostConfig.getOcspEnabled())));
+                    sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_SOFT_FAIL,
+                            Boolean.toString(sslHostConfig.getOcspSoftFail())));
+                    sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_TIMEOUT,
+                            Integer.toString(sslHostConfig.getOcspTimeout())));
+                    sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.OCSP_VERIFY_FLAGS,
+                            Integer.toString(sslHostConfig.getOcspVerifyFlags())));
+                }
             }
 
             if (sslHostConfig.getGroupList() != null) {
-                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS,
-                        sslHostConfig.getGroups().replace(',', ':')));
+                boolean foundGroupsConfig = false;
+                for (OpenSSLConfCmd command : sslHostConfig.getOpenSslConf().getCommands()) {
+                    if (OpenSSLConfCmd.GROUPS.equals(command.getName())) {
+                        foundGroupsConfig = true;
+                    }
+                }
+                if (!foundGroupsConfig) {
+                    sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS,
+                            sslHostConfig.getGroups().replace(',', ':')));
+                }
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
