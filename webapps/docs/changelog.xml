@@ -254,7 +254,7 @@
       </fix>
       <fix>
         Check for last-modified header in <code>ExpiresFilter</code> when a
-        servlet uses <code>addDateHader</code> to avoid wrongly considering
+        servlet uses <code>addDateHeader</code> to avoid wrongly considering
         it has been set. (remm)
       </fix>
       <fix>
