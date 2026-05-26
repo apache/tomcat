@@ -142,7 +142,8 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GenericGroup<?> group) {
-            return group.database == database && groupname.equals(group.getGroupname());
+            return group.database == database &&
+                    ((groupname == null && group.getGroupname() == null) || groupname.equals(group.getGroupname()));
         }
         return super.equals(obj);
     }
