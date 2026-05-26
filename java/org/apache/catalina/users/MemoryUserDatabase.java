@@ -280,7 +280,9 @@ public class MemoryUserDatabase implements UserDatabase {
         Group group = new GenericGroup<>(this, groupname, description, null);
         readLock.lock();
         try {
-            groups.put(group.getGroupname(), group);
+            if (groups.putIfAbsent(group.getGroupname(), group) != null) {
+                return null;
+            }
         } finally {
             readLock.unlock();
         }
@@ -299,7 +301,9 @@ public class MemoryUserDatabase implements UserDatabase {
         Role role = new GenericRole<>(this, rolename, description);
         readLock.lock();
         try {
-            roles.put(role.getRolename(), role);
+            if (roles.putIfAbsent(role.getRolename(), role) != null) {
+                return null;
+            }
         } finally {
             readLock.unlock();
         }
@@ -319,7 +323,9 @@ public class MemoryUserDatabase implements UserDatabase {
         User user = new GenericUser<>(this, username, password, fullName, null, null);
         readLock.lock();
         try {
-            users.put(user.getUsername(), user);
+            if (users.put(user.getUsername(), user) != null) {
+                return null;
+            }
         } finally {
             readLock.unlock();
         }
