@@ -257,12 +257,11 @@ public class Asn1Parser {
         parseTag(tag);
         int len = parseLength();
         byte[] result = new byte[len];
-        if (pos + result.length <= source.length) {
-            System.arraycopy(source, pos, result, 0, result.length);
-        } else {
+        if (result.length > source.length - pos) {
             throw new IllegalArgumentException(sm.getString("asn1Parser.truncatedData", Integer.valueOf(result.length),
                     Integer.valueOf(source.length - pos)));
         }
+        System.arraycopy(source, pos, result, 0, result.length);
         pos += result.length;
         return result;
     }
@@ -274,6 +273,10 @@ public class Asn1Parser {
      * @param dest the destination byte array
      */
     public void parseBytes(byte[] dest) {
+        if (dest.length > source.length - pos) {
+            throw new IllegalArgumentException(sm.getString("asn1Parser.truncatedData", Integer.valueOf(dest.length),
+                    Integer.valueOf(source.length - pos)));
+        }
         System.arraycopy(source, pos, dest, 0, dest.length);
         pos += dest.length;
     }
