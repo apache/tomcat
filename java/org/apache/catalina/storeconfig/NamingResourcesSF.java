@@ -48,6 +48,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
             if (log.isTraceEnabled()) {
                 log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
             }
+            // Note: The elements go directly inside another one without any specific parent
             storeChildren(aWriter, indent, aElement, elementDesc);
         } else {
             log.warn(sm.getString("storeFactory.noDescriptor", aElement.getClass(), "NamingResources"));

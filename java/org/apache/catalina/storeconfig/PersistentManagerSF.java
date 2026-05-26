@@ -45,7 +45,9 @@ public class PersistentManagerSF extends StoreFactoryBase {
 
             // Store nested <Store> element
             Store store = manager.getStore();
-            storeElement(aWriter, indent, store);
+            if (store != null) {
+                storeElement(aWriter, indent, store);
+            }
 
             // Store nested <SessionIdGenerator> element
             SessionIdGenerator sessionIdGenerator = manager.getSessionIdGenerator();
