@@ -91,12 +91,12 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         }
 
         ra = ref.get("readonly");
-        if (ra != null) {
+        if (ra != null && ra.getContent() != null) {
             database.setReadonly(Boolean.parseBoolean(ra.getContent().toString()));
         }
 
         ra = ref.get("watchSource");
-        if (ra != null) {
+        if (ra != null && ra.getContent() != null) {
             database.setWatchSource(Boolean.parseBoolean(ra.getContent().toString()));
         }
 
