@@ -54,8 +54,9 @@ public class StatusTransformer {
 
     /**
      * Sets the response content type based on the output mode.
+     *
      * @param response the HTTP response
-     * @param mode 0 for HTML, 1 for XML, 2 for JSON
+     * @param mode     0 for HTML, 1 for XML, 2 for JSON
      */
     public static void setContentType(HttpServletResponse response, int mode) {
         if (mode == 0) {
@@ -119,9 +120,10 @@ public class StatusTransformer {
 
     /**
      * Writes the page heading section.
+     *
      * @param writer the output writer
-     * @param args formatting arguments
-     * @param mode output mode (0=HTML)
+     * @param args   formatting arguments
+     * @param mode   output mode (0=HTML)
      */
     public static void writePageHeading(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
@@ -132,9 +134,10 @@ public class StatusTransformer {
 
     /**
      * Writes the server information row.
+     *
      * @param writer the output writer
-     * @param args formatting arguments
-     * @param mode output mode (0=HTML)
+     * @param args   formatting arguments
+     * @param mode   output mode (0=HTML)
      */
     public static void writeServerInfo(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
@@ -145,8 +148,9 @@ public class StatusTransformer {
 
     /**
      * Writes the page footer.
+     *
      * @param writer the output writer
-     * @param mode output mode (0=HTML, 1=XML, 2=JSON)
+     * @param mode   output mode (0=HTML, 1=XML, 2=JSON)
      */
     public static void writeFooter(PrintWriter writer, int mode) {
         if (mode == 0) {
@@ -721,16 +725,12 @@ public class StatusTransformer {
                     writer.write("0");
                 }
                 writer.write("\"");
-                writer.write(" remoteAddr=\"" +
-                        Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "remoteAddr"))) + "\"");
-                writer.write(" virtualHost=\"" +
-                        Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "virtualHost"))) + "\"");
+                writer.write(" remoteAddr=\"" + Escape.xml(mBeanServer.getAttribute(pName, "remoteAddr")) + "\"");
+                writer.write(" virtualHost=\"" + Escape.xml(mBeanServer.getAttribute(pName, "virtualHost")) + "\"");
 
                 if (showRequest) {
-                    writer.write(
-                            " method=\"" + Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "method"))) + "\"");
-                    writer.write(" currentUri=\"" +
-                            Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "currentUri"))) + "\"");
+                    writer.write(" method=\"" + Escape.xml(mBeanServer.getAttribute(pName, "method")) + "\"");
+                    writer.write(" currentUri=\"" + Escape.xml(mBeanServer.getAttribute(pName, "currentUri")) + "\"");
 
                     String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
                     if (queryString != null && !queryString.isEmpty()) {
@@ -738,8 +738,7 @@ public class StatusTransformer {
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
-                    writer.write(" protocol=\"" +
-                            Escape.xml(String.valueOf(mBeanServer.getAttribute(pName, "protocol"))) + "\"");
+                    writer.write(" protocol=\"" + Escape.xml(mBeanServer.getAttribute(pName, "protocol")) + "\"");
                 } else {
                     writer.write(" method=\"&#63;\"");
                     writer.write(" currentUri=\"&#63;\"");

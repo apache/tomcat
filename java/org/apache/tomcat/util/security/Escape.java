@@ -90,6 +90,21 @@ public class Escape {
      *
      * @param content The content to escape
      *
+     * @return The escaped content converted to String or {@code &#63;} if the content was {@code null}
+     */
+    public static String xml(Object content) {
+        if (content == null) {
+            return "&#63;";
+        }
+        return xml(null, false, String.valueOf(content));
+    }
+
+
+    /**
+     * Escape content for use in XML.
+     *
+     * @param content The content to escape
+     *
      * @return The escaped content or {@code null} if the content was {@code null}
      */
     public static String xml(String content) {
