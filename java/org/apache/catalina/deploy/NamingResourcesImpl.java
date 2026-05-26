@@ -250,7 +250,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
                 if (server == null) {
                     return;
                 }
-                NamingResourcesImpl global = getServer().getGlobalNamingResources();
+                NamingResourcesImpl global = server.getGlobalNamingResources();
                 if (global.findEnvironment(rl.getGlobal()) != null) {
                     if (global.findEnvironment(rl.getGlobal()).getOverride()) {
                         removeResourceLink(environment.getName());
