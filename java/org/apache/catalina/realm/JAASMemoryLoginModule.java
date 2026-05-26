@@ -318,10 +318,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     public boolean logout() throws LoginException {
         subject.getPrincipals().remove(principal);
         if (principal instanceof GenericPrincipal) {
-            if (roles != null) {
-                for (Principal role : roles) {
-                    subject.getPrincipals().remove(role);
-                }
+            for (Principal role : roles) {
+                subject.getPrincipals().remove(role);
             }
         }
         committed = false;
