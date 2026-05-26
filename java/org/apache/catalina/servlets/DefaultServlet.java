@@ -2028,7 +2028,7 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         reader = new InputStreamReader(is);
                     }
-                    IOException e = copyRange(reader, new PrintWriter(buffer));
+                    IOException e = copyFull(reader, new PrintWriter(buffer));
                     if (debug > 10) {
                         log("readme '" + readmeFile + "' output error: " + ((e != null) ? e.getMessage() : ""));
                     }
@@ -2525,8 +2525,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream, and ensure that the input stream
+     * is closed before returning (even in the face of an exception).
      *
      * @param is      The input stream to read the source resource from
      * @param ostream The output stream to write to
@@ -2538,7 +2538,7 @@ public class DefaultServlet extends HttpServlet {
         InputStream istream = new BufferedInputStream(is, input);
 
         // Copy the input stream to the output stream
-        IOException exception = copyRange(istream, ostream);
+        IOException exception = copyFull(istream, ostream);
 
         // Clean up the input stream
         istream.close();
@@ -2551,8 +2551,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream, and ensure that the input stream
+     * is closed before returning (even in the face of an exception).
      *
      * @param is       The input stream to read the source resource from
      * @param writer   The writer to write to
@@ -2570,7 +2570,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // Copy the input stream to the output stream
-        IOException exception = copyRange(reader, writer);
+        IOException exception = copyFull(reader, writer);
 
         // Clean up the reader
         reader.close();
@@ -2583,8 +2583,7 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified resource to the specified output stream.
      *
      * @param resource The source resource
      * @param length   the resource length
@@ -2612,8 +2611,7 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified resource to the specified output stream.
      *
      * @param resource    The source resource
      * @param length      the resource length
@@ -2663,15 +2661,14 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy full contents of the specified input stream to the specified output stream.
      *
      * @param istream The input stream to read from
      * @param ostream The output stream to write to
      *
      * @return Exception which occurred during processing
      */
-    protected IOException copyRange(InputStream istream, ServletOutputStream ostream) {
+    protected IOException copyFull(InputStream istream, ServletOutputStream ostream) {
 
         // Copy the input stream to the output stream
         IOException exception = null;
@@ -2694,15 +2691,14 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy full contents of the specified input stream to the specified output stream.
      *
      * @param reader The reader to read from
      * @param writer The writer to write to
      *
      * @return Exception which occurred during processing
      */
-    protected IOException copyRange(Reader reader, PrintWriter writer) {
+    protected IOException copyFull(Reader reader, PrintWriter writer) {
 
         // Copy the input stream to the output stream
         IOException exception = null;
@@ -2725,8 +2721,7 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream.
      *
      * @param istream The input stream to read from
      * @param ostream The output stream to write to
