@@ -55,49 +55,4 @@ public class ConnectorSF extends StoreFactoryBase {
         }
     }
 
-    /**
-     * Prints the opening XML tag for a connector element.
-     * @param aWriter the writer to output to
-     * @param indent the indentation level
-     * @param bean the connector bean
-     * @param aDesc the store description
-     * @throws Exception if an error occurs during output
-     */
-    protected void printOpenTag(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc) throws Exception {
-        aWriter.print("<");
-        aWriter.print(aDesc.getTag());
-        storeConnectorAttributes(aWriter, indent, bean, aDesc);
-        aWriter.println(">");
-    }
-
-  /**
-     * Stores connector-specific attributes to the XML output.
-     * @param aWriter the writer to output to
-     * @param indent the indentation level
-     * @param bean the connector bean
-     * @param aDesc the store description
-     * @throws Exception if an error occurs during output
-     */
-    protected void storeConnectorAttributes(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc)
-             throws Exception {
-        if (aDesc.isAttributes()) {
-            getStoreAppender().printAttributes(aWriter, indent, false, bean, aDesc);
-        }
-    }
-
-    /**
-     * Prints a self-closing XML tag for a connector element.
-     * @param aWriter the writer to output to
-     * @param indent the indentation level
-     * @param bean the connector bean
-     * @param aDesc the store description
-     * @throws Exception if an error occurs during output
-     */
-    protected void printTag(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc) throws Exception {
-        aWriter.print("<");
-        aWriter.print(aDesc.getTag());
-        storeConnectorAttributes(aWriter, indent, bean, aDesc);
-        aWriter.println("/>");
-    }
-
 }

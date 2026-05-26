@@ -38,20 +38,23 @@ public class LoaderSF extends StoreFactoryBase {
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
-        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
-        if (elementDesc != null) {
-            Loader loader = (Loader) aElement;
-            if (!isDefaultLoader(loader)) {
-                if (log.isTraceEnabled()) {
-                    log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
+        if (aElement instanceof Loader loader) {
+            StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
+            if (elementDesc != null) {
+                if (!isDefaultLoader(loader)) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
+                    }
+                    getStoreAppender().printIndent(aWriter, indent + 2);
+                    getStoreAppender().printTag(aWriter, indent + 2, loader, elementDesc);
                 }
-                getStoreAppender().printIndent(aWriter, indent + 2);
-                getStoreAppender().printTag(aWriter, indent + 2, loader, elementDesc);
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
+                }
             }
         } else {
-            if (log.isWarnEnabled()) {
-                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-            }
+            super.store(aWriter, indent, aElement);
         }
     }
 

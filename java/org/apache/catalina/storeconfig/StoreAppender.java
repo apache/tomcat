@@ -119,34 +119,6 @@ public class StoreAppender {
     }
 
     /**
-     * Print an array of values.
-     *
-     * @param aWriter  The output writer
-     * @param tag      The element name
-     * @param indent   Indentation level
-     * @param elements Array of element values
-     */
-    public void printTagValueArray(PrintWriter aWriter, String tag, int indent, String[] elements) {
-        if (elements != null && elements.length > 0) {
-            printIndent(aWriter, indent + 2);
-            aWriter.print("<");
-            aWriter.print(tag);
-            aWriter.print(">");
-            for (int i = 0; i < elements.length; i++) {
-                printIndent(aWriter, indent + 4);
-                aWriter.print(elements[i]);
-                if (i + 1 < elements.length) {
-                    aWriter.println(",");
-                }
-            }
-            printIndent(aWriter, indent + 2);
-            aWriter.print("</");
-            aWriter.print(tag);
-            aWriter.println(">");
-        }
-    }
-
-    /**
      * Print an array of elements.
      *
      * @param aWriter  The output writer
