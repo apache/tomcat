@@ -62,7 +62,8 @@ public class JasperELResolver extends CompositeELResolver {
      */
     public JasperELResolver(List<ELResolver> appResolvers, ELResolver streamResolver) {
         appResolversSize = appResolvers.size();
-        resolvers = new ELResolver[appResolversSize + STANDARD_RESOLVERS_COUNT];
+        resolvers = new ELResolver[appResolversSize + STANDARD_RESOLVERS_COUNT
+                                   + (JspRuntimeLibrary.GRAAL ? 1 : 0)];
 
         add(new ImplicitObjectELResolver());
         for (ELResolver appResolver : appResolvers) {
@@ -233,6 +234,7 @@ public class JasperELResolver extends CompositeELResolver {
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
+                    method.setAccessible(true);
                     method.invoke(base, value);
                 } catch (Exception e) {
                     Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
