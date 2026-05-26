@@ -622,27 +622,26 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 users.putAll(createdUsers);
                 users.putAll(modifiedUsers);
 
-                Connection dbConnection = openConnection();
-                if (dbConnection != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllUsers)) {
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            while (rs.next()) {
-                                String userName = rs.getString(1);
-                                if (userName != null) {
-                                    if (!users.containsKey(userName) && !removedUsers.containsKey(userName)) {
-                                        User user = findUserInternal(dbConnection, userName);
-                                        if (user != null) {
-                                            users.put(userName, user);
+                try (Connection dbConnection = openConnection()) {
+                    if (dbConnection != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllUsers)) {
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                while (rs.next()) {
+                                    String userName = rs.getString(1);
+                                    if (userName != null) {
+                                        if (!users.containsKey(userName) && !removedUsers.containsKey(userName)) {
+                                            User user = findUserInternal(dbConnection, userName);
+                                            if (user != null) {
+                                                users.put(userName, user);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    } finally {
-                        closeConnection(dbConnection);
                     }
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
                 return users.values().iterator();
             } finally {
@@ -785,6 +784,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                                 }
                             } catch (SQLException e) {
                                 log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                                return null;
                             }
                         }
                         group = new GenericGroup<>(this, groupName, description, groupRoles);
@@ -928,6 +928,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
         } catch (SQLException e) {
             log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+            return null;
         }
 
         // Lookup groups
@@ -948,6 +949,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 }
             } catch (SQLException e) {
                 log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                return null;
             }
         }
 
@@ -968,6 +970,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 }
             } catch (SQLException e) {
                 log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                return null;
             }
         }
 
@@ -1660,7 +1663,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     }
                 }
             }
-            modifiedGroups.clear();
+            modifiedUsers.clear();
         }
 
     }
