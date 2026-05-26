@@ -182,7 +182,7 @@ public class StoreConfig implements IStoreConfig {
                         } finally {
                             desc.setStoreSeparate(oldSeparate);
                             desc.setBackup(oldBackup);
-                            desc.setBackup(oldExternalAllowed);
+                            desc.setExternalAllowed(oldExternalAllowed);
                         }
                     }
                 } else {

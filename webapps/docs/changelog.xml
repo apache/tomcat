@@ -182,6 +182,10 @@
       <fix>
         Skip BOM when serving files with UTF-32 encoding. (remm)
       </fix>
+      <fix>
+        Mixup of WrapperListener and WrapperLifecycle elements in storeconfig.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -189,7 +189,10 @@ public class StoreFileMover {
     public void move() throws IOException {
         if (configOld.renameTo(configSave)) {
             if (!configNew.renameTo(configOld)) {
-                configSave.renameTo(configOld);
+                if (!configSave.renameTo(configOld)) {
+                    throw new IOException(sm.getString("storeFileMover.restoreError", configNew.getAbsolutePath(),
+                            configOld.getAbsolutePath()));
+                }
                 throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
                         configOld.getAbsolutePath()));
             }

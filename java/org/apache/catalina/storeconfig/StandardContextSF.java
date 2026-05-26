@@ -245,11 +245,11 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, resources);
 
             // Store nested <WrapperListener> elements
-            String[] wLifecycles = context.findWrapperLifecycles();
-            getStoreAppender().printTagArray(aWriter, "WrapperListener", indent + 2, wLifecycles);
-            // Store nested <WrapperLifecycle> elements
             String[] wListeners = context.findWrapperListeners();
-            getStoreAppender().printTagArray(aWriter, "WrapperLifecycle", indent + 2, wListeners);
+            getStoreAppender().printTagArray(aWriter, "WrapperListener", indent + 2, wListeners);
+            // Store nested <WrapperLifecycle> elements
+            String[] wLifecycles = context.findWrapperLifecycles();
+            getStoreAppender().printTagArray(aWriter, "WrapperLifecycle", indent + 2, wLifecycles);
 
             // Store nested <Parameter> elements
             ApplicationParameter[] appParams = context.findApplicationParameters();

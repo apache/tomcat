@@ -151,7 +151,9 @@ public class ConnectorStoreAppender extends StoreAppender {
             propertyKeys.add(descriptor.getName());
         }
         // Add the properties of the protocol handler
-        descriptors = Introspector.getBeanInfo(protocolHandler.getClass()).getPropertyDescriptors();
+        if (protocolHandler != null) {
+            descriptors = Introspector.getBeanInfo(protocolHandler.getClass()).getPropertyDescriptors();
+        }
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
