@@ -196,7 +196,7 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     public boolean equals(Object obj) {
         if (obj instanceof GenericUser<?> user) {
             return user.database == database &&
-                    ((username == null && user.getUsername() == null) || username.equals(user.getUsername()));
+                    ((username == null && user.getUsername() == null) || (username != null && username.equals(user.getUsername())));
         }
         return super.equals(obj);
     }
