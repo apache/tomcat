@@ -190,6 +190,10 @@
         Mixup of WrapperListener and WrapperLifecycle elements in storeconfig.
         (remm)
       </fix>
+      <fix>
+        Incorrect processing of modified users in
+        <code>DataSourceUSerDatabase</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

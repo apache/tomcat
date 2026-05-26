@@ -166,9 +166,9 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     @Override
     public void removeRoles() {
         if (!roles.isEmpty()) {
+            roles.clear();
             database.modifiedUser(this);
         }
-        roles.clear();
     }
 
 
@@ -188,16 +188,16 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
 
     @Override
     public void setUsername(String username) {
-        database.modifiedUser(this);
-        // Note: changing the user name is a problem ...
-        super.setUsername(username);
+        // Note: changing the username (which is the key) in a database will not work
+        // and the user should be removed and added instead
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GenericUser) {
             GenericUser<?> user = (GenericUser<?>) obj;
-            return user.database == database && username.equals(user.getUsername());
+            return user.database == database &&
+                    ((username == null && user.getUsername() == null) || username.equals(user.getUsername()));
         }
         return super.equals(obj);
     }
