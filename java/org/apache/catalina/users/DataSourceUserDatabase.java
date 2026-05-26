@@ -663,6 +663,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public Group createGroup(String groupname, String description) {
         dbReadLock.lock();
         try {
+            if (findGroup(groupname) != null) {
+                return null;
+            }
             groupsWriteLock.lock();
             try {
                 Group group = new GenericGroup<>(this, groupname, description, null);
@@ -681,6 +684,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public Role createRole(String rolename, String description) {
         dbReadLock.lock();
         try {
+            if (findRole(rolename) != null) {
+                return null;
+            }
             rolesWriteLock.lock();
             try {
                 Role role = new GenericRole<>(this, rolename, description);
@@ -699,6 +705,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public User createUser(String username, String password, String fullName) {
         dbReadLock.lock();
         try {
+            if (findUser(username) != null) {
+                return null;
+            }
             usersWriteLock.lock();
             try {
                 User user = new GenericUser<>(this, username, password, fullName, null, null);

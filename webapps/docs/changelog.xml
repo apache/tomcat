@@ -194,6 +194,11 @@
         Incorrect processing of modified users in
         <code>DataSourceUSerDatabase</code>. (remm)
       </fix>
+      <update>
+        Clarify behavior in the <code>UserDatabase</code> for user, role and
+        group creation that it does not immediately override existing elements.
+        Removal (or update) needs to be used instead. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
