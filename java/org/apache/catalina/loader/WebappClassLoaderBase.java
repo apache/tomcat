@@ -782,7 +782,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         String path = nameToPath(name);
 
         if (!notFoundClassResources.contains(path)) {
-            WebResource resource = resources.getClassLoaderResource(path);
+            WebResource resource;
+            try {
+                resource = resources.getClassLoaderResource(path);
+            } catch (IllegalArgumentException iae) {
+                notFoundClassResources.add(path);
+                return null;
+            }
             if (resource.exists()) {
                 url = resource.getURL();
                 trackLastModified(path, resource);
@@ -829,15 +835,22 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForResourceLoading(name);
 
-        LinkedHashSet<URL> result = new LinkedHashSet<>();
-
         if (name == null || name.startsWith("/")) {
             return null;
         }
 
         String path = nameToPath(name);
 
-        WebResource[] webResources = resources.getClassLoaderResources(path);
+        WebResource[] webResources;
+        try {
+            webResources = resources.getClassLoaderResources(path);
+        } catch (IllegalArgumentException iae) {
+            // For consistency with super.findResources(String)
+            return Collections.emptyEnumeration();
+        }
+
+        LinkedHashSet<URL> result = new LinkedHashSet<>();
+
         for (WebResource webResource : webResources) {
             if (webResource.exists()) {
                 result.add(webResource.getURL());
@@ -989,7 +1002,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         String path = nameToPath(name);
         if (!notFoundClassResources.contains(path)) {
-            WebResource resource = resources.getClassLoaderResource(path);
+            WebResource resource;
+            try {
+                resource = resources.getClassLoaderResource(path);
+            } catch (IllegalArgumentException iae) {
+                notFoundClassResources.add(path);
+                return null;
+            }
+
             if (resource.exists()) {
                 stream = resource.getInputStream();
                 // Filter out .class resources through the ClassFileTranformer
