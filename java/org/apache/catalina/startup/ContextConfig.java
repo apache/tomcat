@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletContainerInitializer;
@@ -165,7 +166,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Deployment count.
      */
-    protected static long deploymentCount = 0L;
+    protected static AtomicLong deploymentCount = new AtomicLong();
 
 
     /**
@@ -965,9 +966,9 @@ public class ContextConfig implements LifecycleListener {
             }
 
             if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase + ".war");
+                antiLockingDocBase = new File(tmpFile, deploymentCount.incrementAndGet() + "-" + docBase + ".war");
             } else {
-                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase);
+                antiLockingDocBase = new File(tmpFile, deploymentCount.incrementAndGet() + "-" + docBase);
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
