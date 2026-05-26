@@ -693,7 +693,7 @@ public class Tomcat {
     public Context addWebapp(Host host, String contextPath, String docBase) {
         LifecycleListener listener;
         try {
-            Class<?> clazz = Class.forName(getHost().getConfigClass());
+            Class<?> clazz = Class.forName(host.getConfigClass());
             listener = (LifecycleListener) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             // Wrap in IAE since we can't easily change the method signature
@@ -944,6 +944,8 @@ public class Tomcat {
             loggerName.append('/');
         } else if (contextName.startsWith("##")) {
             loggerName.append('/');
+            loggerName.append(contextName);
+        } else {
             loggerName.append(contextName);
         }
         loggerName.append(']');
