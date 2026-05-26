@@ -82,7 +82,7 @@ public class StoreContextAppender extends StoreAppender {
                 if (host instanceof StandardHost) {
                     File appBase = getAppBase(((StandardHost) host));
                     File docBase = getDocBase(context, appBase);
-                    isPrint = !appBase.equals(docBase.getParentFile());
+                    isPrint = docBase.getParentFile() == null || !appBase.equals(docBase.getParentFile());
                 }
             }
         }

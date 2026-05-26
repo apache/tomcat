@@ -68,17 +68,19 @@ public class RealmSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aRealm, StoreDescription parentDesc)
             throws Exception {
-        if (aRealm instanceof CombinedRealm combinedRealm) {
+        if (aRealm instanceof Realm realm) {
+            if (realm instanceof CombinedRealm combinedRealm) {
 
-            // Store nested <Realm> element
-            Realm[] realms = combinedRealm.getNestedRealms();
-            storeElementArray(aWriter, indent, realms);
-        }
-        // Store nested <CredentialHandler> element
-        CredentialHandler credentialHandler = ((Realm) aRealm).getCredentialHandler();
-        if (credentialHandler != null && !(credentialHandler.getClass().getName()
-                .equals("org.apache.catalina.realm.CombinedRealm$CombinedRealmCredentialHandler"))) {
-            storeElement(aWriter, indent, credentialHandler);
+                // Store nested <Realm> element
+                Realm[] realms = combinedRealm.getNestedRealms();
+                storeElementArray(aWriter, indent, realms);
+            }
+            // Store nested <CredentialHandler> element
+            CredentialHandler credentialHandler = realm.getCredentialHandler();
+            if (credentialHandler != null && !(credentialHandler.getClass().getName()
+                    .equals("org.apache.catalina.realm.CombinedRealm$CombinedRealmCredentialHandler"))) {
+                storeElement(aWriter, indent, credentialHandler);
+            }
         }
     }
 
