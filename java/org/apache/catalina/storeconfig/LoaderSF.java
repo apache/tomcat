@@ -38,7 +38,8 @@ public class LoaderSF extends StoreFactoryBase {
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
-        if (aElement instanceof Loader loader) {
+        if (aElement instanceof Loader) {
+            Loader loader = (Loader) aElement;
             StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
             if (elementDesc != null) {
                 if (!isDefaultLoader(loader)) {
