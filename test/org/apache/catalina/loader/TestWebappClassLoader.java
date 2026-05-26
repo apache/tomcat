@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -174,5 +175,73 @@ public class TestWebappClassLoader extends TomcatBaseTest {
 
         URL u1 = cl.getResource("");
         Assert.assertNotNull(u1);
+    }
+
+
+    @Test
+    public void testFindResourceEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        URL u1 = cl.findResource("");
+        Assert.assertNotNull(u1);
+    }
+
+
+    @Test
+    public void testFindResourcesValid() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.findResources("org/apache/tomcat");
+        Assert.assertNotNull(urls);
+
+        Assert.assertTrue(urls.hasMoreElements());
+    }
+
+
+    @Test
+    public void testFindResourcesDoesNotExist() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.findResources("does/not/exist");
+        Assert.assertNotNull(urls);
+
+        Assert.assertFalse(urls.hasMoreElements());
+    }
+
+
+    @Test
+    public void testFindResourcesInvalid01() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.findResources("does/../../not/exist");
+        Assert.assertNotNull(urls);
+
+        Assert.assertFalse(urls.hasMoreElements());
+    }
+
+
+    @Test
+    public void testFindResourcesInvalid02() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.findResources("does/not/exist/\u0000");
+        Assert.assertNotNull(urls);
+
+        Assert.assertFalse(urls.hasMoreElements());
     }
 }

@@ -195,6 +195,12 @@
         group creation that it does not immediately override existing elements.
         Removal (or update) needs to be used instead. (remm)
       </update>
+      <fix>
+        <bug>70049</bug>: Align the web application class loader with parent
+        class loaders and swallow any errors caused by invalid paths when
+        looking up resources and behave as if the resources were not found in
+        that case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
