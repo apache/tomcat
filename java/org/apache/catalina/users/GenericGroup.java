@@ -144,7 +144,7 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
         if (obj instanceof GenericGroup) {
             GenericGroup<?> group = (GenericGroup<?>) obj;
             return group.database == database &&
-                    ((groupname == null && group.getGroupname() == null) || groupname.equals(group.getGroupname()));
+                    ((groupname == null && group.getGroupname() == null) || (groupname != null && groupname.equals(group.getGroupname())));
         }
         return super.equals(obj);
     }
