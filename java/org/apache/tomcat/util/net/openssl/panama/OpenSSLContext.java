@@ -96,7 +96,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     static final int OPTIONAL_NO_CA = 3;
 
     private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
-    private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
+    private static final String END_KEY = "\n-----END PRIVATE KEY-----";
 
     private static final byte[] HTTP_11_PROTOCOL = new byte[] { 'h', 't', 't', 'p', '/', '1', '.', '1' };
 
