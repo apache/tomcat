@@ -123,7 +123,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     public String createGroup(String groupname, String description) {
         UserDatabase database = (UserDatabase) this.resource;
         Group group = database.createGroup(groupname, description);
-        return group.getGroupname();
+        return group == null ? null : group.getGroupname();
     }
 
 
@@ -138,7 +138,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     public String createRole(String rolename, String description) {
         UserDatabase database = (UserDatabase) this.resource;
         Role role = database.createRole(rolename, description);
-        return role.getRolename();
+        return role == null ? null : role.getRolename();
     }
 
 
@@ -154,7 +154,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     public String createUser(String username, String password, String fullName) {
         UserDatabase database = (UserDatabase) this.resource;
         User user = database.createUser(username, password, fullName);
-        return user.getUsername();
+        return user == null ? null : user.getUsername();
     }
 
 
