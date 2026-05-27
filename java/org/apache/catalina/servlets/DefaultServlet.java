@@ -2668,22 +2668,6 @@ public class DefaultServlet extends HttpServlet {
      * @param ostream The output stream to write to
      *
      * @return Exception which occurred during processing
-     *
-     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(InputStream, ServletOutputStream)}
-     */
-    @Deprecated
-    protected IOException copyRange(InputStream istream, ServletOutputStream ostream) {
-        return copyNoThrow(istream, ostream);
-    }
-
-    /**
-     * Copy the contents of the specified input stream to the specified output stream and return, rather than throw, any
-     * IOException that occurs.
-     *
-     * @param istream The input stream to read from
-     * @param ostream The output stream to write to
-     *
-     * @return Exception which occurred during processing
      */
     protected IOException copyNoThrow(InputStream istream, ServletOutputStream ostream) {
 
@@ -2715,23 +2699,6 @@ public class DefaultServlet extends HttpServlet {
      * @param writer The writer to write to
      *
      * @return Exception which occurred during processing
-     *
-     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(Reader, PrintWriter)}
-     */
-    @Deprecated
-    protected IOException copyRange(Reader reader, PrintWriter writer) {
-        return copyNoThrow(reader, writer);
-    }
-
-
-    /**
-     * Copy the contents of the specified reader to the specified writer and return, rather than throw, any IOException
-     * that occurs.
-     *
-     * @param reader The reader to read from
-     * @param writer The writer to write to
-     *
-     * @return Exception which occurred during processing
      */
     protected IOException copyNoThrow(Reader reader, PrintWriter writer) {
         // Copy the input stream to the output stream
@@ -2751,25 +2718,6 @@ public class DefaultServlet extends HttpServlet {
         }
         return exception;
 
-    }
-
-
-    /**
-     * Copy the selected contents of the specified input stream to the specified output stream, and return, rather than
-     * throw, any IOException that occurs.
-     *
-     * @param istream The input stream to read from
-     * @param ostream The output stream to write to
-     * @param start   Start of the range which will be copied
-     * @param end     End of the range which will be copied
-     *
-     * @return Exception which occurred during processing
-     *
-     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(InputStream, ServletOutputStream, long, long)}
-     */
-    @Deprecated
-    protected IOException copyRange(InputStream istream, ServletOutputStream ostream, long start, long end) {
-        return copyNoThrow(istream, ostream, start, end);
     }
 
 
