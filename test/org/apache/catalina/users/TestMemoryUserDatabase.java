@@ -99,12 +99,20 @@ public class TestMemoryUserDatabase {
                     assertPrincipalNames(new String[0] , user.getGroups());
                     break;
                 }
+                case "user3": {
+                    Assert.assertNull(user.getFullName());
+                    Assert.assertEquals("sekr3t2", user.getPassword());
+
+                    assertPrincipalNames(new String[0], user.getRoles());
+                    assertPrincipalNames(new String[0] , user.getGroups());
+                    break;
+                }
                 default:
                     Assert.fail("Unexpected user: [" + user.getName() + "]");
             }
         }
 
-        Assert.assertEquals("Unexpected number of users in test database", 2, userCount);
+        Assert.assertEquals("Unexpected number of users in test database", 3, userCount);
     }
 
     public void testReloadUserDatabase()
