@@ -50,7 +50,7 @@ final class StandardHostValve extends ValveBase {
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
     private static final StringManager sm = StringManager.getManager(StandardHostValve.class);
 
-    // Saves a call to getClassLoader() on very request. Under high load these
+    // Saves a call to getClassLoader() on every request. Under high load these
     // calls took just long enough to appear as a hot spot (although a very
     // minor one) in a profiler.
     private static final ClassLoader MY_CLASSLOADER = StandardHostValve.class.getClassLoader();
@@ -94,6 +94,8 @@ final class StandardHostValve extends ValveBase {
         boolean asyncAtStart = request.isAsync();
 
         try {
+            // No need to check the return value, the original classloader
+            // will always be considered to be the Catalina one
             context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
 
             if (!asyncAtStart && !context.fireRequestInitEvent(request.getRequest())) {
@@ -161,6 +163,7 @@ final class StandardHostValve extends ValveBase {
                 request.getSession(false);
             }
 
+            // Always reset the classloader to the Catalina one
             context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
         }
     }
