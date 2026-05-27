@@ -77,7 +77,7 @@ public interface UserDatabase {
      * @param groupname   The group name of the new group (must be unique)
      * @param description The description of this group
      *
-     * @return The new group, or {@code null} if there's a pre existing group
+     * @return The new group, or {@code null} if there's a pre-existing group
      */
     Group createGroup(String groupname, String description);
 
@@ -88,7 +88,7 @@ public interface UserDatabase {
      * @param rolename    The role name of the new role (must be unique)
      * @param description The description of this role
      *
-     * @return The new role, or {@code null} if there's a pre existing role
+     * @return The new role, or {@code null} if there's a pre-existing role
      */
     Role createRole(String rolename, String description);
 
@@ -100,7 +100,7 @@ public interface UserDatabase {
      * @param password The logon password of the new user
      * @param fullName The full name of the new user
      *
-     * @return The new user, or {@code null} if there's a pre existing user
+     * @return The new user, or {@code null} if there's a pre-existing user
      */
     User createUser(String username, String password, String fullName);
 
