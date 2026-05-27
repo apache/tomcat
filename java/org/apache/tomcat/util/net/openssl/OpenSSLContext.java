@@ -411,6 +411,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 for (OpenSSLConfCmd command : sslHostConfig.getOpenSslConf().getCommands()) {
                     if (OpenSSLConfCmd.NO_OCSP_CHECK.equals(command.getName())) {
                         foundOcspConfig = true;
+                        break;
                     }
                 }
                 if (!foundOcspConfig) {
@@ -430,6 +431,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 for (OpenSSLConfCmd command : sslHostConfig.getOpenSslConf().getCommands()) {
                     if (OpenSSLConfCmd.GROUPS.equals(command.getName())) {
                         foundGroupsConfig = true;
+                        break;
                     }
                 }
                 if (!foundGroupsConfig) {
