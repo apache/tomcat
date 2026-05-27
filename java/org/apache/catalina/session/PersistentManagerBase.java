@@ -759,33 +759,30 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         Session[] sessions = findSessions();
 
         // Swap out all sessions idle longer than maxIdleSwap
-        if (maxIdleSwap >= 0) {
-            for (Session value : sessions) {
-                StandardSession session = (StandardSession) value;
-                synchronized (session) {
-                    if (!session.isValid()) {
+        for (Session value : sessions) {
+            StandardSession session = (StandardSession) value;
+            synchronized (session) {
+                if (!session.isValid()) {
+                    continue;
+                }
+                int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
+                if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
+                    if (session.accessCount != null && session.accessCount.get() > 0) {
+                        // Session is currently being accessed - skip it
                         continue;
                     }
-                    int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
-                    if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
-                        if (session.accessCount != null && session.accessCount.get() > 0) {
-                            // Session is currently being accessed - skip it
-                            continue;
-                        }
-                        if (log.isTraceEnabled()) {
-                            log.trace(sm.getString("persistentManager.swapMaxIdle", session.getIdInternal(),
-                                    Integer.valueOf(timeIdle)));
-                        }
-                        try {
-                            swapOut(session);
-                        } catch (IOException ignore) {
-                            // This is logged in writeSession()
-                        }
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("persistentManager.swapMaxIdle", session.getIdInternal(),
+                                Integer.valueOf(timeIdle)));
+                    }
+                    try {
+                        swapOut(session);
+                    } catch (IOException ignore) {
+                        // This is logged in writeSession()
                     }
                 }
             }
         }
-
     }
 
 
@@ -851,37 +848,34 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         Session[] sessions = findSessions();
 
         // Back up all sessions idle longer than maxIdleBackup
-        if (maxIdleBackup >= 0) {
-            for (Session value : sessions) {
-                StandardSession session = (StandardSession) value;
-                synchronized (session) {
-                    if (!session.isValid()) {
-                        continue;
+        for (Session value : sessions) {
+            StandardSession session = (StandardSession) value;
+            synchronized (session) {
+                if (!session.isValid()) {
+                    continue;
+                }
+                long lastAccessedTime = session.getLastAccessedTimeInternal();
+                Long persistedLastAccessedTime = (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
+                if (persistedLastAccessedTime != null && lastAccessedTime == persistedLastAccessedTime.longValue()) {
+                    continue;
+                }
+                int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
+                if (timeIdle >= maxIdleBackup) {
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("persistentManager.backupMaxIdle", session.getIdInternal(),
+                                Integer.valueOf(timeIdle)));
                     }
-                    long lastAccessedTime = session.getLastAccessedTimeInternal();
-                    Long persistedLastAccessedTime = (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
-                    if (persistedLastAccessedTime != null &&
-                            lastAccessedTime == persistedLastAccessedTime.longValue()) {
-                        continue;
-                    }
-                    int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
-                    if (timeIdle >= maxIdleBackup) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(sm.getString("persistentManager.backupMaxIdle", session.getIdInternal(),
-                                    Integer.valueOf(timeIdle)));
-                        }
 
-                        try {
-                            writeSession(session);
-                        } catch (IOException ignore) {
-                            // This is logged in writeSession()
-                        }
-                        session.setNote(PERSISTED_LAST_ACCESSED_TIME, Long.valueOf(lastAccessedTime));
+                    try {
+                        writeSession(session);
+                    } catch (IOException ignore) {
+                        // This is logged in writeSession()
                     }
+                    session.setNote(PERSISTED_LAST_ACCESSED_TIME, Long.valueOf(lastAccessedTime));
                 }
             }
         }
-
     }
 
 }
+

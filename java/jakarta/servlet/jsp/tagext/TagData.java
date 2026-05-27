@@ -136,7 +136,19 @@ public class TagData implements Cloneable {
         return attributes.keys();
     }
 
+    @Override
+    public TagData clone() {
+        try {
+            TagData clone = (TagData) super.clone();
+            clone.attributes = new Hashtable<>(attributes);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new InternalError(e);
+        }
+    }
+
     // private data
 
-    private final Hashtable<String,Object> attributes; // the tagname/value map
+    private Hashtable<String,Object> attributes; // the tagname/value map
 }

@@ -196,7 +196,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             DataSender[] list = notinuse.toArray(new DataSender[0]);
             boolean result = false;
             for (DataSender dataSender : list) {
-                result = result | dataSender.keepalive();
+                result = result || dataSender.keepalive();
             }
             return result;
         }

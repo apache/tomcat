@@ -35,6 +35,6 @@ public class MemoryUserDatabaseMBean extends SparseUserDatabaseMBean {
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected final ManagedBean managed = registry.findManagedBean("MemoryUserDatabase");
+    protected final ManagedBean managedMemory = registry.findManagedBean("MemoryUserDatabase");
 
 }
