@@ -35,7 +35,8 @@ public class OpenSSLConfSF extends StoreFactoryBase {
     public OpenSSLConfSF() {
     }
 
-    private static final Set<String> INTERNAL_COMMANDS = new HashSet<>(Arrays.asList(OpenSSLConfCmd.NO_OCSP_CHECK));
+    private static final Set<String> INTERNAL_COMMANDS = new HashSet<>(Arrays.asList(OpenSSLConfCmd.NO_OCSP_CHECK,
+            OpenSSLConfCmd.OCSP_SOFT_FAIL, OpenSSLConfCmd.OCSP_TIMEOUT, OpenSSLConfCmd.OCSP_VERIFY_FLAGS));
 
     /**
      * Store nested OpenSSLConfCmd elements.
