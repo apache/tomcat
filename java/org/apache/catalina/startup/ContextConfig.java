@@ -966,9 +966,9 @@ public class ContextConfig implements LifecycleListener {
             }
 
             if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                antiLockingDocBase = new File(tmpFile, deploymentCount.incrementAndGet() + "-" + docBase + ".war");
+                antiLockingDocBase = new File(tmpFile, deploymentCount.getAndIncrement() + "-" + docBase + ".war");
             } else {
-                antiLockingDocBase = new File(tmpFile, deploymentCount.incrementAndGet() + "-" + docBase);
+                antiLockingDocBase = new File(tmpFile, deploymentCount.getAndIncrement() + "-" + docBase);
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
