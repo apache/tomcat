@@ -668,9 +668,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
             groupsWriteLock.lock();
             try {
+                if (findGroup(groupname) != null) {
+                    return null;
+                }
                 Group group = new GenericGroup<>(this, groupname, description, null);
                 createdGroups.put(groupname, group);
-                modifiedGroups.remove(groupname);
                 return group;
             } finally {
                 groupsWriteLock.unlock();
@@ -689,9 +691,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
             rolesWriteLock.lock();
             try {
+                if (findRole(rolename) != null) {
+                    return null;
+                }
                 Role role = new GenericRole<>(this, rolename, description);
                 createdRoles.put(rolename, role);
-                modifiedRoles.remove(rolename);
                 return role;
             } finally {
                 rolesWriteLock.unlock();
@@ -710,9 +714,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
             usersWriteLock.lock();
             try {
+                if (findUser(username) != null) {
+                    return null;
+                }
                 User user = new GenericUser<>(this, username, password, fullName, null, null);
                 createdUsers.put(username, user);
-                modifiedUsers.remove(username);
                 return user;
             } finally {
                 usersWriteLock.unlock();
