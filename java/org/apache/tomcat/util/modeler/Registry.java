@@ -482,6 +482,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
 
         if (type == null) {
+            if (beanClass == null) {
+                throw new IllegalArgumentException(sm.getString("registry.invalidArguments"));
+            }
             type = beanClass.getName();
         }
 
