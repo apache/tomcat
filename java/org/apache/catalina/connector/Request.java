@@ -2427,7 +2427,7 @@ public class Request implements HttpServletRequest {
         // If the role is "**" then, unless the application defines a role with
         // that name, only check if the user is authenticated
         if ("**".equals(role) && !context.findSecurityRole("**")) {
-            return userPrincipal != null;
+            return true;
         }
 
         Realm realm = context.getRealm();

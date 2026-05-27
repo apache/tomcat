@@ -100,6 +100,16 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         return compareTo;
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
     /**
      * Deallocates the object and sets it {@link PooledObjectState#IDLE IDLE}
      * if it is currently {@link PooledObjectState#ALLOCATED ALLOCATED}
