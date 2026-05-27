@@ -920,7 +920,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                     // Either we timed out or we woke up, process events first
                     if (keyCount == 0) {
-                        hasEvents = (hasEvents || events());
+                        // Non-shorrt-circuit OR since events() always needs to run here.
+                        hasEvents = (hasEvents | events());
                     }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
