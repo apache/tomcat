@@ -451,7 +451,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         try {
             messageParts = transformation.sendMessagePart(messageParts);
         } catch (IOException ioe) {
-            handler.onResult(new SendResult(getSession(), ioe));
+            if (handler != null) {
+                handler.onResult(new SendResult(getSession(), ioe));
+            }
             return;
         }
 

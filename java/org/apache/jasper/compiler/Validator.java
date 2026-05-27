@@ -1516,9 +1516,9 @@ class Validator {
             TagInfo tagInfo = n.getTagInfo();
             if (tagInfo == null) {
                 err.jspError(n, "jsp.error.missing.tagInfo", n.getQName());
+                return;
             }
 
-            @SuppressWarnings("null") // tagInfo can't be null here
             ValidationMessage[] errors = tagInfo.validate(n.getTagData());
             if (errors != null && errors.length != 0) {
                 StringBuilder errMsg = new StringBuilder();

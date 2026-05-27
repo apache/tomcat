@@ -925,7 +925,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     }
                     // Either we timed out or we woke up, process events first
                     if (keyCount == 0) {
-                        hasEvents = (hasEvents | events());
+                        hasEvents = (hasEvents || events());
                     }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
