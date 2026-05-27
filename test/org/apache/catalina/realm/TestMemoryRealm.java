@@ -38,6 +38,7 @@ public class TestMemoryRealm extends TomcatBaseTest {
             + "<group groupname=\"testgroup\" />"
             + "<user username=\"admin\" password=\"sekr3t\" roles=\"testrole, otherrole\" groups=\"testgroup, othergroup\" />"
             + "<user username=\"otheruser\" password=\"sekr3t2\" roles=\" \" />"
+            + "<user username=\"user3\" password=\"sekr3t2\" roles=\",,\" />"
             + "</tomcat-users>";
 
     @Test
@@ -78,6 +79,10 @@ public class TestMemoryRealm extends TomcatBaseTest {
         Principal p2 = lockout.authenticate("otheruser", "sekr3t2");
         Assert.assertNotNull(p2);
         Assert.assertTrue(((GenericPrincipal) p2).getRoles().length == 0);
+
+        Principal p3 = lockout.authenticate("user3", "sekr3t2");
+        Assert.assertNotNull(p3);
+        Assert.assertTrue(((GenericPrincipal) p3).getRoles().length == 0);
     }
 
 }
