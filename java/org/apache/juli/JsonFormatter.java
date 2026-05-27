@@ -164,13 +164,10 @@ public class JsonFormatter extends OneLineFormatter {
                         escaped.append('\\').append(popular);
                     } else {
                         int v = c;
-
-                        escaped.append("\\u")
-                                .append(Character.forDigit((v >>> 12) & 0xF, 16))
+                        escaped.append("\\u").append(Character.forDigit((v >>> 12) & 0xF, 16))
                                 .append(Character.forDigit((v >>> 8) & 0xF, 16))
                                 .append(Character.forDigit((v >>> 4) & 0xF, 16))
-                                .append(Character.forDigit(v & 0xF, 16))
-                                ;
+                                .append(Character.forDigit(v & 0xF, 16));
                     }
                 }
             }
@@ -203,6 +200,5 @@ public class JsonFormatter extends OneLineFormatter {
                 default -> 0;
             };
         }
-
     }
 }
