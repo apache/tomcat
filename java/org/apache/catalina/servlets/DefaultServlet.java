@@ -2131,7 +2131,7 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         reader = new InputStreamReader(is);
                     }
-                    IOException e = copyRange(reader, new PrintWriter(buffer));
+                    IOException e = copyNoThrow(reader, new PrintWriter(buffer));
                     if (debug > 10) {
                         log("readme '" + readmeFile + "' output error: " + ((e != null) ? e.getMessage() : ""));
                     }
@@ -2661,8 +2661,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream, and ensure that the input stream
+     * is closed before returning (even in the face of an exception).
      *
      * @param is      The input stream to read the source resource from
      * @param ostream The output stream to write to
@@ -2674,7 +2674,7 @@ public class DefaultServlet extends HttpServlet {
         InputStream istream = new BufferedInputStream(is, input);
 
         // Copy the input stream to the output stream
-        IOException exception = copyRange(istream, ostream);
+        IOException exception = copyNoThrow(istream, ostream);
 
         // Clean up the input stream
         istream.close();
@@ -2687,8 +2687,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream, and ensure that the input stream
+     * is closed before returning (even in the face of an exception).
      *
      * @param is       The input stream to read the source resource from
      * @param writer   The writer to write to
@@ -2706,7 +2706,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // Copy the input stream to the output stream
-        IOException exception = copyRange(reader, writer);
+        IOException exception = copyNoThrow(reader, writer);
 
         // Clean up the reader
         reader.close();
@@ -2719,8 +2719,7 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified resource to the specified output stream.
      *
      * @param resource The source resource
      * @param ostream  The output stream to write to
@@ -2732,7 +2731,7 @@ public class DefaultServlet extends HttpServlet {
 
         InputStream resourceInputStream = resource.getInputStream();
         InputStream istream = new BufferedInputStream(resourceInputStream, input);
-        IOException exception = copyRange(istream, ostream, range.start, range.end);
+        IOException exception = copyNoThrow(istream, ostream, range.start, range.end);
 
         // Clean up the input stream
         istream.close();
@@ -2746,8 +2745,7 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the selected contents of the specified resource to the specified output stream.
      *
      * @param resource    The source resource
      * @param ostream     The output stream to write to
@@ -2779,7 +2777,7 @@ public class DefaultServlet extends HttpServlet {
                 ostream.println();
 
                 // Printing content
-                exception = copyRange(istream, ostream, currentRange.start, currentRange.end);
+                exception = copyNoThrow(istream, ostream, currentRange.start, currentRange.end);
             }
         }
 
@@ -2795,15 +2793,31 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified input stream to the specified output stream and return, rather than throw, any
+     * IOException that occurs.
+     *
+     * @param istream The input stream to read from
+     * @param ostream The output stream to write to
+     *
+     * @return Exception which occurred during processing
+     *
+     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(InputStream, ServletOutputStream)}
+     */
+    @Deprecated
+    protected IOException copyRange(InputStream istream, ServletOutputStream ostream) {
+        return copyNoThrow(istream, ostream);
+    }
+
+    /**
+     * Copy the contents of the specified input stream to the specified output stream and return, rather than throw, any
+     * IOException that occurs.
      *
      * @param istream The input stream to read from
      * @param ostream The output stream to write to
      *
      * @return Exception which occurred during processing
      */
-    protected IOException copyRange(InputStream istream, ServletOutputStream ostream) {
+    protected IOException copyNoThrow(InputStream istream, ServletOutputStream ostream) {
 
         // Copy the input stream to the output stream
         IOException exception = null;
@@ -2826,16 +2840,32 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the contents of the specified reader to the specified writer and return, rather than throw, any IOException
+     * that occurs.
+     *
+     * @param reader The reader to read from
+     * @param writer The writer to write to
+     *
+     * @return Exception which occurred during processing
+     *
+     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(Reader, PrintWriter)}
+     */
+    @Deprecated
+    protected IOException copyRange(Reader reader, PrintWriter writer) {
+        return copyNoThrow(reader, writer);
+    }
+
+
+    /**
+     * Copy the contents of the specified reader to the specified writer and return, rather than throw, any IOException
+     * that occurs.
      *
      * @param reader The reader to read from
      * @param writer The writer to write to
      *
      * @return Exception which occurred during processing
      */
-    protected IOException copyRange(Reader reader, PrintWriter writer) {
-
+    protected IOException copyNoThrow(Reader reader, PrintWriter writer) {
         // Copy the input stream to the output stream
         IOException exception = null;
         char[] buffer = new char[input];
@@ -2857,8 +2887,27 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
-     * closed before returning (even in the face of an exception).
+     * Copy the selected contents of the specified input stream to the specified output stream, and return, rather than
+     * throw, any IOException that occurs.
+     *
+     * @param istream The input stream to read from
+     * @param ostream The output stream to write to
+     * @param start   Start of the range which will be copied
+     * @param end     End of the range which will be copied
+     *
+     * @return Exception which occurred during processing
+     *
+     * @deprecated Will be removed in Tomcat 12. Use {@link #copyNoThrow(InputStream, ServletOutputStream, long, long)}
+     */
+    @Deprecated
+    protected IOException copyRange(InputStream istream, ServletOutputStream ostream, long start, long end) {
+        return copyNoThrow(istream, ostream, start, end);
+    }
+
+
+    /**
+     * Copy the selected contents of the specified input stream to the specified output stream, and return, rather than
+     * throw, any IOException that occurs.
      *
      * @param istream The input stream to read from
      * @param ostream The output stream to write to
@@ -2867,7 +2916,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @return Exception which occurred during processing
      */
-    protected IOException copyRange(InputStream istream, ServletOutputStream ostream, long start, long end) {
+    protected IOException copyNoThrow(InputStream istream, ServletOutputStream ostream, long start, long end) {
 
         if (debug > 10) {
             log("Serving bytes: " + start + "-" + end);
