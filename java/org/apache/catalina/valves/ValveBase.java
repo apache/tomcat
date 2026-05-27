@@ -25,7 +25,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -34,8 +33,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>Lifecycle</code> interface to provide configuration management and lifecycle support.
  */
 public abstract class ValveBase extends LifecycleMBeanBase implements Contained, Valve {
-
-    private static final Log log = LogFactory.getLog(ValveBase.class);
 
     /**
      * StringManager for internationalized strings.
@@ -146,9 +143,12 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
 
     @Override
     protected void initInternal() throws LifecycleException {
-        super.initInternal();
         Container container = getContainer();
-        containerLog = container != null ? container.getLogger() : log;
+        if (container == null) {
+            throw new IllegalStateException(sm.getString("valveBase.noContainer"));
+        }
+        super.initInternal();
+        containerLog = container.getLogger();
     }
 
 
