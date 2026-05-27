@@ -113,24 +113,32 @@ public class ContentRange {
         // token and if that something was anything other than LWS the following
         // call to readLong() will fail.
 
-        // Start
-        long start = HttpParser.readLong(input);
+        long start;
+        long end;
+        long length;
+        try {
+            // Start
+            start = HttpParser.readLong(input);
 
-        // Must be followed by '-'
-        if (HttpParser.skipConstant(input, "-") == SkipResult.NOT_FOUND) {
+            // Must be followed by '-'
+            if (HttpParser.skipConstant(input, "-") == SkipResult.NOT_FOUND) {
+                return null;
+            }
+
+            // End
+            end = HttpParser.readLong(input);
+
+            // Must be followed by '/'
+            if (HttpParser.skipConstant(input, "/") == SkipResult.NOT_FOUND) {
+                return null;
+            }
+
+            // Length
+            length = HttpParser.readLong(input);
+        } catch (NumberFormatException nfe) {
+            // A value that doesn't fit in a long can't be a valid content range
             return null;
         }
-
-        // End
-        long end = HttpParser.readLong(input);
-
-        // Must be followed by '/'
-        if (HttpParser.skipConstant(input, "/") == SkipResult.NOT_FOUND) {
-            return null;
-        }
-
-        // Length
-        long length = HttpParser.readLong(input);
 
         // Doesn't matter what we look for, result should be EOF
         SkipResult skipResult = HttpParser.skipConstant(input, "X");
