@@ -323,7 +323,7 @@ public class MemoryUserDatabase implements UserDatabase {
         User user = new GenericUser<>(this, username, password, fullName, null, null);
         readLock.lock();
         try {
-            if (users.put(user.getUsername(), user) != null) {
+            if (users.putIfAbsent(user.getUsername(), user) != null) {
                 return null;
             }
         } finally {
@@ -796,7 +796,14 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
         }
         String groups = attributes.getValue("groups");
         String roles = attributes.getValue("roles");
-        User user = database.createUser(username, password, fullName);
+        User user = database.findUser(username);
+        if (user == null) {
+            user = database.createUser(username, password, fullName);
+        } else {
+            if (user.getFullName() == null) {
+                user.setFullName(fullName);
+            }
+        }
         if (groups != null) {
             while (!groups.isEmpty()) {
                 String groupname;
