@@ -443,8 +443,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         try {
             messageParts = transformation.sendMessagePart(messageParts);
         } catch (IOException ioe) {
-            handler.onResult(new SendResult(ioe));
-            return;
+            if (handler != null) {
+                handler.onResult(new SendResult(ioe));
+                return;
+            }
         }
 
         // Some extensions/transformations may buffer messages so it is possible

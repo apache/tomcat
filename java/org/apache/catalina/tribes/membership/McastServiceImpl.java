@@ -106,7 +106,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     /**
      * The actual listener, for callback when stuff goes down
      */
-    protected final MembershipListener service;
+    protected final MembershipListener memberService;
     /**
      * The actual listener for broadcast callbacks
      */
@@ -182,7 +182,7 @@ public class McastServiceImpl extends MembershipProviderBase {
         this.mcastTTL = ttl;
         this.mcastBindAddress = bind;
         this.timeToExpiration = expireTime;
-        this.service = service;
+        this.memberService = service;
         this.msgservice = msgservice;
         this.sendFrequency = sendFrequency;
         this.localLoopbackDisabled = localLoopbackDisabled;
@@ -417,7 +417,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 String name = currentThread.getName();
                 try {
                     currentThread.setName("Membership-MemberDisappeared");
-                    service.memberDisappeared(m);
+                    memberService.memberDisappeared(m);
                 } finally {
                     currentThread.setName(name);
                 }
@@ -430,7 +430,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 String name = currentThread.getName();
                 try {
                     currentThread.setName("Membership-MemberAdded");
-                    service.memberAdded(m);
+                    memberService.memberAdded(m);
                 } finally {
                     currentThread.setName(name);
                 }
@@ -505,7 +505,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                         String name = currentThread.getName();
                         try {
                             currentThread.setName("Membership-MemberExpired");
-                            service.memberDisappeared(member);
+                            memberService.memberDisappeared(member);
                         } finally {
                             currentThread.setName(name);
                         }

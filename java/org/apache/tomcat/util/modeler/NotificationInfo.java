@@ -44,7 +44,7 @@ public class NotificationInfo extends FeatureInfo {
      * The <code>ModelMBeanNotificationInfo</code> object that corresponds to this <code>NotificationInfo</code>
      * instance.
      */
-    transient MBeanNotificationInfo info = null;
+    transient MBeanNotificationInfo notifInfo = null;
     /**
      * Array of notification types.
      */
@@ -65,7 +65,7 @@ public class NotificationInfo extends FeatureInfo {
     @Override
     public void setDescription(String description) {
         super.setDescription(description);
-        this.info = null;
+        this.notifInfo = null;
     }
 
 
@@ -77,7 +77,7 @@ public class NotificationInfo extends FeatureInfo {
     @Override
     public void setName(String name) {
         super.setName(name);
-        this.info = null;
+        this.notifInfo = null;
     }
 
 
@@ -115,7 +115,7 @@ public class NotificationInfo extends FeatureInfo {
             System.arraycopy(notifTypes, 0, results, 0, notifTypes.length);
             results[notifTypes.length] = notifType;
             notifTypes = results;
-            this.info = null;
+            this.notifInfo = null;
         } finally {
             writeLock.unlock();
         }
@@ -131,16 +131,16 @@ public class NotificationInfo extends FeatureInfo {
     public MBeanNotificationInfo createNotificationInfo() {
 
         // Return our cached information (if any)
-        if (info != null) {
-            return info;
+        if (notifInfo != null) {
+            return notifInfo;
         }
 
         // Create and return a new information object
-        info = new MBeanNotificationInfo(getNotifTypes(), getName(), getDescription());
-        // Descriptor descriptor = info.getDescriptor();
+        notifInfo = new MBeanNotificationInfo(getNotifTypes(), getName(), getDescription());
+        // Descriptor descriptor = notifInfo.getDescriptor();
         // addFields(descriptor);
-        // info.setDescriptor(descriptor);
-        return info;
+        // notifInfo.setDescriptor(descriptor);
+        return notifInfo;
 
     }
 
