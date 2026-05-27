@@ -164,7 +164,9 @@ public class MemoryRealm extends RealmBase {
                     break;
                 }
                 String role = roles.substring(0, comma).trim();
-                list.add(role);
+                if (!role.isEmpty()) {
+                    list.add(role);
+                }
                 roles = roles.substring(comma + 1);
             }
         }
@@ -172,7 +174,6 @@ public class MemoryRealm extends RealmBase {
         // Construct and cache the Principal for this user
         GenericPrincipal principal = new GenericPrincipal(username, password, list);
         principals.put(username, principal);
-
     }
 
 
