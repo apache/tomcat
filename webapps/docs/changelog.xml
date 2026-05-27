@@ -192,7 +192,7 @@
       </fix>
       <fix>
         Incorrect processing of modified users in
-        <code>DataSourceUSerDatabase</code>. (remm)
+        <code>DataSourceUserDatabase</code>. (remm)
       </fix>
       <update>
         Clarify behavior in the <code>UserDatabase</code> for user, role and
