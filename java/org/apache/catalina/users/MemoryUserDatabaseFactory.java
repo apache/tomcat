@@ -87,7 +87,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // RefAddr values associated with this Reference
         MemoryUserDatabase database = new MemoryUserDatabase(name.toString());
         RefAddr ra = ref.get("pathname");
-        if (ra != null) {
+        if (ra != null && ra.getContent() != null) {
             database.setPathname(ra.getContent().toString());
         }
 
