@@ -705,7 +705,7 @@ public final class EmbeddedServletOptions implements Options {
         }
 
         if (!(scratchDir.exists() && scratchDir.canRead() && scratchDir.canWrite() && scratchDir.isDirectory())) {
-            log.fatal(Localizer.getMessage("jsp.error.bad.scratch.dir", scratchDir.getAbsolutePath()));
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.bad.scratch.dir", scratchDir.getAbsolutePath()));
         }
 
         this.compiler = config.getInitParameter("compiler");
