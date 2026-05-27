@@ -1404,7 +1404,7 @@ public final class CGIServlet extends HttpServlet {
             Runtime rt;
             BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
-            BufferedReader commandsStdErr;
+            BufferedReader commandsStdErr = null;
             Thread errReaderThread = null;
             BufferedOutputStream commandsStdIn;
             Process proc = null;
@@ -1532,6 +1532,14 @@ public final class CGIServlet extends HttpServlet {
                         cgiOutput.close();
                     } catch (IOException ioe) {
                         log.warn(sm.getString("cgiServlet.runOutputStreamFail"), ioe);
+                    }
+                }
+                // Close the error stream reader if used
+                if (commandsStdErr != null) {
+                    try {
+                        commandsStdErr.close();
+                    } catch (IOException ioe) {
+                        log.warn(sm.getString("cgiServlet.runStdErrReaderFail"), ioe);
                     }
                 }
                 // Make sure the error stream reader has finished
