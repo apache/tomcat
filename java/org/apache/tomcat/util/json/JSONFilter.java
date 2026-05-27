@@ -85,7 +85,7 @@ public class JSONFilter {
          */
         StringBuilder escaped = null;
         int lastUnescapedStart = off;
-        for (int i = off; i < length; i++) {
+        for (int i = off; i < off + length; i++) {
             char c = input.charAt(i);
             if (c < 0x20 || c == 0x22 || c == 0x5c || Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
                 if (escaped == null) {
@@ -108,11 +108,11 @@ public class JSONFilter {
             if (off == 0 && length == input.length()) {
                 return input;
             } else {
-                return input.subSequence(off, length - off);
+                return input.subSequence(off, off + length);
             }
         } else {
-            if (lastUnescapedStart < length) {
-                escaped.append(input.subSequence(lastUnescapedStart, length));
+            if (lastUnescapedStart < off + length) {
+                escaped.append(input.subSequence(lastUnescapedStart, off + length));
             }
             return escaped.toString();
         }
