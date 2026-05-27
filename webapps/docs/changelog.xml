@@ -205,6 +205,12 @@
         looking up resources and behave as if the resources were not found in
         that case. (markt)
       </fix>
+      <fix>
+        Improve validation of <code>Range</code> and <code>Content-Range</code>
+        parsers so invalid ranges trigger a <code>4xx</code> response rather
+        than a <code>500</code> response. Pull request <pr>1012</pr> provided by
+        Sahana Surendra Bogar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
