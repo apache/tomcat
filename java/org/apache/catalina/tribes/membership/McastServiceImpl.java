@@ -810,7 +810,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                     if (log.isInfoEnabled()) {
                         log.info(sm.getString("mcastServiceImpl.recovery"));
                     }
-                    if (stopService() & startService()) {
+                    if (stopService() && startService()) {
                         success = true;
                         if (log.isInfoEnabled()) {
                             log.info(sm.getString("mcastServiceImpl.recovery.successful"));
