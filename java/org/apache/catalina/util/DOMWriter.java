@@ -113,10 +113,21 @@ public class DOMWriter {
                 out.print("<?");
                 out.print(node.getLocalName());
 
-                String data = node.getNodeValue();
-                if (data != null && !data.isEmpty()) {
+                String piData = node.getNodeValue();
+                if (piData != null && !piData.isEmpty()) {
                     out.print(' ');
-                    out.print(data);
+                    // The only illegal sequence in PI data is ?> which would
+                    // terminate the PI early. Break it with a space. PI data
+                    // is opaque and must not have entity escaping applied.
+                    int start = 0;
+                    int end = piData.indexOf("?>");
+                    while (end >= 0) {
+                        out.print(piData.substring(start, end + 1));
+                        out.print(' ');
+                        start = end + 1;
+                        end = piData.indexOf("?>", start);
+                    }
+                    out.print(piData.substring(start));
                 }
                 out.print("?>");
                 break;
