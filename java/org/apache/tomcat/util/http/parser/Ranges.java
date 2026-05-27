@@ -131,12 +131,19 @@ public class Ranges {
 
         SkipResult skipResult;
         do {
-            long start = HttpParser.readLong(input);
-            // Must be followed by '-'
-            if (HttpParser.skipConstant(input, "-") != SkipResult.FOUND) {
+            long start;
+            long end;
+            try {
+                start = HttpParser.readLong(input);
+                // Must be followed by '-'
+                if (HttpParser.skipConstant(input, "-") != SkipResult.FOUND) {
+                    return null;
+                }
+                end = HttpParser.readLong(input);
+            } catch (NumberFormatException nfe) {
+                // A value that doesn't fit in a long can't be a valid range
                 return null;
             }
-            long end = HttpParser.readLong(input);
 
             if (start == -1 && end == -1) {
                 // Invalid range
