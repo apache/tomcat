@@ -74,6 +74,20 @@ public class TestRanges {
 
 
     @Test
+    public void testInvalid07() throws Exception {
+        // End does not fit in a long
+        doTestInvalid("bytes=0-99999999999999999999");
+    }
+
+
+    @Test
+    public void testInvalid08() throws Exception {
+        // Start does not fit in a long
+        doTestInvalid("bytes=99999999999999999999-50");
+    }
+
+
+    @Test
     public void testValid01() throws Exception {
         Ranges r = parse("bytes=1-10,21-30");
         Assert.assertEquals("bytes", r.getUnits());
@@ -115,6 +129,18 @@ public class TestRanges {
         Entry e1 = l.get(0);
         Assert.assertEquals(21, e1.getStart());
         Assert.assertEquals(-1, e1.getEnd());
+    }
+
+
+    @Test
+    public void testValid04() throws Exception {
+        // Long.MAX_VALUE must still be accepted
+        Ranges r = parse("bytes=0-9223372036854775807");
+        List<Entry> l = r.getEntries();
+        Assert.assertEquals(1, l.size());
+        Entry e1 = l.get(0);
+        Assert.assertEquals(0, e1.getStart());
+        Assert.assertEquals(Long.MAX_VALUE, e1.getEnd());
     }
 
 
