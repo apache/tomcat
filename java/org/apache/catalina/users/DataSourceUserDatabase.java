@@ -918,7 +918,10 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * @param dbConnection The database connection to use
      * @param userName The name of the user to find
      * @return the user, or null if not found
+     *
+     * @deprecated Will be made private in Tomcat 12
      */
+    @Deprecated
     public User findUserInternal(Connection dbConnection, String userName) {
         String dbCredentials = null;
         String fullName = null;
