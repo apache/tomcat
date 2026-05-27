@@ -202,7 +202,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
         } else {
             String[] results = new String[urlPatterns.length + 1];
             System.arraycopy(urlPatterns, 0, results, 0, urlPatterns.length);
-            results[urlPatterns.length] = UDecoder.URLDecode(urlPattern, getCharset());
+            results[urlPatterns.length] = urlPattern;
             urlPatterns = results;
         }
     }
