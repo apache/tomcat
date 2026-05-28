@@ -215,6 +215,9 @@
         than a <code>500</code> response. Pull request <pr>1012</pr> provided by
         Sahana Surendra Bogar. (markt)
       </fix>
+      <fix>
+        Fix connection leak in <code>ProxyErrorReportValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

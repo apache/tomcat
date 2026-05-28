@@ -272,7 +272,11 @@ public class SSLValve extends ValveBase {
         }
         headerValue = mygetHeader(request, sslCipherUserKeySizeHeader);
         if (headerValue != null) {
-            request.setAttribute(Globals.KEY_SIZE_ATTR, Integer.valueOf(headerValue));
+            try {
+                request.setAttribute(Globals.KEY_SIZE_ATTR, Integer.valueOf(headerValue));
+            } catch (NumberFormatException e) {
+                log.warn(sm.getString("sslValve.invalidHeader", headerValue, sslCipherUserKeySizeHeader));
+            }
         }
         getNext().invoke(request, response);
     }

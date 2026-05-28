@@ -95,6 +95,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
 
             // Stack trace
             sb.append("  \"throwable\": [");
+            int loops = 0;
             boolean first = true;
             do {
                 if (!first) {
@@ -121,7 +122,8 @@ public class JsonErrorReportValve extends ErrorReportValve {
                 }
 
                 throwable = throwable.getCause();
-            } while (throwable != null);
+                loops++;
+            } while (throwable != null && (loops < 10));
             sb.append("]\n}");
 
         } else {

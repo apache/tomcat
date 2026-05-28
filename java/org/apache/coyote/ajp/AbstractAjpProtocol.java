@@ -223,7 +223,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * @return the pattern string
      */
     public String getAllowedRequestAttributesPattern() {
-        return allowedRequestAttributesPattern.pattern();
+        return allowedRequestAttributesPattern != null ? allowedRequestAttributesPattern.pattern() : null;
     }
 
     /**
