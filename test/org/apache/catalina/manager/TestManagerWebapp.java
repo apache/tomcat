@@ -433,7 +433,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
+        Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains("/examples:running"));
 
         // @formatter:off
         client.setRequest(new String[] {
@@ -446,7 +446,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
+        Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
 
         // @formatter:off
         client.setRequest(new String[] {
@@ -460,7 +460,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
+        Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains("/examples:running"));
 
         // @formatter:off
         client.setRequest(new String[] {
@@ -487,7 +487,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertFalse(client.getResponseBody().contains("/examples:running"));
+        Assert.assertFalse(client.getResponseBody(), client.getResponseBody().contains("/examples:running"));
 
         // @formatter:off
         client.setRequest(new String[] {
