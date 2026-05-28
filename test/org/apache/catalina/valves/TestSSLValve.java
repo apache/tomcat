@@ -338,18 +338,13 @@ public class TestSSLValve {
     }
 
 
-    @Test(expected = NumberFormatException.class)
     public void testSslCipherUserKeySizeHeaderBadFormat() throws Exception {
         setUp();
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), "not-an-integer");
 
-        try {
-            valve.invoke(mockRequest, null);
-        } catch (NumberFormatException e) {
-            Assert.assertNull(mockRequest.getAttribute(Globals.KEY_SIZE_ATTR));
-            mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), null);
-            throw e;
-        }
+        valve.invoke(mockRequest, null);
+
+        Assert.assertNull(mockRequest.getAttribute(Globals.KEY_SIZE_ATTR));
     }
 
 
