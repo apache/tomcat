@@ -187,7 +187,9 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public String resolveSsl(String key) {
-        if (request.getAttribute(SSLSupport.SESSION_MGR) instanceof SSLSupport sslSupport) {
+        Object attr = request.getAttribute(SSLSupport.SESSION_MGR);
+        if (attr instanceof SSLSupport) {
+            SSLSupport sslSupport = (SSLSupport) attr;
             try {
                 // SSL_SRP_USER: no planned support for SRP
                 // SSL_SRP_USERINFO: no planned support for SRP
