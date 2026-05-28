@@ -240,7 +240,7 @@ public final class MimeUtility {
             }
             // Convert decoded byte data into a string.
             return new String(decodedData, javaCharset(charset));
-        } catch (final IOException e) {
+        } catch (final IOException | IllegalArgumentException e) {
             throw new UnsupportedEncodingException("Invalid RFC 2047 encoding");
         }
     }
