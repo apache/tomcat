@@ -58,9 +58,13 @@ public abstract class TimeBucketCounterBase {
      * @param executorService the executor service that will be used to run the maintenance task
      *
      * @throws NullPointerException if executorService is <code>null</code>.
+     * @throws IllegalArgumentException if bucketDuration is not strictly positive
      */
     public TimeBucketCounterBase(int bucketDuration, ScheduledExecutorService executorService) {
         Objects.requireNonNull(executorService);
+        if (bucketDuration <= 0) {
+            throw new IllegalArgumentException(sm.getString("timebucket.invalidDuration", Integer.valueOf(bucketDuration)));
+        }
         this.executorService = executorService;
         this.bucketDuration = bucketDuration;
 

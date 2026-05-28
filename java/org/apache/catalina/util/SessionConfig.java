@@ -81,6 +81,9 @@ public class SessionConfig {
      */
     public static String getSessionCookiePath(Context context) {
 
+        if (context == null) {
+            return null;
+        }
         SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
 
         String contextPath = context.getSessionCookiePath();
