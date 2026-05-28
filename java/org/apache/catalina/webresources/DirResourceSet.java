@@ -372,7 +372,12 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
          * particular, Windows can make individual directories case sensitive and File.getCanonicalPath() doesn't return
          * the canonical file name on Linux for some case insensitive file systems (such as mounted Windows shares).
          */
-        return RequestUtil.normalize(path).toLowerCase(Locale.ENGLISH);
+        String key = RequestUtil.normalize(path).toLowerCase(Locale.ENGLISH);
+        // Avoid bad locking for directory when getResource might lock without the / but then access the path after adding /
+        if (key.endsWith("/")) {
+            key = key.substring(0, key.length() - 1);
+        }
+        return key;
     }
 
 
