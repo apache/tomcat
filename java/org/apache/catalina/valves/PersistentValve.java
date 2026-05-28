@@ -37,6 +37,8 @@ import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Valve that implements per-request session persistence. It is intended to be used with non-sticky load-balancers and a
@@ -66,6 +68,8 @@ import org.apache.catalina.connector.Response;
  * </ul>
  */
 public class PersistentValve extends ValveBase {
+
+    private static final Log log = LogFactory.getLog(PersistentValve.class);
 
     // Saves a couple of calls to getClassLoader() on every request. Under high
     // load these calls took just long enough to appear as a hot spot (although
@@ -347,7 +351,7 @@ public class PersistentValve extends ValveBase {
             try {
                 this.filter = Pattern.compile(filter);
             } catch (PatternSyntaxException pse) {
-                container.getLogger().error(sm.getString("persistentValve.filter.failure", filter), pse);
+                log.error(sm.getString("persistentValve.filter.failure", filter), pse);
             }
         }
     }

@@ -230,7 +230,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
                 response.setContentType(httpURLConnection.getContentType());
                 response.setContentLength(httpURLConnection.getContentLength());
                 OutputStream outputStream = response.getOutputStream();
-                InputStream inputStream = url.openStream();
+                InputStream inputStream = httpURLConnection.getInputStream();
                 IOTools.flow(inputStream, outputStream);
             } catch (URISyntaxException | IOException | IllegalArgumentException e) {
                 if (log.isDebugEnabled()) {
