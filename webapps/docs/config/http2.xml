@@ -71,6 +71,14 @@
 
   <attributes>
 
+    <attribute name="allowSchemeMismatch" required="false">
+      <p>A boolean value which can be used to enable or disable the consistency
+      check for the scheme presented by the user agent in the HTTP/2 stream and
+      the channel over which the stream was received. This should only be set to
+      <code>true</code> where a trusted TLS terminating reverse proxy is used.
+      If not specified, this attribute is set to <code>false</code>.</p>
+    </attribute>
+
     <attribute name="discardRequestsAndResponses" required="false">
       <p>A boolean value which can be used to enable or disable the recycling
       of the container internal request and response processing objects. If set
