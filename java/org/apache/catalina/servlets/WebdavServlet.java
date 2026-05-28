@@ -1756,7 +1756,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (parentLock.hasExpired()) {
                         resourceLocks.remove(parentPath);
                     } else {
-                        // parentPath == currentPath is a check for the first loop
+                        // parentPath == path is a check for the first loop
                         if (parentPath == path || parentLock.depth > 0) {
                             if (parentLock.isExclusive()) {
                                 if (ifHeader.contains(":" + parentLock.token + ">") && (parentLock.principal == null ||
@@ -1858,7 +1858,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    // parentPath == currentPath is a check for the first loop
+                    // parentPath == path is a check for the first loop
                     if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             if (lockTokenHeader.contains(":" + parentLock.token + ">") &&
