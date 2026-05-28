@@ -187,87 +187,88 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public String resolveSsl(String key) {
-        SSLSupport sslSupport = (SSLSupport) request.getAttribute(SSLSupport.SESSION_MGR);
-        try {
-            // SSL_SRP_USER: no planned support for SRP
-            // SSL_SRP_USERINFO: no planned support for SRP
-            if (key.equals("HTTPS")) {
-                return String.valueOf(sslSupport != null);
-            } else if (key.equals("SSL_PROTOCOL")) {
-                return sslSupport.getProtocol();
-            } else if (key.equals("SSL_SESSION_ID")) {
-                return sslSupport.getSessionId();
-            } else if (key.equals("SSL_SESSION_RESUMED")) {
-                // FIXME session resumption state, not available anywhere
-            } else if (key.equals("SSL_SECURE_RENEG")) {
-                // FIXME available from SSLHostConfig
-            } else if (key.equals("SSL_COMPRESS_METHOD")) {
-                // FIXME available from SSLHostConfig
-            } else if (key.equals("SSL_TLS_SNI")) {
-                // FIXME from handshake SNI processing
-            } else if (key.equals("SSL_CIPHER")) {
-                return sslSupport.getCipherSuite();
-            } else if (key.equals("SSL_CIPHER_EXPORT")) {
-                String cipherSuite = sslSupport.getCipherSuite();
-                if (cipherSuite != null) {
-                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                    if (cipherList.size() == 1) {
-                        Cipher cipher = cipherList.iterator().next();
-                        if (cipher.getLevel().equals(EncryptionLevel.EXP40) ||
-                                cipher.getLevel().equals(EncryptionLevel.EXP56)) {
-                            return "true";
-                        } else {
-                            return "false";
+        if (request.getAttribute(SSLSupport.SESSION_MGR) instanceof SSLSupport sslSupport) {
+            try {
+                // SSL_SRP_USER: no planned support for SRP
+                // SSL_SRP_USERINFO: no planned support for SRP
+                if (key.equals("HTTPS")) {
+                    return String.valueOf(sslSupport != null);
+                } else if (key.equals("SSL_PROTOCOL")) {
+                    return sslSupport.getProtocol();
+                } else if (key.equals("SSL_SESSION_ID")) {
+                    return sslSupport.getSessionId();
+                } else if (key.equals("SSL_SESSION_RESUMED")) {
+                    // FIXME session resumption state, not available anywhere
+                } else if (key.equals("SSL_SECURE_RENEG")) {
+                    // FIXME available from SSLHostConfig
+                } else if (key.equals("SSL_COMPRESS_METHOD")) {
+                    // FIXME available from SSLHostConfig
+                } else if (key.equals("SSL_TLS_SNI")) {
+                    // FIXME from handshake SNI processing
+                } else if (key.equals("SSL_CIPHER")) {
+                    return sslSupport.getCipherSuite();
+                } else if (key.equals("SSL_CIPHER_EXPORT")) {
+                    String cipherSuite = sslSupport.getCipherSuite();
+                    if (cipherSuite != null) {
+                        Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                        if (cipherList.size() == 1) {
+                            Cipher cipher = cipherList.iterator().next();
+                            if (cipher.getLevel().equals(EncryptionLevel.EXP40) ||
+                                    cipher.getLevel().equals(EncryptionLevel.EXP56)) {
+                                return "true";
+                            } else {
+                                return "false";
+                            }
+                        }
+                    }
+                } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
+                    String cipherSuite = sslSupport.getCipherSuite();
+                    if (cipherSuite != null) {
+                        Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                        if (cipherList.size() == 1) {
+                            Cipher cipher = cipherList.iterator().next();
+                            return String.valueOf(cipher.getAlg_bits());
+                        }
+                    }
+                } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
+                    Integer keySize = sslSupport.getKeySize();
+                    return (keySize == null) ? null : sslSupport.getKeySize().toString();
+                } else if (key.startsWith("SSL_CLIENT_")) {
+                    X509Certificate[] certificates = sslSupport.getPeerCertificateChain();
+                    if (certificates != null && certificates.length > 0) {
+                        key = key.substring("SSL_CLIENT_".length());
+                        String result = resolveSslCertificates(key, certificates);
+                        if (result != null) {
+                            return result;
+                        } else if (key.startsWith("SAN_OTHER_msUPN_")) {
+                            // Type otherName, which is 0
+                            key = key.substring("SAN_OTHER_msUPN_".length());
+                            // FIXME OID from resolveAlternateName
+                        } else if (key.equals("CERT_RFC4523_CEA")) {
+                            // FIXME return certificate[0] format CertificateExactAssertion in RFC4523
+                        } else if (key.equals("VERIFY")) {
+                            // FIXME return verification state, not available anywhere
+                        }
+                    }
+                } else if (key.startsWith("SSL_SERVER_")) {
+                    X509Certificate[] certificates = sslSupport.getLocalCertificateChain();
+                    if (certificates != null && certificates.length > 0) {
+                        key = key.substring("SSL_SERVER_".length());
+                        String result = resolveSslCertificates(key, certificates);
+                        if (result != null) {
+                            return result;
+                        } else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
+                            // Type otherName, which is 0
+                            key = key.substring("SAN_OTHER_dnsSRV_".length());
+                            // FIXME OID from resolveAlternateName
                         }
                     }
                 }
-            } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
-                String cipherSuite = sslSupport.getCipherSuite();
-                if (cipherSuite != null) {
-                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                    if (cipherList.size() == 1) {
-                        Cipher cipher = cipherList.iterator().next();
-                        return String.valueOf(cipher.getAlg_bits());
-                    }
+            } catch (IOException ioe) {
+                // TLS access error
+                if (containerLog.isDebugEnabled()) {
+                    containerLog.debug(sm.getString("resolverImpl.tlsError"), ioe);
                 }
-            } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
-                Integer keySize = sslSupport.getKeySize();
-                return (keySize == null) ? null : sslSupport.getKeySize().toString();
-            } else if (key.startsWith("SSL_CLIENT_")) {
-                X509Certificate[] certificates = sslSupport.getPeerCertificateChain();
-                if (certificates != null && certificates.length > 0) {
-                    key = key.substring("SSL_CLIENT_".length());
-                    String result = resolveSslCertificates(key, certificates);
-                    if (result != null) {
-                        return result;
-                    } else if (key.startsWith("SAN_OTHER_msUPN_")) {
-                        // Type otherName, which is 0
-                        key = key.substring("SAN_OTHER_msUPN_".length());
-                        // FIXME OID from resolveAlternateName
-                    } else if (key.equals("CERT_RFC4523_CEA")) {
-                        // FIXME return certificate[0] format CertificateExactAssertion in RFC4523
-                    } else if (key.equals("VERIFY")) {
-                        // FIXME return verification state, not available anywhere
-                    }
-                }
-            } else if (key.startsWith("SSL_SERVER_")) {
-                X509Certificate[] certificates = sslSupport.getLocalCertificateChain();
-                if (certificates != null && certificates.length > 0) {
-                    key = key.substring("SSL_SERVER_".length());
-                    String result = resolveSslCertificates(key, certificates);
-                    if (result != null) {
-                        return result;
-                    } else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
-                        // Type otherName, which is 0
-                        key = key.substring("SAN_OTHER_dnsSRV_".length());
-                        // FIXME OID from resolveAlternateName
-                    }
-                }
-            }
-        } catch (IOException ioe) {
-            // TLS access error
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug(sm.getString("resolverImpl.tlsError"), ioe);
             }
         }
         return null;
