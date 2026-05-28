@@ -40,8 +40,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * HTTP/2 protocol handler. Implements the {@link UpgradeProtocol} interface to allow HTTP/2 to be used as an
- * upgrade from HTTP/1.1 or via ALPN.
+ * HTTP/2 protocol handler. Implements the {@link UpgradeProtocol} interface to allow HTTP/2 to be used as an upgrade
+ * from HTTP/1.1 or via ALPN.
  */
 public class Http2Protocol implements UpgradeProtocol {
 
@@ -107,6 +107,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
     private boolean initiatePingDisabled = false;
     private boolean useSendfile = true;
+    private boolean allowSchemeMismatch = false;
     // Reference to HTTP/1.1 protocol that this instance is configured under
     private AbstractHttp11Protocol<?> http11Protocol = null;
 
@@ -190,6 +191,28 @@ public class Http2Protocol implements UpgradeProtocol {
             found = connection.nextElement().contains("HTTP2-Settings");
         }
         return found;
+    }
+
+
+    /**
+     * Are HTTP/2 streams allowed to provide a scheme that is inconsistent with the transport over which the stream was
+     * received?
+     *
+     * @return {@code true} if a mismatched scheme is permitted, otherwise {@code false}
+     */
+    public boolean getAllowSchemeMismatch() {
+        return allowSchemeMismatch;
+    }
+
+
+    /**
+     * Configure whether HTTP/2 streams atr allowed to provide a scheme that is inconsistent with the transport over
+     * which the stream was received
+     *
+     * @param allowSchemeMismatch {@code true} if a mismatched scheme is permitted, otherwise {@code false}
+     */
+    public void setAllowSchemeMismatch(boolean allowSchemeMismatch) {
+        this.allowSchemeMismatch = allowSchemeMismatch;
     }
 
 

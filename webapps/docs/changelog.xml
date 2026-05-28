@@ -263,6 +263,11 @@
       <fix>
         Avoid overflow scenarios in Asn1Parser. (remm)
       </fix>
+      <fix>
+        <bug>70091</bug>: Add a new attribute, <code>allowSchemeMismatch</code>
+        to <code>Http2Protocol</code> that allows the consistency check for the
+        scheme provided by the user agent to be bypassed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
