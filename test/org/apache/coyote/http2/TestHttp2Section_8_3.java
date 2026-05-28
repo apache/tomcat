@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.http.Method;
 
 /**
@@ -36,19 +37,42 @@ public class TestHttp2Section_8_3 extends Http2TestBase {
 
     @Test
     public void testSchemeInconsistencyNonTLS() throws Exception {
-        testSchemeInconsistency(false);
+        testSchemeInconsistency(false, false);
     }
 
 
     @Test
     public void testSchemeInconsistencyTLS() throws Exception {
-        testSchemeInconsistency(true);
+        testSchemeInconsistency(true, false);
     }
 
 
-    private void testSchemeInconsistency(boolean connectionUsesTls) throws Exception {
+    @Test
+    public void testSchemeInconsistencyNonTLSMismatchAllowed() throws Exception {
+        testSchemeInconsistency(false, true);
+    }
+
+
+    @Test
+    public void testSchemeInconsistencyTLSMismatchAllowed() throws Exception {
+        testSchemeInconsistency(true, true);
+    }
+
+
+    private void testSchemeInconsistency(boolean connectionUsesTls, boolean allowSchemeMismatch) throws Exception {
         // Start HTTP/2 over non-TLS connection
-        http2Connect(connectionUsesTls);
+        enableHttp2(connectionUsesTls);
+        if (allowSchemeMismatch) {
+            Connector connector = getTomcatInstance().getConnector();
+            Http2Protocol http2Protocol = (Http2Protocol) connector.findUpgradeProtocols()[0];
+            http2Protocol.setAllowSchemeMismatch(allowSchemeMismatch);
+        }
+
+        configureAndStartWebApplication();
+        openClientConnection(connectionUsesTls);
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
 
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -67,8 +91,15 @@ public class TestHttp2Section_8_3 extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
+        // Read first response frame
         parser.readFrame();
 
-        Assert.assertEquals("3-RST-[1]\n", output.getTrace());
+        if (allowSchemeMismatch) {
+            // Normal response. There will be a data frame with the body too.
+            parser.readFrame();
+            Assert.assertEquals(output.getTrace(), getSimpleResponseTrace(3));
+        } else {
+            Assert.assertEquals("3-RST-[1]\n", output.getTrace());
+        }
     }
 }

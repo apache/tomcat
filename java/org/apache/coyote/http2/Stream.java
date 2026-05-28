@@ -392,12 +392,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             case ":scheme": {
                 if (coyoteRequest.scheme().isNull()) {
                     coyoteRequest.scheme().setString(value);
-                    // Check scheme is consistent with TLS usage
-                    if ("https".equals(value) != handler.getProtocol().getHttp11Protocol().isSSLEnabled()) {
-                        headerException = new StreamException(
-                                sm.getString("stream.header.inconsistentScheme", getConnectionId(), getIdAsString(),
-                                value, Boolean.toString(handler.getProtocol().getHttp11Protocol().isSSLEnabled())),
-                                Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    // Check scheme is consistent with TLS usage when required to be
+                    if (!handler.getProtocol().getAllowSchemeMismatch() &&
+                            "https".equals(value) != handler.getProtocol().getHttp11Protocol().isSSLEnabled()) {
+                        headerException =
+                                new StreamException(
+                                        sm.getString("stream.header.inconsistentScheme", getConnectionId(),
+                                                getIdAsString(), value,
+                                                Boolean.toString(
+                                                        handler.getProtocol().getHttp11Protocol().isSSLEnabled())),
+                                        Http2Error.PROTOCOL_ERROR, getIdAsInt());
                     }
                 } else {
                     headerException = new StreamException(
@@ -585,8 +589,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         } else if (Method.CONNECT.equals(coyoteRequest.getMethod())) {
             // CONNECT only
             if (!coyoteRequest.scheme().isNull() || !coyoteRequest.requestURI().isNull()) {
-                throw new StreamException(sm.getString("stream.header.invalidConnect", getConnectionId(),
-                        getIdAsString()), Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                throw new StreamException(
+                        sm.getString("stream.header.invalidConnect", getConnectionId(), getIdAsString()),
+                        Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
             if (coyoteRequest.serverName().isNull()) {
                 missingHeader = true;
