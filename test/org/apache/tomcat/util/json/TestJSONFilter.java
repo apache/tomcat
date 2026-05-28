@@ -71,8 +71,8 @@ public class TestJSONFilter {
         // Multiple
         parameterSets.add(new String[] { "\n\n", "\\n\\n" });
         parameterSets.add(new String[] { "\n" + STX + "\n", "\\n\\u0002\\n" });
-        parameterSets.add(new String[] { "\n" + STX + "\n" + SUB, "\\n\\u0002\\n\\u001A" });
-        parameterSets.add(new String[] { SUB + "\n" + STX + "\n" + SUB, "\\u001A\\n\\u0002\\n\\u001A" });
+        parameterSets.add(new String[] { "\n" + STX + "\n" + SUB, "\\n\\u0002\\n\\u001a" });
+        parameterSets.add(new String[] { SUB + "\n" + STX + "\n" + SUB, "\\u001a\\n\\u0002\\n\\u001a" });
 
         return parameterSets;
     }
