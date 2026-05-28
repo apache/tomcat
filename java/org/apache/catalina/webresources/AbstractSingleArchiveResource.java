@@ -52,6 +52,9 @@ public abstract class AbstractSingleArchiveResource extends AbstractArchiveResou
             jarFile = getArchiveResourceSet().openJarFile();
             // Need to create a new JarEntry so the certificates can be read
             JarEntry jarEntry = jarFile.getJarEntry(getResource().getName());
+            if (jarEntry == null) {
+                return null;
+            }
             InputStream is = jarFile.getInputStream(jarEntry);
             return new JarInputStreamWrapper(jarEntry, is);
         } catch (IOException ioe) {

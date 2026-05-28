@@ -191,7 +191,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     public URL getCodeBase() {
         try {
             return new URI(codeBaseUrl).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | NullPointerException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
@@ -248,8 +248,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     @Override
     public Certificate[] getCertificates() {
         if (!readCerts) {
-            // TODO - get content first
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString("abstractResource.getContentFirst"));
         }
         return certificates;
     }
