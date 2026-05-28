@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net.openssl;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
@@ -127,10 +128,14 @@ public class OpenSSLUtil extends SSLUtilBase {
                 log.info(msg);
             }
             return null;
-        } catch (KeyStoreException | KeyException | IOException e) {
-            // Depending on what is presented, JSSE may also throw
-            // KeyStoreException or IOException if it doesn't understand the
-            // provided file.
+        } catch (KeyStoreException | KeyException | IOException | NoSuchAlgorithmException e) {
+            /*
+             * JSSE may throw any of KeyStoreException, KeyException or IOException if it does not understand the format
+             * of the provided file.
+             *
+             * If JSSE does understand the file but does not support the algorithm used then NoSuchAlgorithmException
+             * will be seen.
+             */
             if (certificate.getCertificateFile() != null) {
                 String msg = sm.getString("openssl.nonJsseCertificate", certificate.getCertificateFile(),
                         certificate.getCertificateKeyFile());
@@ -139,8 +144,7 @@ public class OpenSSLUtil extends SSLUtilBase {
                 } else {
                     log.info(msg);
                 }
-                // Assume JSSE processing of the certificate failed, try again with OpenSSL
-                // without a key manager
+                // Assume JSSE processing of the certificate failed, try again with OpenSSL without a key manager.
                 return null;
             }
             throw e;
