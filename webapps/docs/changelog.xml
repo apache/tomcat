@@ -214,6 +214,11 @@
       <fix>
         Fix connection leak in <code>ProxyErrorReportValve</code>. (remm)
       </fix>
+      <fix>
+        When using the <code>RewriteValve</code>, <code>%{SSL:HTTPS}</code> now
+        returns <code>on</code> or <code>off</code> rather than
+        <code>true</code> or <code>false</code> to align with httpd. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
