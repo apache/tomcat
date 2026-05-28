@@ -22,7 +22,8 @@ import java.io.Writer;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * XMLWriter helper class.
+ * XMLWriter helper class. writeText is the only method in the class doing
+ * XML escaping.
  */
 public class XMLWriter {
 
@@ -217,7 +218,7 @@ public class XMLWriter {
 
 
     /**
-     * Write text.
+     * Write text. It will be escaped for XML.
      *
      * @param text Text to append
      */
