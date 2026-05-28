@@ -207,7 +207,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        uaPattern = Pattern.compile(crawlerUserAgents);
+        setCrawlerUserAgents(crawlerUserAgents);
     }
 
 
@@ -248,7 +248,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
                     log.trace(request.hashCode() + ": UserAgent=" + uaHeader);
                 }
 
-                if (uaPattern.matcher(uaHeader).matches()) {
+                if (uaPattern != null && uaPattern.matcher(uaHeader).matches()) {
                     isBot = true;
 
                     if (log.isTraceEnabled()) {
