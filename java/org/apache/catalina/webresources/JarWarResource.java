@@ -60,6 +60,9 @@ public class JarWarResource extends AbstractArchiveResource {
         try {
             warFile = getArchiveResourceSet().openJarFile();
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+            if (jarFileInWar == null) {
+                return null;
+            }
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
             jarIs = new JarInputStream(isInWar);
