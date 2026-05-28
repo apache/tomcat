@@ -194,7 +194,7 @@ public class ResolverImpl extends Resolver {
                 // SSL_SRP_USER: no planned support for SRP
                 // SSL_SRP_USERINFO: no planned support for SRP
                 if (key.equals("HTTPS")) {
-                    return String.valueOf(sslSupport != null);
+                    return "on";
                 } else if (key.equals("SSL_PROTOCOL")) {
                     return sslSupport.getProtocol();
                 } else if (key.equals("SSL_SESSION_ID")) {
@@ -272,6 +272,8 @@ public class ResolverImpl extends Resolver {
                     containerLog.debug(sm.getString("resolverImpl.tlsError"), ioe);
                 }
             }
+        } else if (key.equals("HTTPS")) {
+            return "off";
         }
         return null;
     }
