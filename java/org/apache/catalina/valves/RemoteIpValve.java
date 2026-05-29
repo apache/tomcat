@@ -669,6 +669,10 @@ public class RemoteIpValve extends ValveBase {
                 String hostHeaderValue = request.getHeader(hostHeader);
                 if (hostHeaderValue != null) {
                     try {
+                        int commaIndex = hostHeaderValue.indexOf(',');
+                        if (commaIndex > -1) {
+                            hostHeaderValue = hostHeaderValue.substring(0, commaIndex).trim();
+                        }
                         int portIndex = Host.parse(hostHeaderValue);
                         if (portIndex > -1) {
                             log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
