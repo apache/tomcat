@@ -170,6 +170,11 @@ public final class Parameters {
         charset = DEFAULT_BODY_CHARSET;
         decodedQuery.recycle();
         parseFailedReason = null;
+        /*
+         * queryStringCharset cannot be recycled here as it needs to be set to Connector.getURICharset() which is not
+         * accessible from Parameters. queryStringCharset is therefore reset at the start of every request in
+         * CoyoteAdpater.service().
+         */
     }
 
 
