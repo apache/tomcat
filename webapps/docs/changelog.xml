@@ -223,6 +223,11 @@
         returns <code>on</code> or <code>off</code> rather than
         <code>true</code> or <code>false</code> to align with httpd. (markt)
       </fix>
+      <fix>
+        Reset the encoding used for query string parameters between requests in
+        case an application changed changed the encoding in a previous request.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
