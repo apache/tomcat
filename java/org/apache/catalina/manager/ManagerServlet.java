@@ -1084,26 +1084,34 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
+        String name = cn.getName();
         try {
-            Context context = (Context) host.findChild(cn.getName());
-            if (context == null) {
-                writer.println(
-                        smClient.getString("managerServlet.noContext", Escape.htmlElementContent(cn.getDisplayName())));
-                return;
+            if (tryAddServiced(name)) {
+                try {
+                    Context context = (Context) host.findChild(name);
+                    if (context == null) {
+                        writer.println(
+                                smClient.getString("managerServlet.noContext", Escape.htmlElementContent(cn.getDisplayName())));
+                        return;
+                    }
+                    // It isn't possible for the manager to reload itself
+                    if (context.getName().equals(this.context.getName())) {
+                        writer.println(smClient.getString("managerServlet.noSelf"));
+                        return;
+                    }
+                    context.reload();
+                    writer.println(smClient.getString("managerServlet.reloaded", cn.getDisplayName()));
+                } finally {
+                    removeServiced(name);
+                }
+            } else {
+                writer.println(smClient.getString("managerServlet.inService", cn.getDisplayName()));
             }
-            // It isn't possible for the manager to reload itself
-            if (context.getName().equals(this.context.getName())) {
-                writer.println(smClient.getString("managerServlet.noSelf"));
-                return;
-            }
-            context.reload();
-            writer.println(smClient.getString("managerServlet.reloaded", cn.getDisplayName()));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log(sm.getString("managerServlet.error.reload", cn.getDisplayName()), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
-
     }
 
 
