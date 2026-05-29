@@ -381,10 +381,12 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
         }
 
         if (valve instanceof Lifecycle) {
-            try {
-                ((Lifecycle) valve).stop();
-            } catch (LifecycleException e) {
-                log.error(sm.getString("standardPipeline.valve.stop"), e);
+            if (((Lifecycle) valve).getState().isAvailable()) {
+                try {
+                    ((Lifecycle) valve).stop();
+                } catch (LifecycleException e) {
+                    log.error(sm.getString("standardPipeline.valve.stop"), e);
+                }
             }
             try {
                 ((Lifecycle) valve).destroy();
