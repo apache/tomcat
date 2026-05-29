@@ -523,6 +523,10 @@
         Fix double escaping in the context names for the JSON mode of the
         manager servlet. (remm)
       </fix>
+      <fix>
+        Manager. Ensure automatic deployment does not trigger an undeployment
+        during a Manager triggered web application reload. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
