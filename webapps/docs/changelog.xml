@@ -217,8 +217,7 @@
       </fix>
       <fix>
         Reset the encoding used for query string parameters between requests in
-        case an application changed changed the encoding in a previous request.
-        (markt)
+        case an application changed the encoding in a previous request. (markt)
       </fix>
     </changelog>
   </subsection>
