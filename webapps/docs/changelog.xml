@@ -331,6 +331,9 @@
         Restore default authenticator to nullafter executing an Ant task.
         (remm)
       </fix>
+      <update>
+        Update Commons Daemon to 1.6.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
