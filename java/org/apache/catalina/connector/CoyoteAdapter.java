@@ -323,9 +323,12 @@ public class CoyoteAdapter implements Adapter {
             req.setNote(ADAPTER_NOTES, request);
             res.setNote(ADAPTER_NOTES, response);
 
-            // Set query string encoding
-            req.getParameters().setQueryStringCharset(connector.getURICharset());
         }
+        /*
+         * Set query string encoding on every request in case the previous request changed it. It cannot be reset in
+         * Parameters.recyle() as Parameters does not have access to the Connector to obtain the default.
+         */
+        req.getParameters().setQueryStringCharset(connector.getURICharset());
 
         if (connector.getXpoweredBy()) {
             response.addHeader("X-Powered-By", POWERED_BY);
