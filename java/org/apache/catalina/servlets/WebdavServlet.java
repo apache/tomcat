@@ -43,6 +43,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -576,6 +577,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
+            try {
+                documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
+                log(sm.getString("webdavservlet.jaxpfailed"), e);
+            }
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
             documentBuilder.setEntityResolver(new WebdavResolver(this.getServletContext()));

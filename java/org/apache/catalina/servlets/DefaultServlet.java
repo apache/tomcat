@@ -44,8 +44,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -1759,6 +1761,11 @@ public class DefaultServlet extends HttpServlet {
             currentThread.setContextClassLoader(DefaultServlet.class.getClassLoader());
 
             TransformerFactory tFactory = TransformerFactory.newInstance();
+            try {
+                tFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            } catch (TransformerConfigurationException e) {
+                log(sm.getString("defaultServlet.xslError"), e);
+            }
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
             Transformer transformer = tFactory.newTransformer(xsltSource);
 
