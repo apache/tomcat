@@ -673,15 +673,19 @@ public class RemoteIpValve extends ValveBase {
                         if (commaIndex > -1) {
                             hostHeaderValue = hostHeaderValue.substring(0, commaIndex).trim();
                         }
-                        int portIndex = Host.parse(hostHeaderValue);
-                        if (portIndex > -1) {
-                            log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
-                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
-                        }
+                        if (hostHeaderValue.isEmpty()) {
+                            log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                        } else {
+                            int portIndex = Host.parse(hostHeaderValue);
+                            if (portIndex > -1) {
+                                log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
+                                hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                            }
 
-                        request.getCoyoteRequest().serverName().setString(hostHeaderValue);
-                        if (isChangeLocalName()) {
-                            request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                            request.getCoyoteRequest().serverName().setString(hostHeaderValue);
+                            if (isChangeLocalName()) {
+                                request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                            }
                         }
 
                     } catch (IllegalArgumentException iae) {
