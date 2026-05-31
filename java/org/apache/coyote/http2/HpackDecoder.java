@@ -154,6 +154,7 @@ public class HpackDecoder {
                     return;
                 }
             } else {
+                // Unreachable
                 throw new RuntimeException(sm.getString("hpackdecoder.notImplemented"));
             }
         }
@@ -281,6 +282,9 @@ public class HpackDecoder {
                 log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
             }
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
+            if (headerField == null) {
+                throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
+            }
             emitHeader(headerField.name, headerField.value);
         }
     }

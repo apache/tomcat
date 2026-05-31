@@ -198,7 +198,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (c < '0' || c > '9') {
                     throw new IllegalArgumentException();
                 }
-                port = port * 10 + c - '0';
+                int digit = c - '0';
+                if (port > (Integer.MAX_VALUE - digit) / 10) {
+                    throw new IllegalArgumentException();
+                }
+                port = port * 10 + digit;
             }
             coyoteRequest.setServerPort(port);
 
