@@ -357,6 +357,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             String appContextID = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
             removeRegistration(getRegistrationID(layer, appContextID));
+            return;
         }
 
         // Unsupported context type
