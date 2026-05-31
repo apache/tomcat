@@ -283,7 +283,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Settings are only valid on stream 0
                 FrameType.SETTINGS.check(0, settings.length);
 
-                for (int i = 0; i < settings.length % 6; i++) {
+                for (int i = 0; i < settings.length / 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     Setting key = Setting.valueOf(id);

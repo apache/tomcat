@@ -16,8 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -47,8 +47,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     // Defaults (defined by Tomcat)
     static final long DEFAULT_NO_RFC7540_PRIORITIES = 1;
 
-    Map<Setting,Long> current = new ConcurrentHashMap<>();
-    Map<Setting,Long> pending = new ConcurrentHashMap<>();
+    Map<Setting,Long> current = new HashMap<>();
+    Map<Setting,Long> pending = new HashMap<>();
 
 
     ConnectionSettingsBase(String connectionId) {
