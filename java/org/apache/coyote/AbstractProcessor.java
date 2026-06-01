@@ -339,7 +339,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                         return;
                     }
-                    port = port * 10 + c - '0';
+                    int digit = c - '0';
+                    if (port > (Integer.MAX_VALUE - digit) / 10) {
+                        response.setStatus(400);
+                        setErrorState(ErrorState.CLOSE_CLEAN, null);
+                        return;
+                    }
+                    port = port * 10 + digit;
                 }
                 request.setServerPort(port);
 

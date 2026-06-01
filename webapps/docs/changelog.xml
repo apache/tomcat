@@ -272,6 +272,10 @@
         to <code>Http2Protocol</code> that allows the consistency check for the
         scheme provided by the user agent to be bypassed. (markt)
       </fix>
+      <fix>
+        <code>isTrailerFieldsReady</code> was always returning
+        <code>true</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
