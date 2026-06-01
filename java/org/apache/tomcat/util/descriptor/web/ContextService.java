@@ -380,9 +380,15 @@ public class ContextService extends ResourceBase {
             sb.append(", service-qname/localpart=");
             sb.append(serviceqname[1]);
         }
-        if (this.getServiceendpoints() != null) {
+        Iterator<String> serviceEndpoints = getServiceendpoints();
+        if (serviceEndpoints.hasNext()) {
             sb.append(", port-component/service-endpoint-interface=");
-            sb.append(this.getServiceendpoints());
+            while (serviceEndpoints.hasNext()) {
+                sb.append(serviceEndpoints.next());
+                if (serviceEndpoints.hasNext()) {
+                    sb.append(',');
+                }
+            }
         }
         if (!handlers.isEmpty()) {
             sb.append(", handler=");
