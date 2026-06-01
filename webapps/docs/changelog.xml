@@ -279,6 +279,9 @@
       <fix>
         Fix possible EL argument mismatch when it was set to null. (remm)
       </fix>
+      <fix>
+        Fix thread safety of <code>TagPluginManager</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
