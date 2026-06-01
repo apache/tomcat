@@ -90,11 +90,15 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    // --------------------
-
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public CharChunk clone() throws CloneNotSupportedException {
+        CharChunk result = (CharChunk) super.clone();
+        if (buff != null) {
+            result.buff = buff.clone();
+        }
+        result.in = null;
+        result.out = null;
+        return result;
     }
 
 
