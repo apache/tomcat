@@ -406,7 +406,8 @@ public class SmapStratum {
             }
 
             // This is the match
-            int inputOffset = (outputLineNumber - lineInfo.outputStartLine) / lineInfo.outputLineIncrement;
+            int inputOffset = (outputLineNumber - lineInfo.outputStartLine)
+                    / (lineInfo.outputLineIncrement == 0 ? 1 : lineInfo.outputLineIncrement);
 
             inputLineNumber = lineInfo.inputStartLine + inputOffset;
         }

@@ -57,55 +57,58 @@ public class JavaCompiler extends Compiler {
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
-                Charset.forName(ctxt.getOptions().getJavaEncoding()));
-        Iterable<? extends JavaFileObject> compilationUnits =
-                fileManager.getJavaFileObjectsFromFiles(List.of(new File(ctxt.getServletJavaFileName())));
-        // Perform Java compilation using the appropriate options
-        List<String> compilerOptions = List.of("-classpath", ctxt.getClassPath(), "-source",
-                ctxt.getOptions().getCompilerSourceVM(), "-target", ctxt.getOptions().getCompilerTargetVM());
-        Boolean result =
-                compiler.getTask(null, fileManager, diagnostics, compilerOptions, null, compilationUnits).call();
+        try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
+                Charset.forName(ctxt.getOptions().getJavaEncoding()))) {
 
-        List<JavacErrorDetail> problemList = new ArrayList<>();
-        if (!result.booleanValue()) {
-            for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
-                    try {
-                        problemList.add(ErrorDispatcher.createJavacError(diagnostic.getSource().getName(), pageNodes,
-                                new StringBuilder(diagnostic.getMessage(Locale.getDefault())),
-                                (int) diagnostic.getLineNumber(), ctxt));
-                    } catch (JasperException e) {
-                        log.error(Localizer.getMessage("jsp.error.compilation.jdtProblemError"), e);
+            Iterable<? extends JavaFileObject> compilationUnits =
+                    fileManager.getJavaFileObjectsFromFiles(List.of(new File(ctxt.getServletJavaFileName())));
+            // Perform Java compilation using the appropriate options
+            List<String> compilerOptions = List.of("-classpath", ctxt.getClassPath(), "-source",
+                    ctxt.getOptions().getCompilerSourceVM(), "-target", ctxt.getOptions().getCompilerTargetVM());
+            Boolean result =
+                    compiler.getTask(null, fileManager, diagnostics, compilerOptions, null, compilationUnits).call();
+
+            List<JavacErrorDetail> problemList = new ArrayList<>();
+            if (!result.booleanValue()) {
+                for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                    if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
+                        try {
+                            problemList.add(ErrorDispatcher.createJavacError(diagnostic.getSource().getName(), pageNodes,
+                                    new StringBuilder(diagnostic.getMessage(Locale.getDefault())),
+                                    (int) diagnostic.getLineNumber(), ctxt));
+                        } catch (JasperException e) {
+                            log.error(Localizer.getMessage("jsp.error.compilation.jdtProblemError"), e);
+                        }
                     }
                 }
             }
-        }
 
-        if (!ctxt.keepGenerated()) {
-            File javaFile = new File(ctxt.getServletJavaFileName());
-            if (!javaFile.delete()) {
-                throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
+            if (!ctxt.keepGenerated()) {
+                File javaFile = new File(ctxt.getServletJavaFileName());
+                if (!javaFile.delete()) {
+                    throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
+                }
             }
-        }
 
-        if (!problemList.isEmpty()) {
-            JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
-            errDispatcher.javacError(jeds);
-        }
+            if (!problemList.isEmpty()) {
+                JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
+                errDispatcher.javacError(jeds);
+            }
 
-        if (log.isDebugEnabled()) {
-            long t2 = System.currentTimeMillis();
-            log.debug(Localizer.getMessage("jsp.compiled", ctxt.getServletJavaFileName(), Long.valueOf(t2 - t1)));
-        }
+            if (log.isDebugEnabled()) {
+                long t2 = System.currentTimeMillis();
+                log.debug(Localizer.getMessage("jsp.compiled", ctxt.getServletJavaFileName(), Long.valueOf(t2 - t1)));
+            }
 
-        if (ctxt.isPrototypeMode()) {
-            return;
-        }
+            if (ctxt.isPrototypeMode()) {
+                return;
+            }
 
-        // JSR45 Support
-        if (!options.isSmapSuppressed()) {
-            SmapUtil.installSmap(smaps);
+            // JSR45 Support
+            if (!options.isSmapSuppressed()) {
+                SmapUtil.installSmap(smaps);
+            }
+
         }
 
     }
