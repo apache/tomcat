@@ -19,6 +19,7 @@ package org.apache.jasper.compiler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -644,12 +645,14 @@ public class TagFileProcessor {
      * @param classFileName If non-null, remove only the class file with this name.
      */
     public void removeProtoTypeFiles(String classFileName) {
-        for (Compiler c : tempVector) {
+        Iterator<Compiler> compilers = tempVector.iterator();
+        while (compilers.hasNext()) {
+            Compiler c = compilers.next();
             if (classFileName == null) {
                 c.removeGeneratedClassFiles();
             } else if (classFileName.equals(c.getCompilationContext().getClassFileName())) {
                 c.removeGeneratedClassFiles();
-                tempVector.remove(c);
+                compilers.remove();
                 return;
             }
         }
