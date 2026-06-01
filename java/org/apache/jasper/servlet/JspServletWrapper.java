@@ -561,7 +561,7 @@ public class JspServletWrapper {
                 Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(t);
                 // Log any exception, since it can't be passed along
-                log.error(Localizer.getMessage("jsp.error.file.not.found", e.getMessage()), t);
+                log.error(Localizer.getMessage("jsp.error.servlet.destroy.failed"), t);
             }
         }
     }
