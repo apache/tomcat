@@ -16,7 +16,6 @@
  */
 package org.apache.naming.factory;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +83,7 @@ public class ResourceLinkFactory implements ObjectFactory {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         // Web application initialization is single threaded so this is
         // safe.
-        globalResourceRegistrations.computeIfAbsent(cl, k -> new HashMap<>()).put(localName, globalName);
+        globalResourceRegistrations.computeIfAbsent(cl, k -> new ConcurrentHashMap<>()).put(localName, globalName);
     }
 
 
@@ -171,6 +170,9 @@ public class ResourceLinkFactory implements ObjectFactory {
                 return null;
             }
             Object result = globalContext.lookup(globalName);
+            if (result == null) {
+                return null;
+            }
             // Check the expected type
             String expectedClassName = ref.getClassName();
             if (expectedClassName == null) {
