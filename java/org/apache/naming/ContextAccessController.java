@@ -56,8 +56,8 @@ public class ContextAccessController {
         if (sm != null) {
             sm.checkPermission(new RuntimePermission(ContextAccessController.class.getName() + ".setSecurityToken"));
         }
-        if ((!securityTokens.containsKey(name)) && (token != null)) {
-            securityTokens.put(name, token);
+        if (token != null) {
+            securityTokens.putIfAbsent(name, token);
         }
     }
 
