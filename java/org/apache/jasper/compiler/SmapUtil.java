@@ -680,7 +680,7 @@ public class SmapUtil {
      * attribute from the class file or an external .smap resource.
      * @param className the fully qualified class name
      * @param cl the class loader to use for loading the resource
-     * @return the parsed SmapStratum, or {@code null} if no SMAP data is found
+     * @return the parsed SmapStratum, or {@code null} if no or invalid SMAP data is found
      */
     public static SmapStratum loadSmap(String className, ClassLoader cl) {
         // Extract SMAP from class file. First line "SMAP" is not included
@@ -755,6 +755,7 @@ public class SmapUtil {
     }
 
 
+    @SuppressWarnings("null") // is cannot be null when used
     private static String getSmap(String className, ClassLoader cl) {
         Charset encoding = StandardCharsets.ISO_8859_1;
         boolean found = false;
