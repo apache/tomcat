@@ -153,7 +153,13 @@ public class B2CConverter {
             int pos = cb.position();
             // Loop until one char is decoded or there is a decoder error
             do {
-                leftovers.put(bc.subtractB());
+                int b = bc.subtract();
+                if (b < 0) {
+                    leftovers.flip();
+                    result = decoder.decode(leftovers, cb, endOfInput);
+                    break;
+                }
+                leftovers.put((byte) b);
                 leftovers.flip();
                 result = decoder.decode(leftovers, cb, endOfInput);
                 leftovers.position(leftovers.limit());
@@ -222,14 +228,15 @@ public class B2CConverter {
             int pos = cb.position();
             // Loop until one char is decoded or there is a decoder error
             do {
-                byte chr;
                 if (bc.remaining() == 0) {
                     int n = ic.realReadBytes();
-                    chr = n < 0 ? -1 : bc.get();
-                } else {
-                    chr = bc.get();
+                    if (n < 0) {
+                        leftovers.flip();
+                        result = decoder.decode(leftovers, cb, endOfInput);
+                        break;
+                    }
                 }
-                leftovers.put(chr);
+                leftovers.put(bc.get());
                 leftovers.flip();
                 result = decoder.decode(leftovers, cb, endOfInput);
                 leftovers.position(leftovers.limit());

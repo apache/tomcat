@@ -602,6 +602,8 @@ public final class MessageBytes implements Cloneable, Serializable {
                 String sc = src.getString();
                 this.setString(sc);
                 break;
+            case T_NULL:
+                recycle();
         }
         setCharset(src.getCharset());
     }
