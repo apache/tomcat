@@ -18,6 +18,10 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.Method;
@@ -456,7 +461,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 // requiring the use of response.encodeURL.
                 request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePredicates);
+                wResponse = new CsrfResponseWrapper(req, res, nonceRequestParameterName, newNonce, noNoncePredicates);
             }
         }
 
@@ -574,6 +579,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     protected static class CsrfResponseWrapper extends HttpServletResponseWrapper {
 
+        private final HttpServletRequest request;
         private final String nonceRequestParameterName;
         private final String nonce;
         private final Collection<Predicate<String>> noNoncePatterns;
@@ -581,14 +587,16 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         /**
          * Construct a new CsrfResponseWrapper.
          *
+         * @param request                   The associated request
          * @param response                  The wrapped response
          * @param nonceRequestParameterName The name of the nonce request parameter
          * @param nonce                     The current nonce value
          * @param noNoncePatterns           The patterns for URLs that should not have nonces added
          */
-        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName, String nonce,
-                Collection<Predicate<String>> noNoncePatterns) {
+        public CsrfResponseWrapper(HttpServletRequest request, HttpServletResponse response,
+                String nonceRequestParameterName, String nonce, Collection<Predicate<String>> noNoncePatterns) {
             super(response);
+            this.request = request;
             this.nonceRequestParameterName = nonceRequestParameterName;
             this.nonce = nonce;
             this.noNoncePatterns = noNoncePatterns;
@@ -602,6 +610,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeRedirectURL(String url) {
+            if (url == null) {
+                return url;
+            }
+
             url = removeQueryParameters(url, nonceRequestParameterName);
 
             if (shouldAddNonce(url)) {
@@ -619,6 +631,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeURL(String url) {
+            if (url == null) {
+                return url;
+            }
+
             url = removeQueryParameters(url, nonceRequestParameterName);
 
             if (shouldAddNonce(url)) {
@@ -628,18 +644,27 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
         }
 
-        private boolean shouldAddNonce(String url) {
-            if (null == noNoncePatterns || noNoncePatterns.isEmpty()) {
-                return true;
-            }
-
-            for (Predicate<String> p : noNoncePatterns) {
-                if (p.test(url)) {
-                    return false;
+        private boolean shouldAddNonce(String location) {
+            if (null != noNoncePatterns && !noNoncePatterns.isEmpty()) {
+                for (Predicate<String> p : noNoncePatterns) {
+                    if (p.test(location)) {
+                        return false;
+                    }
                 }
             }
 
-            return true;
+            URL urlLocation;
+            try {
+                URI locationUri = new URI(location);
+                URI requestUri = new URI(request.getRequestURL().toString());
+                locationUri = requestUri.resolve(locationUri);
+                urlLocation = locationUri.toURL();
+            } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
+                // Invalid location - don't try and add nonce
+                return false;
+            }
+
+            return RequestUtil.isSameWebApplication(request, urlLocation);
         }
 
         /**

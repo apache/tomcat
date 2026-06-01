@@ -110,6 +110,18 @@ public class TesterContext implements Context {
     }
 
 
+    private String path = "";
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+
     @Override
     public Log getLogger() {
         return log;
@@ -537,16 +549,6 @@ public class TesterContext implements Context {
 
     @Override
     public void setNamingResources(NamingResourcesImpl namingResources) {
-        // NO-OP
-    }
-
-    @Override
-    public String getPath() {
-        return null;
-    }
-
-    @Override
-    public void setPath(String path) {
         // NO-OP
     }
 

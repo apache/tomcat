@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.util;
 
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.connector.Request;
@@ -104,5 +106,54 @@ public final class RequestUtil {
         }
 
         return sb.toString();
+    }
+
+
+    /**
+     * Tests whether the provided URL is for a resource contained within the same web application as the request.
+     *
+     * @param request The request to test
+     * @param url     The URL to test
+     *
+     * @return {@code true} if the provided URL is for a resource contained within the same web application as the
+     * request, otherwise {@code false}
+     */
+    public static boolean isSameWebApplication(HttpServletRequest request, URL url) {
+        // Does this URL match down to (and including) the context path?
+        if (!request.getScheme().equalsIgnoreCase(url.getProtocol())) {
+            return false;
+        }
+        if (!request.getServerName().equalsIgnoreCase(url.getHost())) {
+            return false;
+        }
+        int serverPort = request.getServerPort();
+        if (serverPort == -1) {
+            if ("https".equals(request.getScheme())) {
+                serverPort = 443;
+            } else {
+                serverPort = 80;
+            }
+        }
+        int urlPort = url.getPort();
+        if (urlPort == -1) {
+            if ("https".equals(url.getProtocol())) {
+                urlPort = 443;
+            } else {
+                urlPort = 80;
+            }
+        }
+        if (serverPort != urlPort) {
+            return false;
+        }
+
+        /*
+         * This isn't perfect but is the best that can be done without running the full mapping logic on the url to
+         * determine which web application that url will map to.
+         */
+        if (!url.getPath().startsWith(request.getServletContext().getContextPath())) {
+            return false;
+        }
+
+        return true;
     }
 }

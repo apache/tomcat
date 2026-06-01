@@ -35,14 +35,15 @@ import org.junit.Test;
 
 import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterServletContext;
 
 public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     private static final String RESULT_NONCE = Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";
 
-    private final HttpServletResponse wrapper = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-            Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", null);
+    private final HttpServletResponse wrapper = new CsrfPreventionFilter.CsrfResponseWrapper(new TesterRequest(),
+            new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", null);
 
     @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {
@@ -149,8 +150,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         chain.add(suffix);
         chain.add(regex);
 
-        HttpServletResponse response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-                Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", chain);
+        HttpServletResponse response = new CsrfPreventionFilter.CsrfResponseWrapper(new TesterRequest(),
+                new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", chain);
 
         // These URLs should include nonces
         Assert.assertEquals("/foo?" + RESULT_NONCE, response.encodeURL("/foo"));
@@ -177,8 +178,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         Assert.assertFalse("MIME match succeeds where it should fail", mime.test("/test.txt"));
 
         Collection<Predicate<String>> chain = Collections.singleton(mime);
-        HttpServletResponse response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-                Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", chain);
+        HttpServletResponse response = new CsrfPreventionFilter.CsrfResponseWrapper(new TesterRequest(),
+                new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", chain);
 
         // These URLs should include nonces
         Assert.assertEquals("/foo?" + RESULT_NONCE, response.encodeURL("/foo"));
@@ -202,8 +203,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
     public void testMultipleTokens() {
         String nonce = "TESTNONCE";
         String testURL = "/foo/bar?" + Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=sample";
-        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-                Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
+        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(
+                new TesterRequest(), new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
 
         Assert.assertTrue("Original URL does not contain CSRF token",
                 testURL.contains(Constants.CSRF_NONCE_SESSION_ATTR_NAME));
@@ -211,41 +212,28 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         String result = response.encodeURL(testURL);
 
         int pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
-        Assert.assertTrue("Result URL does not contain CSRF token",
-                pos >= 0);
+        Assert.assertTrue("Result URL does not contain CSRF token", pos >= 0);
         pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME, pos + 1);
-        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result,
-                pos >= 0);
+        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result, pos >= 0);
     }
 
     @Test
     public void testURLCleansing() {
-        String[] urls = new String[] {
-                "/foo/bar",
-                "/foo/bar?",
-                "/foo/bar?csrf",
-                "/foo/bar?csrf&",
-                "/foo/bar?csrf=",
-                "/foo/bar?csrf=&",
-                "/foo/bar?csrf=abc",
-                "/foo/bar?csrf=abc&bar=foo",
-                "/foo/bar?bar=foo&csrf=abc",
-                "/foo/bar?bar=foo&csrf=abc&foo=bar",
-                "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar",
-                "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar&csrf=def",
-                "/foo/bar?csrf=&csrf&csrf&csrf&csrf=abc&csrf=",
+        String[] urls = new String[] { "/foo/bar", "/foo/bar?", "/foo/bar?csrf", "/foo/bar?csrf&", "/foo/bar?csrf=",
+                "/foo/bar?csrf=&", "/foo/bar?csrf=abc", "/foo/bar?csrf=abc&bar=foo", "/foo/bar?bar=foo&csrf=abc",
+                "/foo/bar?bar=foo&csrf=abc&foo=bar", "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar",
+                "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar&csrf=def", "/foo/bar?csrf=&csrf&csrf&csrf&csrf=abc&csrf=",
                 "/foo/bar?xcsrf=&xcsrf&xcsrf&xcsrf&xcsrf=abc&xcsrf=",
-                "/foo/bar?xcsrf=&xcsrf&xcsrf&csrf=foo&xcsrf&xcsrf=abc&csrf=bar&xcsrf=&",
-                "/foo/bar?bar=fo?&csrf=abc",
-                "/foo/bar?bar=fo?&csrf=abc&baz=boh",
-        };
+                "/foo/bar?xcsrf=&xcsrf&xcsrf&csrf=foo&xcsrf&xcsrf=abc&csrf=bar&xcsrf=&", "/foo/bar?bar=fo?&csrf=abc",
+                "/foo/bar?bar=fo?&csrf=abc&baz=boh", };
 
         String csrfParameterName = "csrf";
 
-        for(String url : urls) {
+        for (String url : urls) {
             String result = CsrfPreventionFilter.CsrfResponseWrapper.removeQueryParameters(url, csrfParameterName);
 
-            Assert.assertEquals("Failed to cleanse URL '" + url + "' properly", dumbButAccurateCleanse(url, csrfParameterName), result);
+            Assert.assertEquals("Failed to cleanse URL '" + url + "' properly",
+                    dumbButAccurateCleanse(url, csrfParameterName), result);
         }
 
     }
@@ -270,7 +258,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
             // the query-string is technically allowed to contain ? characters.
             // Only trim the trailing ? if it is actually the quest-string
             // separator.
-            if(url.lastIndexOf('?', url.length() - 2) < 0) {
+            if (url.lastIndexOf('?', url.length() - 2) < 0) {
                 url = url.substring(0, url.length() - 1);
             }
         }
@@ -282,8 +270,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
     public void testDuplicateTokens() {
         String nonce = "TESTNONCE";
         String testURL = "/foo/bar?" + Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=" + nonce;
-        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-                Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
+        CsrfPreventionFilter.CsrfResponseWrapper response = new CsrfPreventionFilter.CsrfResponseWrapper(
+                new TesterRequest(), new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonce, null);
 
         Assert.assertTrue("Original URL does not contain CSRF token",
                 testURL.contains(Constants.CSRF_NONCE_SESSION_ATTR_NAME));
@@ -291,11 +279,9 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         String result = response.encodeURL(testURL);
 
         int pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
-        Assert.assertTrue("Result URL does not contain CSRF token",
-                pos >= 0);
+        Assert.assertTrue("Result URL does not contain CSRF token", pos >= 0);
         pos = result.indexOf(Constants.CSRF_NONCE_SESSION_ATTR_NAME, pos + 1);
-        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result,
-                pos >= 0);
+        Assert.assertFalse("Result URL contains multiple CSRF tokens: " + result, pos >= 0);
     }
 
     private static class MimeTypeServletContext extends TesterServletContext {
