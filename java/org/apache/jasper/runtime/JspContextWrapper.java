@@ -324,7 +324,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     @Override
     public void include(String relativeUrlPath, boolean flush) throws ServletException, IOException {
-        invokingJspCtxt.include(relativeUrlPath, false);
+        invokingJspCtxt.include(relativeUrlPath, flush);
     }
 
     @Override
