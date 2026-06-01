@@ -20,6 +20,7 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.Enumeration;
@@ -566,9 +567,9 @@ public class JspRuntimeLibrary {
 
         try {
             if (propertyEditorClass != null) {
-                Object[] tmpval = new Object[values.length];
+                Object tmpval = Array.newInstance(t, values.length);
                 for (int i = 0; i < values.length; i++) {
-                    tmpval[i] = getValueFromBeanInfoPropertyEditor(t, propertyName, values[i], propertyEditorClass);
+                    Array.set(tmpval, i, getValueFromBeanInfoPropertyEditor(t, propertyName, values[i], propertyEditorClass));
                 }
                 method.invoke(bean, new Object[] { tmpval });
             } else if (t.equals(Integer.class)) {
@@ -668,7 +669,7 @@ public class JspRuntimeLibrary {
                 }
                 method.invoke(bean, new Object[] { tmpval });
             } else {
-                Object[] tmpval = new Object[values.length];
+                Object[] tmpval = (Object[]) Array.newInstance(t, values.length);
                 for (int i = 0; i < values.length; i++) {
                     tmpval[i] = getValueFromPropertyEditorManager(t, propertyName, values[i]);
                 }
