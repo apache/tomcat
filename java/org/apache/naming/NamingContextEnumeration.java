@@ -79,7 +79,7 @@ public class NamingContextEnumeration implements NamingEnumeration<NameClassPair
     @Override
     public NameClassPair nextElement() {
         NamingEntry entry = iterator.next();
-        return new NameClassPair(entry.name, entry.value.getClass().getName());
+        return new NameClassPair(entry.name, entry.value == null ? null : entry.value.getClass().getName());
     }
 
 

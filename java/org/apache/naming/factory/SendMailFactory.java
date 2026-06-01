@@ -79,42 +79,45 @@ public class SendMailFactory implements ObjectFactory {
      */
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context ctx, Hashtable<?,?> env) throws Exception {
-        final Reference ref = (Reference) refObj;
 
-        if (ref.getClassName().equals(DataSourceClassName)) {
-            // set up the smtp session that will send the message
-            Properties props = new Properties();
-            // enumeration of all refaddr
-            Enumeration<RefAddr> list = ref.getAll();
-            // current refaddr to be set
-            RefAddr refaddr;
-            // set transport to smtp
-            props.put("mail.transport.protocol", "smtp");
-
-            while (list.hasMoreElements()) {
-                refaddr = list.nextElement();
-
-                // set property
-                props.put(refaddr.getType(), refaddr.getContent());
-            }
-            MimeMessage message = new MimeMessage(Session.getInstance(props));
-            try {
-                RefAddr fromAddr = ref.get("mail.from");
-                String from = null;
-                if (fromAddr != null) {
-                    from = (String) fromAddr.getContent();
-                }
-                if (from != null) {
-                    message.setFrom(new InternetAddress(from));
-                }
-                message.setSubject("");
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                // Otherwise ignore
-            }
-            return new MimePartDataSource(message);
-        } else { // We can't create an instance of the DataSource
+        if (!(refObj instanceof Reference ref)) {
             return null;
         }
+        if (!ref.getClassName().equals(DataSourceClassName)) {
+            return null;
+        }
+
+        // set up the smtp session that will send the message
+        Properties props = new Properties();
+        // enumeration of all refaddr
+        Enumeration<RefAddr> list = ref.getAll();
+        // current refaddr to be set
+        RefAddr refaddr;
+        // set transport to smtp
+        props.put("mail.transport.protocol", "smtp");
+
+        while (list.hasMoreElements()) {
+            refaddr = list.nextElement();
+
+            // set property
+            props.put(refaddr.getType(), refaddr.getContent());
+        }
+        MimeMessage message = new MimeMessage(Session.getInstance(props));
+        try {
+            RefAddr fromAddr = ref.get("mail.from");
+            String from = null;
+            if (fromAddr != null) {
+                from = (String) fromAddr.getContent();
+            }
+            if (from != null) {
+                message.setFrom(new InternetAddress(from));
+            }
+            message.setSubject("");
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // Otherwise ignore
+        }
+        return new MimePartDataSource(message);
+
     }
 }

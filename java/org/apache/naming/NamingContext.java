@@ -384,13 +384,17 @@ public class NamingContext implements Context {
             return nameParser;
         }
 
+        NamingEntry entry = bindings.get(name.get(0));
+        if (entry == null) {
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
+        }
+
+        if (entry.type != NamingEntry.CONTEXT) {
+            throw new NotContextException(sm.getString("namingContext.contextExpected", name.get(0)));
+        }
+
         if (name.size() > 1) {
-            Object obj = bindings.get(name.get(0));
-            if (obj instanceof Context) {
-                return ((Context) obj).getNameParser(name.getSuffix(1));
-            } else {
-                throw new NotContextException(sm.getString("namingContext.contextExpected", name.get(0)));
-            }
+            return ((Context) entry.value).getNameParser(name.getSuffix(1));
         }
 
         return nameParser;

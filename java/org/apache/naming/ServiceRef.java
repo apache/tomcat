@@ -118,13 +118,15 @@ public class ServiceRef extends AbstractRef {
             refAddr = new StringRefAddr(SERVICE_INTERFACE, serviceInterface);
             add(refAddr);
         }
-        if (serviceQname[0] != null) {
-            refAddr = new StringRefAddr(SERVICE_NAMESPACE, serviceQname[0]);
-            add(refAddr);
-        }
-        if (serviceQname[1] != null) {
-            refAddr = new StringRefAddr(SERVICE_LOCAL_PART, serviceQname[1]);
-            add(refAddr);
+        if (serviceQname != null) {
+            if (serviceQname.length > 0 && serviceQname[0] != null) {
+                refAddr = new StringRefAddr(SERVICE_NAMESPACE, serviceQname[0]);
+                add(refAddr);
+            }
+            if (serviceQname.length > 1 && serviceQname[1] != null) {
+                refAddr = new StringRefAddr(SERVICE_LOCAL_PART, serviceQname[1]);
+                add(refAddr);
+            }
         }
         if (wsdl != null) {
             refAddr = new StringRefAddr(WSDL, wsdl);
