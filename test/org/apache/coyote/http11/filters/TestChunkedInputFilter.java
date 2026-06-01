@@ -627,7 +627,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         private void dumpHeader(String headerName, HttpServletRequest req,
                 PrintWriter pw) {
-            String value = req.getTrailerFields().get(headerName);
+            String value = req.isTrailerFieldsReady() ? req.getTrailerFields().get(headerName) : null;
             if (value == null) {
                 value = "null";
             }
