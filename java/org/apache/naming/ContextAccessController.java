@@ -52,8 +52,8 @@ public class ContextAccessController {
      * @param token Security token
      */
     public static void setSecurityToken(Object name, Object token) {
-        if ((!securityTokens.containsKey(name)) && (token != null)) {
-            securityTokens.put(name, token);
+        if (token != null) {
+            securityTokens.putIfAbsent(name, token);
         }
     }
 

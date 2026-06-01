@@ -567,7 +567,7 @@ public class JspRuntimeLibrary {
 
         try {
             if (propertyEditorClass != null) {
-                Object[] tmpval = new Integer[values.length];
+                Object[] tmpval = new Object[values.length];
                 for (int i = 0; i < values.length; i++) {
                     tmpval[i] = getValueFromBeanInfoPropertyEditor(t, propertyName, values[i], propertyEditorClass);
                 }
@@ -669,7 +669,7 @@ public class JspRuntimeLibrary {
                 }
                 method.invoke(bean, new Object[] { tmpval });
             } else {
-                Object[] tmpval = new Integer[values.length];
+                Object[] tmpval = new Object[values.length];
                 for (int i = 0; i < values.length; i++) {
                     tmpval[i] = getValueFromPropertyEditorManager(t, propertyName, values[i]);
                 }
@@ -956,6 +956,7 @@ public class JspRuntimeLibrary {
         Method result = null;
         Class<?> type = null;
         if (GRAAL) {
+            // BeanInfo is approximated with Graal
             String setter = "set" + capitalize(prop);
             Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
@@ -1002,10 +1003,11 @@ public class JspRuntimeLibrary {
         Method result = null;
         Class<?> type = null;
         if (GRAAL) {
-            String setter = "get" + capitalize(prop);
+            // BeanInfo is approximated with Graal
+            String getter = "get" + capitalize(prop);
             Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
-                if (setter.equals(method.getName())) {
+                if (getter.equals(method.getName())) {
                     return method;
                 }
             }
