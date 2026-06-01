@@ -158,8 +158,14 @@ public final class ByteChunk extends AbstractChunk {
 
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public ByteChunk clone() throws CloneNotSupportedException {
+        ByteChunk result = (ByteChunk) super.clone();
+        if (buff != null) {
+            result.buff = buff.clone();
+        }
+        result.in = null;
+        result.out = null;
+        return result;
     }
 
 
@@ -442,7 +448,12 @@ public final class ByteChunk extends AbstractChunk {
      * @return the byte value or -1 if end of data
      *
      * @throws IOException if reading from input channel fails
+     *
+     * @deprecated Use {@link #subtract()} instead. This method cannot distinguish
+     *             between EOF (-1) and the legitimate byte value 0xFF because
+     *             it returns {@code byte}.
      */
+    @Deprecated
     public byte subtractB() throws IOException {
         if (checkEof()) {
             return -1;
