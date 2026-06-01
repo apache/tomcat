@@ -294,11 +294,109 @@ public final class AstValue extends SimpleNode {
 
         if (m.isVarArgs()) {
             Class<?> varArgType = m.getParameterTypes()[paramCount - 1].getComponentType();
-            Object[] varArgs = (Object[]) Array.newInstance(varArgType, src.length - (paramCount - 1));
-            for (int i = 0; i < src.length - (paramCount - 1); i++) {
-                varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], varArgType);
+            if (varArgType.equals(Integer.class)) {
+                Integer[] varArgs = new Integer[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Integer.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Byte.class)) {
+                Byte[] varArgs = new Byte[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Byte.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Boolean.class)) {
+                Boolean[] varArgs = new Boolean[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Boolean.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Short.class)) {
+                Short[] varArgs = new Short[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Short.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Long.class)) {
+                Long[] varArgs = new Long[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Long.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Double.class)) {
+                Double[] varArgs = new Double[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Double.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Float.class)) {
+                Float[] varArgs = new Float[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Float.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(Character.class)) {
+                Character[] varArgs = new Character[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], Character.class);
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(int.class)) {
+                int[] varArgs = new int[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], int.class).intValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(byte.class)) {
+                byte[] varArgs = new byte[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], byte.class).byteValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(boolean.class)) {
+                boolean[] varArgs = new boolean[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], boolean.class).booleanValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(short.class)) {
+                short[] varArgs = new short[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], short.class).shortValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(long.class)) {
+                long[] varArgs = new long[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], long.class).longValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(double.class)) {
+                double[] varArgs = new double[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], double.class).doubleValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(float.class)) {
+                float[] varArgs = new float[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], float.class).floatValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else if (varArgType.equals(char.class)) {
+                char[] varArgs = new char[src.length - (paramCount - 1)];
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], char.class).charValue();
+                }
+                dest[paramCount - 1] = varArgs;
+            } else {
+                Object[] varArgs = (Object[]) Array.newInstance(varArgType, src.length - (paramCount - 1));
+                for (int i = 0; i < src.length - (paramCount - 1); i++) {
+                    varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], varArgType);
+                }
+                dest[paramCount - 1] = varArgs;
             }
-            dest[paramCount - 1] = varArgs;
         } else {
             dest[paramCount - 1] = ELSupport.coerceToType(ctx, src[paramCount - 1], types[paramCount - 1]);
         }
