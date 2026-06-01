@@ -70,8 +70,10 @@ public class MailSessionFactory implements ObjectFactory {
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context context, Hashtable<?,?> env) throws Exception {
 
+        if (!(refObj instanceof Reference ref)) {
+            return null;
+        }
         // Return null if we cannot create an object of the requested type
-        final Reference ref = (Reference) refObj;
         if (!ref.getClassName().equals(factoryType)) {
             return null;
         }
@@ -118,5 +120,6 @@ public class MailSessionFactory implements ObjectFactory {
 
         // Create and return the new Session object
         return Session.getInstance(props, auth);
+
     }
 }

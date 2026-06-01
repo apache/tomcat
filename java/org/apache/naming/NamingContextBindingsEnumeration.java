@@ -113,7 +113,7 @@ public class NamingContextBindingsEnumeration implements NamingEnumeration<Bindi
             value = entry.value;
         }
 
-        return new Binding(entry.name, value.getClass().getName(), value, true);
+        return new Binding(entry.name, value == null ? null : value.getClass().getName(), value, true);
     }
 }
 
