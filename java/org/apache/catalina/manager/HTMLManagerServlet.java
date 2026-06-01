@@ -1026,7 +1026,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         int nbAffectedSessions = 0;
         for (String sessionId : sessionIds) {
             Session session = getSessionForNameAndId(cn, sessionId, smClient);
-            if (null == session) {
+            if (null == session || session.getSession() == null) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {
                     log("Cannot invalidate null session " + sessionId);
@@ -1069,6 +1069,12 @@ public class HTMLManagerServlet extends ManagerServlet {
             return false;
         }
         HttpSession httpSession = session.getSession();
+        if (httpSession == null) {
+            if (debug >= 1) {
+                log("Cannot remove attribute '" + attributeName + "' for null session " + sessionId);
+            }
+            return false;
+        }
         boolean wasPresent = null != httpSession.getAttribute(attributeName);
         try {
             httpSession.removeAttribute(attributeName);
@@ -1097,7 +1103,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingInt(Session::getMaxInactiveInterval);
         } else if ("new".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparing(s -> Boolean.valueOf(s.getSession().isNew()));
+            return Comparator.comparing(s -> (s.getSession() != null) ? Boolean.valueOf(s.getSession().isNew()) : Boolean.FALSE);
         } else if ("locale".equalsIgnoreCase(sortBy)) {
             return Comparator.comparing(JspHelper::guessDisplayLocaleFromSession);
         } else if ("user".equalsIgnoreCase(sortBy)) {

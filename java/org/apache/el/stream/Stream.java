@@ -114,10 +114,13 @@ public class Stream {
             protected void findNext() {
                 while (iterator.hasNext() || (inner != null && inner.hasNext())) {
                     if (inner == null || !inner.hasNext()) {
-                        inner = ((Stream) le.invoke(iterator.next())).iterator;
+                        Object obj = le.invoke(iterator.next());
+                        if (obj instanceof Stream) {
+                            inner = ((Stream) obj).iterator;
+                        }
                     }
 
-                    if (inner.hasNext()) {
+                    if (inner != null && inner.hasNext()) {
                         next = inner.next();
                         foundNext = true;
                         break;
@@ -371,13 +374,11 @@ public class Stream {
 
         if (iterator.hasNext()) {
             seed = iterator.next();
+        } else {
+            return Optional.EMPTY;
         }
 
-        if (seed == null) {
-            return Optional.EMPTY;
-        } else {
-            return new Optional(reduce(seed, le));
-        }
+        return new Optional(reduce(seed, le));
     }
 
 
