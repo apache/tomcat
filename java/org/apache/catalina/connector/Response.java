@@ -50,6 +50,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ContinueResponseTiming;
@@ -1418,46 +1419,13 @@ public class Response implements HttpServletResponse {
             return false;
         }
 
-        // Does this URL match down to (and including) the context path?
-        if (!hreq.getScheme().equalsIgnoreCase(url.getProtocol())) {
-            return false;
-        }
-        if (!hreq.getServerName().equalsIgnoreCase(url.getHost())) {
-            return false;
-        }
-        int serverPort = hreq.getServerPort();
-        if (serverPort == -1) {
-            if ("https".equals(hreq.getScheme())) {
-                serverPort = 443;
-            } else {
-                serverPort = 80;
-            }
-        }
-        int urlPort = url.getPort();
-        if (urlPort == -1) {
-            if ("https".equals(url.getProtocol())) {
-                urlPort = 443;
-            } else {
-                urlPort = 80;
-            }
-        }
-        if (serverPort != urlPort) {
+        if (!RequestUtil.isSameWebApplication(hreq, url)) {
             return false;
         }
 
-        String contextPath = context.getPath();
-        if (contextPath != null) {
-            String file = url.getFile();
-            if (!file.startsWith(contextPath)) {
-                return false;
-            }
-            String tok = ";" + SessionConfig.getSessionUriParamName(context) + "=" + session.getIdInternal();
-            return file.indexOf(tok, contextPath.length()) < 0;
-        }
-
-        // This URL belongs to our web application, so it is encodeable
-        return true;
-
+        // Don't encode if the correct session ID is already present
+        String tok = ";" + SessionConfig.getSessionUriParamName(context) + "=" + session.getIdInternal();
+        return location.indexOf(tok) < 0;
     }
 
 
