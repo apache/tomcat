@@ -18,6 +18,7 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 
 /**
@@ -110,4 +111,28 @@ public class SecurityRoleRef implements Serializable {
     }
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((link == null) ? 0 : link.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SecurityRoleRef other = (SecurityRoleRef) obj;
+        if (!Objects.equals(link, other.link)) {
+            return false;
+        }
+        return Objects.equals(name, other.name);
+    }
 }

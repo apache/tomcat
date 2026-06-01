@@ -138,6 +138,16 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
     }
 
 
+    /**
+     * Set the already URL decoded location.
+     *
+     * @param location The new location
+     */
+    public void setDecodedLocation(String location) {
+        this.location = location;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
