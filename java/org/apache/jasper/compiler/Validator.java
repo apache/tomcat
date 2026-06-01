@@ -1193,10 +1193,10 @@ class Validator {
             // valid attribute value in xml).
 
             if (value != null) {
-                if (n.getRoot().isXmlSyntax() && value.startsWith("%=")) {
+                if (n.getRoot().isXmlSyntax() && value.startsWith("%=") && value.length() >= 3) {
                     result = new Node.JspAttribute(tai, qName, uri, localName, value.substring(2, value.length() - 1),
                             true, null, dynamic);
-                } else if (!n.getRoot().isXmlSyntax() && value.startsWith("<%=")) {
+                } else if (!n.getRoot().isXmlSyntax() && value.startsWith("<%=") && value.length() >= 5) {
                     result = new Node.JspAttribute(tai, qName, uri, localName, value.substring(3, value.length() - 2),
                             true, null, dynamic);
                 } else {
