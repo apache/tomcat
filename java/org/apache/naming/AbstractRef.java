@@ -62,8 +62,8 @@ public abstract class AbstractRef extends Reference {
         if (factory != null) {
             return factory;
         } else {
-            factory = System.getProperty(Context.OBJECT_FACTORIES);
-            if (factory != null) {
+            String objectFactories = System.getProperty(Context.OBJECT_FACTORIES);
+            if (objectFactories != null) {
                 return null;
             } else {
                 return getDefaultFactoryClassName();
