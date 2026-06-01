@@ -476,7 +476,9 @@ public class PageInfo {
      */
     public void popPrefixMapping(String prefix) {
         Deque<String> stack = xmlPrefixMapper.get(prefix);
-        stack.removeFirst();
+        if (stack != null) {
+            stack.removeFirst();
+        }
     }
 
     /**
