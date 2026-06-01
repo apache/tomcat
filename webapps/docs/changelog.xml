@@ -323,6 +323,10 @@
         Reset the encoding used for query string parameters between requests in
         case an application changed the encoding in a previous request. (markt)
       </fix>
+      <fix>
+        When encoding URLs with the <code>CsrfPreventionFilter</code>, don't add
+        the nonce to URLs that are known not to require it. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
