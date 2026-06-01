@@ -33,7 +33,7 @@ public class StringInterpreterEnum extends DefaultStringInterpreter {
     }
 
     // Can't be static
-    private final Log log = LogFactory.getLog(ELInterpreterTagSetters.class);
+    private final Log log = LogFactory.getLog(StringInterpreterEnum.class);
 
     @Override
     protected String coerceToOtherType(Class<?> c, String s, boolean isNamedAttribute) {
