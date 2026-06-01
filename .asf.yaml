@@ -7,6 +7,12 @@ github:
           - "~DEFAULT_BRANCH"
           - "release/*"
           - "rel/*"
+          - "11.0.x"
+          - "10.1.x"
+          - "10.0.x"
+          - "9.0.x"
+          - "8.5.x"
+          - "7.0.x"
         excludes: []
       bypass_teams:
         - root
