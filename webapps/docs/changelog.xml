@@ -448,6 +448,9 @@
       <fix>
         Fix thread safety of <code>TagPluginManager</code>. (remm)
       </fix>
+      <fix>
+        Correctly use flush on JSP include. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
