@@ -76,6 +76,8 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
         if (buffered == null) {
             buffered = new ByteChunk();
             buffered.setLimit(limit);
+        } else {
+            buffered.setLimit(limit);
         }
     }
 

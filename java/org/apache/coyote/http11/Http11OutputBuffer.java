@@ -557,7 +557,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     boolean isChunking() {
-        for (int i = 0; i < lastActiveFilter; i++) {
+        for (int i = 0; i <= lastActiveFilter; i++) {
             if (activeFilters[i] == filterLibrary[Constants.CHUNKED_FILTER]) {
                 return true;
             }
