@@ -997,9 +997,13 @@ public final class Request {
      * @return the protocol request ID
      */
     public String getProtocolRequestId() {
-        AtomicReference<String> ref = new AtomicReference<>();
-        hook.action(ActionCode.PROTOCOL_REQUEST_ID, ref);
-        return ref.get();
+        if (hook != null) {
+            AtomicReference<String> ref = new AtomicReference<>();
+            hook.action(ActionCode.PROTOCOL_REQUEST_ID, ref);
+            return ref.get();
+        } else {
+            return null;
+        }
     }
 
 
@@ -1009,9 +1013,13 @@ public final class Request {
      * @return the servlet connection
      */
     public ServletConnection getServletConnection() {
-        AtomicReference<ServletConnection> ref = new AtomicReference<>();
-        hook.action(ActionCode.SERVLET_CONNECTION, ref);
-        return ref.get();
+        if (hook != null) {
+            AtomicReference<ServletConnection> ref = new AtomicReference<>();
+            hook.action(ActionCode.SERVLET_CONNECTION, ref);
+            return ref.get();
+        } else {
+            return null;
+        }
     }
 
 
