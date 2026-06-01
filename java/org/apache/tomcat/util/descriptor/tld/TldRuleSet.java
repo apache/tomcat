@@ -134,8 +134,8 @@ public class TldRuleSet implements RuleSet {
 
     private void addDescriptionGroup(Digester digester, String prefix) {
         digester.addCallMethod(prefix + "/info", "setInfo", 0);
-        digester.addCallMethod(prefix + "small-icon", "setSmallIcon", 0);
-        digester.addCallMethod(prefix + "large-icon", "setLargeIcon", 0);
+        digester.addCallMethod(prefix + "/small-icon", "setSmallIcon", 0);
+        digester.addCallMethod(prefix + "/large-icon", "setLargeIcon", 0);
 
         digester.addCallMethod(prefix + "/description", "setInfo", 0);
         digester.addCallMethod(prefix + "/display-name", "setDisplayName", 0);

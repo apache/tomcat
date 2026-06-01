@@ -89,7 +89,7 @@ public class MessageDestinationRef extends ResourceBase {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("MessageDestination[");
+        StringBuilder sb = new StringBuilder("MessageDestinationRef[");
         sb.append("name=");
         sb.append(getName());
         if (link != null) {
