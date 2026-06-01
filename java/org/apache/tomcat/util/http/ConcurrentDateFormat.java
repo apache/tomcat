@@ -61,9 +61,11 @@ public class ConcurrentDateFormat {
         if (sdf == null) {
             sdf = createInstance();
         }
-        String result = sdf.format(date);
-        queue.add(sdf);
-        return result;
+        try {
+            return sdf.format(date);
+        } finally {
+            queue.add(sdf);
+        }
     }
 
     /**
@@ -78,10 +80,12 @@ public class ConcurrentDateFormat {
         if (sdf == null) {
             sdf = createInstance();
         }
-        Date result = sdf.parse(source);
-        sdf.setTimeZone(timezone);
-        queue.add(sdf);
-        return result;
+        try {
+            return sdf.parse(source);
+        } finally {
+            sdf.setTimeZone(timezone);
+            queue.add(sdf);
+        }
     }
 
     private SimpleDateFormat createInstance() {
