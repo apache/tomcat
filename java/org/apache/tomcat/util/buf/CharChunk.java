@@ -726,7 +726,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     @Override
     public CharSequence subSequence(int start, int end) {
         try {
-            CharChunk result = (CharChunk) this.clone();
+            CharChunk result = this.clone();
             result.setStart(this.start + start);
             result.setEnd(this.start + end);
             return result;
