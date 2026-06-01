@@ -707,10 +707,16 @@ public class SmapUtil {
             String fileName = lines[lineIndex].substring(i + 1);
             smapStratum.addFile(fileName, lines[++lineIndex]);
             lineIndex++;
+            if (lineIndex == lines.length) {
+                return null;
+            }
         }
 
         // Skip *L
         lineIndex++;
+        if (lineIndex == lines.length) {
+            return null;
+        }
 
         while (!lines[lineIndex].equals("*E")) {
             LineInfo li = new LineInfo();
@@ -740,6 +746,9 @@ public class SmapUtil {
             smapStratum.addLineInfo(li);
 
             lineIndex++;
+            if (lineIndex == lines.length) {
+                return null;
+            }
         }
 
         return smapStratum;
@@ -759,27 +768,29 @@ public class SmapUtil {
                 found = true;
             } else {
                 is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
-                // Alternative approach would be to read the class file as per the
-                // JLS. That would require duplicating a lot of BCEL functionality.
-                int b = is.read();
-                while (b != -1) {
-                    if (b == 'S') {
-                        if ((b = is.read()) != 'M') {
-                            continue;
+                if (is != null) {
+                    // Alternative approach would be to read the class file as per the
+                    // JLS. That would require duplicating a lot of BCEL functionality.
+                    int b = is.read();
+                    while (b != -1) {
+                        if (b == 'S') {
+                            if ((b = is.read()) != 'M') {
+                                continue;
+                            }
+                            if ((b = is.read()) != 'A') {
+                                continue;
+                            }
+                            if ((b = is.read()) != 'P') {
+                                continue;
+                            }
+                            if ((b = is.read()) != '\n') {
+                                continue;
+                            }
+                            found = true;
+                            break;
                         }
-                        if ((b = is.read()) != 'A') {
-                            continue;
-                        }
-                        if ((b = is.read()) != 'P') {
-                            continue;
-                        }
-                        if ((b = is.read()) != '\n') {
-                            continue;
-                        }
-                        found = true;
-                        break;
+                        b = is.read();
                     }
-                    b = is.read();
                 }
             }
 

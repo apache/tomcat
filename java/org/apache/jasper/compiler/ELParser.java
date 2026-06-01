@@ -355,6 +355,7 @@ public class ELParser {
     private Token parseQuotedChars(char quote) {
         StringBuilder buf = new StringBuilder();
         buf.append(quote);
+        boolean foundQuote = false;
         while (hasNextChar()) {
             char ch = nextChar();
             if (ch == '\\') {
@@ -366,11 +367,16 @@ public class ELParser {
                             Localizer.getMessage("org.apache.jasper.compiler.ELParser.invalidQuoting", expression));
                 }
             } else if (ch == quote) {
+                foundQuote = true;
                 buf.append(ch);
                 break;
             } else {
                 buf.append(ch);
             }
+        }
+        if (!foundQuote) {
+            throw new IllegalArgumentException(
+                    Localizer.getMessage("org.apache.jasper.compiler.ELParser.missingQuote", expression));
         }
         return new QuotedString(getAndResetWhiteSpace(), buf.toString());
     }

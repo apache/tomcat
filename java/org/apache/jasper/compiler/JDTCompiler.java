@@ -105,7 +105,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
             @Override
             public char[] getContents() {
-                char[] result = null;
+                char[] result;
                 try (FileInputStream is = new FileInputStream(sourceFile);
                         InputStreamReader isr = new InputStreamReader(is, ctxt.getOptions().getJavaEncoding());
                         Reader reader = new BufferedReader(isr)) {
@@ -119,6 +119,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     buf.getChars(0, result.length, result, 0);
                 } catch (IOException ioe) {
                     log.error(Localizer.getMessage("jsp.error.compilation.source", sourceFile), ioe);
+                    result = new char[0];
                 }
                 return result;
             }

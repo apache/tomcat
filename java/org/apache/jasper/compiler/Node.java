@@ -2796,7 +2796,7 @@ public abstract class Node implements TagConstants {
             Node n = null;
             try {
                 n = list.get(index);
-            } catch (ArrayIndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException e) {
                 // Ignore
             }
             return n;
