@@ -113,6 +113,16 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
     /**
+     * Set the already decoded error page URI.
+     *
+     * @param errorPage the decoded errorPage to set
+     */
+    public void setErrorPageDecoded(String errorPage) {
+        this.errorPage = errorPage;
+    }
+
+
+    /**
      * The context-relative URI of the login page for form login.
      */
     private String loginPage = null;
@@ -133,6 +143,16 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     public void setLoginPage(String loginPage) {
         this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
+    }
+
+
+    /**
+     * Set the already decoded login page URI.
+     *
+     * @param loginPage the decoded loginPage to set
+     */
+    public void setLoginPageDecoded(String loginPage) {
+        this.loginPage = loginPage;
     }
 
 
