@@ -147,7 +147,10 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                 return unwrap((Class<?>) args[0]);
             } else if ("isWrapperFor".equals(method.getName())) {
                 Class<?> iface = (Class<?>) args[0];
-                return iface != null && iface.isInstance(ds);
+                if (iface != null && iface.isInstance(ds)) {
+                    return Boolean.TRUE;
+                }
+                // If not, delegate to the wrapped resource
             }
 
             try {
@@ -169,15 +172,12 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
          * @throws SQLException if the interface does not match DataSource
          */
         public Object unwrap(Class<?> iface) throws SQLException {
-            if (iface == DataSource.class) {
+            if (iface == DataSource.class || iface.isInstance(ds)) {
                 return ds;
             } else {
-                throw new SQLException(sm.getString("dataSourceLinkFactory.badWrapper", iface.getName()));
+                return ds.unwrap(iface);
             }
         }
-
     }
-
-
 }
 
