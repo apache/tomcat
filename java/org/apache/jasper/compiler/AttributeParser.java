@@ -198,7 +198,7 @@ public class AttributeParser {
                 result.append(ch);
             } else if (ch == '\\') {
                 result.append(ch);
-                if (insideLiteral && size < i) {
+                if (insideLiteral && i < size) {
                     if (quoteAttributeEL) {
                         ch = nextChar();
                     } else {

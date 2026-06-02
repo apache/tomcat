@@ -64,11 +64,6 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
      */
     private static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    /**
-     * The domain (effectively the engine) this mapper is associated with
-     */
-    private final String domain = null;
-
 
     // ----------------------------------------------------------- Constructors
 
@@ -301,7 +296,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
         findDefaultHost();
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.registerHost", host.getName(), domain, service));
+            log.debug(sm.getString("mapperListener.registerHost", host.getName(), getDomainInternal(), service));
         }
     }
 
@@ -319,7 +314,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
         findDefaultHost();
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.unregisterHost", hostname, domain, service));
+            log.debug(sm.getString("mapperListener.unregisterHost", hostname, getDomainInternal(), service));
         }
     }
 
