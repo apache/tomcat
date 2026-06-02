@@ -94,7 +94,10 @@ public class B2CConverter {
      *
      * @param charset the charset to use for decoding
      * @param replaceOnError if {@code true}, replace malformed/unmappable input; otherwise report errors
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@link B2CConverter#B2CConverter(Charset)}
      */
+    @Deprecated
     public B2CConverter(Charset charset, boolean replaceOnError) {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
