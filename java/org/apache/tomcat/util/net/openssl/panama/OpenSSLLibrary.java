@@ -203,7 +203,7 @@ public class OpenSSLLibrary {
                         enginePointer = ENGINE_by_id(engine);
                         if (MemorySegment.NULL.equals(enginePointer)) {
                             enginePointer = ENGINE_by_id(memorySession.allocateFrom("dynamic"));
-                            if (enginePointer != null) {
+                            if (!MemorySegment.NULL.equals(enginePointer)) {
                                 if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("SO_PATH"), engine,
                                         0) == 0 ||
                                         ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("LOAD"),

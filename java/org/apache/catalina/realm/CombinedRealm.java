@@ -30,6 +30,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.ietf.jgss.GSSContext;
@@ -80,8 +81,8 @@ public class CombinedRealm extends RealmBase {
     public ObjectName[] getRealms() {
         ObjectName[] result = new ObjectName[realms.size()];
         for (Realm realm : realms) {
-            if (realm instanceof RealmBase) {
-                result[realms.indexOf(realm)] = ((RealmBase) realm).getObjectName();
+            if (realm instanceof LifecycleMBeanBase) {
+                result[realms.indexOf(realm)] = ((LifecycleMBeanBase) realm).getObjectName();
             }
         }
         return result;

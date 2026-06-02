@@ -371,7 +371,7 @@ public class JSONParser implements JSONParserConstants {
                 if (nativeNumbers) {
                     {
                         if ("" != null) {
-                            return Long.valueOf(t.image);
+                            return Double.valueOf(t.image);
                         }
                     }
                 } else {
@@ -388,7 +388,7 @@ public class JSONParser implements JSONParserConstants {
                 if (nativeNumbers) {
                     {
                         if ("" != null) {
-                            return Double.valueOf(t.image);
+                            return Long.valueOf(t.image);
                         }
                     }
                 } else {

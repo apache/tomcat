@@ -171,20 +171,28 @@ public class MimeHeaders {
             if (allowedHeaders.contains(name.trim().toLowerCase(Locale.ENGLISH))) {
                 ++j;
                 if (j != i) {
+                    MimeHeaderField temp = headers[j];
                     headers[j] = headers[i];
+                    headers[i] = temp;
                 }
             }
         }
         count = ++j;
+        for (int i = count; i < headers.length; i++) {
+            if (headers[i] != null) {
+                headers[i].recycle();
+            }
+        }
     }
 
 
     /**
-     * Duplicate headers from the source.
+     * Duplicate headers from the source. Existing headers are all cleared.
      * @param source the source headers
      * @throws IOException if an I/O error occurs
      */
     public void duplicate(MimeHeaders source) throws IOException {
+        recycle();
         for (int i = 0; i < source.size(); i++) {
             MimeHeaderField mhf = createHeader();
             mhf.getName().duplicate(source.getName(i));

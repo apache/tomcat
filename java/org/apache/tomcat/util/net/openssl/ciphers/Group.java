@@ -130,7 +130,7 @@ public enum Group {
         for (Group group : values()) {
             int id = group.getId();
 
-            if (id > 0 && id < 0xFFFF) {
+            if (id >= 0 && id < 0xFFFF) {
                 idMap.put(Integer.valueOf(id), group);
             }
         }

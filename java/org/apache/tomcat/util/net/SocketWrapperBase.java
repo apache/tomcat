@@ -501,7 +501,7 @@ public abstract class SocketWrapperBase<E> {
      * @return {@code true} if there is pending write data
      */
     public boolean hasDataToWrite() {
-        return !socketBufferHandler.isWriteBufferEmpty() || !nonBlockingWriteBuffer.isEmpty();
+        return (socketBufferHandler != null && !socketBufferHandler.isWriteBufferEmpty()) || !nonBlockingWriteBuffer.isEmpty();
     }
 
     /**
