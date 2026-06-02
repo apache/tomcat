@@ -68,7 +68,7 @@ public class DigestAuthenticator extends Authenticator {
 
         StringBuilder challenge = new StringBuilder();
 
-        if (!messageQop.isEmpty()) {
+        if (messageQop != null && !messageQop.isEmpty()) {
             if (cnonceGenerator == null) {
                 synchronized (cnonceGeneratorLock) {
                     if (cnonceGenerator == null) {

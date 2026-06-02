@@ -74,6 +74,9 @@ public class LimitLatch {
      * @param limit - maximum number of concurrent acquisitions of this latch
      */
     public LimitLatch(long limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException(sm.getString("limitLatch.badLimit", String.valueOf(limit)));
+        }
         this.limit = limit;
         this.count = new AtomicLong(0);
         this.sync = new Sync();
@@ -108,6 +111,9 @@ public class LimitLatch {
      * @param limit The new limit
      */
     public void setLimit(long limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException(sm.getString("limitLatch.badLimit", String.valueOf(limit)));
+        }
         this.limit = limit;
     }
 

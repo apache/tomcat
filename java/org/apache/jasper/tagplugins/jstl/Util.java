@@ -162,6 +162,32 @@ public class Util {
     }
 
     /**
+     * Strips a servlet session ID from <code>url</code>.  The session ID
+     * is encoded as a URL "path parameter" beginning with "jsessionid=".
+     * We thus remove anything we find between ";jsessionid=" (inclusive)
+     * and either EOS or a subsequent ';' (exclusive).
+     *
+     * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
+     * @param url The URL
+     * @return the URL without a user submitted session id parameter
+     */
+    public static String stripSession(String url) {
+        StringBuilder u = new StringBuilder(url);
+        int sessionStart;
+        while ((sessionStart = u.toString().indexOf(";" + "jsessionid" /* FIXME */ + "=")) != -1) {
+            int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
+            if (sessionEnd == -1) {
+                sessionEnd = u.toString().indexOf('?', sessionStart + 1);
+            }
+            if (sessionEnd == -1) {
+                sessionEnd = u.length();
+            }
+            u.delete(sessionStart, sessionEnd);
+        }
+        return u.toString();
+    }
+
+    /**
      * Performs the following substring replacements (to facilitate output to XML/HTML pages):
      * <ul>
      * <li>{@code &} -&gt; {@code &amp}</li>

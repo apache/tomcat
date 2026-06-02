@@ -833,9 +833,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             entry.encoder().destroy();
             if (instanceManager != null) {
                 try {
-                    instanceManager.destroyInstance(entry);
+                    instanceManager.destroyInstance(entry.encoder());
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    log.warn(sm.getString("wsRemoteEndpoint.encoderDestroyFailed", encoder.getClass()), e);
+                    log.warn(sm.getString("wsRemoteEndpoint.encoderDestroyFailed", entry.clazz()), e);
                 }
             }
         }

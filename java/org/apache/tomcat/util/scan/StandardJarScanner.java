@@ -388,6 +388,9 @@ public class StandardJarScanner implements JarScanner {
                 // Skip this URL it has already been processed
                 continue;
             }
+            if (url.getPath() == null) {
+                continue;
+            }
 
             ClassPathEntry cpe = new ClassPathEntry(url);
 
@@ -473,7 +476,7 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
         }
 
-        if ("jar".equals(url.getProtocol()) || url.getPath().endsWith(Constants.JAR_EXT)) {
+        if ("jar".equals(url.getProtocol()) || (url.getPath() != null && url.getPath().endsWith(Constants.JAR_EXT))) {
             try (Jar jar = JarFactory.newInstance(url)) {
                 if (isScanManifest()) {
                     processManifest(jar, isWebapp, classPathUrlsToProcess);
