@@ -104,7 +104,7 @@ public class Priority {
         SfListMember urgencyListMember = dictionary.getDictionaryMember("u");
         // If not an integer, ignore it
         if (urgencyListMember instanceof SfInteger) {
-            long urgency = ((SfInteger) urgencyListMember).getVaue().longValue();
+            long urgency = ((SfInteger) urgencyListMember).getValue().longValue();
             // If out of range, ignore it
             if (urgency > -1 && urgency < 8) {
                 result.setUrgency((int) urgency);
@@ -114,7 +114,7 @@ public class Priority {
         SfListMember incrementalListMember = dictionary.getDictionaryMember("i");
         // If not a boolean, ignore it
         if (incrementalListMember instanceof SfBoolean) {
-            result.setIncremental(((SfBoolean) incrementalListMember).getVaue().booleanValue());
+            result.setIncremental(((SfBoolean) incrementalListMember).getValue().booleanValue());
         }
 
         return result;

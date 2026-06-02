@@ -552,7 +552,7 @@ public class StructuredField {
             this.value = value;
         }
 
-        T getVaue() {
+        T getValue() {
             return value;
         }
     }
