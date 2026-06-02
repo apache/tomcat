@@ -89,12 +89,15 @@ public class InlineExecutorService extends AbstractExecutorService {
             }
             taskRunning = true;
         }
-        command.run();
-        synchronized (lock) {
-            taskRunning = false;
-            if (shutdown) {
-                terminated = true;
-                lock.notifyAll();
+        try {
+            command.run();
+        } finally {
+            synchronized (lock) {
+                taskRunning = false;
+                if (shutdown) {
+                    terminated = true;
+                    lock.notifyAll();
+                }
             }
         }
     }

@@ -259,7 +259,13 @@ public abstract class AbstractInputStreamJar implements Jar {
                 int i = name.indexOf('/', 18);
                 if (i > 0) {
                     String baseName = name.substring(i + 1);
-                    int version = Integer.parseInt(name.substring(18, i));
+                    int version = 0;
+                    try {
+                        version = Integer.parseInt(name.substring(18, i));
+                    } catch (NumberFormatException e) {
+                        jarEntry = jarInputStream.getNextJarEntry();
+                        continue;
+                    }
 
                     // Ignore any entries targeting for a later version than
                     // the target for this runtime
