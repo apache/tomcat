@@ -387,11 +387,11 @@ public class CombinedRealm extends RealmBase {
     @Override
     public boolean isAvailable() {
         for (Realm realm : realms) {
-            if (!realm.isAvailable()) {
-                return false;
+            if (realm.isAvailable()) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 

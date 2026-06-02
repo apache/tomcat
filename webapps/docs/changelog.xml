@@ -223,6 +223,10 @@
         When encoding URLs with the <code>CsrfPreventionFilter</code>, don't add
         the nonce to URLs that are known not to require it. (markt)
       </fix>
+      <fix>
+        Fix <code>CombinedRealm</code> <code>isAvailable</code>, it allows
+        authentication if at least one sub realm is available. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
