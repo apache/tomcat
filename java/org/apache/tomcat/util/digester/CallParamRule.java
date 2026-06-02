@@ -132,8 +132,11 @@ public class CallParamRule extends Rule {
 
         if (param != null) {
             Object obj = digester.peekParams();
-            if (obj instanceof Object[] parameters && parameters.length > paramIndex) {
-                parameters[paramIndex] = param;
+            if (obj instanceof Object[]) {
+                Object[]parameters = (Object[]) obj;
+                if (parameters.length > paramIndex) {
+                    parameters[paramIndex] = bodyTextStack.pop();
+                }
             }
         }
     }
@@ -170,8 +173,11 @@ public class CallParamRule extends Rule {
         if (bodyTextStack != null && !bodyTextStack.empty()) {
             // what we do now is push one parameter onto the top set of parameters
             Object obj = digester.peekParams();
-            if (obj instanceof Object[] parameters && parameters.length > paramIndex) {
-                parameters[paramIndex] = bodyTextStack.pop();
+            if (obj instanceof Object[]) {
+                Object[]parameters = (Object[]) obj;
+                if (parameters.length > paramIndex) {
+                    parameters[paramIndex] = bodyTextStack.pop();
+                }
             }
         }
     }
