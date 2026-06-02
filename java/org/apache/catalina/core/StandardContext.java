@@ -2005,7 +2005,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.loginWarning", loginPage));
                 }
-                config.setLoginPage("/" + loginPage);
+                config.setLoginPageDecoded("/" + loginPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.loginPage", loginPage));
             }
@@ -2016,7 +2016,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.errorWarning", errorPage));
                 }
-                config.setErrorPage("/" + errorPage);
+                config.setErrorPageDecoded("/" + errorPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.errorPage", errorPage));
             }
