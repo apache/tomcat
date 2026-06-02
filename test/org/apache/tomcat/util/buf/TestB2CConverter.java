@@ -245,6 +245,7 @@ public class TestB2CConverter {
 
     @Test
     public void testLeftoverChunkMalformed() throws Exception {
+        @SuppressWarnings("deprecation")
         B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8, true);
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk();
@@ -263,6 +264,7 @@ public class TestB2CConverter {
 
     @Test
     public void testLeftoverChunkMalformedAtEnd() throws Exception {
+        @SuppressWarnings("deprecation")
         B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8, true);
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk();
