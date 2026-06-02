@@ -461,7 +461,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             ClassLoader classLoader = getClass().getClassLoader();
             Class<?> clazz = classLoader.loadClass(className);
             if (!(TrustManager.class.isAssignableFrom(clazz))) {
-                throw new InstantiationException(sm.getString("sslUtilBase.invalidTrustManagerClassName", className));
+                throw new IllegalArgumentException(sm.getString("sslUtilBase.invalidTrustManagerClassName", className));
             }
             Object trustManagerObject = clazz.getConstructor().newInstance();
             TrustManager trustManager = (TrustManager) trustManagerObject;

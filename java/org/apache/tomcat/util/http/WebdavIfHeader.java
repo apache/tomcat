@@ -868,9 +868,11 @@ public class WebdavIfHeader {
             if (resource.startsWith("/")) {
                 path = resource;
                 uri = WebdavIfHeader.this.uriPrefix + resource;
-            } else {
+            } else if (resource.length() > WebdavIfHeader.this.uriPrefix.length()) {
                 path = resource.substring(WebdavIfHeader.this.uriPrefix.length());
                 uri = resource;
+            } else {
+                return false;
             }
             IfHeaderList list = get(path);
             if (list == null) {

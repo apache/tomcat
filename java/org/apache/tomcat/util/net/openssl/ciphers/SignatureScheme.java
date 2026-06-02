@@ -149,7 +149,7 @@ public enum SignatureScheme {
         for (SignatureScheme scheme : values()) {
             int id = scheme.getId();
 
-            if (id > 0 && id < 0xFFFF) {
+            if (id >= 0 && id < 0xFFFF) {
                 idMap.put(Integer.valueOf(id), scheme);
             }
         }
