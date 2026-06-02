@@ -330,6 +330,10 @@
       <fix>
         Fix SSO cookie partitioned configuration. (remm)
       </fix>
+      <fix>
+        Fix <code>CombinedRealm</code> <code>isAvailable</code>, it allows
+        authentication if at least one sub realm is available. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
