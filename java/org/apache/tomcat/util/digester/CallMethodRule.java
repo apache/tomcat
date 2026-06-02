@@ -123,11 +123,12 @@ public class CallMethodRule extends Rule {
 
         this.targetOffset = targetOffset;
         this.methodName = methodName;
-        this.paramCount = paramCount;
         if (paramTypes == null) {
+            this.paramCount = paramCount;
             this.paramTypes = new Class[paramCount];
             Arrays.fill(this.paramTypes, String.class);
         } else {
+            this.paramCount = paramTypes.length;
             this.paramTypes = new Class[paramTypes.length];
             System.arraycopy(paramTypes, 0, this.paramTypes, 0, this.paramTypes.length);
         }

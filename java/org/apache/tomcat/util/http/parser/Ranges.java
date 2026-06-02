@@ -149,6 +149,10 @@ public class Ranges {
                 // Invalid range
                 return null;
             }
+            if (end != -1 && start > end) {
+                // Invalid range: start must not be greater than end
+                return null;
+            }
 
             entries.add(new Entry(start, end));
 

@@ -145,7 +145,11 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                 method = getConnection;
             } else if ("unwrap".equals(method.getName())) {
                 return unwrap((Class<?>) args[0]);
+            } else if ("isWrapperFor".equals(method.getName())) {
+                Class<?> iface = (Class<?>) args[0];
+                return iface != null && iface.isInstance(ds);
             }
+
             try {
                 return method.invoke(ds, args);
             } catch (Throwable t) {
