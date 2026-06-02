@@ -126,7 +126,7 @@ public class BeanFactory implements ObjectFactory {
                         continue;
                     }
 
-                    value = (String) ra.getContent();
+                    value = String.valueOf(ra.getContent());
 
                     Object[] valueArray = new Object[1];
 

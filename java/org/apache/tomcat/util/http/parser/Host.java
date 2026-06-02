@@ -99,11 +99,16 @@ public class Host {
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            for (int i = off; i < off + len; i++) {
-                // Want output in range 0 to 255, not -128 to 127
-                cbuf[i] = (char) (bytes[pos++] & 0xFF);
+            if (pos < end) {
+                len = Math.min(len, end - pos);
+                for (int i = off; i < off + len; i++) {
+                    // Want output in range 0 to 255, not -128 to 127
+                    cbuf[i] = (char) (bytes[pos++] & 0xFF);
+                }
+                return len;
+            } else {
+                return -1;
             }
-            return len;
         }
 
         @Override
