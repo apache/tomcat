@@ -103,7 +103,7 @@ public class DigestAuthenticator extends Authenticator {
             challenge.append("opaque=\"").append(opaque).append("\",");
         }
 
-        if (!messageQop.isEmpty()) {
+        if (messageQop != null && !messageQop.isEmpty()) {
             challenge.append("qop=\"").append(messageQop).append("\"");
             challenge.append(",cnonce=\"").append(cNonce).append("\",");
             challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
