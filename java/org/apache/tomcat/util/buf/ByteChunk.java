@@ -66,6 +66,13 @@ public final class ByteChunk extends AbstractChunk {
          * @throws IOException If an I/O error occurs during reading
          */
         int realReadBytes() throws IOException;
+
+        /**
+         * Obtain the ByteBuffer this channel is targeting.
+         *
+         * @return the ByteBuffer this channel is targeting
+         */
+        ByteBuffer getByteBuffer();
     }
 
     /**
