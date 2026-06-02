@@ -313,8 +313,9 @@ public class SingleSignOn extends ValveBase {
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
-            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
-                    Boolean.toString(request.getContext().getUsePartitioned()));
+            if (request.getContext().getUsePartitioned()) {
+                cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "");
+            }
 
             response.addCookie(cookie);
         }

@@ -1193,8 +1193,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             }
 
             // Configure Partitioned on SSO cookie using same rules as session cookies
-            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
-                    Boolean.toString(request.getContext().getUsePartitioned()));
+            if (request.getContext().getUsePartitioned()) {
+                cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "");
+            }
 
             response.addCookie(cookie);
 

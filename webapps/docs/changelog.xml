@@ -327,6 +327,9 @@
         When encoding URLs with the <code>CsrfPreventionFilter</code>, don't add
         the nonce to URLs that are known not to require it. (markt)
       </fix>
+      <fix>
+        Fix SSO cookie partitioned configuration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
