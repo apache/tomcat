@@ -50,7 +50,7 @@ public class OpenSSLCipherConfigurationParser {
     private static final Log log = LogFactory.getLog(OpenSSLCipherConfigurationParser.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLCipherConfigurationParser.class);
 
-    private static boolean initialized = false;
+    private static volatile boolean initialized = false;
 
     private static final String SEPARATOR = ":|,| ";
     /**
@@ -342,7 +342,10 @@ public class OpenSSLCipherConfigurationParser {
 
     private static final Map<String,String> jsseToOpenSSL = new HashMap<>();
 
-    private static void init() {
+    private static synchronized void init() {
+        if (initialized) {
+            return;
+        }
 
         for (Cipher cipher : Cipher.values()) {
             String alias = cipher.getOpenSSLAlias();
@@ -841,8 +844,8 @@ public class OpenSSLCipherConfigurationParser {
                 }
             } else {
                 builder.append(cipher.getOpenSSLAlias());
+                builder.append(separator);
             }
-            builder.append(separator);
         }
         return builder.substring(0, builder.length() - 1);
     }

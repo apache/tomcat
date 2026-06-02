@@ -383,7 +383,7 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             return 1;
         } else {
-            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_DH_AUTO(), onoff, MemorySegment.NULL);
         }
     }
 
@@ -498,7 +498,7 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long X509_LOOKUP_add_dir(MemorySegment x509Lookup, MemorySegment name, long type) {
-        return X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
+        return X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), name, type, MemorySegment.NULL);
     }
 
 
@@ -515,7 +515,7 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long X509_LOOKUP_load_file(MemorySegment x509Lookup, MemorySegment name, long type) {
-        return X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
+        return X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), name, type, MemorySegment.NULL);
     }
 
 
