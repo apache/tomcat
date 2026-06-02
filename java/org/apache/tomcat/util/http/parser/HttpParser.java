@@ -640,7 +640,7 @@ public class HttpParser {
     /**
      * @return the number if digits were found, -1 if no data was found or if data other than digits was found
      */
-    static long readInteger(Reader input) throws IOException {
+    static int readInteger(Reader input) throws IOException {
         String digits = readDigits(input);
 
         if (digits.isEmpty()) {
@@ -687,6 +687,9 @@ public class HttpParser {
                 return null;
             } else if (c == '\\') {
                 c = input.read();
+                if (c == -1) {
+                    return null;
+                }
                 if (returnQuoted) {
                     result.append('\\');
                 }
