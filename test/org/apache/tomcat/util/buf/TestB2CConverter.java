@@ -360,7 +360,7 @@ public class TestB2CConverter {
         private boolean replaceByteBuffer = false;
 
         TesterInputBuffer(ByteBuffer byteBuffer) {
-            super(null);
+            super();
             setByteBuffer(byteBuffer);
         }
 
