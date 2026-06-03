@@ -132,69 +132,79 @@ public class PersistentValve extends ValveBase {
             return;
         }
 
+        boolean asyncOnEntry = request.isAsync();
+
         String sessionId = request.getRequestedSessionId();
         UsageCountingSemaphore semaphore = null;
         boolean mustReleaseSemaphore = true;
 
         try {
-            // Acquire the per session semaphore
-            if (sessionId != null) {
-                semaphore = sessionToSemaphoreMap.compute(sessionId,
-                        (k, v) -> v == null ? new UsageCountingSemaphore(semaphoreFairness) : v.incrementUsageCount());
-                if (semaphoreBlockOnAcquire) {
-                    if (semaphoreAcquireUninterruptibly) {
-                        semaphore.acquireUninterruptibly();
+            /*
+             * If the request was in asynchronous mode when it entered the Valve, the semaphore was acquired during the
+             * original request where asynchronous processing started and does not need to be acquired again.
+             */
+            if (!asyncOnEntry) {
+                /*
+                 * Acquire the per session semaphore.
+                 */
+                if (sessionId != null) {
+                    semaphore = sessionToSemaphoreMap.compute(sessionId,
+                            (k, v) -> v == null ? new UsageCountingSemaphore(semaphoreFairness) : v.incrementUsageCount());
+                    if (semaphoreBlockOnAcquire) {
+                        if (semaphoreAcquireUninterruptibly) {
+                            semaphore.acquireUninterruptibly();
+                        } else {
+                            try {
+                                semaphore.acquire();
+                            } catch (InterruptedException e) {
+                                mustReleaseSemaphore = false;
+                                onSemaphoreNotAcquired(request, response);
+                                if (containerLog.isDebugEnabled()) {
+                                    containerLog.debug(sm.getString("persistentValve.acquireInterrupted",
+                                            request.getDecodedRequestURI()));
+                                }
+                                return;
+                            }
+                        }
                     } else {
-                        try {
-                            semaphore.acquire();
-                        } catch (InterruptedException e) {
+                        if (!semaphore.tryAcquire()) {
                             mustReleaseSemaphore = false;
                             onSemaphoreNotAcquired(request, response);
                             if (containerLog.isDebugEnabled()) {
-                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted",
-                                        request.getDecodedRequestURI()));
+                                containerLog.debug(
+                                        sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
                             }
                             return;
                         }
                     }
-                } else {
-                    if (!semaphore.tryAcquire()) {
-                        mustReleaseSemaphore = false;
-                        onSemaphoreNotAcquired(request, response);
-                        if (containerLog.isDebugEnabled()) {
-                            containerLog.debug(
-                                    sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
-                        }
-                        return;
-                    }
                 }
-            }
 
-            // Update the session last access time for our session (if any)
-            Manager manager = context.getManager();
-            if (sessionId != null && manager instanceof StoreManager) {
-                Store store = ((StoreManager) manager).getStore();
-                if (store != null) {
-                    Session session = null;
-                    try {
-                        session = store.load(sessionId);
-                    } catch (Exception e) {
-                        containerLog.error(sm.getString("persistentValve.sessionLoadFail", sessionId));
-                    }
-                    if (session != null) {
-                        if (!session.isValid() || isSessionStale(session, System.currentTimeMillis())) {
-                            if (containerLog.isTraceEnabled()) {
-                                containerLog.trace("session swapped in is invalid or expired");
+                // Update the session last access time for our session (if any)
+                Manager manager = context.getManager();
+                if (sessionId != null && manager instanceof StoreManager) {
+                    Store store = ((StoreManager) manager).getStore();
+                    if (store != null) {
+                        Session session = null;
+                        try {
+                            session = store.load(sessionId);
+                        } catch (Exception e) {
+                            containerLog.error(sm.getString("persistentValve.sessionLoadFail", sessionId));
+                        }
+                        if (session != null) {
+                            if (!session.isValid() || isSessionStale(session, System.currentTimeMillis())) {
+                                if (containerLog.isTraceEnabled()) {
+                                    containerLog.trace("session swapped in is invalid or expired");
+                                }
+                                session.expire();
+                                store.remove(sessionId);
+                            } else {
+                                session.setManager(manager);
+                                // session.setId(sessionId); Only if new ???
+                                manager.add(session);
+                                // ((StandardSession)session).activate();
+                                session.access();
+                                session.endAccess();
                             }
-                            session.expire();
-                            store.remove(sessionId);
-                        } else {
-                            session.setManager(manager);
-                            // session.setId(sessionId); Only if new ???
-                            manager.add(session);
-                            // ((StandardSession)session).activate();
-                            session.access();
-                            session.endAccess();
                         }
                     }
                 }
@@ -211,10 +221,15 @@ public class PersistentValve extends ValveBase {
                  * Need to continue to hold the semaphore until asynchronous processing is complete. Register a listener
                  * that will release the Semaphore once asynchronous processing is complete. Also need to delay session
                  * persistence until completion of the asynchronous processing.
+                 *
+                 * The listener must only be added once so it is only added when the request was not in asynchronous
+                 * mode on entry.
                  */
-                AsyncContext asyncContext = request.getAsyncContext();
-                asyncContext.addListener(
-                        new StoreSessionAsyncListener(request, context, sessionId, semaphore, mustReleaseSemaphore));
+                if (!asyncOnEntry) {
+                    AsyncContext asyncContext = request.getAsyncContext();
+                    asyncContext.addListener(
+                            new StoreSessionAsyncListener(request, context, sessionId, semaphore, mustReleaseSemaphore));
+                }
             } else {
                 storeSession(request, context, sessionId, semaphore, mustReleaseSemaphore);
             }
