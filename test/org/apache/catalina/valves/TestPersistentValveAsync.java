@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,6 +48,9 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestPersistentValveAsync extends TomcatBaseTest {
+
+    private static final String TEST_SESSION_ID = "TEST-SESSION-ID";
+    private static final long TEST_TIMEOUT_MS = 1000;
 
     @Test
     public void testAsyncRequestStoresSessionOnComplete() throws Exception {
@@ -98,66 +102,61 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
 
     @Test
     public void testSemaphoreHeldWhileAsyncRequestInProgress() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        StandardContext context = (StandardContext) getProgrammaticRootContext();
-        context.setDistributable(true);
-
-        Tomcat.addServlet(context, "session", new SessionServlet());
-        context.addServletMappingDecoded("/session", "session");
-
         CountDownLatch asyncStarted = new CountDownLatch(1);
         CountDownLatch allowAsyncComplete = new CountDownLatch(1);
-        Wrapper asyncWrapper =
-                Tomcat.addServlet(context, "async-block", new BlockingAsyncServlet(asyncStarted, allowAsyncComplete));
-        asyncWrapper.setAsyncSupported(true);
-        context.addServletMappingDecoded("/async-block", "async-block");
 
-        TesterStore store = new TesterStore();
-        PersistentValve persistentValve = new PersistentValve();
-        persistentValve.setSemaphoreBlockOnAcquire(false);
-        configurePersistentManager(context, store, persistentValve);
-
+        Tomcat tomcat = getTomcatInstance();
+        addSemaphoreTestServlets("async-block",
+                new BlockingAsyncServlet(asyncStarted, allowAsyncComplete), "/async-block");
         tomcat.start();
 
-        String sessionId = "TEST-SESSION-ID";
+        assertSemaphoreHeldUntilAsyncRequestCompletes("/async-block", asyncStarted, allowAsyncComplete,
+                HttpServletResponse.SC_OK, TEST_SESSION_ID);
+    }
 
-        Map<String,List<String>> requestHeaders = cookieHeaders(sessionId);
 
-        ByteChunk asyncResponseBody = new ByteChunk();
-        AtomicInteger asyncResponseCode = new AtomicInteger(-1);
-        AtomicReference<Throwable> asyncFailure = new AtomicReference<>();
-        Thread asyncClientThread = new Thread(() -> {
-            try {
-                asyncResponseCode.set(getUrl("http://localhost:" + getPort() + "/async-block", asyncResponseBody,
-                        requestHeaders, null));
-            } catch (Throwable t) {
-                asyncFailure.set(t);
-            }
-        });
+    @Test
+    public void testSemaphoreHeldAcrossAsyncDispatchDispatchComplete() throws Exception {
+        CountDownLatch asyncStarted = new CountDownLatch(1);
+        CountDownLatch allowAsyncComplete = new CountDownLatch(1);
 
-        asyncClientThread.start();
+        Tomcat tomcat = getTomcatInstance();
+        addSemaphoreTestServlets("async-dispatch-dispatch-complete",
+                new DispatchingAsyncServlet(2, asyncStarted, allowAsyncComplete, TerminalAction.COMPLETE), "/async-ddc");
+        tomcat.start();
 
-        Assert.assertTrue(asyncStarted.await(10, TimeUnit.SECONDS));
+        assertSemaphoreHeldUntilAsyncRequestCompletes("/async-ddc", asyncStarted, allowAsyncComplete,
+                HttpServletResponse.SC_OK, TEST_SESSION_ID);
+    }
 
-        ByteChunk rejectedOne = new ByteChunk();
-        int rejectedOneStatus = getUrl("http://localhost:" + getPort() + "/session", rejectedOne, requestHeaders, null);
-        Assert.assertEquals(HttpServletResponse.SC_TOO_MANY_REQUESTS, rejectedOneStatus);
 
-        ByteChunk rejectedTwo = new ByteChunk();
-        int rejectedTwoStatus = getUrl("http://localhost:" + getPort() + "/session", rejectedTwo, requestHeaders, null);
-        Assert.assertEquals(HttpServletResponse.SC_TOO_MANY_REQUESTS, rejectedTwoStatus);
+    @Test
+    public void testSemaphoreHeldUntilAsyncError() throws Exception {
+        CountDownLatch asyncStarted = new CountDownLatch(1);
+        CountDownLatch allowAsyncError = new CountDownLatch(1);
 
-        allowAsyncComplete.countDown();
-        asyncClientThread.join(10000);
+        Tomcat tomcat = getTomcatInstance();
+        StandardContext context = addSemaphoreTestServlets("async-error",
+                new ErrorDispatchingAsyncServlet(asyncStarted, allowAsyncError), "/async-error");
+        Tomcat.addServlet(context, "async-error-target", new ErrorServlet());
+        context.addServletMappingDecoded("/async-error-target", "async-error-target");
+        tomcat.start();
 
-        Assert.assertNull(asyncFailure.get());
-        Assert.assertEquals(HttpServletResponse.SC_OK, asyncResponseCode.get());
-        Assert.assertEquals(sessionId, asyncResponseBody.toString());
+        assertSemaphoreHeldUntilAsyncRequestCompletes("/async-error", asyncStarted, allowAsyncError,
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
+    }
 
-        ByteChunk success = new ByteChunk();
-        int successStatus = getUrl("http://localhost:" + getPort() + "/session", success, requestHeaders, null);
-        Assert.assertEquals(HttpServletResponse.SC_OK, successStatus);
-        Assert.assertFalse(success.isNull());
+
+    @Test
+    public void testSemaphoreHeldUntilAsyncTimeout() throws Exception {
+        CountDownLatch asyncStarted = new CountDownLatch(1);
+
+        Tomcat tomcat = getTomcatInstance();
+        addSemaphoreTestServlets("async-timeout", new TimeoutAsyncServlet(asyncStarted), "/async-timeout");
+        tomcat.start();
+
+        assertSemaphoreHeldUntilAsyncRequestCompletes("/async-timeout", asyncStarted, null,
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
     }
 
 
@@ -173,10 +172,68 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
     }
 
 
+    private StandardContext addSemaphoreTestServlets(String asyncServletName, HttpServlet asyncServlet,
+            String asyncPath) {
+        StandardContext context = (StandardContext) getProgrammaticRootContext();
+        context.setDistributable(true);
+
+        Tomcat.addServlet(context, "session", new SessionServlet());
+        context.addServletMappingDecoded("/session", "session");
+
+        Wrapper asyncWrapper = Tomcat.addServlet(context, asyncServletName, asyncServlet);
+        asyncWrapper.setAsyncSupported(true);
+        context.addServletMappingDecoded(asyncPath, asyncServletName);
+
+        TesterStore store = new TesterStore();
+        PersistentValve persistentValve = new PersistentValve();
+        persistentValve.setSemaphoreBlockOnAcquire(false);
+        configurePersistentManager(context, store, persistentValve);
+
+        return context;
+    }
+
+
     private Map<String,List<String>> cookieHeaders(String sessionId) {
         Map<String,List<String>> result = new HashMap<>();
         result.put("Cookie", List.of("JSESSIONID=" + sessionId));
         return result;
+    }
+
+
+    private void assertSemaphoreHeldUntilAsyncRequestCompletes(String path, CountDownLatch asyncStarted,
+            CountDownLatch allowTerminalAction, int expectedStatus, String expectedResponseBody) throws Exception {
+        Map<String,List<String>> requestHeaders = cookieHeaders(TEST_SESSION_ID);
+
+        AsyncRequest asyncRequest = new AsyncRequest(path, requestHeaders);
+        asyncRequest.start();
+
+        Assert.assertTrue(asyncStarted.await(10, TimeUnit.SECONDS));
+
+        assertSessionRequestRejected(requestHeaders);
+        assertSessionRequestRejected(requestHeaders);
+
+        if (allowTerminalAction != null) {
+            allowTerminalAction.countDown();
+        }
+
+        asyncRequest.await();
+        asyncRequest.assertResponse(expectedStatus, expectedResponseBody);
+        assertSessionRequestSucceeds(requestHeaders);
+    }
+
+
+    private void assertSessionRequestRejected(Map<String,List<String>> requestHeaders) throws Exception {
+        ByteChunk rejected = new ByteChunk();
+        int status = getUrl("http://localhost:" + getPort() + "/session", rejected, requestHeaders, null);
+        Assert.assertEquals(429, status);
+    }
+
+
+    private void assertSessionRequestSucceeds(Map<String,List<String>> requestHeaders) throws Exception {
+        ByteChunk success = new ByteChunk();
+        int status = getUrl("http://localhost:" + getPort() + "/session", success, requestHeaders, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, status);
+        Assert.assertFalse(success.isNull());
     }
 
 
@@ -272,6 +329,162 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
                 }
             });
         }
+    }
+
+
+    private static class DispatchingAsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final int dispatchCount;
+        private final CountDownLatch asyncStarted;
+        private final CountDownLatch allowTerminalAction;
+        private final TerminalAction terminalAction;
+
+        private DispatchingAsyncServlet(int dispatchCount, CountDownLatch asyncStarted, CountDownLatch allowTerminalAction,
+                TerminalAction terminalAction) {
+            this.dispatchCount = dispatchCount;
+            this.asyncStarted = asyncStarted;
+            this.allowTerminalAction = allowTerminalAction;
+            this.terminalAction = terminalAction;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+            Integer dispatches = (Integer) request.getAttribute("dispatches");
+            int dispatchesSoFar = dispatches == null ? 0 : dispatches.intValue();
+
+            if (dispatchesSoFar < dispatchCount) {
+                request.setAttribute("dispatches", Integer.valueOf(dispatchesSoFar + 1));
+                AsyncContext asyncContext = request.startAsync();
+                asyncContext.start(asyncContext::dispatch);
+                return;
+            }
+
+            if (terminalAction == TerminalAction.COMPLETE) {
+                String sessionId = request.getRequestedSessionId();
+                AsyncContext asyncContext = request.startAsync();
+                asyncContext.start(() -> {
+                    asyncStarted.countDown();
+                    try {
+                        Assert.assertTrue(allowTerminalAction.await(10, TimeUnit.SECONDS));
+                        response.getWriter().print(sessionId);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException(e);
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e);
+                    } finally {
+                        asyncContext.complete();
+                    }
+                });
+            }
+        }
+    }
+
+
+    private static class ErrorDispatchingAsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final CountDownLatch asyncStarted;
+        private final CountDownLatch allowAsyncError;
+
+        private ErrorDispatchingAsyncServlet(CountDownLatch asyncStarted, CountDownLatch allowAsyncError) {
+            this.asyncStarted = asyncStarted;
+            this.allowAsyncError = allowAsyncError;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+            AsyncContext asyncContext = request.startAsync();
+            asyncContext.start(() -> {
+                asyncStarted.countDown();
+                try {
+                    Assert.assertTrue(allowAsyncError.await(10, TimeUnit.SECONDS));
+                    asyncContext.dispatch("/async-error-target");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+    }
+
+
+    private static class TimeoutAsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final CountDownLatch asyncStarted;
+
+        private TimeoutAsyncServlet(CountDownLatch asyncStarted) {
+            this.asyncStarted = asyncStarted;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+            AsyncContext asyncContext = request.startAsync();
+            asyncContext.setTimeout(TEST_TIMEOUT_MS);
+            asyncStarted.countDown();
+        }
+    }
+
+
+    private static class ErrorServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+            throw new ServletException("Async test error");
+        }
+    }
+
+
+    private class AsyncRequest {
+
+        private final String path;
+        private final Map<String,List<String>> requestHeaders;
+        private final ByteChunk responseBody = new ByteChunk();
+        private final AtomicInteger responseCode = new AtomicInteger(-1);
+        private final AtomicReference<Throwable> failure = new AtomicReference<>();
+        private final Thread thread;
+
+        private AsyncRequest(String path, Map<String,List<String>> requestHeaders) {
+            this.path = path;
+            this.requestHeaders = requestHeaders;
+            this.thread = new Thread(this::doRequest);
+        }
+
+        private void start() {
+            thread.start();
+        }
+
+        private void await() throws InterruptedException {
+            thread.join(10000);
+        }
+
+        private void assertResponse(int expectedStatus, String expectedResponseBody) {
+            Assert.assertNull(failure.get());
+            Assert.assertEquals(expectedStatus, responseCode.get());
+            if (expectedResponseBody != null) {
+                Assert.assertEquals(expectedResponseBody, responseBody.toString());
+            }
+        }
+
+        private void doRequest() {
+            try {
+                responseCode.set(getUrl("http://localhost:" + getPort() + path, responseBody, requestHeaders, null));
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        }
+    }
+
+
+    private enum TerminalAction {
+        COMPLETE
     }
 
 
