@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         ByteChunk responseBody = getUrl("http://localhost:" + getPort() + "/async-complete");
         String sessionId = responseBody.toString();
 
-        Assert.assertEquals(List.of(sessionId), store.getSavedIds());
+        Assert.assertEquals(Arrays.asList(sessionId), store.getSavedIds());
         Assert.assertNotNull(store.load(sessionId));
         Assert.assertEquals(0, manager.getActiveSessions());
     }
@@ -94,7 +95,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         ByteChunk responseBody = getUrl("http://localhost:" + getPort() + "/async-dispatch");
         String sessionId = responseBody.toString();
 
-        Assert.assertEquals(List.of(sessionId), store.getSavedIds());
+        Assert.assertEquals(Arrays.asList(sessionId), store.getSavedIds());
         Assert.assertNotNull(store.load(sessionId));
         Assert.assertEquals(0, manager.getActiveSessions());
     }
@@ -165,7 +166,6 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         PersistentManager manager = new PersistentManager();
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setSessionActivityCheck(true);
         context.setManager(manager);
         context.addValve(valve);
         return manager;
@@ -195,7 +195,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
 
     private Map<String,List<String>> cookieHeaders(String sessionId) {
         Map<String,List<String>> result = new HashMap<>();
-        result.put("Cookie", List.of("JSESSIONID=" + sessionId));
+        result.put("Cookie", Arrays.asList("JSESSIONID=" + sessionId));
         return result;
     }
 
