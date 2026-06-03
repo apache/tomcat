@@ -156,6 +156,7 @@ public class PersistentValve extends ValveBase {
                     }
                 } else {
                     if (!semaphore.tryAcquire()) {
+                        mustReleaseSemaphore = false;
                         onSemaphoreNotAcquired(request, response);
                         if (containerLog.isDebugEnabled()) {
                             containerLog.debug(
