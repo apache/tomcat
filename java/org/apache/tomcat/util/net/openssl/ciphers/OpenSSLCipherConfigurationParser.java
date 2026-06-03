@@ -493,6 +493,13 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aSRP, filterByAuthentication(allCiphers, Collections.singleton(Authentication.SRP)));
         addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
+
+        /*
+         * initialized needs to be set to true here to avoid an infinite loop as parse(String) will call init() if
+         * initialized is not true.
+         */
+        initialized = true;
+
         addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault =
@@ -511,8 +518,6 @@ public class OpenSSLCipherConfigurationParser {
         complementOfDefault.addAll(aliases.get(ARIA));
         defaultSort(complementOfDefault);
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
-
-        initialized = true;
     }
 
     static void addListAlias(String alias, Set<Cipher> ciphers) {
