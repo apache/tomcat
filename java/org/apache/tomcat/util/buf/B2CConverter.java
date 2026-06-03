@@ -290,12 +290,7 @@ public class B2CConverter {
         result = decoder.decode(bb, cb, endOfInput);
         if (result.isError()) {
             result.throwException();
-        } else if (result.isOverflow()) {
-            // Propagate current positions to the byte chunk and char chunk, if
-            // this continues the char buffer will get resized
-            bc.position(bb.position());
-            cc.limit(cb.position());
-        } else if (result.isUnderflow()) {
+        } else if (result.isOverflow() || result.isUnderflow()) {
             // Propagate current positions to the byte chunk and char chunk
             bc.position(bb.position());
             cc.limit(cb.position());

@@ -180,6 +180,7 @@ public class TestB2CConverter {
     @Test
     public void testLeftoverBuffer() throws Exception {
         // E2 8C A8 is the "keyboard" character
+        // Note: UTF-8 decoder behaviour in 9.0.x is different to 10.1.x onwards
         B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
         ByteBuffer bb = ByteBuffer.allocate(8);
         CharBuffer cb = newCharBuffer(1);
@@ -191,24 +192,26 @@ public class TestB2CConverter {
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A", cb);
 
-        // Will trigger overflow if there is a complete character
+        // Triggers overflow since cb is full
         bb.clear();
         bb.put((byte) 0xE2);
         bb.flip();
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A", cb);
 
-        // NO-OP (underflow)
+        // NO-OP (still overflow)
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A", cb);
 
-        // Adds second byte of an incomplete 3 byte character to leftovers
+        // Further decodes will be NO-OPs until cb is expanded.
+
+        // Provide 2nd byte of 3 byte character. Not read as decoder still returns overflow.
         ib.setNextRealBytes(new byte[] { (byte) 0x8C });
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A", cb);
 
-        // Adds final byte of 3 byte character to leftovers. Not converted as output will overflow
-        ib.setNextRealBytes(new byte[] { (byte) 0xA8 });
+        // Provide final byte of 3 byte character. Still not read as decoder still returns overflow.
+        ib.setNextRealBytes(new byte[] { (byte) 0x8C, (byte) 0xA8 });
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A", cb);
 
