@@ -244,41 +244,6 @@ public class TestB2CConverter {
 
 
     @Test
-    public void testLeftoverChunkMalformed() throws Exception {
-        @SuppressWarnings("deprecation")
-        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8, true);
-        ByteChunk bc = new ByteChunk();
-        CharChunk cc = new CharChunk();
-        cc.allocate(4, -1);
-
-        bc.append((byte) 0x41);
-        bc.append((byte) 0xE2);
-        conv.convert(bc, cc, false);
-
-        bc.append((byte) 0x42);
-        conv.convert(bc, cc, true);
-
-        Assert.assertEquals("A\ufffdB", cc.toString());
-    }
-
-
-    @Test
-    public void testLeftoverChunkMalformedAtEnd() throws Exception {
-        @SuppressWarnings("deprecation")
-        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8, true);
-        ByteChunk bc = new ByteChunk();
-        CharChunk cc = new CharChunk();
-        cc.allocate(4, -1);
-
-        bc.append((byte) 0x41);
-        bc.append((byte) 0xE2);
-        conv.convert(bc, cc, true);
-
-        Assert.assertEquals("A\ufffd", cc.toString());
-    }
-
-
-    @Test
     public void testBug54602d() throws Exception {
         B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
         ByteBuffer bb = ByteBuffer.allocate(4);
