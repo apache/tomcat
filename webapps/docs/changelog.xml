@@ -238,6 +238,10 @@
         Fix <code>CombinedRealm</code> <code>isAvailable</code>, it allows
         authentication if at least one sub realm is available. (remm)
       </fix>
+      <fix>
+        <bug>70048</bug>: Correctly handle asynchronous requests in
+        <code>PersistentValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
