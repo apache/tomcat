@@ -113,8 +113,6 @@ public class PersistentValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
-        containerLog.error("invoke");
-
         // request without session
         if (isRequestWithoutSession(request.getDecodedRequestURI())) {
             if (containerLog.isTraceEnabled()) {
@@ -134,8 +132,6 @@ public class PersistentValve extends ValveBase {
         }
 
         boolean asyncOnEntry = request.isAsync();
-
-        containerLog.error("invoke: asyncOnEntry [" + asyncOnEntry + "]");
 
         String sessionId = request.getRequestedSessionId();
         UsageCountingSemaphore semaphore = null;
@@ -219,7 +215,6 @@ public class PersistentValve extends ValveBase {
             // Ask the next valve to process the request.
             getNext().invoke(request, response);
         } finally {
-            containerLog.error("invoke - finally isAsync: [" + request.isAsync() + "]");
             if (request.isAsync()) {
                 /*
                  * Need to continue to hold the semaphore until asynchronous processing is complete. Register a listener
@@ -530,26 +525,21 @@ public class PersistentValve extends ValveBase {
 
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
-            containerLog.error("listener - on complete");
             storeSession(request, context, originalSessionId, semaphore, mustReleaseSemaphore);
         }
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
-            containerLog.error("listener - on timeout");
             // NO-OP.
         }
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
-            containerLog.error("listener - on error");
             // NO-OP.
         }
 
         @Override
         public void onStartAsync(AsyncEvent event) throws IOException {
-            containerLog.error("listener - on start async");
-
             event.getAsyncContext().addListener(this);
         }
     }
