@@ -177,11 +177,10 @@ public class MimeHeaders {
                 }
             }
         }
+        int unfilteredCount = count;
         count = ++j;
-        for (int i = count; i < headers.length; i++) {
-            if (headers[i] != null) {
-                headers[i].recycle();
-            }
+        for (int i = count; i < unfilteredCount; i++) {
+            headers[i].recycle();
         }
     }
 
