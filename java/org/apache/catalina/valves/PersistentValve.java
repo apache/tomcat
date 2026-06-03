@@ -24,6 +24,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -202,31 +205,48 @@ public class PersistentValve extends ValveBase {
 
             // Ask the next valve to process the request.
             getNext().invoke(request, response);
+        } finally {
+            if (request.isAsync()) {
+                /*
+                 * Need to continue to hold the semaphore until asynchronous processing is complete. Register a listener
+                 * that will release the Semaphore once asynchronous processing is complete. Also need to delay session
+                 * persistence until completion of the asynchronous processing.
+                 */
+                AsyncContext asyncContext = request.getAsyncContext();
+                asyncContext.addListener(
+                        new StoreSessionAsyncListener(request, context, sessionId, semaphore, mustReleaseSemaphore));
+            } else {
+                storeSession(request, context, sessionId, semaphore, mustReleaseSemaphore);
+            }
+        }
+    }
 
-            // If still processing async, don't try to store the session
-            if (!request.isAsync()) {
-                // Read the sessionid after the response.
-                // HttpSession hsess = hreq.getSession(false);
-                Session hsess;
+
+    private void storeSession(Request request, Context context, String originalSessionId,
+            UsageCountingSemaphore semaphore, boolean mustReleaseSemaphore) {
+        try {
+            Manager manager = context.getManager();
+            Session hsess;
+            try {
+                hsess = request.getSessionInternal(false);
+            } catch (Exception e) {
+                hsess = null;
+            }
+            String newsessionId = null;
+            if (hsess != null) {
+                newsessionId = hsess.getIdInternal();
+            }
+
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("newsessionId: " + newsessionId);
+            }
+            if (newsessionId != null) {
                 try {
-                    hsess = request.getSessionInternal(false);
-                } catch (Exception e) {
-                    hsess = null;
-                }
-                String newsessionId = null;
-                if (hsess != null) {
-                    newsessionId = hsess.getIdInternal();
-                }
+                    bind(context);
 
-                if (containerLog.isTraceEnabled()) {
-                    containerLog.trace("newsessionId: " + newsessionId);
-                }
-                if (newsessionId != null) {
-                    try {
-                        bind(context);
-
-                        /* store the session and remove it from the manager */
-                        if (manager instanceof StoreManager) {
+                    /* store the session and remove it from the manager */
+                    if (manager instanceof StoreManager) {
+                        try {
                             Session session = manager.findSession(newsessionId);
                             Store store = ((StoreManager) manager).getStore();
                             boolean stored = false;
@@ -247,14 +267,16 @@ public class PersistentValve extends ValveBase {
                                                     " stale: " + isSessionStale(session, System.currentTimeMillis()));
                                 }
                             }
-                        } else {
-                            if (containerLog.isTraceEnabled()) {
-                                containerLog.trace("newsessionId Manager: " + manager);
-                            }
+                        } catch (IOException ioe) {
+                            containerLog.warn(sm.getString("persistentValve.sessionSaveFail", newsessionId));
                         }
-                    } finally {
-                        unbind(context);
+                    } else {
+                        if (containerLog.isTraceEnabled()) {
+                            containerLog.trace("newsessionId Manager: " + manager);
+                        }
                     }
+                } finally {
+                    unbind(context);
                 }
             }
         } finally {
@@ -262,7 +284,7 @@ public class PersistentValve extends ValveBase {
                 if (mustReleaseSemaphore) {
                     semaphore.release();
                 }
-                sessionToSemaphoreMap.computeIfPresent(sessionId,
+                sessionToSemaphoreMap.computeIfPresent(originalSessionId,
                         (k, v) -> v.decrementAndGetUsageCount() == 0 ? null : v);
             }
         }
@@ -322,6 +344,7 @@ public class PersistentValve extends ValveBase {
      * Determines whether the given URI should bypass session persistence based on the configured filter.
      *
      * @param uri the request URI to check
+     *
      * @return {@code true} if the request should bypass session persistence, otherwise {@code false}
      */
     protected boolean isRequestWithoutSession(String uri) {
@@ -464,6 +487,46 @@ public class PersistentValve extends ValveBase {
 
         private void release() {
             semaphore.release();
+        }
+    }
+
+
+    private class StoreSessionAsyncListener implements AsyncListener {
+
+        private final Request request;
+        private final Context context;
+        private final String originalSessionId;
+        private final UsageCountingSemaphore semaphore;
+        private final boolean mustReleaseSemaphore;
+
+        StoreSessionAsyncListener(Request request, Context context, String originalSessionId,
+                UsageCountingSemaphore semaphore, boolean mustReleaseSemaphore) {
+            this.request = request;
+            this.context = context;
+            this.originalSessionId = originalSessionId;
+            this.semaphore = semaphore;
+            this.mustReleaseSemaphore = mustReleaseSemaphore;
+        }
+
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            storeSession(request, context, originalSessionId, semaphore, mustReleaseSemaphore);
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP.
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NO-OP.
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            event.getAsyncContext().addListener(this);
         }
     }
 }
