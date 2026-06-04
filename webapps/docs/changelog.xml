@@ -368,6 +368,9 @@
       <update>
         Update Commons Daemon to 1.6.0. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
