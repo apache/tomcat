@@ -610,7 +610,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         }
 
         if (create) {
-            collection.addPattern(urlPattern);
+            collection.addPatternDecoded(urlPattern);
             constraint.addCollection(collection);
             return constraint;
         }
