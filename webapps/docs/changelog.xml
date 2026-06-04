@@ -342,6 +342,10 @@
         Improve the detection of cross-context dispatches when using a
         <code>RequestDispatcher</code>. (markt)
       </fix>
+      <fix>
+        Fix various instances of double decoding of URL patterns configured
+        either programmatically or in web.xml. (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
