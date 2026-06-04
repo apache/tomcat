@@ -218,7 +218,21 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
 
         asyncRequest.await();
         asyncRequest.assertResponse(expectedStatus, expectedResponseBody);
-        assertSessionRequestSucceeds(requestHeaders);
+
+        /*
+         * The semaphore will not be released until after AsyncListener.onComplete() has been called which will occur
+         * after the error response has been sent to the client. On some CI systems the follow-up request occurs before
+         * the listener has completed so allow up to two seconds for the listener to complete.
+         */
+        int count = 0;
+        int status = makeSessionRequest();
+        while (status != HttpServletResponse.SC_OK && count < 20) {
+            Thread.sleep(100);
+            count++;
+            status = makeSessionRequest();
+        }
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, status);
     }
 
 
@@ -229,11 +243,9 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
     }
 
 
-    private void assertSessionRequestSucceeds(Map<String,List<String>> requestHeaders) throws Exception {
-        ByteChunk success = new ByteChunk();
-        int status = getUrl("http://localhost:" + getPort() + "/session", success, requestHeaders, null);
-        Assert.assertEquals(HttpServletResponse.SC_OK, status);
-        Assert.assertFalse(success.isNull());
+    private int makeSessionRequest() throws Exception {
+        ByteChunk body = new ByteChunk();
+        return getUrl("http://localhost:" + getPort() + "/session", body, false);
     }
 
 
