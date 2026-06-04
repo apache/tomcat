@@ -159,8 +159,12 @@ public class RewriteRule {
                     if (lastMatcher2 != null) {
                         lastMatcher = lastMatcher2;
                     }
-                    while (pos < conditions.length && conditions[pos].isOrnext()) {
-                        pos++;
+                    if (conditions[pos].isOrnext()) {
+                        // Skip until the next condition not covered by the OR
+                        // The rule immediately after the OR is covered
+                        do {
+                            pos++;
+                        } while (pos < conditions.length && conditions[pos].isOrnext());
                     }
                 } else if (!conditions[pos].isOrnext()) {
                     done = true;
