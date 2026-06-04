@@ -2884,7 +2884,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.errorPage.warning", location));
                 }
-                errorPage.setDecodedLocation("/" + location);
+                errorPage.setLocationDecoded("/" + location);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.errorPage.error", location));
             }

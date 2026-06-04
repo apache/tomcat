@@ -141,7 +141,7 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
      *
      * @param location The new location
      */
-    public void setDecodedLocation(String location) {
+    public void setLocationDecoded(String location) {
         this.location = location;
     }
 
