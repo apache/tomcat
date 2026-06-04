@@ -346,6 +346,11 @@
         Fix various instances of double decoding of URL patterns configured
         either programmatically or in web.xml. (remm/markt)
       </fix>
+      <fix>
+        Align the rewrite conditions <code>ornext</code> flag processing with
+        mod_rewrite, which follows a purely sequential evaluation strategy.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
