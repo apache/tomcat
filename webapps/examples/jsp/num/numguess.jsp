@@ -20,7 +20,7 @@
 <%@ page import = "num.NumberGuessBean" %>
 
 <jsp:useBean id="numguess" class="num.NumberGuessBean" scope="session"/>
-<jsp:setProperty name="numguess" property="*"/>
+<jsp:setProperty name="numguess" property="guess"/>
 
 <html>
 <head><title>Number Guess</title></head>
