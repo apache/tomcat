@@ -379,6 +379,9 @@
         Prevent duplicate log messages when clustering JARs are not present on
         startup. (csutherl)
       </fix>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
