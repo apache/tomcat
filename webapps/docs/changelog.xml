@@ -338,6 +338,10 @@
         <bug>70048</bug>: Correctly handle asynchronous requests in
         <code>PersistentValve</code>. (markt)
       </fix>
+      <fix>
+        Improve the detection of cross-context dispatches when using a
+        <code>RequestDispatcher</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
