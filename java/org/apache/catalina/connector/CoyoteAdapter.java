@@ -565,8 +565,9 @@ public class CoyoteAdapter implements Adapter {
             Response response) throws IOException, ServletException {
 
         /*
-         * If the processor has set the scheme (AJP and HTTP/2 do this, HTTP/1.x does this if SSL is enabled), use this
-         * to set the secure flag as well. If the processor hasn't set it, use the settings from the connector.
+         * If the processor has set the scheme (HTTP/2 does this, AJP does this if is_ssl is set and HTTP/1.x does this
+         * if SSL is enabled), use this to set the secure flag as well. If the processor hasn't set it, use the settings
+         * from the connector.
          */
         if (req.scheme().isNull()) {
             // Use connector scheme and secure configuration, (defaults to
