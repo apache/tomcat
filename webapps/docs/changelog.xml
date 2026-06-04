@@ -553,8 +553,12 @@
         manager servlet. (remm)
       </fix>
       <fix>
-        Manager. Ensure automatic deployment does not trigger an undeployment
+        Manager: Ensure automatic deployment does not trigger an undeployment
         during a Manager triggered web application reload. (markt)
+      </fix>
+      <fix>
+        Documentation: Provide better documentation for the <code>scheme</code>
+        and <code>secure</code> attributes of a Connector. (markt)
       </fix>
     </changelog>
   </subsection>
