@@ -79,6 +79,7 @@ public class TestRfc9218 extends Http2TestBase {
         sendWindowUpdate(0, 1024);
         parser.readFrame();
         Assert.assertEquals("17-Body-1024\n", output.getTrace());
+        System.out.println(trace);
         output.clearTrace();
 
         // 17 - 6k body left
@@ -94,6 +95,7 @@ public class TestRfc9218 extends Http2TestBase {
         parser.readFrame();
 
         Assert.assertEquals("21-Body-1024\n", output.getTrace());
+        System.out.println(trace);
         output.clearTrace();
 
         // 17 - 6k body left
@@ -112,6 +114,7 @@ public class TestRfc9218 extends Http2TestBase {
         parser.readFrame();
 
         trace = output.getTrace();
+        System.out.println(trace);
         Assert.assertTrue(trace.contains("17-Body-877\n"));
         trace = trace.replace("17-Body-877\n", "");
         Assert.assertTrue(trace.contains("19-Body-1170\n"));
@@ -133,6 +136,7 @@ public class TestRfc9218 extends Http2TestBase {
         parser.readFrame();
 
         trace = output.getTrace();
+        System.out.println(trace);
         Assert.assertTrue(trace.contains("17-Body-1\n"));
         trace = trace.replace("17-Body-1\n", "");
         Assert.assertTrue(trace.contains("19-Body-1\n"));
