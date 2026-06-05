@@ -610,6 +610,10 @@
       <update>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
+        to 1.0.12. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
