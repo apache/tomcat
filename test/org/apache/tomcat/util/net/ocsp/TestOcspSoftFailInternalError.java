@@ -16,12 +16,10 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
-import java.net.SocketException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -102,7 +100,7 @@ public class TestOcspSoftFailInternalError extends OcspBaseTest {
             if (handshakeFailureExpected) {
                 Assert.fail("Handshake did not fail when expected to do so.");
             }
-        } catch (SSLHandshakeException | SocketException e) {
+        } catch (IOException e) {
             if (!handshakeFailureExpected) {
                 Assert.fail("Handshake failed when not expected to do so.");
             }
