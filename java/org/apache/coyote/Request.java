@@ -1234,6 +1234,7 @@ public final class Request {
          * instance.
          */
         trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
+        trailerFields.setLimit(-1);
         serverNameMB.recycle();
         serverPort = -1;
         localAddrMB.recycle();
