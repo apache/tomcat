@@ -1204,9 +1204,10 @@ public final class Request {
         headers.recycle();
         trailerFields.recycle();
         /*
-         * Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         * Trailer fields are limited in size by bytes. The following calls ensures that any request with a large number
          * of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
-         * instance.
+         * instance. The first call ensures the array is no larger than 8. The second call allows the next request to
+         * process more than 8 headers if it needs to.
          */
         trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         trailerFields.setLimit(-1);
