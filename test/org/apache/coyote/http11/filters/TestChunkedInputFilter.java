@@ -353,7 +353,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     private String createTrailerHeader(int totalTrailerSize) {
         int valueSize = totalTrailerSize - "x-trailer: ".length() - (2 * CRLF.length());
-        return "x-trailer: " + "x".repeat(valueSize);
+        return "x-trailer: " + new String(new char[valueSize]).replace("\0", "x");
     }
 
 
