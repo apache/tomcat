@@ -159,7 +159,7 @@ public class TestJspCServletContext {
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(6, context.getEffectiveMajorVersion());
-        Assert.assertEquals(0, context.getEffectiveMinorVersion());
+        Assert.assertEquals(1, context.getEffectiveMinorVersion());
     }
 
 
