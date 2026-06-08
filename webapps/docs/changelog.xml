@@ -301,6 +301,11 @@
         <code>isTrailerFieldsReady</code> was always returning
         <code>true</code>. (remm)
       </fix>
+      <fix>
+        Align OpenSSL/Panama TLS implementation with other implementations and
+        throw an exception if there is an error loading the provided CRL(s).
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
