@@ -1198,7 +1198,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
                     if (X509_LOOKUP_load_file(x509Lookup, certificateRevocationListFileNative,
                             X509_FILETYPE_PEM()) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificateRevocationListWithError",
+                        throw new IllegalArgumentException(sm.getString(
+                                "openssl.errorLoadingCertificateRevocationListWithError",
                                 sslHostConfig.getCertificateRevocationListFile(), OpenSSLLibrary.getLastError()));
                     }
                 }
@@ -1208,7 +1209,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
                     if (X509_LOOKUP_add_dir(x509Lookup, certificateRevocationListPathNative,
                             X509_FILETYPE_PEM()) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificateRevocationListWithError",
+                        throw new IllegalArgumentException(sm.getString(
+                                "openssl.errorLoadingCertificateRevocationListWithError",
                                 sslHostConfig.getCertificateRevocationListPath(), OpenSSLLibrary.getLastError()));
                     }
                 }
