@@ -326,6 +326,11 @@
         throw an exception if there is an error loading the provided CRL(s).
         (markt)
       </fix>
+      <fix>
+        Parsing of OpenSSL format cipher expressions incorrectly stopped if
+        <code>@STRENGTH</code> was encountered, ignoring any subsequent
+        expressions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
