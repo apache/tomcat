@@ -1253,7 +1253,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             }
                         }
                     } finally {
-                        X509_free(issuer);
+                        if (!openssl_h_Compatibility.OPENSSL || openssl_h_Compatibility.OPENSSL3) {
+                            X509_free(issuer);
+                        }
                     }
                 }
             }
