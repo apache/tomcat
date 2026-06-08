@@ -737,7 +737,6 @@ public class OpenSSLCipherConfigurationParser {
                 }
             } else if ("@STRENGTH".equals(element)) {
                 strengthSort(ciphers);
-                break;
             } else if (aliases.containsKey(element)) {
                 add(ciphers, element);
             } else if (element.contains(AND)) {
