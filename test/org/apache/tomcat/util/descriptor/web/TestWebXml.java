@@ -188,6 +188,11 @@ public class TestWebXml {
         doTestValidateVersion("6.0");
     }
 
+    @Test
+    public void testValidateVersion61() throws IOException, SAXException {
+        doTestValidateVersion("6.1");
+    }
+
     private void doTestValidateVersion(String version) throws IOException, SAXException {
         WebXml webxml = new WebXml();
 
