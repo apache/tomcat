@@ -285,6 +285,12 @@
         (according to the examples in the RFC). Use the first acceptable value.
         (remm)
       </fix>
+      <fix>
+        Fix various issues when logging the effective web.xml for a web
+        application. Empty sections are no longer logged. Special roles and
+        empty authorisation constraints are included. All session cookie
+        attributes are included. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
