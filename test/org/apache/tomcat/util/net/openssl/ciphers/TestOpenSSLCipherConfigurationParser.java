@@ -486,6 +486,17 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
+    public void testSpecification05() throws Exception {
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL");
+        } else {
+            testSpecification("HIGH:@STRENGTH:!aNULL:!eNULL");
+        }
+    }
+
+
+    @Test
     public void testSpecificationIsEmptyNonsense() throws Exception {
         testSpecificationIsEmpty("Nonsense");
     }
