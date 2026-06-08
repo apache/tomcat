@@ -150,6 +150,31 @@ public class TestPerMessageDeflate {
         Assert.assertEquals(mp2, compressedParts.get(1));
     }
 
+
+    /*
+     * RFC 7692 section 5.1 requires a permessage-deflate offer that contains an invalid extension parameter to be
+     * declined so the handshake continues without compression. The offer must not fail the handshake.
+     */
+    @Test
+    public void testInvalidParameterDeclinesOffer() {
+        // client_max_window_bits with an out-of-range value
+        assertDeclined("client_max_window_bits", "16");
+        // client_max_window_bits with a non-numeric value
+        assertDeclined("client_max_window_bits", "x");
+        // server_max_window_bits offered without a value
+        assertDeclined("server_max_window_bits", null);
+    }
+
+
+    private static void assertDeclined(String name, String value) {
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(new WsExtensionParameter(name, value));
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        Assert.assertNull(PerMessageDeflate.build(preferences, true));
+    }
+
     /*
      * Minimal implementation to enable other transformations to be tested. It is NOT robust.
      */
