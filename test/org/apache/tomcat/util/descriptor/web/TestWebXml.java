@@ -198,7 +198,29 @@ public class TestWebXml {
         doTestValidateVersion("6.2");
     }
 
+    @Test
+    public void testValidateVersion63() throws IOException, SAXException {
+        /*
+         * Partly here to test behaviour on invalid versions. Partly here as a reminder to update the tests when adding
+         * support for a new Servlet version.
+         */
+        doTestValidateVersion("6.3", "6.2");
+    }
+
+    @Test
+    public void testValidateVersion70() throws IOException, SAXException {
+        /*
+         * Partly here to test behaviour on invalid versions. Partly here as a reminder to update the tests when adding
+         * support for a new Servlet version.
+         */
+        doTestValidateVersion("7.0", "6.2");
+    }
+
     private void doTestValidateVersion(String version) throws IOException, SAXException {
+        doTestValidateVersion(version, version);
+    }
+
+    private void doTestValidateVersion(String version, String expected) throws IOException, SAXException {
         WebXml webxml = new WebXml();
 
         // Special cases
@@ -230,8 +252,8 @@ public class TestWebXml {
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
 
-        Assert.assertEquals(version, webxml.getVersion());
-        Assert.assertEquals(version, webxmlResult.getVersion());
+        Assert.assertEquals(expected, webxml.getVersion());
+        Assert.assertEquals(expected, webxmlResult.getVersion());
     }
 
     // A simplified copy of ContextConfig.getDefaultWebXmlFragment().
