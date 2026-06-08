@@ -511,6 +511,12 @@ public class TestOpenSSLCipherConfigurationParser {
         // First check the lists have the same entries
         // Order is NOT important at this point. It is checked below.
         Assert.assertEquals(
+                "Expected " + jsseCipherListFromOpenSSL.size() + " ciphers but got "
+                        + jsseCipherListFromParser.size() + " for the specification '"
+                        + specification + "'",
+                new TreeSet<>(jsseCipherListFromOpenSSL), new TreeSet<>(jsseCipherListFromParser));
+
+        Assert.assertEquals(
                 "Expected " + jsseCipherListFromParser.size() + " ciphers but got "
                         + jsseCipherListFromOpenSSL.size() + " for the specification '"
                         + specification + "'",
