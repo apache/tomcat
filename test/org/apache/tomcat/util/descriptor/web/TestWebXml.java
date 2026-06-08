@@ -530,4 +530,176 @@ public class TestWebXml {
         }
 
     }
+
+
+    @Test
+    public void testToXml01() throws Exception {
+        // Empty web.xml
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    @Test
+    public void testToXml02() throws Exception {
+        // Deny all
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <security-constraint>\n" +
+                "    <web-resource-collection>\n" +
+                "      <web-resource-name>Test</web-resource-name>\n" +
+                "      <url-pattern>/deny-all</url-pattern>\n" +
+                "    </web-resource-collection>\n" +
+                "    <auth-constraint/>\n" +
+                "    <user-data-constraint>\n" +
+                "      <transport-guarantee>NONE</transport-guarantee>\n" +
+                "    </user-data-constraint>\n" +
+                "  </security-constraint>\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    @Test
+    public void testToXml03() throws Exception {
+        // other role plus all roles
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <security-constraint>\n" +
+                "    <web-resource-collection>\n" +
+                "      <web-resource-name>Test</web-resource-name>\n" +
+                "      <url-pattern>/deny-all</url-pattern>\n" +
+                "    </web-resource-collection>\n" +
+                "    <auth-constraint>\n" +
+                "      <role-name>other</role-name>\n" +
+                "      <role-name>*</role-name>\n" +
+                "    </auth-constraint>\n" +
+                "    <user-data-constraint>\n" +
+                "      <transport-guarantee>NONE</transport-guarantee>\n" +
+                "    </user-data-constraint>\n" +
+                "  </security-constraint>\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    @Test
+    public void testToXml04() throws Exception {
+        // all roles
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <security-constraint>\n" +
+                "    <web-resource-collection>\n" +
+                "      <web-resource-name>Test</web-resource-name>\n" +
+                "      <url-pattern>/deny-all</url-pattern>\n" +
+                "    </web-resource-collection>\n" +
+                "    <auth-constraint>\n" +
+                "      <role-name>*</role-name>\n" +
+                "    </auth-constraint>\n" +
+                "    <user-data-constraint>\n" +
+                "      <transport-guarantee>NONE</transport-guarantee>\n" +
+                "    </user-data-constraint>\n" +
+                "  </security-constraint>\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    @Test
+    public void testToXml05() throws Exception {
+        // other role plus authenticated users
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <security-constraint>\n" +
+                "    <web-resource-collection>\n" +
+                "      <web-resource-name>Test</web-resource-name>\n" +
+                "      <url-pattern>/deny-all</url-pattern>\n" +
+                "    </web-resource-collection>\n" +
+                "    <auth-constraint>\n" +
+                "      <role-name>other</role-name>\n" +
+                "      <role-name>**</role-name>\n" +
+                "    </auth-constraint>\n" +
+                "    <user-data-constraint>\n" +
+                "      <transport-guarantee>NONE</transport-guarantee>\n" +
+                "    </user-data-constraint>\n" +
+                "  </security-constraint>\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    @Test
+    public void testToXml06() throws Exception {
+        // authenticated users
+        doTestToXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <security-constraint>\n" +
+                "    <web-resource-collection>\n" +
+                "      <web-resource-name>Test</web-resource-name>\n" +
+                "      <url-pattern>/deny-all</url-pattern>\n" +
+                "    </web-resource-collection>\n" +
+                "    <auth-constraint>\n" +
+                "      <role-name>**</role-name>\n" +
+                "    </auth-constraint>\n" +
+                "    <user-data-constraint>\n" +
+                "      <transport-guarantee>NONE</transport-guarantee>\n" +
+                "    </user-data-constraint>\n" +
+                "  </security-constraint>\n" +
+                "\n" +
+                "</web-app>");
+    }
+
+
+    private void doTestToXml(String input) throws Exception {
+        Digester digester = DigesterFactory.newDigester(true, true, new WebRuleSet(), true);
+
+        XmlErrorHandler handler = new XmlErrorHandler();
+        digester.setErrorHandler(handler);
+
+        InputSource is = new InputSource(new StringReader(input));
+        WebXml webxml = new WebXml();
+        digester.push(webxml);
+        digester.parse(is);
+
+        String output = webxml.toXml();
+
+        Assert.assertEquals(input, output);
+    }
 }
