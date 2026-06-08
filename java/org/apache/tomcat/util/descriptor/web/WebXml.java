@@ -389,7 +389,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // Derived major and minor version attributes
     private int majorVersion = 6;
-    private int minorVersion = 0;
+    private int minorVersion = 1;
 
     /**
      * Returns the major version number.

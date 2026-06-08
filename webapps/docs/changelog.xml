@@ -255,6 +255,10 @@
         mod_rewrite, which follows a purely sequential evaluation strategy.
         (remm)
       </fix>
+      <fix>
+        Update default web.xml version to match supported Servlet specification
+        version. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
