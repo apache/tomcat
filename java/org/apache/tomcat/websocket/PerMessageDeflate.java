@@ -87,82 +87,91 @@ public class PerMessageDeflate implements Transformation {
             boolean clientContextTakeover = true;
             int clientMaxWindowBits = -1;
 
-            for (Parameter param : preference) {
-                if (SERVER_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
-                    if (serverContextTakeover) {
-                        serverContextTakeover = false;
-                    } else {
-                        // Duplicate definition
-                        throw new IllegalArgumentException(
-                                sm.getString("perMessageDeflate.duplicateParameter", SERVER_NO_CONTEXT_TAKEOVER));
-                    }
-                } else if (CLIENT_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
-                    if (clientContextTakeover) {
-                        clientContextTakeover = false;
-                    } else {
-                        // Duplicate definition
-                        throw new IllegalArgumentException(
-                                sm.getString("perMessageDeflate.duplicateParameter", CLIENT_NO_CONTEXT_TAKEOVER));
-                    }
-                } else if (SERVER_MAX_WINDOW_BITS.equals(param.getName())) {
-                    if (serverMaxWindowBits == -1) {
-                        serverMaxWindowBits = Integer.parseInt(param.getValue());
-                        if (serverMaxWindowBits < 8 || serverMaxWindowBits > 15) {
-                            throw new IllegalArgumentException(sm.getString("perMessageDeflate.invalidWindowSize",
-                                    SERVER_MAX_WINDOW_BITS, Integer.valueOf(serverMaxWindowBits)));
-                        }
-                        // Java SE API (as of Java 11) does not expose the API to
-                        // control the Window size. It is effectively hard-coded
-                        // to 15
-                        if (isServer && serverMaxWindowBits != 15) {
-                            ok = false;
-                            break;
-                            // Note server window size is not an issue for the
-                            // client since the client will assume 15 and if the
-                            // server uses a smaller window everything will
-                            // still work
-                        }
-                    } else {
-                        // Duplicate definition
-                        throw new IllegalArgumentException(
-                                sm.getString("perMessageDeflate.duplicateParameter", SERVER_MAX_WINDOW_BITS));
-                    }
-                } else if (CLIENT_MAX_WINDOW_BITS.equals(param.getName())) {
-                    if (clientMaxWindowBits == -1) {
-                        if (param.getValue() == null) {
-                            // Hint to server that the client supports this
-                            // option. Java SE API (as of Java 11) does not
-                            // expose the API to control the Window size. It is
-                            // effectively hard-coded to 15
-                            clientMaxWindowBits = 15;
+            try {
+                for (Parameter param : preference) {
+                    if (SERVER_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                        if (serverContextTakeover) {
+                            serverContextTakeover = false;
                         } else {
-                            clientMaxWindowBits = Integer.parseInt(param.getValue());
-                            if (clientMaxWindowBits < 8 || clientMaxWindowBits > 15) {
-                                throw new IllegalArgumentException(sm.getString("perMessageDeflate.invalidWindowSize",
-                                        CLIENT_MAX_WINDOW_BITS, Integer.valueOf(clientMaxWindowBits)));
-                            }
+                            // Duplicate definition
+                            throw new IllegalArgumentException(
+                                    sm.getString("perMessageDeflate.duplicateParameter", SERVER_NO_CONTEXT_TAKEOVER));
                         }
-                        // Java SE API (as of Java 11) does not expose the API to
-                        // control the Window size. It is effectively hard-coded
-                        // to 15
-                        if (!isServer && clientMaxWindowBits != 15) {
-                            ok = false;
-                            break;
-                            // Note client window size is not an issue for the
-                            // server since the server will assume 15 and if the
-                            // client uses a smaller window everything will
-                            // still work
+                    } else if (CLIENT_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                        if (clientContextTakeover) {
+                            clientContextTakeover = false;
+                        } else {
+                            // Duplicate definition
+                            throw new IllegalArgumentException(
+                                    sm.getString("perMessageDeflate.duplicateParameter", CLIENT_NO_CONTEXT_TAKEOVER));
+                        }
+                    } else if (SERVER_MAX_WINDOW_BITS.equals(param.getName())) {
+                        if (serverMaxWindowBits == -1) {
+                            serverMaxWindowBits = Integer.parseInt(param.getValue());
+                            if (serverMaxWindowBits < 8 || serverMaxWindowBits > 15) {
+                                throw new IllegalArgumentException(sm.getString("perMessageDeflate.invalidWindowSize",
+                                        SERVER_MAX_WINDOW_BITS, Integer.valueOf(serverMaxWindowBits)));
+                            }
+                            // Java SE API (as of Java 11) does not expose the API to
+                            // control the Window size. It is effectively hard-coded
+                            // to 15
+                            if (isServer && serverMaxWindowBits != 15) {
+                                ok = false;
+                                break;
+                                // Note server window size is not an issue for the
+                                // client since the client will assume 15 and if the
+                                // server uses a smaller window everything will
+                                // still work
+                            }
+                        } else {
+                            // Duplicate definition
+                            throw new IllegalArgumentException(
+                                    sm.getString("perMessageDeflate.duplicateParameter", SERVER_MAX_WINDOW_BITS));
+                        }
+                    } else if (CLIENT_MAX_WINDOW_BITS.equals(param.getName())) {
+                        if (clientMaxWindowBits == -1) {
+                            if (param.getValue() == null) {
+                                // Hint to server that the client supports this
+                                // option. Java SE API (as of Java 11) does not
+                                // expose the API to control the Window size. It is
+                                // effectively hard-coded to 15
+                                clientMaxWindowBits = 15;
+                            } else {
+                                clientMaxWindowBits = Integer.parseInt(param.getValue());
+                                if (clientMaxWindowBits < 8 || clientMaxWindowBits > 15) {
+                                    throw new IllegalArgumentException(
+                                            sm.getString("perMessageDeflate.invalidWindowSize", CLIENT_MAX_WINDOW_BITS,
+                                                    Integer.valueOf(clientMaxWindowBits)));
+                                }
+                            }
+                            // Java SE API (as of Java 11) does not expose the API to
+                            // control the Window size. It is effectively hard-coded
+                            // to 15
+                            if (!isServer && clientMaxWindowBits != 15) {
+                                ok = false;
+                                break;
+                                // Note client window size is not an issue for the
+                                // server since the server will assume 15 and if the
+                                // client uses a smaller window everything will
+                                // still work
+                            }
+                        } else {
+                            // Duplicate definition
+                            throw new IllegalArgumentException(
+                                    sm.getString("perMessageDeflate.duplicateParameter", CLIENT_MAX_WINDOW_BITS));
                         }
                     } else {
-                        // Duplicate definition
+                        // Unknown parameter
                         throw new IllegalArgumentException(
-                                sm.getString("perMessageDeflate.duplicateParameter", CLIENT_MAX_WINDOW_BITS));
+                                sm.getString("perMessageDeflate.unknownParameter", param.getName()));
                     }
-                } else {
-                    // Unknown parameter
-                    throw new IllegalArgumentException(
-                            sm.getString("perMessageDeflate.unknownParameter", param.getName()));
                 }
+            } catch (IllegalArgumentException iae) {
+                // An invalid extension parameter has been offered. RFC 7692
+                // section 5.1 requires the offer to be declined and the handshake to
+                // continue (without this extension) rather than failing. Try the
+                // next offered configuration.
+                ok = false;
             }
             if (ok) {
                 return new PerMessageDeflate(serverContextTakeover, serverMaxWindowBits, clientContextTakeover,
