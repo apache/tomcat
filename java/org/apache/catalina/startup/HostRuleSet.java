@@ -67,13 +67,6 @@ public class HostRuleSet implements RuleSet {
 
         digester.addCallMethod(prefix + "Host/Alias", "addAlias", 0);
 
-        // Cluster configuration start
-        digester.addObjectCreate(prefix + "Host/Cluster", null, // MUST be specified in the element
-                "className");
-        digester.addSetProperties(prefix + "Host/Cluster");
-        digester.addSetNext(prefix + "Host/Cluster", "setCluster", "org.apache.catalina.Cluster");
-        // Cluster configuration end
-
         digester.addObjectCreate(prefix + "Host/Listener", null, // MUST be specified in the element
                 "className");
         digester.addSetProperties(prefix + "Host/Listener");

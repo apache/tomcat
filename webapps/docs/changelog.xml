@@ -256,6 +256,14 @@
         detailed error information (message, description, stack trace) is
         suppressed from error responses. (dsoumis)
       </add>
+      <fix>
+        Avoid a <code>NoClassDefFoundError</code> at startup when
+        <code>catalina-tribes.jar</code> is removed but
+        <code>catalina-ha.jar</code> is present and the
+        <code>Cluster</code> element is enabled in
+        <code>server.xml</code>. Cluster digester rules are now fully
+        conditional on both JARs being available. (dsoumis)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
