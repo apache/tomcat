@@ -17,8 +17,9 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
@@ -57,7 +58,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
     /**
      * Map of fragment keys to their fragment collections for reassembly.
      */
-    protected final HashMap<FragKey,FragCollection> fragpieces = new HashMap<>();
+    protected final Map<FragKey,FragCollection> fragpieces = new ConcurrentHashMap<>();
     private int maxSize = 1024 * 100;
     private long expire = 1000 * 60; // one minute expiration
     /**
