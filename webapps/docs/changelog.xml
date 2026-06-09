@@ -355,6 +355,11 @@
         Update default web.xml version to match supported Servlet specification
         version. (markt)
       </fix>
+      <fix>
+        Change the default for the <code>useRedirect</code> attribute of the
+        <code>ProxyErrorReportValve</code> from <code>true</code> to
+        <code>false</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

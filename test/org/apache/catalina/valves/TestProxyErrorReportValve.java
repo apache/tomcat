@@ -67,6 +67,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
             }
         }
         Assert.assertNotNull(valve);
+        valve.setUseRedirect(true);
         valve.setProperty("errorCode." + HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "http://localhost:" + getPort() + "/error-page");
 
@@ -188,11 +189,11 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
     public void testGetSetProperties() {
         ProxyErrorReportValve valve = new ProxyErrorReportValve();
 
-        Assert.assertTrue(valve.getUseRedirect());
+        Assert.assertFalse(valve.getUseRedirect());
         Assert.assertFalse(valve.getUsePropertiesFile());
 
-        valve.setUseRedirect(false);
-        Assert.assertFalse(valve.getUseRedirect());
+        valve.setUseRedirect(true);
+        Assert.assertTrue(valve.getUseRedirect());
 
         valve.setUsePropertiesFile(true);
         Assert.assertTrue(valve.getUsePropertiesFile());
