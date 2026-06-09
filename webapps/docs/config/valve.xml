@@ -2498,6 +2498,18 @@
         value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="showReport" required="false">
+        <p>Flag to determine if the error report details (description, custom
+           error message and/or stack trace) are included in the query
+           parameters of the redirect or proxy URL when an error occurs. If
+           set to <code>false</code>, then only the status code and reason
+           phrase are included. When falling back to the default error report
+           valve (no error page configured), this flag also controls whether
+           the HTML error report includes these details.
+           Default value: <code>true</code>
+        </p>
+      </attribute>
+
       <attribute name="useRedirect" required="false">
         <p>If <code>true</code>, the valve will redirect the client to the URL
         that displays the error and the redirect will include full details of
