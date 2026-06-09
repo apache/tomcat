@@ -333,6 +333,10 @@
         Ensure listeners are correctly added and removed when configuring the
         channel coordinator. (markt)
       </fix>
+      <fix>
+        Fix some concurrency issues in <code>FragmentationInterceptor</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
