@@ -58,9 +58,9 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     }
 
     /**
-     * Use a redirect or proxy the response to the specified location. Default to redirect.
+     * Use a redirect or proxy the response to the specified location. Default to not redirect.
      */
-    protected boolean useRedirect = true;
+    protected boolean useRedirect = false;
 
     /**
      * Returns whether a redirect is used to send the error report to the specified location.
