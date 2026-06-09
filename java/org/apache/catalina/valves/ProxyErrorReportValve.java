@@ -193,19 +193,22 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             reason = smClient.getString("errorReportValve.unknownReason");
             description = smClient.getString("errorReportValve.noDescription");
         }
-        stringBuilder.append("&statusDescription=");
-        stringBuilder.append(URLEncoder.encode(description, StandardCharsets.UTF_8));
         stringBuilder.append("&statusReason=");
         stringBuilder.append(URLEncoder.encode(reason, StandardCharsets.UTF_8));
 
-        String message = response.getMessage();
-        if (message != null) {
-            stringBuilder.append("&message=");
-            stringBuilder.append(URLEncoder.encode(message, StandardCharsets.UTF_8));
-        }
-        if (throwable != null) {
-            stringBuilder.append("&throwable=");
-            stringBuilder.append(URLEncoder.encode(throwable.toString(), StandardCharsets.UTF_8));
+        if (isShowReport()) {
+            stringBuilder.append("&statusDescription=");
+            stringBuilder.append(URLEncoder.encode(description, StandardCharsets.UTF_8));
+
+            String message = response.getMessage();
+            if (message != null) {
+                stringBuilder.append("&message=");
+                stringBuilder.append(URLEncoder.encode(message, StandardCharsets.UTF_8));
+            }
+            if (throwable != null) {
+                stringBuilder.append("&throwable=");
+                stringBuilder.append(URLEncoder.encode(throwable.toString(), StandardCharsets.UTF_8));
+            }
         }
 
         urlString = stringBuilder.toString();
