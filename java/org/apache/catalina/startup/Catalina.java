@@ -597,8 +597,15 @@ public class Catalina {
         Constructor<?> constructor;
         try {
             clazz = Class.forName("org.apache.catalina.ha.ClusterRuleSet");
+            Class.forName("org.apache.catalina.tribes.Channel");
             constructor = clazz.getConstructor(String.class);
             RuleSet ruleSet = (RuleSet) constructor.newInstance(prefix);
+
+            String clusterPrefix = prefix.substring(0, prefix.length() - 1);
+            digester.addObjectCreate(clusterPrefix, null, "className");
+            digester.addSetProperties(clusterPrefix);
+            digester.addSetNext(clusterPrefix, "setCluster", "org.apache.catalina.Cluster");
+
             digester.addRuleSet(ruleSet);
         } catch (Exception e) {
             if (!clusterUnavailabilityLogged) {
