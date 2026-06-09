@@ -249,6 +249,13 @@
         <code>ProxyErrorReportValve</code> from <code>true</code> to
         <code>false</code>. (markt)
       </fix>
+      <add>
+        Add support for the <code>showReport</code> attribute in
+        <code>JsonErrorReportValve</code> and
+        <code>ProxyErrorReportValve</code>. When set to <code>false</code>,
+        detailed error information (message, description, stack trace) is
+        suppressed from error responses. (dsoumis)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
