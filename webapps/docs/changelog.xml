@@ -244,6 +244,11 @@
         mod_rewrite, which follows a purely sequential evaluation strategy.
         (remm)
       </fix>
+      <fix>
+        Change the default for the <code>useRedirect</code> attribute of the
+        <code>ProxyErrorReportValve</code> from <code>true</code> to
+        <code>false</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

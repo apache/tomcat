@@ -2487,9 +2487,12 @@
       </attribute>
 
       <attribute name="useRedirect" required="false">
-        <p>If <code>true</code>, the valve will send a redirect to the URL.
-        If <code>false</code>, the valve will instead proxy the content from
-        the specified URL. The default value is <code>true</code>.</p>
+        <p>If <code>true</code>, the valve will redirect the client to the URL
+        that displays the error and the redirect will include full details of
+        the error including the stack trace. If <code>false</code>, the valve
+        will instead proxy the content from the specified URL which allows the
+        proxy to filter the information presented to the client. The default
+        value is <code>false</code>.</p>
       </attribute>
 
     </attributes>
