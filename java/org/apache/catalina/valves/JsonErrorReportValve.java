@@ -61,73 +61,81 @@ public class JsonErrorReportValve extends ErrorReportValve {
             return;
         }
 
-        StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
-        response.setLocale(smClient.getLocale());
-        String type;
-        if (throwable != null) {
-            type = smClient.getString("errorReportValve.exceptionReport");
-        } else {
-            type = smClient.getString("errorReportValve.statusReport");
-        }
-        String message = response.getMessage();
-        if (message == null && throwable != null) {
-            message = throwable.getMessage();
-        }
-        if (message == null) {
-            message = "";
-        }
-        String description = smClient.getString("http." + statusCode + ".desc");
-        if (description == null) {
-            if (message.isEmpty()) {
-                return;
-            } else {
-                description = smClient.getString("errorReportValve.noDescription");
-            }
-        }
         StringBuilder sb = new StringBuilder();
-        sb.append("{\n  \"type\": \"").append(JSONFilter.escape(type)).append("\",\n");
-        sb.append("  \"status\": ").append(statusCode).append(",\n");
-        sb.append("  \"message\": \"").append(JSONFilter.escape(message)).append("\",\n");
-        sb.append("  \"description\": \"").append(JSONFilter.escape(description));
+        sb.append("{\n");
+        sb.append("  \"status\": ").append(statusCode);
 
-        if (throwable != null) {
-            sb.append("\",\n");
-
-            // Stack trace
-            sb.append("  \"throwable\": [");
-            int loops = 0;
-            boolean first = true;
-            do {
-                if (!first) {
-                    sb.append(',');
+        if (isShowReport()) {
+            StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
+            response.setLocale(smClient.getLocale());
+            String type;
+            if (throwable != null) {
+                type = smClient.getString("errorReportValve.exceptionReport");
+            } else {
+                type = smClient.getString("errorReportValve.statusReport");
+            }
+            String message = response.getMessage();
+            if (message == null && throwable != null) {
+                message = throwable.getMessage();
+            }
+            if (message == null) {
+                message = "";
+            }
+            String description = smClient.getString("http." + statusCode + ".desc");
+            if (description == null) {
+                if (message.isEmpty()) {
+                    return;
                 } else {
-                    first = false;
+                    description = smClient.getString("errorReportValve.noDescription");
                 }
-                sb.append('\"').append(JSONFilter.escape(throwable.toString())).append('\"');
+            }
+            sb.append(",\n");
+            sb.append("  \"type\": \"").append(JSONFilter.escape(type)).append("\",\n");
+            sb.append("  \"message\": \"").append(JSONFilter.escape(message)).append("\",\n");
+            sb.append("  \"description\": \"").append(JSONFilter.escape(description));
 
-                StackTraceElement[] elements = throwable.getStackTrace();
-                int pos = elements.length;
-                for (int i = elements.length - 1; i >= 0; i--) {
-                    if ((elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain")) &&
-                            (elements[i].getMethodName().equals("doFilter"))) {
-                        pos = i;
-                        break;
+            if (throwable != null) {
+                sb.append("\",\n");
+
+                // Stack trace
+                sb.append("  \"throwable\": [");
+                int loops = 0;
+                boolean first = true;
+                do {
+                    if (!first) {
+                        sb.append(',');
+                    } else {
+                        first = false;
                     }
-                }
-                for (int i = 0; i < pos; i++) {
-                    if (!(elements[i].getClassName().startsWith("org.apache.catalina.core."))) {
-                        sb.append(',').append('\"').append(' ').append(JSONFilter.escape(elements[i].toString()))
-                                .append('\"');
+                    sb.append('\"').append(JSONFilter.escape(throwable.toString())).append('\"');
+
+                    StackTraceElement[] elements = throwable.getStackTrace();
+                    int pos = elements.length;
+                    for (int i = elements.length - 1; i >= 0; i--) {
+                        if (elements[i].getClassName()
+                                .startsWith("org.apache.catalina.core.ApplicationFilterChain") &&
+                                elements[i].getMethodName().equals("doFilter")) {
+                            pos = i;
+                            break;
+                        }
                     }
-                }
+                    for (int i = 0; i < pos; i++) {
+                        if (!elements[i].getClassName().startsWith("org.apache.catalina.core.")) {
+                            sb.append(',').append('\"').append(' ')
+                                    .append(JSONFilter.escape(elements[i].toString())).append('\"');
+                        }
+                    }
 
-                throwable = throwable.getCause();
-                loops++;
-            } while (throwable != null && (loops < 10));
-            sb.append("]\n}");
+                    throwable = throwable.getCause();
+                    loops++;
+                } while (throwable != null && loops < 10);
+                sb.append("]\n}");
 
+            } else {
+                sb.append("\"\n}");
+            }
         } else {
-            sb.append("\"\n}");
+            sb.append("\n}");
         }
 
         try {

@@ -2447,6 +2447,15 @@
         <strong>org.apache.catalina.valves.JsonErrorReportValve</strong>.</p>
       </attribute>
 
+      <attribute name="showReport" required="false">
+        <p>Flag to determine if the error report (custom error message,
+           description and/or stack trace) is included in the JSON response
+           when an error occurs. If set to <code>false</code>, then the JSON
+           response will only contain the HTTP status code.
+           Default value: <code>true</code>
+        </p>
+      </attribute>
+
     </attributes>
 
   </subsection>
