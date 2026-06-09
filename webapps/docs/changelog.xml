@@ -344,6 +344,10 @@
         Fix some concurrency issues in <code>FragmentationInterceptor</code>.
         (markt)
       </fix>
+      <fix>
+        Fix some concurrency issues in <code>OrderInterceptor</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

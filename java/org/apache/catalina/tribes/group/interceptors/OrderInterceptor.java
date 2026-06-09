@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -59,9 +59,9 @@ public class OrderInterceptor extends ChannelInterceptorBase {
      * String manager for internationalization.
      */
     protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);
-    private final Map<Member,Counter> outcounter = new HashMap<>();
-    private final Map<Member,Counter> incounter = new HashMap<>();
-    private final Map<Member,MessageOrder> incoming = new HashMap<>();
+    private final Map<Member,Counter> outcounter = new ConcurrentHashMap<>();
+    private final Map<Member,Counter> incounter = new ConcurrentHashMap<>();
+    private final Map<Member,MessageOrder> incoming = new ConcurrentHashMap<>();
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
@@ -205,18 +205,17 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     @Override
-    public void memberAdded(Member member) {
-        // notify upwards
-        super.memberAdded(member);
-    }
-
-    @Override
     public void memberDisappeared(Member member) {
         // reset counters - lock free
         incounter.remove(member);
         outcounter.remove(member);
         // clear the remaining queue
-        processLeftOvers(member, true);
+        inLock.writeLock().lock();
+        try {
+            processLeftOvers(member, true);
+        } finally {
+            inLock.writeLock().unlock();
+        }
         // notify upwards
         super.memberDisappeared(member);
     }
@@ -239,13 +238,8 @@ public class OrderInterceptor extends ChannelInterceptorBase {
      * @return The counter
      */
     protected Counter getInCounter(Member mbr) {
-        Counter cnt = incounter.get(mbr);
-        if (cnt == null) {
-            cnt = new Counter();
-            cnt.inc(); // always start at 1 for incoming
-            incounter.put(mbr, cnt);
-        }
-        return cnt;
+        // Always start at 1 for incoming
+        return incounter.computeIfAbsent(mbr, k -> new Counter(1));
     }
 
     /**
@@ -255,12 +249,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
      * @return The counter
      */
     protected Counter getOutCounter(Member mbr) {
-        Counter cnt = outcounter.get(mbr);
-        if (cnt == null) {
-            cnt = new Counter();
-            outcounter.put(mbr, cnt);
-        }
-        return cnt;
+        return outcounter.computeIfAbsent(mbr, k -> new Counter());
     }
 
     /**
@@ -271,9 +260,14 @@ public class OrderInterceptor extends ChannelInterceptorBase {
          * Constructs a Counter with initial value 0.
          */
         public Counter() {
+            this(0);
         }
 
-        private final AtomicInteger value = new AtomicInteger(0);
+        public Counter(int startValue) {
+            value =  new AtomicInteger(startValue);
+        }
+
+        private final AtomicInteger value;
 
         /**
          * Returns the current counter value.
