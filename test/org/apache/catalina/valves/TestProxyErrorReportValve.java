@@ -17,6 +17,9 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -245,6 +248,90 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         String body = res.toString();
         Assert.assertNotNull(body);
         Assert.assertTrue(body.contains("RuntimeException"));
+    }
+
+
+    @Test
+    public void testRedirectShowReportFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
+        ctx.addServletMappingDecoded("/", "sendError");
+
+        Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
+        ctx.addServletMappingDecoded("/error-page", "errorPage");
+
+        tomcat.start();
+
+        ProxyErrorReportValve proxyErrorReportValve = null;
+        for (Valve valve : host.getPipeline().getValves()) {
+            if (valve instanceof ProxyErrorReportValve) {
+                proxyErrorReportValve = (ProxyErrorReportValve) valve;
+                break;
+            }
+        }
+        Assert.assertNotNull(proxyErrorReportValve);
+        proxyErrorReportValve.setUseRedirect(true);
+        proxyErrorReportValve.setShowReport(false);
+        proxyErrorReportValve.setProperty("errorCode." + HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "http://localhost:" + getPort() + "/error-page");
+
+        ByteChunk res = new ByteChunk();
+        Map<String, List<String>> resHead = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort(), res,
+                DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "GET", false);
+
+        Assert.assertEquals(HttpServletResponse.SC_FOUND, rc);
+
+        List<String> locationHeader = resHead.get("Location");
+        Assert.assertNotNull(locationHeader);
+        String location = locationHeader.get(0);
+
+        Assert.assertTrue(location.contains("statusCode="));
+        Assert.assertTrue(location.contains("statusReason="));
+        Assert.assertFalse(location.contains("message="));
+        Assert.assertFalse(location.contains("throwable="));
+        Assert.assertFalse(location.contains("statusDescription="));
+    }
+
+
+    @Test
+    public void testNoErrorPageShowReportFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
+        ctx.addServletMappingDecoded("/", "sendError");
+
+        tomcat.start();
+
+        ProxyErrorReportValve proxyErrorReportValve = null;
+        for (Valve valve : host.getPipeline().getValves()) {
+            if (valve instanceof ProxyErrorReportValve) {
+                proxyErrorReportValve = (ProxyErrorReportValve) valve;
+                break;
+            }
+        }
+        Assert.assertNotNull(proxyErrorReportValve);
+        proxyErrorReportValve.setShowReport(false);
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull(body);
+        Assert.assertFalse(body.contains("Server broke"));
     }
 
 

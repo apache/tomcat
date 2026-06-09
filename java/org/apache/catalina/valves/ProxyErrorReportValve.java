@@ -176,8 +176,8 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         }
         try {
             stringBuilder.append("requestUri=");
-            stringBuilder
-                    .append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
+            stringBuilder.append(
+                URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
             stringBuilder.append("&statusCode=");
             stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -199,19 +199,22 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             description = smClient.getString("errorReportValve.noDescription");
         }
         try {
-            stringBuilder.append("&statusDescription=");
-            stringBuilder.append(URLEncoder.encode(description, "UTF-8"));
             stringBuilder.append("&statusReason=");
             stringBuilder.append(URLEncoder.encode(reason, "UTF-8"));
 
-            String message = response.getMessage();
-            if (message != null) {
-                stringBuilder.append("&message=");
-                stringBuilder.append(URLEncoder.encode(message, "UTF-8"));
-            }
-            if (throwable != null) {
-                stringBuilder.append("&throwable=");
-                stringBuilder.append(URLEncoder.encode(throwable.toString(), "UTF-8"));
+            if (isShowReport()) {
+                stringBuilder.append("&statusDescription=");
+                stringBuilder.append(URLEncoder.encode(description, "UTF-8"));
+
+                String message = response.getMessage();
+                if (message != null) {
+                    stringBuilder.append("&message=");
+                    stringBuilder.append(URLEncoder.encode(message, "UTF-8"));
+                }
+                if (throwable != null) {
+                    stringBuilder.append("&throwable=");
+                    stringBuilder.append(URLEncoder.encode(throwable.toString(), "UTF-8"));
+                }
             }
         } catch (UnsupportedEncodingException e) {
             // Ignore
