@@ -16,8 +16,9 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
@@ -55,7 +56,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     /**
      * Map of pending messages keyed by their unique ID.
      */
-    protected final HashMap<UniqueId,MapEntry> messages = new HashMap<>();
+    protected final Map<UniqueId,MapEntry> messages = new ConcurrentHashMap<>();
 
     /**
      * Message expiration time in milliseconds.
@@ -105,10 +106,9 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                             END_DATA, 0, END_DATA.length)) {
                 UniqueId id =
                         new UniqueId(msg.getMessage().getBytesDirect(), START_DATA.length, msg.getUniqueId().length);
-                MapEntry original = messages.get(id);
+                MapEntry original = messages.remove(id);
                 if (original != null) {
                     super.messageReceived(original.msg);
-                    messages.remove(id);
                 } else {
                     log.warn(sm.getString("twoPhaseCommitInterceptor.originalMessage.missing",
                             Arrays.toString(id.getBytes())));
@@ -159,13 +159,13 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     public void heartbeat() {
         try {
             long now = System.currentTimeMillis();
-            @SuppressWarnings("unchecked")
-            Map.Entry<UniqueId,MapEntry>[] entries = messages.entrySet().toArray(new Map.Entry[0]);
-            for (Map.Entry<UniqueId,MapEntry> uniqueIdMapEntryEntry : entries) {
-                MapEntry entry = uniqueIdMapEntryEntry.getValue();
-                if (entry.expired(now, expire)) {
-                    log.info(sm.getString("twoPhaseCommitInterceptor.expiredMessage", entry.id));
-                    messages.remove(entry.id);
+            Iterator<Map.Entry<UniqueId,MapEntry>> iter = messages.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<UniqueId,MapEntry> entry = iter.next();
+                MapEntry value = entry.getValue();
+                if (value.expired(now, expire)) {
+                    log.info(sm.getString("twoPhaseCommitInterceptor.expiredMessage", value.id));
+                    iter.remove();
                 }
             }
         } catch (Exception e) {
