@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -337,6 +338,79 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ((Number) json.get("status")).intValue());
         Assert.assertEquals(unicodeMessage, json.get("message"));
     }
+
+    @Test
+    public void testJsonErrorShowReportFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(JSON_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
+        ctx.addServletMappingDecoded("/", "sendError");
+
+        tomcat.start();
+
+        for (Valve valve : host.getPipeline().getValves()) {
+            if (valve instanceof JsonErrorReportValve) {
+                ((JsonErrorReportValve) valve).setShowReport(false);
+                break;
+            }
+        }
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ((Number) json.get("status")).intValue());
+        Assert.assertNull(json.get("type"));
+        Assert.assertNull(json.get("message"));
+        Assert.assertNull(json.get("description"));
+    }
+
+
+    @Test
+    public void testJsonErrorWithThrowableShowReportFalse() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(JSON_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "exception", new ExceptionServlet("Something went wrong"));
+        ctx.addServletMappingDecoded("/", "exception");
+
+        tomcat.start();
+
+        for (Valve valve : host.getPipeline().getValves()) {
+            if (valve instanceof JsonErrorReportValve) {
+                ((JsonErrorReportValve) valve).setShowReport(false);
+                break;
+            }
+        }
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        JSONParser parser = new JSONParser(body);
+        LinkedHashMap<String, Object> json = parser.parseObject();
+
+        Assert.assertEquals(500, ((Number) json.get("status")).intValue());
+        Assert.assertNull(json.get("throwable"));
+        Assert.assertNull(json.get("message"));
+        Assert.assertNull(json.get("description"));
+    }
+
 
     @Test
     public void testNoJsonForUnknownStatusWithoutMessage() throws Exception {
