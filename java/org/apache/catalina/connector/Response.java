@@ -909,6 +909,9 @@ public class Response implements HttpServletResponse {
         cookies.add(cookie);
 
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         // if we reached here, no exception, cookie is valid
         addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
@@ -927,6 +930,9 @@ public class Response implements HttpServletResponse {
         final String headername = "Set-Cookie";
         final String startsWith = name + "=";
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         boolean set = false;
         MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
         int n = headers.size();

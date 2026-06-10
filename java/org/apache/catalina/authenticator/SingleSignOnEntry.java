@@ -57,7 +57,8 @@ public class SingleSignOnEntry implements Serializable {
     private transient Principal principal = null;
 
     /**
-     * Map of session keys associated with this SSO entry.
+     * Set of session keys associated with this SSO entry. Backed by ConcurrentHashMap to take
+     * advantage of its thread safety features.
      */
     private final Map<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
 

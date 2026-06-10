@@ -1561,6 +1561,9 @@ public class Request implements HttpServletRequest {
      */
     private void notifyAttributeRemoved(String name, Object value) {
         Context context = getContext();
+        if (context == null) {
+            return;
+        }
         Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
@@ -3268,7 +3271,7 @@ public class Request implements HttpServletRequest {
         int len = 0;
         while (len > -1) {
             len = getStream().read(buffer, 0, CACHED_POST_LEN);
-            if (connector.getMaxPostSize() >= 0 && (body.getLength() + len) > connector.getMaxPostSize()) {
+            if (connector.getMaxPostSize() >= 0 && ((long) body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
                 checkSwallowInput();
                 throw new IllegalStateException(sm.getString("coyoteRequest.chunkedPostTooLarge"));

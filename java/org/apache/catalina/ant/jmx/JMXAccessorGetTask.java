@@ -89,12 +89,14 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
 
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
         if ((attribute == null)) {
             throw new BuildException("Must specify a 'attribute' for get");
+        }
+        if (jmxServerConnection == null) {
+            throw new BuildException("Must open a connection!");
         }
         return jmxGet(jmxServerConnection, getName());
     }

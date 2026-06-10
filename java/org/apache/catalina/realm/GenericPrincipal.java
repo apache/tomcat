@@ -294,6 +294,25 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        GenericPrincipal that = (GenericPrincipal) obj;
+        return Objects.equals(this.name, that.name);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+
+    @Override
     public void logout() throws Exception {
         if (loginContext != null) {
             loginContext.logout();

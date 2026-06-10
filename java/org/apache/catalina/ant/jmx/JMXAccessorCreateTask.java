@@ -139,12 +139,14 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
 
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
         if ((className == null)) {
-            throw new BuildException("Must specify a 'className' for get");
+            throw new BuildException("Must specify a 'className' for create");
+        }
+        if (jmxServerConnection == null) {
+            throw new BuildException("Must open a connection!");
         }
         jmxCreate(jmxServerConnection, getName());
         return null;
