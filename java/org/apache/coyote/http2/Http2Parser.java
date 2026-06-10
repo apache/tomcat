@@ -158,6 +158,14 @@ class Http2Parser {
 
         int dataLength;
         if (Flags.hasPadding(flags)) {
+
+            // Frame is too small to contain mandatory frame data (for the given flags)
+            if (payloadSize == 0) {
+                throw new ConnectionException(sm.getString("http2Parser.processFrame.insufficientPayload",connectionId,
+                        Integer.toString(streamId), Integer.toString(FrameType.DATA.getId()),
+                        Integer.toString(flags), Integer.toString(payloadSize)), Http2Error.FRAME_SIZE_ERROR);
+            }
+
             if (buffer == null) {
                 byte[] b = new byte[1];
                 input.fill(true, b);
@@ -264,6 +272,14 @@ class Http2Parser {
         if (priority) {
             optionalLen += 5;
         }
+
+        // Frame is too small to contain mandatory frame data (for the given flags)
+        if (payloadSize < optionalLen) {
+            throw new ConnectionException(sm.getString("http2Parser.processFrame.insufficientPayload",connectionId,
+                    Integer.toString(streamId), Integer.toString(FrameType.HEADERS.getId()),
+                    Integer.toString(flags), Integer.toString(payloadSize)), Http2Error.FRAME_SIZE_ERROR);
+        }
+
         if (optionalLen > 0) {
             byte[] optional = new byte[optionalLen];
             if (buffer == null) {
