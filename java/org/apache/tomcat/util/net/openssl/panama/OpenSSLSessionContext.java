@@ -35,7 +35,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     private static final StringManager sm = StringManager.getManager(OpenSSLSessionContext.class);
     private static final Enumeration<byte[]> EMPTY = new EmptyEnumeration();
 
-    private static final int TICKET_KEYS_SIZE = 48;
+    private static final int TICKET_KEYS_SIZE = 80;
 
     private final OpenSSLSessionStats stats;
     private final OpenSSLContext context;
