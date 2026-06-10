@@ -279,6 +279,9 @@
         <code>server.xml</code>. Cluster digester rules are now fully
         conditional on both JARs being available. (dsoumis)
       </fix>
+      <fix>
+        Fix a potential deadlock when copying resources using WebDAV. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
