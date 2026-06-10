@@ -27,6 +27,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
@@ -41,7 +43,10 @@ import org.apache.juli.logging.LogFactory;
  * Abstract base class for cloud-based membership providers.
  */
 public abstract class CloudMembershipProvider extends MembershipProviderBase implements Heartbeat, ChannelListener {
+
     private static final Log log = LogFactory.getLog(CloudMembershipProvider.class);
+    private static final Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
+
     /**
      * String manager for this class.
      */
@@ -73,10 +78,6 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
      * The time when this provider started.
      */
     protected Instant startTime;
-    /**
-     * MD5 message digest for hashing operations.
-     */
-    protected MessageDigest md5;
 
     /**
      * HTTP headers for cloud API requests.
@@ -98,14 +99,24 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected long expirationTime = 5000;
 
     /**
-     * Creates a new CloudMembershipProvider and initializes the MD5 digest.
+     * Thread safe MD5 digest.
+     *
+     * @param input The bytes to digest
+     * @return The MD5 digest for the given input
      */
-    public CloudMembershipProvider() {
-        try {
-            md5 = MessageDigest.getInstance("md5");
-        } catch (NoSuchAlgorithmException e) {
-            // Ignore
+    protected static byte[] digest(byte[] input) {
+        MessageDigest md = queue.poll();
+        if (md == null) {
+            try {
+                md = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                // Newer JVMs are not required to support MD5
+                throw new IllegalStateException(sm.getString("cloudMembershipProvider.noDigest"), e);
+            }
         }
+        byte[] result = md.digest(input);
+        queue.add(md);
+        return result;
     }
 
     /**
@@ -229,5 +240,4 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     public boolean accept(Serializable msg, Member sender) {
         return false;
     }
-
 }

@@ -372,6 +372,10 @@
         Fix some concurrency issues in <code>TwoPhaseCommitInterceptor</code>.
         (markt)
       </fix>
+      <fix>
+        Fix concurrency issues generating MD5 digests in the
+        <code>CloudMembershipProvider</code> implementations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
