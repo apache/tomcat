@@ -174,14 +174,15 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
 
     /**
-     * Check if a name is reserved (java., javax., sun. prefixes).
+     * Check if a name is reserved (java., javax., sun. & jakarta. prefixes).
      *
      * @param name the name to check
      *
      * @return true if the name is reserved
      */
     protected boolean isNameReserved(String name) {
-        return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.");
+        return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.") ||
+                name.startsWith("jakarta.");
     }
 
 
