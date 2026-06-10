@@ -2988,8 +2988,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     propertiesDest = new ArrayList<>();
                     deadProperties.put(destination, propertiesDest);
                 }
-                synchronized (properties) {
-                    synchronized (propertiesDest) {
+                /*
+                 * The following ensures that locks for any two paths are always obtained in the same other order
+                 * regardless of which is the source and which is the destination. This is to avoid deadlocks for
+                 * concurrent calls where source and destination are reversed.
+                 */
+                Object lockFirst;
+                Object lockSecond;
+                if (source.compareTo(destination) > 0) {
+                    lockFirst = properties;
+                    lockSecond = propertiesDest;
+                } else {
+                    lockFirst = propertiesDest;
+                    lockSecond = properties;
+                }
+                synchronized (lockFirst) {
+                    synchronized (lockSecond) {
                         for (Node node : properties) {
                             node = node.cloneNode(true);
                             boolean found = false;
