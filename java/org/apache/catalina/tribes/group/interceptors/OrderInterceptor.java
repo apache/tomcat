@@ -206,9 +206,6 @@ public class OrderInterceptor extends ChannelInterceptorBase {
 
     @Override
     public void memberDisappeared(Member member) {
-        // reset counters - lock free
-        incounter.remove(member);
-        outcounter.remove(member);
         // clear the remaining queue
         inLock.writeLock().lock();
         try {
@@ -216,6 +213,9 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         } finally {
             inLock.writeLock().unlock();
         }
+        // reset counters - lock free
+        incounter.remove(member);
+        outcounter.remove(member);
         // notify upwards
         super.memberDisappeared(member);
     }
