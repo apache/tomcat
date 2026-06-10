@@ -157,7 +157,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         if (inetAddresses != null) {
             for (InetAddress inetAddress : inetAddresses) {
                 String ip = inetAddress.getHostAddress();
-                byte[] id = md5.digest(ip.getBytes());
+                byte[] id = digest(ip.getBytes());
                 // We found ourselves, ignore
                 if (ip.equals(localIp)) {
                     // Update the UID on initial lookup
@@ -209,7 +209,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                 buf.append('.').append(host[i] & 0xff);
             }
 
-            byte[] id = md5.digest(buf.toString().getBytes());
+            byte[] id = digest(buf.toString().getBytes());
             member.setUniqueId(id);
             member.setMemberAliveTime(-1);
             updateMember(member, true);
