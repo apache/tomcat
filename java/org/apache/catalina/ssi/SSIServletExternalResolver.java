@@ -175,7 +175,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
 
     /**
-     * Check if a name is reserved (java., javax., sun. & jakarta. prefixes).
+     * Check if a name is reserved (java., javax., sun. &amp; jakarta. prefixes).
      *
      * @param name the name to check
      *
