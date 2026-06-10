@@ -151,12 +151,14 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
         if ((attribute == null || value == null)) {
             throw new BuildException("Must specify a 'attribute' and 'value' for set");
+        }
+        if (jmxServerConnection == null) {
+            throw new BuildException("Must open a connection!");
         }
         return jmxSet(jmxServerConnection, getName());
     }

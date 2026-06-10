@@ -156,6 +156,9 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
         if ((operation == null)) {
             throw new BuildException("Must specify a 'operation' for call");
         }
+        if (jmxServerConnection == null) {
+            throw new BuildException("Must open a connection!");
+        }
         return jmxInvoke(jmxServerConnection, getName());
     }
 

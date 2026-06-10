@@ -90,12 +90,13 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
 
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
+        if (jmxServerConnection == null) {
+            throw new BuildException("Must open a connection!");
+        }
         return jmxQuery(jmxServerConnection, getName());
-
     }
 
 
