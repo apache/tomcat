@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Objects;
 
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that is used to represent principals authenticated
@@ -67,6 +68,25 @@ public class CoyotePrincipal implements Principal, Serializable {
     @Override
     public String toString() {
         return "CoyotePrincipal[" + this.name + "]";
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        CoyotePrincipal that = (CoyotePrincipal) obj;
+        return Objects.equals(this.name, that.name);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
 

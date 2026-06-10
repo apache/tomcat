@@ -901,6 +901,9 @@ public class Response implements HttpServletResponse {
         }
 
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         // if we reached here, no exception, cookie is valid
         addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
@@ -919,6 +922,9 @@ public class Response implements HttpServletResponse {
         final String headername = "Set-Cookie";
         final String startsWith = name + "=";
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         boolean set = false;
         MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
         int n = headers.size();
@@ -944,9 +950,14 @@ public class Response implements HttpServletResponse {
      * @return The cookie header string
      */
     public String generateCookieString(final Cookie cookie) {
-        // Web application code can receive a IllegalArgumentException
-        // from the generateHeader() invocation
-        return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
+        Context context = getContext();
+        if (context != null) {
+            // Web application code can receive a IllegalArgumentException
+            // from the generateHeader() invocation
+            return context.getCookieProcessor().generateHeader(cookie, request.getRequest());
+        } else {
+            return null;
+        }
     }
 
 

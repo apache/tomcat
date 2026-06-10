@@ -50,7 +50,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Returns the character set used for encoding credentials.
+     * Returns the character set used for encoding credentials, as set by the user.
+     * If the charset was null or empty, the effective charset will be ISO-8859-1.
      *
      * @return the character set name
      */
@@ -60,7 +61,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Sets the character set used for encoding credentials.
+     * Sets the character set used for encoding credentials. Empty charsets will set
+     * ISO-8859-1.
      *
      * @param charsetString the character set name
      */

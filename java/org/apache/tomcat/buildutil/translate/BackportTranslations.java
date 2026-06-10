@@ -58,6 +58,10 @@ public class BackportTranslations extends BackportBase {
             }
 
             Properties sourceTranslated = sourceTranslations.get(language);
+            if (sourceTranslated == null) {
+                sourceTranslated = new Properties();
+                sourceTranslations.put(language, sourceTranslated);
+            }
             Properties targetTranslated = targetTranslations.get(language);
             if (targetTranslated == null) {
                 targetTranslated = new Properties();
@@ -66,7 +70,6 @@ public class BackportTranslations extends BackportBase {
 
             for (Object key : targetEnglish.keySet()) {
                 if (sourceTranslated.containsKey(key) && targetEnglish.get(key).equals(sourceEnglish.get(key))) {
-
                     targetTranslated.put(key, sourceTranslated.get(key));
                 }
             }

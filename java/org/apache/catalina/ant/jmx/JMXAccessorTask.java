@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -436,6 +435,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             environment = new HashMap<>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
+        // FIXME: Referencing JMXConnector instead of MBeanServerConnection is needed to close the connection
         return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment).getMBeanServerConnection();
 
     }
@@ -515,7 +515,6 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return the JMX connection
      */
     protected MBeanServerConnection getJMXConnection() throws MalformedURLException, IOException {
-
         MBeanServerConnection jmxServerConnection = null;
         if (isUseRef()) {
             Object pref;
@@ -552,8 +551,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @exception Exception if an error occurs
      */
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
-        if ((jmxServerConnection == null)) {
+        if (jmxServerConnection == null) {
             throw new BuildException("Must open a connection!");
         } else if (isEcho()) {
             handleOutput("JMX Connection ref=" + ref + " is open!");
@@ -562,7 +560,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * Convert string to datatype FIXME How we can transfer values from ant project reference store (ref)?
+     * Convert string to datatype.
      *
      * @param value     The value
      * @param valueType The type
@@ -686,15 +684,16 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                 }
             }
         } else if (result instanceof TabularDataSupport data) {
-            for (Object key : data.keySet()) {
-                for (Object key1 : ((List<?>) key)) {
-                    CompositeData valuedata = data.get(new Object[] { key1 });
-                    Object value = valuedata.get("value");
-                    OpenType<?> type = valuedata.getCompositeType().getType("value");
-                    if (type instanceof SimpleType<?>) {
-                        setProperty(propertyPrefix + "." + key1, value);
+            for (Object rowObj : data.values()) {
+                CompositeData row = (CompositeData) rowObj;
+                CompositeType rowType = row.getCompositeType();
+                for (String fieldName : rowType.keySet()) {
+                    Object fieldValue = row.get(fieldName);
+                    OpenType<?> fieldType = rowType.getType(fieldName);
+                    if (fieldType instanceof SimpleType<?>) {
+                        setProperty(propertyPrefix + "." + fieldName, fieldValue);
                     } else {
-                        createProperty(propertyPrefix + "." + key1, value);
+                        createProperty(propertyPrefix + "." + fieldName, fieldValue);
                     }
                 }
             }

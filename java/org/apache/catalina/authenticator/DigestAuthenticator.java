@@ -665,8 +665,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate the Realm name
-            String lcRealm = getRealmName(request.getContext());
-            if (!lcRealm.equals(realmName)) {
+            if (!realmName.equals(getRealmName(request.getContext()))) {
                 return false;
             }
 

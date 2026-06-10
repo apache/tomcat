@@ -66,8 +66,12 @@ public class AccessLogAdapter implements AccessLog {
 
     @Override
     public boolean getRequestAttributesEnabled() {
-        // NOOP. Could return logs[0].getRequestAttributesEnabled(), but I do
-        // not see a use case for that.
+        for (AccessLog log : logs) {
+            // Return true if any AccessLog is going to use the attributes
+            if (log.getRequestAttributesEnabled()) {
+                return true;
+            }
+        }
         return false;
     }
 }

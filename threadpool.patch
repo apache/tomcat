@@ -1,0 +1,63 @@
+diff --git a/java/org/apache/tomcat/util/descriptor/web/SecurityConstraint.java b/java/org/apache/tomcat/util/descriptor/web/SecurityConstraint.java
+index 0451582..785a352 100644
+--- a/java/org/apache/tomcat/util/descriptor/web/SecurityConstraint.java
++++ b/java/org/apache/tomcat/util/descriptor/web/SecurityConstraint.java
+@@ -610,7 +610,7 @@
+         }
+ 
+         if (create) {
+-            collection.addPattern(urlPattern);
++            collection.addPatternDecoded(urlPattern);
+             constraint.addCollection(collection);
+             return constraint;
+         }
+diff --git a/java/org/apache/tomcat/util/threads/ThreadPoolExecutor.java b/java/org/apache/tomcat/util/threads/ThreadPoolExecutor.java
+index 6c61572..3a6636f 100644
+--- a/java/org/apache/tomcat/util/threads/ThreadPoolExecutor.java
++++ b/java/org/apache/tomcat/util/threads/ThreadPoolExecutor.java
+@@ -662,6 +662,11 @@
+      * ScheduledThreadPoolExecutor.
+      */
+     final void reject(Runnable command) {
++        // Decrement before calling the handler so non-throwing handlers
++        // (DiscardPolicy, CallerRunsPolicy, DiscardOldestPolicy) don't leak
++        // submittedCount. If the handler throws, the decrement is accounted
++        // for in the catch block of execute().
++        submittedCount.decrementAndGet();
+         handler.rejectedExecution(command, this);
+     }
+ 
+@@ -1102,11 +1107,13 @@
+                 // TaskQueue) in some tasks being rejected rather than queued.
+                 // If this happens, add them to the queue.
+                 if (!queue.force(command)) {
+-                    submittedCount.decrementAndGet();
+                     throw new RejectedExecutionException(sm.getString("threadPoolExecutor.queueFull"));
+                 }
++                // Task was force-queued and will run through a worker, so
++                // afterExecute() will decrement. Re-increment to cancel the
++                // decrement that was done in reject() before the handler threw.
++                submittedCount.incrementAndGet();
+             } else {
+-                submittedCount.decrementAndGet();
+                 throw rx;
+             }
+         }
+diff --git a/webapps/docs/changelog.xml b/webapps/docs/changelog.xml
+index 24b0d72..4e92dd0 100644
+--- a/webapps/docs/changelog.xml
++++ b/webapps/docs/changelog.xml
+@@ -415,6 +415,12 @@
+         <code>isTrailerFieldsReady</code> was always returning
+         <code>true</code>. (remm)
+       </fix>
++      <fix>
++        Fix <code>submittedCount</code> leak with the thread pool when using
++        non default <code>RejectedExecutionHandler</code>. The default handler
++        is throwing an exception on rejection and was processed properly.
++        (remm)
++      </fix>
+     </changelog>
+   </subsection>
+   <subsection name="Jasper">
+
