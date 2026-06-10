@@ -338,6 +338,10 @@
         Handle the case where the HTTP/2 payload length is insufficient for the
         mandatory data required by the flags set in the header. (markt)
       </fix>
+      <fix>
+        <bug>70102</bug>: Correct expected size of ticket keys when calling
+        <code>setSessionTicketKeys</code> with an FFM connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
