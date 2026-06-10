@@ -436,6 +436,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             environment = new HashMap<>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
+        // FIXME: Referencing JMXConnector instead of MBeanServerConnection is needed to close the connection
         return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment).getMBeanServerConnection();
 
     }
@@ -515,7 +516,6 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return the JMX connection
      */
     protected MBeanServerConnection getJMXConnection() throws MalformedURLException, IOException {
-
         MBeanServerConnection jmxServerConnection = null;
         if (isUseRef()) {
             Object pref;
@@ -552,8 +552,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @exception Exception if an error occurs
      */
     public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
-
-        if ((jmxServerConnection == null)) {
+        if (jmxServerConnection == null) {
             throw new BuildException("Must open a connection!");
         } else if (isEcho()) {
             handleOutput("JMX Connection ref=" + ref + " is open!");
@@ -562,7 +561,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * Convert string to datatype FIXME How we can transfer values from ant project reference store (ref)?
+     * Convert string to datatype.
      *
      * @param value     The value
      * @param valueType The type

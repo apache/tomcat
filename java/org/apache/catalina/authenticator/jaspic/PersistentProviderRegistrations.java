@@ -37,6 +37,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.SAXException;
 
 /**
@@ -133,9 +134,9 @@ public final class PersistentProviderRegistrations {
                 writer.write(">\n");
                 for (Entry<String,String> entry : provider.getProperties().entrySet()) {
                     writer.write("    <property name=\"");
-                    writer.write(entry.getKey());
+                    writer.write(Escape.xml(entry.getKey()));
                     writer.write("\" value=\"");
-                    writer.write(entry.getValue());
+                    writer.write(Escape.xml(entry.getValue()));
                     writer.write("\"/>\n");
                 }
                 writer.write("  </provider>\n");
@@ -174,7 +175,7 @@ public final class PersistentProviderRegistrations {
     private static void writeOptional(String name, String value, Writer writer) throws IOException {
         if (value != null) {
             writer.write(" " + name + "=\"");
-            writer.write(value);
+            writer.write(Escape.xml(value));
             writer.write("\"");
         }
     }

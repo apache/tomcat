@@ -332,7 +332,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
         }
 
-        // Send response token on success and failure
+        // Send response token since one is available, even for SC_UNAUTHORIZED
         response.setHeader(AUTH_HEADER_NAME,
                 AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.getEncoder().encodeToString(outToken));
 

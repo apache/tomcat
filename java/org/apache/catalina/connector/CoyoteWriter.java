@@ -118,7 +118,6 @@ public class CoyoteWriter extends PrintWriter {
         } catch (IOException ignore) {
             // Ignore
         }
-        error = false;
 
     }
 

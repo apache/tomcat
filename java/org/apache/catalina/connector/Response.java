@@ -936,6 +936,9 @@ public class Response implements HttpServletResponse {
         cookies.add(cookie);
 
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         // if we reached here, no exception, cookie is valid
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
         // RFC2965 is not supported by browsers and the Servlet spec
@@ -957,6 +960,9 @@ public class Response implements HttpServletResponse {
         final String headername = "Set-Cookie";
         final String startsWith = name + "=";
         String header = generateCookieString(cookie);
+        if (header == null) {
+            return;
+        }
         boolean set = false;
         MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
         int n = headers.size();
