@@ -349,6 +349,10 @@
         <code>@STRENGTH</code> was encountered, ignoring any subsequent
         expressions. (markt)
       </fix>
+      <fix>
+        Handle the case where the HTTP/2 payload length is insufficient for the
+        mandatory data required by the flags set in the header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
