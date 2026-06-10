@@ -270,7 +270,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     Member localMember = service.getLocalMember(false);
                     if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
                             localMember instanceof MemberImpl) {
-                        byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
+                        byte[] id = digest(uid.getBytes(StandardCharsets.US_ASCII));
                         ((MemberImpl) localMember).setUniqueId(id);
                     }
                     continue;
@@ -288,7 +288,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
                     continue;
                 }
-                byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
+                byte[] id = digest(uid.getBytes(StandardCharsets.US_ASCII));
                 member.setUniqueId(id);
                 members.add(member);
             }
