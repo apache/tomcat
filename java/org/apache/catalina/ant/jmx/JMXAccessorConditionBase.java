@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 
@@ -234,7 +233,7 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
                 return result.toString();
             }
         } catch (Exception e) {
-            throw new BuildException("Cannot access JMX value for condition", e);
+            // ignore access or connection open errors
         }
         return null;
     }

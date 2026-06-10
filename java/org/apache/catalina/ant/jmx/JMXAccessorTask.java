@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -684,16 +685,15 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                 }
             }
         } else if (result instanceof TabularDataSupport data) {
-            for (Object rowObj : data.values()) {
-                CompositeData row = (CompositeData) rowObj;
-                CompositeType rowType = row.getCompositeType();
-                for (String fieldName : rowType.keySet()) {
-                    Object fieldValue = row.get(fieldName);
-                    OpenType<?> fieldType = rowType.getType(fieldName);
-                    if (fieldType instanceof SimpleType<?>) {
-                        setProperty(propertyPrefix + "." + fieldName, fieldValue);
+            for (Object key : data.keySet()) {
+                for (Object key1 : ((List<?>) key)) {
+                    CompositeData valuedata = data.get(new Object[] { key1 });
+                    Object value = valuedata.get("value");
+                    OpenType<?> type = valuedata.getCompositeType().getType("value");
+                    if (type instanceof SimpleType<?>) {
+                        setProperty(propertyPrefix + "." + key1, value);
                     } else {
-                        createProperty(propertyPrefix + "." + fieldName, fieldValue);
+                        createProperty(propertyPrefix + "." + key1, value);
                     }
                 }
             }
