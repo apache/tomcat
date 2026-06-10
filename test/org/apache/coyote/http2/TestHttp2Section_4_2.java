@@ -81,7 +81,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
 
     @Test
-    public void testFrameTypeLimitsTooSmall() throws Exception {
+    public void testFrameTypeLimitsTooSmallPing() throws Exception {
         // HTTP2 upgrade
         http2Connect();
 
@@ -97,6 +97,31 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(ping);
+        os.flush();
+
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
+    }
+
+
+    @Test
+    public void testFrameTypeLimitsTooSmallHeaders() throws Exception {
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Too small headers
+        byte[] headers = new byte[9];
+
+        // Header
+        // Length 0
+        // Type
+        headers[3] = FrameType.HEADERS.getIdByte();
+        // Set flags: End headers 0x04, Priority 0x20
+        headers[4] =  0x24;
+        // Stream 3
+        ByteUtil.set31Bits(headers, 5, 3);
+        // Empty payload
+
+        os.write(headers);
         os.flush();
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
