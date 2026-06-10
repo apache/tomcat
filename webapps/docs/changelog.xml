@@ -378,6 +378,10 @@
       <fix>
         Fix a potential deadlock when copying resources using WebDAV. (markt)
       </fix>
+      <fix>
+        Add <code>jakarta.</code> to the list of reserved prefixes for SSI
+        variables and request attributes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
