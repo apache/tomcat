@@ -79,7 +79,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * The <code>ManagedBean</code> information describing Group MBeans.
+     * The <code>ManagedBean</code> information describing Role MBeans.
      */
     protected final ManagedBean managedRole = registry.findManagedBean("Role");
 
@@ -171,8 +171,8 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new Role and return the corresponding MBean Name.
      *
-     * @param rolename    Group name of the new group
-     * @param description Description of the new group
+     * @param rolename    Role name of the new role
+     * @param description Description of the new role
      *
      * @return the new role object name
      */
