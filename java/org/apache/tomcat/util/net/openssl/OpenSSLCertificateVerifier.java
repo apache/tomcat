@@ -23,6 +23,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.CertificateVerifier;
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -49,6 +50,7 @@ public class OpenSSLCertificateVerifier implements CertificateVerifier {
         X509Certificate[] peerCerts = certificates(chain);
         try {
             x509TrustManager.checkClientTrusted(peerCerts, auth);
+            SSL.markPostHandshakeAuthComplete(ssl);
             return true;
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
