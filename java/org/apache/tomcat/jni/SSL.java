@@ -980,6 +980,8 @@ public final class SSL {
      */
     public static native int getPostHandshakeAuthInProgress(long ssl);
 
+    public static native void markPostHandshakeAuthComplete(long ssl);
+
     /**
      * SSL_in_init.
      *
