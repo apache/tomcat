@@ -22,6 +22,8 @@ import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
@@ -38,6 +40,7 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
     public ContextResourceMBean() {
     }
 
+    protected static final Log log = LogFactory.getLog(ContextResourceMBean.class);
     private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
 
     @Override
@@ -96,7 +99,8 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
         } else if ("description".equals(name)) {
             cr.setDescription((String) value);
         } else if ("name".equals(name)) {
-            cr.setName((String) value);
+            // Updating the name actually needs removing and adding back the component under the new name
+            log.info(sm.getString("mBean.nameChange"));
         } else if ("scope".equals(name)) {
             cr.setScope((String) value);
         } else if ("type".equals(name)) {

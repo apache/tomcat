@@ -363,15 +363,16 @@ public class MBeanUtils {
             throws MalformedObjectNameException {
 
         ObjectName name = null;
+        String quotedEnvironmentName = ObjectName.quote(environment.getName());
         Object container = environment.getNamingResources().getContainer();
         if (container instanceof Server) {
-            name = new ObjectName(domain + ":type=Environment" + ",resourcetype=Global,name=" + environment.getName());
+            name = new ObjectName(domain + ":type=Environment" + ",resourcetype=Global,name=" + quotedEnvironmentName);
         } else if (container instanceof Context) {
             Context context = ((Context) container);
             ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Environment" + ",resourcetype=Context,host=" + host.getName() +
-                    ",context=" + cn.getDisplayName() + ",name=" + environment.getName());
+                    ",context=" + cn.getDisplayName() + ",name=" + quotedEnvironmentName);
         }
         return name;
 

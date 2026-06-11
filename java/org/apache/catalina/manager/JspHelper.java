@@ -204,20 +204,6 @@ public class JspHelper {
     }
 
 
-    /*
-     * Following copied from org.apache.taglibs.standard.tag.common.core.Util v1.1.2
-     */
-
-    private static final int HIGHEST_SPECIAL = '>';
-    private static final char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
-    static {
-        specialCharactersRepresentation['&'] = "&amp;".toCharArray();
-        specialCharactersRepresentation['<'] = "&lt;".toCharArray();
-        specialCharactersRepresentation['>'] = "&gt;".toCharArray();
-        specialCharactersRepresentation['"'] = "&#034;".toCharArray();
-        specialCharactersRepresentation['\''] = "&#039;".toCharArray();
-    }
-
     /**
      * Escapes XML special characters in the given object's string representation.
      *

@@ -497,7 +497,7 @@ public class MBeanFactory {
      *
      * @param domain      Domain name for the container instance
      * @param defaultHost Name of the default host to be used in the Engine
-     * @param baseDir     Base directory value for Engine
+     * @param baseDir     Base directory value for Engine, not used anymore
      *
      * @return the object name of the created service
      *
@@ -805,7 +805,9 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
         Container container = getParentContainerFromChild(oname);
-        container.setRealm(null);
+        if (container != null) {
+            container.setRealm(null);
+        }
     }
 
 
@@ -841,6 +843,9 @@ public class MBeanFactory {
         // Acquire a reference to the component to be removed
         ObjectName oname = new ObjectName(name);
         Container container = getParentContainerFromChild(oname);
+        if (container == null) {
+            return;
+        }
         Valve[] valves = container.getPipeline().getValves();
         for (Valve valve : valves) {
             if (valve instanceof JmxEnabled) {
