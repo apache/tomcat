@@ -933,8 +933,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int code;
         if (SSL.getVersion(state.ssl).equals(Constants.SSL_PROTO_TLSv1_3)) {
             code = SSL.verifyClientPostHandshake(state.ssl);
+            currentHandshake = SSL.getHandshakeCount(state.ssl) - 1;
         } else {
             code = SSL.renegotiate(state.ssl);
+            currentHandshake = SSL.getHandshakeCount(state.ssl);
         }
         if (code <= 0) {
             checkLastError();
@@ -942,7 +944,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         handshakeFinished = false;
         peerCerts = null;
         x509PeerCerts = null;
-        currentHandshake = SSL.getHandshakeCount(state.ssl);
         int code2 = SSL.doHandshake(state.ssl);
         if (code2 <= 0) {
             checkLastError();
@@ -1019,7 +1020,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             /*
              * Tomcat Native stores a count of the completed handshakes in the SSL instance and increments it every time
              * a handshake is completed. Comparing the handshake count when the handshake started to the current
-             * handshake count enables this code to detect when the handshake has completed.
+             * handshake count enables this code to detect when the handshake has completed. Post handshake
+             * authentication DOES NOT increase this count. See https://github.com/openssl/openssl/commit/4af5836b
+             * For PHA Tomcat manipulates the handshake count so it appears to the check below that the count has
+             * increased.
              *
              * Obtaining client certificates after the connection has been established requires additional checks. We
              * need to trigger additional reads until the certificates have been read, but we don't know how many reads
