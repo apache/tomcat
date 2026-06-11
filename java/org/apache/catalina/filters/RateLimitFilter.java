@@ -284,9 +284,11 @@ public class RateLimitFilter extends FilterBase {
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
         if (exposeHeaders) {
-            ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT_POLICY, rateLimiter.getPolicy());
-            if (enforce) {
-                ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT, rateLimiter.getQuota(reqCount));
+            if (response instanceof HttpServletResponse) {
+                ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT_POLICY, rateLimiter.getPolicy());
+                if (enforce) {
+                    ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT, rateLimiter.getQuota(reqCount));
+                }
             }
         }
         if (reqCount > rateLimiter.getRequests()) {
@@ -295,7 +297,9 @@ public class RateLimitFilter extends FilterBase {
                     Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration())));
 
             if (enforce) {
-                ((HttpServletResponse) response).sendError(statusCode, statusMessage);
+                if (response instanceof HttpServletResponse) {
+                    ((HttpServletResponse) response).sendError(statusCode, statusMessage);
+                }
                 return;
             }
         }

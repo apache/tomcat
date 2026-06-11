@@ -1218,8 +1218,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     public void removeResourceLink(String name) {
 
+        javax.naming.Context ctx = "UserTransaction".equals(name) ? compCtx : envCtx;
         try {
-            envCtx.unbind(name);
+            ctx.unbind(name);
         } catch (NamingException e) {
             log.error(sm.getString("naming.unbindFailed", name), e);
         }

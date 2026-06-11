@@ -30,9 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
- * Sender to proxies using multicast socket.
- */
 /**
  * TCP-based sender for sending heartbeat messages to proxy servers.
  */
@@ -44,7 +41,7 @@ public class TcpSender implements Sender {
     public TcpSender() {
     }
 
-    private static final Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Log log = LogFactory.getLog(TcpSender.class);
     private static final StringManager sm = StringManager.getManager(TcpSender.class);
 
     /**
@@ -87,8 +84,8 @@ public class TcpSender implements Sender {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));
             }
             proxies[i] = new Proxy();
-            proxies[i].port = Integer.parseInt(token.substring(pos + 1));
             try {
+                proxies[i].port = Integer.parseInt(token.substring(pos + 1));
                 proxies[i].address = InetAddress.getByName(token.substring(0, pos));
             } catch (Exception e) {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));
@@ -161,7 +158,12 @@ public class TcpSender implements Sender {
             } else {
                 responseStatus = responseStatus.substring(responseStatus.indexOf(' ') + 1,
                         responseStatus.indexOf(' ', responseStatus.indexOf(' ') + 1));
-                int status = Integer.parseInt(responseStatus);
+                int status = 500;
+                try {
+                    status = Integer.parseInt(responseStatus);
+                } catch (NumberFormatException e) {
+                    // Ignore
+                }
                 if (status != 200) {
                     log.error(sm.getString("tcpSender.responseErrorCode", Integer.valueOf(status)));
                     close(i);
