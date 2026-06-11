@@ -31,7 +31,7 @@ public interface ClusterValve extends Valve {
     CatalinaCluster getCluster();
 
     /**
-     * Associates the cluster deployer with a cluster
+     * Associates the cluster valve with a cluster
      *
      * @param cluster CatalinaCluster
      */

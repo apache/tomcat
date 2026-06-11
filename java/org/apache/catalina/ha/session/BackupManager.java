@@ -142,10 +142,10 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
         super.startInternal();
 
+        if (cluster == null) {
+            throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
+        }
         try {
-            if (cluster == null) {
-                throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
-            }
             LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
                     getMapName(), getClassLoaders(), terminateOnStartFailure);
             map.setChannelSendOptions(mapSendOptions);

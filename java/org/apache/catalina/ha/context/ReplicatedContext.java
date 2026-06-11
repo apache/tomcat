@@ -94,7 +94,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        Map<String,Object> map = ((ReplApplContext) this.context).getAttributeMap();
+        Map<String,Object> map = this.context != null ? ((ReplApplContext) this.context).getAttributeMap() : null;
 
         super.stopInternal();
 
@@ -251,7 +251,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
-            Set<String> names = new HashSet<>(attributes.keySet());
+            Set<String> names = new HashSet<>(tomcatAttributes.keySet());
 
             return new MultiEnumeration<String>(
                     new Enumeration[] { super.getAttributeNames(), Collections.enumeration(names) });

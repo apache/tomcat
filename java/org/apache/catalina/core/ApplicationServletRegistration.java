@@ -93,7 +93,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     public boolean setInitParameter(String name, String value) {
         if (name == null || value == null) {
             throw new IllegalArgumentException(
-                    sm.getString("applicationFilterRegistration.nullInitParam", name, value));
+                    sm.getString("applicationServletRegistration.nullInitParam", name, value));
         }
         if (getInitParameter(name) != null) {
             return false;
@@ -112,7 +112,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
         for (Map.Entry<String,String> entry : initParameters.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
                 throw new IllegalArgumentException(
-                        sm.getString("applicationFilterRegistration.nullInitParams", entry.getKey(), entry.getValue()));
+                        sm.getString("applicationServletRegistration.nullInitParams", entry.getKey(), entry.getValue()));
             }
             if (getInitParameter(entry.getKey()) != null) {
                 conflicts.add(entry.getKey());
@@ -177,6 +177,9 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
 
         String[] decodedUrlPatterns = new String[urlPatterns.length];
         for (int i = 0; i < urlPatterns.length; i++) {
+            if (urlPatterns[i] == null) {
+                throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
+            }
             decodedUrlPatterns[i] = UDecoder.URLDecode(urlPatterns[i], StandardCharsets.UTF_8);
         }
 

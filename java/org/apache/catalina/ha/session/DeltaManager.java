@@ -897,31 +897,27 @@ public class DeltaManager extends ClusterManagerBase {
 
         super.startInternal();
 
+        if (cluster == null) {
+            throw new LifecycleException(sm.getString("deltaManager.noCluster", getName()));
+        }
+
         // Load unloaded sessions, if any
         try {
-            if (cluster == null) {
-                log.error(sm.getString("deltaManager.noCluster", getName()));
-                return;
-            } else {
-                if (log.isInfoEnabled()) {
-                    String type = "unknown";
-                    if (cluster.getContainer() instanceof Host) {
-                        type = "Host";
-                    } else if (cluster.getContainer() instanceof Engine) {
-                        type = "Engine";
-                    }
-                    log.info(sm.getString("deltaManager.registerCluster", getName(), type, cluster.getClusterName()));
-                }
-            }
             if (log.isInfoEnabled()) {
-                log.info(sm.getString("deltaManager.startClustering", getName()));
+                String type = "unknown";
+                if (cluster.getContainer() instanceof Host) {
+                    type = "Host";
+                } else if (cluster.getContainer() instanceof Engine) {
+                    type = "Engine";
+                }
+                log.info(sm.getString("deltaManager.registerCluster", getName(), type, cluster.getClusterName()));
             }
 
             getAllClusterSessions();
 
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("deltaManager.managerLoad"), t);
+            throw new LifecycleException(sm.getString("deltaManager.managerLoad"), t);
         }
 
         setState(LifecycleState.STARTING);
@@ -1642,6 +1638,7 @@ public class DeltaManager extends ClusterManagerBase {
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
         clone(result);
+        result.enableStatistics = enableStatistics;
         result.expireSessionsOnShutdown = expireSessionsOnShutdown;
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;

@@ -71,8 +71,11 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
             }
         }
 
-        if (servletNames != null) {
+        if (servletNames != null && servletNames.length > 0) {
             for (String servletName : servletNames) {
+                if (servletName == null) {
+                    throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullServletName"));
+                }
                 filterMap.addServletName(servletName);
             }
 
@@ -81,8 +84,9 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
             } else {
                 context.addFilterMapBefore(filterMap);
             }
+        } else {
+            throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullServletName"));
         }
-        // else error?
     }
 
     @Override
@@ -99,9 +103,12 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
             }
         }
 
-        if (urlPatterns != null) {
-            // % decoded (if necessary) using UTF-8
+        if (urlPatterns != null && urlPatterns.length > 0) {
             for (String urlPattern : urlPatterns) {
+                if (urlPattern == null) {
+                    throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullUrlPattern"));
+                }
+                // URL decoded using UTF-8 in addURLPattern
                 filterMap.addURLPattern(urlPattern);
             }
 
@@ -110,8 +117,9 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
             } else {
                 context.addFilterMapBefore(filterMap);
             }
+        } else {
+            throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullUrlPattern"));
         }
-        // else error?
 
     }
 

@@ -163,9 +163,9 @@ public class WarWatcher {
         protected final File war;
 
         /**
-         * The last time this file was checked.
+         * The last time this file was modified.
          */
-        protected long lastChecked;
+        protected long lastModified;
 
         /**
          * The last known state of the file.
@@ -179,7 +179,7 @@ public class WarWatcher {
          */
         public WarInfo(File war) {
             this.war = war;
-            this.lastChecked = war.lastModified();
+            this.lastModified = war.lastModified();
             if (!war.exists()) {
                 lastState = -1;
             }
@@ -191,7 +191,7 @@ public class WarWatcher {
          * @return {@code true} if the file has been modified
          */
         public boolean modified() {
-            return war.exists() && war.lastModified() > lastChecked;
+            return war.exists() && war.lastModified() != lastModified;
         }
 
         /**
@@ -216,6 +216,7 @@ public class WarWatcher {
                 // file has changed - timestamp
                 result = 1;
                 lastState = result;
+                lastModified = war.lastModified();
             } else if ((!exists()) && (!(lastState == -1))) {
                 // file was removed
                 result = -1;
@@ -225,7 +226,6 @@ public class WarWatcher {
                 result = 1;
                 lastState = result;
             }
-            this.lastChecked = System.currentTimeMillis();
             return result;
         }
 
