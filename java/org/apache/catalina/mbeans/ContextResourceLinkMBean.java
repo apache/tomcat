@@ -40,7 +40,7 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
     public ContextResourceLinkMBean() {
     }
 
-    protected static final Log log = LogFactory.getLog(ContextResourceLinkMBean.class);
+    private static final Log log = LogFactory.getLog(ContextResourceLinkMBean.class);
     private static final StringManager sm = StringManager.getManager(ContextResourceLinkMBean.class);
 
     @Override

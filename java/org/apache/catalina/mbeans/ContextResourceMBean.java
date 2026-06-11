@@ -40,7 +40,7 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
     public ContextResourceMBean() {
     }
 
-    protected static final Log log = LogFactory.getLog(ContextResourceMBean.class);
+    private static final Log log = LogFactory.getLog(ContextResourceMBean.class);
     private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
 
     @Override
