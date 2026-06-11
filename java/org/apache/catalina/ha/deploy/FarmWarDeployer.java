@@ -392,7 +392,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("farmWarDeployer.removeTxMsg", contextName));
             }
-            cluster.send(msg);
+            getCluster().send(msg);
         }
         // remove locally
         if (undeploy) {
@@ -437,10 +437,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     removeServiced(cn.getName());
                 }
                 check(cn.getName());
+                install(cn.getName(), deployWar);
             } else {
                 log.error(sm.getString("farmWarDeployer.servicingDeploy", cn.getName(), deployWar.getName()));
             }
-            install(cn.getName(), deployWar);
         } catch (Exception e) {
             log.error(sm.getString("farmWarDeployer.modInstallFail"), e);
         }

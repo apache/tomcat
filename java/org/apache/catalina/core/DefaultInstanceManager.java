@@ -276,7 +276,7 @@ public class DefaultInstanceManager implements InstanceManager {
             preDestroy(instance, superClass);
         }
 
-        // At the end the postconstruct annotated
+        // At the end the predestroy annotated
         // method is invoked
         AnnotationCacheEntry[] annotations = annotationCache.get(clazz);
         if (annotations == null) {

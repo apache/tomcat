@@ -202,7 +202,8 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {
-            if (fetchRequest.test(nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME))) {
+            String nonceFromRequest = nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME);
+            if (Objects.nonNull(nonceFromRequest) && fetchRequest.test(nonceFromRequest)) {
                 String nonceFromSessionStr = nonceFromSession.getNonce(request.getSession(false),
                         Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
                 if (nonceFromSessionStr == null) {

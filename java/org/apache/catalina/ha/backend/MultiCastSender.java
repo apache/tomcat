@@ -37,7 +37,7 @@ public class MultiCastSender implements Sender {
     public MultiCastSender() {
     }
 
-    private static final Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Log log = LogFactory.getLog(MultiCastSender.class);
     private static final StringManager sm = StringManager.getManager(MultiCastSender.class);
 
     HeartbeatListener config = null;

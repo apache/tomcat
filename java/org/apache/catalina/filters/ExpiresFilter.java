@@ -1437,14 +1437,9 @@ public class ExpiresFilter extends FilterBase {
                 break;
             case LAST_MODIFICATION_TIME:
                 if (response.isLastModifiedHeaderSet()) {
-                    try {
-                        long lastModified = response.getLastModifiedHeader();
-                        calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(lastModified);
-                    } catch (NumberFormatException e) {
-                        // default to now
-                        calendar = Calendar.getInstance();
-                    }
+                    long lastModified = response.getLastModifiedHeader();
+                    calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(lastModified);
                 } else {
                     // Last-Modified header not found, use now
                     calendar = Calendar.getInstance();

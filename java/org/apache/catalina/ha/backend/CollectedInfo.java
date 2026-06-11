@@ -102,7 +102,12 @@ public class CollectedInfo {
             // ajp-nio-10.36.116.209-8009
             String[] elenames = name.split("-");
             String sport = elenames[elenames.length - 1];
-            iport = Integer.parseInt(sport);
+            try {
+                iport = Integer.parseInt(sport);
+            } catch (NumberFormatException e) {
+                objName = null;
+                continue;
+            }
             if (elenames.length == 4) {
                 shost = elenames[2];
             }
@@ -145,6 +150,6 @@ public class CollectedInfo {
         Integer ibusy = (Integer) mBeanServer.getAttribute(objName, "currentThreadsBusy");
 
         busy = ibusy.intValue();
-        ready = imax.intValue() - ibusy.intValue();
+        ready = Math.max(imax.intValue() - ibusy.intValue(), 0);
     }
 }

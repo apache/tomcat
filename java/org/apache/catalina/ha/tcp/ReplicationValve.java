@@ -47,14 +47,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of a Valve that logs interesting contents from the specified Request (before processing) and the
- * corresponding Response (after processing). It is especially useful in debugging problems related to headers and
- * cookies.
- * <p>
- * This Valve may be attached to any Container, depending on the granularity of the logging you wish to perform.
- * <p>
- * primaryIndicator=true, then the request attribute <i>org.apache.catalina.ha.tcp.isPrimarySession.</i> is set true,
- * when request processing is at sessions primary node.
+ * Valve that triggers session replication across the cluster.
  */
 public class ReplicationValve extends ValveBase implements ClusterValve {
 
