@@ -175,16 +175,21 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
 
         Set<String> conflicts = new HashSet<>();
 
-        for (String urlPattern : urlPatterns) {
-            String wrapperName = context.findServletMapping(urlPattern);
+        String[] decodedUrlPatterns = new String[urlPatterns.length];
+        for (int i = 0; i < urlPatterns.length; i++) {
+            decodedUrlPatterns[i] = UDecoder.URLDecode(urlPatterns[i], StandardCharsets.UTF_8);
+        }
+
+        for (int i = 0; i < decodedUrlPatterns.length; i++) {
+            String wrapperName = context.findServletMapping(decodedUrlPatterns[i]);
             if (wrapperName != null) {
                 Wrapper wrapper = (Wrapper) context.findChild(wrapperName);
                 if (wrapper.isOverridable()) {
                     // Some Wrappers (from global and host web.xml) may be
                     // overridden rather than generating a conflict
-                    context.removeServletMapping(urlPattern);
+                    context.removeServletMapping(decodedUrlPatterns[i]);
                 } else {
-                    conflicts.add(urlPattern);
+                    conflicts.add(urlPatterns[i]);
                 }
             }
         }
@@ -193,8 +198,8 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             return conflicts;
         }
 
-        for (String urlPattern : urlPatterns) {
-            context.addServletMappingDecoded(UDecoder.URLDecode(urlPattern, StandardCharsets.UTF_8), wrapper.getName());
+        for (String urlPattern : decodedUrlPatterns) {
+            context.addServletMappingDecoded(urlPattern, wrapper.getName());
         }
 
         if (constraint != null) {

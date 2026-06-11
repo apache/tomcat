@@ -286,6 +286,10 @@
         Add <code>jakarta.</code> to the list of reserved prefixes for SSI
         variables and request attributes. (markt)
       </fix>
+      <fix>
+        Missing URL decoding when processing <code>addMapping</code> on a
+        Servlet registration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
