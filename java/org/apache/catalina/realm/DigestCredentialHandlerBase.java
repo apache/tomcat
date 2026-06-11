@@ -189,7 +189,13 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
         String hexSalt = storedCredentials.substring(0, sep1);
 
-        int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
+        int iterations;
+        try {
+            iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
+        } catch (NumberFormatException e) {
+            logInvalidStoredCredentials(storedCredentials);
+            return false;
+        }
 
         String storedHexEncoded = storedCredentials.substring(sep2 + 1);
         byte[] salt;
