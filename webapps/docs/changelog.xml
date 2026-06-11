@@ -346,6 +346,10 @@
         <bug>70102</bug>: Correct expected size of ticket keys when calling
         <code>setSessionTicketKeys</code> with an FFM connector. (markt)
       </fix>
+      <fix>
+        <bug>69988</bug>: Fix post handshake authentication for TLS 1.3. It was
+        broken by a breaking change in OpenSSL between 1.1.1 and 3.0.0. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
