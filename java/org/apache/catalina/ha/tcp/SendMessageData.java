@@ -25,29 +25,4 @@ import org.apache.catalina.tribes.Member;
  * @param exception the exception, if any, when attempting to send the message
  */
 public record SendMessageData(Object message, Member destination, Exception exception) {
-
-    /**
-     * Returns the destination of the message.
-     * @return the destination
-     */
-    public Member getDestination() {
-        return destination;
-    }
-
-    /**
-     * Returns the exception that occurred when attempting to send the message.
-     * @return the exception
-     */
-    public Exception getException() {
-        return exception;
-    }
-
-    /**
-     * Returns the message that was sent.
-     * @return the message
-     */
-    public Object getMessage() {
-        return message;
-    }
-
 }

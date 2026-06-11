@@ -18,11 +18,10 @@ package org.apache.catalina.ha.tcp;
 
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.ObjectName;
 
@@ -156,14 +155,14 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * The context name &lt;-&gt; manager association for distributed contexts.
      */
-    protected final Map<String,ClusterManager> managers = new HashMap<>();
+    protected final Map<String,ClusterManager> managers = new ConcurrentHashMap<>();
 
     /**
      * Template used to create new cluster managers for contexts.
      */
     protected ClusterManager managerTemplate = new DeltaManager();
 
-    private final List<Valve> valves = new ArrayList<>();
+    private final List<Valve> valves = new CopyOnWriteArrayList<>();
 
     private ClusterDeployer clusterDeployer;
     private ObjectName onameClusterDeployer;
@@ -171,7 +170,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * Listeners of messages
      */
-    protected final List<ClusterListener> clusterListeners = new ArrayList<>();
+    protected final List<ClusterListener> clusterListeners = new CopyOnWriteArrayList<>();
 
     /**
      * Comment for <code>notifyLifecycleListenerOnFailure</code>
