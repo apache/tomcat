@@ -325,7 +325,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
         if (htmlSubTitle != null) {
-            args[1] += "</font><br/><font size=\"+1\">" + htmlSubTitle;
+            args[1] += "</font><br/><font size=\"+1\">" + Escape.htmlElementContent(htmlSubTitle);
         }
 
         // HTML Header Section
@@ -1078,7 +1078,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             httpSession.removeAttribute(attributeName);
         } catch (IllegalStateException ise) {
             if (debug >= 1) {
-                log("Cannot remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
+                log("Cannot remove attribute '" + attributeName + "' for invalidated session id " + sessionId);
             }
         }
         return wasPresent;

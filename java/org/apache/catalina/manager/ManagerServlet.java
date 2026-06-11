@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -410,12 +411,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Set our properties from the initialization parameters
-        String value;
-        try {
-            value = getServletConfig().getInitParameter("debug");
-            debug = Integer.parseInt(value);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+        String value = getServletConfig().getInitParameter("debug");
+        if (value != null) {
+            try {
+                debug = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                // Ignore
+                debug = 0;
+            }
         }
 
         // Acquire global JNDI resources if available
@@ -1758,18 +1761,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
-                    SSLContext sslContext = sslHostConfig.getCertificates().iterator().next().getSslContext();
-                    if (sslContext == null) {
-                        certList.add(smClient.getString("managerServlet.certsNotLoaded"));
-                    } else {
-                        X509Certificate[] certs = sslContext.getAcceptedIssuers();
-                        if (certs == null) {
-                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                        } else if (certs.length == 0) {
-                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                    Iterator<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates().iterator();
+                    while (certificates.hasNext()) {
+                        SSLContext sslContext = certificates.next().getSslContext();
+                        if (sslContext == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                         } else {
-                            for (Certificate cert : certs) {
-                                certList.add(cert.toString());
+                            X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                            if (certs == null) {
+                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                            } else if (certs.length == 0) {
+                                certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                            } else {
+                                for (Certificate cert : certs) {
+                                    certList.add(cert.toString());
+                                }
                             }
                         }
                     }

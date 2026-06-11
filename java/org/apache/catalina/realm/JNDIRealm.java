@@ -2321,8 +2321,14 @@ public class JNDIRealm extends RealmBase {
         NamingEnumeration<?> e = attr.getAll();
         try {
             while (e.hasMore()) {
-                String value = (String) e.next();
-                values.add(value);
+                Object value = e.next();
+                String valueString;
+                if (value instanceof byte[]) {
+                    valueString = new String((byte[]) value);
+                } else {
+                    valueString = value.toString();
+                }
+                values.add(valueString);
             }
         } catch (PartialResultException ex) {
             if (!adCompat) {
@@ -2697,7 +2703,7 @@ public class JNDIRealm extends RealmBase {
     @Override
     public boolean isAvailable() {
         // Simple best effort check
-        return (connectionPool != null || singleConnection.context != null);
+        return (connectionPool != null || (singleConnection != null && singleConnection.context != null));
     }
 
 

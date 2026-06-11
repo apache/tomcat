@@ -43,7 +43,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -275,12 +274,14 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Set our properties from the initialization parameters
-        String value;
-        try {
-            value = getServletConfig().getInitParameter("debug");
-            debug = Integer.parseInt(value);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+        String value = getServletConfig().getInitParameter("debug");
+        if (value != null) {
+            try {
+                debug = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                // Ignore
+                debug = 0;
+            }
         }
 
     }
@@ -603,13 +604,12 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             writer.println(smClient.getString("hostManagerServlet.persisted"));
         } catch (Exception e) {
             getServletContext().log(sm.getString("hostManagerServlet.persistFailed"), e);
-            writer.println(smClient.getString("hostManagerServlet.persistFailed"));
             // catch InstanceNotFoundException when StoreConfig is not enabled instead of printing
             // the failure message
             if (e instanceof InstanceNotFoundException) {
                 writer.println(smClient.getString("hostManagerServlet.noStoreConfig"));
             } else {
-                writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
+                writer.println(smClient.getString("hostManagerServlet.persistFailed"));
             }
         }
     }

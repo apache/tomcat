@@ -393,7 +393,7 @@ public class LockOutRealm extends CombinedRealm {
         /**
          * The time of the last failure.
          */
-        private long lastFailureTime = 0;
+        private volatile long lastFailureTime = 0;
 
         /**
          * Default constructor.

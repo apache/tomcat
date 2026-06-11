@@ -619,6 +619,9 @@ public class JAASRealm extends RealmBase {
                     jaasConfigurationLoaded = true;
                     return null;
                 }
+                if (jaasConfigurationLoaded) {
+                    return jaasConfiguration;
+                }
                 @SuppressWarnings("unchecked")
                 Class<Configuration> sunConfigFile =
                         (Class<Configuration>) Class.forName("com.sun.security.auth.login.ConfigFile");
