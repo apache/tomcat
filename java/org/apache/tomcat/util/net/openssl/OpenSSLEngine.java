@@ -927,6 +927,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int code;
         if (SSL.getVersion(state.ssl).equals(Constants.SSL_PROTO_TLSv1_3)) {
             code = SSL.verifyClientPostHandshake(state.ssl);
+            /*
+             * PHA doesn't increment the handshake count with OpenSSL 3.0.x so make it look like the handshake count has
+             * been incremented.
+             */
             currentHandshake = SSL.getHandshakeCount(state.ssl) - 1;
         } else {
             code = SSL.renegotiate(state.ssl);
