@@ -464,7 +464,7 @@
         Use per connection authenticator when executing an Ant task. (remm/markt)
       </fix>
       <update>
-        Update Commons Daemon to 1.6.0. (markt)
+        Update Commons Daemon to 1.6.1. (markt)
       </update>
       <fix>
         Prevent duplicate log messages when clustering JARs are not present on
