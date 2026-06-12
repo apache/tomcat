@@ -386,6 +386,11 @@
         Missing URL decoding when processing <code>addMapping</code> on a
         Servlet registration. (remm)
       </fix>
+      <fix>
+        The <code>Timeout</code> WebDAV header allows comma separated values
+        (according to the examples in the RFC). Use the first acceptable value.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

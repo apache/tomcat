@@ -554,6 +554,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
                     "Host: localhost:" + getPort() + CRLF +
+                    "Timeout: Second-fwe, Second-259" + CRLF +
                     "Content-Length: " + LOCK_BODY.length() + CRLF +
                     "Connection: Close" + CRLF +
                     CRLF +
@@ -563,7 +564,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
+        String clientBody = client.getResponseBody();
+        Assert.assertTrue(clientBody.contains("urn:uuid:"));
+        Assert.assertTrue(clientBody.contains("Second-25"));
         String lockToken = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
