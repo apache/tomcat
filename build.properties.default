@@ -210,20 +210,20 @@ nsis.src.home=${base.path}/nsis-${nsis.version}-src
 nsis.src.loc=${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
 # ----- Commons Daemon, version 1.2.0 or later -----
-commons-daemon.version=1.6.0
+commons-daemon.version=1.6.1
 
-# checksum for commons-daemon-1.6.0-bin.tar.gz
+# checksum for commons-daemon-1.6.1-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=1bbafd2b51b38c68159d1a895c66173ee9e0787039aa98b11f05b230cc3504130cc5c8c41874639f8bd2ffb42991621a96dfe98f5f2928be9aac8ced7abd9b27
+commons-daemon.bin.checksum.value=4757860f7700908cd915141237321b2996ea07077066e8afaa1de322d9edbf7e20c73cb19c57e2bcc27e5e0756d7c3d568f8849718e2011e3b182a2420d7a969
 
-# checksums for commons-daemon-1.6.0-native-src.tar.gz, commons-daemon-1.6.0-bin-windows.zip
+# checksums for commons-daemon-1.6.1-native-src.tar.gz, commons-daemon-1.6.1-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=b07d0aa67aa381c48a08fc19f8108d4c3218f8720623b9bbf4d33447b97a6b4ac915478b6b17362b77e982159d224dd2b99ddd8aba97733f58759974127a5271
+commons-daemon.native.src.checksum.value=6ecc74a85d7356078d778cbc414e007435e58c0c15dffc5cb83865e037adf423980842946218c75e80062e0ee715ce3240d39c709afe15e0d52db1a613e0484e
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=aac8c8a84668ded13c95826de8c81f2a121c64650ad56390b05d7b58dcaf9b76ac8fca3c895080ab393593623687b60c4137675934a79963e303da345e58e644
+commons-daemon.native.win.checksum.value=a878177edc92e663c1113858f8903451ec02b5b033bca373bea4f8761d9196323771301fcd6a7b8387d8e2300f7a1056b9e08e83fca9703df32ac3ecd5b129f7
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
