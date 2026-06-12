@@ -368,8 +368,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         } else if (nameParts[0].equals("SERVER")) {
             if (nameParts[1].equals("ADDR")) {
                 retVal = req.getLocalAddr();
-            }
-            if (nameParts[1].equals("NAME")) {
+            } else if (nameParts[1].equals("NAME")) {
                 retVal = req.getServerName();
             } else if (nameParts[1].equals("PORT")) {
                 retVal = Integer.toString(req.getServerPort());

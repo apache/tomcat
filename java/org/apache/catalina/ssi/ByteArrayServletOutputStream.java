@@ -62,23 +62,14 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
         buf.write(b);
     }
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public boolean isReady() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public void setWriteListener(WriteListener listener) {
-        // TODO Auto-generated method stub
-
     }
 
 
