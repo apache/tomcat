@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +31,6 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
@@ -672,8 +670,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         if (propertyPrefix == null) {
             propertyPrefix = "";
         }
-        if (result instanceof CompositeDataSupport) {
-            CompositeDataSupport data = (CompositeDataSupport) result;
+        if (result instanceof CompositeData) {
+            CompositeData data = (CompositeData) result;
             CompositeType compositeType = data.getCompositeType();
             Set<String> keys = compositeType.keySet();
             for (String key : keys) {
@@ -685,19 +683,11 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     createProperty(propertyPrefix + "." + key, value);
                 }
             }
-        } else if (result instanceof TabularDataSupport) {
-            TabularDataSupport data = (TabularDataSupport) result;
-            for (Object key : data.keySet()) {
-                for (Object key1 : ((List<?>) key)) {
-                    CompositeData valuedata = data.get(new Object[] { key1 });
-                    Object value = valuedata.get("value");
-                    OpenType<?> type = valuedata.getCompositeType().getType("value");
-                    if (type instanceof SimpleType<?>) {
-                        setProperty(propertyPrefix + "." + key1, value);
-                    } else {
-                        createProperty(propertyPrefix + "." + key1, value);
-                    }
-                }
+        } else if (result instanceof TabularDataSupport data) {
+            int rowIndex = 0;
+            for (Object value : data.values()) {
+                createProperty(propertyPrefix + "." + rowIndex, value);
+                rowIndex++;
             }
         } else if (result.getClass().isArray()) {
             if (isSeparatearrayresults()) {
