@@ -233,7 +233,10 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
                 return result.toString();
             }
         } catch (Exception e) {
-            // ignore access or connection open errors
+            /*
+             * Exceptions are ignored for compatibility with the waitFor task when waiting for the server to start. If
+             * the exception was thrown the build task would fail rather than wait.
+             */
         }
         return null;
     }
