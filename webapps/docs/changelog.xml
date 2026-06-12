@@ -355,6 +355,10 @@
         <bug>69988</bug>: Fix post handshake authentication for TLS 1.3. It was
         broken by a breaking change in OpenSSL between 1.1.1 and 3.0.0. (markt)
       </fix>
+      <fix>
+        When processing an OpenSSL cipher specification, fully align the order
+        of the resulting ciphers with the order produced by OpenSSL. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

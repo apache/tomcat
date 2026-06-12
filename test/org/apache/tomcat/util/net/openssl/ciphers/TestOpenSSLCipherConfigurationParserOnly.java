@@ -84,6 +84,23 @@ public class TestOpenSSLCipherConfigurationParserOnly {
     }
 
     @Test
+    public void testDefaultSort04() throws Exception {
+        // Reproducing a failure observed when aligning sorting with OpenSSL master
+
+        // ECDHE should beat DHE
+        LinkedHashSet<Cipher> input = new LinkedHashSet<>();
+        input.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM_8);
+        input.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8);
+        LinkedHashSet<Cipher> result = OpenSSLCipherConfigurationParser.defaultSort(input);
+
+        LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
+        expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8);
+        expected.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM_8);
+
+        Assert.assertEquals(expected.toString(), result.toString());
+    }
+
+    @Test
     public void testRename01() throws Exception {
         // EDH -> DHE
         LinkedHashSet<Cipher> result =
