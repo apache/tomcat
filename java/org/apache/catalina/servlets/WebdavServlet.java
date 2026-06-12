@@ -1447,26 +1447,32 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
 
-        // Parsing timeout header
+        // Parsing timeout header (RFC 4918: comma-separated list, pick first acceptable)
 
         int lockDuration = DEFAULT_TIMEOUT;
         String lockDurationStr = req.getHeader("Timeout");
         if (lockDurationStr != null) {
-            if (lockDurationStr.startsWith("Second-")) {
-                try {
-                    lockDuration = Integer.parseInt(lockDurationStr.substring("Second-".length()));
-                } catch (NumberFormatException e) {
-                    // Ignore
+            String[] timeoutValues = lockDurationStr.split(",");
+            for (String tv : timeoutValues) {
+                tv = tv.trim();
+                if (tv.startsWith("Second-")) {
+                    try {
+                        lockDuration = Integer.parseInt(tv.substring("Second-".length()));
+                        break;
+                    } catch (NumberFormatException e) {
+                        // Try the next value if any
+                    }
+                } else if (tv.equals("Infinite")) {
+                    lockDuration = MAX_TIMEOUT;
+                    break;
                 }
-            } else if (lockDurationStr.equals("Infinite")) {
-                lockDuration = MAX_TIMEOUT;
             }
-            if (lockDuration == 0) {
-                lockDuration = DEFAULT_TIMEOUT;
-            }
-            if (lockDuration > MAX_TIMEOUT) {
-                lockDuration = MAX_TIMEOUT;
-            }
+        }
+        if (lockDuration == 0) {
+            lockDuration = DEFAULT_TIMEOUT;
+        }
+        if (lockDuration > MAX_TIMEOUT) {
+            lockDuration = MAX_TIMEOUT;
         }
         lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000L);
 
