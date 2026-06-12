@@ -526,16 +526,16 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     static void moveToEnd(final LinkedHashSet<Cipher> ciphers, final Collection<Cipher> toBeMovedCiphers) {
-        List<Cipher> movedCiphers = new ArrayList<>(toBeMovedCiphers);
-        movedCiphers.retainAll(ciphers);
+        List<Cipher> movedCiphers = new ArrayList<>(ciphers);
+        movedCiphers.retainAll(toBeMovedCiphers);
         movedCiphers.forEach(ciphers::remove);
         ciphers.addAll(movedCiphers);
     }
 
     static void moveToStart(final LinkedHashSet<Cipher> ciphers, final Collection<Cipher> toBeMovedCiphers) {
-        List<Cipher> movedCiphers = new ArrayList<>(toBeMovedCiphers);
+        List<Cipher> movedCiphers = new ArrayList<>(ciphers);
         List<Cipher> originalCiphers = new ArrayList<>(ciphers);
-        movedCiphers.retainAll(ciphers);
+        movedCiphers.retainAll(toBeMovedCiphers);
         ciphers.clear();
         ciphers.addAll(movedCiphers);
         ciphers.addAll(originalCiphers);
@@ -569,45 +569,86 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     /*
-     * See https://github.com/openssl/openssl/blob/7c96dbcdab959fef74c4caae63cdebaa354ab252/ssl/ssl_ciph.c#L1371
+     * See https://github.com/openssl/openssl/blob/master/ssl/ssl_ciph.c
+     *
+     * Most recently reviewed at afaa70c on 2026-06-12
      */
     static LinkedHashSet<Cipher> defaultSort(final LinkedHashSet<Cipher> ciphers) {
-        final LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
-        final LinkedHashSet<Cipher> ecdh = new LinkedHashSet<>(ciphers.size());
+        LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
 
-        /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
-        ecdh.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
+        // Copy because we need to manipulate the order before adding
+        LinkedHashSet<Cipher> source = new LinkedHashSet<>(ciphers);
 
-        /* AES is our preferred symmetric cipher */
-        Set<Encryption> aes = new HashSet<>(
-                Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM,
-                        Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM));
-
-        /* Now arrange all ciphers by preference: */
-        result.addAll(filterByEncryption(ecdh, aes));
-        result.addAll(filterByEncryption(ciphers, aes));
-
-        /* Add everything else */
-        result.addAll(ecdh);
-        result.addAll(ciphers);
-
-        /* Low priority for MD5 */
-        moveToEnd(result, filterByMessageDigest(result, Collections.singleton(MessageDigest.MD5)));
+        // Can't find this in the OpenSSL source but observed in test results
+        Set<Cipher> camelliaWithDSS = filterByAuthentication(source, Collections.singleton(Authentication.DSS));
+        camelliaWithDSS = filterByEncryption(
+                camelliaWithDSS, new LinkedHashSet<>(Arrays.asList(Encryption.CAMELLIA128, Encryption.CAMELLIA256)));
+        moveToEnd(source, camelliaWithDSS);
 
         /*
-         * Move anonymous ciphers to the end. Usually, these will remain disabled. (For applications that allow them,
-         * they aren't too bad, but we prefer authenticated ciphers.)
+         * This change is made to source so it effectively applies to each group that is subsequently added to the
+         * result.
          */
-        moveToEnd(result, filterByAuthentication(result, Collections.singleton(Authentication.aNULL)));
+        LinkedHashSet<Cipher> eecdh = filterByKeyExchange(source, Collections.singleton(KeyExchange.EECDH));
+        moveToStart(source, eecdh);
+        moveToStart(source, filterByAuthentication(eecdh, Collections.singleton(Authentication.ECDSA)));
 
-        /* Move ciphers without forward secrecy to the end */
-        moveToEnd(result, filterByAuthentication(result, Collections.singleton(Authentication.ECDH)));
+        // Now start adding ciphers to the result
+
+        // Prefer GCM over CHACHA
+        result.addAll(filterByEncryption(source, Collections.singleton(Encryption.AES256GCM)));
+        result.addAll(filterByEncryption(source, Collections.singleton(Encryption.AES128GCM)));
+        result.addAll(filterByEncryption(source, Collections.singleton(Encryption.CHACHA20POLY1305)));
+
+        // Generally prefer AES
+        result.addAll(filterByEncryption(source,
+                new HashSet<>(Arrays.asList(Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256,
+                        Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128))));
+
+        // Add everything else
+        result.addAll(source);
+
+        // Move MD5 to end
+        moveToEnd(result, filterByMessageDigest(result, Collections.singleton(MessageDigest.MD5)));
+
+        // Move anonymous ciphers to the end.
+        moveToEnd(result, filterByAuthentication(result, Collections.singleton(Authentication.aNULL)));
         moveToEnd(result, filterByKeyExchange(result, Collections.singleton(KeyExchange.RSA)));
         moveToEnd(result, filterByKeyExchange(result, Collections.singleton(KeyExchange.PSK)));
 
-        /* RC4 is sort-of broken -- move to the end */
+        // RC4 is sort-of broken -- move to the end
         moveToEnd(result, filterByEncryption(result, Collections.singleton(Encryption.RC4)));
-        return strengthSort(result);
+
+        // Sort by encryption strength
+        result = strengthSort(result);
+
+        // Partially override strength sort to prefer TLS 1.2
+        moveToStart(result, filterByProtocol(result, Collections.singleton(Protocol.TLSv1_2)));
+
+        /*
+         * Irrespective of strength, enforce the following order:
+         * (EC)DHE + AEAD > (EC)DHE > rest of AEAD > rest.
+         * Within each group, ciphers remain sorted by strength and previous
+         * preference, i.e.,
+         * 1) ECDHE > DHE
+         * 2) GCM > CHACHA
+         * 3) AES > rest
+         * 4) TLS 1.2 > legacy
+         *
+         * Moving to start so move in reverse order.
+         */
+        Set<Cipher> ecdheAndDhe = new LinkedHashSet<>(result.size());
+        Set<Cipher> ecdheAndDheWithAead = new LinkedHashSet<>(result.size());
+
+        ecdheAndDhe.addAll(filterByKeyExchange(result, new HashSet<>(Arrays.asList(KeyExchange.EDH, KeyExchange.EECDH))));
+        ecdheAndDheWithAead.addAll(ecdheAndDhe);
+        ecdheAndDheWithAead = filterByMessageDigest(ecdheAndDheWithAead, Collections.singleton(MessageDigest.AEAD));
+
+        moveToStart(result, filterByMessageDigest(result, Collections.singleton(MessageDigest.AEAD)));
+        moveToStart(result, ecdheAndDhe);
+        moveToStart(result, ecdheAndDheWithAead);
+
+        return result;
     }
 
     static Set<Cipher> filterByStrengthBits(Set<Cipher> ciphers, int strength_bits) {
