@@ -53,6 +53,9 @@ public class SSIExec implements SSICommand {
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {
         long lastModified = 0;
+        if (paramNames.length == 0 || paramValues.length == 0) {
+            return 0;
+        }
         String configErrMsg = ssiMediator.getConfigErrMsg();
         String paramName = paramNames[0];
         String paramValue = paramValues[0];

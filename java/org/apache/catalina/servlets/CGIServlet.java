@@ -1326,13 +1326,11 @@ public final class CGIServlet extends HttpServlet {
          * @param map Map to convert
          *
          * @return converted string array
-         *
-         * @exception NullPointerException if a hash key has a null value
          */
-        protected String[] mapToStringArray(Map<String,?> map) throws NullPointerException {
+        protected String[] mapToStringArray(Map<String,?> map) {
             List<String> list = new ArrayList<>(map.size());
             for (Entry<String,?> entry : map.entrySet()) {
-                list.add(entry.getKey() + "=" + entry.getValue().toString());
+                list.add(entry.getKey() + "=" + (entry.getValue() == null ? "" : entry.getValue().toString()));
             }
             return list.toArray(new String[0]);
         }
