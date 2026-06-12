@@ -511,7 +511,7 @@ public class OpenSSLCipherConfigurationParser {
         complementOfDefault.addAll(aliases.get(CAMELLIA));
         complementOfDefault.addAll(aliases.get(AESCCM));
         complementOfDefault.addAll(aliases.get(ARIA));
-        defaultSort(complementOfDefault);
+        complementOfDefault = defaultSort(complementOfDefault);
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
 
         initialized = true;
@@ -736,7 +736,7 @@ public class OpenSSLCipherConfigurationParser {
                     moveToEnd(ciphers, alias);
                 }
             } else if ("@STRENGTH".equals(element)) {
-                strengthSort(ciphers);
+                ciphers = strengthSort(ciphers);
             } else if (aliases.containsKey(element)) {
                 add(ciphers, element);
             } else if (element.contains(AND)) {
