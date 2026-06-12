@@ -683,7 +683,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     createProperty(propertyPrefix + "." + key, value);
                 }
             }
-        } else if (result instanceof TabularDataSupport data) {
+        } else if (result instanceof TabularDataSupport) {
+            TabularDataSupport data = (TabularDataSupport) result;
             int rowIndex = 0;
             for (Object value : data.values()) {
                 createProperty(propertyPrefix + "." + rowIndex, value);
