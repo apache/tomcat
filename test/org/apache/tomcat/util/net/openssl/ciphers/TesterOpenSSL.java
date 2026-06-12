@@ -60,12 +60,10 @@ public class TesterOpenSSL {
             VERSION = 30500;
         } else if (versionString.startsWith("OpenSSL 3.4.")) {
             VERSION = 30400;
-        } else if (versionString.startsWith("OpenSSL 3.3.")) {
-            VERSION = 30300;
         } else if (versionString.startsWith("OpenSSL 3.0.")) {
             VERSION = 30000;
         } else {
-            // Note: 3.2.x and 3.1.x are no longer supported by OpenSSL
+            // Note: 3.3.x, 3.2.x and 3.1.x are no longer supported by OpenSSL
             // Note: Release branches 1.1.1 and earlier are no longer supported by
             //       the OpenSSL team so these tests don't support them either.
             VERSION = -1;
