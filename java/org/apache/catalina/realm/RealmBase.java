@@ -363,11 +363,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return null;
         }
 
-        if (containerLog.isTraceEnabled()) {
+        Principal principal = getPrincipal(username);
+
+        if (principal != null && containerLog.isTraceEnabled()) {
             containerLog.trace(sm.getString("realmBase.authenticateSuccess", username));
         }
 
-        return getPrincipal(username);
+        return principal;
     }
 
 
