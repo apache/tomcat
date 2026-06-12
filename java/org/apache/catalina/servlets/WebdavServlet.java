@@ -1452,8 +1452,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 tv = tv.trim();
                 if (tv.startsWith("Second-")) {
                     try {
-                        lockDuration = Integer.parseInt(tv.substring("Second-".length()));
-                        break;
+                        int value = Integer.parseInt(tv.substring("Second-".length()));
+                        if (value > 0) {
+                            lockDuration = value;
+                            break;
+                        }
                     } catch (NumberFormatException e) {
                         // Try the next value if any
                     }
@@ -1462,9 +1465,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     break;
                 }
             }
-        }
-        if (lockDuration == 0) {
-            lockDuration = DEFAULT_TIMEOUT;
         }
         if (lockDuration > MAX_TIMEOUT) {
             lockDuration = MAX_TIMEOUT;

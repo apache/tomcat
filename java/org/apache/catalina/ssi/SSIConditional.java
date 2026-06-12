@@ -134,6 +134,9 @@ public class SSIConditional implements SSICommand {
      * Returns the "expr" if the arg name is appropriate, otherwise returns null.
      */
     private String getExpression(String[] paramNames, String[] paramValues) {
+        if (paramNames.length == 0 || paramValues.length == 0) {
+            return null;
+        }
         if ("expr".equalsIgnoreCase(paramNames[0])) {
             return paramValues[0];
         }
