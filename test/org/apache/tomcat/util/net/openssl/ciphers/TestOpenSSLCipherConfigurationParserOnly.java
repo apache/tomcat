@@ -41,10 +41,10 @@ public class TestOpenSSLCipherConfigurationParserOnly {
         LinkedHashSet<Cipher> result = OpenSSLCipherConfigurationParser.defaultSort(input);
 
         LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
-        expected.add(Cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384);
         expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384);
-        expected.add(Cipher.TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384);
+        expected.add(Cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384);
         expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
+        expected.add(Cipher.TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384);
 
         Assert.assertEquals(expected.toString(), result.toString());
     }
@@ -70,14 +70,14 @@ public class TestOpenSSLCipherConfigurationParserOnly {
     public void testDefaultSort03() throws Exception {
         // Reproducing a failure observed on Gump with OpenSSL 1.1.x
 
-        // AES should beat CAMELLIA
+        // AES should beat CAMELLIA but
         LinkedHashSet<Cipher> input = new LinkedHashSet<>();
         input.add(Cipher.TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
-        input.add(Cipher.TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384);
+        input.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM);
         LinkedHashSet<Cipher> result = OpenSSLCipherConfigurationParser.defaultSort(input);
 
         LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
-        expected.add(Cipher.TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384);
+        expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM);
         expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
 
         Assert.assertEquals(expected.toString(), result.toString());
