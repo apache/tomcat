@@ -2778,7 +2778,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             true,
-            128,
+            64,
             128,
             null,
             null
@@ -4455,7 +4455,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            128,
+            64,
             128,
             null,
             null
@@ -4472,7 +4472,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            256,
+            64,
             256,
             null,
             null
@@ -4489,7 +4489,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            128,
+            64,
             128,
             null,
             null
@@ -4506,7 +4506,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            256,
+            64,
             256,
             null,
             null
@@ -4591,7 +4591,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            128,
+            64,
             128,
             null,
             null
@@ -4608,7 +4608,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            256,
+            64,
             256,
             null,
             null
@@ -4625,7 +4625,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            128,
+            64,
             128,
             null,
             null
@@ -4642,7 +4642,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            256,
+            64,
             256,
             null,
             null
@@ -4694,7 +4694,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            128,
+            64,
             128,
             null,
             null
@@ -4711,7 +4711,7 @@ public enum Cipher {
             false,
             EncryptionLevel.MEDIUM,
             false,
-            256,
+            64,
             256,
             null,
             null
