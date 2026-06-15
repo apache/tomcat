@@ -2994,9 +2994,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     deadProperties.put(destination, propertiesDest);
                 }
                 /*
-                 * The following ensures that locks for any two paths are always obtained in the same other order
-                 * regardless of which is the source and which is the destination. This is to avoid deadlocks for
-                 * concurrent calls where source and destination are reversed.
+                 * The following ensures that locks for any two paths are always obtained in the same order regardless
+                 * of which is the source and which is the destination. This is to avoid deadlocks for concurrent calls
+                 * where source and destination are reversed.
                  */
                 Object lockFirst;
                 Object lockSecond;
