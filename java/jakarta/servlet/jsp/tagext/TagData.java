@@ -137,7 +137,7 @@ public class TagData implements Cloneable {
     }
 
     @Override
-    public TagData clone() {
+    protected Object clone() throws CloneNotSupportedException {
         try {
             TagData clone = (TagData) super.clone();
             clone.attributes = new Hashtable<>(attributes);
