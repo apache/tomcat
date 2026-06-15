@@ -19,6 +19,7 @@ package org.apache.catalina.realm;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -2325,8 +2326,10 @@ public class JNDIRealm extends RealmBase {
             while (e.hasMore()) {
                 Object value = e.next();
                 String valueString;
-                if (value instanceof byte[]) {
-                    valueString = new String((byte[]) value);
+                if (value == null) {
+                    valueString = null;
+                } else if (value instanceof byte[]) {
+                    valueString = new String((byte[]) value, StandardCharsets.UTF_8);
                 } else {
                     valueString = value.toString();
                 }

@@ -633,16 +633,15 @@ public class JAASRealm extends RealmBase {
                     try (ConfigurationSource.Resource configFileResource =
                             ConfigFileLoader.getSource().getResource(configFile)) {
                         config = constructor.newInstance(configFileResource.getURI());
-                        this.jaasConfigurationLoaded = true;
                     } catch (IOException ioe) {
                         throw new RuntimeException(sm.getString("jaasRealm.configFileNotFound", configFile));
                     }
                 } else {
                     URI uri = resource.toURI();
                     config = constructor.newInstance(uri);
-                    this.jaasConfigurationLoaded = true;
                 }
                 this.jaasConfiguration = config;
+                this.jaasConfigurationLoaded = true;
                 return this.jaasConfiguration;
             }
         } catch (InvocationTargetException ex) {
