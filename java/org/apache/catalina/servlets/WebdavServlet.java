@@ -2988,12 +2988,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         @Override
         public void copy(String source, String destination) {
             ArrayList<Node> properties = deadProperties.get(source);
-            ArrayList<Node> propertiesDest = deadProperties.get(destination);
             if (properties != null) {
-                if (propertiesDest == null) {
-                    propertiesDest = new ArrayList<>();
-                    deadProperties.put(destination, propertiesDest);
-                }
+                ArrayList<Node> propertiesDest = deadProperties.computeIfAbsent(destination, k -> new ArrayList<>());
                 /*
                  * The following ensures that locks for any two paths are always obtained in the same order regardless
                  * of which is the source and which is the destination. This is to avoid deadlocks for concurrent calls
