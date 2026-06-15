@@ -173,8 +173,6 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             return Collections.emptySet();
         }
 
-        Set<String> conflicts = new HashSet<>();
-
         String[] decodedUrlPatterns = new String[urlPatterns.length];
         for (int i = 0; i < urlPatterns.length; i++) {
             if (urlPatterns[i] == null) {
@@ -183,14 +181,20 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             decodedUrlPatterns[i] = UDecoder.URLDecode(urlPatterns[i], StandardCharsets.UTF_8);
         }
 
+        Set<String> conflicts = new HashSet<>();
+        Set<String> overrides = new HashSet<>();
+
         for (int i = 0; i < decodedUrlPatterns.length; i++) {
             String wrapperName = context.findServletMapping(decodedUrlPatterns[i]);
             if (wrapperName != null) {
                 Wrapper wrapper = (Wrapper) context.findChild(wrapperName);
                 if (wrapper.isOverridable()) {
-                    // Some Wrappers (from global and host web.xml) may be
-                    // overridden rather than generating a conflict
-                    context.removeServletMapping(decodedUrlPatterns[i]);
+                    /*
+                     * Some Wrappers (from global and host web.xml) may be overridden rather than generating a conflict.
+                     * Changes as a result of this method should be all or nothing so note the overrides until the check
+                     * for conflicts has completed.
+                     */
+                    overrides.add(decodedUrlPatterns[i]);
                 } else {
                     conflicts.add(urlPatterns[i]);
                 }
@@ -200,6 +204,9 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
         if (!conflicts.isEmpty()) {
             return conflicts;
         }
+
+        // No conflicts, remove the mappings that are about to be overridden
+        overrides.forEach(p -> context.removeServletMapping(p));
 
         for (String urlPattern : decodedUrlPatterns) {
             context.addServletMappingDecoded(urlPattern, wrapper.getName());
