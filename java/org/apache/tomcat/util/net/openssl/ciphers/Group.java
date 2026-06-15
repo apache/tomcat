@@ -41,6 +41,20 @@ public enum Group {
      */
     secp521r1(0x0019),
     /**
+     * Brainpool P-256 (brainpoolP256r1) elliptic curve group.
+     */
+    brainpoolP256r1(0x001A),
+
+    /**
+     * Brainpool P-384 (brainpoolP384r1) elliptic curve group.
+     */
+    brainpoolP384r1(0x001B),
+
+    /**
+     * Brainpool P-512 (brainpoolP512r1) elliptic curve group.
+     */
+    brainpoolP512r1(0x001C),
+    /**
      * Curve25519 elliptic curve group.
      */
     x25519(0x001D),
