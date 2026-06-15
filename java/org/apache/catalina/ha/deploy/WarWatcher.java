@@ -225,6 +225,7 @@ public class WarWatcher {
                 // file was added
                 result = 1;
                 lastState = result;
+                lastModified = war.lastModified();
             }
             return result;
         }
