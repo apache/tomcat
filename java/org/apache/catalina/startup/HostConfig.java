@@ -691,7 +691,7 @@ public class HostConfig implements LifecycleListener {
             addGlobalRedeployResources(deployedApp);
         }
 
-        deployed.put(context.getName(), deployedApp);
+        deployed.put(cn.getName(), deployedApp);
 
         if (log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.deployDescriptor.finished", contextXml.getAbsolutePath(),

@@ -16,16 +16,22 @@
  */
 package org.apache.catalina.startup;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 /**
  * Rule implementation that creates an SSLHostConfigCertificate.
  */
 public class CertificateCreateRule extends Rule {
+
+    private static final Log log = LogFactory.getLog(CertificateCreateRule.class);
+    private static final StringManager sm = StringManager.getManager(CertificateCreateRule.class);
 
     /**
      * Default constructor.
@@ -42,7 +48,12 @@ public class CertificateCreateRule extends Rule {
         if (typeValue == null || typeValue.isEmpty()) {
             type = Type.UNDEFINED;
         } else {
-            type = Type.valueOf(typeValue);
+            try {
+                type = Type.valueOf(typeValue);
+            } catch (IllegalArgumentException e) {
+                log.warn(sm.getString("certificate.unknownType", typeValue));
+                type = Type.UNDEFINED;
+            }
         }
 
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, type);

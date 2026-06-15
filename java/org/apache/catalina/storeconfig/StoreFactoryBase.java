@@ -24,7 +24,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * StoreFactory saves special elements. Output was generate with StoreAppenders.
+ * StoreFactory saves special elements. Output was generated with StoreAppenders.
  */
 public class StoreFactoryBase implements IStoreFactory {
     /**

@@ -82,7 +82,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         String protocol = connector.getProtocol();
         List<String> propertyKeys = getPropertyKeys(connector);
         // Create blank instance
-        Object bean2 = new Connector(protocol);// defaultInstance(bean);
+        Object bean2 = new Connector(protocol);
         for (String key : propertyKeys) {
             Object value = IntrospectionUtils.getProperty(bean, key);
             if (desc.isTransientAttribute(key)) {
@@ -245,7 +245,6 @@ public class ConnectorStoreAppender extends StoreAppender {
      * <ul>
      * <li>Special handling to default jkHome.</li>
      * <li>Don't save catalina.base path at server.xml</li>
-     * <li>
      * </ul>
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object, Object, String, StoreDescription)

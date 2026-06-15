@@ -19,6 +19,7 @@ package org.apache.catalina.storeconfig;
 import java.io.PrintWriter;
 
 import org.apache.catalina.Loader;
+import org.apache.catalina.loader.ParallelWebappClassLoader;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -71,6 +72,6 @@ public class LoaderSF extends StoreFactoryBase {
             return false;
         }
         return (!wloader.getDelegate()) &&
-                wloader.getLoaderClass().equals("org.apache.catalina.loader.WebappClassLoader");
+                wloader.getLoaderClass().equals(ParallelWebappClassLoader.class.getName());
     }
 }
