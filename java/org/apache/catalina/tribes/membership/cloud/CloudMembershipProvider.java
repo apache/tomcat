@@ -104,6 +104,10 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
      * @param input The bytes to digest
      * @return The MD5 digest for the given input
      */
+    /*
+     * Keep in sync with org.apache.tomcat.util.security.ConcurrentMessageDigest. Can't re-use that directly as tribes
+     * is not permitted to create a dependency on that package.
+     */
     protected static byte[] digest(byte[] input) {
         MessageDigest md = queue.poll();
         if (md == null) {
@@ -141,6 +145,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
      * Default constructor.
      */
     public CloudMembershipProvider() {
+        // Early check that required digest is available
+        digest(new byte[0]);
     }
 
 
