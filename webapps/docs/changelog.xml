@@ -364,6 +364,10 @@
         When processing an OpenSSL cipher specification, fully align the order
         of the resulting ciphers with the order produced by OpenSSL. (markt)
       </fix>
+      <add>
+        Add support for Brainpool TLS groups. Patch provided by YStankov.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
