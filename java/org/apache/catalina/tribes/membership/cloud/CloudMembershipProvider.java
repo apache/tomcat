@@ -136,6 +136,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     }
 
     /**
+     * Default constructor.
+     */
+    public CloudMembershipProvider() {
+    }
+
+
+    /**
      * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable cannot be found (with a warning
      * log about the missing namespace).
      *
