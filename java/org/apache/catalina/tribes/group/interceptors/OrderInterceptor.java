@@ -210,11 +210,11 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         inLock.writeLock().lock();
         try {
             processLeftOvers(member, true);
+            incounter.remove(member);
         } finally {
             inLock.writeLock().unlock();
         }
-        // reset counters - lock free
-        incounter.remove(member);
+        // reset counters
         outcounter.remove(member);
         // notify upwards
         super.memberDisappeared(member);
