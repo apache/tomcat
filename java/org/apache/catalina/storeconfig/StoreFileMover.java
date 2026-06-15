@@ -28,8 +28,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Move server.xml or context.xml as backup
- * <p>
- * TODO Get Encoding from Registry
  */
 public class StoreFileMover {
 
@@ -146,16 +144,12 @@ public class StoreFileMover {
     }
 
     /**
-     * Calculate file objects for the old and new configuration files.
-     */
-    public StoreFileMover() {
-        init();
-    }
-
-    /**
      * Generate the Filename to new with TimeStamp.
      */
     public void init() {
+        if (getBasename() == null || getFilename() == null || getEncoding() == null) {
+            throw new IllegalArgumentException(sm.getString("storeFileMover.null"));
+        }
         String configFile = getFilename();
         configOld = new File(configFile);
         if (!configOld.isAbsolute()) {

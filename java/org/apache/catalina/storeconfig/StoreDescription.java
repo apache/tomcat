@@ -359,7 +359,7 @@ public class StoreDescription {
      *
      * @param classname The class name to check
      *
-     * @return is classname attribute?
+     * @return true if the classname is a transient child
      */
     public boolean isTransientChild(String classname) {
         if (transientChildren != null) {
@@ -373,7 +373,7 @@ public class StoreDescription {
      *
      * @param attribute The attribute name to check
      *
-     * @return is transient attribute?
+     * @return true if the attribute is transient
      */
     public boolean isTransientAttribute(String attribute) {
         if (transientAttributes != null) {

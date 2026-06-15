@@ -61,7 +61,6 @@ public class StoreContextAppender extends StoreAppender {
      * <li>Special handling to default workDir.</li>
      * <li>Don't save path at external context.xml</li>
      * <li>Don't generate docBase for host.appBase webapps
-     * <LI>
      * </ul>
      * {@inheritDoc}
      */
