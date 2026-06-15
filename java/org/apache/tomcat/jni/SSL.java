@@ -975,6 +975,12 @@ public final class SSL {
      */
     public static native int getPostHandshakeAuthInProgress(long ssl);
 
+    /**
+     * Marks post handshake authentication complete for the connection. Used when JSSE is performing certificate
+     * verification for OpenSSL.
+     *
+     * @param ssl the SSL instance (SSL *)
+     */
     public static native void markPostHandshakeAuthComplete(long ssl);
 
     /**
