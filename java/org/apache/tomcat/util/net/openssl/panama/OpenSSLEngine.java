@@ -1444,6 +1444,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
 
+    static void markPostHandshakeAuthComplete(MemorySegment ssl) {
+        EngineState state = getState(ssl);
+        if (state != null) {
+            state.phaState = PHAState.COMPLETE;
+        }
+    }
+
+
     private class OpenSSLSession implements SSLSession {
 
         // lazy init for memory reasons
