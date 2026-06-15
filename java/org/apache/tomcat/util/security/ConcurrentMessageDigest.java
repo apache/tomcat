@@ -125,6 +125,9 @@ public class ConcurrentMessageDigest {
             throw new IllegalStateException(sm.getString("concurrentMessageDigest.noDigest"));
         }
 
+        /*
+         * Keep in sync with org.apache.catalina.tribes.membership.cloud.CloudMembershipProvider
+         */
         MessageDigest md = queue.poll();
         if (md == null) {
             try {
