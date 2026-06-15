@@ -542,7 +542,6 @@ public class HostConfig implements LifecycleListener {
      * @param cn         The context name
      * @param contextXml The descriptor
      */
-    @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
 
         // Check for descriptors with /../ /./ or similar sequences in the name
