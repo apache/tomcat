@@ -201,6 +201,11 @@ public final class ContextName {
     }
 
 
+    /**
+     * Checks if the path for this instance is valid.
+     *
+     * @return {@code true} if the path given/calculated for this instance is valid, otherwise {@code false}
+     */
     public boolean isPathValid() {
         // No need to test for null since path can never be null (see constructors)
         //
