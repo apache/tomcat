@@ -68,7 +68,7 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        return smanager.getPathname() == null && (smanager.getMaxActiveSessions() == -1);
+        return "SESSIONS.ser".equals(smanager.getPathname()) && (smanager.getMaxActiveSessions() == -1);
 
     }
 
