@@ -816,6 +816,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509Certificate[] peerCerts = certificates(certificateChain);
                 try {
                     x509TrustManager.checkClientTrusted(peerCerts, authMethod);
+                    OpenSSLEngine.markPostHandshakeAuthComplete(ssl);
                     return 1;
                 } catch (Exception e) {
                     if (log.isDebugEnabled()) {
