@@ -263,6 +263,11 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             this(0);
         }
 
+        /**
+         * Constructs a Counter with the given initial value.
+         *
+         * @param startValue The initial value
+         */
         public Counter(int startValue) {
             value =  new AtomicInteger(startValue);
         }
