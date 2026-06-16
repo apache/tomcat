@@ -106,12 +106,12 @@ public class Arrays {
             int i = offset;
             if (unsigned) {
                 buf.append(data[i++] & 0xff);
-                for (; i < length; i++) {
+                for (; i < offset + length; i++) {
                     buf.append(", ").append(data[i] & 0xff);
                 }
             } else {
                 buf.append(data[i++]);
-                for (; i < length; i++) {
+                for (; i < offset + length; i++) {
                     buf.append(", ").append(data[i]);
                 }
             }
@@ -141,8 +141,9 @@ public class Arrays {
     public static String toString(Object[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if (data != null && length > 0) {
-            buf.append(data[offset++]);
-            for (int i = offset; i < length; i++) {
+            int i = offset;
+            buf.append(data[i++]);
+            for (; i < offset + length; i++) {
                 buf.append(", ").append(data[i]);
             }
         }
@@ -171,8 +172,9 @@ public class Arrays {
     public static String toNameString(Member[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if (data != null && length > 0) {
-            buf.append(data[offset++].getName());
-            for (int i = offset; i < length; i++) {
+            int i = offset;
+            buf.append(data[i++].getName());
+            for (; i < offset + length; i++) {
                 buf.append(", ").append(data[i].getName());
             }
         }
