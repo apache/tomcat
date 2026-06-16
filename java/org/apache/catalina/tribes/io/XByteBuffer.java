@@ -471,13 +471,13 @@ public class XByteBuffer implements Serializable {
      * @return the output buffer
      */
     public static byte[] createDataPackage(byte[] data, int doff, int dlength, byte[] buffer, int bufoff) {
-        if ((buffer.length - bufoff) > getDataPackageLength(dlength)) {
+        if ((buffer.length - bufoff) < getDataPackageLength(dlength)) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.unableCreate"));
         }
         System.arraycopy(START_DATA, 0, buffer, bufoff, START_DATA.length);
-        toBytes(data.length, buffer, bufoff + START_DATA.length);
+        toBytes(dlength, buffer, bufoff + START_DATA.length);
         System.arraycopy(data, doff, buffer, bufoff + START_DATA.length + 4, dlength);
-        System.arraycopy(END_DATA, 0, buffer, bufoff + START_DATA.length + 4 + data.length, END_DATA.length);
+        System.arraycopy(END_DATA, 0, buffer, bufoff + START_DATA.length + 4 + dlength, END_DATA.length);
         return buffer;
     }
 

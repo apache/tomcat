@@ -119,7 +119,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     protected final List<ChannelListener> channelListeners = new CopyOnWriteArrayList<>();
 
     /**
-     * If set to true, the GroupChannel will check to make sure that
+     * If set to true, the GroupChannel will throw an error upon start if two interceptors
+     * are using the same option flag.
      */
     protected boolean optionCheck = false;
 
