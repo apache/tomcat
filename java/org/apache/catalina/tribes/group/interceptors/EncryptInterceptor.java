@@ -162,10 +162,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      */
     @Override
     public void setEncryptionAlgorithm(String algorithm) {
-        if (null == getEncryptionAlgorithm()) {
-            throw new IllegalStateException(sm.getString("encryptInterceptor.algorithm.required"));
+        if (algorithm == null) {
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.required"));
         }
-
         int pos = algorithm.indexOf('/');
         if (pos < 0) {
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.required"));
