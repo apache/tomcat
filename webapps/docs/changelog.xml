@@ -491,6 +491,9 @@
       <update>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </update>
+      <update>
+        Update Tomcat Native to 2.0.15. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
