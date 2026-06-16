@@ -1103,7 +1103,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
             if (state == null) {
-                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                log.warn(sm.getString("engine.noSSLState", Long.valueOf(ssl.address())));
                 return;
             }
             if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
@@ -1118,7 +1118,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
             EngineState state = getState(ssl);
             if (state == null) {
-                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                log.warn(sm.getString("engine.noSSLState", Long.valueOf(ssl.address())));
                 return 0;
             }
             if (log.isTraceEnabled()) {
@@ -1450,9 +1450,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     static void markPostHandshakeAuthComplete(MemorySegment ssl) {
         EngineState state = getState(ssl);
-        if (state != null) {
-            state.phaState = PHAState.COMPLETE;
+        if (state == null) {
+            log.warn(sm.getString("engine.noSSLState", Long.valueOf(ssl.address())));
+            return;
         }
+        state.phaState = PHAState.COMPLETE;
     }
 
 
