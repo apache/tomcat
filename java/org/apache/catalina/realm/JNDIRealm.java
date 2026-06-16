@@ -2325,7 +2325,7 @@ public class JNDIRealm extends RealmBase {
                 Object value = e.next();
                 String valueString;
                 if (value == null) {
-                    // Where this is used (roles) it makes to sense to pass on null values
+                    // Where this is used (roles) it makes no sense to pass on null values
                     continue;
                 } else if (value instanceof byte[]) {
                     valueString = new String((byte[]) value, StandardCharsets.UTF_8);
