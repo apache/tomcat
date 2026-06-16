@@ -208,14 +208,16 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     public void memberDisappeared(Member member) {
         // clear the remaining queue
         inLock.writeLock().lock();
+        outLock.writeLock().lock();
         try {
             processLeftOvers(member, true);
+            // reset counters
             incounter.remove(member);
+            outcounter.remove(member);
         } finally {
             inLock.writeLock().unlock();
+            outLock.writeLock().unlock();
         }
-        // reset counters
-        outcounter.remove(member);
         // notify upwards
         super.memberDisappeared(member);
     }
