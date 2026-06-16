@@ -639,8 +639,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "</web-app>");
@@ -654,8 +654,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <security-constraint>\n" +
@@ -680,8 +680,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <security-constraint>\n" +
@@ -709,8 +709,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <security-constraint>\n" +
@@ -737,8 +737,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <security-constraint>\n" +
@@ -766,8 +766,8 @@ public class TestWebXml {
                 "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
-                "         version=\"6.2\"\n" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\n" +
+                "         version=\"6.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <security-constraint>\n" +
