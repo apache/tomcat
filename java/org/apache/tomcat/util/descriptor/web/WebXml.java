@@ -1605,7 +1605,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                             case "domain":
                             case "path":
                             case "comment":
-                            case "http-only":
+                            case "httponly":
                             case "secure":
                             case "max-age":
                                 // NO-OP - handled above
