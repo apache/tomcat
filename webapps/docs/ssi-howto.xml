@@ -233,7 +233,7 @@ Apache Introduction to SSI</a> for more information on using SSI directives.</p>
 <p>
 SSI variables are implemented via request attributes on the <b>jakarta.servlet.ServletRequest</b> object
 and are not limited to the SSI servlet. Variables starting with the names
-"java.", "javax.", "sun" or "org.apache.catalina.ssi.SSIMediator." are reserved
+"java.", "javax.", "sun.", "jakarta.", "org.apache.catalina." or "org.apache.tomcat." are reserved
 and cannot be used.
 </p>
 <p>The SSI servlet currently implements the following variables:
