@@ -615,6 +615,16 @@
         Incorrect <code>Future.isDone()</code> return by
         <code>AsyncChannelWrapperSecure</code>. (remm)
       </fix>
+      <fix>
+        Trigger standard WebSocket error handling if a call to
+        <code>Endpoint.onOpen()</code> fails for a programmatic endpoint.
+        (markt)
+      </fix>
+      <fix>
+        <bug>70110</bug>: Fix memory leak if a call to
+        <code>Endpoint.onOpen()</code> fails for a programmatic endpoint. Test
+        case provided by uabdur. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
