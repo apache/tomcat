@@ -707,6 +707,9 @@
         Update the packaged version of the Tomcat Migration Tool for Jakarta EE
         to 1.0.12. (markt)
       </update>
+      <update>
+        Update Tomcat Native to 2.0.15. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
