@@ -19,7 +19,6 @@ package org.apache.catalina.tribes.membership.cloud;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -132,7 +131,6 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("cloudMembershipProvider.start", dnsServiceName));
         }
-        dnsServiceName = URLEncoder.encode(dnsServiceName, StandardCharsets.UTF_8);
 
         // Fetch initial members
         heartbeat();
@@ -204,11 +202,12 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             byte[] host = sender.getHost();
             int i = 0;
             StringBuilder buf = new StringBuilder();
-            buf.append(host[i++] & 0xff);
-            for (; i < host.length; i++) {
-                buf.append('.').append(host[i] & 0xff);
+            if (host.length > 0 ) {
+                buf.append(host[i++] & 0xff);
+                for (; i < host.length; i++) {
+                    buf.append('.').append(host[i] & 0xff);
+                }
             }
-
             byte[] id = digest(buf.toString().getBytes(StandardCharsets.US_ASCII));
             member.setUniqueId(id);
             member.setMemberAliveTime(-1);
