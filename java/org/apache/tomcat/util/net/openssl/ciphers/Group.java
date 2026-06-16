@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * All the supported named groups for TLS 1.3.
+ * All the supported named groups.
  *
  * @see <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8" >The supported
  *          groups registry</a>
