@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
@@ -98,7 +99,8 @@ public abstract class PojoEndpointBase extends Endpoint {
         // Trigger the error handler and close the session
         onError(session, t);
         try {
-            session.close();
+            CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+            session.close(cr);
         } catch (IOException ioe) {
             log.warn(sm.getString("pojoEndpointBase.closeSessionFail"), ioe);
         }

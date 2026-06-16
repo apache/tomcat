@@ -70,6 +70,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.InstanceManagerBindings;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.http.Method;
@@ -484,8 +485,22 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // completed transformation chain to the remote end point.
         wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
 
-        wsSession.getLocal().onOpen(wsSession, clientEndpointConfiguration);
-        registerSession(wsSession.getLocal(), wsSession);
+        try {
+            wsSession.getLocal().onOpen(wsSession, clientEndpointConfiguration);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            wsSession.getLocal().onError(wsSession, t);
+            try {
+                CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+                wsSession.close(cr);
+            } catch (IOException ioe) {
+                log.warn(sm.getString("wsWebSocketContainer.closeSessionFail"), ioe);
+            }
+            throw new IllegalArgumentException(t);
+        } finally {
+            // Always register the session to ensure the connection is closed in both normal and error cases.
+            registerSession(wsSession.getLocal(), wsSession);
+        }
 
         /*
          * It is possible that the server sent one or more messages as soon as the WebSocket connection was established.
@@ -610,8 +625,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      */
     protected void registerSession(Object key, WsSession wsSession) {
 
-        if (!wsSession.isOpen()) {
-            // The session was closed during onOpen. No need to register it.
+        if (wsSession.isClosed()) {
+            /*
+             * The session was fully closed during onOpen. No need to register it. For all other states, including the
+             * partially closed ones, register the session to ensure that the connection is closed if the other endpoint
+             * doesn't complete the closing handshake in a timely manner.
+             */
+
             return;
         }
         synchronized (endPointSessionMapLock) {
