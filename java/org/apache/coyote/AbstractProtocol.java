@@ -1408,27 +1408,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     // Connection closed. OK to recycle the processor.
                     // Processors handling upgrades require additional clean-up
                     // before release.
-                    if (processor.isUpgrade()) {
-                        UpgradeToken upgradeToken = processor.getUpgradeToken();
-                        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
-                        InstanceManager instanceManager = upgradeToken.getInstanceManager();
-                        if (instanceManager == null) {
-                            httpUpgradeHandler.destroy();
-                        } else {
-                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
-                            try {
-                                httpUpgradeHandler.destroy();
-                            } finally {
-                                try {
-                                    instanceManager.destroyInstance(httpUpgradeHandler);
-                                } catch (Throwable t) {
-                                    ExceptionUtils.handleThrowable(t);
-                                    getLog().error(sm.getString("abstractConnectionHandler.error"), t);
-                                }
-                                upgradeToken.getContextBind().unbind(false, oldCL);
-                            }
-                        }
-                    }
+                    cleanUpIfUpgrade(processor);
 
                     release(processor);
                     processor = null;
@@ -1471,10 +1451,38 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 getLog().error(sm.getString("abstractConnectionHandler.error"), t);
             }
 
+            // Processors handling upgrades require additional clean-up
+            // before release.
+            cleanUpIfUpgrade(processor);
             // Make sure socket/processor is removed from the list of current
             // connections
             release(processor);
             return SocketState.CLOSED;
+        }
+
+
+        private void cleanUpIfUpgrade(Processor processor) {
+            if (processor != null && processor.isUpgrade()) {
+                UpgradeToken upgradeToken = processor.getUpgradeToken();
+                HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+                InstanceManager instanceManager = upgradeToken.getInstanceManager();
+                if (instanceManager == null) {
+                    httpUpgradeHandler.destroy();
+                } else {
+                    ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                    try {
+                        httpUpgradeHandler.destroy();
+                    } finally {
+                        try {
+                            instanceManager.destroyInstance(httpUpgradeHandler);
+                        } catch (Throwable t) {
+                            ExceptionUtils.handleThrowable(t);
+                            getLog().error(sm.getString("abstractConnectionHandler.error"), t);
+                        }
+                        upgradeToken.getContextBind().unbind(false, oldCL);
+                    }
+                }
+            }
         }
 
 
@@ -1537,6 +1545,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         @Override
         public void release(SocketWrapperBase<S> socketWrapper) {
             Processor processor = (Processor) socketWrapper.takeCurrentProcessor();
+            cleanUpIfUpgrade(processor);
             release(processor);
         }
 
