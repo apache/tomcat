@@ -63,7 +63,7 @@ public class Arrays {
         }
         boolean match = true;
         int pos = keyoffset;
-        for (int i = srcoffset; match && i < length; i++) {
+        for (int i = srcoffset; match && i < srcoffset + length; i++) {
             match = (source[i] == key[pos++]);
         }
         return match;
