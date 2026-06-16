@@ -200,6 +200,8 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     @Override
     public void setSessionIdLength(int sessionIdLength) {
         if (sessionIdLength < 2) {
+            log.warn(sm.getString("sessionIdGeneratorBase.idLengthTooShort", Integer.toString(sessionIdLength),
+                    Integer.toString(this.sessionIdLength)));
             return;
         }
         this.sessionIdLength = sessionIdLength;
