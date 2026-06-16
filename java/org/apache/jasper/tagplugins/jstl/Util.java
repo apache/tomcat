@@ -309,8 +309,7 @@ public class Util {
 
             @Override
             public boolean isReady() {
-                // Non-blocking IO not supported
-                return false;
+                return true;
             }
 
             @Override
