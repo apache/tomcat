@@ -1085,19 +1085,14 @@ public class ExpiresFilter extends FilterBase {
             servletOutputStream.write(b);
         }
 
-        /**
-         * TODO SERVLET 3.1
-         */
         @Override
         public boolean isReady() {
-            return false;
+            return servletOutputStream.isReady();
         }
 
-        /**
-         * TODO SERVLET 3.1
-         */
         @Override
         public void setWriteListener(WriteListener listener) {
+            servletOutputStream.setWriteListener(listener);
         }
 
     }
