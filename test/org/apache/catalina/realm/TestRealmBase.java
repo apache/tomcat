@@ -872,4 +872,71 @@ public class TestRealmBase {
         Assert.assertFalse(mapRealm.hasResourcePermission(
                 request, response, constraintsPost, null));
     }
+
+
+    @Test
+    public void testDefaultServletConstraints() throws IOException {
+        // Create a constraint that allows GET
+        SecurityConstraint allowConstraint = new SecurityConstraint();
+        SecurityCollection allowCollection = new SecurityCollection();
+        allowCollection.addMethod(Method.GET);
+        allowCollection.addPatternDecoded("/");
+        allowConstraint.addCollection(allowCollection);
+        // Create a constraint that disallows everything but GET
+        SecurityConstraint blockConstraint = new SecurityConstraint();
+        SecurityCollection blockCollection = new SecurityCollection();
+        blockCollection.addOmittedMethod(Method.GET);
+        blockCollection.addPatternDecoded("/");
+        blockConstraint.addCollection(blockCollection);
+        blockConstraint.addAuthRole(ROLE1);
+
+        TesterMapRealm mapRealm = new TesterMapRealm();
+
+        // Set up the mock request and response
+        TesterRequest request = new TesterRequest();
+        Response response = new TesterResponse();
+        Context context = request.getContext();
+        request.getMappingData().context = context;
+
+        // Create the principals
+        List<String> userRoles1 = new ArrayList<>();
+        userRoles1.add(ROLE1);
+        GenericPrincipal gp1 = new GenericPrincipal(USER1, userRoles1);
+
+        List<String> userRoles2 = new ArrayList<>();
+        userRoles2.add(ROLE2);
+        GenericPrincipal gp2 = new GenericPrincipal(USER2, userRoles2);
+
+        // Add the constraints to the context
+        context.addConstraint(allowConstraint);
+        context.addConstraint(blockConstraint);
+
+        // GET should be allowed
+        request.setMethod(Method.GET);
+        SecurityConstraint[] constraints = mapRealm.findSecurityConstraints(request, context);
+
+        request.setUserPrincipal(null);
+        Assert.assertTrue(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+        request.setUserPrincipal(gp1);
+        Assert.assertTrue(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+        request.setUserPrincipal(gp2);
+        Assert.assertTrue(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+
+        // POST should require ROLE1 should be allowed
+        request.setMethod(Method.POST);
+        constraints = mapRealm.findSecurityConstraints(request, context);
+
+        request.setUserPrincipal(null);
+        Assert.assertFalse(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+        request.setUserPrincipal(gp1);
+        Assert.assertTrue(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+        request.setUserPrincipal(gp2);
+        Assert.assertFalse(mapRealm.hasResourcePermission(
+                request, response, constraints, null));
+    }
 }
