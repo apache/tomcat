@@ -212,6 +212,12 @@
      <i>before</i> the <code>TcpFailureDetector</code> on the sender and <i>after</i>
      it on the receiver, otherwise message corruption will occur.
    </p>
+   <p>
+     The EncryptInterceptor uses the timestamp of the message to provide replay
+     protection. For this to be effective, clock skew between cluster nodes
+     should be minimised. If not, it is likely a high proportion of valid
+     messages will be rejected.
+   </p>
    <attributes>
      <attribute name="encryptionAlgorithm" required="false">
        <p>The encryption algorithm to be used, including the mode and padding.
@@ -233,11 +239,31 @@
        <code>AES/GCM/NoPadding</code> is used.</p>
      </attribute>
      <attribute name="encryptionKey" required="true">
-       The key to be used with the encryption algorithm.
+       <p>The key to be used with the encryption algorithm.</p>
 
-       The key should be specified as hex-encoded bytes of the appropriate
+       <p>The key should be specified as hex-encoded bytes of the appropriate
        length for the algorithm (e.g. 16 bytes / 32 characters / 128 bits for
-       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).
+       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).</p>
+     </attribute>
+     <attribute name="replayWindowTime" required="false">
+       <p>Messages with a timestamp before the current time less this window or
+       after the current time plus this window will be rejected. This window
+       needs to account for clock skew across the cluster as well as the
+       expected maximum delay between messages being sent and received.
+       Specified in milliseconds. If not specified, the default value of 10000
+       (10 seconds) will be used.</p>
+     </attribute>
+     <attribute name="replayWindowMessageCount" required="false">
+       <p>The number of past messages for which the nonces will be tracked to
+       prevent replay attacks. Messages with a nonce that has already been
+       tracked will be rejected. If not specified, the default value of 8192
+       will be used.</p>
+
+       <p>If messages are received at a high rate, it is possible that a nonce
+       will be removed from the list of tracked nonces before
+       <code>replayWindowTime</code> milliseconds have elapsed. If that happens,
+       any message with a timestamp older than the last nonce evicted from the
+       list of tracked nonces will also be rejected.</p>
      </attribute>
    </attributes>
   </subsection>

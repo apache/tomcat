@@ -76,4 +76,32 @@ public interface EncryptInterceptorMBean {
      * @return the JCA provider name, or {@code null} for default
      */
     String getProviderName();
+
+    /**
+     * Sets the time-based replay window in milliseconds.
+     *
+     * @param replayWindowTime the replay window time
+     */
+    void setReplayWindowTime(long replayWindowTime);
+
+    /**
+     * Returns the time-based replay window in milliseconds.
+     *
+     * @return the replay window time
+     */
+    long getReplayWindowTime();
+
+    /**
+     * Sets the maximum number of replay cache entries.
+     *
+     * @param replayWindowMessageCount the replay window message count
+     */
+    void setReplayWindowMessageCount(int replayWindowMessageCount);
+
+    /**
+     * Returns the maximum number of replay cache entries.
+     *
+     * @return the replay window message count
+     */
+    int getReplayWindowMessageCount();
 }
