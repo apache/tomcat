@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.22 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.23 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -218,199 +218,6 @@
         third-party library version information. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Add support for literal <code>'%'</code> characters in access log
-        output. Based on pull request <pr>1002</pr> by Fabian Hahn. (markt)
-      </add>
-      <fix>
-        <bug>70038</bug>: <code>Cookie.clone()</code> should also clone internal
-        attribute map. (markt)
-      </fix>
-      <scode>
-        Remove unnecessary code from the SSI processing engine that was
-        duplicating some of the normalisation checks. (markt)
-      </scode>
-      <fix>
-        Cleaner handling of invalid SPNEGO tokens. (remm)
-      </fix>
-      <fix>
-        Avoid some NPEs in the Connector class on an uninitialize protocol.
-        (remm)
-      </fix>
-      <fix>
-        Incorrect session average life calculation. (remm)
-      </fix>
-      <fix>
-        Improve robustness on using <code>Pipeline.setBasic</code> on a running
-        pipeline. (remm)
-      </fix>
-      <fix>
-        Avoid any init parameter updates when conflicts are found for filters,
-        similar to what is done for servlets, as required by the servlet
-        specification. (remm)
-      </fix>
-      <fix>
-        Fix container event cleanups in some edge cases. (remm)
-      </fix>
-      <fix>
-        Check for last-modified header in <code>ExpiresFilter</code> when a
-        servlet uses <code>addDateHeader</code> to avoid wrongly considering
-        it has been set. (remm)
-      </fix>
-      <fix>
-        Fix hour unit used by <code>ExpiresFilter</code>. (remm)
-      </fix>
-      <fix>
-        Remove exception swallowing in <code>DataSourceStore</code> to align
-        it with <code>FileStore</code> and avoid session loss on errors. (remm)
-      </fix>
-      <fix>
-        On JAAS logout, clear out role principals on the subject that were
-        added on commit, as recommended by the JAAS specification. (remm)
-      </fix>
-      <fix>
-        <code>MemoryRealm</code> should not add a dummy role when none is
-        specified in the configuration. (remm)
-      </fix>
-      <fix>
-        <code>DataSourceUserDatabase</code> should return a null principal on
-        a non existing user. (remm)
-      </fix>
-      <fix>
-        Fix shared lock expiration in WebDAV. (remm)
-      </fix>
-      <fix>
-        Inaccurate session exipration statistics when using the persistent
-        manager. (remm)
-      </fix>
-      <fix>
-        Skip BOM when serving files with UTF-32 encoding. (remm)
-      </fix>
-      <fix>
-        Mixup of WrapperListener and WrapperLifecycle elements in storeconfig.
-        (remm)
-      </fix>
-      <fix>
-        Incorrect processing of modified users in
-        <code>DataSourceUserDatabase</code>. (remm)
-      </fix>
-      <update>
-        Clarify behavior in the <code>UserDatabase</code> for user, role and
-        group creation that it does not immediately override existing elements.
-        Removal (or update) needs to be used instead. (remm)
-      </update>
-      <fix>
-        <bug>70049</bug>: Align the web application class loader with parent
-        class loaders and swallow any errors caused by invalid paths when
-        looking up resources and behave as if the resources were not found in
-        that case. (markt)
-      </fix>
-      <fix>
-        Improve validation of <code>Range</code> and <code>Content-Range</code>
-        parsers so invalid ranges trigger a <code>4xx</code> response rather
-        than a <code>500</code> response. Pull request <pr>1012</pr> provided by
-        Sahana Surendra Bogar. (markt)
-      </fix>
-      <fix>
-        Fix connection leak in <code>ProxyErrorReportValve</code>. (remm)
-      </fix>
-      <fix>
-        When using the <code>RewriteValve</code>, <code>%{SSL:HTTPS}</code> now
-        returns <code>on</code> or <code>off</code> rather than
-        <code>true</code> or <code>false</code> to align with httpd. (markt)
-      </fix>
-      <fix>
-        Reset the encoding used for query string parameters between requests in
-        case an application changed the encoding in a previous request. (markt)
-      </fix>
-      <fix>
-        When encoding URLs with the <code>CsrfPreventionFilter</code>, don't add
-        the nonce to URLs that are known not to require it. (markt)
-      </fix>
-      <fix>
-        Fix SSO cookie partitioned configuration. (remm)
-      </fix>
-      <fix>
-        Fix <code>CombinedRealm</code> <code>isAvailable</code>, it allows
-        authentication if at least one sub realm is available. (remm)
-      </fix>
-      <fix>
-        <bug>70048</bug>: Correctly handle asynchronous requests in
-        <code>PersistentValve</code>. (markt)
-      </fix>
-      <fix>
-        Improve the detection of cross-context dispatches when using a
-        <code>RequestDispatcher</code>. (markt)
-      </fix>
-      <fix>
-        Fix various instances of double decoding of URL patterns configured
-        either programmatically or in web.xml. (remm/markt)
-      </fix>
-      <fix>
-        Align the rewrite conditions <code>ornext</code> flag processing with
-        mod_rewrite, which follows a purely sequential evaluation strategy.
-        (remm)
-      </fix>
-      <fix>
-        Update default web.xml version to match supported Servlet specification
-        version. (markt)
-      </fix>
-      <fix>
-        Change the default for the <code>useRedirect</code> attribute of the
-        <code>ProxyErrorReportValve</code> from <code>true</code> to
-        <code>false</code>. (markt)
-      </fix>
-      <add>
-        Add support for the <code>showReport</code> attribute in
-        <code>JsonErrorReportValve</code> and
-        <code>ProxyErrorReportValve</code>. When set to <code>false</code>,
-        detailed error information (message, description, stack trace) is
-        suppressed from error responses. (dsoumis)
-      </add>
-      <fix>
-        Avoid a <code>NoClassDefFoundError</code> at startup when
-        <code>catalina-tribes.jar</code> is removed but
-        <code>catalina-ha.jar</code> is present and the
-        <code>Cluster</code> element is enabled in
-        <code>server.xml</code>. Cluster digester rules are now fully
-        conditional on both JARs being available. (dsoumis)
-      </fix>
-      <fix>
-        Fix a potential deadlock when copying resources using WebDAV. (markt)
-      </fix>
-      <fix>
-        Add <code>jakarta.</code>, <code>org.apache.catalina.</code> and
-        <code>org.apache.tomcat.</code>to the list of reserved prefixes for SSI
-        variables and request attributes. (markt)
-      </fix>
-      <fix>
-        Missing URL decoding when processing <code>addMapping</code> on a
-        Servlet registration. (remm)
-      </fix>
-      <fix>
-        The <code>Timeout</code> WebDAV header allows comma separated values
-        (according to the examples in the RFC). Use the first acceptable value.
-        (remm)
-      </fix>
-      <fix>
-        Fix various issues when logging the effective web.xml for a web
-        application. Empty sections are no longer logged. Special roles and
-        empty authorisation constraints are included. All session cookie
-        attributes are included. (markt)
-      </fix>
-      <fix>
-        Expand the write lock for the save process in the
-        <code>MemoryUserDatabase</code> to avoid concurrency issues with the
-        file save operations. (markt)
-      </fix>
-      <fix>
-        Ensure atomic session persistence in <code>FileStore</code>. Based on
-        pull request <pr>1016</pr> by sahvx655-wq. (markt)
-      </fix>
-      <fix>
-        Do not ignore methods configured on security constraints that map to the
-        default servlet. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -443,88 +250,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Log a suitable warning if an encrypted PEM file is detected using an
-        insecure form for encryption. (markt)
-      </add>
-      <fix>
-        If TLS groups have been configured, use the configured groups rather
-        than using OpenSSL's default TLS groups when using Tomcat Native with
-        OpenSSL based connectors. (markt)
-      </fix>
-      <fix>
-        For HTTP/2, ensure that any in progress request body reads are cancelled
-        if the container resets the associated stream. This prevents delays
-        waiting for reads to time out when it is known that no more data will be
-        received. (markt)
-      </fix>
-      <fix>
-        Ensure that malformed HTTP/2 messages that should trigger a stream reset
-        do so, rather than triggered a connection close. (markt)
-      </fix>
-      <fix>
-        Improve enforcement of header trailer allow list for HTTP/2. (remm)
-      </fix>
-      <fix>
-        <bug>70050</bug>: Avoid NPE when no header frame is processed in HTTP/2,
-        following refactor clean-up of header buffer. (remm)
-      </fix>
-      <fix>
-        Properly use <code>pollerThreadPriority</code> for the NIO poller
-        thread. (remm)
-      </fix>
-      <fix>
-        Fix <code>MessageByte.equals</code> if called on a null MB. (remm)
-      </fix>
-      <fix>
-        Call the delegate key manager in JSSE to retrieve the server key.
-        (remm)
-      </fix>
-      <fix>
-        Avoid overflow scenarios in Asn1Parser. (remm)
-      </fix>
-      <fix>
-        <bug>70091</bug>: Add a new attribute, <code>allowSchemeMismatch</code>
-        to <code>Http2Protocol</code> that allows the consistency check for the
-        scheme provided by the user agent to be bypassed. (markt)
-      </fix>
-      <fix>
-        <code>isTrailerFieldsReady</code> was always returning
-        <code>true</code>. (remm)
-      </fix>
-      <fix>
-        Align OpenSSL/Panama TLS implementation with other implementations and
-        throw an exception if there is an error loading the provided CRL(s).
-        (markt)
-      </fix>
-      <fix>
-        Parsing of OpenSSL format cipher expressions incorrectly stopped if
-        <code>@STRENGTH</code> was encountered, ignoring any subsequent
-        expressions. (markt)
-      </fix>
-      <fix>
-        Handle the case where the HTTP/2 payload length is insufficient for the
-        mandatory data required by the flags set in the header. (markt)
-      </fix>
-      <fix>
-        <bug>70102</bug>: Correct expected size of ticket keys when calling
-        <code>setSessionTicketKeys</code> with an FFM connector. (markt)
-      </fix>
-      <fix>
-        <bug>69988</bug>: Fix post handshake authentication for TLS 1.3. It was
-        broken by a breaking change in OpenSSL between 1.1.1 and 3.0.0. (markt)
-      </fix>
-      <fix>
-        When processing an OpenSSL cipher specification, fully align the order
-        of the resulting ciphers with the order produced by OpenSSL. (markt)
-      </fix>
-      <update>
-        Update both the minimum and recommended version for Tomcat Native 2.x to
-        2.0.15. (markt)
-      </update>
-      <update>
-        Update the minimum version for Tomcat Native 1.x to 1.3.8. (markt)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -563,15 +288,6 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix possible EL argument mismatch when it was set to null. (remm)
-      </fix>
-      <fix>
-        Fix thread safety of <code>TagPluginManager</code>. (remm)
-      </fix>
-      <fix>
-        Correctly use flush on JSP include. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -581,35 +297,6 @@
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Expand wording and increase visibility of log message when cloud
-        membership is configured without a trust store as all certificates will
-        be trusted in this configuration. (markt)
-      </fix>
-      <fix>
-        Ensure listeners are correctly added and removed when configuring the
-        channel coordinator. (markt)
-      </fix>
-      <fix>
-        Fix some concurrency issues in <code>FragmentationInterceptor</code>.
-        (markt)
-      </fix>
-      <fix>
-        Fix some concurrency issues in <code>OrderInterceptor</code>.
-        (markt)
-      </fix>
-      <fix>
-        Fix some concurrency issues in <code>TwoPhaseCommitInterceptor</code>.
-        (markt)
-      </fix>
-      <fix>
-        Fix concurrency issues generating MD5 digests in the
-        <code>CloudMembershipProvider</code> implementations. (markt)
-      </fix>
-      <add>
-        Add replay protection to the <code>EncryptInterceptor</code>. This us a
-        breaking change for the <code>EncryptInterceptor</code>.(markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -641,26 +328,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Incorrect <code>Future.isDone()</code> return by
-        <code>AsyncChannelWrapperSecure</code>. (remm)
-      </fix>
-      <fix>
-        Trigger standard WebSocket error handling if a call to
-        <code>Endpoint.onOpen()</code> fails for a programmatic endpoint.
-        (markt)
-      </fix>
-      <fix>
-        <bug>70110</bug>: Fix memory leak if a call to
-        <code>Endpoint.onOpen()</code> fails for a programmatic endpoint. Test
-        case provided by uabdur. (markt)
-      </fix>
-      <fix>
-        If a client presents invalid parameters when negotiating a WebSocket
-        extension, decline the negotiation offer that includes the invalid
-        parameters rather than failing the connection. Pull request
-        <pr>1019</pr> provided by sahvx655-wq. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -670,34 +337,6 @@
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Manager: Add checks to ensure that any uploaded files are uploaded to
-        the expected location. (markt)
-      </add>
-      <add>
-        Manager: Add checks to ensure that the requested context path for a
-        deployed WAR, directory or descriptor file is valid. (markt)
-      </add>
-      <add>
-        Documentation: Expand the description of some of the attributes of the
-        <code>CrawlerSessionManagerValve</code>. (markt)
-      </add>
-      <fix>
-        Documentation: Clearer description and correct documented default for
-        <code>ocspSoftFail</code>. (markt)
-      </fix>
-      <fix>
-        Fix double escaping in the context names for the JSON mode of the
-        manager servlet. (remm)
-      </fix>
-      <fix>
-        Manager: Ensure automatic deployment does not trigger an undeployment
-        during a Manager triggered web application reload. (markt)
-      </fix>
-      <fix>
-        Documentation: Provide better documentation for the <code>scheme</code>
-        and <code>secure</code> attributes of a Connector. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
@@ -727,25 +366,6 @@
         Update Checkstyle to 13.4.2. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Use per connection authenticator when executing an Ant task. (remm)
-      </fix>
-      <update>
-        Update Commons Daemon to 1.6.1. (markt)
-      </update>
-      <update>
-        Improvements to French translations. (remm)
-      </update>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
-      <update>
-        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
-        to 1.0.12. (markt)
-      </update>
-      <update>
-        Update Tomcat Native to 2.0.15. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
