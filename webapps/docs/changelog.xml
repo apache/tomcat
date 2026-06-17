@@ -602,6 +602,10 @@
         Fix concurrency issues generating MD5 digests in the
         <code>CloudMembershipProvider</code> implementations. (markt)
       </fix>
+      <add>
+        Add replay protection to the <code>EncryptInterceptor</code>. This us a
+        breaking change for the <code>EncryptInterceptor</code>.(markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
