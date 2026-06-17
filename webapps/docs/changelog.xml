@@ -655,6 +655,12 @@
         <code>Endpoint.onOpen()</code> fails for a programmatic endpoint. Test
         case provided by uabdur. (markt)
       </fix>
+      <fix>
+        If a client presents invalid parameters when negotiating a WebSocket
+        extension, decline the negotiation offer that includes the invalid
+        parameters rather than failing the connection. Pull request
+        <pr>1019</pr> provided by sahvx655-wq. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
