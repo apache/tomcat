@@ -161,8 +161,8 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
                 throw new GeneralSecurityException(sm.getString("encryptInterceptor.decrypt.error.short-message"));
             }
             // Time stamp is trusted since it was encrypted.
-            long trustedTimstamp = XByteBuffer.toLong(data, 0);
-            if (!encryptionManager.checkIncomingMessage(encryptedData, trustedTimstamp)) {
+            long trustedTimestamp = XByteBuffer.toLong(data, 0);
+            if (!encryptionManager.checkIncomingMessage(encryptedData, trustedTimestamp)) {
                 log.error(sm.getString("encryptInterceptor.decrypt.replay"));
                 return;
             }
