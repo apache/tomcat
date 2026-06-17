@@ -901,11 +901,11 @@ public class TestRealmBase {
         // Create the principals
         List<String> userRoles1 = new ArrayList<>();
         userRoles1.add(ROLE1);
-        GenericPrincipal gp1 = new GenericPrincipal(USER1, userRoles1);
+        GenericPrincipal gp1 = new GenericPrincipal(USER1, PWD, userRoles1);
 
         List<String> userRoles2 = new ArrayList<>();
         userRoles2.add(ROLE2);
-        GenericPrincipal gp2 = new GenericPrincipal(USER2, userRoles2);
+        GenericPrincipal gp2 = new GenericPrincipal(USER2, PWD, userRoles2);
 
         // Add the constraints to the context
         context.addConstraint(allowConstraint);
