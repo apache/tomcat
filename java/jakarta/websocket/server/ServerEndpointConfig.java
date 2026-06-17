@@ -115,7 +115,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
             this.path = path;
         }
 
- /**
+        /**
          * Builds and returns a {@link ServerEndpointConfig} with the configured settings.
          *
          * @return The configured server endpoint configuration
