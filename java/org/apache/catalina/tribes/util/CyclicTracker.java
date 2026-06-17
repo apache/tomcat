@@ -24,6 +24,8 @@ package org.apache.catalina.tribes.util;
  */
 public class CyclicTracker {
 
+    private static final StringManager sm = StringManager.getManager(CyclicTracker.class);
+
     private final boolean[] seen;
 
     private boolean initialized = false;
@@ -33,7 +35,7 @@ public class CyclicTracker {
 
     public CyclicTracker(int size) {
         if (size < 1) {
-            throw new IllegalArgumentException("size must be greater than zero");
+            throw new IllegalArgumentException(sm.getString("cyclicTracker.size.tooSmall"));
         }
         seen = new boolean[size];
     }
