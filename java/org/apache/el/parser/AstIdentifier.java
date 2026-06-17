@@ -89,7 +89,7 @@ public final class AstIdentifier extends SimpleNode {
         } finally {
             // Always reset the flag to false so the optimisation is not applied
             // inappropriately
-            ctx.putContext(ELResolver.StandaloneIdentifierMarker.class, Boolean.FALSE);
+            ctx.putContext(this.getClass(), Boolean.FALSE);
         }
 
         if (ctx.isPropertyResolved()) {
