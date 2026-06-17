@@ -315,7 +315,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     @Override
     public void setReplayWindowSize(int replayWindowSize) {
         if (replayWindowSize < 1) {
-            throw new IllegalArgumentException("replayWindowSize must be greater than zero");
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.replayWindow.tooSmall"));
         }
         this.replayWindowSize = replayWindowSize;
     }
@@ -544,7 +544,10 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         private CyclicTracker createTrackerForMember(Member member) {
             CyclicTracker tracker = new CyclicTracker(replayWindowSize);
             Long headValue = messageNumbersByRemovedMember.remove(member);
-            if (headValue != null) {
+            if (headValue == null) {
+                // This is a new member. First valid message will be 0. Therefore set last message to -1.
+                tracker.track(-1);
+            } else {
                 tracker.track(headValue.longValue());
             }
             return tracker;
