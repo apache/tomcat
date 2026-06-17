@@ -290,7 +290,7 @@ public final class FileStore extends StoreBase {
         } finally {
             try {
                 if (tempFile.exists() && !tempFile.delete()) {
-                    log.warn(sm.getString("fileStore.deleteFailed", tempFile));
+                    log.warn(sm.getString("fileStore.deleteTempFailed", tempFile));
                 }
             } finally {
                 writeLock.unlock();
