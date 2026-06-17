@@ -24,6 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -269,15 +272,29 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
         }
 
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+
         Lock writeLock = sessionLocksById.getLock(session.getIdInternal()).writeLock();
         writeLock.lock();
         try {
-            try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+            try (FileOutputStream fos = new FileOutputStream(tempFile);
                     ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
                 ((StandardSession) session).writeObjectData(oos);
             }
+            try {
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         } finally {
-            writeLock.unlock();
+            try {
+                if (tempFile.exists() && !tempFile.delete()) {
+                    log.warn(sm.getString("fileStore.deleteFailed", tempFile));
+                }
+            } finally {
+                writeLock.unlock();
+            }
         }
     }
 

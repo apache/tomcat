@@ -307,6 +307,10 @@
         <code>MemoryUserDatabase</code> to avoid concurrency issues with the
         file save operations. (markt)
       </fix>
+      <fix>
+        Ensure atomic session persistence in <code>FileStore</code>. Based on
+        pull request <pr>1016</pr> by sahvx655-wq. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
