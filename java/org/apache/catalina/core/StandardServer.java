@@ -827,7 +827,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
             MBeanServer server = Registry.getRegistry(null).getMBeanServer();
             if (server.isRegistered(sname)) {
-                server.invoke(sname, "store", new Object[] { context }, new String[] { "java.lang.String" });
+                server.invoke(sname, "store", new Object[] { context }, new String[] { "org.apache.catalina.Context" });
             } else {
                 log.error(sm.getString("standardServer.storeConfig.notAvailable", sname));
             }

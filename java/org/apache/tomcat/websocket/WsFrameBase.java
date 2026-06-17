@@ -357,7 +357,8 @@ public abstract class WsFrameBase {
                         new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.oneByteCloseCode")));
             }
             if (controlBufferBinary.remaining() > 1) {
-                code = controlBufferBinary.getShort();
+                short rawCode = controlBufferBinary.getShort();
+                code = rawCode & 0xFFFF;
                 if (controlBufferBinary.remaining() > 0) {
                     CoderResult cr = utf8DecoderControl.decode(controlBufferBinary, controlBufferText, true);
                     if (cr.isError()) {
