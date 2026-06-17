@@ -76,18 +76,4 @@ public interface EncryptInterceptorMBean {
      * @return the JCA provider name, or {@code null} for default
      */
     String getProviderName();
-
-    /**
-     * Returns the number of message sequence numbers remembered for replay detection.
-     *
-     * @return the replay window size
-     */
-    int getReplayWindowSize();
-
-    /**
-     * Sets the number of message sequence numbers remembered for replay detection.
-     *
-     * @param replayWindowSize the replay window size
-     */
-    void setReplayWindowSize(int replayWindowSize);
 }
