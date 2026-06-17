@@ -233,11 +233,19 @@
        <code>AES/GCM/NoPadding</code> is used.</p>
      </attribute>
      <attribute name="encryptionKey" required="true">
-       The key to be used with the encryption algorithm.
+       <p>The key to be used with the encryption algorithm.</p>
 
-       The key should be specified as hex-encoded bytes of the appropriate
+       <p>The key should be specified as hex-encoded bytes of the appropriate
        length for the algorithm (e.g. 16 bytes / 32 characters / 128 bits for
-       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).
+       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).</p>
+     </attribute>
+     <attribute name="replayWindowSize" required="false">
+       <p>The number of messages per sender remembered for replay detection.</p>
+
+       <p>Any message outside of this window will be rejected. Any message
+       inside this window will only be accpeted once and any duplicates
+       rejected. If not specified, the default of <code>1024</code> will be
+       used.</p>
      </attribute>
    </attributes>
   </subsection>
