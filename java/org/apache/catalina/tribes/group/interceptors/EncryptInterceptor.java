@@ -23,7 +23,10 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -39,6 +42,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.util.CyclicTracker;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -63,6 +67,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     private String encryptionAlgorithm = DEFAULT_ENCRYPTION_ALGORITHM;
     private byte[] encryptionKeyBytes;
     private String encryptionKeyString;
+    private int replayWindowSize = 1024;
 
 
     private BaseEncryptionManager encryptionManager;
@@ -80,7 +85,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         if (Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
             try {
                 encryptionManager = createEncryptionManager(getEncryptionAlgorithm(), getEncryptionKeyInternal(),
-                        getProviderName());
+                        getProviderName(), getReplayWindowSize());
             } catch (GeneralSecurityException gse) {
                 throw new ChannelException(sm.getString("encryptInterceptor.init.failed"), gse);
             }
@@ -114,9 +119,12 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             throws ChannelException {
         try {
             byte[] data = msg.getMessage().getBytes();
+            byte[] message = new byte[data.length + 8];
+            XByteBuffer.toBytes(encryptionManager.getAndIncrementMessageNumber(), message, 0);
+            System.arraycopy(data, 0, message, 8, data.length);
 
             // See #encrypt(byte[]) for an explanation of the return value
-            byte[][] bytes = encryptionManager.encrypt(data);
+            byte[][] bytes = encryptionManager.encrypt(message);
 
             XByteBuffer xbb = msg.getMessage();
 
@@ -139,17 +147,32 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             byte[] data = msg.getMessage().getBytes();
 
             data = encryptionManager.decrypt(data);
+            if (data.length < 8) {
+                throw new GeneralSecurityException(sm.getString("encryptInterceptor.decrypt.error.short-message"));
+            }
+            if (!encryptionManager.checkIncomingMessageNumber(msg.getAddress(), XByteBuffer.toLong(data, 0))) {
+                log.error(sm.getString("encryptInterceptor.decrypt.replay"));
+                return;
+            }
 
             XByteBuffer xbb = msg.getMessage();
 
             // Completely replace the message with the decrypted one
             xbb.clear();
-            xbb.append(data, 0, data.length);
+            xbb.append(data, 8, data.length - 8);
 
             super.messageReceived(msg);
         } catch (GeneralSecurityException gse) {
             log.error(sm.getString("encryptInterceptor.decrypt.failed"), gse);
         }
+    }
+
+    @Override
+    public void memberDisappeared(Member member) {
+        if (encryptionManager != null) {
+            encryptionManager.memberDisappeared(member);
+        }
+        super.memberDisappeared(member);
     }
 
     /**
@@ -274,6 +297,36 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         return providerName;
     }
 
+    /**
+     * Returns the number of message sequence numbers remembered for replay detection.
+     *
+     * @return The replay window size
+     */
+    @Override
+    public int getReplayWindowSize() {
+        return replayWindowSize;
+    }
+
+    /**
+     * Sets the number of message sequence numbers remembered for replay detection.
+     *
+     * @param replayWindowSize The replay window size
+     */
+    @Override
+    public void setReplayWindowSize(int replayWindowSize) {
+        if (replayWindowSize < 1) {
+            throw new IllegalArgumentException("replayWindowSize must be greater than zero");
+        }
+        this.replayWindowSize = replayWindowSize;
+    }
+
+    Long getRemovedMemberHeadValue(Member member) {
+        if (encryptionManager == null) {
+            return null;
+        }
+        return encryptionManager.getRemovedMemberHeadValue(member);
+    }
+
     // Copied from org.apache.tomcat.util.buf.HexUtils
     // @formatter:off
     private static final int[] DEC = {
@@ -320,7 +373,8 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     }
 
     private static BaseEncryptionManager createEncryptionManager(String algorithm, byte[] encryptionKey,
-            String providerName) throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
+            String providerName, int replayWindowSize)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
         if (null == encryptionKey) {
             throw new IllegalStateException(sm.getString("encryptInterceptor.key.required"));
         }
@@ -359,8 +413,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
          */
         if ("NONE".equals(algorithmMode) || "ECB".equals(algorithmMode) || "PCBC".equals(algorithmMode) ||
                 "CTS".equals(algorithmMode) || "KW".equals(algorithmMode) || "KWP".equals(algorithmMode) ||
-                "CTR".equals(algorithmMode) ||
-                ("CBC".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) ||
+                "CTR".equals(algorithmMode) || ("CBC".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) ||
                 ("CFB".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) ||
                 ("GCM".equals(algorithmMode) && "PKCS5PADDING".equals(algorithmPadding)) ||
                 ("OFB".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding))) {
@@ -375,17 +428,18 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
         } else if (algorithmMode.startsWith("CFB") || algorithmMode.startsWith("OFB")) {
             // Using a non-default block size. Not supported as insecure and/or inefficient.
-            throw new IllegalArgumentException(
-                    sm.getString("encryptInterceptor.algorithm.unsupported", algorithm));
+            throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithm));
 
         } else if ("GCM".equals(algorithmMode) && "NOPADDING".equals(algorithmPadding)) {
             // Needs a specialised encryption manager to handle the differences between GCM and other modes
-            return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+            return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName,
+                    replayWindowSize);
         }
 
         // Use the default encryption manager
         try {
-            return new BaseEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+            return new BaseEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName,
+                    replayWindowSize);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException ex) {
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported", algorithm), ex);
         }
@@ -423,24 +477,77 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
          * SecureRandom is thread-safe, but sharing a single instance will likely be a bottleneck.
          */
         private final ConcurrentLinkedQueue<SecureRandom> randomPool;
+        private final AtomicLong messageNumberGenerator = new AtomicLong();
+        private final Map<Member,CyclicTracker> receivedMessageNumbersByMember = new ConcurrentHashMap<>();
+        private final Map<Member,Long> messageNumbersByRemovedMember = new ConcurrentHashMap<>();
+        private final CyclicTracker receivedMessageNumbersForUnknownSender;
+        private final int replayWindowSize;
 
-        BaseEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+        BaseEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName, int replayWindowSize)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
             this.algorithm = algorithm;
             this.providerName = providerName;
             this.secretKey = secretKey;
+            this.replayWindowSize = replayWindowSize;
 
             cipherPool = new ConcurrentLinkedQueue<>();
             Cipher cipher = createCipher();
             blockSize = cipher.getBlockSize();
             cipherPool.offer(cipher);
             randomPool = new ConcurrentLinkedQueue<>();
+            receivedMessageNumbersForUnknownSender = new CyclicTracker(replayWindowSize);
         }
 
         public void shutdown() {
             // Individual Cipher and SecureRandom objects need no explicit tear down
             cipherPool.clear();
             randomPool.clear();
+            receivedMessageNumbersByMember.clear();
+            messageNumbersByRemovedMember.clear();
+        }
+
+        public long getAndIncrementMessageNumber() {
+            return messageNumberGenerator.getAndIncrement();
+        }
+
+        public boolean checkIncomingMessageNumber(Member sender, long messageNumber) {
+            if (sender == null) {
+                return receivedMessageNumbersForUnknownSender.track(messageNumber);
+            }
+            return receivedMessageNumbersByMember.computeIfAbsent(sender, this::createTrackerForMember)
+                    .track(messageNumber);
+        }
+
+        public void memberDisappeared(Member member) {
+            CyclicTracker tracker = receivedMessageNumbersByMember.remove(member);
+            if (tracker != null) {
+                /*
+                 * There is a security trade off here.
+                 *
+                 * Entries are only removed from this Map if the Member reappears. That means there is a potential DoS
+                 * risks due to the growth of this Map. That is considered unlikely as only Members with the encryption
+                 * key will be added to this Map and the size of the Map.Entry is minimal.
+                 *
+                 * If entries are removed from this Map based either on Map size or time, that exposes the risk of a
+                 * replay attack using any message the Member may have previously sent.
+                 *
+                 * The replay attack is viewed as the higher risk, hence there are no limits on the size of this Map.
+                 */
+                messageNumbersByRemovedMember.put(member, Long.valueOf(tracker.getHeadValue()));
+            }
+        }
+
+        public Long getRemovedMemberHeadValue(Member member) {
+            return messageNumbersByRemovedMember.get(member);
+        }
+
+        private CyclicTracker createTrackerForMember(Member member) {
+            CyclicTracker tracker = new CyclicTracker(replayWindowSize);
+            Long headValue = messageNumbersByRemovedMember.remove(member);
+            if (headValue != null) {
+                tracker.track(headValue.longValue());
+            }
+            return tracker;
         }
 
         private String getAlgorithm() {
@@ -611,9 +718,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      * number of bits supported 128-bit provide the best security.
      */
     private static class GCMEncryptionManager extends BaseEncryptionManager {
-        GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+        GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName, int replayWindowSize)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
-            super(algorithm, secretKey, providerName);
+            super(algorithm, secretKey, providerName, replayWindowSize);
         }
 
         @Override
