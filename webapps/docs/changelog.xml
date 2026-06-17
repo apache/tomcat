@@ -429,8 +429,8 @@
         <code>CloudMembershipProvider</code> implementations. (markt)
       </fix>
       <add>
-        Add replay protection to the <code>EncryptInterceptor</code>. This us a
-        breaking change for the <code>EncryptInterceptor</code>.(markt)
+        Add replay protection to the <code>EncryptInterceptor</code>. This is a
+        breaking change for the <code>EncryptInterceptor</code>. (markt)
       </add>
     </changelog>
   </subsection>
