@@ -311,6 +311,10 @@
         Ensure atomic session persistence in <code>FileStore</code>. Based on
         pull request <pr>1016</pr> by sahvx655-wq. (markt)
       </fix>
+      <fix>
+        Do not ignore methods configured on security constraints that map to the
+        default servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
