@@ -171,7 +171,7 @@ public class AbsoluteOrder {
          * @return comparison result
          */
         protected int compareBytes(byte b1, byte b2) {
-            return compareInts(b1, b2);
+            return compareInts(b1 & 0xFF, b2 & 0xFF);
         }
 
         /**
