@@ -217,6 +217,90 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
     }
 
     @Test
+    public void testRejectReplay() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        byte[] encrypted = encrypt("msg-1", System.currentTimeMillis());
+
+        deliver(encrypted);
+        deliver(encrypted);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(1, messages.size());
+    }
+
+    @Test
+    public void testReplayWindowRejectsOldMessage() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowTime(50);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        long now = System.currentTimeMillis();
+        byte[] encryptedRecent = encrypt("msg-recent", now);
+        byte[] encryptedOld = encrypt("msg-old", now - 1000);
+
+        deliver(encryptedRecent);
+        deliver(encryptedOld);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(1, messages.size());
+    }
+
+    @Test
+    public void testReplayWindowRejectsOldMessageAfterCountEviction() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowMessageCount(2);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        long now = System.currentTimeMillis();
+        byte[] encrypted1000 = encrypt("msg-1000", now);
+        byte[] encrypted1001 = encrypt("msg-1001", now + 1);
+        byte[] encrypted1002 = encrypt("msg-1002", now + 2);
+        byte[] encrypted1003 = encrypt("msg-1003", now + 3);
+
+        deliver(encrypted1000);
+        deliver(encrypted1001);
+        deliver(encrypted1002);
+        deliver(encrypted1003);
+        deliver(encrypted1000);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(4, messages.size());
+    }
+
+    @Test
+    public void testReplayWindowEvictsOldestTimestampFirst() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowMessageCount(2);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        long now = System.currentTimeMillis();
+        byte[] encrypted300 = encrypt("msg-300", now + 300);
+        byte[] encrypted100 = encrypt("msg-100", now + 100);
+        byte[] encrypted200 = encrypt("msg-200", now + 200);
+        byte[] encrypted225 = encrypt("msg-225", now + 225);
+        byte[] encrypted250 = encrypt("msg-250", now + 250);
+
+        deliver(encrypted300);
+        deliver(encrypted100);
+        deliver(encrypted200);
+        deliver(encrypted225);
+        deliver(encrypted250);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(5, messages.size());
+    }
+
+    @Test
     public void testPickup() throws Exception {
         File file = new File(MESSAGE_FILE);
         if(!file.exists()) {
@@ -315,5 +399,21 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         } catch (Throwable t) {
             Assert.fail("EncryptionInterceptor should throw ChannelConfigException, not " + t.getClass().getName());
         }
+    }
+
+    private byte[] encrypt(String message, long timestamp) throws Exception {
+        ChannelData msg = new ChannelData(false);
+        msg.setTimestamp(timestamp);
+        msg.setMessage(new XByteBuffer(message.getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+        return ((ValueCaptureInterceptor) src.getNext()).getValue();
+    }
+
+    private void deliver(byte[] encrypted) {
+        ChannelData incoming = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(encrypted.length, false);
+        xbb.append(encrypted, 0, encrypted.length);
+        incoming.setMessage(xbb);
+        dest.messageReceived(incoming);
     }
 }
