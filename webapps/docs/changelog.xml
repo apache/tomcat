@@ -302,6 +302,11 @@
         empty authorisation constraints are included. All session cookie
         attributes are included. (markt)
       </fix>
+      <fix>
+        Expand the write lock for the save process in the
+        <code>MemoryUserDatabase</code> to avoid concurrency issues with the
+        file save operations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
