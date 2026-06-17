@@ -286,6 +286,11 @@
         application. Empty sections are no longer logged. Special roles and
         empty authorisation constraints are included. (markt)
       </fix>
+      <fix>
+        Expand the write lock for the save process in the
+        <code>MemoryUserDatabase</code> to avoid concurrency issues with the
+        file save operations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
