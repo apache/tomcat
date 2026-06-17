@@ -160,12 +160,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             if (data.length < 8) {
                 throw new GeneralSecurityException(sm.getString("encryptInterceptor.decrypt.error.short-message"));
             }
-            /*
-             *  This is trusted since it was encrypted.
-             *
-             *  Excessive clock skew will cause problems here. Can't address that without creating risks of replay
-             *  attacks.
-             */
+            // Time stamp is trusted since it was encrypted.
             long trustedTimstamp = XByteBuffer.toLong(data, 0);
             if (!encryptionManager.checkIncomingMessage(encryptedData, trustedTimstamp)) {
                 log.error(sm.getString("encryptInterceptor.decrypt.replay"));
@@ -566,6 +561,10 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
         public synchronized boolean checkIncomingMessage(byte[] bytes, long messageTimestamp) {
             if (messageTimestamp < (System.currentTimeMillis() - replayWindowTime)) {
+                return false;
+            }
+            // Shouldn't happen but provide some mitigation against excessive clock skew.
+            if (messageTimestamp > (System.currentTimeMillis() + replayWindowTime)) {
                 return false;
             }
             if (messageTimestamp <= lastRemovedTimestamp) {
