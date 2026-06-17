@@ -37,13 +37,13 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.membership.MemberImpl;
 
 /**
  * Tests the EncryptInterceptor.
- *
- * Many of the tests in this class use strings as input and output, even
- * though the interceptor actually operates on byte arrays. This is done
- * for readability for the tests and their outputs.
+ * <p>
+ * Many of the tests in this class use strings as input and output, even though the interceptor actually operates on
+ * byte arrays. This is done for readability for the tests and their outputs.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
@@ -55,9 +55,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        Assert.assertEquals("Basic roundtrip failed",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Basic roundtrip failed", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -67,25 +65,15 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        Assert.assertEquals("Basic roundtrip failed",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Basic roundtrip failed", testInput, roundTrip(testInput, src, dest));
 
-        Assert.assertEquals("Second roundtrip failed",
-                testInput,
-                roundTrip(testInput, src, dest));
+        Assert.assertEquals("Second roundtrip failed", testInput, roundTrip(testInput, src, dest));
 
-        Assert.assertEquals("Third roundtrip failed",
-                testInput,
-                roundTrip(testInput, src, dest));
+        Assert.assertEquals("Third roundtrip failed", testInput, roundTrip(testInput, src, dest));
 
-        Assert.assertEquals("Fourth roundtrip failed",
-                testInput,
-                roundTrip(testInput, src, dest));
+        Assert.assertEquals("Fourth roundtrip failed", testInput, roundTrip(testInput, src, dest));
 
-        Assert.assertEquals("Fifth roundtrip failed",
-                testInput,
-                roundTrip(testInput, src, dest));
+        Assert.assertEquals("Fifth roundtrip failed", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -95,9 +83,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "x";
 
-        Assert.assertEquals("Tiny payload roundtrip failed",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Tiny payload roundtrip failed", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -105,11 +91,9 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         src.start(Channel.SND_TX_SEQ);
         dest.start(Channel.SND_TX_SEQ);
 
-        byte[] bytes = new byte[1024*1024];
+        byte[] bytes = new byte[1024 * 1024];
 
-        Assert.assertArrayEquals("Huge payload roundtrip failed",
-                          bytes,
-                          roundTrip(bytes, src, dest));
+        Assert.assertArrayEquals("Huge payload roundtrip failed", bytes, roundTrip(bytes, src, dest));
     }
 
     @Test
@@ -121,9 +105,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        Assert.assertEquals("Failed to set custom provider name",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Failed to set custom provider name", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -138,9 +120,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        Assert.assertEquals("Failed to set custom provider name",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Failed to set custom provider name", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -155,9 +135,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        Assert.assertEquals("Failed to set custom provider name",
-                     testInput,
-                     roundTrip(testInput, src, dest));
+        Assert.assertEquals("Failed to set custom provider name", testInput, roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -171,7 +149,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
         src.sendMessage(null, msg, null);
 
-        byte[] bytes = ((ValueCaptureInterceptor)src.getNext()).getValue();
+        byte[] bytes = ((ValueCaptureInterceptor) src.getNext()).getValue();
 
         try (FileOutputStream out = new FileOutputStream(MESSAGE_FILE)) {
             out.write(bytes);
@@ -205,21 +183,213 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
         src.sendMessage(null, msg, null);
 
-        byte[] cipherText1 = ((ValueCaptureInterceptor)src.getNext()).getValue();
+        byte[] cipherText1 = ((ValueCaptureInterceptor) src.getNext()).getValue();
 
         msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
         src.sendMessage(null, msg, null);
 
-        byte[] cipherText2 = ((ValueCaptureInterceptor)src.getNext()).getValue();
+        byte[] cipherText2 = ((ValueCaptureInterceptor) src.getNext()).getValue();
 
-        MatcherAssert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
-                cipherText1, IsNot.not(IsEqual.equalTo(cipherText2)));
+        MatcherAssert.assertThat("Two identical cleartexts encrypt to the same ciphertext", cipherText1,
+                IsNot.not(IsEqual.equalTo(cipherText2)));
+    }
+
+    @Test
+    public void testRejectReplay() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+        MemberImpl sender = createMember("127.0.0.1", 10001, 1);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        ChannelData msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+
+        byte[] encrypted = ((ValueCaptureInterceptor) src.getNext()).getValue();
+
+        ChannelData incoming = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(encrypted.length, false);
+        xbb.append(encrypted, 0, encrypted.length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(sender);
+        dest.messageReceived(incoming);
+
+        incoming = new ChannelData(false);
+        xbb = new XByteBuffer(encrypted.length, false);
+        xbb.append(encrypted, 0, encrypted.length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(sender);
+        dest.messageReceived(incoming);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(1, messages.size());
+        Assert.assertArrayEquals(testInput.getBytes("UTF-8"), messages.iterator().next());
+    }
+
+    @Test
+    public void testReplayWindowRejectsOldMessage() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowSize(2);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+        MemberImpl sender = createMember("127.0.0.1", 10001, 1);
+
+        byte[][] encrypted = new byte[3][];
+        for (int i = 0; i < encrypted.length; i++) {
+            ChannelData msg = new ChannelData(false);
+            msg.setMessage(new XByteBuffer(Long.toString(i).getBytes("UTF-8"), false));
+            src.sendMessage(null, msg, null);
+            encrypted[i] = ((ValueCaptureInterceptor) src.getNext()).getValue();
+            ChannelData incoming = new ChannelData(false);
+            XByteBuffer xbb = new XByteBuffer(encrypted[i].length, false);
+            xbb.append(encrypted[i], 0, encrypted[i].length);
+            incoming.setMessage(xbb);
+            incoming.setAddress(sender);
+            dest.messageReceived(incoming);
+        }
+
+        ChannelData replay = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(encrypted[0].length, false);
+        xbb.append(encrypted[0], 0, encrypted[0].length);
+        replay.setMessage(xbb);
+        replay.setAddress(sender);
+        dest.messageReceived(replay);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(3, messages.size());
+    }
+
+    @Test
+    public void testAcceptSameMessageNumberFromDifferentMembers() throws Exception {
+        EncryptInterceptor src1 = new EncryptInterceptor();
+        src1.setEncryptionKey(encryptionKey128);
+        src1.setNext(new ValueCaptureInterceptor());
+        src1.start(Channel.SND_TX_SEQ);
+
+        EncryptInterceptor src2 = new EncryptInterceptor();
+        src2.setEncryptionKey(encryptionKey128);
+        src2.setNext(new ValueCaptureInterceptor());
+        src2.start(Channel.SND_TX_SEQ);
+
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.start(Channel.SND_TX_SEQ);
+
+        ChannelData msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer("msg-1".getBytes("UTF-8"), false));
+        src1.sendMessage(null, msg, null);
+        byte[] encrypted1 = ((ValueCaptureInterceptor) src1.getNext()).getValue();
+
+        msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer("msg-2".getBytes("UTF-8"), false));
+        src2.sendMessage(null, msg, null);
+        byte[] encrypted2 = ((ValueCaptureInterceptor) src2.getNext()).getValue();
+
+        ChannelData incoming = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(encrypted1.length, false);
+        xbb.append(encrypted1, 0, encrypted1.length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(createMember("127.0.0.1", 10001, 1));
+        dest.messageReceived(incoming);
+
+        incoming = new ChannelData(false);
+        xbb = new XByteBuffer(encrypted2.length, false);
+        xbb.append(encrypted2, 0, encrypted2.length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(createMember("127.0.0.1", 10002, 2));
+        dest.messageReceived(incoming);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(2, messages.size());
+    }
+
+    @Test
+    public void testMemberDisappearedStoresHeadValue() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowSize(4);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+        MemberImpl sender = createMember("127.0.0.1", 10001, 1);
+
+        for (int i = 0; i < 3; i++) {
+            ChannelData msg = new ChannelData(false);
+            msg.setMessage(new XByteBuffer(Long.toString(i).getBytes("UTF-8"), false));
+            src.sendMessage(null, msg, null);
+            byte[] encrypted = ((ValueCaptureInterceptor) src.getNext()).getValue();
+
+            ChannelData incoming = new ChannelData(false);
+            XByteBuffer xbb = new XByteBuffer(encrypted.length, false);
+            xbb.append(encrypted, 0, encrypted.length);
+            incoming.setMessage(xbb);
+            incoming.setAddress(sender);
+            dest.messageReceived(incoming);
+        }
+
+        dest.memberDisappeared(sender);
+
+        Assert.assertEquals(Long.valueOf(2), dest.getRemovedMemberHeadValue(sender));
+    }
+
+    @Test
+    public void testRemovedMemberHeadValueInitializesReplacementTracker() throws Exception {
+        src.setNext(new ValueCaptureInterceptor());
+        dest.setPrevious(new ValuesCaptureInterceptor());
+        dest.setReplayWindowSize(4);
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+        MemberImpl sender = createMember("127.0.0.1", 10001, 1);
+
+        byte[][] encrypted = new byte[4][];
+        for (int i = 0; i < 3; i++) {
+            ChannelData msg = new ChannelData(false);
+            msg.setMessage(new XByteBuffer(Long.toString(i).getBytes("UTF-8"), false));
+            src.sendMessage(null, msg, null);
+            encrypted[i] = ((ValueCaptureInterceptor) src.getNext()).getValue();
+
+            ChannelData incoming = new ChannelData(false);
+            XByteBuffer xbb = new XByteBuffer(encrypted[i].length, false);
+            xbb.append(encrypted[i], 0, encrypted[i].length);
+            incoming.setMessage(xbb);
+            incoming.setAddress(sender);
+            dest.messageReceived(incoming);
+        }
+
+        dest.memberDisappeared(sender);
+        Assert.assertEquals(Long.valueOf(2), dest.getRemovedMemberHeadValue(sender));
+
+        ChannelData msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer("3".getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+        encrypted[3] = ((ValueCaptureInterceptor) src.getNext()).getValue();
+
+        ChannelData incoming = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(encrypted[3].length, false);
+        xbb.append(encrypted[3], 0, encrypted[3].length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(sender);
+        dest.messageReceived(incoming);
+
+        Assert.assertNull(dest.getRemovedMemberHeadValue(sender));
+
+        incoming = new ChannelData(false);
+        xbb = new XByteBuffer(encrypted[2].length, false);
+        xbb.append(encrypted[2], 0, encrypted[2].length);
+        incoming.setMessage(xbb);
+        incoming.setAddress(sender);
+        dest.messageReceived(incoming);
+
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
+        Assert.assertEquals(4, messages.size());
     }
 
     @Test
     public void testPickup() throws Exception {
         File file = new File(MESSAGE_FILE);
-        if(!file.exists()) {
+        if (!file.exists()) {
             System.err.println("File message.bin does not exist. Skipping test.");
             return;
         }
@@ -242,8 +412,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
     }
 
     /*
-     * This test isn't guaranteed to catch any multithreaded issues, but it
-     * gives a good exercise.
+     * This test isn't guaranteed to catch any multithreaded issues, but it gives a good exercise.
      */
     @Test
     public void testMultithreaded() throws Exception {
@@ -266,8 +435,8 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
                     xbb.append(bytes, 0, bytes.length);
                     msg.setMessage(xbb);
 
-                    for(int i=0; i<messagesPerThread; ++i) {
-                      src.sendMessage(null, msg, null);
+                    for (int i = 0; i < messagesPerThread; ++i) {
+                        src.sendMessage(null, msg, null);
                     }
                 } catch (ChannelException e) {
                     Assert.fail("Encountered exception sending messages: " + e.getMessage());
@@ -276,27 +445,26 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         };
 
         Thread[] threads = new Thread[numThreads];
-        for(int i=0; i<numThreads; ++i) {
+        for (int i = 0; i < numThreads; ++i) {
             threads[i] = new Thread(job);
             threads[i].setName("Message-Thread-" + i);
         }
 
-        for(int i=0; i<numThreads; ++i) {
-          threads[i].start();
+        for (int i = 0; i < numThreads; ++i) {
+            threads[i].start();
         }
 
-        for(int i=0; i<numThreads; ++i) {
-          threads[i].join();
+        for (int i = 0; i < numThreads; ++i) {
+            threads[i].join();
         }
 
         // Check all received messages to make sure they are not corrupted
-        Collection<byte[]> messages = ((ValuesCaptureInterceptor)dest.getPrevious()).getValues();
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor) dest.getPrevious()).getValues();
 
-        Assert.assertEquals("Did not receive all expected messages",
-                numThreads * messagesPerThread, messages.size());
+        Assert.assertEquals("Did not receive all expected messages", numThreads * messagesPerThread, messages.size());
 
-        for(byte[] message : messages) {
-          Assert.assertArrayEquals("Message is corrupted", message, bytes);
+        for (byte[] message : messages) {
+            Assert.assertArrayEquals("Message is corrupted", message, bytes);
         }
     }
 
@@ -315,5 +483,11 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         } catch (Throwable t) {
             Assert.fail("EncryptionInterceptor should throw ChannelConfigException, not " + t.getClass().getName());
         }
+    }
+
+    private MemberImpl createMember(String host, int port, int uniqueIdSeed) throws Exception {
+        MemberImpl member = new MemberImpl(host, port, 0);
+        member.setUniqueId(new byte[] { (byte) uniqueIdSeed, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        return member;
     }
 }
