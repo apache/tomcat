@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.util.net;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,11 +84,13 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
             getUrl("https://localhost:" + getPort() + "/");
             Assert.fail("SSLHandshakeException expected, but handshake did not fail");
         } catch (SSLHandshakeException e) {
-        // Java 8 might throw SSLException instead of SSLHandshakeException
+            // Java 8 might throw SSLException instead of SSLHandshakeException
         } catch (SSLException e) {
             if (JreCompat.isJre9Available()) {
                 throw(e);
             }
+        } catch (SocketException e) {
+            // SocketException has also been observed
         }
 
     }
