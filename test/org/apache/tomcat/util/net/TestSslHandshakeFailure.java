@@ -26,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -79,6 +80,7 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
 
         try {
             getUrl("https://localhost:" + getPort() + "/");
+            Assert.fail("SSLHandshakeException expected, but handshake did not fail");
         } catch (SSLHandshakeException t) {
             // Expected
         } catch (SocketException e) {
