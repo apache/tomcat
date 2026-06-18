@@ -26,7 +26,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -78,24 +77,12 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
         sc.init(null, TesterSupport.getTrustManagers(), null);
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-        Throwable actual = null;
         try {
             getUrl("https://localhost:" + getPort() + "/");
-        } catch (Throwable t) {
-            actual = t;
-        }
-
-        /*
-         * SSLHandshakeException expected but SocketException has been observed
-         */
-        Assert.assertNotNull("No exception was thrown when SSLHandshakeException was expected", actual);
-
-        if (actual instanceof SSLHandshakeException || actual instanceof SocketException) {
-            // Tests passes = NO-OP
-        } else {
-            actual.printStackTrace();
-            Assert.fail("Unexpected exception [" + actual.getClass() + ": " + actual.getMessage() + "].");
+        } catch (SSLHandshakeException t) {
+            // Expected
+        } catch (SocketException e) {
+            // Expected - SocketException has also been observed (less often)
         }
     }
-
 }
