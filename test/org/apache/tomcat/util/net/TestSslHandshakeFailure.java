@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.util.net;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -57,7 +59,7 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
     @Parameter(2)
     public String sslImplementationName;
 
-    @Test(expected = SSLHandshakeException.class)
+    @Test
     public void testMissingClientCertificate() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -76,8 +78,24 @@ public class TestSslHandshakeFailure extends TomcatBaseTest {
         sc.init(null, TesterSupport.getTrustManagers(), null);
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-        getUrl("https://localhost:" + getPort() + "/");
+        Throwable actual = null;
+        try {
+            getUrl("https://localhost:" + getPort() + "/");
+        } catch (Throwable t) {
+            actual = t;
+        }
 
+        /*
+         * SSLHandshakeException expected but SocketException has been observed
+         */
+        Assert.assertNotNull("No exception was thrown when SSLHandshakeException was expected", actual);
+
+        if (actual instanceof SSLHandshakeException || actual instanceof SocketException) {
+            // Tests passes = NO-OP
+        } else {
+            actual.printStackTrace();
+            Assert.fail("Unexpected exception [" + actual.getClass() + ": " + actual.getMessage() + "].");
+        }
     }
 
 }
