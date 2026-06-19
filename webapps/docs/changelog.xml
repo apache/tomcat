@@ -108,6 +108,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.120 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Avoid a race condition with concurrent lookups for a singleton JNDI
+        resource. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.119 (remm)" rtext="release in progress">
   <subsection name="Catalina">

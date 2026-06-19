@@ -518,27 +518,27 @@ public class NamingContext implements Context {
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {
                     Object obj = null;
-                    if (!GRAAL) {
-                        obj = NamingManager.getObjectInstance(entry.value, name, this, env);
-                    } else {
-                        // NamingManager.getObjectInstance would simply return the reference here
-                        // Use the configured object factory to resolve it directly if possible
-                        // Note: This may need manual constructor reflection configuration
-                        Reference reference = (Reference) entry.value;
-                        String factoryClassName = reference.getFactoryClassName();
-                        if (factoryClassName != null) {
-                            Class<?> factoryClass = getClass().getClassLoader().loadClass(factoryClassName);
-                            ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
-                            obj = factory.getObjectInstance(entry.value, name, this, env);
+                    boolean singleton = false;
+                    if (entry.value instanceof ResourceRef) {
+                        // Only create singleton instances inside the sync
+                        synchronized (entry) {
+                            if (entry.value instanceof ResourceRef) {
+                                singleton = Boolean.parseBoolean(
+                                        (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
+                                if (singleton) {
+                                    obj = getObjectInstance(name, entry);
+                                    entry.type = NamingEntry.ENTRY;
+                                    entry.value = obj;
+                                }
+                            } else {
+                                // Another thread has created the singleton
+                                singleton = true;
+                                obj = entry.value;
+                            }
                         }
                     }
-                    if (entry.value instanceof ResourceRef) {
-                        boolean singleton = Boolean.parseBoolean(
-                                (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
-                        if (singleton) {
-                            entry.type = NamingEntry.ENTRY;
-                            entry.value = obj;
-                        }
+                    if (!singleton) {
+                        obj = getObjectInstance(name, entry);
                     }
                     if (obj == null) {
                         throw new NamingException(sm.getString("namingContext.failResolvingReference", name));
@@ -557,9 +557,27 @@ public class NamingContext implements Context {
                 return entry.value;
             }
         }
-
     }
 
+
+    private Object getObjectInstance(Name name, NamingEntry entry) throws Exception {
+        Object obj = null;
+        if (!GRAAL) {
+            obj = NamingManager.getObjectInstance(entry.value, name, this, env);
+        } else {
+            // NamingManager.getObjectInstance would simply return the reference here
+            // Use the configured object factory to resolve it directly if possible
+            // Note: This may need manual constructor reflection configuration
+            Reference reference = (Reference) entry.value;
+            String factoryClassName = reference.getFactoryClassName();
+            if (factoryClassName != null) {
+                Class<?> factoryClass = getClass().getClassLoader().loadClass(factoryClassName);
+                ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
+                obj = factory.getObjectInstance(entry.value, name, this, env);
+            }
+        }
+        return obj;
+    }
 
     /**
      * Binds a name to an object. All intermediate contexts and the target context (that named by all but terminal
