@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents the value of an HTTP Range header.
@@ -71,7 +72,7 @@ public class Ranges {
     /**
      * Represents a single range entry with a start and end position.
      */
-    public static class Entry {
+    public static class Entry implements Comparable<Entry> {
 
         private final long start;
         private final long end;
@@ -106,6 +107,38 @@ public class Ranges {
          */
         public long getEnd() {
             return end;
+        }
+
+
+        @Override
+        public int compareTo(Entry o) {
+            if (start == o.start) {
+                return Long.compare(end, o.end);
+            } else {
+                return Long.compare(start, o.start);
+            }
+        }
+
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(Long.valueOf(end), Long.valueOf(start));
+        }
+
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Entry other = (Entry) obj;
+            return end == other.end && start == other.start;
         }
     }
 

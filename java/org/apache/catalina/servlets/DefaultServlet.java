@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import javax.xml.transform.Source;
@@ -1368,43 +1369,62 @@ public class DefaultServlet extends HttpServlet {
     }
 
     private static boolean validate(Ranges ranges, long length) {
-        List<long[]> rangeContext = new ArrayList<>();
-        int overlapCount = 0;
+        /*
+         * Looking for overlapping ranges.
+         *
+         * Where the start or end (never both as that would be invalid) is -1, update the start and/or end as
+         * appropriate to the actual start and end points in the file.
+         *
+         * Then process the ranges in order. If range starts before the largest observed end so far, it must overlap.
+         */
+        TreeSet<Ranges.Entry> orderedRanges = new TreeSet<>();
         for (Ranges.Entry range : ranges.getEntries()) {
-            long start = getStart(range, length);
-            long end = getEnd(range, length);
-            if (start < 0 || start > end) {
+            // Adjusted values depend on both original values so calculate both adjusted values first then update range.
+            long adjustedStart = getStart(range, length);
+            long adjustedEnd = getEnd(range, length);
+            if (adjustedStart > adjustedEnd) {
                 // Invalid range
                 return false;
             }
-            /*
-             * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
-             * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-             *
-             * The server MAY ignore or reject Range headers with:
-             *
-             * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
-             *
-             * - More than two overlapping ranges (enforced)
-             */
-            for (long[] r : rangeContext) {
-                long s2 = r[0];
-                long e2 = r[1];
-                // Given valid [s1,e1] and [s2,e2]
-                // If { s1>e2 || s2>e1 } then no overlap
-                // equivalent to
-                // If not { s1>e2 || s2>e1 } then overlap
-                // De Morgan's law
-                if (start <= e2 && s2 <= end) {
-                    overlapCount++;
-                    // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
-                    if (overlapCount > 1) {
-                        return false;
-                    }
-                }
-            }
-            rangeContext.add(new long[] { start, end });
+            Ranges.Entry adjustedRange = new Ranges.Entry(adjustedStart, adjustedEnd);
+
+            orderedRanges.add(adjustedRange);
         }
+
+        int overlapCount = ranges.getEntries().size() - orderedRanges.size();
+        // This only detected duplicate ranges. Each duplicate is equivalent to 1 overlap.
+        // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+        if (overlapCount > 1) {
+            return false;
+        }
+
+        /*
+         * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
+         * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+         *
+         * The server MAY ignore or reject Range headers with:
+         *
+         * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
+         *
+         * - More than two overlapping ranges (enforced)
+         */
+        long latestObservedEnd = -1;
+        for (Ranges.Entry range : orderedRanges) {
+            if (range.getStart() <= latestObservedEnd) {
+                overlapCount++;
+            }
+
+
+            if (range.getEnd() > latestObservedEnd) {
+                latestObservedEnd = range.getEnd();
+            }
+
+            // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+            if (overlapCount > 1) {
+                return false;
+            }
+        }
+
         return true;
     }
 

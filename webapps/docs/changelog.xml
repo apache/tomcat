@@ -974,6 +974,10 @@
         <bug>69932</bug>: Fix request end access log pattern regression,
         which would log the start time of the request instead. (remm)
       </fix>
+      <fix>
+        Improve the performance of range validation for the default servlet.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
