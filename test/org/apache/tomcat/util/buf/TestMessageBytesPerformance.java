@@ -57,7 +57,7 @@ public class TestMessageBytesPerformance {
     public void testConversionPerformance() {
 
         // ISO_8859_1 conversion appears to be optimised in Java 16 onwards
-        Assume.assumeFalse(JreCompat.isJre16Available());
+        Assume.assumeFalse("Test only runs for Java < 16", JreCompat.isJre16Available());
 
         long optimized = -1;
         long nonOptimized = -1;
