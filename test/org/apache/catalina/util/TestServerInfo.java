@@ -289,7 +289,7 @@ public class TestServerInfo {
         Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
 
         // Verify version info format (should contain version numbers)
-        String[] lines = output.split("\n");
+        String[] lines = output.split(System.lineSeparator());
         boolean foundAprVersion = false;
         boolean foundTcnVersion = false;
 
