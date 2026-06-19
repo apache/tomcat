@@ -519,24 +519,21 @@ public class NamingContext implements Context {
                 try {
                     Object obj = null;
                     boolean singleton = false;
-                    if (entry.value instanceof ResourceRef) {
-                        // Only create singleton instances inside the sync
-                        synchronized (entry) {
-                            if (entry.value instanceof ResourceRef) {
-                                singleton = Boolean.parseBoolean(
-                                        (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
-                                if (singleton) {
-                                    obj = getObjectInstance(name, entry);
-                                    // If reference resolution fails, don't cache failed result.
-                                    if (obj != null) {
-                                        entry.value = obj;
-                                        entry.type = NamingEntry.ENTRY;
-                                    }
+                    synchronized (entry) {
+                        if (entry.type == NamingEntry.ENTRY) {
+                            // Other thread has already created the singleton
+                            singleton = true;
+                            obj = entry.value;
+                        } else if (entry.value instanceof ResourceRef resourceRef) {
+                            singleton =
+                                    Boolean.parseBoolean((String) resourceRef.get(ResourceRef.SINGLETON).getContent());
+                            if (singleton) {
+                                obj = getObjectInstance(name, entry);
+                                // If reference resolution fails, don't cache failed result.
+                                if (obj != null) {
+                                    entry.value = obj;
+                                    entry.type = NamingEntry.ENTRY;
                                 }
-                            } else {
-                                // Another thread has created the singleton
-                                singleton = true;
-                                obj = entry.value;
                             }
                         }
                     }
