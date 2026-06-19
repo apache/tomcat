@@ -78,7 +78,8 @@ public class TestRfc9218 extends Http2TestBase {
         // Add 1k to the connection window. Should be used for stream 17.
         sendWindowUpdate(0, 1024);
         parser.readFrame();
-        Assert.assertEquals("17-Body-1024\n", output.getTrace());
+        trace = output.getTrace();
+        Assert.assertEquals("17-Body-1024\n", trace);
         System.out.println(trace);
         output.clearTrace();
 
@@ -94,7 +95,8 @@ public class TestRfc9218 extends Http2TestBase {
         sendWindowUpdate(0, 1024);
         parser.readFrame();
 
-        Assert.assertEquals("21-Body-1024\n", output.getTrace());
+        trace = output.getTrace();
+        Assert.assertEquals("21-Body-1024\n", trace);
         System.out.println(trace);
         output.clearTrace();
 
