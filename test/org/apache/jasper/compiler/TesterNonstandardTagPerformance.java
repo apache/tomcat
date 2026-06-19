@@ -23,12 +23,15 @@ import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.TesterPageContext;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 
-public class TestNonstandardTagPerformance {
+/*
+ * This test requires additional setup and cannot be run as part of a standard test run so it is excluded due to the
+ * name starting Tester...
+ */
+public class TesterNonstandardTagPerformance {
     static final long NUM_ITERATIONS = 100000000L;
 
     static final int NUM_TESTS = 5;
@@ -105,7 +108,6 @@ public class TestNonstandardTagPerformance {
      * </ol>
      * @throws Throwable generic error
      */
-    @Ignore
     @Test
     public void runBenchmark() throws Throwable {
         long[] durations = new long[NUM_TESTS];
