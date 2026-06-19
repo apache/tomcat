@@ -28,7 +28,6 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.tomcat.util.collections.SynchronizedStack;
@@ -98,9 +97,12 @@ public class TestELParserPerformance {
     /*
      * Ignored by default since this is an absolute test primarily for
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=69338
+     *
+     * Comment out @Test rather than use @Ignore since @Ignore triggers a "skipped test" message in the test output
+     * and those messages should be reserved for tests skipped due to environmental (no APR, wrong Java version, etc)
+     * issues.
      */
-    @Ignore
-    @Test
+    //@Test
     public void testAstAnd() {
 
         ELManager manager = new ELManager();
@@ -144,9 +146,12 @@ public class TestELParserPerformance {
     /*
      * Ignored by default since this is an absolute test primarily for
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=69338
+     *
+     * Comment out @Test rather than use @Ignore since @Ignore triggers a "skipped test" message in the test output
+     * and those messages should be reserved for tests skipped due to environmental (no APR, wrong Java version, etc)
+     * issues.
      */
-    @Ignore
-    @Test
+    //@Test
     public void testAstNotEmpty() {
 
         ELManager manager = new ELManager();
@@ -213,9 +218,12 @@ public class TestELParserPerformance {
      *
      * Ignored by default since this is an absolute test primarily for
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=69381
+     *
+     * Comment out @Test rather than use @Ignore since @Ignore triggers a "skipped test" message in the test output
+     * and those messages should be reserved for tests skipped due to environmental (no APR, wrong Java version, etc)
+     * issues.
      */
-    @Ignore
-    @Test
+    //@Test
     public void testExpressions() throws Exception {
 
         ELManager manager = new ELManager();
