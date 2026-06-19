@@ -297,13 +297,13 @@ public class TestServerInfo {
             if (line.contains("APR Version:")) {
                 foundAprVersion = true;
                 // APR version should be in format like "1.7.0"
-                Assert.assertTrue("APR Version line should contain version number",
+                Assert.assertTrue("APR Version line should contain version number\n" + output,
                         line.matches(".*APR Version:\\s+\\d+\\.\\d+.*"));
             }
             if (line.contains("Tomcat Native:")) {
                 foundTcnVersion = true;
                 // Tomcat Native version should be in format like "2.0.5"
-                Assert.assertTrue("Tomcat Native line should contain version number",
+                Assert.assertTrue("Tomcat Native line should contain version number\n" + output,
                         line.matches(".*Tomcat Native:\\s+\\d+\\.\\d+.*"));
             }
         }
