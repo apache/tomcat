@@ -527,8 +527,11 @@ public class NamingContext implements Context {
                                         (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
                                 if (singleton) {
                                     obj = getObjectInstance(name, entry);
-                                    entry.type = NamingEntry.ENTRY;
-                                    entry.value = obj;
+                                    // If reference resolution fails, don't cache failed result.
+                                    if (obj != null) {
+                                        entry.value = obj;
+                                        entry.type = NamingEntry.ENTRY;
+                                    }
                                 }
                             } else {
                                 // Another thread has created the singleton
