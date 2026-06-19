@@ -106,6 +106,20 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
                 "bytes=0-1000", null, Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
         parameterSets.add(new Object[] {
                 "bytes=-1000", null, Integer.valueOf(206), strLen, "0-" + (len - 1) + "/" + len });
+        // Lots of small ranges (test target has a little over 900 bytes. Exact length varies by platform."
+        StringBuilder range = new StringBuilder();
+        range.append("bytes=");
+        int lastRange = 900;
+        for (int i = 1; i < lastRange; i++) {
+            range.append(i);
+            range.append('-');
+            range.append(i);
+            range.append(',');
+        }
+        range.append(lastRange);
+        range.append('-');
+        range.append(lastRange);
+        parameterSets.add(new Object[] { range.toString(), null, Integer.valueOf(206), null, "500-500/" + len });
 
         /* If-Range tests */
         // Valid
