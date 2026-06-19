@@ -61,7 +61,7 @@ public class TestAstIdentifier {
          *
          * In Java 24, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeTrue(Runtime.version().feature() < 24);
+        Assume.assumeTrue("Test only works on Java 21 to 23", Runtime.version().feature() < 24);
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierStart(i)) {
                 testIdentifier((char) i, 'b');
@@ -86,7 +86,7 @@ public class TestAstIdentifier {
          *
          * In Java 24, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeTrue(Runtime.version().feature() < 24);
+        Assume.assumeTrue("Test only works on Java 21 to 23", Runtime.version().feature() < 24);
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierPart(i)) {
                 testIdentifier('b', (char) i);
