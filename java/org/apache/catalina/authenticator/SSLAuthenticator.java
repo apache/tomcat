@@ -164,18 +164,21 @@ public class SSLAuthenticator extends AuthenticatorBase {
          */
         Container container = getContainer();
         if (!(container instanceof Context)) {
+            log.warn(sm.getString("sslAuthenticatorValve.invalidContainer"));
             return;
         }
         Context context = (Context) container;
 
         container = context.getParent();
         if (!(container instanceof Host)) {
+            log.warn(sm.getString("sslAuthenticatorValve.invalidContainer"));
             return;
         }
         Host host = (Host) container;
 
         container = host.getParent();
         if (!(container instanceof Engine)) {
+            log.warn(sm.getString("sslAuthenticatorValve.invalidContainer"));
             return;
         }
         Engine engine = (Engine) container;

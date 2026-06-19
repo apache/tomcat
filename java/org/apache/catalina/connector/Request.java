@@ -1941,7 +1941,7 @@ public class Request implements HttpServletRequest {
     /**
      * Get the decoded request URI.
      *
-     * @return the URL decoded request URI
+     * @return the URL decoded request URI as MessageBytes
      */
     public MessageBytes getDecodedRequestURIMB() {
         return coyoteRequest.decodedURI();
