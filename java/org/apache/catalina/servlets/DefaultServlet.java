@@ -43,6 +43,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import javax.servlet.DispatcherType;
@@ -1596,12 +1598,20 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        // Can't update to use Ranges as this is a protected method. Only backwards compatible API changes are allowed.
-        // Convert to Range
+        /*
+         * Can't update to use Ranges as this is a protected method. Only backwards compatible API changes are allowed.
+         *
+         * Combine converting to Range with checking for overlaps.
+         *
+         * Looking for overlapping ranges.
+         *
+         * Where the start or end (never both as that would be invalid) is -1, update the start and/or end as
+         * appropriate to the actual start and end points in the file.
+         *
+         * Then process the ranges in order. If range starts before the largest observed end so far, it must overlap.
+         */
         ArrayList<Range> result = new ArrayList<>();
-
-        List<long[]> rangeContext = new ArrayList<>();
-        int overlapCount = 0;
+        TreeSet<Range> orderedRanges = new TreeSet<>();
         for (Ranges.Entry entry : ranges.getEntries()) {
             Range currentRange = new Range();
             if (entry.getStart() == -1) {
@@ -1618,44 +1628,53 @@ public class DefaultServlet extends HttpServlet {
                 currentRange.end = entry.getEnd();
             }
             currentRange.length = fileLength;
-
             if (!currentRange.validate()) {
                 response.addHeader("Content-Range", "bytes */" + fileLength);
                 response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                 return null;
             }
 
-            // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-            /*
-             * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
-             * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-             *
-             * The server MAY ignore or reject Range headers with:
-             *
-             * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
-             *
-             * - More than two overlapping ranges (enforced)
-             */
-            for (long[] r : rangeContext) {
-                long s2 = r[0];
-                long e2 = r[1];
-                // Given valid [s1,e1] and [s2,e2]
-                // If { s1>e2 || s2>e1 } then no overlap
-                // equivalent to
-                // If not { s1>e2 || s2>e1 } then overlap
-                // De Morgan's law
-                if (currentRange.start <= e2 && s2 <= currentRange.end) {
-                    overlapCount++;
-                    // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
-                    if (overlapCount > 1) {
-                        response.addHeader("Content-Range", "bytes */" + fileLength);
-                        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                        return null;
-                    }
-                }
-            }
-            rangeContext.add(new long[] { currentRange.start, currentRange.end });
             result.add(currentRange);
+            orderedRanges.add(currentRange);
+        }
+
+        // This only detected duplicate ranges. Each duplicate is equivalent to 1 overlap.
+        int overlapCount = ranges.getEntries().size() - orderedRanges.size();
+        // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+        if (overlapCount > 1) {
+            response.addHeader("Content-Range", "bytes */" + fileLength);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+            return null;
+        }
+
+        // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+        /*
+         * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
+         * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+         *
+         * The server MAY ignore or reject Range headers with:
+         *
+         * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
+         *
+         * - More than two overlapping ranges (enforced)
+         */
+        long latestObservedEnd = -1;
+        for (Range range : orderedRanges) {
+            if (range.start <= latestObservedEnd) {
+                overlapCount++;
+            }
+
+
+            if (range.end > latestObservedEnd) {
+                latestObservedEnd = range.end;
+            }
+
+            // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+            if (overlapCount > 1) {
+                response.addHeader("Content-Range", "bytes */" + fileLength);
+                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                return null;
+            }
         }
 
         return result;
@@ -2958,7 +2977,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    protected static class Range {
+    protected static class Range implements Comparable<Range> {
 
         public long start;
         public long end;
@@ -2975,7 +2994,37 @@ public class DefaultServlet extends HttpServlet {
             }
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
         }
+
+        @Override
+        public int compareTo(Range o) {
+            if (start == o.start) {
+                return Long.compare(end, o.end);
+            } else {
+                return Long.compare(start, o.start);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(Long.valueOf(end), Long.valueOf(start));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Range other = (Range) obj;
+            return end == other.end && start == other.start;
+        }
     }
+
 
     protected static class CompressionFormat implements Serializable {
         private static final long serialVersionUID = 1L;
