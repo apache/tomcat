@@ -60,7 +60,7 @@ public class NamingEntry {
     /**
      * The type instance variable is used to avoid using RTTI when doing lookups.
      */
-    public int type;
+    public volatile int type;
 
     /**
      * The binding name.
@@ -70,7 +70,7 @@ public class NamingEntry {
     /**
      * The bound object value.
      */
-    public Object value;
+    public volatile Object value;
 
 
     @Override
