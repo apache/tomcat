@@ -218,6 +218,10 @@
         third-party library version information. (csutherl)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Avoid a race condition with concurrent lookups for a singleton JNDI
+        resource. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
