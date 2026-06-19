@@ -23,7 +23,6 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.TesterPageContext;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.jasper.runtime.JspRuntimeLibrary;
@@ -34,7 +33,11 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
  * The benchmark requires libraries that are not normally on the build-time classpath (standard tags) so much of this
  * code is commented out. Users running the benchmark should uncomment the imports, fields, and methods.
  */
-public class TestNonstandardTagPerformance {
+/*
+ * This test requires additional setup and cannot be run as part of a standard test run so it is excluded due to the
+ * name starting Tester...
+ */
+public class TesterNonstandardTagPerformance {
     static final long NUM_ITERATIONS = 100000000L;
 
     static final int NUM_TESTS = 5;
@@ -119,7 +122,6 @@ public class TestNonstandardTagPerformance {
      * </ol>
      * @throws Throwable generic error
      */
-    @Ignore
     @Test
     public void runBenchmark() throws Throwable {
         long[] durations = new long[NUM_TESTS];
