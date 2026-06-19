@@ -62,7 +62,7 @@ public class TestAstIdentifier {
          *
          * In Java 19, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeFalse(JreCompat.isJre19Available());
+        Assume.assumeFalse("Test only works on Java 17 & 18", JreCompat.isJre19Available());
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierStart(i)) {
                 testIdentifier((char) i, 'b');
@@ -87,7 +87,7 @@ public class TestAstIdentifier {
          *
          * In Java 19, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeFalse(JreCompat.isJre19Available());
+        Assume.assumeFalse("Test only works on Java 17 & 18", JreCompat.isJre19Available());
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierPart(i)) {
                 testIdentifier('b', (char) i);
