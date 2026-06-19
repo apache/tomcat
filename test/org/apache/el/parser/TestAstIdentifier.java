@@ -61,7 +61,7 @@ public class TestAstIdentifier {
          *
          * In Java 12, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeTrue(Integer.valueOf(11).equals(Runtime.version().version().get(0)));
+        Assume.assumeTrue("Test only works on Java 11", Integer.valueOf(11).equals(Runtime.version().version().get(0)));
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierStart(i)) {
                 testIdentifier((char) i, 'b');
@@ -86,7 +86,7 @@ public class TestAstIdentifier {
          *
          * In Java 12, the definition of Java Letter and/or Java Digit has changed.
          */
-        Assume.assumeTrue(Integer.valueOf(11).equals(Runtime.version().version().get(0)));
+        Assume.assumeTrue("Test only works on Java 11", Integer.valueOf(11).equals(Runtime.version().version().get(0)));
         for (int i = 0; i < 0xFFFF; i++) {
             if (Character.isJavaIdentifierPart(i)) {
                 testIdentifier('b', (char) i);
