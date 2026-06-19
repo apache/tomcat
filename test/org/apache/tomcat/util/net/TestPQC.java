@@ -52,8 +52,11 @@ public class TestPQC extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        /*
+         * Avoid skipped test warnings for something we know isn't supported
+         */
+        //parameterSets.add(new Object[] {
+        //        "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
