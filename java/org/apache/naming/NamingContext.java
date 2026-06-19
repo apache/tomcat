@@ -524,9 +524,9 @@ public class NamingContext implements Context {
                             // Other thread has already created the singleton
                             singleton = true;
                             obj = entry.value;
-                        } else if (entry.value instanceof ResourceRef resourceRef) {
-                            singleton =
-                                    Boolean.parseBoolean((String) resourceRef.get(ResourceRef.SINGLETON).getContent());
+                        } else if (entry.value instanceof ResourceRef) {
+                            singleton = Boolean.parseBoolean(
+                                    (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
                             if (singleton) {
                                 obj = getObjectInstance(name, entry);
                                 // If reference resolution fails, don't cache failed result.
