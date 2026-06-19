@@ -52,9 +52,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
     /**
      * Returns the character set used for encoding credentials, as set by the user.
-     * If the charset was null or empty, the effective charset will be ISO-8859-1.
      *
-     * @return the character set name
+     * @return the character set name, the default value is "UTF-8"
      */
     public String getCharset() {
         return charsetString;
@@ -66,6 +65,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
      * ISO-8859-1.
      *
      * @param charsetString the character set name
+     * @throws IllegalArgumentException if the charset is not supported
      */
     public void setCharset(String charsetString) {
         // Only acceptable options are null, "" or "UTF-8" (case-insensitive)
@@ -287,6 +287,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
             }
 
+            // Tomcat allows a null password
             if (colon < 0) {
                 username = new String(decoded, charset);
                 // password will remain null!

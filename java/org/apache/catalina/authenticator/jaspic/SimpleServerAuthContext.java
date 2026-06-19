@@ -49,7 +49,8 @@ public class SimpleServerAuthContext implements ServerAuthContext {
     /**
      * {@inheritDoc}
      * <p>
-     * Iterates through the configured modules and returns the first result that is not {@code SEND_FAILURE}.
+     * Iterates through the configured modules in order and returns the first result that is not
+     * {@code SEND_FAILURE}. If all modules return {@code SEND_FAILURE}, returns {@code SEND_FAILURE}.
      */
     @Override
     public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)

@@ -102,11 +102,13 @@ public class Connector extends LifecycleMBeanBase {
     public Connector(String protocol) {
         configuredProtocol = protocol;
         ProtocolHandler p = null;
+        Exception ex = null;
         try {
             p = ProtocolHandler.create(protocol);
         } catch (Exception e) {
-            log.error(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"), e);
+            ex = e;
         }
+        protocolHandlerCreationException = ex;
         if (p != null) {
             protocolHandler = p;
             protocolHandlerClassName = protocolHandler.getClass().getName();
@@ -125,6 +127,7 @@ public class Connector extends LifecycleMBeanBase {
      * @param protocolHandler The protocol handler to use
      */
     public Connector(ProtocolHandler protocolHandler) {
+        protocolHandlerCreationException = null;
         protocolHandlerClassName = protocolHandler.getClass().getName();
         configuredProtocol = protocolHandlerClassName;
         this.protocolHandler = protocolHandler;
@@ -134,6 +137,13 @@ public class Connector extends LifecycleMBeanBase {
 
 
     // ----------------------------------------------------- Instance Variables
+
+
+    /**
+     * Exception creating the protocol handler.
+     */
+    protected final Throwable protocolHandlerCreationException;
+
 
     /**
      * The <code>Service</code> we are associated with (if any).
@@ -1241,7 +1251,7 @@ public class Connector extends LifecycleMBeanBase {
         super.initInternal();
 
         if (protocolHandler == null) {
-            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
+            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"), protocolHandlerCreationException);
         }
 
         // Initialize adapter

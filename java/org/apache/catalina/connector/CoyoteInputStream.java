@@ -68,7 +68,7 @@ public class CoyoteInputStream extends ServletInputStream {
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
