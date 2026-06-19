@@ -37,6 +37,16 @@ public interface ChannelReceiver extends Heartbeat {
     void start() throws IOException;
 
     /**
+     * Waits until the receiver has completed the asynchronous portion of start-up. Receivers that complete start-up
+     * synchronously do not need to override this method.
+     *
+     * @throws IOException Start-up failed
+     */
+    default void awaitStart() throws IOException {
+        // NO-OP
+    }
+
+    /**
      * Stop listening for messages
      */
     void stop();
