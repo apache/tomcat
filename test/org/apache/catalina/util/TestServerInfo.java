@@ -212,10 +212,14 @@ public class TestServerInfo {
      */
     @Test
     public void testServerInfoOutputWithApr() throws Exception {
-        // Only run this test if APR is available
-        Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
-
         String output = captureServerInfoOutput();
+
+        /*
+         * APR is not initialised (if present) until the version info is captured. Therefore, this test needs to made
+         * after the Server info has been collected.
+         */
+        // Only run this test if APR is available - only know this after ServerInfo has nee
+        Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
 
         // Check for APR-specific output
         Assert.assertTrue("Should contain 'APR loaded: true'", output.contains("APR loaded:     true"));
@@ -276,10 +280,13 @@ public class TestServerInfo {
      */
     @Test
     public void testAprVersionInfo() throws Exception {
-        // Only run if APR is available
-        Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
-
         String output = captureServerInfoOutput();
+
+        /*
+         * APR is not initialised (if present) until the version info is captured. Therefore, this test needs to made
+         * after the Server info has been collected.
+         */
+        Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
 
         // Verify version info format (should contain version numbers)
         String[] lines = output.split("\n");
@@ -313,7 +320,12 @@ public class TestServerInfo {
      */
     @Test
     public void testTomcatNativeVersionWarningWithRealVersion() throws Exception {
-        // Only run if APR is available
+        captureServerInfoOutput();
+
+        /*
+         * APR is not initialised (if present) until the version info is captured. Therefore, this test needs to made
+         * after the Server info has been collected.
+         */
         Assume.assumeTrue("APR not available", AprLifecycleListener.isAprAvailable());
 
         // If APR is available, getTcnVersionWarning() should return non-null if version is old,
