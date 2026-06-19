@@ -26,6 +26,7 @@ import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.Method;
@@ -45,13 +46,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     protected AbstractCatalinaTask() {
     }
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * manager webapp's encoding.
-     */
-    private static final String CHARSET = "utf-8";
 
 
     // ------------------------------------------------------------- Properties
@@ -270,7 +264,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             }
 
             // Process the response message
-            reader = new InputStreamReader(hconn.getInputStream(), CHARSET);
+            reader = new InputStreamReader(hconn.getInputStream(), StandardCharsets.UTF_8);
             StringBuilder buff = new StringBuilder();
             String error = null;
             int msgPriority = Project.MSG_INFO;

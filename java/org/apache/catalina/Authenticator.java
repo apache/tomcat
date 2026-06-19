@@ -37,7 +37,7 @@ public interface Authenticator {
      * @param request  Request we are processing
      * @param response Response we are populating
      *
-     * @return <code>true</code> if any specified constraints have been satisfied, or <code>false</code> if one more
+     * @return <code>true</code> if any specified constraints have been satisfied, or <code>false</code> if one or more
      *             constraints were not satisfied (in which case an authentication challenge will have been written to
      *             the response).
      *

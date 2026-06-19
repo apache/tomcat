@@ -366,8 +366,9 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
                     sb.append("&ws=");
                     sb.append(workerStopped);
                 }
-                if ((workerRedirect != null)) { // other worker conrecte lb's
+                if ((workerRedirect != null)) { // redirect to other worker or load balancer
                     sb.append("&wr=");
+                    sb.append(URLEncoder.encode(workerRedirect, getCharset()));
                 }
                 if ((workerClusterDomain != null)) {
                     sb.append("&wc=");
@@ -400,10 +401,10 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
                 throw new BuildException(
                         "Must specify at a lb worker either" + "'lbStickySession' and 'lbForceSession' attribute");
             }
-            if (null != lbRecovertime && 60 < lbRecovertime.intValue()) {
+            if (null != lbRecovertime && lbRecovertime.intValue() < 60) {
                 throw new BuildException("The 'lbRecovertime' must be greater than 59");
             }
-            if (null != lbRetries && 1 < lbRetries.intValue()) {
+            if (null != lbRetries && lbRetries.intValue() < 2) {
                 throw new BuildException("The 'lbRetries' must be greater than 1");
             }
             isLBMode = true;

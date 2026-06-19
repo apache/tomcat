@@ -1618,7 +1618,7 @@ public interface Context extends Container, ContextBind {
      * class - IllegalArgumentException will be thrown.
      *
      * @param clazz  Fully qualified class name
-     * @param method Post construct method name
+     * @param method Pre destroy method name
      *
      * @throws IllegalArgumentException if the fully qualified class name or method name are <code>NULL</code>; if there
      *                                      is already pre destroy method definition for the given class

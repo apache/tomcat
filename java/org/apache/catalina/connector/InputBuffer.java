@@ -175,7 +175,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Recycle the output buffer.
+     * Recycle the input buffer.
      */
     public void recycle() {
 

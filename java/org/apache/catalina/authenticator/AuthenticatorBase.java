@@ -671,8 +671,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             // This is a subset of the tests in CorsFilter.checkRequestType
             if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
-                if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
-                        !RequestUtil.isSameOrigin(request, originHeader)) {
+                if (originHeader != null && !originHeader.isEmpty()
+                        && !"null".equals(originHeader) && RequestUtil.isValidOrigin(originHeader)
+                        && !RequestUtil.isSameOrigin(request, originHeader)) {
                     String accessControlRequestMethodHeader =
                             request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                     if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
@@ -1269,7 +1270,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param username The user
      * @param password The password
      *
-     * @return The authenticated Principal
+     * @return The non null authenticated Principal
      *
      * @throws ServletException No principal was authenticated with the specified credentials
      */

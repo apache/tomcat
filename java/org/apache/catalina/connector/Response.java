@@ -447,9 +447,9 @@ public class Response implements HttpServletResponse {
      * Return a PrintWriter that can be used to render error messages, regardless of whether a stream or writer has
      * already been acquired.
      *
-     * @return Writer which can be used for error reports. If the response is not an error report returned using
-     *             sendError or triggered by an unexpected exception thrown during the servlet processing (and only in
-     *             that case), null will be returned if the response stream has already been used.
+     * @return Writer which can be used for error reports. Returns null if the output
+     *             buffer is not in a new state (i.e., data has been written or headers
+     *             have been modified).
      *
      * @exception IOException if an input/output error occurs
      */
@@ -906,8 +906,12 @@ public class Response implements HttpServletResponse {
         if (header == null) {
             return;
         }
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
         // if we reached here, no exception, cookie is valid
-        addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
+        addHeader("Set-Cookie", header, context.getCookieProcessor().getCharset());
     }
 
     /**
@@ -1090,10 +1094,12 @@ public class Response implements HttpServletResponse {
     @Override
     public String encodeRedirectURL(String url) {
         if (isEncodeable(toAbsolute(url))) {
-            return toEncoded(url, request.getSessionInternal().getIdInternal());
-        } else {
-            return url;
+            Session session = request.getSessionInternal();
+            if (session != null) {
+                return toEncoded(url, session.getIdInternal());
+            }
         }
+        return url;
     }
 
 
@@ -1104,7 +1110,7 @@ public class Response implements HttpServletResponse {
         try {
             absolute = toAbsolute(url);
         } catch (IllegalArgumentException iae) {
-            // Relative URL
+            // URL construction failed
             return url;
         }
 
@@ -1415,7 +1421,7 @@ public class Response implements HttpServletResponse {
      *
      * @param location URL to be (possibly) converted and then returned
      *
-     * @return the encoded URL
+     * @return the absolute URL
      *
      * @exception IllegalArgumentException if a MalformedURLException is thrown when converting the relative URL to an
      *                                         absolute one
