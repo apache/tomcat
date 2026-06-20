@@ -323,7 +323,6 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/index.db"/>
-    <include name="**/index.db.attr"/>
     <include name="**/jakarta.el.ExpressionFactory"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
@@ -3071,16 +3070,11 @@ You may need a custom build of makensis. Instructions for this may be found in B
   </target>
 
   <target name="release-version-check">
-    <!--FIXME: add version check for release once Java 22 has reasonable availability
     <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
       <condition>
         <not><javaversion atleast="${release.java.version}" /></not>
       </condition>
-    </fail>-->
-    <condition property="no-ffm">
-      <not><javaversion atleast="${release.java.version}" /></not>
-    </condition>
-    <echo level="error" if:set="no-ffm">JAVA VERSION 22 OR NEWER IS REQUIRED FOR RELEASE</echo>
+    </fail>
   </target>
 
   <target name="-pre-release-lone-target-check">
@@ -4633,13 +4627,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.sha512" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.sha512" />
       </condition>
 
       <fail unless="success">
@@ -4735,13 +4723,7 @@ Invalid signature for @{src-or-bin}/@{basefile}
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.asc" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.asc" />
       </condition>
 
       <fail unless="success">
@@ -4824,21 +4806,6 @@ information.
     <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
-<!--
-<echo>
-reproducible-1=${reproducible-1}
-reproducible-2=${reproducible-2}
-reproducible-3=${reproducible-3}
-reproducible-4=${reproducible-4}
-reproducible-5=${reproducible-5}
-reproducible-6=${reproducible-6}
-reproducible-7=${reproducible-7}
-reproducible-8=${reproducible-8}
-reproducible-9=${reproducible-9}
-reproducible-10=${reproducible-10}
-</echo>
--->
-
     <condition property="reproducible">
       <and>
         <isset property="reproducible-1" />
@@ -4847,10 +4814,7 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-3" />
 -->
         <isset property="reproducible-4" />
-        <or>
-          <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
-        </or>
+        <isset property="reproducible-5" />
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
