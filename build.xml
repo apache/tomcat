@@ -319,7 +319,6 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/index.db"/>
-    <include name="**/index.db.attr"/>
     <include name="**/javax.el.ExpressionFactory"/>
     <include name="**/javax.servlet.ServletContainerInitializer"/>
     <include name="**/javax.websocket.ContainerProvider"/>
@@ -2203,6 +2202,10 @@
     </condition>
   </target>
 
+  <!-- Set native specific properties -->
+  <condition property="native.nativeaccess" value="--enable-native-access=ALL-UNNAMED"><javaversion atleast="22"/></condition>
+  <property name="native.nativeaccess" value="-Dtest.1=1"/>
+  <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}${path.separator}${java.library.path}"/>
   <condition property="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED" else="-Dtest10=1">
     <javaversion atleast="9"/>
   </condition>
@@ -2244,7 +2247,7 @@
           <jvmarg value="${test.jvmarg.egd}"/>
           <jvmarg value="-Dfile.encoding=UTF-8"/>
           <jvmarg value="${test.xmx}"/>
-          <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
+          <jvmarg value="${runtests.librarypath}"/>
           <jvmarg value="${test.formatter}"/>
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
           <jvmarg value="${opens.javalang}"/>
@@ -3065,6 +3068,14 @@ You may need a custom build of makensis. Instructions for this may be found in B
     </exec>
   </target>
 
+  <target name="release-version-check">
+    <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
+      <condition>
+        <not><javaversion atleast="${release.java.version}" /></not>
+      </condition>
+    </fail>
+  </target>
+
   <target name="-pre-release-lone-target-check">
     <fail message="The pre-release target must be called all on its own. Specifically, you must run 'ant release' /after/ 'ant pre-release' in order to properly configure the build.">
       <condition>
@@ -3079,7 +3090,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
     <input message="Enter ASF username" addproperty="release.asfusername" defaultValue="${user.name}" />
   </target>
 
-  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
+  <target name="pre-release" depends="release-version-check,-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
     <antversion property="antversion"/>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
@@ -3220,19 +3231,6 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
     <forceUtcTimeZone />
-  </target>
-
-  <target name="release-version-check">
-    <!--FIXME: add version check for release once Java 22 has reasonable availability
-    <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
-      <condition>
-        <not><javaversion atleast="${release.java.version}" /></not>
-      </condition>
-    </fail>-->
-    <condition property="no-ffm">
-      <not><javaversion atleast="${release.java.version}" /></not>
-    </condition>
-    <echo level="error" if:set="no-ffm">JAVA VERSION 22 OR NEWER IS REQUIRED FOR RELEASE</echo>
   </target>
 
   <target name="gpg-init-available">
@@ -4346,8 +4344,14 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <mkdir dir="${tomcat.home}/lib"/>
 
     <echo>IntelliJ IDEA project directory created.
+
 The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
-or update the Project Settings accordingly.</echo>
+or update the Project Settings accordingly. Choose [File &gt; Project Structure] to open the settings dialog
+and set the SDK level, language level, etc. as needed.
+
+Some folders have been excluded by default as they require the latest SDK version and enabling of preview
+features. You can remove or comment out the exclusions to enable the directories in the .idea/tomcat.iml
+file, or via the IDEA UI by right-clicking folders, and choosing [Mark Directory as &gt; Cancel Exclusion]</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->
@@ -4606,13 +4610,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.sha512" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.sha512" />
       </condition>
 
       <fail unless="success">
@@ -4708,13 +4706,7 @@ Invalid signature for @{src-or-bin}/@{basefile}
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.asc" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.asc" />
       </condition>
 
       <fail unless="success">
@@ -4797,21 +4789,6 @@ information.
     <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
-<!--
-<echo>
-reproducible-1=${reproducible-1}
-reproducible-2=${reproducible-2}
-reproducible-3=${reproducible-3}
-reproducible-4=${reproducible-4}
-reproducible-5=${reproducible-5}
-reproducible-6=${reproducible-6}
-reproducible-7=${reproducible-7}
-reproducible-8=${reproducible-8}
-reproducible-9=${reproducible-9}
-reproducible-10=${reproducible-10}
-</echo>
--->
-
     <condition property="reproducible">
       <and>
         <isset property="reproducible-1" />
@@ -4820,10 +4797,7 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-3" />
 -->
         <isset property="reproducible-4" />
-        <or>
-          <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
-        </or>
+        <isset property="reproducible-5" />
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
