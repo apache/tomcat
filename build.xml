@@ -319,7 +319,6 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/index.db"/>
-    <include name="**/index.db.attr"/>
     <include name="**/jakarta.el.ExpressionFactory"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
@@ -4542,13 +4541,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.sha512" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.sha512" />
       </condition>
 
       <fail unless="success">
@@ -4644,13 +4637,7 @@ Invalid signature for @{src-or-bin}/@{basefile}
       </antcall>
 
       <condition property="success">
-        <or>
-          <available file="${tomcat.release.verify}/@{basefile}.asc" />
-          <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
-            <contains string="@{basefile}" substring="x86" />
-          </and>
-        </or>
+        <available file="${tomcat.release.verify}/@{basefile}.asc" />
       </condition>
 
       <fail unless="success">
