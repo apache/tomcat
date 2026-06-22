@@ -123,6 +123,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid a potential JVM crash if a suitable version of Tomcat Native is
+        not available when the connector is explicitly configured to use Tomcat
+        Native with OpenSSL for TLS. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.23 (markt)" rtext="release in progress">
   <subsection name="Catalina">
