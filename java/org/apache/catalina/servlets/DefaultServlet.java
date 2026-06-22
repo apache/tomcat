@@ -1399,6 +1399,11 @@ public class DefaultServlet extends HttpServlet {
             orderedRanges.add(adjustedRange);
         }
 
+        // Short-cut if two ranges or less (can't have more than 2 overlapping ranges)
+        if (ranges.getEntries().size() < 3) {
+            return true;
+        }
+
         int overlapCount = ranges.getEntries().size() - orderedRanges.size();
         // This only detected duplicate ranges. Each duplicate is equivalent to 1 overlap.
         // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
