@@ -588,6 +588,12 @@ public class RewriteValve extends ValveBase {
                     // Decode then normalize
                     String urlStringRewriteDecoded = URLDecoder.decode(urlStringRewriteEncoded, uriCharset);
                     urlStringRewriteDecoded = RequestUtil.normalize(urlStringRewriteDecoded);
+                    if (urlStringRewriteDecoded == null) {
+                        // Assume bad input caused the re-write to try and escape root
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        return;
+                    }
+
                     request.getCoyoteRequest().decodedURI().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                     chunk = request.getCoyoteRequest().decodedURI().getCharChunk();
                     if (context) {

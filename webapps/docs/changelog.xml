@@ -118,6 +118,9 @@
         Improve the performance of range validation for the default servlet.
         (markt)
       </fix>
+      <fix>
+        Avoid NPE in RewriteValve. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
