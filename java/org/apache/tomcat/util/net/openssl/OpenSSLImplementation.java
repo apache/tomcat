@@ -21,16 +21,20 @@ import java.util.Map;
 
 import javax.net.ssl.SSLSession;
 
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * OpenSSL implementation of SSLImplementation.
  */
 public class OpenSSLImplementation extends SSLImplementation {
+
+    private static final StringManager sm = StringManager.getManager(OpenSSLImplementation.class);
 
     @Deprecated
     @Override
@@ -40,11 +44,13 @@ public class OpenSSLImplementation extends SSLImplementation {
 
     @Override
     public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
+        ensureAvailable();
         return new JSSESupport(session, additionalAttributes);
     }
 
     @Override
     public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
+        ensureAvailable();
         return new OpenSSLUtil(certificate);
     }
 
@@ -52,5 +58,12 @@ public class OpenSSLImplementation extends SSLImplementation {
     public boolean isAlpnSupported() {
         // OpenSSL supported ALPN
         return true;
+    }
+
+    private void ensureAvailable() {
+        // Avoid a core dump if and older than minimum version is installed
+        if (!AprStatus.isAprAvailable()) {
+            throw new IllegalStateException(sm.getString("opensslImplementation.notAvailable"));
+        }
     }
 }
