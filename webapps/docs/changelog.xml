@@ -261,6 +261,11 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Avoid a potential JVM crash if a suitable version of Tomcat Native is
+        not available when the connector is explicitly configured to use Tomcat
+        Native with OpenSSL for TLS. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
