@@ -902,16 +902,13 @@ public class Response implements HttpServletResponse {
             return;
         }
 
+        // Note: This also ensures context is not null
         String header = generateCookieString(cookie);
         if (header == null) {
             return;
         }
-        Context context = getContext();
-        if (context == null) {
-            return;
-        }
         // if we reached here, no exception, cookie is valid
-        addHeader("Set-Cookie", header, context.getCookieProcessor().getCharset());
+        addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
 
     /**
@@ -1115,17 +1112,18 @@ public class Response implements HttpServletResponse {
         }
 
         if (isEncodeable(absolute)) {
-            // W3c spec clearly said
-            if (url.equalsIgnoreCase("")) {
-                url = absolute;
-            } else if (url.equals(absolute) && !hasPath(url)) {
-                url += '/';
+            Session session = request.getSessionInternal();
+            if (session != null) {
+                // W3c spec clearly said
+                if (url.equalsIgnoreCase("")) {
+                    url = absolute;
+                } else if (url.equals(absolute) && !hasPath(url)) {
+                    url += '/';
+                }
+                return toEncoded(url, session.getIdInternal());
             }
-            return toEncoded(url, request.getSessionInternal().getIdInternal());
-        } else {
-            return url;
         }
-
+        return url;
     }
 
 
