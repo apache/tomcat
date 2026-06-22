@@ -99,8 +99,11 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        executor = null;
         setState(LifecycleState.STOPPING);
+        if (executor != null) {
+            executor.shutdownNow();
+        }
+        executor = null;
     }
 
     @Override
