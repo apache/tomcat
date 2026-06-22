@@ -30,10 +30,10 @@ import javax.servlet.ServletRequestWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Wrapper around a <code>javax.servlet.ServletRequest</code> that transforms an application request object (which might
- * be the original one passed to a servlet, or might be based on the 2.3
+ * Wrapper around a <code>javax.servlet.ServletRequest</code> that transforms an application request object (which
+ * might be the original one passed to a servlet, or might be based on the 2.3
  * <code>javax.servlet.ServletRequestWrapper</code> class) back into an internal
- * <code>org.apache.catalina.Request</code>.
+ * <code>org.apache.catalina.connector.Request</code>.
  * <p>
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these

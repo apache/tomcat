@@ -556,9 +556,6 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * Ask the resource represented by this RequestDispatcher to process the associated request, and create (or append
      * to) the associated response.
-     * <p>
-     * <strong>IMPLEMENTATION NOTE</strong>: This implementation assumes that no filters are applied to a forwarded or
-     * included resource, because they were already done for the original request.
      *
      * @param request  The servlet request we are processing
      * @param response The servlet response we are creating

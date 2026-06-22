@@ -23,20 +23,20 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.NamingException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.Introspection;
 import org.apache.catalina.util.LifecycleMBeanBase;
@@ -99,7 +99,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     /**
      * Set of naming entries, keyed by name.
      */
-    private final Set<String> entries = new HashSet<>();
+    private final Set<String> entries = ConcurrentHashMap.newKeySet();
 
 
     /**
@@ -174,7 +174,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     /**
      * Set the container with which the naming resources are associated.
      *
-     * @param container the associated with the resources
+     * @param container the container associated with the resources
      */
     public void setContainer(Object container) {
         this.container = container;
@@ -298,15 +298,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
     // Container should be an instance of Server or Context. If it is anything
-    // else, return null which will trigger a NPE.
+    // else, return null.
     private Server getServer() {
         if (container instanceof Server) {
             return (Server) container;
         }
         if (container instanceof Context) {
-            // Could do this in one go. Lots of casts so split out for clarity
-            Engine engine = (Engine) ((Context) container).getParent().getParent();
-            return engine.getService().getServer();
+            Service service = Container.getService((Context) container);
+            if (service != null) {
+                return service.getServer();
+            }
         }
         return null;
     }
@@ -906,7 +907,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         // timing issues. Duplication registration is not an issue.
         resourceRequireExplicitRegistration = true;
 
-        for (ContextResource cr : resources.values()) {
+        for (ContextResource cr : findResources()) {
             try {
                 MBeanUtils.createMBean(cr);
             } catch (Exception e) {
@@ -914,7 +915,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             }
         }
 
-        for (ContextEnvironment ce : envs.values()) {
+        for (ContextEnvironment ce : findEnvironments()) {
             try {
                 MBeanUtils.createMBean(ce);
             } catch (Exception e) {
@@ -922,7 +923,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             }
         }
 
-        for (ContextResourceLink crl : resourceLinks.values()) {
+        for (ContextResourceLink crl : findResourceLinks()) {
             try {
                 MBeanUtils.createMBean(crl);
             } catch (Exception e) {
@@ -965,7 +966,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             log.warn(sm.getString("namingResources.cleanupNoContext", container), e);
             return;
         }
-        for (ContextResource cr : resources.values()) {
+        for (ContextResource cr : findResources()) {
             if (cr.getSingleton()) {
                 String closeMethod = cr.getCloseMethod();
                 if (closeMethod != null && !closeMethod.isEmpty()) {
@@ -1021,7 +1022,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         resourceRequireExplicitRegistration = false;
 
         // Destroy in reverse order to create, although it should not matter
-        for (ContextResourceLink crl : resourceLinks.values()) {
+        for (ContextResourceLink crl : findResourceLinks()) {
             try {
                 MBeanUtils.destroyMBean(crl);
             } catch (Exception e) {
@@ -1029,7 +1030,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             }
         }
 
-        for (ContextEnvironment ce : envs.values()) {
+        for (ContextEnvironment ce : findEnvironments()) {
             try {
                 MBeanUtils.destroyMBean(ce);
             } catch (Exception e) {
@@ -1037,7 +1038,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             }
         }
 
-        for (ContextResource cr : resources.values()) {
+        for (ContextResource cr : findResources()) {
             try {
                 MBeanUtils.destroyMBean(cr);
             } catch (Exception e) {

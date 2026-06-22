@@ -446,9 +446,9 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public void setErrorReportValveClass(String errorReportValveClass) {
 
-        String oldErrorReportValveClassClass = this.errorReportValveClass;
+        String oldErrorReportValveClass = this.errorReportValveClass;
         this.errorReportValveClass = errorReportValveClass;
-        support.firePropertyChange("errorReportValveClass", oldErrorReportValveClassClass, this.errorReportValveClass);
+        support.firePropertyChange("errorReportValveClass", oldErrorReportValveClass, this.errorReportValveClass);
 
     }
 

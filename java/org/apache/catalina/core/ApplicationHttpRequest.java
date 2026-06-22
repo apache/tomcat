@@ -58,7 +58,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Wrapper around a <code>javax.servlet.http.HttpServletRequest</code> that transforms an application request object
  * (which might be the original one passed to a servlet, or might be based on the 2.3
  * <code>javax.servlet.http.HttpServletRequestWrapper</code> class) back into an internal
- * <code>org.apache.catalina.HttpRequest</code>.
+ * <code>org.apache.catalina.connector.Request</code>.
  * <p>
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these
@@ -629,7 +629,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     // -------------------------------------------------------- Package Methods
 
     /**
-     * Recycle this request
+     * Recycle this request. Since there is no object reuse, this only ends
+     * the session access.
      */
     public void recycle() {
         if (session != null) {

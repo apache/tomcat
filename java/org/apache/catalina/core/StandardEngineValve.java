@@ -56,8 +56,7 @@ final class StandardEngineValve extends ValveBase {
         // Select the Host to be used for this Request
         Host host = request.getHost();
         if (host == null) {
-            // HTTP 0.9 or HTTP 1.0 request without a host when no default host
-            // is defined.
+            // No Host found for this request (unknown server name or no default host defined)
             // Don't overwrite an existing error
             if (!response.isError()) {
                 response.sendError(404);

@@ -196,6 +196,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
                      */
                     overrides.add(decodedUrlPatterns[i]);
                 } else {
+                    // The conflicts list the original URL patterns passed
                     conflicts.add(urlPatterns[i]);
                 }
             }

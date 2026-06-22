@@ -37,15 +37,16 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1102,11 +1103,13 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
 
     private javax.naming.Context getGlobalNamingContext() {
         if (container instanceof Context) {
-            Engine e = (Engine) ((Context) container).getParent().getParent();
-            Server s = e.getService().getServer();
-            // When the Service is an embedded Service, there is no Server
-            if (s != null) {
-                return s.getGlobalNamingContext();
+            Service service = Container.getService((Context) container);
+            if (service != null) {
+                Server s = service.getServer();
+                // When the Service is an embedded Service, there is no Server
+                if (s != null) {
+                    return s.getGlobalNamingContext();
+                }
             }
         }
         return null;

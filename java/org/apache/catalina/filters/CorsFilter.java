@@ -74,7 +74,7 @@ import org.apache.tomcat.util.res.StringManager;
  * {@link CorsFilter#doFilter(ServletRequest, ServletResponse, FilterChain)} and add appropriate locking so that the
  * {@code doFilter()} method executes with a consistent configuration.
  *
- * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
+ * @see <a href="https://fetch.spec.whatwg.org/#http-cors-protocol">CORS specification</a>
  */
 public class CorsFilter extends GenericFilter {
 
