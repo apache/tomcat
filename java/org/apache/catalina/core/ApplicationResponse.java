@@ -26,7 +26,7 @@ import jakarta.servlet.ServletResponseWrapper;
  * Wrapper around a <code>jakarta.servlet.ServletResponse</code> that transforms an application response object (which
  * might be the original one passed to a servlet, or might be based on the 2.3
  * <code>jakarta.servlet.ServletResponseWrapper</code> class) back into an internal
- * <code>org.apache.catalina.Response</code>.
+ * <code>org.apache.catalina.connector.Response</code>.
  * <p>
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these

@@ -365,6 +365,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
         if (first == basic) {
             first = null;
         }
+        // Note: Removing the basic valve is done by replacing it using setBasic
 
         cleanupValve(valve);
 

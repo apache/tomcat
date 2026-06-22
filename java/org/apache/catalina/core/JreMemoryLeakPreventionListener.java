@@ -238,7 +238,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
-                    URLConnection.setDefaultUseCaches("JAR", false);
+                    URLConnection.setDefaultUseCaches("jar", false);
                 }
 
                 /*
