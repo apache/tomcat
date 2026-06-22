@@ -61,7 +61,7 @@ public class OpenSSLImplementation extends SSLImplementation {
     }
 
     private void ensureAvailable() {
-        // Avoid a core dump if and older than minimum version is installed
+        // Avoid a core dump if an older than minimum version is installed
         if (!AprStatus.isAprAvailable()) {
             throw new IllegalStateException(sm.getString("opensslImplementation.notAvailable"));
         }
