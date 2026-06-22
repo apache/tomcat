@@ -646,7 +646,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private void check() {
         Request request = this.request;
-        if (hasBeenRecycled.get()) {
+        if (hasBeenRecycled.get() || request == null) {
             // AsyncContext has been recycled and should not be being used
             throw new IllegalStateException(sm.getString("asyncContextImpl.requestEnded"));
         }

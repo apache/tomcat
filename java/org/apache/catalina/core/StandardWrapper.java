@@ -959,6 +959,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             }
         }
 
+        ServletException servletException = null;
+
         if (instanceInitialized) {
             PrintStream out = System.out;
             if (swallowOutput) {
@@ -980,9 +982,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             } catch (Throwable t) {
                 Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(throwable);
-                fireContainerEvent("unload", this);
-                unloading = false;
-                throw new ServletException(sm.getString("standardWrapper.destroyException", getName()), throwable);
+                servletException = new ServletException(sm.getString("standardWrapper.destroyException", getName()), throwable);
             } finally {
                 // Annotation processing
                 if (!((Context) getParent()).getIgnoreAnnotations()) {
@@ -1004,7 +1004,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                         }
                     }
                 }
-                instance = null;
                 instanceInitialized = false;
             }
         }
@@ -1018,6 +1017,11 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
         unloading = false;
         fireContainerEvent("unload", this);
+
+        if (servletException != null) {
+            throw servletException;
+        }
+
     }
 
 
@@ -1364,7 +1368,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                     new MBeanNotificationInfo(new String[] { "j2ee.state.running" }, Notification.class.getName(),
                             "servlet is running"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
-                            "servlet start to stopped"),
+                            "servlet is stopping"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
                             "servlet is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
