@@ -121,6 +121,10 @@
       <fix>
         Avoid NPE in RewriteValve. (markt)
       </fix>
+      <fix>
+        <bug>70127</bug>: Fix use of Bootstrap through reflection by restoring
+        the public constructor. Use through scripts was not affected. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
