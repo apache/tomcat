@@ -114,6 +114,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Returns the realm name for the given context.
      *
      * @param context the context
+     *
      * @return the realm name
      */
     protected static String getRealmName(Context context) {
@@ -660,6 +661,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Determines whether a CORS preflight request should bypass authentication.
      *
      * @param request the request to check
+     *
      * @return {@code true} if the CORS preflight request should bypass authentication
      */
     protected boolean allowCorsPreflightBypass(Request request) {
@@ -670,9 +672,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             // This is a subset of the tests in CorsFilter.checkRequestType
             if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
-                if (originHeader != null && !originHeader.isEmpty()
-                        && !"null".equals(originHeader) && RequestUtil.isValidOrigin(originHeader)
-                        && !RequestUtil.isSameOrigin(request, originHeader)) {
+                if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
+                        !RequestUtil.isSameOrigin(request, originHeader)) {
                     String accessControlRequestMethodHeader =
                             request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                     if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
@@ -1229,6 +1230,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      *
      * @param request the request being processed
      * @param session the session whose ID should be changed
+     *
      * @return the new session ID
      */
     protected String changeSessionID(Request request, Session session) {
