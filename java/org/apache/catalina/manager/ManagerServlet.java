@@ -423,9 +423,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Acquire global JNDI resources if available
-        Server server = ((Engine) host.getParent()).getService().getServer();
-        if (server != null) {
-            global = server.getGlobalNamingContext();
+        Service service = Container.getService(host);
+        if (service != null) {
+            Server server = service.getServer();
+            if (server != null) {
+                global = server.getGlobalNamingContext();
+            }
         }
 
         // Calculate the directory into which we will be deploying applications

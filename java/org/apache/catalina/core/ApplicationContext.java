@@ -60,7 +60,6 @@ import jakarta.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -96,7 +95,7 @@ public class ApplicationContext implements ServletContext {
     public ApplicationContext(StandardContext context) {
         super();
         this.context = context;
-        this.service = ((Engine) context.getParent().getParent()).getService();
+        this.service = Container.getService(context);
         this.sessionCookieConfig = new ApplicationSessionCookieConfig(context);
 
         // Populate session tracking modes
