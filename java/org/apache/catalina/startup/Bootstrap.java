@@ -46,7 +46,7 @@ public final class Bootstrap {
     /**
      * Default constructor.
      */
-    private Bootstrap() {
+    public Bootstrap() {
     }
 
     private static final Log log = LogFactory.getLog(Bootstrap.class);
