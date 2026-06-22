@@ -178,6 +178,34 @@ public class TestTomcat extends TomcatBaseTest {
         }
     }
 
+    /**
+     * Simple servlet to test destruction of servlet instances.
+     */
+    private static class DestroyCount extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private AtomicInteger destroyCount = new AtomicInteger();
+
+        @Override
+        public void destroy() {
+            super.destroy();
+            destroyCount.incrementAndGet();
+        }
+
+        int getDestroyCount() {
+            return destroyCount.get();
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().write("OK");
+        }
+    }
+
+
 
     /*
      * Start tomcat with a single context and one
@@ -394,6 +422,27 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
     @Test
+    public void testServletDestroyNotCalledAgainOnDoubleStop() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+
+        DestroyCount servlet = new DestroyCount();
+        Tomcat.addServlet(ctx, "testServlet", servlet);
+        ctx.addServletMappingDecoded("/", "testServlet");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        Assert.assertEquals("OK", res.toString());
+
+        tomcat.stop();
+        Assert.assertEquals(1, servlet.getDestroyCount());
+
+        tomcat.stop(); // second stop should have no additional effect
+        Assert.assertEquals(1, servlet.getDestroyCount());
+    }
+
+    @Test
     public void testGetWebappConfigFileFromDirectory() {
         Tomcat tomcat = new Tomcat();
         Assert.assertNotNull(tomcat.getWebappConfigFile("test/deployment/dirContext", ""));
@@ -443,7 +492,7 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
     @Test
-    public void testGetBrokenContextPerAddWepapp() {
+    public void testGetBrokenContextPerAddWebapp() {
         Tomcat tomcat = getTomcatInstance();
         Host host = tomcat.getHost();
         if (host instanceof StandardHost) {
