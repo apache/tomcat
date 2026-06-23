@@ -25,7 +25,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Lifecycle listener that provides heartbeat information to mod_heartbeat for Apache HTTP Server.
- * Message format: "v=%u&ready=%u&busy=%u"
+ * Message format: "v=%u&amp;ready=%u&amp;busy=%u"
  */
 public class HeartbeatListener implements LifecycleListener {
 
