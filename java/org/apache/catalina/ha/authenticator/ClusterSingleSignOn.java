@@ -198,7 +198,7 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Load the cluster component, if any
         try {
@@ -238,7 +238,7 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         super.stopInternal();
 

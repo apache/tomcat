@@ -135,7 +135,7 @@ public class DeltaManager extends ClusterManagerBase {
         return name;
     }
 
-  /**
+    /**
      * Get the send counter for EVT_GET_ALL_SESSIONS events.
      *
      * @return the counterSend_EVT_GET_ALL_SESSIONS value.
@@ -144,7 +144,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_GET_ALL_SESSIONS.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_SESSION_ACCESSED events.
      *
      * @return the counterSend_EVT_SESSION_ACCESSED value.
@@ -153,7 +153,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_SESSION_ACCESSED.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_SESSION_CREATED events.
      *
      * @return the counterSend_EVT_SESSION_CREATED value.
@@ -162,7 +162,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_SESSION_CREATED.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_SESSION_DELTA events.
      *
      * @return the counterSend_EVT_SESSION_DELTA value.
@@ -171,7 +171,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_SESSION_DELTA.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_SESSION_EXPIRED events.
      *
      * @return the counterSend_EVT_SESSION_EXPIRED value.
@@ -180,7 +180,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_SESSION_EXPIRED.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_ALL_SESSION_DATA events.
      *
      * @return the counterSend_EVT_ALL_SESSION_DATA value.
@@ -189,7 +189,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_ALL_SESSION_DATA.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_ALL_SESSION_TRANSFERCOMPLETE events.
      *
      * @return the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE value.
@@ -198,7 +198,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
-  /**
+    /**
      * Get the send counter for EVT_CHANGE_SESSION_ID events.
      *
      * @return the counterSend_EVT_CHANGE_SESSION_ID value.
@@ -207,7 +207,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterSend_EVT_CHANGE_SESSION_ID.get();
     }
 
-  /**
+    /**
      * Get the receive counter for EVT_ALL_SESSION_DATA events.
      *
      * @return the counterReceive_EVT_ALL_SESSION_DATA value.
@@ -216,7 +216,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_ALL_SESSION_DATA.get();
     }
 
-  /**
+    /**
      * Get the receive counter for EVT_GET_ALL_SESSIONS events.
      *
      * @return the counterReceive_EVT_GET_ALL_SESSIONS value.
@@ -225,7 +225,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_GET_ALL_SESSIONS.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_SESSION_ACCESSED events.
      *
      * @return the counterReceive_EVT_SESSION_ACCESSED value.
@@ -234,7 +234,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_SESSION_ACCESSED.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_SESSION_CREATED events.
      *
      * @return the counterReceive_EVT_SESSION_CREATED value.
@@ -243,7 +243,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_SESSION_CREATED.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_SESSION_DELTA events.
      *
      * @return the counterReceive_EVT_SESSION_DELTA value.
@@ -252,7 +252,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_SESSION_DELTA.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_SESSION_EXPIRED events.
      *
      * @return the counterReceive_EVT_SESSION_EXPIRED value.
@@ -262,7 +262,7 @@ public class DeltaManager extends ClusterManagerBase {
     }
 
 
- /**
+    /**
      * Get the receive counter for EVT_ALL_SESSION_TRANSFERCOMPLETE events.
      *
      * @return the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE value.
@@ -271,7 +271,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_CHANGE_SESSION_ID events.
      *
      * @return the counterReceive_EVT_CHANGE_SESSION_ID value.
@@ -280,7 +280,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_CHANGE_SESSION_ID.get();
     }
 
- /**
+    /**
      * Get the receive counter for EVT_ALL_SESSION_NOCONTEXTMANAGER events.
      *
      * @return the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER value.
@@ -289,7 +289,7 @@ public class DeltaManager extends ClusterManagerBase {
         return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.get();
     }
 
- /**
+    /**
      * Get the session replace counter.
      *
      * @return the sessionReplaceCounter value.
@@ -298,7 +298,7 @@ public class DeltaManager extends ClusterManagerBase {
         return sessionReplaceCounter.get();
     }
 
- /**
+    /**
      * Get the counter for sessions where no state was transferred.
      *
      * @return the counterNoStateTransferred value.
@@ -318,7 +318,7 @@ public class DeltaManager extends ClusterManagerBase {
         }
     }
 
- /**
+    /**
      * Get the state transfer timeout value.
      *
      * @return the stateTransferTimeout value.
@@ -327,7 +327,7 @@ public class DeltaManager extends ClusterManagerBase {
         return stateTransferTimeout;
     }
 
-  /**
+    /**
      * Set the state transfer timeout.
      *
      * @param timeoutAllSession The timeout value
@@ -336,7 +336,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.stateTransferTimeout = timeoutAllSession;
     }
 
-  /**
+    /**
      * Check if the state transfer is complete.
      *
      * @return <code>true</code> if the state transfer is complete.
@@ -372,7 +372,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.noContextManagerReceived = noContextManagerReceived;
     }
 
-  /**
+    /**
      * Get the wait time for sending all sessions.
      *
      * @return the sendAllSessionsWaitTime in milliseconds
@@ -381,7 +381,7 @@ public class DeltaManager extends ClusterManagerBase {
         return sendAllSessionsWaitTime;
     }
 
- /**
+    /**
      * Set the wait time for sending all sessions.
      *
      * @param sendAllSessionsWaitTime The wait time in milliseconds
@@ -390,7 +390,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.sendAllSessionsWaitTime = sendAllSessionsWaitTime;
     }
 
- /**
+    /**
      * Check if state timestamp drop is enabled.
      *
      * @return the stateTimestampDrop flag
@@ -399,7 +399,7 @@ public class DeltaManager extends ClusterManagerBase {
         return stateTimestampDrop;
     }
 
- /**
+    /**
      * Set the state timestamp drop flag.
      *
      * @param isTimestampDrop The new flag value
@@ -408,7 +408,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.stateTimestampDrop = isTimestampDrop;
     }
 
- /**
+    /**
      * Check if sending all sessions is enabled.
      *
      * @return the sendAllSessions flag
@@ -417,7 +417,7 @@ public class DeltaManager extends ClusterManagerBase {
         return sendAllSessions;
     }
 
- /**
+    /**
      * Set whether to send all sessions during replication.
      *
      * @param sendAllSessions The flag value
@@ -426,7 +426,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.sendAllSessions = sendAllSessions;
     }
 
- /**
+    /**
      * Get the batch size for sending all sessions.
      *
      * @return the sendAllSessionsSize value
@@ -435,7 +435,7 @@ public class DeltaManager extends ClusterManagerBase {
         return sendAllSessionsSize;
     }
 
- /**
+    /**
      * Set the batch size for sending all sessions.
      *
      * @param sendAllSessionsSize The batch size value
@@ -444,7 +444,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.sendAllSessionsSize = sendAllSessionsSize;
     }
 
- /**
+    /**
      * Check if session listeners are notified on replication.
      *
      * @return the notifySessionListenersOnReplication flag
@@ -453,13 +453,13 @@ public class DeltaManager extends ClusterManagerBase {
         return notifySessionListenersOnReplication;
     }
 
- /**
+    /**
      * Set whether to notify session listeners on replication.
      *
-     * @param notifyListenersCreateSessionOnReplication The flag value
+     * @param notifySessionListenersOnReplication The flag value
      */
-    public void setNotifySessionListenersOnReplication(boolean notifyListenersCreateSessionOnReplication) {
-        this.notifySessionListenersOnReplication = notifyListenersCreateSessionOnReplication;
+    public void setNotifySessionListenersOnReplication(boolean notifySessionListenersOnReplication) {
+        this.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
     }
 
 
@@ -499,7 +499,7 @@ public class DeltaManager extends ClusterManagerBase {
         this.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
     }
 
-/**
+    /**
      * Check if statistics collection is enabled.
      *
      * @return the enableStatistics flag
@@ -508,7 +508,7 @@ public class DeltaManager extends ClusterManagerBase {
         return this.enableStatistics;
     }
 
-/**
+    /**
      * Set whether statistics collection is enabled.
      *
      * @param enableStatistics The flag value
@@ -1377,7 +1377,7 @@ public class DeltaManager extends ClusterManagerBase {
     }
 
     /**
-     * handle receive sessions from other not ( restart )
+     * Handle receive sessions from other node ( restart )
      *
      * @param msg    Session message
      * @param sender Member which sent the message
@@ -1398,7 +1398,6 @@ public class DeltaManager extends ClusterManagerBase {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.allSessionDataAfter", getName()));
         }
-        // stateTransferred = true;
     }
 
     /**
