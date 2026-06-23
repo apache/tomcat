@@ -298,10 +298,10 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Register all cross context sessions inside endAccess. Use a list with contains check, that the Portlet API can
-     * include a lot of fragments from same or different applications with session changes.
+     * Register a cross-context session for replication. The session is added to
+     * the current thread's cross-context session list if it is not already present.
      *
-     * @param session cross context session
+     * @param session the cross-context session to register
      */
     public void registerReplicationSession(DeltaSession session) {
         List<DeltaSession> sessions = crossContextSessions.get();
@@ -608,8 +608,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     protected void createPrimaryIndicator(Request request) throws IOException {
         String id = request.getRequestedSessionId();
         if ((id != null) && (!id.isEmpty())) {
-            Manager manager = request.getContext().getManager();
-            Session session = manager.findSession(id);
+            Context ctx = request.getContext();
+            Session session = null;
+            if (ctx != null) {
+                Manager manager = ctx.getManager();
+                if (manager != null) {
+                    session = manager.findSession(id);
+                }
+            }
             if (session instanceof ClusterSession cses) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.session.indicator", request.getContext().getName(), id,

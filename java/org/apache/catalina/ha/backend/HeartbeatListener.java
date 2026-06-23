@@ -23,15 +23,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
- * Listener to provide information to mod_heartbeat.c
- * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
- * send the multicast message using the format...
- * what about the bind(IP. port) only IP makes sense (for the moment).
- * BTW:v  = version :-)
- */
 /**
  * Lifecycle listener that provides heartbeat information to mod_heartbeat for Apache HTTP Server.
+ * Message format: "v=%u&ready=%u&busy=%u"
  */
 public class HeartbeatListener implements LifecycleListener {
 

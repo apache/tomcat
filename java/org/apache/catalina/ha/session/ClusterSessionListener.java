@@ -26,7 +26,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Receive replicated SessionMessage form other cluster node.
+ * Receive replicated SessionMessage from other cluster node.
  */
 public class ClusterSessionListener extends ClusterListener {
 

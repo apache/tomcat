@@ -20,7 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -67,7 +68,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Map of file name to factory for in-progress file transfers.
      */
-    protected final HashMap<String,FileMessageFactory> fileFactories = new HashMap<>();
+    protected final Map<String,FileMessageFactory> fileFactories = new ConcurrentHashMap<>();
 
     /**
      * Deployment directory.
