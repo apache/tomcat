@@ -137,7 +137,8 @@
         Add the Jakarta EE 12 XML schemas. (markt)
       </add>
       <add>
-        Add support for the HTTP QUERY method as defined in RFC 10008. (desiderantes)
+        Add support for the HTTP <code>QUERY</code> method as defined in RFC
+        10008. (desiderantes)
       </add>
       <add>
         Add support for the new Servlet API method
