@@ -2322,6 +2322,10 @@ class Generator {
                 out.print(".get(");
                 out.print(tagHandlerClassName);
                 out.println(".class);");
+                out.printin("boolean ");
+                // Used to track if the tag is re-used successfully
+                out.print(tagHandlerVar);
+                out.println("_reused = false;");
             } else {
                 writeNewInstance(tagHandlerVar, tagHandlerClass);
             }
@@ -2513,22 +2517,32 @@ class Generator {
                 out.printil("}");
             }
 
-            // Ensure clean-up takes place
-            out.popIndent();
-            out.printil("} finally {");
-            out.pushIndent();
-
+            // Print tag reuse
             if (usePooling(n)) {
-                // Print tag reuse
                 out.printin(n.getTagHandlerPoolName());
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-            } else {
-                // Clean-up
-                out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
+                // This code will be skipped if an exception occurs which will prevent this instance from being re-used.
+                out.printin(tagHandlerVar);
+                out.println("_reused = true;");
+            }
+
+            // Ensure clean-up takes place
+            // Use JspRuntimeLibrary to minimise code in _jspService()
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
+            out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
+            out.print(tagHandlerVar);
+            out.print(", _jsp_getInstanceManager()");
+            if (usePooling(n)) {
+                // The tag will only be released for reuse if no exceptions occurred during use.
+                out.print(", ");
                 out.print(tagHandlerVar);
-                out.println(", _jsp_getInstanceManager());");
+                out.println("_reused);");
+            } else {
+                out.print(");");
             }
             out.popIndent();
             out.printil("}");

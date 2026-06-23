@@ -1222,7 +1222,13 @@ public class JspRuntimeLibrary {
         return out;
     }
 
-    @Deprecated
+    /**
+     * Releases a tag and destroys its instance it it has not been re-used.
+     *
+     * @param tag The tag to release
+     * @param instanceManager The instance manager
+     * @param reused Has the tag successfully been re-used
+     */
     public static void releaseTag(Tag tag, InstanceManager instanceManager, boolean reused) {
         // Caller ensures pool is non-null if reuse is true
         if (!reused) {

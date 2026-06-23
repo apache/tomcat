@@ -23,13 +23,18 @@ import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.channels.IllegalSelectorException;
 import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -676,6 +681,81 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
+    public static class TesterExceptionTag extends TagSupport {
+
+        private static final long serialVersionUID = 1L;
+
+        private static AtomicInteger counter = new AtomicInteger(0);
+
+        private static Set<Integer> released = new HashSet<>();
+
+        private final int index;
+
+        private String state = "";
+
+        public static void resetForNewTest() {
+            counter.set(0);
+            released.clear();
+        }
+
+        public static boolean isReleased(int index) {
+            return released.contains(Integer.valueOf(index));
+        }
+
+        public TesterExceptionTag() {
+            index = counter.incrementAndGet();
+        }
+
+        @Override
+        public int doStartTag() throws JspException {
+            ServletRequest request = pageContext.getRequest();
+            boolean throwOnStart = Boolean.parseBoolean(request.getParameter("throwOnStart"));
+            if (throwOnStart) {
+                state += "lastStartFailed";
+                throw new IllegalSelectorException();
+            } else {
+                try {
+                    if (!state.isBlank()) {
+                        pageContext.getOut().print(state);
+                        pageContext.getOut().print("-");
+                    }
+                    pageContext.getOut().println("start-" + index);
+                } catch (IOException ioe) {
+                    throw new JspException(ioe);
+                }
+            }
+            return super.doStartTag();
+        }
+
+        @Override
+        public int doEndTag() throws JspException {
+            ServletRequest request = pageContext.getRequest();
+            boolean throwOnEnd = Boolean.parseBoolean(request.getParameter("throwOnEnd"));
+            if (throwOnEnd) {
+                state += "lastEndFailed";
+                throw new IllegalSelectorException();
+            } else {
+                try {
+                    if (!state.isBlank()) {
+                        pageContext.getOut().print(state);
+                        pageContext.getOut().print("-");
+                    }
+                    pageContext.getOut().println("end-" + index);
+                } catch (IOException ioe) {
+                    throw new JspException(ioe);
+                }
+            }
+            return super.doEndTag();
+        }
+
+        @Override
+        public void release() {
+            released.add(Integer.valueOf(index));
+            super.release();
+        }
+    }
+
+
     @Test
     public void testLambdaScriptlets() throws Exception {
         doTestJsp("lambda.jsp");
@@ -1175,5 +1255,63 @@ public class TestGenerator extends TomcatBaseTest {
                 + "session value=null" + NEW_LINE
                 + "application value=null", body.toString());
         body.recycle();
+    }
+
+    @Test
+    public void testTagReuseException01() throws Exception {
+        TesterExceptionTag.resetForNewTest();
+        // No exceptions. Check re-use.
+        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(1));
+        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(1));
+    }
+
+    @Test
+    public void testTagReuseException02() throws Exception {
+        TesterExceptionTag.resetForNewTest();
+        // Exception on doStartTag
+        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(1));
+        doTestTagReuseException("throwOnStart=true", null, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        Assert.assertTrue(TesterExceptionTag.isReleased(1));
+        // Should use new instance
+        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(2));
+        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(2));
+    }
+
+    @Test
+    public void testTagReuseException03() throws Exception {
+        TesterExceptionTag.resetForNewTest();
+        // Exception on doEndTag
+        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(1));
+        doTestTagReuseException("throwOnEnd=true", null, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        Assert.assertTrue(TesterExceptionTag.isReleased(1));
+        // Should use new instance
+        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(2));
+        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        Assert.assertFalse(TesterExceptionTag.isReleased(2));
+    }
+
+    private void doTestTagReuseException(String queryString, String expectedBody, int expectedStatus) throws Exception {
+        if (!getTomcatInstance().getServer().getState().isAvailable()) {
+            getTomcatInstanceTestWebapp(false, true);
+        }
+
+        ByteChunk body = new ByteChunk();
+        String uri = "/test/jsp/generator/reuse-exception.jsp";
+        if (queryString != null) {
+            uri += "?" + queryString;
+        }
+        int rc = getUrl("http://localhost:" + getPort() + uri, body, null);
+
+        Assert.assertEquals(expectedStatus, rc);
+        if (expectedBody != null) {
+            Assert.assertEquals("Wrong body", expectedBody, body.toString());
+        }
     }
 }

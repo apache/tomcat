@@ -136,6 +136,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>70120</bug>: The fix for <bug>69699</bug> (itself a fix for a
+        regression in the fix for <bug>69333</bug>) was incomplete and tags that
+        threw exceptions in <code>doStartTag()</code> and
+        <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags
+        from being re-used if such an exception occurs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.119 (remm)" rtext="2026-06-23">
   <subsection name="Catalina">
