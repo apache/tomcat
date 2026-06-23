@@ -1473,9 +1473,9 @@ public class ExpiresFilter extends FilterBase {
     protected boolean isEligibleToExpirationHeaderGeneration(HttpServletRequest request,
             XHttpServletResponse response) {
 
-        // Don't add cache headers unless the request is a GET or a HEAD request
+        // Don't add cache headers unless the request is a GET, HEAD, or QUERY request
         String method = request.getMethod();
-        if (!Method.GET.equals(method) && !Method.HEAD.equals(method)) {
+        if (!Method.GET.equals(method) && !Method.HEAD.equals(method) && !Method.QUERY.equals(method)) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.invalidMethod", request.getRequestURI(), method));
             }

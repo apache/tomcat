@@ -225,6 +225,85 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testDoOptionsQuery() throws Exception {
+        doTestDoOptions(new OptionsServletQuery(), "GET, HEAD, QUERY, OPTIONS");
+    }
+
+
+    @Test
+    public void testQueryMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Type: text/plain" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testQueryMethodWithoutContentType() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Connection: close" + CRLF +
+                CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse400());
+    }
+
+
+
     private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -583,4 +662,16 @@ public class TestHttpServlet extends TomcatBaseTest {
             doGet(req, resp);
         }
     }
+
+
+    private static class OptionsServletQuery extends OptionsServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doGet(req, resp);
+        }
+    }
 }
+

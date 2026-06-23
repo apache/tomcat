@@ -815,6 +815,12 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
+        // Filter QUERY method without Content-Type
+        if (Method.QUERY.equals(req.getMethod()) && req.getContentType() == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, sm.getString("coyoteAdapter.query.contentTypeMissing"));
+            return true;
+        }
+
         // Filter TRACE method
         if (!connector.getAllowTrace() && Method.TRACE.equals(req.getMethod())) {
             Wrapper wrapper = request.getWrapper();
