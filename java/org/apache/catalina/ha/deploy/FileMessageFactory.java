@@ -281,7 +281,7 @@ public class FileMessageFactory {
     /**
      * Closes the factory, its streams and sets all its references to null
      */
-    public void cleanup() {
+    public synchronized void cleanup() {
         if (in != null) {
             try {
                 in.close();
@@ -304,7 +304,8 @@ public class FileMessageFactory {
         nrOfMessagesProcessed = 0;
         totalNrOfMessages = 0;
         msgBuffer.clear();
-        lastMessageProcessed = null;
+        lastMessageProcessed.set(0);
+        isWriting = false;
     }
 
     /**

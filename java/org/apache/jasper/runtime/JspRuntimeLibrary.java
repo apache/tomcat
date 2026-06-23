@@ -1223,7 +1223,7 @@ public class JspRuntimeLibrary {
     }
 
     /**
-     * Releases a tag and destroys its instance it it has not been re-used.
+     * Releases a tag and destroys its instance if it has not been re-used.
      *
      * @param tag The tag to release
      * @param instanceManager The instance manager

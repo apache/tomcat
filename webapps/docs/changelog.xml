@@ -139,7 +139,7 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>70120</bug>: The fix for <bug>69699</bug> (itself a fix for a
+        <bug>70120</bug>: The fix for <bug>69399</bug> (itself a fix for a
         regression in the fix for <bug>69333</bug>) was incomplete and tags that
         threw exceptions in <code>doStartTag()</code> and
         <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags

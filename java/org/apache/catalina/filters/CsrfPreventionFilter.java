@@ -53,7 +53,7 @@ import org.apache.tomcat.util.http.Method;
  * <ul>
  * <li>The filter is mapped to /*</li>
  * <li>{@link HttpServletResponse#encodeRedirectURL(String)} and {@link HttpServletResponse#encodeURL(String)} are used
- * to encode all URLs returned to the client
+ * to encode all URLs returned to the client</li>
  * </ul>
  * <p>
  * CSRF protection is enabled by generating random nonce values which are stored in the client's HTTP session. Each URL
@@ -66,7 +66,7 @@ import org.apache.tomcat.util.http.Method;
  * configured with the <code>entryPoints</code> filter <code>init-param</code>.
  * </p>
  * <p>
- * Some URLs should not have nonce parameters added to them at all
+ * Some URLs should not have nonce parameters added to them at all.
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 

@@ -32,6 +32,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
+import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterDeployer;
@@ -57,7 +58,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for setting up a cluster and provides callers
- * with a valid multicast receiver/sender.
+ * with a valid message receiver/sender.
  */
 public class SimpleTcpCluster extends LifecycleMBeanBase
         implements CatalinaCluster, MembershipListener, ChannelListener {
@@ -592,7 +593,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             log.info(sm.getString("simpleTcpCluster.start"));
         }
 
-        channel.setUtilityExecutor(Container.getService(getContainer()).getServer().getUtilityExecutor());
+        Service service = Container.getService(getContainer());
+        if (service != null && service.getServer() != null) {
+            channel.setUtilityExecutor(service.getServer().getUtilityExecutor());
+        }
 
         try {
             checkDefaults();
@@ -662,14 +666,16 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * unregister all cluster valve to host or engine
      */
     protected void unregisterClusterValve() {
-        for (Valve v : valves) {
-            ClusterValve valve = (ClusterValve) v;
-            if (log.isTraceEnabled()) {
-                log.trace("Invoking removeValve on " + getContainer() + " with class=" + valve.getClass().getName());
-            }
-            if (valve != null) {
-                container.getPipeline().removeValve(valve);
-                valve.setCluster(null);
+        if (container != null) {
+            for (Valve v : valves) {
+                ClusterValve valve = (ClusterValve) v;
+                if (log.isTraceEnabled()) {
+                    log.trace("Invoking removeValve on " + getContainer() + " with class=" + valve.getClass().getName());
+                }
+                if (valve != null) {
+                    container.getPipeline().removeValve(valve);
+                    valve.setCluster(null);
+                }
             }
         }
     }

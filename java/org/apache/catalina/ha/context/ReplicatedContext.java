@@ -217,7 +217,6 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @Override
         public void removeAttribute(String name) {
             tomcatAttributes.remove(name);
-            // do nothing
             super.removeAttribute(name);
         }
 

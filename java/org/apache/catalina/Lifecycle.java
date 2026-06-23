@@ -196,7 +196,8 @@ public interface Lifecycle {
      * Prepare the component for starting. This method should perform any initialization required post object creation.
      * The following {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
-     * <li>INIT_EVENT: On the successful completion of component initialization.</li>
+     * <li>BEFORE_INIT_EVENT: At the beginning of the method.</li>
+     * <li>AFTER_INIT_EVENT: On the successful completion of component initialization.</li>
      * </ol>
      *
      * @exception LifecycleException if this component detects a fatal error that prevents this component from being
@@ -250,7 +251,8 @@ public interface Lifecycle {
     /**
      * Prepare to discard the object. The following {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
-     * <li>DESTROY_EVENT: On the successful completion of component destruction.</li>
+     * <li>BEFORE_DESTROY_EVENT: At the beginning of the method.</li>
+     * <li>AFTER_DESTROY_EVENT: On the successful completion of component destruction.</li>
      * </ol>
      *
      * @exception LifecycleException if this component detects a fatal error that prevents this component from being
