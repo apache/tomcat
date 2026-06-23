@@ -36,13 +36,13 @@ import jakarta.servlet.http.HttpServletResponse;
  * expressions (in the syntax supported by {@link Pattern}) to which the appropriate request property will be compared.
  * Evaluation proceeds as follows:
  * <ul>
- * <li>The subclass extracts the request property to be filtered, and calls the common <code>process()</code> method.
+ * <li>The subclass extracts the request property to be filtered, and calls the common <code>process()</code> method.</li>
  * <li>If there is a deny expression configured, the property will be compared to the expression. If a match is found,
  * this request will be rejected with a "Forbidden" HTTP response.</li>
  * <li>If there is an allow expression configured, the property will be compared to the expression. If a match is found,
  * this request will be allowed to pass through to the next filter in the current pipeline.</li>
  * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
- * the deny expressions matched it).
+ * the deny expressions matched it).</li>
  * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  */

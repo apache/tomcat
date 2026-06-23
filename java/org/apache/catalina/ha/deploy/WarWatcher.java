@@ -19,6 +19,7 @@ package org.apache.catalina.ha.deploy;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.juli.logging.Log;
@@ -149,7 +150,7 @@ public class WarWatcher {
             if (name == null) {
                 return false;
             }
-            return name.endsWith(".war");
+            return name.toLowerCase(Locale.ENGLISH).endsWith(".war");
         }
     }
 
@@ -170,7 +171,7 @@ public class WarWatcher {
         /**
          * The last known state of the file.
          */
-        protected long lastState = 0;
+        protected int lastState = 0;
 
         /**
          * Constructs a new WarInfo.

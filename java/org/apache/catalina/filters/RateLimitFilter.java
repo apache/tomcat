@@ -166,6 +166,9 @@ public class RateLimitFilter extends FilterBase {
      * @param bucketDuration the duration in seconds
      */
     public void setBucketDuration(int bucketDuration) {
+        if (bucketDuration <= 0) {
+            throw new IllegalArgumentException(sm.getString("rateLimitFilter.invalidBucketDuration", Integer.valueOf(bucketDuration)));
+        }
         this.bucketDuration = bucketDuration;
     }
 
@@ -175,6 +178,9 @@ public class RateLimitFilter extends FilterBase {
      * @param bucketRequests the maximum number of requests
      */
     public void setBucketRequests(int bucketRequests) {
+        if (bucketRequests <= 0) {
+            throw new IllegalArgumentException(sm.getString("rateLimitFilter.invalidBucketRequests", Integer.valueOf(bucketRequests)));
+        }
         this.bucketRequests = bucketRequests;
     }
 
@@ -250,7 +256,7 @@ public class RateLimitFilter extends FilterBase {
         try {
             rateLimiter = (RateLimiter) Class.forName(rateLimitClassName).getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            throw new ServletException(e);
+            throw new ServletException(sm.getString("rateLimitFilter.classNotFound"), e);
         }
 
         rateLimiter.setDuration(bucketDuration);
@@ -312,7 +318,9 @@ public class RateLimitFilter extends FilterBase {
      */
     @Override
     public void destroy() {
-        rateLimiter.destroy();
+        if (rateLimiter != null) {
+            rateLimiter.destroy();
+        }
         super.destroy();
     }
 

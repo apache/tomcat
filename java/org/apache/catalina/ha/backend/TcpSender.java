@@ -73,6 +73,12 @@ public class TcpSender implements Sender {
 
     @Override
     public void init(HeartbeatListener config) throws Exception {
+        // Close any existing connections from a previous init
+        if (connections != null) {
+            for (int i = 0; i < connections.length; i++) {
+                close(i);
+            }
+        }
         this.config = config;
         StringTokenizer tok = new StringTokenizer(config.getProxyList(), ",");
         proxies = new Proxy[tok.countTokens()];
@@ -156,8 +162,14 @@ public class TcpSender implements Sender {
                 close(i);
                 continue;
             } else {
-                responseStatus = responseStatus.substring(responseStatus.indexOf(' ') + 1,
-                        responseStatus.indexOf(' ', responseStatus.indexOf(' ') + 1));
+                int firstSpace = responseStatus.indexOf(' ');
+                int secondSpace = responseStatus.indexOf(' ', firstSpace + 1);
+                if (firstSpace < 0 || secondSpace < 0 || secondSpace <= firstSpace + 1) {
+                    log.error(sm.getString("tcpSender.responseError"));
+                    close(i);
+                    continue;
+                }
+                responseStatus = responseStatus.substring(firstSpace + 1, secondSpace);
                 int status = 500;
                 try {
                     status = Integer.parseInt(responseStatus);
@@ -175,10 +187,12 @@ public class TcpSender implements Sender {
                 int contentLength = 0;
                 while (header != null && !header.isEmpty()) {
                     int colon = header.indexOf(':');
-                    String headerName = header.substring(0, colon).trim();
-                    String headerValue = header.substring(colon + 1).trim();
-                    if ("content-length".equalsIgnoreCase(headerName)) {
-                        contentLength = Integer.parseInt(headerValue);
+                    if (colon >= 0 && header.length() > (colon + 1)) {
+                        String headerName = header.substring(0, colon).trim();
+                        String headerValue = header.substring(colon + 1).trim();
+                        if ("content-length".equalsIgnoreCase(headerName)) {
+                            contentLength = Integer.parseInt(headerValue);
+                        }
                     }
                     header = connectionReaders[i].readLine();
                 }
