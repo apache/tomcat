@@ -188,6 +188,11 @@
       <type>jakarta.el.MethodExpression</type>
     </attribute>
   </tag>
+  <tag>
+    <name>TesterExceptionTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterExceptionTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
   <function>
     <name>bug49555</name>
     <function-class>org.apache.el.TesterFunctions$Inner$Class</function-class>
