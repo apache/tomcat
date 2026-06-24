@@ -348,7 +348,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     }
                 }
             } catch (Exception e) {
-                log(sm.getString("webdavservlet.storeError"), e);
+                log(sm.getString("webdavservlet.storeError", propertyStore), e);
             }
         }
         if (store == null) {
