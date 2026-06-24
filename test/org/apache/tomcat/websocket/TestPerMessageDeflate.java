@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -98,6 +99,51 @@ public class TestPerMessageDeflate {
 
         Assert.assertEquals(8192, received.position());
         Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+    }
+
+
+    @Test
+    public void testMessagePartThatOverfillsBuffer() throws IOException {
+
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        List<String> truncated = new ArrayList<>();
+
+        for (int size = 8192 + 1; size <= 8192 + 512; size++) {
+
+            // Compress `size` identical (highly compressible) bytes as one binary message.
+            PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.build(preferences, true);
+            perMessageDeflateTx.setNext(new TesterTransformation());
+            byte[] data = new byte[size];
+            Arrays.fill(data, (byte) 0x80);
+            List<MessagePart> uncompressedParts = new ArrayList<>();
+            uncompressedParts.add(new MessagePart(true, 0, Constants.OPCODE_BINARY,
+                    ByteBuffer.wrap(data), null, null, -1));
+            MessagePart compressedPart = perMessageDeflateTx.sendMessagePart(uncompressedParts).get(0);
+
+            // Decompress the way WsFrameBase.processDataBinary does: fill an 8192
+            // byte buffer, loop on OVERFLOW, stop on END_OF_FRAME.
+            PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, true);
+            perMessageDeflateRx.setNext(new TesterTransformation(compressedPart.getPayload()));
+
+            int total = 0;
+            ByteBuffer received = ByteBuffer.allocate(8192);
+            TransformationResult tr;
+            do {
+                tr = perMessageDeflateRx.getMoreData(compressedPart.getOpCode(), compressedPart.isFin(),
+                        compressedPart.getRsv(), received);
+                total += received.position();
+                received.clear();
+            } while (tr == TransformationResult.OVERFLOW);
+
+            if (total != size) {
+                truncated.add("size=" + size + " recovered=" + total);
+            }
+        }
+
+        Assert.assertTrue("permessage-deflate dropped trailing bytes for: " + truncated, truncated.isEmpty());
     }
 
 
