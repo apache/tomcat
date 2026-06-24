@@ -188,8 +188,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         /**
          * Trivial accessor.
          *
-         * @return the decoded password token as a String, or <code>null</code> if no password was found in the
-         *             credentials.
+         * @return the decoded password token as a String, which is never <code>null</code>, but can be empty.
          */
         public String getPassword() {
             return password;
@@ -228,7 +227,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * Extract the mandatory username token and separate it from the optional password token. Tolerate surplus
+         * Extract the mandatory username and password tokens separated by a colon. Tolerate surplus
          * surrounding white space.
          */
         private void parseCredentials(byte[] decoded) throws IllegalArgumentException {
@@ -241,10 +240,9 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
             }
 
-            // Tomcat allows a null password
+            // Null password is not allowed according to RFC 7617
             if (colon < 0) {
-                username = new String(decoded, charset);
-                // password will remain null!
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.noColon"));
             } else {
                 username = new String(decoded, 0, colon, charset);
                 password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);

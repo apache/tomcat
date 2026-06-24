@@ -46,13 +46,12 @@ public class TestBasicAuthParser {
         Assert.assertEquals(PASSWORD, credentials.getPassword());
     }
 
-    @Test
-    public void testGoodCredentialsNoPassword() throws Exception {
+    @Test(expected = IllegalArgumentException.class)
+    public void testBadCredentialsNoPassword() throws Exception {
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, USER_NAME, null);
+        @SuppressWarnings("unused")
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
-        Assert.assertEquals(USER_NAME, credentials.getUsername());
-        Assert.assertNull(credentials.getPassword());
     }
 
     @Test
@@ -65,14 +64,13 @@ public class TestBasicAuthParser {
         Assert.assertEquals(PASSWORD, credentials.getPassword());
     }
 
-    @Test
-    public void testGoodCribUserOnly() throws Exception {
+    @Test(expected = IllegalArgumentException.class)
+    public void testBadCribUserOnly() throws Exception {
         final String BASE64_CRIB = "dXNlcmlk";
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, BASE64_CRIB);
+        @SuppressWarnings("unused")
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
-        Assert.assertEquals(USER_NAME, credentials.getUsername());
-        Assert.assertNull(credentials.getPassword());
     }
 
     @Test
@@ -108,8 +106,8 @@ public class TestBasicAuthParser {
         // Our decoder accepts a long token without complaint.
         // 80 characters
         final String USER_LONG = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/AAAABBBBCCCCDDDD";
-        final String BASE64_CRIB = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejAxMjM0" +
-                "NTY3ODkrL0FBQUFCQkJCQ0NDQ0REREQ="; // no new line
+        final String BASE64_CRIB = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5e" +
+                "jAxMjM0NTY3ODkrL0FBQUFCQkJCQ0NDQ0REREQ6"; // no new line
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, BASE64_CRIB);
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
