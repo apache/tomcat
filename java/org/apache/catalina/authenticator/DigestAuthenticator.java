@@ -670,7 +670,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * @return {@code true} if validation succeeded
          */
         public boolean validate(Request request, List<AuthDigest> algorithms) {
-            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
+            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null) ||
+                    qop == null) {
                 return false;
             }
 
@@ -743,43 +744,36 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate qop
-            if (qop != null && !QOP.equals(qop)) {
+            if (!QOP.equals(qop)) {
                 return false;
             }
 
             // Validate cnonce and nc
-            // Check if presence of nc and Cnonce is consistent with presence of qop
-            if (qop == null) {
-                if (cnonce != null || nc != null) {
-                    return false;
-                }
+            if (cnonce == null || nc == null) {
+                return false;
+            }
+            // RFC 2617 says nc must be 8 digits long. Older Android clients
+            // use 6. 2.3.5 < fixed Android version <= 4.0.3
+            if (nc.length() < 6 || nc.length() > 8) {
+                return false;
+            }
+            long count;
+            try {
+                count = Long.parseLong(nc, 16);
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
+            NonceInfo info;
+            synchronized (nonces) {
+                info = nonces.get(nonce);
+            }
+            if (info == null) {
+                // Nonce is valid but not in cache. It must have dropped out
+                // of the cache - force a re-authentication
+                nonceStale = true;
             } else {
-                if (cnonce == null || nc == null) {
+                if (!info.nonceCountValid(count)) {
                     return false;
-                }
-                // RFC 2617 says nc must be 8 digits long. Older Android clients
-                // use 6. 2.3.5 < fixed Android version <= 4.0.3
-                if (nc.length() < 6 || nc.length() > 8) {
-                    return false;
-                }
-                long count;
-                try {
-                    count = Long.parseLong(nc, 16);
-                } catch (NumberFormatException nfe) {
-                    return false;
-                }
-                NonceInfo info;
-                synchronized (nonces) {
-                    info = nonces.get(nonce);
-                }
-                if (info == null) {
-                    // Nonce is valid but not in cache. It must have dropped out
-                    // of the cache - force a re-authentication
-                    nonceStale = true;
-                } else {
-                    if (!info.nonceCountValid(count)) {
-                        return false;
-                    }
                 }
             }
 
