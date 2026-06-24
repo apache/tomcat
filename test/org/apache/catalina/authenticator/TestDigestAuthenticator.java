@@ -85,8 +85,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     }
 
     @Test
-    public void testValidNoQop() throws Exception {
-        doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true, null, null, null, null, true, true);
+    public void testInvalidNoQop() throws Exception {
+        doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true, null, null, null, null, false, false);
     }
 
     @Test
