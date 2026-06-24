@@ -670,8 +670,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * @return {@code true} if validation succeeded
          */
         public boolean validate(Request request, List<AuthDigest> algorithms) {
-            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null) ||
-                    qop == null) {
+            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
                 return false;
             }
 
