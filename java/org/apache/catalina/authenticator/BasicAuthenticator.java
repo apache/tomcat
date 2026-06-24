@@ -243,6 +243,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
             // Null password is not allowed according to RFC 7617
             if (colon < 0) {
                 throw new IllegalArgumentException(sm.getString("basicAuthenticator.noColon"));
+            } else if (colon == 0) {
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.emptyUsername"));
             } else {
                 username = new String(decoded, 0, colon, charset);
                 password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);

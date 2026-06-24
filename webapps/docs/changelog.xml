@@ -221,6 +221,10 @@
         Reject BASIC authorization with no password, to comply with RFC 7617
         strictly. (remm)
       </fix>
+      <fix>
+        Reject BASIC authorization with empty user names as required by RFC
+        7613. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Avoid a race condition with concurrent lookups for a singleton JNDI

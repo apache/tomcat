@@ -165,14 +165,12 @@ public class TestBasicAuthParser {
         Assert.assertNotSame(PASSWORD, credentials.getPassword());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testMissingUsername() throws Exception {
         final String EMPTY_USER_NAME = "";
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, EMPTY_USER_NAME, PASSWORD);
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
-        Assert.assertEquals(EMPTY_USER_NAME, credentials.getUsername());
-        Assert.assertEquals(PASSWORD, credentials.getPassword());
     }
 
     @Test
