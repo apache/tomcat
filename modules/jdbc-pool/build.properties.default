@@ -91,10 +91,10 @@ tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
 tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
 tomcat.loc=https://archive.apache.org/dist/tomcat/tomcat-8/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip
 
-tomcat.project.loc=https://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/project.xml
+tomcat.project.loc=https://github.com/apache/tomcat/tree/main/webapps/docs/project.xml
 tomcat.project.dest=${base.path}/project.xml
 
-tomcat.xsl.loc=https://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/tomcat-docs.xsl
+tomcat.xsl.loc=https://github.com/apache/tomcat/tree/main/webapps/docs/tomcat-docs.xsl
 tomcat.xsl.dest=${base.path}/tomcat-docs.xsl
 
 derby.home=${base.path}/db-derby-10.5.1.1-bin
