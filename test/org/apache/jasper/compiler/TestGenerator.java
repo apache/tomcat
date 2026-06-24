@@ -1266,9 +1266,9 @@ public class TestGenerator extends TomcatBaseTest {
     public void testTagReuseException01() throws Exception {
         TesterExceptionTag.resetForNewTest();
         // No exceptions. Check re-use.
-        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-1" + NEW_LINE + "end-1" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(1));
-        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-1" + NEW_LINE + "end-1" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(1));
     }
 
@@ -1276,14 +1276,14 @@ public class TestGenerator extends TomcatBaseTest {
     public void testTagReuseException02() throws Exception {
         TesterExceptionTag.resetForNewTest();
         // Exception on doStartTag
-        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-1" + NEW_LINE + "end-1" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(1));
         doTestTagReuseException("throwOnStart=true", null, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         Assert.assertTrue(TesterExceptionTag.isReleased(1));
         // Should use new instance
-        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-2" + NEW_LINE + "end-2" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(2));
-        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-2" + NEW_LINE + "end-2" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(2));
     }
 
@@ -1291,14 +1291,14 @@ public class TestGenerator extends TomcatBaseTest {
     public void testTagReuseException03() throws Exception {
         TesterExceptionTag.resetForNewTest();
         // Exception on doEndTag
-        doTestTagReuseException(null, "start-1\nend-1\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-1" + NEW_LINE + "end-1" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(1));
         doTestTagReuseException("throwOnEnd=true", null, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         Assert.assertTrue(TesterExceptionTag.isReleased(1));
         // Should use new instance
-        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-2" + NEW_LINE + "end-2" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(2));
-        doTestTagReuseException(null, "start-2\nend-2\n", HttpServletResponse.SC_OK);
+        doTestTagReuseException(null, "start-2" + NEW_LINE + "end-2" + NEW_LINE + "", HttpServletResponse.SC_OK);
         Assert.assertFalse(TesterExceptionTag.isReleased(2));
     }
 
