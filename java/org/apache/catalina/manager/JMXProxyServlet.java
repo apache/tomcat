@@ -43,7 +43,8 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This servlet will dump JMX attributes in a simple format and implement proxy services for modeler.
+ * This servlet is an administrative tool that will dump JMX attributes
+ * in a simple format and implement proxy services for modeler.
  */
 public class JMXProxyServlet extends HttpServlet {
 
