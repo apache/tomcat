@@ -225,7 +225,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         /**
          * Trivial accessor.
          *
-         * @return the decoded username token as a String, which is never be <code>null</code>, but can be empty.
+         * @return the decoded username token as a String, which is never <code>null</code>, but can be empty.
          */
         public String getUsername() {
             return username;
