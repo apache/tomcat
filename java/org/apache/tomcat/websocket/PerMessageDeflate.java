@@ -68,11 +68,14 @@ public class PerMessageDeflate implements Transformation {
     private final boolean isServer;
     private final Inflater inflater = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
+    private final byte[] eomOverflowBuffer = new byte[1];
     private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
     private final byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
     private volatile Transformation next;
     private volatile boolean skipDecompression = false;
+    private volatile boolean eomBytesInserted = false;
+    private volatile boolean eomOverflowWritten = false;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private volatile boolean firstCompressedFrameWritten = false;
     // Flag to track if a message is completely empty
@@ -211,10 +214,23 @@ public class PerMessageDeflate implements Transformation {
             return next.getMoreData(opCode, fin, rsv, dest);
         }
 
-        int written;
-        boolean usedEomBytes = false;
+        if (eomOverflowWritten) {
+            if (!dest.hasRemaining()) {
+                return TransformationResult.OVERFLOW;
+            }
+            dest.put(eomOverflowBuffer[0]);
+            eomOverflowWritten = false;
+            if (!dest.hasRemaining()) {
+                if (inflateEomBytes()) {
+                    return TransformationResult.OVERFLOW;
+                }
+                return endFrame(fin);
+            }
+        }
 
-        while (dest.remaining() > 0 || usedEomBytes) {
+        int written;
+
+        while (dest.hasRemaining()) {
             // Space available in destination. Try and fill it.
             try {
                 written = inflater.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
@@ -226,7 +242,7 @@ public class PerMessageDeflate implements Transformation {
             }
             dest.position(dest.position() + written);
 
-            if (inflater.needsInput() && !usedEomBytes) {
+            if (inflater.needsInput() && !eomBytesInserted) {
                 readBuffer.clear();
                 TransformationResult nextResult = next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
                 inflater.setInput(readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
@@ -236,30 +252,75 @@ public class PerMessageDeflate implements Transformation {
                     } else if (TransformationResult.END_OF_FRAME.equals(nextResult) && readBuffer.position() == 0) {
                         if (fin) {
                             inflater.setInput(EOM_BYTES);
-                            usedEomBytes = true;
+                            eomBytesInserted = true;
                         } else {
-                            return TransformationResult.END_OF_FRAME;
+                            return endFrame(fin);
                         }
                     }
                 } else if (readBuffer.position() > 0) {
                     return TransformationResult.OVERFLOW;
-                } else if (fin) {
-                    inflater.setInput(EOM_BYTES);
-                    usedEomBytes = true;
+                } else if (TransformationResult.END_OF_FRAME.equals(nextResult)) {
+                    if (fin) {
+                        if (inflateEomBytes()) {
+                            return TransformationResult.OVERFLOW;
+                        }
+                    }
+                    return endFrame(fin);
+                } else if (TransformationResult.UNDERFLOW.equals(nextResult)) {
+                    return nextResult;
                 }
             } else if (written == 0) {
-                if (fin && (isServer && !clientContextTakeover || !isServer && !serverContextTakeover)) {
-                    try {
-                        inflater.reset();
-                    } catch (NullPointerException e) {
-                        throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
-                    }
-                }
-                return TransformationResult.END_OF_FRAME;
+                return endFrame(fin);
             }
         }
 
+        if (eomBytesInserted) {
+            if (inflateEomBytes()) {
+                return TransformationResult.OVERFLOW;
+            }
+            return endFrame(fin);
+        }
+
         return TransformationResult.OVERFLOW;
+    }
+
+
+    private boolean inflateEomBytes() throws IOException {
+        if (!eomBytesInserted) {
+            inflater.setInput(EOM_BYTES);
+            eomBytesInserted = true;
+        }
+
+        int written;
+        try {
+            written = inflater.inflate(eomOverflowBuffer, 0, eomOverflowBuffer.length);
+        } catch (DataFormatException e) {
+            throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
+        } catch (IllegalStateException | NullPointerException e) {
+            // As of Java 25, the JRE throws an ISE rather than an NPE
+            throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+        }
+
+        if (written > 0) {
+            eomOverflowWritten = true;
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private TransformationResult endFrame(boolean fin) throws IOException {
+        eomBytesInserted = false;
+        eomOverflowWritten = false;
+        if (fin && (isServer && !clientContextTakeover || !isServer && !serverContextTakeover)) {
+            try {
+                inflater.reset();
+            } catch (NullPointerException e) {
+                throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+            }
+        }
+        return TransformationResult.END_OF_FRAME;
     }
 
 
