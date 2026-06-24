@@ -125,6 +125,10 @@
         <bug>70127</bug>: Fix use of Bootstrap through reflection by restoring
         the public constructor. Use through scripts was not affected. (remm)
       </fix>
+      <fix>
+        Restore ability to extend many element classes from
+        <code>AbstractAccessLogValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
