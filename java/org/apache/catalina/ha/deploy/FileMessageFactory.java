@@ -207,7 +207,7 @@ public class FileMessageFactory {
      *
      * @return returns true if the file is complete and outputstream is closed, false otherwise.
      */
-    public boolean writeMessage(FileMessage msg) throws IllegalArgumentException, IOException {
+    public synchronized boolean writeMessage(FileMessage msg) throws IllegalArgumentException, IOException {
         if (!openForWrite) {
             throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
         }
