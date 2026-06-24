@@ -229,7 +229,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     // last message received war file is completed
                     String name = factory.getFile().getName();
                     if (!name.endsWith(".war")) {
-                        name = name + ".war";
+                        name = (new ContextName(name, true)).getBaseName() + ".war";
                     }
                     File deployable = new File(getDeployDirFile(), name);
                     try {
@@ -419,8 +419,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     @Override
     public void fileModified(File newWar) {
         try {
-            File deployWar = new File(getDeployDirFile(), newWar.getName());
-            ContextName cn = new ContextName(deployWar.getName(), true);
+            ContextName cn = new ContextName(newWar.getName(), true);
+            // Ensure deployed war uses lower case ".war" extension
+            File deployWar = new File(getDeployDirFile(), cn.getBaseName() + ".war");
             if (deployWar.exists() && deployWar.lastModified() > newWar.lastModified()) {
                 if (log.isInfoEnabled()) {
                     log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
