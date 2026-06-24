@@ -271,8 +271,11 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     public String getLoaderRepositoriesString() {
         String[] repositories = getLoaderRepositories();
         StringBuilder sb = new StringBuilder();
-        for (String repository : repositories) {
-            sb.append(repository).append(':');
+        for (int i = 0; i < repositories.length; i++) {
+            if (i > 0) {
+                sb.append(':');
+            }
+            sb.append(repositories[i]);
         }
         return sb.toString();
     }

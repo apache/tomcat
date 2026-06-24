@@ -716,6 +716,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         base.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
         base.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
         base.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
+        base.clearReferencesRmiTargets = this.clearReferencesRmiTargets;
+        base.clearReferencesThreadLocals = this.clearReferencesThreadLocals;
+        base.skipMemoryLeakChecksOnJvmShutdown = this.skipMemoryLeakChecksOnJvmShutdown;
+        base.notFoundClassResources.setLimit(this.notFoundClassResources.getLimit());
         base.jarModificationTimes.putAll(this.jarModificationTimes);
         base.permissionList.addAll(this.permissionList);
         base.loaderPC.putAll(this.loaderPC);
