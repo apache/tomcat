@@ -177,7 +177,7 @@ public class TcpSender implements Sender {
                     // Ignore
                 }
                 if (status != 200) {
-                    log.error(sm.getString("tcpSender.responseErrorCode", Integer.valueOf(status)));
+                    log.error(sm.getString("tcpSender.responseErrorCode", responseStatus));
                     close(i);
                     continue;
                 }
@@ -191,8 +191,20 @@ public class TcpSender implements Sender {
                         String headerName = header.substring(0, colon).trim();
                         String headerValue = header.substring(colon + 1).trim();
                         if ("content-length".equalsIgnoreCase(headerName)) {
-                            contentLength = Integer.parseInt(headerValue);
+                            try {
+                                contentLength = Integer.parseInt(headerValue);
+                            } catch (NumberFormatException e) {
+                                log.error(sm.getString("tcpSender.invalidContentLength", headerValue));
+                                close(i);
+                                break;
+                            }
                         }
+                    } else {
+                        log.error(sm.getString("tcpSender.invalidHeaderLine", header));
+                        close(i);
+                        // Clear any content length if one has been read.
+                        contentLength = 0;
+                        break;
                     }
                     header = connectionReaders[i].readLine();
                 }
