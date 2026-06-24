@@ -298,8 +298,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Register a cross-context session for replication. The session is added to
-     * the current thread's cross-context session list if it is not already present.
+     * Register a cross-context session for replication. The session is added to the current thread's cross-context
+     * session list if it is not already present.
      *
      * @param session the cross-context session to register
      */
@@ -398,10 +398,10 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     /**
      * Send a replication message for the given request.
      *
-     * @param request the request
-     * @param totalstart the start time
+     * @param request        the request
+     * @param totalstart     the start time
      * @param isCrossContext {@code true} if cross-context
-     * @param isAsync {@code true} if async
+     * @param isAsync        {@code true} if async
      * @param clusterManager the cluster manager
      */
     protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext, boolean isAsync,
@@ -618,16 +618,19 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             }
             if (session instanceof ClusterSession cses) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.session.indicator", request.getContext().getName(), id,
-                            primaryIndicatorName, Boolean.valueOf(cses.isPrimarySession())));
+                    log.debug(sm.getString("ReplicationValve.session.indicator",
+                            ctx == null ? "null Context" : ctx.getPath(), id, primaryIndicatorName,
+                            Boolean.valueOf(cses.isPrimarySession())));
                 }
                 request.setAttribute(primaryIndicatorName, cses.isPrimarySession() ? Boolean.TRUE : Boolean.FALSE);
             } else {
                 if (log.isDebugEnabled()) {
                     if (session != null) {
-                        log.debug(sm.getString("ReplicationValve.session.found", request.getContext().getName(), id));
+                        log.debug(sm.getString("ReplicationValve.session.found",
+                                ctx == null ? "null Context" : ctx.getPath(), id));
                     } else {
-                        log.debug(sm.getString("ReplicationValve.session.invalid", request.getContext().getName(), id));
+                        log.debug(sm.getString("ReplicationValve.session.invalid",
+                                ctx == null ? "null Context" : ctx.getPath(), id));
                     }
                 }
             }
