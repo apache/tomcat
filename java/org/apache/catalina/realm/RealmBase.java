@@ -424,12 +424,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return null;
         }
         digestA1 = digestA1.toLowerCase(Locale.ENGLISH);
-        String serverDigestValue;
-        if (qop == null) {
-            serverDigestValue = digestA1 + ":" + nonce + ":" + digestA2;
-        } else {
-            serverDigestValue = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + digestA2;
-        }
+        // No explicit test for qop == null since the digest will fail anyway in that case
+        String serverDigestValue = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + digestA2;
 
         byte[] valueBytes;
         try {
