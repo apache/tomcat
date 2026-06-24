@@ -169,6 +169,7 @@ public class TestBasicAuthParser {
     public void testMissingUsername() throws Exception {
         final String EMPTY_USER_NAME = "";
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, EMPTY_USER_NAME, PASSWORD);
+        @SuppressWarnings("unused")
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
     }
