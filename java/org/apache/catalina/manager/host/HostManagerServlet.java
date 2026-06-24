@@ -287,6 +287,24 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
     }
 
 
+    private static boolean pathCheck(File input, File expected, PrintWriter writer, StringManager smClient) {
+        try {
+            if (!input.getCanonicalFile().toPath().startsWith(expected.getCanonicalFile().toPath())) {
+                if (writer != null) {
+                    writer.println(smClient.getString("hostManagerServlet.pathCheckFail", input, expected));
+                }
+                return false;
+            }
+        } catch (IOException ioe) {
+            if (writer != null) {
+                writer.println(smClient.getString("hostManagerServlet.pathCheckError", input, expected, ioe.getMessage()));
+            }
+            return false;
+        }
+        return true;
+    }
+
+
     // -------------------------------------------------------- Private Methods
 
 
@@ -339,6 +357,10 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             appBaseFile = file.getCanonicalFile();
         } catch (IOException ioe) {
             appBaseFile = file;
+        }
+        if (!pathCheck(appBaseFile, engine.getCatalinaBase(), writer, smClient)) {
+            // Any error reported in pathCheck()
+            return;
         }
         if (!appBaseFile.mkdirs() && !appBaseFile.isDirectory()) {
             writer.println(smClient.getString("hostManagerServlet.appBaseCreateFail", appBaseFile.toString(), name));
@@ -634,6 +656,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
         if (installedHost != null) {
             configBase = new File(configBase, hostName);
+        }
+        if (!pathCheck(configBase, new File(context.getCatalinaBase(), "conf"), null, null)) {
+            return null;
         }
         if (!configBase.mkdirs() && !configBase.isDirectory()) {
             return null;

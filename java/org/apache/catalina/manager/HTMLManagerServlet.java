@@ -974,7 +974,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         req.setAttribute("sort", sortBy);
         req.setAttribute("order", orderBy);
         req.setAttribute("activeSessions", sessions);
-        // strong>NOTE</strong> - This header will be overridden
+        // <strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
         // ultimately invoked.
         resp.setHeader("Pragma", "No-cache"); // HTTP 1.0
@@ -998,7 +998,10 @@ public class HTMLManagerServlet extends ManagerServlet {
     protected void displaySessionDetailPage(HttpServletRequest req, HttpServletResponse resp, ContextName cn,
             String sessionId, StringManager smClient) throws ServletException, IOException {
         Session session = getSessionForNameAndId(cn, sessionId, smClient);
-        // strong>NOTE</strong> - This header will be overridden
+        if (session == null) {
+            req.setAttribute(APPLICATION_ERROR, "Session not found: " + sessionId);
+        }
+        // <strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
         // ultimately invoked.
         resp.setHeader("Pragma", "No-cache"); // HTTP 1.0

@@ -675,7 +675,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Deploy a web application archive (included in the current request) at the specified context path.
      *
      * @param writer   Writer to render results to
-     * @param config   URL of the context configuration file to be installed
+     * @param config   URL of the context configuration file to be copied into the local config folder
      * @param cn       Name of the application to be installed
      * @param tag      Tag to be associated with the webapp
      * @param update   Flag that indicates that any existing app should be replaced
@@ -887,7 +887,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Install an application for the specified path from the specified web application archive.
      *
      * @param writer   Writer to render results to
-     * @param config   URL of the context configuration file to be installed
+     * @param config   URL of the context configuration file to be copied into the local config folder
      * @param cn       Name of the application to be installed
      * @param war      URL of the web application archive to be installed
      * @param update   true to override any existing webapp on the path
@@ -1467,6 +1467,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(name);
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext", Escape.htmlElementContent(displayPath)));
+                return;
+            }
+
+            // It isn't possible for the manager to undeploy itself
+            if (context.getName().equals(this.context.getName())) {
+                writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
 
