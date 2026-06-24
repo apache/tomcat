@@ -129,6 +129,10 @@
         Restore ability to extend many element classes from
         <code>AbstractAccessLogValve</code>. (remm)
       </fix>
+      <fix>
+        Align DIGEST authentication with RFC 7616 and require clients to provide
+        a valid <code>qop</code> parameter. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
