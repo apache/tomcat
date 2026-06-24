@@ -185,18 +185,21 @@ public class TcpSender implements Sender {
                 // read all the headers.
                 String header = connectionReaders[i].readLine();
                 int contentLength = 0;
+                boolean contentLengthSeen = false;
                 while (header != null && !header.isEmpty()) {
                     int colon = header.indexOf(':');
                     if (colon >= 0) {
                         String headerName = header.substring(0, colon).trim();
                         String headerValue = header.substring(colon + 1).trim();
                         if ("content-length".equalsIgnoreCase(headerName)) {
-                            if (contentLength > 0) {
+                            if (contentLengthSeen) {
                                 log.error(sm.getString("tcpSender.duplicateContentLength"));
                                 close(i);
                                 // Clear any content length if one has been read.
                                 contentLength = 0;
                                 break;
+                            } else {
+                                contentLengthSeen = true;
                             }
                             try {
                                 contentLength = Integer.parseInt(headerValue);
