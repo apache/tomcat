@@ -168,9 +168,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             return;
         }
         if (watchEnabled) {
-            if (getDeployDirFile().getCanonicalPath().equals(getWatchDirFile().getCanonicalPath())) {
-                throw new IllegalStateException(sm.getString("farmWarDeployer.samePathDeployWatch"));
-            }
             watcher = new WarWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("farmWarDeployer.watchDir", getWatchDir()));
@@ -654,6 +651,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     public void setTempDir(String tempDir) {
         this.tempDir = tempDir;
+        tempDirFile = null;
     }
 
     /**
@@ -767,6 +765,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected boolean copy(File from, File to) {
         try {
+            if (from.getCanonicalPath().equals(to.getCanonicalPath())) {
+                throw new IOException(sm.getString("farmWarDeployer.samePathCopy"));
+            }
+
             if (!to.exists()) {
                 if (!to.createNewFile()) {
                     log.error(sm.getString("fileNewFail", to));
