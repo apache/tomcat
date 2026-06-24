@@ -922,7 +922,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new ThreadNameElement.
          */
-        ThreadNameElement() {
+        public ThreadNameElement() {
         }
 
         /**
@@ -1061,7 +1061,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new HostElement.
          */
-        HostElement() {
+        public HostElement() {
         }
 
         /**
@@ -1110,7 +1110,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new LogicalUserNameElement.
          */
-        LogicalUserNameElement() {
+        public LogicalUserNameElement() {
         }
 
         /**
@@ -1135,7 +1135,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new ProtocolElement.
          */
-        ProtocolElement() {
+        public ProtocolElement() {
         }
 
         /**
@@ -1169,7 +1169,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new UserElement.
          */
-        UserElement() {
+        public UserElement() {
         }
 
         /**
@@ -1245,7 +1245,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Creates a new date and time element using CLF format.
          */
-        protected DateAndTimeElement() {
+        public DateAndTimeElement() {
             this(null);
         }
 
@@ -1283,7 +1283,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          *
          * @param sdf The SimpleDateFormat pattern or special format identifier
          */
-        protected DateAndTimeElement(String sdf) {
+        public DateAndTimeElement(String sdf) {
             String format = sdf;
             boolean needsEscaping = false;
             if (sdf != null) {
@@ -1391,7 +1391,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new RequestElement.
          */
-        RequestElement() {
+        public RequestElement() {
         }
 
         /**
@@ -1431,7 +1431,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new HttpStatusCodeElement.
          */
-        HttpStatusCodeElement() {
+        public HttpStatusCodeElement() {
         }
 
         /**
@@ -1580,7 +1580,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new MethodElement.
          */
-        MethodElement() {
+        public MethodElement() {
         }
 
         /**
@@ -1713,7 +1713,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new FirstByteTimeElement.
          */
-        FirstByteTimeElement() {
+        public FirstByteTimeElement() {
         }
 
         /**
@@ -1744,7 +1744,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new QueryElement.
          */
-        QueryElement() {
+        public QueryElement() {
         }
 
         /**
@@ -1797,7 +1797,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new SessionIdElement.
          */
-        SessionIdElement() {
+        public SessionIdElement() {
         }
 
         /**
@@ -1831,7 +1831,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new RequestURIElement.
          */
-        RequestURIElement() {
+        public RequestURIElement() {
         }
 
         /**
@@ -1860,7 +1860,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new LocalServerNameElement.
          */
-        LocalServerNameElement() {
+        public LocalServerNameElement() {
         }
 
         /**
@@ -2101,7 +2101,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Constructs a new ConnectionStatusElement.
          */
-        ConnectionStatusElement() {
+        public ConnectionStatusElement() {
         }
 
         /**
