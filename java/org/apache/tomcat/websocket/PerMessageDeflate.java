@@ -31,8 +31,8 @@ import jakarta.websocket.SendHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of the permessage-deflate WebSocket extension as defined in RFC 7692.
- * This extension provides message compression for WebSocket frames.
+ * Implementation of the permessage-deflate WebSocket extension as defined in RFC 7692. This extension provides message
+ * compression for WebSocket frames.
  */
 public class PerMessageDeflate implements Transformation {
 
@@ -232,14 +232,7 @@ public class PerMessageDeflate implements Transformation {
 
         while (dest.hasRemaining()) {
             // Space available in destination. Try and fill it.
-            try {
-                written = inflater.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
-            } catch (DataFormatException e) {
-                throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
-            } catch (IllegalStateException | NullPointerException e) {
-                // As of Java 25, the JRE throws an ISE rather than an NPE
-                throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
-            }
+            written = inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
             dest.position(dest.position() + written);
 
             if (inflater.needsInput() && !eomBytesInserted) {
@@ -268,6 +261,10 @@ public class PerMessageDeflate implements Transformation {
                     return endFrame(fin);
                 } else if (TransformationResult.UNDERFLOW.equals(nextResult)) {
                     return nextResult;
+                } else {
+                    // Should never happen unless next mis-behaves
+                    throw new IllegalStateException(
+                            sm.getString("perMessageDeflate.next.ise", next.getClass().getName()));
                 }
             } else if (written == 0) {
                 return endFrame(fin);
@@ -291,15 +288,7 @@ public class PerMessageDeflate implements Transformation {
             eomBytesInserted = true;
         }
 
-        int written;
-        try {
-            written = inflater.inflate(eomOverflowBuffer, 0, eomOverflowBuffer.length);
-        } catch (DataFormatException e) {
-            throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
-        } catch (IllegalStateException | NullPointerException e) {
-            // As of Java 25, the JRE throws an ISE rather than an NPE
-            throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
-        }
+        int written = inflate(eomOverflowBuffer, 0, eomOverflowBuffer.length);
 
         if (written > 0) {
             eomOverflowWritten = true;
@@ -309,6 +298,17 @@ public class PerMessageDeflate implements Transformation {
         return false;
     }
 
+
+    private int inflate(byte[] dest, int start, int len) throws IOException {
+        try {
+            return inflater.inflate(dest, start, len);
+        } catch (DataFormatException e) {
+            throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
+        } catch (IllegalStateException | NullPointerException e) {
+            // As of Java 25, the JRE throws an ISE rather than an NPE
+            throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+        }
+    }
 
     private TransformationResult endFrame(boolean fin) throws IOException {
         eomBytesInserted = false;
