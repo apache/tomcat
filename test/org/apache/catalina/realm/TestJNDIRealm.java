@@ -54,6 +54,9 @@ public class TestJNDIRealm {
     private static final String REALM = "test-realm";
 
     private static final String NONCE = "test-nonce";
+    private static final String CNONCE = "cnonce";
+    private static final String NC = "00000001";
+    private static final String QOP = "auth";
     // Not digested but doesn't matter for the purposes of the test
     private static final String DIGEST_A2 = "method:request-uri";
     public static final String USER_PASSWORD_ATTR = "test-pwd";
@@ -72,9 +75,9 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + NC + ":" + CNONCE + ":" + QOP + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
+                realm.authenticate(USER, expectedResponse, NONCE, NC, CNONCE, QOP, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         Assert.assertNull(principal);
@@ -88,9 +91,9 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + NC + ":" + CNONCE + ":" + QOP + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
+                realm.authenticate(USER, expectedResponse, NONCE, NC, CNONCE, QOP, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         assertThat(principal, instanceOf(GenericPrincipal.class));
@@ -106,9 +109,9 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + NC + ":" + CNONCE + ":" + QOP + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
+                realm.authenticate(USER, expectedResponse, NONCE, NC, CNONCE, QOP, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         assertThat(principal, instanceOf(GenericPrincipal.class));
