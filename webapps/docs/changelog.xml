@@ -229,6 +229,10 @@
       <fix>
         Avoid NPE in RewriteValve. (markt)
       </fix>
+      <fix>
+        Restore ability to extend many element classes from
+        <code>AbstractAccessLogValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
