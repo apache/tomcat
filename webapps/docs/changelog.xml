@@ -155,6 +155,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>70126</bug>: Fix WebSocket extension permessage-deflate so that it
+        does not drop bytes if a compressed message inflates to more than the
+        available buffer. Fix written by GPT-5.5. Test case written by Hironori
+        Ichimiya. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.23 (markt)" rtext="2026-06-22">
   <subsection name="Catalina">
