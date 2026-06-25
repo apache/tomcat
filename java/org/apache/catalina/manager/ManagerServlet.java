@@ -1093,15 +1093,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         try {
             if (tryAddServiced(name)) {
                 try {
-                    Context context = (Context) host.findChild(name);
+                    // Validates the Context of the specified application
+                    Context context = getContextForName(cn, writer, smClient);
                     if (context == null) {
-                        writer.println(
-                                smClient.getString("managerServlet.noContext", Escape.htmlElementContent(cn.getDisplayName())));
-                        return;
-                    }
-                    // It isn't possible for the manager to reload itself
-                    if (context.getName().equals(this.context.getName())) {
-                        writer.println(smClient.getString("managerServlet.noSelf"));
                         return;
                     }
                     context.reload();
@@ -1399,14 +1393,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String displayPath = cn.getDisplayName();
 
         try {
-            Context context = (Context) host.findChild(cn.getName());
+            // Validates the Context of the specified application
+            Context context = getContextForName(cn, writer, smClient);
             if (context == null) {
-                writer.println(smClient.getString("managerServlet.noContext", Escape.htmlElementContent(displayPath)));
-                return;
-            }
-            // It isn't possible for the manager to stop itself
-            if (context.getName().equals(this.context.getName())) {
-                writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
             context.stop();
@@ -1442,17 +1431,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String displayPath = cn.getDisplayName();
 
         try {
-
-            // Validate the Context of the specified application
-            Context context = (Context) host.findChild(name);
+            // Validates the Context of the specified application
+            Context context = getContextForName(cn, writer, smClient);
             if (context == null) {
-                writer.println(smClient.getString("managerServlet.noContext", Escape.htmlElementContent(displayPath)));
-                return;
-            }
-
-            // It isn't possible for the manager to undeploy itself
-            if (context.getName().equals(this.context.getName())) {
-                writer.println(smClient.getString("managerServlet.noSelf"));
                 return;
             }
 
@@ -1498,6 +1479,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
+    }
+
+
+    private Context getContextForName(ContextName cn, PrintWriter writer, StringManager smClient) {
+        Context context = (Context) host.findChild(cn.getName());
+        if (context == null) {
+            writer.println(
+                    smClient.getString("managerServlet.noContext", Escape.htmlElementContent(cn.getDisplayName())));
+            return null;
+        }
+
+        // Manager cannot operate on itself
+        if (context.getName().equals(this.context.getName())) {
+            writer.println(smClient.getString("managerServlet.noSelf"));
+            return null;
+        }
+        return context;
     }
 
 
