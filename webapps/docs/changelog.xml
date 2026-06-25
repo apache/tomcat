@@ -163,6 +163,10 @@
         available buffer. Fix written by GPT-5.5. Test case written by Hironori
         Ichimiya. (markt)
       </fix>
+      <fix>
+        Optimise WebSocket client processing of server responses during
+        WebSocket HTTP upgrade process. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

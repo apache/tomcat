@@ -848,6 +848,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         int status = 0;
         boolean readStatus = false;
         boolean readHeaders = false;
+        StringBuilder lineBuffer = new StringBuilder();
         String line = null;
         while (!readHeaders) {
             // On entering loop buffer will be empty and at the start of a new
@@ -870,14 +871,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
             response.flip();
             while (response.hasRemaining() && !readHeaders) {
-                if (line == null) {
-                    line = readLine(response);
-                } else {
-                    line += readLine(response);
+                if (readLine(response, lineBuffer)) {
+                    line = lineBuffer.toString();
+                    lineBuffer = new StringBuilder();
                 }
                 if ("\r\n".equals(line)) {
                     readHeaders = true;
-                } else if (line.endsWith("\r\n")) {
+                } else if (line != null && line.endsWith("\r\n")) {
                     if (readStatus) {
                         parseHeaders(line, headers);
                     } else {
@@ -927,20 +927,18 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         values.add(headerValue);
     }
 
-    private String readLine(ByteBuffer response) {
+    private boolean readLine(ByteBuffer response, StringBuilder sb) {
         // All ISO-8859-1
-        StringBuilder sb = new StringBuilder();
-
         char c;
         while (response.hasRemaining()) {
             c = (char) response.get();
             sb.append(c);
             if (c == 10) {
-                break;
+                return true;
             }
         }
 
-        return sb.toString();
+        return false;
     }
 
 
