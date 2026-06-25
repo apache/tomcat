@@ -353,7 +353,10 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             applicationBase = name;
         }
         file = new File(applicationBase);
-        if (!file.isAbsolute()) {
+        boolean appBaseIsAbsolute = false;
+        if (file.isAbsolute()) {
+            appBaseIsAbsolute = true;
+        } else {
             file = new File(engine.getCatalinaBase(), file.getPath());
         }
         try {
@@ -361,7 +364,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         } catch (IOException ioe) {
             appBaseFile = file;
         }
-        if (!pathCheck(appBaseFile, engine.getCatalinaBase(), writer, smClient)) {
+        if (!appBaseIsAbsolute && !pathCheck(appBaseFile, engine.getCatalinaBase(), writer, smClient)) {
             // Any error reported in pathCheck()
             return;
         }

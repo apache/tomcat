@@ -87,7 +87,8 @@
         This is the pathname of a directory that may contain web applications
         to be deployed on this virtual host.  You may specify an
         absolute pathname, or a pathname that is relative to the
-        <code>$CATALINA_BASE</code> directory.  See
+        <code>$CATALINA_BASE</code> directory. Relative path names must be under
+        the <code>$CATALINA_BASE</code> directory. See
         <a href="#Automatic_Application_Deployment">Automatic Application
         Deployment</a> for more information on automatic recognition and
         deployment of web applications. If not specified, the default of
