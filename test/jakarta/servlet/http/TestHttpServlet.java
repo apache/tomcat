@@ -225,6 +225,123 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testDoOptionsQuery() throws Exception {
+        doTestDoOptions(new OptionsServletQuery(), "GET, HEAD, QUERY, OPTIONS");
+    }
+
+
+    @Test
+    public void testQueryMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Type: text/plain" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testQueryMethodWithoutContentType() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse400());
+    }
+
+
+    @Test
+    public void testQueryParameters() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        ParamsServlet servlet = new ParamsServlet();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY /?baz=123 HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                    "Content-Length: 15" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "foo=abc&bar=xyz"
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abc,xyz,123", client.getResponseBody());
+    }
+
+
     private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -262,8 +379,6 @@ public class TestHttpServlet extends TomcatBaseTest {
      * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of this test. It was placed in that package
      * because it needed access to package private classes.
      */
-
-
     private void doTestUnimplementedMethod(String httpVersion) {
         StringBuilder request = new StringBuilder("PUT /test");
         boolean isHttp09 = "0.9".equals(httpVersion);
@@ -581,6 +696,31 @@ public class TestHttpServlet extends TomcatBaseTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doGet(req, resp);
+        }
+    }
+
+
+    private static class OptionsServletQuery extends OptionsServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doGet(req, resp);
+        }
+    }
+
+
+    private static class ParamsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.print(req.getParameter("foo") + "," + req.getParameter("bar") + "," + req.getParameter("baz"));
         }
     }
 }

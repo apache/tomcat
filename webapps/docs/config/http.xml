@@ -245,7 +245,7 @@
       specification.
       The HTTP method TRACE is specifically forbidden here in accordance
       with the HTTP specification.
-      The default is <code>POST</code></p>
+      The default is <code>POST,QUERY</code></p>
     </attribute>
 
     <attribute name="port" required="true">

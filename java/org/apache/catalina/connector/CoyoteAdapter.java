@@ -794,6 +794,12 @@ public class CoyoteAdapter implements Adapter {
             }
         }
 
+        // Filter QUERY method without Content-Type
+        if (Method.QUERY.equals(req.getMethod()) && req.getContentType() == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, sm.getString("coyoteAdapter.query.contentTypeMissing"));
+            return true;
+        }
+
         // Possible redirect
         MessageBytes redirectPathMB = request.getMappingData().redirectPath;
         if (!redirectPathMB.isNull()) {

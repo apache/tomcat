@@ -269,7 +269,7 @@ public class Connector extends LifecycleMBeanBase {
      * Comma-separated list of HTTP methods that will be parsed according to POST-style rules for
      * application/x-www-form-urlencoded request bodies.
      */
-    protected String parseBodyMethods = Method.POST;
+    protected String parseBodyMethods = StringUtils.join(Method.POST, Method.QUERY);
 
     /**
      * A Set of methods determined by {@link #parseBodyMethods}.
