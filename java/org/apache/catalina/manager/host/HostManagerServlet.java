@@ -374,14 +374,14 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Create base for config files
-        File configBaseFile = getConfigBase(name);
+        File configBaseFile = getConfigBase(name, writer, smClient);
+        if (configBaseFile == null) {
+            writer.println(smClient.getString("hostManagerServlet.configBaseCreateFail", name));
+            return;
+        }
 
         // Copy manager.xml if requested
         if (manager) {
-            if (configBaseFile == null) {
-                writer.println(smClient.getString("hostManagerServlet.configBaseCreateFail", name));
-                return;
-            }
             try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/manager.xml")) {
                 if (is == null) {
                     writer.println(smClient.getString("hostManagerServlet.managerXml"));
@@ -651,8 +651,26 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
      * @param hostName The host name
      *
      * @return the config base for the host
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12. Use {@link #getConfigBase(String, PrintWriter, StringManager)}
      */
+    @Deprecated
     protected File getConfigBase(String hostName) {
+        return getConfigBase(hostName, null, null);
+    }
+
+
+    /**
+     * Get config base.
+     *
+     * @param hostName The host name
+     * @param writer   Writer to render results to
+     * @param smClient StringManager for the client's locale
+     *
+     *
+     * @return the config base for the host
+     */
+    protected File getConfigBase(String hostName, PrintWriter writer, StringManager smClient) {
         File configBase = new File(context.getCatalinaBase(), "conf");
         if (!configBase.exists()) {
             return null;
@@ -663,7 +681,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         if (installedHost != null) {
             configBase = new File(configBase, hostName);
         }
-        if (!pathCheck(configBase, new File(context.getCatalinaBase(), "conf"), null, null)) {
+        if (!pathCheck(configBase, new File(context.getCatalinaBase(), "conf"), writer, smClient)) {
             return null;
         }
         if (!configBase.mkdirs() && !configBase.isDirectory()) {
