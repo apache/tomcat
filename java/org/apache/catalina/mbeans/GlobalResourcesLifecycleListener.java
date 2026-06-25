@@ -238,6 +238,61 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         if (log.isTraceEnabled()) {
             log.trace("Destroying MBeans for Global JNDI Resources");
         }
-        // FIXME: Implement removing MBeans
+        // Look up our global naming context
+        Context context;
+        try {
+            context = (Context) (new InitialContext()).lookup("java:/");
+        } catch (NamingException e) {
+            log.error(sm.getString("globalResources.noNamingContext"));
+            return;
+        }
+
+        // Recurse through the defined global JNDI resources context
+        try {
+            destroyMBeans("", context);
+        } catch (NamingException e) {
+            log.error(sm.getString("globalResources.destroyError"), e);
+        }
+    }
+
+
+    /**
+     * Destroy the MBeans for the interesting global JNDI resources in the specified naming context.
+     *
+     * @param prefix  Prefix for complete object name paths
+     * @param context Context to be scanned
+     *
+     * @exception NamingException if a JNDI exception occurs
+     */
+    protected void destroyMBeans(String prefix, Context context) throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("globalResources.destroy", prefix));
+        }
+
+        try {
+            NamingEnumeration<Binding> bindings = context.listBindings("");
+            while (bindings.hasMore()) {
+                Binding binding = bindings.next();
+                String name = prefix + binding.getName();
+                Object value = context.lookup(binding.getName());
+                if (log.isTraceEnabled()) {
+                    log.trace("Checking resource " + name);
+                }
+                if (value instanceof Context) {
+                    destroyMBeans(name + "/", (Context) value);
+                } else if (value instanceof UserDatabase) {
+                    try {
+                        MBeanUtils.destroyMBeanUserDatabase(name);
+                    } catch (Exception e) {
+                        log.error(sm.getString("globalResources.userDatabaseDestroyError", name), e);
+                    }
+                }
+            }
+        } catch (RuntimeException ex) {
+            log.error(sm.getString("globalResources.destroyError.runtime"), ex);
+        } catch (OperationNotSupportedException ex) {
+            log.error(sm.getString("globalResources.destroyError.operation"), ex);
+        }
     }
 }

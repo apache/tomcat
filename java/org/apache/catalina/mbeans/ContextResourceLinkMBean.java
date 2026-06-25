@@ -101,13 +101,15 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
             // Updating the name actually needs removing and adding back the component under the new name
             case "name" -> log.info(sm.getString("mBean.nameChange"));
             case "type" -> crl.setType((String) value);
-            default -> crl.setProperty(name, "" + value);
+            default -> crl.setProperty(name, value == null ? null : value.toString());
         }
 
         // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = crl.getNamingResources();
-        nr.removeResourceLink(crl.getName());
-        nr.addResourceLink(crl);
+        if (nr != null) {
+            nr.removeResourceLink(crl.getName());
+            nr.addResourceLink(crl);
+        }
     }
 }

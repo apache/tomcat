@@ -38,6 +38,11 @@ public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
 
     @Override
     public String getClassName() {
-        return this.resource.getClass().getName();
+        Object resource = this.resource;
+        if (resource != null) {
+            return resource.getClass().getName();
+        } else {
+            return null;
+        }
     }
 }
