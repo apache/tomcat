@@ -103,13 +103,15 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
             case "name" -> log.info(sm.getString("mBean.nameChange"));
             case "scope" -> cr.setScope((String) value);
             case "type" -> cr.setType((String) value);
-            default -> cr.setProperty(name, "" + value);
+            default -> cr.setProperty(name, value == null ? null : value.toString());
         }
 
         // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = cr.getNamingResources();
-        nr.removeResource(cr.getName());
-        nr.addResource(cr);
+        if (nr != null) {
+            nr.removeResource(cr.getName());
+            nr.addResource(cr);
+        }
     }
 }

@@ -75,13 +75,18 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             oldValue = container.getStartChildren();
             container.setStartChildren(false);
             container.addChild(contained);
-            contained.init();
-        } catch (LifecycleException e) {
-            throw new MBeanException(e);
         } finally {
             if (container != null) {
                 container.setStartChildren(oldValue);
             }
+        }
+
+        try {
+            contained.init();
+        } catch (LifecycleException e) {
+            // If init fails, try to cleanup since the MBean may not have been added
+            container.removeChild(contained);
+            throw new MBeanException(e);
         }
     }
 
