@@ -58,6 +58,7 @@
 <body>
 <% if (currentHttpSession == null) { %>
    <h1><%=currentSessionId%></h1>
+   <div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
 <% } else { %>
    <h1>Details for Session <%= currentSessionId %></h1>
 
