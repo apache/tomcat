@@ -999,7 +999,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             String sessionId, StringManager smClient) throws ServletException, IOException {
         Session session = getSessionForNameAndId(cn, sessionId, smClient);
         if (session == null) {
-            req.setAttribute(APPLICATION_ERROR, "Session not found: " + sessionId);
+            req.setAttribute(APPLICATION_ERROR, smClient.getString("htmlManagerServlet.sessionNotFound", sessionId));
         }
         // <strong>NOTE</strong> - This header will be overridden
         // automatically if a <code>RequestDispatcher.forward()</code> call is
