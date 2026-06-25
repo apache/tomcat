@@ -106,13 +106,15 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
         } else if ("type".equals(name)) {
             cr.setType((String) value);
         } else {
-            cr.setProperty(name, "" + value);
+            cr.setProperty(name, value == null ? null : value.toString());
         }
 
         // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = cr.getNamingResources();
-        nr.removeResource(cr.getName());
-        nr.addResource(cr);
+        if (nr != null) {
+            nr.removeResource(cr.getName());
+            nr.addResource(cr);
+        }
     }
 }

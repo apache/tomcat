@@ -60,22 +60,23 @@ public class SessionUtils {
             new String[] { "Login", "User", "userName", "UserName", "Utilisateur", "SPRING_SECURITY_LAST_USERNAME" };
 
     /**
-     * Try to get user locale from the session, if possible. IMPLEMENTATION NOTE: this method has explicit support for
-     * Tapestry 3, Struts 1.x and Spring JSF check the browser meta tag "accept languages" to choose what language to
-     * display.
+     * Try to get user locale from the session, if possible.
      *
      * @param in_session The session
      *
-     * @return the locale
+     * @return the locale, or {@code null} if it cannot be determined
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
         return guessLocaleFromSession(in_session.getSession());
     }
 
     /**
-     * Try to get user locale from the HttpSession, if possible.
+     * Try to get user locale from the session, if possible. Searches for Locale objects stored under known attribute
+     * names used by common frameworks (Struts, JSTL, Spring MVC), and falls back to iterating all session attributes if
+     * exactly one Locale is found.
      *
      * @param in_session The HTTP session
+     *
      * @return the locale, or {@code null} if it cannot be determined
      */
     public static Locale guessLocaleFromSession(final HttpSession in_session) {

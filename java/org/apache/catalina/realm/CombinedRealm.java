@@ -75,15 +75,18 @@ public class CombinedRealm extends RealmBase {
 
     /**
      * Returns the JMX ObjectNames of the realms that this realm is wrapping.
+     * Entries for realms that do not implement LifecycleMBeanBase will be null.
      *
-     * @return the array of realm ObjectNames
+     * @return the array of realm ObjectNames, which may contain null entries
      */
     public ObjectName[] getRealms() {
         ObjectName[] result = new ObjectName[realms.size()];
+        int i = 0;
         for (Realm realm : realms) {
             if (realm instanceof LifecycleMBeanBase) {
-                result[realms.indexOf(realm)] = ((LifecycleMBeanBase) realm).getObjectName();
+                result[i] = ((LifecycleMBeanBase) realm).getObjectName();
             }
+            i++;
         }
         return result;
     }
@@ -181,14 +184,15 @@ public class CombinedRealm extends RealmBase {
 
     @Override
     public void setContainer(Container container) {
+        int i = 0;
         for (Realm realm : realms) {
             // Set the realmPath for JMX naming
             if (realm instanceof RealmBase) {
-                ((RealmBase) realm).setRealmPath(getRealmPath() + "/realm" + realms.indexOf(realm));
+                ((RealmBase) realm).setRealmPath(getRealmPath() + "/realm" + Integer.toString(i));
             }
-
             // Set the container for sub-realms. Mainly so logging works.
             realm.setContainer(container);
+            i++;
         }
         super.setContainer(container);
     }

@@ -523,7 +523,7 @@ public class DataSourceRealm extends RealmBase {
 
 
     private boolean isRoleStoreDefined() {
-        return userRoleTable != null || roleNameCol != null;
+        return (userRoleTable != null && !userRoleTable.isEmpty()) && (roleNameCol != null && !roleNameCol.isEmpty());
     }
 
 
@@ -531,6 +531,23 @@ public class DataSourceRealm extends RealmBase {
 
     @Override
     protected void startInternal() throws LifecycleException {
+
+        if (userTable == null || userTable.isEmpty()) {
+            throw new LifecycleException(sm.getString("dataSourceRealm.noUserTable"));
+        }
+        if (userNameCol == null || userNameCol.isEmpty()) {
+            throw new LifecycleException(sm.getString("dataSourceRealm.noUserNameCol"));
+        }
+        if (userCredCol == null || userCredCol.isEmpty()) {
+            throw new LifecycleException(sm.getString("dataSourceRealm.noUserCredCol"));
+        }
+
+        // Validate role configuration: either both must be set or neither
+        boolean hasRoleTable = userRoleTable != null && !userRoleTable.isEmpty();
+        boolean hasRoleNameCol = roleNameCol != null && !roleNameCol.isEmpty();
+        if (hasRoleTable != hasRoleNameCol) {
+            throw new LifecycleException(sm.getString("dataSourceRealm.roleConfigMismatch"));
+        }
 
         // Create the roles PreparedStatement string
         StringBuilder temp = new StringBuilder("SELECT ");

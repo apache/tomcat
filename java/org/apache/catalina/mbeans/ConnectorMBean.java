@@ -27,7 +27,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A <strong>ModelMBean</strong> implementation for the <code>org.apache.coyote.tomcat5.CoyoteConnector</code>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.connector.Connector</code>
  * component.
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
@@ -72,6 +72,10 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         }
 
         Connector connector = doGetManagedResource();
-        IntrospectionUtils.setProperty(connector, name, String.valueOf(value));
+        if (value == null) {
+            IntrospectionUtils.setProperty(connector, name, null);
+        } else {
+            IntrospectionUtils.setProperty(connector, name, String.valueOf(value));
+        }
     }
 }

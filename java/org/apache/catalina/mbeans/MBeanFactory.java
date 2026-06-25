@@ -472,6 +472,9 @@ public class MBeanFactory {
             Service service = getService(pname);
             Engine engine = service.getContainer();
             Host host = (Host) engine.findChild(pname.getKeyProperty("host"));
+            if (host == null) {
+                throw new IllegalArgumentException(sm.getString("mBeanFactory.noHost", pname.getKeyProperty("host")));
+            }
             host.addChild(context);
         }
 
@@ -750,6 +753,9 @@ public class MBeanFactory {
         } else {
             log.warn(sm.getString("mBeanFactory.noDeployer", hostName));
             Host host = (Host) engine.findChild(hostName);
+            if (host == null) {
+                throw new IllegalArgumentException(sm.getString("mBeanFactory.noHost", hostName));
+            }
             Context context = (Context) host.findChild(pathStr);
             // Remove this component from its parent component
             host.removeChild(context);
