@@ -250,6 +250,10 @@
         <code>antiLockingDocBase</code> is enabled. (markt)
       </fix>
       <fix>
+        Improve validation of configuration when <code>DataSourceRealm</code>
+        starts. (remm)
+      </fix>
+      <fix>
         <code>JAASRealm</code> should do a logout if login does not fail outright but
         does not produce a Principal. (remm)
       </fix>
