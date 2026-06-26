@@ -803,6 +803,12 @@
         be <strong>deleted</strong> on Tomcat shutdown.  You probably don't want
         to do this, so think twice before setting antiResourceLocking=true on a
         webapp that's outside the <code>appBase</code> for its Host.</p>
+
+        <p>If Tomcat terminates abnormally, the temporary copy of the web
+        application will not be deleted and must be cleaned-up manually. It will
+        be in the JVM default temporary directory. If Tomcat has been restarted,
+        take care to check the timestamps before deleting any web application
+        copies to make sure you are not deleting any currently in use.</p>
       </attribute>
 
       <attribute name="clearReferencesHttpClientKeepAliveThread" required="false">

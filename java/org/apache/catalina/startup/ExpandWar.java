@@ -236,7 +236,7 @@ public class ExpandWar {
         String[] files;
         if (src.isDirectory()) {
             files = src.list();
-            result = dest.mkdir();
+            result = dest.isDirectory() || dest.mkdir();
         } else {
             files = new String[1];
             files[0] = "";
