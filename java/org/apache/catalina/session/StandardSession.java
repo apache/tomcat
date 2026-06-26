@@ -759,6 +759,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Reset the instance variables associated with this Session
         attributes.clear();
+        listeners.clear();
         setAuthType(null);
         creationTime = 0L;
         expiring = false;
@@ -964,7 +965,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * calls <code>valueBound()</code> on the object.
      *
      * @param name   Name to which the object is bound, cannot be null
-     * @param value  Object to be bound, cannot be null
+     * @param value  Object to be bound, or null to remove the attribute (equivalent to removeAttribute)
      * @param notify whether to notify session listeners
      *
      * @exception IllegalArgumentException if an attempt is made to add a non-serializable object in an environment

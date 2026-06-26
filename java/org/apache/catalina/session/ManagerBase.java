@@ -440,7 +440,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
                 sessionIdGenerator = sessionIdGeneratorClass.getConstructor().newInstance();
                 return sessionIdGenerator;
             } catch (ReflectiveOperationException ex) {
-                // Ignore
+                log.warn(sm.getString("managerBase.sessionIdGeneratorInitFailed",
+                        sessionIdGeneratorClass.getName()), ex);
             }
         }
         return null;
@@ -628,7 +629,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
     /**
-     * Invalidate all sessions that have expired.
+     * Check all sessions validity to trigger their expiration if needed.
      */
     public void processExpires() {
 

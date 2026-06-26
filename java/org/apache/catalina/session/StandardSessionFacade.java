@@ -22,7 +22,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Facade for the StandardSession object.
+ * Facade for a HttpSession object.
  */
 public class StandardSessionFacade implements HttpSession {
 
