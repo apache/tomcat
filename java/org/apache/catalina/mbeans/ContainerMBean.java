@@ -85,7 +85,9 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             contained.init();
         } catch (LifecycleException e) {
             // If init fails, try to cleanup since the MBean may not have been added
-            container.removeChild(contained);
+            if (container != null) {
+                container.removeChild(contained);
+            }
             throw new MBeanException(e);
         }
     }
