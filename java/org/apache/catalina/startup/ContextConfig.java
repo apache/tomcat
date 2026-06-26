@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -955,19 +956,18 @@ public class ContextConfig implements LifecycleListener {
                 return;
             }
             ContextName cn = new ContextName(path, context.getWebappVersion());
-            docBase = cn.getBaseName();
 
-            String tmp = System.getProperty("java.io.tmpdir");
-            File tmpFile = new File(tmp);
-            if (!tmpFile.isDirectory()) {
-                log.error(sm.getString("contextConfig.noAntiLocking", tmp, context.getName()));
+            String prefix = "tomcat-" + deploymentCount++ + "-" + cn.getBaseName();
+
+            try {
+                if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                    antiLockingDocBase = Files.createTempFile(prefix, ".war").toFile();
+                } else {
+                    antiLockingDocBase = Files.createTempDirectory(prefix).toFile();
+                }
+            } catch (IOException ioe) {
+                log.error(sm.getString("contextConfig.noAntiLocking", context.getName()), ioe);
                 return;
-            }
-
-            if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase + ".war");
-            } else {
-                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase);
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
