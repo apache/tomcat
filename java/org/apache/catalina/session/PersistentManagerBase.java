@@ -191,7 +191,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
      * Indicates how many seconds old a session can get, after its last use in a request, before it should be backed up
      * to the store. {@code -1} means sessions are not backed up.
      *
-     * @return the timeout after which sessions are ripe for back up
+     * @return the timeout after which sessions are ripe for backup
      */
     public int getMaxIdleBackup() {
 
@@ -336,7 +336,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
      * Indicates whether sessions are saved when the Manager is shut down properly. This requires the {@link #unload()}
      * method to be called.
      *
-     * @return {@code true}, when sessions should be saved on restart, {code false} otherwise
+     * @return {@code true}, when sessions should be saved on restart, {@code false} otherwise
      */
     public boolean getSaveOnRestart() {
 

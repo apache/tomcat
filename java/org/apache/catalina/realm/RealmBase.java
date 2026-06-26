@@ -68,8 +68,9 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
 /**
- * Simple implementation of <b>Realm</b> that reads an XML file to configure the valid users, passwords, and roles. The
- * file format (and default file location) are identical to those currently supported by Tomcat 3.X.
+ * Abstract base class for Realm implementations.
+ * Provides common functionality including credential handling, security constraint evaluation,
+ * and GSS-API authentication support.
  */
 public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
