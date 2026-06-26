@@ -249,6 +249,10 @@
         Use <code>Files</code> API to create temporary docBase when
         <code>antiLockingDocBase</code> is enabled. (markt)
       </fix>
+      <fix>
+        <code>JAASRealm</code> should do a logout if login does not fail outright but
+        does not produce a Principal. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
