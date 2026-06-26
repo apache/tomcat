@@ -245,6 +245,10 @@
         Align DIGEST authentication with RFC 7616 and require clients to provide
         a valid <code>qop</code> parameter. (markt)
       </fix>
+      <fix>
+        Use <code>Files</code> API to create temporary docBase when
+        <code>antiLockingDocBase</code> is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
