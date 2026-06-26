@@ -361,9 +361,6 @@ public class JAASRealm extends RealmBase {
 
         // Establish a LoginContext to use for authentication
         try {
-            if (appName == null) {
-                appName = "Tomcat";
-            }
 
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jaasRealm.beginLogin", username, appName));
@@ -414,6 +411,7 @@ public class JAASRealm extends RealmBase {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("jaasRealm.failedLogin", username));
                     }
+                    loginContext.logout();
                     return null;
                 }
             } catch (AccountExpiredException e) {
@@ -465,6 +463,7 @@ public class JAASRealm extends RealmBase {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.authenticateFailure", username));
                 }
+                loginContext.logout();
                 return null;
             }
             if (log.isTraceEnabled()) {
