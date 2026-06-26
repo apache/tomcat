@@ -213,8 +213,8 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Anti-locking docBase. It is a path to a copy of the web application in the java.io.tmpdir directory. This path is
-     * always an absolute one.
+     * Anti-locking docBase. This is a path to a copy of the web application located in a temporary directory under the
+     * default JVM temporary directory. This path is always an absolute one.
      */
     private File antiLockingDocBase = null;
 
@@ -968,8 +968,8 @@ public class ContextConfig implements LifecycleListener {
                 } else {
                     antiLockingDocBase = Files.createTempDirectory(prefix).toFile();
                 }
-            } catch (IOException ioe) {
-                log.error(sm.getString("contextConfig.noAntiLocking", context.getName()), ioe);
+            } catch (IllegalArgumentException | IOException e) {
+                log.error(sm.getString("contextConfig.noAntiLocking", context.getName()), e);
                 return;
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
@@ -978,8 +978,6 @@ public class ContextConfig implements LifecycleListener {
                 log.debug(sm.getString("contextConfig.antiLocking", context.getName(), antiLockingDocBase.getPath()));
             }
 
-            // Cleanup just in case an old deployment is lying around
-            ExpandWar.delete(antiLockingDocBase);
             if (ExpandWar.copy(docBaseFile, antiLockingDocBase)) {
                 context.setDocBase(antiLockingDocBase.getPath());
             }
