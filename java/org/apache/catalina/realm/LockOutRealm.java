@@ -259,6 +259,7 @@ public class LockOutRealm extends CombinedRealm {
         synchronized (this) {
             if (!failedUsers.containsKey(username)) {
                 lockRecord = new LockRecord();
+                lockRecord.registerFailure();
                 failedUsers.put(username, lockRecord);
             } else {
                 lockRecord = failedUsers.get(username);
@@ -268,9 +269,9 @@ public class LockOutRealm extends CombinedRealm {
                     // expired so reset failure count
                     lockRecord.setFailures(0);
                 }
+                lockRecord.registerFailure();
             }
         }
-        lockRecord.registerFailure();
     }
 
 

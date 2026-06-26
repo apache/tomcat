@@ -164,7 +164,8 @@ public class StandardManager extends ManagerBase {
                         }
                     }
                 } finally {
-                    // Delete the persistent storage file
+                    // Delete the persistent storage file in all cases, since retrying after an exception
+                    // is not an option
                     if (file.exists()) {
                         if (!file.delete()) {
                             log.warn(sm.getString("standardManager.deletePersistedFileFail", file));

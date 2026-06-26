@@ -826,7 +826,7 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Set the "search subtree for roles" flag.
+     * Set the nested group search flag.
      *
      * @param roleNested The nested group search flag
      */
@@ -2285,7 +2285,7 @@ public class JNDIRealm extends RealmBase {
         }
         String valueString;
         if (value instanceof byte[]) {
-            valueString = new String((byte[]) value);
+            valueString = new String((byte[]) value, StandardCharsets.UTF_8);
         } else {
             valueString = value.toString();
         }

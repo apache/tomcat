@@ -36,8 +36,9 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>&lt;Realm&gt;</code> element in <code>server.xml</code>.
  * <p>
  * At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of type
- * <code>javax.security.auth.callback.NameCallback</code> and
- * <code>javax.security.auth.callback.PasswordCallback</code>.
+ * <code>javax.security.auth.callback.NameCallback</code>,
+ * <code>javax.security.auth.callback.PasswordCallback</code> and
+ * <code>javax.security.auth.callback.TextInputCallback</code>.
  */
 public class JAASCallbackHandler implements CallbackHandler {
 

@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
+import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleBase;
@@ -141,7 +142,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
         for (String key : keys) {
             try {
-                StandardSession session = (StandardSession) load(key);
+                Session session = load(key);
                 if (session == null) {
                     continue;
                 }
