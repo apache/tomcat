@@ -283,7 +283,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
                     destroyMBeans(name + "/", (Context) value);
                 } else if (value instanceof UserDatabase) {
                     try {
-                        MBeanUtils.destroyMBeanUserDatabase(name);
+                        MBeanUtils.destroyMBeanUserDatabase(binding.getName());
                     } catch (Exception e) {
                         log.error(sm.getString("globalResources.userDatabaseDestroyError", name), e);
                     }
