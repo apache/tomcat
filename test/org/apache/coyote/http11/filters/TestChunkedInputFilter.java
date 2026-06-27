@@ -47,6 +47,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     private static final int EXT_SIZE_LIMIT = 10;
     private static final int TRAILER_SIZE_LIMIT = 8 * 1024;
+    private static final int TRAILER_COUNT_LIMIT = 3;
 
     @Test
     public void testChunkHeaderCRLF() throws Exception {
@@ -277,6 +278,160 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 "x-trailer: Test",
                 true);
         // @formatter:on
+    }
+
+
+    @Test
+    public void testTrailingHeadersCountLimitBelowLimit() throws Exception {
+        doTestTrailingHeadersCountLimit(TRAILER_COUNT_LIMIT - 1, true);
+    }
+
+
+    @Test
+    public void testTrailingHeadersCountLimitAtLimit() throws Exception {
+        doTestTrailingHeadersCountLimit(TRAILER_COUNT_LIMIT, true);
+    }
+
+
+    @Test
+    public void testTrailingHeadersCountLimitAboveLimit() throws Exception {
+        doTestTrailingHeadersCountLimit(TRAILER_COUNT_LIMIT + 1, false);
+    }
+
+
+    /*
+     * maxTrailerCount=-1 disables the count limit entirely; 50 trailers must be accepted.
+     * Total trailer bytes are ~850, well within the default maxTrailerSize (8 KiB).
+     */
+    @Test
+    public void testTrailingHeadersCountLimitDisabled() throws Exception {
+        doTestTrailingHeadersCountLimit(50, true, -1);
+    }
+
+
+    /*
+     * maxTrailerCount=0 means zero trailers are permitted; even one trailer must be rejected.
+     * Mirrors the HTTP/2 count=0 case in TestHttp2Limits.
+     */
+    @Test
+    public void testTrailingHeadersCountLimitZeroRejectsAny() throws Exception {
+        doTestTrailingHeadersCountLimit(1, false, 0);
+    }
+
+
+    /*
+     * maxTrailerCount=0 with no trailers sent: the limit guard (trailerCount > 0) is never
+     * triggered, so the request must succeed.
+     */
+    @Test
+    public void testTrailingHeadersCountLimitZeroAllowsNone() throws Exception {
+        doTestTrailingHeadersCountLimit(0, true, 0);
+    }
+
+
+    /*
+     * Positive parse assertion: proves trailers are actually echoed (not silently dropped)
+     * when the count is under the limit.  EchoHeaderServlet outputs:
+     *   {pre-read x-trailer1}{pre-read x-trailer2}{body-byte-count}
+     *   {post-read x-trailer1}{post-read x-trailer2}
+     * Body "a=0&b=1" = 7 bytes; only x-trailer1 is sent and allowed.
+     */
+    @Test
+    public void testTrailingHeadersCountLimitParsedCorrectly() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerCount", Integer.toString(TRAILER_COUNT_LIMIT)));
+        Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1"));
+
+        Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(true));
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        // @formatter:off
+        String[] request = new String[] {
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + CRLF +
+                    "a=0" + CRLF +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    "x-trailer1: TestValue1" + CRLF +
+                    CRLF
+        };
+        // @formatter:on
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setRequest(request);
+
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        // pre-read trailers both null; 7 body bytes; post-read x-trailer1 echoed; x-trailer2 not sent -> null
+        Assert.assertEquals("nullnull7TestValue1null", client.getResponseBody());
+    }
+
+
+    private void doTestTrailingHeadersCountLimit(int trailerCount, boolean ok) throws Exception {
+        doTestTrailingHeadersCountLimit(trailerCount, ok, TRAILER_COUNT_LIMIT);
+    }
+
+
+    private void doTestTrailingHeadersCountLimit(int trailerCount, boolean ok, int maxTrailerCount) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(false));
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        // Limit the number of trailing headers
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerCount", Integer.toString(maxTrailerCount)));
+        tomcat.start();
+
+        // Build a chunked request with trailerCount distinct trailer headers
+        StringBuilder trailerHeaders = new StringBuilder();
+        for (int i = 0; i < trailerCount; i++) {
+            trailerHeaders.append("x-trailer-").append(i).append(": a").append(CRLF);
+        }
+
+        // @formatter:off
+        String[] request = new String[] {
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + CRLF +
+                    "a=0" + CRLF +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    trailerHeaders.toString() +
+                    CRLF
+        };
+        // @formatter:on
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setRequest(request);
+
+        client.connect();
+        client.processRequest();
+        if (ok) {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        } else {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        }
     }
 
 

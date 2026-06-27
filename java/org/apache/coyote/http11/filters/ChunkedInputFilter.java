@@ -103,6 +103,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      */
     private final long maxExtensionSize;
 
+    private final int maxTrailerCount;
 
     private final int maxSwallowSize;
 
@@ -116,6 +117,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     private volatile int chunkSizeDigitsRead = 0;
     private volatile State extensionState = null;
     private final AtomicLong extensionSize = new AtomicLong(0);
+    private volatile int trailerCount = 0;
     private final HttpHeaderParser httpHeaderParser;
 
     // ----------------------------------------------------------- Constructors
@@ -125,15 +127,17 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      *
      * @param request the HTTP request
      * @param maxTrailerSize the maximum trailer size
+     * @param maxTrailerCount the maximum number of trailing headers, or a value less than 0 for no limit
      * @param allowedTrailerHeaders the set of allowed trailer headers
      * @param maxExtensionSize the maximum extension size
      * @param maxSwallowSize the maximum swallow size
      */
-    public ChunkedInputFilter(final Request request, int maxTrailerSize, Set<String> allowedTrailerHeaders,
-            int maxExtensionSize, int maxSwallowSize) {
+    public ChunkedInputFilter(final Request request, int maxTrailerSize, int maxTrailerCount,
+            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize) {
         this.request = request;
         this.trailingHeaders = ByteBuffer.allocate(maxTrailerSize);
         this.trailingHeaders.limit(0);
+        this.maxTrailerCount = maxTrailerCount;
         this.allowedTrailerHeaders = allowedTrailerHeaders;
         this.maxExtensionSize = maxExtensionSize;
         this.maxSwallowSize = maxSwallowSize;
@@ -270,6 +274,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         chunkSizeDigitsRead = 0;
         extensionState = null;
         extensionSize.set(0);
+        trailerCount = 0;
         httpHeaderParser.recycle();
     }
 
@@ -642,6 +647,12 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             } catch (IllegalArgumentException iae) {
                 parseState = ParseState.ERROR;
                 throw new BadRequestException(iae);
+            }
+            if (status == HeaderParseStatus.HAVE_MORE_HEADERS) {
+                trailerCount++;
+                if (maxTrailerCount >= 0 && trailerCount > maxTrailerCount) {
+                    throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailerCount"));
+                }
             }
         } while (status == HeaderParseStatus.HAVE_MORE_HEADERS);
         if (status == HeaderParseStatus.DONE) {

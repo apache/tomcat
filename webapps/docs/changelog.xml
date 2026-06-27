@@ -284,6 +284,15 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <add>
+        Add a new <code>maxTrailerCount</code> attribute to the HTTP/1.1
+        connector that limits the number of trailing headers permitted in a
+        chunked request. The default of <code>100</code> is consistent with
+        <code>maxHeaderCount</code> and the equivalent attribute for HTTP/2.
+        Previously, trailing headers were limited only by
+        <code>maxTrailerSize</code>. A value less than 0 disables the limit.
+        (HwangRock)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Avoid a potential JVM crash if a suitable version of Tomcat Native is
