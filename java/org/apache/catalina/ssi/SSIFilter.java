@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,7 +174,11 @@ public class SSIFilter extends GenericFilter {
             // Ignore, will try to use a writer
         }
         if (out == null) {
-            res.getWriter().write(new String(bytes));
+            String encoding = res.getCharacterEncoding();
+            if (encoding == null) {
+                encoding = StandardCharsets.ISO_8859_1.name();
+            }
+            res.getWriter().write(new String(bytes, encoding));
         } else {
             out.write(bytes);
         }

@@ -101,7 +101,7 @@ public class SSIServlet extends HttpServlet {
 
 
     /**
-     * Process and forward the GET request to our <code>requestHandler()</code>.
+     * Delegate the GET request to our <code>requestHandler()</code>.
      *
      * @param req a value of type 'HttpServletRequest'
      * @param res a value of type 'HttpServletResponse'
@@ -119,7 +119,7 @@ public class SSIServlet extends HttpServlet {
 
 
     /**
-     * Process and forward the POST request to our <code>requestHandler()</code>.
+     * Delegate the POST request to our <code>requestHandler()</code>.
      *
      * @param req a value of type 'HttpServletRequest'
      * @param res a value of type 'HttpServletResponse'
