@@ -20,7 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.StringTokenizer;
+import java.util.ArrayList;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.res.StringManager;
@@ -67,21 +67,45 @@ public class SSIExec implements SSICommand {
             boolean foundProgram = false;
             try {
                 Runtime rt = Runtime.getRuntime();
-                StringTokenizer st = new StringTokenizer(substitutedValue);
-                String[] cmdArray = new String[st.countTokens()];
-                for (int i = 0; i < cmdArray.length; i++) {
-                    cmdArray[i] = st.nextToken();
+                ArrayList<String> tokens = new ArrayList<>();
+                StringBuilder current = new StringBuilder();
+                boolean inDoubleQuote = false;
+                boolean inSingleQuote = false;
+                for (int j = 0; j < substitutedValue.length(); j++) {
+                    char c = substitutedValue.charAt(j);
+                    if (c == '"' && !inSingleQuote) {
+                        inDoubleQuote = !inDoubleQuote;
+                    } else if (c == '\'' && !inDoubleQuote) {
+                        inSingleQuote = !inSingleQuote;
+                    } else if (Character.isWhitespace(c) && !inDoubleQuote && !inSingleQuote) {
+                        if (current.length() > 0) {
+                            tokens.add(current.toString());
+                            current.setLength(0);
+                        }
+                    } else {
+                        current.append(c);
+                    }
                 }
+                if (current.length() > 0) {
+                    tokens.add(current.toString());
+                }
+                String[] cmdArray = tokens.toArray(new String[0]);
                 Process proc = rt.exec(cmdArray);
                 foundProgram = true;
                 char[] buf = new char[BUFFER_SIZE];
-                try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-                        BufferedReader stdErrReader =
-                                new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
-                    IOTools.flow(stdErrReader, writer, buf);
-                    IOTools.flow(stdOutReader, writer, buf);
+                try {
+                    try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                            BufferedReader stdErrReader = new BufferedReader(
+                                    new InputStreamReader(proc.getErrorStream()))) {
+                        // We don't spawn a thread here, since this is costly. stderr would be usually written
+                        // right away and the amount written would be small
+                        IOTools.flow(stdErrReader, writer, buf);
+                        IOTools.flow(stdOutReader, writer, buf);
+                    }
+                    proc.waitFor();
+                } finally {
+                    proc.destroy();
                 }
-                proc.waitFor();
                 lastModified = System.currentTimeMillis();
             } catch (InterruptedException e) {
                 ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);

@@ -253,6 +253,9 @@
         <code>JAASRealm</code> should do a logout if login does not fail outright but
         does not produce a Principal. (remm)
       </fix>
+      <fix>
+        Various edge cases for SSI substitutions, quoting and escaping. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
