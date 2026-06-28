@@ -23,7 +23,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import org.apache.catalina.util.IOTools;
 
@@ -197,47 +196,62 @@ public class SSIProcessor {
      * @return an array with the parameter names
      */
     protected String[] parseParamNames(StringBuilder cmd, int start) {
+        // Count parameters first
+        int count = 0;
         int bIdx = start;
-        int i = 0;
-        int quotes;
-        boolean inside = false;
-        StringBuilder retBuf = new StringBuilder();
+        boolean insideQuotes = false;
+        boolean escaped = false;
         while (bIdx < cmd.length()) {
-            if (!inside) {
-                while (bIdx < cmd.length() && isSpace(cmd.charAt(bIdx))) {
-                    bIdx++;
-                }
-                if (bIdx >= cmd.length()) {
-                    break;
-                }
-                inside = true;
-            } else {
-                while (bIdx < cmd.length() && cmd.charAt(bIdx) != '=') {
-                    retBuf.append(cmd.charAt(bIdx));
-                    bIdx++;
-                }
-                retBuf.append('=');
-                inside = false;
-                quotes = 0;
-                boolean escaped = false;
-                for (; bIdx < cmd.length() && quotes != 2; bIdx++) {
-                    char c = cmd.charAt(bIdx);
-                    // Need to skip escaped characters
-                    if (c == '\\' && !escaped) {
-                        escaped = true;
-                        continue;
-                    }
-                    if (c == '"' && !escaped) {
-                        quotes++;
-                    }
-                    escaped = false;
-                }
+            char c = cmd.charAt(bIdx);
+            if (escaped) {
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == '"' || c == '\'' || c == '`') {
+                insideQuotes = !insideQuotes;
+            } else if (c == '=' && !insideQuotes) {
+                count++;
             }
+            bIdx++;
         }
-        StringTokenizer str = new StringTokenizer(retBuf.toString(), "=");
-        String[] retString = new String[str.countTokens()];
-        while (str.hasMoreTokens()) {
-            retString[i++] = str.nextToken().trim();
+        String[] retString = new String[count];
+        // Extract parameter names (characters between spaces and the first unquoted '=')
+        bIdx = start;
+        int idx = 0;
+        StringBuilder nameBuf = new StringBuilder();
+        boolean collectingName = false;
+        insideQuotes = false;
+        escaped = false;
+        while (bIdx < cmd.length() && idx < count) {
+            char c = cmd.charAt(bIdx);
+            if (escaped) {
+                escaped = false;
+                if (collectingName && !insideQuotes) {
+                    nameBuf.append(c);
+                }
+            } else if (c == '\\') {
+                escaped = true;
+                if (collectingName && !insideQuotes) {
+                    nameBuf.append(c);
+                }
+            } else if (!insideQuotes && (c == '"' || c == '\'' || c == '`')) {
+                insideQuotes = true;
+            } else if (insideQuotes && (c == '"' || c == '\'' || c == '`')) {
+                insideQuotes = false;
+            } else if (!insideQuotes && isSpace(c)) {
+                if (collectingName) {
+                    nameBuf.setLength(0);
+                    collectingName = false;
+                }
+            } else if (!insideQuotes && c == '=') {
+                retString[idx++] = nameBuf.toString().trim();
+                nameBuf.setLength(0);
+                collectingName = false;
+            } else if (!insideQuotes) {
+                collectingName = true;
+                nameBuf.append(c);
+            }
+            bIdx++;
         }
         return retString;
     }
