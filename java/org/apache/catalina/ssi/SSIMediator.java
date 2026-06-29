@@ -346,10 +346,10 @@ public class SSIMediator {
                 boolean processed = false;
                 try {
                     int codePoint = Integer.parseInt(sb.substring(charStart + 2, charEnd));
-                    if (codePoint >= 0 && codePoint <= 0xFFFF) {
-                        char c = (char) codePoint;
+                    if (Character.isValidCodePoint(codePoint)) {
+                        // Use toChars() so code points outside the BMP are inserted as a surrogate pair
                         sb.delete(charStart, charEnd + 1);
-                        sb.insert(charStart, c);
+                        sb.insert(charStart, Character.toChars(codePoint));
                         processed = true;
                     }
                 } catch (NumberFormatException e) {
@@ -440,6 +440,7 @@ public class SSIMediator {
             // count prevents infinite loops from circular variable references
             // (e.g. X="$Y" and Y="$X")
             if (++substitutionCount > maxSubstitutions) {
+                log(sm.getString("ssiMediator.maxSubstitutionsExceeded", Integer.toString(maxSubstitutions)));
                 break;
             }
             i = start;
