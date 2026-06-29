@@ -199,7 +199,8 @@ public class SSIProcessor {
         // Count parameters first
         int count = 0;
         int bIdx = start;
-        boolean insideQuotes = false;
+        // Tracks the quote character that will close any currently quoted text. 0 means not currently quoted.
+        char endQuote = 0;
         boolean escaped = false;
         while (bIdx < cmd.length()) {
             char c = cmd.charAt(bIdx);
@@ -207,9 +208,11 @@ public class SSIProcessor {
                 escaped = false;
             } else if (c == '\\') {
                 escaped = true;
-            } else if (c == '"' || c == '\'' || c == '`') {
-                insideQuotes = !insideQuotes;
-            } else if (c == '=' && !insideQuotes) {
+            } else if (endQuote == 0 && (c == '"' || c == '\'' || c == '`')) {
+                endQuote = c;
+            } else if (endQuote == c) {
+                endQuote = 0;
+            } else if (c == '=' && endQuote == 0) {
                 count++;
             }
             bIdx++;
@@ -220,34 +223,34 @@ public class SSIProcessor {
         int idx = 0;
         StringBuilder nameBuf = new StringBuilder();
         boolean collectingName = false;
-        insideQuotes = false;
+        endQuote = 0;
         escaped = false;
         while (bIdx < cmd.length() && idx < count) {
             char c = cmd.charAt(bIdx);
             if (escaped) {
                 escaped = false;
-                if (collectingName && !insideQuotes) {
+                if (collectingName && endQuote == 0) {
                     nameBuf.append(c);
                 }
             } else if (c == '\\') {
                 escaped = true;
-                if (collectingName && !insideQuotes) {
+                if (collectingName && endQuote == 0) {
                     nameBuf.append(c);
                 }
-            } else if (!insideQuotes && (c == '"' || c == '\'' || c == '`')) {
-                insideQuotes = true;
-            } else if (insideQuotes && (c == '"' || c == '\'' || c == '`')) {
-                insideQuotes = false;
-            } else if (!insideQuotes && isSpace(c)) {
+            } else if (endQuote == 0 && (c == '"' || c == '\'' || c == '`')) {
+                endQuote = c;
+            } else if (endQuote == c) {
+                endQuote = 0;
+            } else if (endQuote == 0 && isSpace(c)) {
                 if (collectingName) {
                     nameBuf.setLength(0);
                     collectingName = false;
                 }
-            } else if (!insideQuotes && c == '=') {
+            } else if (endQuote == 0 && c == '=') {
                 retString[idx++] = nameBuf.toString().trim();
                 nameBuf.setLength(0);
                 collectingName = false;
-            } else if (!insideQuotes) {
+            } else if (endQuote == 0) {
                 collectingName = true;
                 nameBuf.append(c);
             }
