@@ -97,14 +97,14 @@ public final class UserConfig implements LifecycleListener {
     private String userClass = "org.apache.catalina.startup.PasswdUserDatabase";
 
     /**
-     * A regular expression defining user who deployment is allowed.
+     * A regular expression defining users for whom deployment is allowed.
      */
-    Pattern allow = null;
+    private Pattern allow = null;
 
     /**
-     * A regular expression defining user who deployment is denied.
+     * A regular expression defining users for whom deployment is denied.
      */
-    Pattern deny = null;
+    private Pattern deny = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -222,7 +222,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the regular expression used to test for user who deployment is allowed.
+     * Set the regular expression used to test for users for whom deployment is allowed.
      *
      * @param allow The new allow expression
      */
@@ -249,7 +249,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the regular expression used to test for user who deployment is denied.
+     * Set the regular expression used to test for users for whom deployment is denied.
      *
      * @param deny The new deny expression
      */

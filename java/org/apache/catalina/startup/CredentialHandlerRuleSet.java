@@ -21,7 +21,7 @@ import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <strong>RuleSet</strong> for processing the contents of a CredentialHandler definition element. This
- * <code>RuleSet</code> supports CredentialHandler such as the <code>NestedCredentialHandler</code> that used nested
+ * <code>RuleSet</code> supports CredentialHandler such as the <code>NestedCredentialHandler</code> that uses nested
  * CredentialHandlers.
  */
 public class CredentialHandlerRuleSet implements RuleSet {
