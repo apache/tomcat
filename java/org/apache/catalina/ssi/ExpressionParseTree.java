@@ -407,7 +407,8 @@ public class ExpressionParseTree {
                     }
                 } catch (PatternSyntaxException pse) {
                     ssiMediator.log(sm.getString("expressionParseTree.invalidExpression", expr), pse);
-                    return 0;
+                    // Return non-zero (no match) instead of 0 (match)
+                    return -1;
                 }
             }
             return val1.compareTo(val2);

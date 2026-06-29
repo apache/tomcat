@@ -56,7 +56,7 @@ public interface SSIExternalResolver {
      * Returns the current date. This is useful for putting the SSI stuff in a regression test. Since you can make the
      * current date a constant, it makes testing easier since the output won't change.
      *
-     * @return the data
+     * @return the date
      */
     Date getCurrentDate();
 

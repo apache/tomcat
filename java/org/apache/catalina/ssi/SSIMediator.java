@@ -327,7 +327,7 @@ public class SSIMediator {
      * @return the value after variable substitution
      */
     public String substituteVariables(String val) {
-        // If it has no references or HTML entities then no work need to be done
+        // If it contains no variable references ($) or HTML entities (&), no processing is needed.
         if (val.indexOf('$') < 0 && val.indexOf('&') < 0) {
             return val;
         }
@@ -343,15 +343,30 @@ public class SSIMediator {
         while (charStart > -1) {
             int charEnd = sb.indexOf(";", charStart);
             if (charEnd > -1) {
-                char c = (char) Integer.parseInt(sb.substring(charStart + 2, charEnd));
-                sb.delete(charStart, charEnd + 1);
-                sb.insert(charStart, c);
-                charStart = sb.indexOf("&#");
+                boolean processed = false;
+                try {
+                    int codePoint = Integer.parseInt(sb.substring(charStart + 2, charEnd));
+                    if (codePoint >= 0 && codePoint <= 0xFFFF) {
+                        char c = (char) codePoint;
+                        sb.delete(charStart, charEnd + 1);
+                        sb.insert(charStart, c);
+                        processed = true;
+                    }
+                } catch (NumberFormatException e) {
+                    // Not a valid numeric entity – leave as-is
+                }
+                if (processed) {
+                    charStart = sb.indexOf("&#", charStart + 1);
+                } else {
+                    charStart = sb.indexOf("&#", charStart + 2);
+                }
             } else {
                 break;
             }
         }
 
+        int maxSubstitutions = 100;
+        int substitutionCount = 0;
         for (int i = 0; i < sb.length();) {
             // Find the next $
             for (; i < sb.length(); i++) {
@@ -364,13 +379,36 @@ public class SSIMediator {
                 break;
             }
             // Check to see if the $ is escaped
-            if (i > 1 && sb.charAt(i - 2) == '\\') {
-                sb.deleteCharAt(i - 2);
-                i--;
-                continue;
+            int dollarIdx = i - 1;
+            // Count consecutive backslashes before $
+            int backslashCount = 0;
+            int pos = dollarIdx - 1;
+            while (pos >= 0 && sb.charAt(pos) == '\\') {
+                backslashCount++;
+                pos--;
+            }
+            if (backslashCount > 0) {
+                int backslashStart = dollarIdx - backslashCount;
+                if (backslashCount % 2 == 1) {
+                    // Odd: $ is escaped. Remove backslashes, keep $ as literal.
+                    sb.delete(backslashStart, dollarIdx);
+                    for (int b = 0; b < backslashCount / 2; b++) {
+                        sb.insert(backslashStart, '\\');
+                    }
+                    i = backslashStart + backslashCount / 2 + 1;
+                    continue;
+                } else {
+                    // Even: reduce backslashes, $ is NOT escaped.
+                    sb.delete(backslashStart, dollarIdx);
+                    for (int b = 0; b < backslashCount / 2; b++) {
+                        sb.insert(backslashStart, '\\');
+                    }
+                    dollarIdx = backslashStart + backslashCount / 2;
+                    i = dollarIdx + 1;
+                }
             }
             int nameStart = i;
-            int start = i - 1;
+            int start = dollarIdx;
             int end;
             int nameEnd;
             char endChar = ' ';
@@ -398,8 +436,13 @@ public class SSIMediator {
             }
             // Replace the var name with its value
             sb.replace(start, end, value);
-            // Start searching for the next $ after the value that was just substituted.
-            i = start + value.length();
+            // Re-scan from the start of the substituted value. A max iteration
+            // count prevents infinite loops from circular variable references
+            // (e.g. X="$Y" and Y="$X")
+            if (++substitutionCount > maxSubstitutions) {
+                break;
+            }
+            i = start;
         }
         return sb.toString();
     }

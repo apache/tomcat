@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -213,8 +214,8 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Anti-locking docBase. It is a path to a copy of the web application in the java.io.tmpdir directory. This path is
-     * always an absolute one.
+     * Anti-locking docBase. This is a path to a copy of the web application located in a temporary directory under the
+     * default JVM temporary directory. This path is always an absolute one.
      */
     private File antiLockingDocBase = null;
 
@@ -956,19 +957,18 @@ public class ContextConfig implements LifecycleListener {
                 return;
             }
             ContextName cn = new ContextName(path, context.getWebappVersion());
-            docBase = cn.getBaseName();
 
-            String tmp = System.getProperty("java.io.tmpdir");
-            File tmpFile = new File(tmp);
-            if (!tmpFile.isDirectory()) {
-                log.error(sm.getString("contextConfig.noAntiLocking", tmp, context.getName()));
+            String prefix = "tomcat-" + deploymentCount.getAndIncrement() + "-" + cn.getBaseName();
+
+            try {
+                if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                    antiLockingDocBase = Files.createTempFile(prefix, ".war").toFile();
+                } else {
+                    antiLockingDocBase = Files.createTempDirectory(prefix).toFile();
+                }
+            } catch (IllegalArgumentException | IOException e) {
+                log.error(sm.getString("contextConfig.noAntiLocking", context.getName()), e);
                 return;
-            }
-
-            if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                antiLockingDocBase = new File(tmpFile, deploymentCount.getAndIncrement() + "-" + docBase + ".war");
-            } else {
-                antiLockingDocBase = new File(tmpFile, deploymentCount.getAndIncrement() + "-" + docBase);
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
@@ -976,8 +976,6 @@ public class ContextConfig implements LifecycleListener {
                 log.debug(sm.getString("contextConfig.antiLocking", context.getName(), antiLockingDocBase.getPath()));
             }
 
-            // Cleanup just in case an old deployment is lying around
-            ExpandWar.delete(antiLockingDocBase);
             if (ExpandWar.copy(docBaseFile, antiLockingDocBase)) {
                 context.setDocBase(antiLockingDocBase.getPath());
             }
