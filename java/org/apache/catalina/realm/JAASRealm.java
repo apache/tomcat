@@ -361,7 +361,6 @@ public class JAASRealm extends RealmBase {
 
         // Establish a LoginContext to use for authentication
         try {
-
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jaasRealm.beginLogin", username, appName));
             }
@@ -409,9 +408,9 @@ public class JAASRealm extends RealmBase {
                 invocationSuccess = true;
                 if (subject == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("jaasRealm.failedLogin", username));
+                        log.debug(sm.getString("jaasRealm.nullSubject", username));
                     }
-                    loginContext.logout();
+                    silentLogout(loginContext);
                     return null;
                 }
             } catch (AccountExpiredException e) {
@@ -463,7 +462,7 @@ public class JAASRealm extends RealmBase {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.authenticateFailure", username));
                 }
-                loginContext.logout();
+                silentLogout(loginContext);
                 return null;
             }
             if (log.isTraceEnabled()) {
@@ -476,6 +475,16 @@ public class JAASRealm extends RealmBase {
             // JAAS throws exception different from LoginException so mark the realm as unavailable
             invocationSuccess = false;
             return null;
+        }
+    }
+
+
+    private void silentLogout(LoginContext loginContext) {
+        try {
+            loginContext.logout();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // Ignore anything else. Caller should have created any necessary log entries.
         }
     }
 
