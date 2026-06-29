@@ -127,7 +127,7 @@ public class ListenerCreateRule extends ObjectCreateRule {
         }
 
         /**
-         * Return a property from the protocol handler.
+         * Return a property from the listener.
          *
          * @param name the property name
          *

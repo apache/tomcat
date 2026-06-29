@@ -72,8 +72,8 @@ public class CatalinaProperties {
         try {
             String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
-                if (configUrl.indexOf('/') == -1) {
-                    // No '/'. Must be a file name rather than a URL
+                if (configUrl.indexOf(':') == -1) {
+                    // No ':'. Must be a file name rather than a URL
                     fileName = configUrl;
                 } else {
                     is = new URI(configUrl).toURL().openStream();

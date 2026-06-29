@@ -302,7 +302,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Removed a serviced application from the list.
+     * Remove a serviced application from the list.
      *
      * @param name the context name
      */
@@ -1218,6 +1218,7 @@ public class HostConfig implements LifecycleListener {
                 Files.move(destination.toPath(), tempOld.toPath());
             }
             Files.move(tempNew.toPath(), destination.toPath());
+            // Only delete the previous webapp if everything went fine
             ExpandWar.delete(tempOld);
 
         } catch (Throwable t) {

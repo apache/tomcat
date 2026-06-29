@@ -695,8 +695,12 @@ public class ContextConfig implements LifecycleListener {
                     if (generateCode) {
                         contextXmlJavaSource =
                                 getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
-                        digester.startGeneratingCode();
-                        generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        if (contextXmlJavaSource != null) {
+                            digester.startGeneratingCode();
+                            generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        } else {
+                            generateCode = false;
+                        }
                     }
                     URL defaultContextUrl = contextXmlResource.getURI().toURL();
                     processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
@@ -734,8 +738,12 @@ public class ContextConfig implements LifecycleListener {
             } else if (!useGeneratedCode) {
                 if (generateCode) {
                     contextXmlJavaSource = getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
-                    digester.startGeneratingCode();
-                    generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                    if (contextXmlJavaSource != null) {
+                        digester.startGeneratingCode();
+                        generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                    } else {
+                        generateCode = false;
+                    }
                 }
                 processContextConfig(digester, context.getConfigFile(), null);
                 if (generateCode) {
@@ -1020,7 +1028,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Process a "contextConfig" event for this Context.
+     * Process a "configure_start" event for this Context.
      */
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
@@ -1076,7 +1084,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Process a "stop" event for this Context.
+     * Process a "configure_stop" event for this Context.
      */
     protected synchronized void configureStop() {
 
@@ -1685,44 +1693,24 @@ public class ContextConfig implements LifecycleListener {
         long hostTimeStamp = 0;
 
         if (globalWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(globalWebXml.getSystemId());
                 URL url = uri.toURL();
-                uc = url.openConnection();
+                URLConnection uc = url.openConnection();
                 globalTimeStamp = uc.getLastModified();
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 globalTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        globalTimeStamp = -1;
-                    }
-                }
             }
         }
 
         if (hostWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(hostWebXml.getSystemId());
                 URL url = uri.toURL();
-                uc = url.openConnection();
+                URLConnection uc = url.openConnection();
                 hostTimeStamp = uc.getLastModified();
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 hostTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        hostTimeStamp = -1;
-                    }
-                }
             }
         }
 
