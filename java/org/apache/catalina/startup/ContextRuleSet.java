@@ -42,6 +42,7 @@ public class ContextRuleSet implements RuleSet {
 
     /**
      * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
+     * The context instance will be created by the digester.
      */
     public ContextRuleSet() {
         this("");
@@ -50,6 +51,7 @@ public class ContextRuleSet implements RuleSet {
 
     /**
      * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
+     * The context instance will be created by the digester.
      *
      * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */

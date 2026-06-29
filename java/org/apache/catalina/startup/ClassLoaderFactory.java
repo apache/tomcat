@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
  * repositories.</li>
  * <li>A set of directories containing classes and resources in JAR files. Each readable JAR file discovered in these
  * directories will be added to the class loader's repositories.</li>
- * <li><code>ClassLoader</code> instance that should become the parent of the new class loader.</li>
+ * <li>{@link java.lang.ClassLoader} instance that should become the parent of the new class loader.</li>
  * </ul>
  */
 public final class ClassLoaderFactory {
