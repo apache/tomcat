@@ -628,6 +628,31 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
+     * Maximum number of trailing headers allowed in a chunked HTTP request.
+     */
+    private int maxTrailerCount = 100;
+
+    /**
+     * Get the maximum number of trailing headers allowed in a chunked HTTP request.
+     *
+     * @return The maximum number of trailing headers, or a value less than 0 for no limit
+     */
+    public int getMaxTrailerCount() {
+        return maxTrailerCount;
+    }
+
+    /**
+     * Set the maximum number of trailing headers allowed in a chunked HTTP request. Use a value of less than 0 for no
+     * limit.
+     *
+     * @param maxTrailerCount The maximum number of trailing headers
+     */
+    public void setMaxTrailerCount(int maxTrailerCount) {
+        this.maxTrailerCount = maxTrailerCount;
+    }
+
+
+    /**
      * Maximum size of extension information in chunked encoding
      */
     private int maxExtensionSize = 8192;
