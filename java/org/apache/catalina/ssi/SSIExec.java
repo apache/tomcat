@@ -90,6 +90,9 @@ public class SSIExec implements SSICommand {
                     tokens.add(current.toString());
                 }
                 String[] cmdArray = tokens.toArray(new String[0]);
+                if (cmdArray.length == 0) {
+                    throw new IOException(sm.getString("ssiExec.noCommand"));
+                }
                 Process proc = rt.exec(cmdArray);
                 foundProgram = true;
                 char[] buf = new char[BUFFER_SIZE];
@@ -99,8 +102,8 @@ public class SSIExec implements SSICommand {
                                     new InputStreamReader(proc.getErrorStream()))) {
                         // We don't spawn a thread here, since this is costly. stderr would be usually written
                         // right away and the amount written would be small
-                        IOTools.flow(stdErrReader, writer, buf);
                         IOTools.flow(stdOutReader, writer, buf);
+                        IOTools.flow(stdErrReader, writer, buf);
                     }
                     proc.waitFor();
                 } finally {
