@@ -208,6 +208,22 @@ public class TestExpressionParseTree {
         Assert.assertEquals("$Yresult", mediator.substituteVariables(input));
     }
 
+
+    @Test
+    public void testSubstituteVariablesNumericEntityBmp() throws Exception {
+        // A numeric character reference in the BMP is decoded
+        SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+        Assert.assertEquals("A", mediator.substituteVariables("&#65;"));
+    }
+
+
+    @Test
+    public void testSubstituteVariablesNumericEntitySupplementary() throws Exception {
+        // A numeric character reference outside the BMP (U+1F600 = surrogate pair \uD83D\uDE00) must be decoded
+        SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+        Assert.assertEquals("\uD83D\uDE00", mediator.substituteVariables("&#128512;"));
+    }
+
     /**
      * Minimal implementation that provides the bare essentials require for the unit tests.
      */
