@@ -781,6 +781,7 @@ public class Catalina {
         if (loaded) {
             return;
         }
+        // No load retry after a failure
         loaded = true;
 
         long t1 = System.nanoTime();

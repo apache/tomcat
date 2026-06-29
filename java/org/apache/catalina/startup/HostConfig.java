@@ -388,7 +388,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Removed a serviced application from the list.
+     * Remove a serviced application from the list.
      *
      * @param name the context name
      */
