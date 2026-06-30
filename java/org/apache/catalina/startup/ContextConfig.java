@@ -1751,6 +1751,8 @@ public class ContextConfig implements LifecycleListener {
             entry = hostWebXmlCache.get(host);
             if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                     entry.getHostTimeStamp() == hostTimeStamp) {
+                InputSourceUtil.close(globalWebXml);
+                InputSourceUtil.close(hostWebXml);
                 return entry.getWebXml();
             }
 
