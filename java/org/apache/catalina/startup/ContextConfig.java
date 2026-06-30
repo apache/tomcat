@@ -1706,9 +1706,8 @@ public class ContextConfig implements LifecycleListener {
                 if (uc != null) {
                     try {
                         uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        globalTimeStamp = -1;
+                    } catch (Exception e) {
+                        ExceptionUtils.handleThrowable(e);
                     }
                 }
             }
@@ -1727,9 +1726,8 @@ public class ContextConfig implements LifecycleListener {
                 if (uc != null) {
                     try {
                         uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        hostTimeStamp = -1;
+                    } catch (Exception e) {
+                        ExceptionUtils.handleThrowable(e);
                     }
                 }
             }
