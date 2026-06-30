@@ -26,9 +26,14 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class SecurityClassLoad {
 
-    public static void securityClassLoad(ClassLoader loader) {
+    public static void securityClassLoad(ClassLoader loader) throws Exception {
+        securityClassLoad(loader, true);
+    }
 
-        if (System.getSecurityManager() == null) {
+
+    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager) throws Exception {
+
+        if (requireSecurityManager && System.getSecurityManager() == null) {
             return;
         }
 
