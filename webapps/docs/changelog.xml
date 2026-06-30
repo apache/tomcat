@@ -168,6 +168,9 @@
         <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags
         from being re-used if such an exception occurs. (markt)
       </fix>
+      <fix>
+        <bug>70135</bug>: Fix security classload regression. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

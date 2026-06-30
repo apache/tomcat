@@ -57,9 +57,9 @@ public class JspRuntimeLibrary {
 
 
     /**
-     * Private constructor to prevent instantiation.
+     * Public constructor to allow security classload.
      */
-    private JspRuntimeLibrary() {
+    public JspRuntimeLibrary() {
     }
 
     static {
