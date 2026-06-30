@@ -65,21 +65,17 @@ public class DigestAuthenticator extends Authenticator {
         String messageQop = parameterMap.get("qop");
         String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
         String opaque = parameterMap.get("opaque");
-
-        StringBuilder challenge = new StringBuilder();
-
-        if (messageQop != null && !messageQop.isEmpty()) {
-            if (cnonceGenerator == null) {
-                synchronized (cnonceGeneratorLock) {
-                    if (cnonceGenerator == null) {
-                        cnonceGenerator = new SecureRandom();
-                    }
+        if (cnonceGenerator == null) {
+            synchronized (cnonceGeneratorLock) {
+                if (cnonceGenerator == null) {
+                    cnonceGenerator = new SecureRandom();
                 }
             }
-
-            cNonce = cnonceGenerator.nextLong();
-            nonceCount++;
         }
+        cNonce = cnonceGenerator.nextLong();
+        nonceCount++;
+
+        StringBuilder challenge = new StringBuilder();
 
         challenge.append("Digest ");
         challenge.append("username=\"").append(userName).append("\",");
