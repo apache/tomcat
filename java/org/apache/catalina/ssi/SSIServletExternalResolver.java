@@ -651,9 +651,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             if (urlConnection != null) {
                 try {
                     urlConnection.getInputStream().close();
-                } catch (IOException ioe) {
-                    ExceptionUtils.handleThrowable(ioe);
-                    fileSize = -1;
+                } catch (Exception e) {
+                    ExceptionUtils.handleThrowable(e);
                 }
             }
         }
