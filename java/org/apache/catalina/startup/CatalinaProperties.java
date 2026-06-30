@@ -72,11 +72,12 @@ public class CatalinaProperties {
         try {
             String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
-                if (configUrl.indexOf(':') == -1) {
-                    // No ':'. Must be a file name rather than a URL
-                    fileName = configUrl;
-                } else {
+                boolean isAbsoluteUri = isAbsoluteURI(configUrl);
+                if (isAbsoluteUri) {
                     is = new URI(configUrl).toURL().openStream();
+                } else {
+                    // Not an absolute URI. Must be a file name.
+                    fileName = configUrl;
                 }
             }
         } catch (Throwable t) {
@@ -134,6 +135,34 @@ public class CatalinaProperties {
                 System.setProperty(name, value);
             }
         }
+    }
+
+
+    private static boolean isSchemeChar(char c) {
+        return Character.isLetterOrDigit(c) || c == '+' || c == '-' || c == '.';
+    }
+
+
+    private static boolean isAbsoluteURI(String path) {
+        // Special case as only a single /
+        if (path.startsWith("file:/")) {
+            return true;
+        }
+
+        // Start at the beginning of the path and skip over any valid protocol
+        // characters
+        int i = 0;
+        while (i < path.length() && isSchemeChar(path.charAt(i))) {
+            i++;
+        }
+        // Need at least one protocol character. False positives with Windows
+        // drives such as C:/... will be caught by the later test for "://"
+        if (i == 0) {
+            return false;
+        }
+        // path starts with something that might be a protocol. Look for a
+        // following "://"
+        return i + 2 < path.length() && path.charAt(i++) == ':' && path.charAt(i++) == '/' && path.charAt(i) == '/';
     }
 
 
