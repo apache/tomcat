@@ -46,7 +46,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
         StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
             if (log.isTraceEnabled()) {
-                log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
+                log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
             }
             // Note: The elements go directly inside another one without any specific parent
             storeChildren(aWriter, indent, aElement, elementDesc);

@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -232,7 +233,6 @@ public class StandardContextSF extends StoreFactoryBase {
             Realm realm = context.getRealm();
             if (realm != null) {
                 Realm parentRealm = null;
-                // @TODO is this case possible?
                 if (context.getParent() != null) {
                     parentRealm = context.getParent().getRealm();
                 }
@@ -326,8 +326,17 @@ public class StandardContextSF extends StoreFactoryBase {
                 new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/context.xml").getCanonicalPath();
         String confWeb = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/web.xml").getCanonicalPath();
         String confHostDefault = new File(configBase, "context.xml.default").getCanonicalPath();
-        String configFile =
-                (context.getConfigFile() != null ? new File(context.getConfigFile().toURI()).getCanonicalPath() : null);
+        String configFile = null;
+        if (context.getConfigFile() != null) {
+            try {
+                configFile = new File(context.getConfigFile().toURI()).getCanonicalPath();
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                // Non-file scheme URL (e.g., jar:), skip configFile comparison
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("standardContextSF.nonFileConfigUrl", context.getConfigFile()), e);
+                }
+            }
+        }
         String webxml = "WEB-INF/web.xml";
         String tomcatwebxml = "WEB-INF/tomcat-web.xml";
 
