@@ -17,11 +17,11 @@
 package org.apache.catalina.valves.rewrite;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -173,7 +173,8 @@ public class RewriteValve extends ValveBase {
             String webInfResourcePath = "/WEB-INF/" + resourcePath;
             is = ((Context) getContainer()).getServletContext().getResourceAsStream(webInfResourcePath);
             if (is == null) {
-                if (containerLog.isInfoEnabled()) {
+                // Don't log if the rules have been set directly via setConfiguration()
+                if (containerLog.isInfoEnabled() && rules == null) {
                     containerLog.info(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
                 }
             } else {
@@ -186,6 +187,13 @@ public class RewriteValve extends ValveBase {
             try {
                 ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
+            } catch (FileNotFoundException fnfe) {
+                // Don't log if the rules have been set directly via setConfiguration()
+                if (rules == null) {
+                    if (containerLog.isInfoEnabled()) {
+                        containerLog.info(sm.getString("rewriteValve.noConfiguration", resourceName), fnfe);
+                    }
+                }
             } catch (IOException ioe) {
                 if (containerLog.isInfoEnabled()) {
                     containerLog.info(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
@@ -584,7 +592,7 @@ public class RewriteValve extends ValveBase {
                     chunk.append(REWRITE_DEFAULT_ENCODER.encode(urlStringRewriteEncoded, uriCharset));
                     // Rewriting may have denormalized the URL and added encoded characters
                     // Decode then normalize
-                    String urlStringRewriteDecoded = URLDecoder.decode(urlStringRewriteEncoded, uriCharset);
+                    String urlStringRewriteDecoded = UDecoder.URLDecode(urlStringRewriteEncoded, uriCharset);
                     urlStringRewriteDecoded = RequestUtil.normalize(urlStringRewriteDecoded);
                     if (urlStringRewriteDecoded == null) {
                         // Assume bad input caused the re-write to try and escape root
