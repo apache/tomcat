@@ -82,8 +82,6 @@ public class StoreDescription {
 
     private IStoreFactory storeFactory;
 
-    private String storeWriterClass;
-
     private boolean children = false;
 
     private List<String> transientAttributes;
@@ -219,28 +217,6 @@ public class StoreDescription {
     }
 
     /**
-     * Returns the fully qualified class name of the StoreWriter implementation.
-     *
-     * @return the StoreWriter class name
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public String getStoreWriterClass() {
-        return storeWriterClass;
-    }
-
-    /**
-     * Sets the fully qualified class name of the StoreWriter implementation.
-     *
-     * @param storeWriterClass the StoreWriter class name
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public void setStoreWriterClass(String storeWriterClass) {
-        this.storeWriterClass = storeWriterClass;
-    }
-
-    /**
      * Returns the XML tag name for this description.
      *
      * @return the XML tag name
@@ -277,28 +253,6 @@ public class StoreDescription {
     }
 
     /**
-     * Returns the list of attribute names that should not be persisted.
-     *
-     * @return the list of transient attribute names
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public List<String> getTransientAttributes() {
-        return transientAttributes;
-    }
-
-    /**
-     * Sets the list of attribute names that should not be persisted.
-     *
-     * @param transientAttributes the list of transient attribute names
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public void setTransientAttributes(List<String> transientAttributes) {
-        this.transientAttributes = transientAttributes;
-    }
-
-    /**
      * Adds an attribute name to the list of transient attributes that should not be persisted.
      *
      * @param attribute the attribute name to add
@@ -319,28 +273,6 @@ public class StoreDescription {
         if (transientAttributes != null) {
             transientAttributes.remove(attribute);
         }
-    }
-
-    /**
-     * Returns the list of child class names that should not be persisted.
-     *
-     * @return the list of transient child class names
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public List<String> getTransientChildren() {
-        return transientChildren;
-    }
-
-    /**
-     * Sets the list of child class names that should not be persisted.
-     *
-     * @param transientChildren the list of transient child class names
-     * @deprecated Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public void setTransientChildren(List<String> transientChildren) {
-        this.transientChildren = transientChildren;
     }
 
     /**
