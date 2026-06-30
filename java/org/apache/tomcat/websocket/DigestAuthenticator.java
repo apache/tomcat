@@ -63,6 +63,9 @@ public class DigestAuthenticator extends Authenticator {
 
         String nonce = parameterMap.get("nonce");
         String messageQop = parameterMap.get("qop");
+        if (messageQop == null || messageQop.isEmpty()) {
+            throw new AuthenticationException(sm.getString("digestAuthenticator.noQop"));
+        }
         String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
         String opaque = parameterMap.get("opaque");
         if (cnonceGenerator == null) {
@@ -99,11 +102,9 @@ public class DigestAuthenticator extends Authenticator {
             challenge.append("opaque=\"").append(opaque).append("\",");
         }
 
-        if (messageQop != null && !messageQop.isEmpty()) {
-            challenge.append("qop=\"").append(messageQop).append("\"");
-            challenge.append(",cnonce=\"").append(cNonce).append("\",");
-            challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
-        }
+        challenge.append("qop=\"").append(messageQop).append("\"");
+        challenge.append(",cnonce=\"").append(cNonce).append("\",");
+        challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
 
         return challenge.toString();
 
