@@ -484,7 +484,7 @@ public class JspCompilationContext {
                     uc.getInputStream().close();
                 } catch (Exception e) {
                     if (log.isDebugEnabled()) {
-                        log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
+                        log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), e);
                     }
                 }
             }
