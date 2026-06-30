@@ -45,15 +45,13 @@ public class LoaderSF extends StoreFactoryBase {
             if (elementDesc != null) {
                 if (!isDefaultLoader(loader)) {
                     if (log.isTraceEnabled()) {
-                        log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
+                        log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
                     }
                     getStoreAppender().printIndent(aWriter, indent + 2);
                     getStoreAppender().printTag(aWriter, indent + 2, loader, elementDesc);
                 }
             } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-                }
+                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
             }
         } else {
             super.store(aWriter, indent, aElement);

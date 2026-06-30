@@ -36,9 +36,27 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SocketProperties;
 
 /**
- * Store the Connector attributes. Connector has really special design. A Connector is only a startup Wrapper for a
- * ProtocolHandler. This meant that ProtocolHandler get all there attributes from the Connector attribute map. Strange
- * is that some attributes change their name and the attribute sslProtocol need a special handling
+ * Specialized {@link StoreAppender} for persisting
+ * {@link org.apache.catalina.connector.Connector} instances to XML configuration.
+ * <p>
+ * A {@code Connector} acts as a wrapper around a {@link org.apache.coyote.ProtocolHandler},
+ * meaning configuration attributes are spread across both objects. This appender
+ * collects properties from the Connector, its ProtocolHandler, and its
+ * {@link org.apache.tomcat.util.net.SocketProperties}, applying the following
+ * transformations during persistence:
+ * </p>
+ * <ul>
+ * <li>Maps certain attribute names to their XML equivalents (e.g., {@code timeout} to
+ * {@code connectionUploadTimeout})</li>
+ * <li>Filters internal executor attributes when an external executor is configured</li>
+ * <li>Prefixes socket properties with {@code socket.}</li>
+ * <li>Suppresses default values by comparing against a freshly created Connector</li>
+ * <li>Handles special cases such as {@code jkHome} and catalina.base path resolution</li>
+ * </ul>
+ *
+ * @see org.apache.catalina.connector.Connector
+ * @see org.apache.coyote.ProtocolHandler
+ * @see StoreAppender
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
@@ -153,6 +171,8 @@ public class ConnectorStoreAppender extends StoreAppender {
         // Add the properties of the protocol handler
         if (protocolHandler != null) {
             descriptors = Introspector.getBeanInfo(protocolHandler.getClass()).getPropertyDescriptors();
+        } else {
+            descriptors = null;
         }
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
@@ -294,6 +314,9 @@ public class ConnectorStoreAppender extends StoreAppender {
     protected File getJkHomeBase(String jkHome, File appBase) {
 
         File jkHomeBase;
+        if (jkHome == null) {
+            return null;
+        }
         File file = new File(jkHome);
         if (!file.isAbsolute()) {
             file = new File(appBase, jkHome);

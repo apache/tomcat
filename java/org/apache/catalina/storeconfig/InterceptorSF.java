@@ -71,7 +71,7 @@ public class InterceptorSF extends StoreFactoryBase {
         if (aInterceptor instanceof StaticMembershipInterceptor) {
             ChannelInterceptor interceptor = (ChannelInterceptor) aInterceptor;
             // Store nested <Member> elements
-            storeElementArray(aWriter, indent + 2, interceptor.getMembers());
+            storeElementArray(aWriter, indent, interceptor.getMembers());
         }
     }
 }
