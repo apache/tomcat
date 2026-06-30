@@ -245,17 +245,15 @@ public class FileMessageFactory {
         lastModified = System.currentTimeMillis();
 
         FileMessage next;
-        synchronized (this) {
-            if (!isWriting) {
-                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
-                if (next != null) {
-                    isWriting = true;
-                } else {
-                    return false;
-                }
+        if (!isWriting) {
+            next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+            if (next != null) {
+                isWriting = true;
             } else {
                 return false;
             }
+        } else {
+            return false;
         }
 
         while (next != null) {
@@ -267,11 +265,9 @@ public class FileMessageFactory {
                 cleanup();
                 return true;
             }
-            synchronized (this) {
-                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
-                if (next == null) {
-                    isWriting = false;
-                }
+            next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+            if (next == null) {
+                isWriting = false;
             }
         }
 
