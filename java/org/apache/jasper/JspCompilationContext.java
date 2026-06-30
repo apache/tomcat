@@ -481,11 +481,10 @@ public class JspCompilationContext {
             if (uc != null) {
                 try {
                     uc.getInputStream().close();
-                } catch (IOException ioe) {
+                } catch (Exception e) {
                     if (log.isDebugEnabled()) {
                         log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
                     }
-                    result = -1;
                 }
             }
         }
