@@ -69,7 +69,7 @@ public class InterceptorSF extends StoreFactoryBase {
             throws Exception {
         if (aInterceptor instanceof StaticMembershipInterceptor interceptor) {
             // Store nested <Member> elements
-            storeElementArray(aWriter, indent + 2, interceptor.getMembers());
+            storeElementArray(aWriter, indent, interceptor.getMembers());
         }
     }
 }
