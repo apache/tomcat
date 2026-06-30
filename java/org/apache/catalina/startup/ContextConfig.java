@@ -1704,24 +1704,44 @@ public class ContextConfig implements LifecycleListener {
         long hostTimeStamp = 0;
 
         if (globalWebXml != null) {
+            URLConnection uc = null;
             try {
                 URI uri = new URI(globalWebXml.getSystemId());
                 URL url = uri.toURL();
-                URLConnection uc = url.openConnection();
+                uc = url.openConnection();
                 globalTimeStamp = uc.getLastModified();
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 globalTimeStamp = -1;
+            } finally {
+                if (uc != null) {
+                    try {
+                        uc.getInputStream().close();
+                    } catch (IOException ioe) {
+                        ExceptionUtils.handleThrowable(ioe);
+                        globalTimeStamp = -1;
+                    }
+                }
             }
         }
 
         if (hostWebXml != null) {
+            URLConnection uc = null;
             try {
                 URI uri = new URI(hostWebXml.getSystemId());
                 URL url = uri.toURL();
-                URLConnection uc = url.openConnection();
+                uc = url.openConnection();
                 hostTimeStamp = uc.getLastModified();
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 hostTimeStamp = -1;
+            } finally {
+                if (uc != null) {
+                    try {
+                        uc.getInputStream().close();
+                    } catch (IOException ioe) {
+                        ExceptionUtils.handleThrowable(ioe);
+                        hostTimeStamp = -1;
+                    }
+                }
             }
         }
 
