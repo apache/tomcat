@@ -47,7 +47,7 @@ public class StoreFactoryBase implements IStoreFactory {
     /**
      * The descriptive information string for this implementation.
      */
-    private static final String info = "org.apache.catalina.config.StoreFactoryBase/1.0";
+    private static final String info = "org.apache.catalina.storeconfig.StoreFactoryBase/1.0";
 
     /**
      * Returns descriptive information about this Factory implementation and the corresponding version number, in the

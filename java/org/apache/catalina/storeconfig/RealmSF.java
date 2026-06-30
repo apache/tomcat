@@ -53,9 +53,7 @@ public class RealmSF extends StoreFactoryBase {
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-                }
+                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
             }
         } else {
             super.store(aWriter, indent, aElement);

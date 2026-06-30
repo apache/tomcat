@@ -174,7 +174,7 @@ public class StoreAppender {
      * @param indent  Indentation level
      * @param include Should we include a <code>className</code> attribute?
      * @param bean    Bean whose properties are to be rendered as attributes,
-     * @param desc    RegistryDescriptor from this bean
+     * @param desc    Store description from this bean
      *
      * @exception Exception if an exception occurs while storing
      */
@@ -222,7 +222,7 @@ public class StoreAppender {
     /**
      * Check if the attribute should be printed.
      *
-     * @param desc          RegistryDescriptor from this bean
+     * @param desc          Store description from this bean
      * @param descriptor    PropertyDescriptor from this bean property
      * @param attributeName The attribute name to store
      * @param bean          The current bean
@@ -260,7 +260,7 @@ public class StoreAppender {
      * @param writer        PrintWriter to which we are storing
      * @param indent        Indentation level
      * @param bean          The current bean
-     * @param desc          RegistryDescriptor from this bean
+     * @param desc          Store description from this bean
      * @param attributeName The attribute name to store
      * @param bean2         A default instance of the bean for comparison
      * @param value         The attribute value
@@ -278,7 +278,7 @@ public class StoreAppender {
      * @param bean     original bean
      * @param bean2    default bean
      * @param attrName attribute name
-     * @param desc     StoreDescription from bean
+     * @param desc     Store description from this bean
      *
      * @return <code>true</code> if the value should be stored
      */

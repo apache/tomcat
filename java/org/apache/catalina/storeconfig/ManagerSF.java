@@ -18,9 +18,12 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.util.SessionIdGeneratorBase;
+import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -52,9 +55,7 @@ public class ManagerSF extends StoreFactoryBase {
                 super.store(aWriter, indent, aElement);
             }
         } else {
-            if (log.isWarnEnabled()) {
-                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-            }
+            log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
         }
     }
 
@@ -67,7 +68,74 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        return smanager.getPathname() == null && (smanager.getMaxActiveSessions() == -1);
+        // StandardManager-specific property
+        if (smanager.getPathname() != null) {
+            return false;
+        }
+
+        // ManagerBase properties
+        if (smanager.getMaxActiveSessions() != -1) {
+            return false;
+        }
+        if (smanager.getSecureRandomClass() != null) {
+            return false;
+        }
+        if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(smanager.getSecureRandomAlgorithm())) {
+            return false;
+        }
+        if (smanager.getSecureRandomProvider() != null) {
+            return false;
+        }
+        if (smanager.getProcessExpiresFrequency() != 6) {
+            return false;
+        }
+        if (smanager.getSessionAttributeNameFilter() != null) {
+            return false;
+        }
+        if (smanager.getSessionAttributeValueClassNameFilter() != null) {
+            return false;
+        }
+        if (smanager.getWarnOnSessionAttributeFilterFailure()) {
+            return false;
+        }
+        if (smanager.getNotifyBindingListenerOnUnchangedValue()) {
+            return false;
+        }
+        if (!smanager.getNotifyAttributeListenerOnUnchangedValue()) {
+            return false;
+        }
+        if (smanager.getPersistAuthentication()) {
+            return false;
+        }
+        if (smanager.getSessionActivityCheck() != Globals.STRICT_SERVLET_COMPLIANCE) {
+            return false;
+        }
+        if (smanager.getSessionLastAccessAtStart() != Globals.STRICT_SERVLET_COMPLIANCE) {
+            return false;
+        }
+        SessionIdGenerator sessionIdGenerator = smanager.getSessionIdGenerator();
+        SessionIdGeneratorBase sigBase = null;
+        if (sessionIdGenerator == null || !StandardSessionIdGenerator.class.isInstance(sessionIdGenerator)) {
+            return false;
+        }
+        sigBase = (SessionIdGeneratorBase) sessionIdGenerator;
+        if (!"".equals(sigBase.getJvmRoute())) {
+            return false;
+        }
+        if (sigBase.getSecureRandomClass() != null) {
+            return false;
+        }
+        if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(sigBase.getSecureRandomAlgorithm())) {
+            return false;
+        }
+        if (sigBase.getSecureRandomProvider() != null) {
+            return false;
+        }
+        if (sigBase.getSessionIdLength() != 16) {
+            return false;
+        }
+
+        return true;
 
     }
 
