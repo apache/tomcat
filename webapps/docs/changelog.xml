@@ -148,6 +148,10 @@
       <fix>
         Various edge cases for SSI substitutions, quoting and escaping. (remm)
       </fix>
+      <fix>
+        Fix unintentional conversion of literal <code>+</code> to a space during
+        rule processing in the <code>RewriteValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
