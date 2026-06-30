@@ -605,6 +605,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      *
      * @throws IOException IO error finding session
      */
+    @SuppressWarnings("null") // ctx can't be null
     protected void createPrimaryIndicator(Request request) throws IOException {
         String id = request.getRequestedSessionId();
         if ((id != null) && (!id.isEmpty())) {
@@ -618,16 +619,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             }
             if (session instanceof ClusterSession cses) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.session.indicator",
-                            ctx == null ? "null Context" : ctx.getPath(), id, primaryIndicatorName,
+                    log.debug(sm.getString("ReplicationValve.session.indicator", ctx.getPath(), id, primaryIndicatorName,
                             Boolean.valueOf(cses.isPrimarySession())));
                 }
                 request.setAttribute(primaryIndicatorName, cses.isPrimarySession() ? Boolean.TRUE : Boolean.FALSE);
             } else {
                 if (log.isDebugEnabled()) {
                     if (session != null) {
-                        log.debug(sm.getString("ReplicationValve.session.found",
-                                ctx == null ? "null Context" : ctx.getPath(), id));
+                        log.debug(sm.getString("ReplicationValve.session.found", ctx.getPath(), id));
                     } else {
                         log.debug(sm.getString("ReplicationValve.session.invalid",
                                 ctx == null ? "null Context" : ctx.getPath(), id));
