@@ -26,8 +26,13 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class SecurityClassLoad {
 
-    public static void securityClassLoad(ClassLoader loader) throws Exception {
-        securityClassLoad(loader, true);
+    public static void securityClassLoad(ClassLoader loader) {
+        try {
+            securityClassLoad(loader, true);
+        } catch (Exception ex) {
+            Log log = LogFactory.getLog(SecurityClassLoad.class);
+            log.error(Localizer.getMessage("jsp.error.securityPreload"), ex);
+        }
     }
 
 
@@ -38,31 +43,26 @@ public final class SecurityClassLoad {
         }
 
         final String basePackage = "org.apache.jasper.";
-        try {
-            // Ensure XMLInputFactory is loaded with Tomcat's class loader
-            loader.loadClass(basePackage + "compiler.EncodingDetector");
+        // Ensure XMLInputFactory is loaded with Tomcat's class loader
+        loader.loadClass(basePackage + "compiler.EncodingDetector");
 
-            loader.loadClass(basePackage + "runtime.JspContextWrapper");
-            loader.loadClass(basePackage + "runtime.JspFactoryImpl$PrivilegedGetPageContext");
-            loader.loadClass(basePackage + "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
-            loader.loadClass(basePackage + "runtime.JspFragmentHelper");
+        loader.loadClass(basePackage + "runtime.JspContextWrapper");
+        loader.loadClass(basePackage + "runtime.JspFactoryImpl$PrivilegedGetPageContext");
+        loader.loadClass(basePackage + "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
+        loader.loadClass(basePackage + "runtime.JspFragmentHelper");
 
-            Class<?> clazz = loader.loadClass(basePackage + "runtime.JspRuntimeLibrary");
-            clazz.getConstructor().newInstance();
+        Class<?> clazz = loader.loadClass(basePackage + "runtime.JspRuntimeLibrary");
+        clazz.getConstructor().newInstance();
 
-            loader.loadClass(basePackage + "runtime.PageContextImpl");
+        loader.loadClass(basePackage + "runtime.PageContextImpl");
 
-            loader.loadClass(basePackage + "runtime.ProtectedFunctionMapper");
-            loader.loadClass(basePackage + "runtime.ServletResponseWrapperInclude");
-            loader.loadClass(basePackage + "runtime.TagHandlerPool");
+        loader.loadClass(basePackage + "runtime.ProtectedFunctionMapper");
+        loader.loadClass(basePackage + "runtime.ServletResponseWrapperInclude");
+        loader.loadClass(basePackage + "runtime.TagHandlerPool");
 
-            // Trigger loading of class and reading of property
-            SecurityUtil.isPackageProtectionEnabled();
+        // Trigger loading of class and reading of property
+        SecurityUtil.isPackageProtectionEnabled();
 
-            loader.loadClass(basePackage + "servlet.JspServletWrapper");
-        } catch (Exception ex) {
-            Log log = LogFactory.getLog(SecurityClassLoad.class);
-            log.error(Localizer.getMessage("jsp.error.securityPreload"), ex);
-        }
+        loader.loadClass(basePackage + "servlet.JspServletWrapper");
     }
 }
