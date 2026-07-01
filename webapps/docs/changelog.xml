@@ -188,6 +188,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to the Eclipse JDT compiler 4.40. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.23 (markt)" rtext="2026-06-22">
   <subsection name="Catalina">
