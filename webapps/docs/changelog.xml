@@ -455,6 +455,9 @@
       <update>
         Update UnboundID to 7.0.5. (markt)
       </update>
+      <update>
+        Update JaCoCo to 0.8.15. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
