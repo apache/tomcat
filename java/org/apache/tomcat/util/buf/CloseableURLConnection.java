@@ -22,6 +22,9 @@ import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Permission;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -81,7 +84,8 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
 
 
     /**
-     * Returns the wrapped URLConnection.
+     * Returns the wrapped URLConnection. Some subclasses can have additional
+     * methods, in which case the wrapped URLConnection needs to be accessed.
      *
      * @return the wrapped URLConnection
      */
@@ -131,13 +135,14 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
         if (trackedStream != null) {
             try {
                 trackedStream.close();
-            } catch (IOException e) {
-                // Ignore
+            } catch (Exception e) {
+                ExceptionUtils.handleThrowable(e);
             }
         } else if (connection instanceof JarURLConnection) {
             try (@SuppressWarnings("unused")
-            InputStream is = connection.getInputStream()) {
-                // Open and immediately close to release the JarFile
+                java.util.jar.JarFile jarFile = ((JarURLConnection) connection).getJarFile()) {
+                // Explicitly close the JarFile to release its native resources.
+                // As setUseCaches(false) is set, this should not cause side effects on other streams.
             } catch (Exception e) {
                 ExceptionUtils.handleThrowable(e);
             }
@@ -146,6 +151,7 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
         if (connection instanceof HttpURLConnection) {
             ((HttpURLConnection) connection).disconnect();
         }
+
     }
 
 
@@ -190,6 +196,199 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
     @Override
     public String getHeaderField(String name) {
         return connection.getHeaderField(name);
+    }
+
+
+    @Override
+    public URL getURL() {
+        return connection.getURL();
+    }
+
+
+    @Override
+    public String getContentEncoding() {
+        return connection.getContentEncoding();
+    }
+
+
+    @Override
+    public long getExpiration() {
+        return connection.getExpiration();
+    }
+
+
+    @Override
+    public long getDate() {
+        return connection.getDate();
+    }
+
+
+    @Override
+    public Map<String, List<String>> getHeaderFields() {
+        return connection.getHeaderFields();
+    }
+
+
+    @Override
+    public int getHeaderFieldInt(String name, int defaultValue) {
+        return connection.getHeaderFieldInt(name, defaultValue);
+    }
+
+
+    @Override
+    public long getHeaderFieldLong(String name, long defaultValue) {
+        return connection.getHeaderFieldLong(name, defaultValue);
+    }
+
+
+    @Override
+    public long getHeaderFieldDate(String name, long defaultValue) {
+        return connection.getHeaderFieldDate(name, defaultValue);
+    }
+
+
+    @Override
+    public String getHeaderFieldKey(int n) {
+        return connection.getHeaderFieldKey(n);
+    }
+
+
+    @Override
+    public String getHeaderField(int n) {
+        return connection.getHeaderField(n);
+    }
+
+
+    @Override
+    public Object getContent() throws IOException {
+        return connection.getContent();
+    }
+
+
+    @Override
+    public Object getContent(Class<?>[] classes) throws IOException {
+        return connection.getContent(classes);
+    }
+
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public Permission getPermission() throws IOException {
+        return connection.getPermission();
+    }
+
+
+    @Override
+    public String toString() {
+        return connection.toString();
+    }
+
+
+    @Override
+    public void setDoInput(boolean doinput) {
+        connection.setDoInput(doinput);
+    }
+
+
+    @Override
+    public boolean getDoInput() {
+        return connection.getDoInput();
+    }
+
+
+    @Override
+    public void setDoOutput(boolean dooutput) {
+        connection.setDoOutput(dooutput);
+    }
+
+
+    @Override
+    public boolean getDoOutput() {
+        return connection.getDoOutput();
+    }
+
+
+    @Override
+    public void setAllowUserInteraction(boolean allowuserinteraction) {
+        connection.setAllowUserInteraction(allowuserinteraction);
+    }
+
+
+    @Override
+    public boolean getAllowUserInteraction() {
+        return connection.getAllowUserInteraction();
+    }
+
+
+    @Override
+    public void setUseCaches(boolean usecaches) {
+        connection.setUseCaches(usecaches);
+    }
+
+
+    @Override
+    public boolean getUseCaches() {
+        return connection.getUseCaches();
+    }
+
+
+    @Override
+    public void setIfModifiedSince(long ifmodifiedsince) {
+        connection.setIfModifiedSince(ifmodifiedsince);
+    }
+
+
+    @Override
+    public long getIfModifiedSince() {
+        return connection.getIfModifiedSince();
+    }
+
+
+    @Override
+    public boolean getDefaultUseCaches() {
+        return connection.getDefaultUseCaches();
+    }
+
+
+    @Override
+    public void setDefaultUseCaches(boolean defaultusecaches) {
+        connection.setDefaultUseCaches(defaultusecaches);
+    }
+
+
+    @Override
+    public void setRequestProperty(String key, String value) {
+        connection.setRequestProperty(key, value);
+    }
+
+
+    @Override
+    public void addRequestProperty(String key, String value) {
+        connection.addRequestProperty(key, value);
+    }
+
+
+    @Override
+    public String getRequestProperty(String key) {
+        return connection.getRequestProperty(key);
+    }
+
+
+    @Override
+    public Map<String, List<String>> getRequestProperties() {
+        return connection.getRequestProperties();
+    }
+
+
+    @Override
+    public int hashCode() {
+        return connection.hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return connection.equals(obj);
     }
 
 }
