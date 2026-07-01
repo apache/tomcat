@@ -172,6 +172,13 @@
         <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags
         from being re-used if such an exception occurs. (markt)
       </fix>
+      <add>
+        Add support for specifying Java 28 (with the value <code>28</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will be used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
