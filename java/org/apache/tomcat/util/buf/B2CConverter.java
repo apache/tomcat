@@ -287,10 +287,20 @@ public class B2CConverter {
         }
         // Do the decoding and get the results into the byte chunk and the char
         // chunk
+        int bbStart = bb.position();
         result = decoder.decode(bb, cb, endOfInput);
         if (result.isError()) {
             result.throwException();
-        } else if (result.isOverflow() || result.isUnderflow()) {
+        } else if (result.isOverflow()) {
+            // Propagate current positions to the byte chunk and char chunk
+            bc.position(bb.position());
+            cc.limit(cb.position());
+            if (bb.position() == bbStart && bc.remaining() > 0 && bc.remaining() <= leftovers.array().length) {
+                leftovers.limit(leftovers.array().length);
+                leftovers.position(bc.remaining());
+                bc.get(leftovers.array(), 0, bc.remaining());
+            }
+        } else if (result.isUnderflow()) {
             // Propagate current positions to the byte chunk and char chunk
             bc.position(bb.position());
             cc.limit(cb.position());

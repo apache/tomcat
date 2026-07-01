@@ -161,6 +161,10 @@
         not available when the connector is explicitly configured to use Tomcat
         Native with OpenSSL for TLS. (markt)
       </fix>
+      <fix>
+        Correct a regression introduced in 9.0.119 that broke reading of some
+        request bodies via a Reader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
