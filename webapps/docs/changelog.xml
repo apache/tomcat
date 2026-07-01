@@ -458,6 +458,9 @@
       <update>
         Update JaCoCo to 0.8.15. (markt)
       </update>
+      <update>
+        Update BND to 7.3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
