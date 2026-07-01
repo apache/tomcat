@@ -439,6 +439,9 @@
         Update Checkstyle to 13.4.2. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update to the Eclipse JDT compiler 4.40. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
