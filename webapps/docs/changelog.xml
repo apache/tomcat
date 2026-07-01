@@ -207,6 +207,9 @@
       <update>
         Update Byte Buddy to 1.18.9. (markt)
       </update>
+      <update>
+        Update UnboundID to 7.0.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
