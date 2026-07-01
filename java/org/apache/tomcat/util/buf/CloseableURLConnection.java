@@ -135,7 +135,8 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
                 // Ignore
             }
         } else if (connection instanceof JarURLConnection) {
-            try (InputStream is = connection.getInputStream()) {
+            try (@SuppressWarnings("unused")
+            InputStream is = connection.getInputStream()) {
                 // Open and immediately close to release the JarFile
             } catch (Exception e) {
                 ExceptionUtils.handleThrowable(e);
