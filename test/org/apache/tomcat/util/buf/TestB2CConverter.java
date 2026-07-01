@@ -22,6 +22,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.junit.Assert;
@@ -218,6 +219,23 @@ public class TestB2CConverter {
         cb.limit(1);
         conv.convert(bb, cb, ib, false);
         assertCharBufferEquals("A\u2328", cb);
+    }
+
+
+    @Test
+    public void testOverflowWithLargeReadBuffer() throws Exception {
+        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
+        byte[] bytes = new byte[10500];
+        Arrays.fill(bytes, (byte) '0');
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        CharBuffer cb = newCharBuffer(InputBuffer.DEFAULT_BUFFER_SIZE);
+        TesterInputBuffer ib = new TesterInputBuffer(bb);
+
+        conv.convert(bb, cb, ib, false);
+
+        Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, cb.remaining());
+        Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, bb.position());
+        Assert.assertEquals(bytes.length - InputBuffer.DEFAULT_BUFFER_SIZE, bb.remaining());
     }
 
 
