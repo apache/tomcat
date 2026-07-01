@@ -443,7 +443,7 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
     @Test
-    public void testGetBrokenContextPerAddWepapp() {
+    public void testGetBrokenContextPerAddWebapp() {
         Tomcat tomcat = getTomcatInstance();
         Host host = tomcat.getHost();
         if (host instanceof StandardHost) {
