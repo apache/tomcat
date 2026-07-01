@@ -443,7 +443,7 @@
         to make it easier to see when it's not used by the suite. (csutherl)
       </add>
       <update>
-        Update Checkstyle to 13.4.2. (markt)
+        Update Checkstyle to 13.7.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
