@@ -79,6 +79,29 @@ public class TestInputBuffer extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testLargeReadBufSize() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "Echo", new Utf8Echo());
+        root.addServletMappingDecoded("/test", "Echo");
+
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "10500"));
+
+        tomcat.start();
+
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "10500"));
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        byte[] requestBody = new byte[95000];
+        Arrays.fill(requestBody, (byte) '0');
+        int rc = postUrl(requestBody, "http://localhost:" + getPort() + "/test", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(requestBody.length, bc.getLength());
+    }
+
+
     private void doUtf8BodyTest(String description, int[] input, String expected) throws Exception {
 
         byte[] bytes = new byte[input.length];
