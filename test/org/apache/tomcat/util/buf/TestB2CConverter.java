@@ -224,18 +224,21 @@ public class TestB2CConverter {
 
     @Test
     public void testOverflowWithLargeReadBuffer() throws Exception {
-        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
-        byte[] bytes = new byte[10500];
-        Arrays.fill(bytes, (byte) '0');
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
-        CharBuffer cb = newCharBuffer(InputBuffer.DEFAULT_BUFFER_SIZE);
-        TesterInputBuffer ib = new TesterInputBuffer(bb);
+        // Test range of input sizes from default (8kB) to 12kB.
+        for (int i = 0; i < 4096; i++) {
+            B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
+            byte[] bytes = new byte[8192 + i];
+            Arrays.fill(bytes, (byte) '0');
+            ByteBuffer bb = ByteBuffer.wrap(bytes);
+            CharBuffer cb = newCharBuffer(InputBuffer.DEFAULT_BUFFER_SIZE);
+            TesterInputBuffer ib = new TesterInputBuffer(bb);
 
-        conv.convert(bb, cb, ib, false);
+            conv.convert(bb, cb, ib, false);
 
-        Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, cb.remaining());
-        Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, bb.position());
-        Assert.assertEquals(bytes.length - InputBuffer.DEFAULT_BUFFER_SIZE, bb.remaining());
+            Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, cb.remaining());
+            Assert.assertEquals(InputBuffer.DEFAULT_BUFFER_SIZE, bb.position());
+            Assert.assertEquals(bytes.length - InputBuffer.DEFAULT_BUFFER_SIZE, bb.remaining());
+        }
     }
 
 
