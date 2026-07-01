@@ -146,6 +146,14 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
             } catch (Exception e) {
                 ExceptionUtils.handleThrowable(e);
             }
+        } else if (!(connection instanceof HttpURLConnection)) {
+            // Other cases like FileURLConnection could have used a stream as a side effect,
+            // possibly causing file locking.
+            try (@SuppressWarnings("unused") InputStream is = connection.getInputStream()) {
+                // Explicitly close the InputStream to release its native resources.
+            } catch (Exception e) {
+                ExceptionUtils.handleThrowable(e);
+            }
         }
 
         if (connection instanceof HttpURLConnection) {
