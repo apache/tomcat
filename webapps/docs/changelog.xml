@@ -200,6 +200,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.40. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.18.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
