@@ -280,9 +280,16 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
 
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public Permission getPermission() throws IOException {
-        return connection.getPermission();
+        /*
+         * This method is deprecated for removal in Java 25. If it isn't overridden the superclass will return {@code
+         * java.security.AllPermission} which would be acceptable but, for consistency, it is better to oveerride the
+         * method. Calling {@code getPermission()} on the wrapped connection would work until the method is removed.
+         * Throwing {@code UnsupportedOperationException} works now since Tomcat never calls the method and will
+         * continue to work once the method is removed.
+         */
+        throw new UnsupportedOperationException();
     }
 
 
