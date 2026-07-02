@@ -34,26 +34,49 @@
 
 <section name="Introduction">
   <p>
-  Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
-  This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
+    Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
+    This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
+  </p>
+</section>
+
+<section name="Ordering">
+  <p>
+    The order of interceptors is important. The order in which the interceptors are defined in server.xml is the order
+    in which the interceptors appear in the channel stack. Think of it as a linked list, with the head being the first
+    most interceptor and the tail the last.
+  </p>
+  <p>
+    When sending a message, the message will pass through the interceptors in order (i.e. the order they are defined in
+    server.xml). When receiving a message, the messages will pass through the interceptors in reverse order.
   </p>
 </section>
 
 <section name="Available Interceptors">
+  <p>
+    Tribes has been designed as a general clustering solutiuon. Not all interceptors are expected to be of use
+    in Tomcat cluster configurations. The interceptors expected to be of use in Tomcat clusters are described in
+    more detail in the following sections. They are:
+   </p>
    <ul>
-    <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.EncryptInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
+   </ul>
+   <p>
+    The interceptors not expected to be of use in Tomcat clusters are described in the Javadoc for each interceptor.
+    They are:
+   </p>
+   <ul>
     <li><code>org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.OrderInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.SimpleCoordinator</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.TwoPhaseCommitInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.EncryptInterceptor</code></li>
    </ul>
 </section>
 
@@ -199,7 +222,10 @@
   <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
    <p>
      The EncryptInterceptor adds encryption to the channel messages carrying
-     session data between nodes.
+     session data between nodes. For the EncryptInterceptor to be effective it
+     <strong>MUST</strong> be the final interceptor (ignoring the
+     TcpFailureDetector - see below) in the set of interceptors for any given
+     channel.
    </p>
    <p>
      If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>
