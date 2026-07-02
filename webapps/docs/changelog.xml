@@ -461,6 +461,9 @@
       <update>
         Update BND to 7.3.0. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
