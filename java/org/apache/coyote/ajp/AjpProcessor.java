@@ -825,7 +825,7 @@ public class AjpProcessor extends AbstractProcessor {
                     requestHeaderMessage.getBytes(tmpMB);
                     if (secret != null && !secret.isEmpty()) {
                         secretPresentInRequest = true;
-                        if (!ConstantTime.equals(tmpMB.getByteChunk(), secret)) {
+                        if (!ConstantTime.equals(secret, tmpMB.getByteChunk())) {
                             response.setStatus(403);
                             setErrorState(ErrorState.CLOSE_CLEAN, null);
                         }
