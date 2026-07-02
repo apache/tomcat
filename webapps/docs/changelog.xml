@@ -461,9 +461,12 @@
       <update>
         Update BND to 7.3.0. (markt)
       </update>
-      <update>
+      <add>
         Improvements to French translations. (remm)
-      </update>
+      </add>
+      <add>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
