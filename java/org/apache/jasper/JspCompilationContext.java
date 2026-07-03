@@ -23,7 +23,6 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.util.Set;
 import java.util.jar.JarEntry;
 
