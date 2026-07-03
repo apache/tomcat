@@ -85,6 +85,7 @@ import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.InputSourceUtil;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
@@ -1694,42 +1695,24 @@ public class ContextConfig implements LifecycleListener {
         long hostTimeStamp = 0;
 
         if (globalWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(globalWebXml.getSystemId());
-                URL url = uri.toURL();
-                uc = url.openConnection();
-                globalTimeStamp = uc.getLastModified();
+                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
+                    globalTimeStamp = uc.getLastModified();
+                }
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 globalTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (Exception e) {
-                        ExceptionUtils.handleThrowable(e);
-                    }
-                }
             }
         }
 
         if (hostWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(hostWebXml.getSystemId());
-                URL url = uri.toURL();
-                uc = url.openConnection();
-                hostTimeStamp = uc.getLastModified();
+                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
+                    hostTimeStamp = uc.getLastModified();
+                }
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 hostTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (Exception e) {
-                        ExceptionUtils.handleThrowable(e);
-                    }
-                }
             }
         }
 

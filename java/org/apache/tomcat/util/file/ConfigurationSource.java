@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.buf.UriUtil;
 
 /**
@@ -128,14 +128,8 @@ public interface ConfigurationSource {
      * @throws IOException if an I/O error occurs while fetching the last modified time
      */
         public long getLastModified() throws MalformedURLException, IOException {
-            URLConnection connection = null;
-            try {
-                connection = uri.toURL().openConnection();
+            try (CloseableURLConnection connection = new CloseableURLConnection(uri.toURL())) {
                 return connection.getLastModified();
-            } finally {
-                if (connection != null) {
-                    connection.getInputStream().close();
-                }
             }
         }
 
