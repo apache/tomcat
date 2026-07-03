@@ -37,8 +37,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
@@ -607,23 +607,12 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
      */
     @Override
     public long getFileLastModified(String path, boolean virtual) throws IOException {
-        long lastModified = 0;
-        URLConnection urlConnection = null;
-        try {
-            urlConnection = getURLConnection(path, virtual);
-            lastModified = urlConnection.getLastModified();
-        } catch (IOException ignore) {
+        try (CloseableURLConnection urlConnection = new CloseableURLConnection(getURLConnection(path, virtual))) {
+            return urlConnection.getLastModified();
+        } catch (IOException e) {
             // Ignore this. It will always fail for non-file based includes
-        } finally {
-            if (urlConnection != null) {
-                try {
-                    urlConnection.getInputStream().close();
-                } catch (Exception e) {
-                    ExceptionUtils.handleThrowable(e);
-                }
-            }
+            return 0L;
         }
-        return lastModified;
     }
 
 
@@ -639,23 +628,12 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
      */
     @Override
     public long getFileSize(String path, boolean virtual) throws IOException {
-        long fileSize = -1;
-        URLConnection urlConnection = null;
-        try {
-            urlConnection = getURLConnection(path, virtual);
-            fileSize = urlConnection.getContentLengthLong();
-        } catch (IOException ignore) {
+        try (CloseableURLConnection urlConnection = new CloseableURLConnection(getURLConnection(path, virtual))) {
+            return urlConnection.getContentLengthLong();
+        } catch (IOException e) {
             // Ignore this. It will always fail for non-file based includes
-        } finally {
-            if (urlConnection != null) {
-                try {
-                    urlConnection.getInputStream().close();
-                } catch (Exception e) {
-                    ExceptionUtils.handleThrowable(e);
-                }
-            }
+            return -1L;
         }
-        return fileSize;
     }
 
 
