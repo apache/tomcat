@@ -274,7 +274,8 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
 
 
     @Override
-    public Object getContent(Class<?>[] classes) throws IOException {
+    @SuppressWarnings("rawtypes")
+    public Object getContent(Class[] classes) throws IOException {
         return connection.getContent(classes);
     }
 
