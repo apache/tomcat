@@ -231,44 +231,6 @@
         Saavedra. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Avoid a race condition with concurrent lookups for a singleton JNDI
-        resource. (markt)
-      </fix>
-      <fix>
-        Improve the performance of range validation for the default servlet.
-        (markt)
-      </fix>
-      <fix>
-        Avoid NPE in RewriteValve. (markt)
-      </fix>
-      <fix>
-        Restore ability to extend many element classes from
-        <code>AbstractAccessLogValve</code>. (remm)
-      </fix>
-      <fix>
-        Align DIGEST authentication with RFC 7616 and require clients to provide
-        a valid <code>qop</code> parameter. (markt)
-      </fix>
-      <fix>
-        Use <code>Files</code> API to create temporary docBase when
-        <code>antiLockingDocBase</code> is enabled. (markt)
-      </fix>
-      <fix>
-        Improve validation of configuration when <code>DataSourceRealm</code>
-        starts. (remm)
-      </fix>
-      <fix>
-        <code>JAASRealm</code> should do a logout if login does not fail outright but
-        does not produce a Principal. (remm)
-      </fix>
-      <fix>
-        Various edge cases for SSI substitutions, quoting and escaping. (remm)
-      </fix>
-      <fix>
-        Fix unintentional conversion of literal <code>+</code> to a space during
-        rule processing in the <code>RewriteValve</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -301,11 +263,10 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Avoid a potential JVM crash if a suitable version of Tomcat Native is
-        not available when the connector is explicitly configured to use Tomcat
-        Native with OpenSSL for TLS. (markt)
-      </fix>
+      <update>
+        Add utility AutoCloseable URLConnection wrapper, and use it to cleanup
+        existing code patterns. (remm/markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -344,20 +305,6 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>70120</bug>: The fix for <bug>69399</bug> (itself a fix for a
-        regression in the fix for <bug>69333</bug>) was incomplete and tags that
-        threw exceptions in <code>doStartTag()</code> and
-        <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags
-        from being re-used if such an exception occurs. (markt)
-      </fix>
-      <add>
-        Add support for specifying Java 28 (with the value <code>28</code>) as
-        the compiler source and/or compiler target for JSP compilation. If used
-        with an Eclipse JDT compiler version that does not support these values,
-        a warning will be logged and the default will be used.
-        (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -398,16 +345,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>70126</bug>: Fix WebSocket extension permessage-deflate so that it
-        does not drop bytes if a compressed message inflates to more than the
-        available buffer. Fix written by GPT-5.5. Test case written by Hironori
-        Ichimiya. (markt)
-      </fix>
-      <fix>
-        Optimise WebSocket client processing of server responses during
-        WebSocket HTTP upgrade process. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -446,27 +383,6 @@
         Update Checkstyle to 13.7.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update to the Eclipse JDT compiler 4.40. (markt)
-      </update>
-      <update>
-        Update Byte Buddy to 1.18.9. (markt)
-      </update>
-      <update>
-        Update UnboundID to 7.0.5. (markt)
-      </update>
-      <update>
-        Update JaCoCo to 0.8.15. (markt)
-      </update>
-      <update>
-        Update BND to 7.3.0. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
