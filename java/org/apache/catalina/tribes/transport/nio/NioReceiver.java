@@ -30,6 +30,8 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.io.ObjectReader;
@@ -55,6 +57,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     private volatile boolean running = false;
 
+    private volatile CompletableFuture<Void> startFuture = CompletableFuture.completedFuture(null);
+
     private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
@@ -78,10 +82,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     @Override
     public void start() throws IOException {
+        CompletableFuture<Void> startFuture = new CompletableFuture<>();
+        this.startFuture = startFuture;
         super.start();
         try {
             setPool(new RxTaskPool(getMaxThreads(), getMinThreads(), this));
         } catch (Exception e) {
+            startFuture.completeExceptionally(e);
             log.fatal(sm.getString("nioReceiver.threadpool.fail"), e);
             if (e instanceof IOException) {
                 throw (IOException) e;
@@ -100,12 +107,29 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             t.setDaemon(true);
             t.start();
         } catch (Exception e) {
+            startFuture.completeExceptionally(e);
             log.fatal(sm.getString("nioReceiver.start.fail"), e);
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else {
                 throw new IOException(e.getMessage());
             }
+        }
+    }
+
+    @Override
+    public void awaitStart() throws IOException {
+        try {
+            startFuture.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            }
+            throw new IOException(cause);
         }
     }
 
@@ -298,19 +322,28 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException IO error
      */
     protected void listen() throws Exception {
-        if (doListen()) {
-            log.warn(sm.getString("nioReceiver.alreadyStarted"));
-            return;
-        }
+        Selector selector;
+        try {
+            if (doListen()) {
+                log.warn(sm.getString("nioReceiver.alreadyStarted"));
+                startFuture.complete(null);
+                return;
+            }
 
-        setListen(true);
+            setListen(true);
 
-        // Avoid NPEs if selector is set to null on stop.
-        Selector selector = this.selector.get();
+            // Avoid NPEs if selector is set to null on stop.
+            selector = this.selector.get();
 
-        if (selector != null && datagramChannel != null) {
-            ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); // max size for a datagram packet
-            registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
+            if (selector != null && datagramChannel != null) {
+                ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); // max size for a datagram packet
+                registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
+            }
+
+            startFuture.complete(null);
+        } catch (Exception e) {
+            startFuture.completeExceptionally(e);
+            throw e;
         }
 
         while (doListen() && selector != null) {
@@ -371,7 +404,6 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("nioReceiver.requestError"), t);
             }
-
         }
         serverChannel.close();
         if (datagramChannel != null) {
