@@ -62,6 +62,7 @@ public interface Jar extends AutoCloseable {
         URL jarUrl = getJarFileURL();
         URLConnection urlConn = null;
         try {
+            // Note: this cannot use CloseableURLConnection due to Tomcat JAR packaging
             urlConn = jarUrl.openConnection();
             return urlConn.getLastModified();
         } finally {

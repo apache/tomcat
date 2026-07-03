@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,6 +36,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 
@@ -557,13 +557,13 @@ public abstract class Compiler {
                     if (includeUrl == null) {
                         return true;
                     }
-                    URLConnection iuc = includeUrl.openConnection();
-                    if (iuc instanceof JarURLConnection) {
-                        includeLastModified = ((JarURLConnection) iuc).getJarEntry().getTime();
-                    } else {
-                        includeLastModified = iuc.getLastModified();
+                    try (CloseableURLConnection iuc = new CloseableURLConnection(includeUrl)) {
+                        if (iuc.getConnection() instanceof JarURLConnection) {
+                            includeLastModified = ((JarURLConnection) iuc.getConnection()).getJarEntry().getTime();
+                        } else {
+                            includeLastModified = iuc.getLastModified();
+                        }
                     }
-                    iuc.getInputStream().close();
                 }
 
                 if (includeLastModified != include.getValue().longValue()) {

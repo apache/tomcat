@@ -18,7 +18,6 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,6 +27,7 @@ import javax.servlet.ServletContext;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
@@ -168,13 +168,8 @@ public class TldCache {
                 // webappPath will be null for JARs containing TLDs that are on
                 // the class path but not part of the web application
                 URL url = servletContext.getResource(tldResourcePath.getWebappPath());
-                URLConnection conn = url.openConnection();
-                result[0] = conn.getLastModified();
-                if ("file".equals(url.getProtocol())) {
-                    // Reading the last modified time opens an input stream so we
-                    // need to make sure it is closed again otherwise the TLD file
-                    // will be locked until GC runs.
-                    conn.getInputStream().close();
+                try (CloseableURLConnection conn = new CloseableURLConnection(url)) {
+                    result[0] = conn.getLastModified();
                 }
             }
             try (Jar jar = tldResourcePath.openJar()) {
