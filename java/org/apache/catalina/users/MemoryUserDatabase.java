@@ -17,7 +17,6 @@
 package org.apache.catalina.users;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -392,6 +391,9 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Parse the XML input to load this database
                 digester.parse(resource.getInputStream());
             } catch (IOException ioe) {
+                // The file doesn't exist / isn't accessible
+                // Set the last modified time to avoid repeated log messages
+                this.lastModified = 0;
                 log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
             } catch (Exception e) {
                 // Fail safe on error
@@ -644,11 +646,6 @@ public class MemoryUserDatabase implements UserDatabase {
                         writeLock.unlock();
                     }
                 }
-            } catch (FileNotFoundException fnfe) {
-                // The file doesn't exist.
-                // This has been logged above. No need to log again.
-                // Set the last modified time to avoid repeated log messages
-                this.lastModified = 0;
             } catch (IOException ioe) {
                 log.warn(sm.getString("memoryUserDatabase.fileClose", pathname), ioe);
             }
