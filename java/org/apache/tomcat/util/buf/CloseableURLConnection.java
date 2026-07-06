@@ -146,15 +146,12 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
             }
-        } else if (connection.getClass().getName().equals("sun.net.www.protocol.file.FileURLConnection")) {
-            /*
-             * Internal JDK class so have to check by default name. If a JDK uses another name it will be handled by the
-             * final block.
-             *
-             * NO-OP - known not to open a stream to read metadata
-             */
         } else if (!(connection instanceof HttpURLConnection)) {
-            // Other cases could have used a stream as a side effect, possibly causing file locking.
+            /*
+             * sun.net.www.protocol.file.FileURLConnection is known to open an InputStream for files.
+             *
+             * Other cases could have used a stream as a side effect, possibly causing file locking.
+             */
             try (@SuppressWarnings("unused") InputStream is = connection.getInputStream()) {
                 // Explicitly close the InputStream to release its native resources.
             } catch (Throwable t) {
