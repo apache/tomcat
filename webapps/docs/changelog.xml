@@ -231,6 +231,10 @@
         Saavedra. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Ensure that a <code>login-config</code> conflict when merging web.xml
+        fragments triggers a deployment failure. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

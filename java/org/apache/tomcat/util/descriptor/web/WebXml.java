@@ -2248,6 +2248,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     } else {
                         log.error(
                                 sm.getString("webXml.mergeConflictLoginConfig", fragment.getName(), fragment.getURL()));
+                        return false;
                     }
                 }
             }
