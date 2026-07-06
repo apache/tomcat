@@ -108,6 +108,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.121 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that a <code>login-config</code> conflict when merging web.xml
+        fragments triggers a deployment failure. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
