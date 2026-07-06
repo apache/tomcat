@@ -135,31 +135,36 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
         if (trackedStream != null) {
             try {
                 trackedStream.close();
-            } catch (Exception e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
             }
         } else if (connection instanceof JarURLConnection) {
             try (@SuppressWarnings("unused")
                 java.util.jar.JarFile jarFile = ((JarURLConnection) connection).getJarFile()) {
                 // Explicitly close the JarFile to release its native resources.
                 // As setUseCaches(false) is set, this should not cause side effects on other streams.
-            } catch (Exception e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
             }
+        } else if (connection.getClass().getName().equals("sun.net.www.protocol.file.FileURLConnection")) {
+            /*
+             * Internal JDK class so have to check by default name. If a JDK uses another name it will be handled by the
+             * final block.
+             *
+             * NO-OP - known not to open a stream to read metadata
+             */
         } else if (!(connection instanceof HttpURLConnection)) {
-            // Other cases like FileURLConnection could have used a stream as a side effect,
-            // possibly causing file locking.
+            // Other cases could have used a stream as a side effect, possibly causing file locking.
             try (@SuppressWarnings("unused") InputStream is = connection.getInputStream()) {
                 // Explicitly close the InputStream to release its native resources.
-            } catch (Exception e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
             }
         }
 
         if (connection instanceof HttpURLConnection) {
             ((HttpURLConnection) connection).disconnect();
         }
-
     }
 
 
@@ -172,7 +177,9 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
      */
     @Override
     public InputStream getInputStream() throws IOException {
-        trackedStream = connection.getInputStream();
+        if (trackedStream == null) {
+            trackedStream = connection.getInputStream();
+        }
         return trackedStream;
     }
 
@@ -284,7 +291,7 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
     public Permission getPermission() throws IOException {
         /*
          * This method is deprecated for removal in Java 25. If it isn't overridden the superclass will return {@code
-         * java.security.AllPermission} which would be acceptable but, for consistency, it is better to oveerride the
+         * java.security.AllPermission} which would be acceptable but, for consistency, it is better to override the
          * method. Calling {@code getPermission()} on the wrapped connection would work until the method is removed.
          * Throwing {@code UnsupportedOperationException} works now since Tomcat never calls the method and will
          * continue to work once the method is removed.
@@ -393,17 +400,4 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
     public Map<String, List<String>> getRequestProperties() {
         return connection.getRequestProperties();
     }
-
-
-    @Override
-    public int hashCode() {
-        return connection.hashCode();
-    }
-
-
-    @Override
-    public boolean equals(Object obj) {
-        return connection.equals(obj);
-    }
-
 }
