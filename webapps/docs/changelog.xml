@@ -131,6 +131,12 @@
         <code>EncryptInterceptor</code> to <code>AES/GCM/NoPadding</code>. This
         is a breaking change for the <code>EncryptInterceptor</code>. (markt)
       </add>
+      <add>
+        Expand the documentation for the <code>EncryptInterceptor</code> to be
+        more explicit regarding the security weaknesses of some supported
+        algorithms. Also explicitly state that the replay protection is only
+        effective for non-malleable algorithms. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
