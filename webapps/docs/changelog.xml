@@ -124,6 +124,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Change the default <code>encryptionAlgorithm</code> for the
+        <code>EncryptInterceptor</code> to <code>AES/GCM/NoPadding</code>. This
+        is a breaking change for the <code>EncryptInterceptor</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.120 (remm)" rtext="release in progress">
   <subsection name="Catalina">
