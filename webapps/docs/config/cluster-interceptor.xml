@@ -241,8 +241,16 @@
    <p>
      The EncryptInterceptor uses the timestamp of the message to provide replay
      protection. For this to be effective, clock skew between cluster nodes
-     should be minimised. If not, it is likely a high proportion of valid
-     messages will be rejected.
+     should be minimised. If the clock skew is not minimised, it is likely that
+     a high proportion of valid messages will be rejected.
+   </p>
+   <p>
+     The replay protection is only effective if the configured encryption
+     algorithm is not malleable. The default algorithm
+     (<code>AES/GCM/NoPadding</code>) is not malleable and replay protection
+     will be effective in the default configuration. Some supported algorithms -
+     such as <code>AES/CBC/PKCS5Padding</code> - are malleable and the replay
+     protection will not be effective with such algoriths.
    </p>
    <attributes>
      <attribute name="encryptionAlgorithm" required="false">
@@ -255,7 +263,7 @@
        <p>The EncryptInterceptor currently supports the following standard
        <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">block-cipher modes</a>:
        CBC, CFB, OFB and GCM. Of these, it is recommended that GCM is always
-       used.</p>
+       used due to security weaknesses with the other block-cipher modes.</p>
 
        <p>The length of the key will specify the flavor of the encryption
        algorithm to be used, if applicable (e.g. AES-128 versus AES-256).</p>

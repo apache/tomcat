@@ -318,6 +318,12 @@
         <code>AES/GCM/NoPadding</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Expand the documentation for the <code>EncryptInterceptor</code> to be
+        more explicit regarding the security weaknesses of some supported
+        algorithms. Also explicitly state that the replay protection is only
+        effective for non-malleable algorithms. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
