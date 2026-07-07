@@ -260,9 +260,8 @@
        <p>The length of the key will specify the flavor of the encryption
        algorithm to be used, if applicable (e.g. AES-128 versus AES-256).</p>
 
-       <p>The default algorithm is <code>AES/CBC/PKCS5Padding</code> for
-       backwards compatability but it is recommended that
-       <code>AES/GCM/NoPadding</code> is used.</p>
+       <p>If not specified, the default algorithm is
+       <code>AES/GCM/NoPadding</code>.</p>
      </attribute>
      <attribute name="encryptionKey" required="true">
        <p>The key to be used with the encryption algorithm.</p>

@@ -61,7 +61,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      */
     protected static final StringManager sm = StringManager.getManager(EncryptInterceptor.class);
 
-    private static final String DEFAULT_ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String DEFAULT_ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
 
     private String providerName;
     private String encryptionAlgorithm = DEFAULT_ENCRYPTION_ALGORITHM;
@@ -185,8 +185,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      * Sets the encryption algorithm to be used for encrypting and decrypting channel messages. You must specify the
      * <code>algorithm/mode/padding</code>. Information on standard algorithm names may be found in the
      * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">Java
-     * documentation</a>. Default is <code>AES/CBC/PKCS5Padding</code> for backwards compatibility but it is recommended
-     * that <code>AES/GCM/NoPadding</code> is used.
+     * documentation</a>. Default is <code>AES/GCM/NoPadding</code>.
      *
      * @param algorithm The algorithm to use.
      */
