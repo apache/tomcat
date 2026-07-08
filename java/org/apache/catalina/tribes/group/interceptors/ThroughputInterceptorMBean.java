@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public interface ThroughputInterceptorMBean {
 
     /**
-     * Returns the socket option flag.
+     * Returns the option flag used to determine if this interceptor should process a message.
      * @return the option flag
      */
     int getOptionFlag();

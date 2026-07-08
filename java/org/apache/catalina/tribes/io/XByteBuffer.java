@@ -156,6 +156,7 @@ public class XByteBuffer implements Serializable {
     /**
      * Resets the buffer length to zero.
      */
+    @Deprecated
     public void reset() {
         bufSize = 0;
     }
@@ -181,7 +182,7 @@ public class XByteBuffer implements Serializable {
     }
 
     /**
-     * Resets the buffer
+     * Resets the buffer length to zero.
      */
     public void clear() {
         bufSize = 0;
@@ -198,6 +199,9 @@ public class XByteBuffer implements Serializable {
      *             something, or the length of data is 0
      */
     public boolean append(ByteBuffer b, int len) {
+        if (len == 0) {
+            return false;
+        }
         int newcount = bufSize + len;
         if (newcount > buf.length) {
             expand(newcount);
@@ -526,7 +530,7 @@ public class XByteBuffer implements Serializable {
     /**
      * Convert eight bytes to a long
      *
-     * @param b   - the byte array containing the four bytes
+     * @param b   - the byte array containing the eight bytes
      * @param off - the offset
      *
      * @return the long value constructed from the eight bytes

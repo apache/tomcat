@@ -456,6 +456,7 @@ public class McastService extends MembershipServiceBase implements MessageListen
 
     @Override
     public void broadcast(ChannelMessage message) throws ChannelException {
+        McastServiceImpl impl = this.impl;
         if (impl == null || (impl.startLevel & Channel.MBR_TX_SEQ) != Channel.MBR_TX_SEQ) {
             throw new ChannelException(sm.getString("mcastService.noStart"));
         }
@@ -520,6 +521,7 @@ public class McastService extends MembershipServiceBase implements MessageListen
         if (localMember != null) {
             localMember.setPayload(payload);
             try {
+                McastServiceImpl impl = this.impl;
                 if (impl != null) {
                     impl.send(false);
                 }
@@ -535,6 +537,7 @@ public class McastService extends MembershipServiceBase implements MessageListen
         if (localMember != null) {
             localMember.setDomain(domain);
             try {
+                McastServiceImpl impl = this.impl;
                 if (impl != null) {
                     impl.send(false);
                 }

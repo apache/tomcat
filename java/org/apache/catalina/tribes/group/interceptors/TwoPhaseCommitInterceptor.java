@@ -82,7 +82,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             } else {
                 confirmation = (ChannelMessage) msg.clone();
             }
-            confirmation.getMessage().reset();
+            confirmation.getMessage().clear();
             UUIDGenerator.randomUUID(false, confirmation.getUniqueId(), 0);
             confirmation.getMessage().append(START_DATA, 0, START_DATA.length);
             confirmation.getMessage().append(msg.getUniqueId(), 0, msg.getUniqueId().length);

@@ -76,6 +76,9 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
 
         String protocol = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PROTOCOL", "KUBERNETES_MASTER_PROTOCOL");
+        if (protocol == null) {
+            protocol = "https";
+        }
         String masterHost = getEnv(CUSTOM_ENV_PREFIX + "MASTER_HOST", "KUBERNETES_SERVICE_HOST");
         String masterPort = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PORT", "KUBERNETES_SERVICE_PORT");
 
@@ -87,9 +90,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
 
         if (clientCertificateFile == null) {
-            if (protocol == null) {
-                protocol = "https";
-            }
             String saTokenFile = getEnv(CUSTOM_ENV_PREFIX + "SA_TOKEN_FILE", "SA_TOKEN_FILE");
             if (saTokenFile == null) {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
@@ -103,9 +103,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
             }
         } else {
-            if (protocol == null) {
-                protocol = "http";
-            }
             String clientKeyFile = getEnv("KUBERNETES_CLIENT_KEY_FILE");
             if (clientKeyFile == null) {
                 log.error(sm.getString("kubernetesMembershipProvider.noKey"));
@@ -243,7 +240,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 Object objectUid = metadata.get("uid");
                 Object creationTimestampObject = metadata.get("creationTimestamp");
                 if (creationTimestampObject == null) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "uid"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "creationTimestamp"));
                     continue;
                 }
                 // "status" contains "phase" (which must be "Running") and "podIP"

@@ -194,7 +194,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      *                <li>Channel.SND_RX_SEQ - stops the replication receiver</li>
      *                </ul>
      *
-     * @throws ChannelException if a startup error occurs or the service is already started.
+     * @throws ChannelException if a shutdown error occurs or the service is already stopped.
      *
      * @see Channel
      */

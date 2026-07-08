@@ -80,7 +80,7 @@ public class BufferPool {
             buffer.expand(minSize);
         }
         buffer.setDiscard(discard);
-        buffer.reset();
+        buffer.clear();
         return buffer;
     }
 

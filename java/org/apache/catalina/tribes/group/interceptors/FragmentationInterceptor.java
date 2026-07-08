@@ -322,7 +322,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
         @Override
         public int hashCode() {
-            return XByteBuffer.toInt(uniqueId, 0);
+            return Arrays.hashCode(uniqueId);
         }
 
         @Override

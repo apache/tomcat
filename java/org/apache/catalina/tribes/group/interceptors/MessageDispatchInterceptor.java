@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -131,8 +132,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
      * @return true if added
      */
     public boolean addToQueue(final ChannelMessage msg, final Member[] destination, final InterceptorPayload payload) {
-        executor.execute(() -> sendAsyncData(msg, destination, payload));
-        return true;
+        try {
+            executor.execute(() -> sendAsyncData(msg, destination, payload));
+            return true;
+        } catch (RejectedExecutionException ree) {
+            return false;
+        }
     }
 
 
