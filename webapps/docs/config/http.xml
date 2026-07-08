@@ -1022,12 +1022,44 @@
 
       <attribute name="unixDomainSocketPathPermissions" required="false">
         <p>Where supported, the posix permissions that will be applied to the
-        to the Unix Domain Socket specified with
-        <code>unixDomainSocketPath</code> above. The
-        permissions are specified as a string of nine characters, in three sets
-        of three: (r)ead, (w)rite and e(x)ecute for owner, group and others
-        respectively. If a permission is not granted, a hyphen is used. If
-        unspecified, the permissions default to <code>rw-rw-rw-</code>.</p>
+        Unix Domain Socket specified with <code>unixDomainSocketPath</code>
+        above.  If the Unix Domain Socket is required to be created securely,
+        these permissions should be selected as to limit access to trusted
+        users.</p>
+        <p>The permissions are specified as a string of nine characters, in
+        three sets of three: (r)ead, (w)rite and e(x)ecute for owner, group and
+        others respectively. If a permission is not granted, a hyphen is
+        used.</p>
+        <p>If unspecified, no permissions are explicitly set meaning that the
+        resulting permissions will be determined by the current umask.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketParentOwner" required="false">
+        <p>The expected ownership of the directory where the Unix Domain Socket
+        will be created. The directory must be owned either by this user or the
+        current user associated with the Tomcat process.</p>
+        <p>This attribute is ignored if
+        <code>unixDomainSocketParentPermissions</code> are skipped. If not
+        ignored, the ownership checks on the parent directory, can be skipped by
+        setting this attribute to the empty string.</p>
+        <p>If unspecified, the default value is unset.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketParentPermissions" required="false">
+        <p>Where supported, the posix permissions that will be checked on /
+        applied to the directory where the Unix Domain Socket will be created.
+        If the Unix Domain Socket is required to be created securely, these
+        permissions should be selected as to limit access to trusted users.</p>
+        <p>To skip the permission checks on the parent directory, set this
+        attribute to the empty string.</p>
+        <p>The permissions are specified as a string of nine characters, in
+        three sets of three: (r)ead, (w)rite and e(x)ecute for owner, group and
+        others respectively. If a permission is not granted, a hyphen is used.
+        If unspecified, the value of
+        <code>unixDomainSocketPathPermissions</code> is used with the addition
+        of the appropriate execute permission for every read and/or write
+        permission that is specified and the removal of group and other write
+        permissions if present.</p>
       </attribute>
 
       <attribute name="useInheritedChannel" required="false">
@@ -1134,16 +1166,14 @@
   that support Unix Domain Sockets will bind to the socket at the given path.
   </p>
 
-  <p>For users of Java 16 and higher, support is provided within the NIO
-  connectors.
-  </p>
+  <p>Support is provided within the NIO connector.</p>
 
-  <p>The socket path is created with read and write permissions for all
-  users. To protect this socket, place it in a directory with suitable
-  permissions appropriately configured to restrict access as required.
-  Alternatively, on platforms that support posix permissions, the
-  permissions on the socket can be set directly with the
-  <code>unixDomainSocketPathPermissions</code> option.
+  <p>By default, the socket path is created with the current umask. To protect
+  this socket, place it in a directory with suitable permissions appropriately
+  configured to restrict access as required. Alternatively, on platforms that
+  support posix permissions, the permissions for the containing folder can be
+  set with <code>unixDomainSocketParentPermissions</code> and the permissions
+  for the socket can be set with <code>unixDomainSocketPathPermissions</code>.
   </p>
 
   <p>Tomcat will automatically remove the socket on server shutdown. If the
