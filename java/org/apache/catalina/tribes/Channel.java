@@ -273,7 +273,7 @@ public interface Channel {
     /**
      * Send a message to one or more members in the cluster
      *
-     * @param destination Member[] - the destinations, null or zero length means all members. Note that a membership
+     * @param destination Member[] - the destinations. Note that a membership
      *                        change can occur between obtaining the member list and sending the message, so the
      *                        application is uncertain what group the message actually got sent to.
      * @param msg         Serializable - the message to send, has to be serializable, or a <code>ByteMessage</code> to
@@ -283,7 +283,7 @@ public interface Channel {
      *
      * @return a unique Id that identifies the message that is sent
      *
-     * @throws ChannelException if a serialization error happens.
+     * @throws ChannelException if the msg is null, if the destination is null or is empty, or if a serialization error happens.
      *
      * @see ByteMessage
      * @see #SEND_OPTIONS_USE_ACK
@@ -295,7 +295,7 @@ public interface Channel {
     /**
      * Send a message to one or more members in the cluster
      *
-     * @param destination Member[] - the destinations, null or zero length means all members. Note that a membership
+     * @param destination Member[] - the destinations. Note that a membership
      *                        change can occur between obtaining the member list and sending the message, so the
      *                        application is uncertain what group the message actually got sent to.
      * @param msg         ClusterMessage - the message to send
@@ -304,7 +304,7 @@ public interface Channel {
      *
      * @return a unique Id that identifies the message that is sent
      *
-     * @exception ChannelException - if a serialization error happens.
+     * @throws ChannelException if the msg is null, if the destination is null or is empty, or if a serialization error happens.
      */
     UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException;
 
