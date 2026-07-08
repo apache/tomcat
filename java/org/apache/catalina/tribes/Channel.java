@@ -139,12 +139,7 @@ public interface Channel {
     int MBR_TX_SEQ = 8;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
-     * to trigger channel interceptors as the message passes through the channel stack.
-     * <p>
-     * However, there are five default flags that every channel implementation must implement.
-     * <p>
-     * SEND_OPTIONS_BYTE_MESSAGE - The message is a pure byte message and no marshaling or unmarshalling will be
+     * Send options. The message is a pure byte message and no marshaling or unmarshalling will be
      * performed.
      *
      * @see #send(Member[], Serializable , int)
@@ -153,12 +148,7 @@ public interface Channel {
     int SEND_OPTIONS_BYTE_MESSAGE = 0x0001;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
-     * to trigger channel interceptors as the message passes through the channel stack.
-     * <p>
-     * However, there are five default flags that every channel implementation must implement
-     * <p>
-     * SEND_OPTIONS_USE_ACK - Message is sent and an ACK is received when the message has been received by the
+     * Send options. Message is sent and an ACK is received when the message has been received by the
      * recipient. If no ack is received, the message is not considered successful.
      *
      * @see #send(Member[], Serializable , int)
@@ -167,12 +157,7 @@ public interface Channel {
     int SEND_OPTIONS_USE_ACK = 0x0002;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
-     * to trigger channel interceptors as the message passes through the channel stack.
-     * <p>
-     * However, there are five default flags that every channel implementation must implement
-     * <p>
-     * SEND_OPTIONS_SYNCHRONIZED_ACK - Message is sent and an ACK is received when the message has been received and
+     * Send options. Message is sent and an ACK is received when the message has been received and
      * processed by the recipient. If no ack is received, the message is not considered successful
      *
      * @see #send(Member[], Serializable , int)
@@ -181,12 +166,7 @@ public interface Channel {
     int SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
-     * to trigger channel interceptors as the message passes through the channel stack.
-     * <p>
-     * However, there are five default flags that every channel implementation must implement
-     * <p>
-     * SEND_OPTIONS_ASYNCHRONOUS - Message will be placed on a queue and sent by a separate thread. If the queue is
+     * Send options. Message will be placed on a queue and sent by a separate thread. If the queue is
      * full, behaviour depends on {@link MessageDispatchInterceptor#isAlwaysSend()}
      *
      * @see #send(Member[], Serializable , int)
@@ -195,12 +175,7 @@ public interface Channel {
     int SEND_OPTIONS_ASYNCHRONOUS = 0x0008;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
-     * to trigger channel interceptors as the message passes through the channel stack.
-     * <p>
-     * However, there are five default flags that every channel implementation must implement
-     * <p>
-     * SEND_OPTIONS_SECURE - Message is sent over an encrypted channel
+     * Send options. Message is sent over an encrypted channel
      *
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
@@ -225,10 +200,10 @@ public interface Channel {
     int SEND_OPTIONS_MULTICAST = 0x0040;
 
     /**
-     * Send options, when a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
+     * When a message is sent, it can have an option flag to trigger certain behavior. Most flags are used
      * to trigger channel interceptors as the message passes through the channel stack.
      * <p>
-     * However, there are five default flags that every channel implementation must implement
+     * However, there are seven default flags that every channel implementation must implement
      * <p>
      * SEND_OPTIONS_DEFAULT - the default sending options, just a helper variable. The default is
      * <code>SEND_OPTIONS_USE_ACK</code>
@@ -291,16 +266,16 @@ public interface Channel {
      *                <li>SND_RX_SEQ - stops the replication receiver</li>
      *                </ul>
      *
-     * @throws ChannelException if a startup error occurs or the service is already stopped or an error occurs.
+     * @throws ChannelException if a shutdown error occurs or the service is already stopped or an error occurs.
      */
     void stop(int svc) throws ChannelException;
 
     /**
      * Send a message to one or more members in the cluster
      *
-     * @param destination Member[] - the destinations, cannot be null or zero length, the reason for that is that a
-     *                        membership change can occur and at that time the application is uncertain what group the
-     *                        message actually got sent to.
+     * @param destination Member[] - the destinations, null or zero length means all members. Note that a membership
+     *                        change can occur between obtaining the member list and sending the message, so the
+     *                        application is uncertain what group the message actually got sent to.
      * @param msg         Serializable - the message to send, has to be serializable, or a <code>ByteMessage</code> to
      *                        send a pure byte array
      * @param options     int - sender options, see class documentation for each interceptor that is configured in order
@@ -320,7 +295,9 @@ public interface Channel {
     /**
      * Send a message to one or more members in the cluster
      *
-     * @param destination Member[] - the destinations, null or zero length means all
+     * @param destination Member[] - the destinations, null or zero length means all members. Note that a membership
+     *                        change can occur between obtaining the member list and sending the message, so the
+     *                        application is uncertain what group the message actually got sent to.
      * @param msg         ClusterMessage - the message to send
      * @param options     int - sender options, see class documentation
      * @param handler     ErrorHandler - handle errors through a callback, rather than throw it
@@ -493,6 +470,9 @@ public interface Channel {
      * @return a bitwise ORd value of the passed option names
      */
     static int parseSendOptions(String input) {
+        if (input == null || input.isEmpty()) {
+            return 0;
+        }
 
         try {
             return Integer.parseInt(input);
@@ -520,7 +500,7 @@ public interface Channel {
      *
      * @param input the int value of SendOptions
      *
-     * @return the human-friendly string representation in a reverse order (i.e. the last option will be shown first)
+     * @return the human-friendly comma-separated string representation of the set options
      */
     static String getSendOptionsAsString(int input) {
 

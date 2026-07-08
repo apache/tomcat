@@ -68,8 +68,7 @@ public interface MembershipService {
 
 
     /**
-     * Stops the membership service. If a membership listeners is added the listener will start to receive membership
-     * events.
+     * Stops the membership service. If a membership listener is added the listener will stop receiving membership events.
      *
      * @param level - level MBR_RX stops listening for members, level MBR_TX stops broadcasting the server
      *

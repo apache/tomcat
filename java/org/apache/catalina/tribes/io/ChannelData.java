@@ -174,9 +174,9 @@ public class ChannelData implements ChannelMessage {
                 4 + // unique id length off=12
                 uniqueId.length + // id data off=12+uniqueId.length
                 4 + // addr length off=12+uniqueId.length+4
-                address.getDataLength() + // member data off=12+uniqueId.length+4+add.length
+                ((address != null) ? address.getDataLength() : 0) + // member data off=12+uniqueId.length+4+add.length
                 4 + // message length off=12+uniqueId.length+4+add.length+4
-                message.getLength();
+                ((message != null) ? message.getLength() : 0);
     }
 
     /**
@@ -200,7 +200,8 @@ public class ChannelData implements ChannelMessage {
      * @return the byte array
      */
     public byte[] getDataPackage(byte[] data, int offset) {
-        byte[] addr = address.getData(false);
+        byte[] addr = (address != null) ? address.getData(false) : new byte[0];
+        int msgLen = (message != null) ? message.getLength() : 0;
         XByteBuffer.toBytes(options, data, offset);
         offset += 4; // options
         XByteBuffer.toBytes(timestamp, data, offset);
@@ -213,9 +214,11 @@ public class ChannelData implements ChannelMessage {
         offset += 4; // addr.length
         System.arraycopy(addr, 0, data, offset, addr.length);
         offset += addr.length; // addr data
-        XByteBuffer.toBytes(message.getLength(), data, offset);
+        XByteBuffer.toBytes(msgLen, data, offset);
         offset += 4; // message.length
-        System.arraycopy(message.getBytesDirect(), 0, data, offset, message.getLength());
+        if (msgLen > 0) {
+            System.arraycopy(message.getBytesDirect(), 0, data, offset, msgLen);
+        }
         return data;
     }
 
@@ -280,7 +283,6 @@ public class ChannelData implements ChannelMessage {
         // data.message = new XByteBuffer(new byte[xsize],false);
         data.message = BufferPool.getBufferPool().getBuffer(xsize, false);
         offset += 4; // message length
-        System.arraycopy(b, offset, data.message.getBytesDirect(), 0, xsize);
         data.message.append(b, offset, xsize);
         offset += xsize; // message data
         return data;
@@ -288,7 +290,7 @@ public class ChannelData implements ChannelMessage {
 
     @Override
     public int hashCode() {
-        return XByteBuffer.toInt(getUniqueId(), 0);
+        return Arrays.hashCode(getUniqueId());
     }
 
     /**
@@ -310,7 +312,7 @@ public class ChannelData implements ChannelMessage {
     /**
      * Create a shallow clone, only the data gets recreated
      *
-     * @return ClusterData
+     * @return ChannelData clone
      */
     @Override
     public ChannelData clone() {
@@ -323,6 +325,7 @@ public class ChannelData implements ChannelMessage {
         }
         if (this.message != null) {
             clone.message = new XByteBuffer(this.message.getBytesDirect(), false);
+            clone.message.setLength(this.message.getLength());
         }
         return clone;
     }

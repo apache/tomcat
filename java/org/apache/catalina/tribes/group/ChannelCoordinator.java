@@ -93,7 +93,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      *
      * @param destination Member[] - the destinations, null or zero length means all
      * @param msg         ClusterMessage - the message to send
-     * @param payload     TBA
+     * @param payload     InterceptorPayload - optional payload carrying error handlers and metadata
      */
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
@@ -218,7 +218,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      *                SND_TX_SEQ - stops the replication transmitter<BR>
      *                SND_RX_SEQ - stops the replication receiver<BR>
      *
-     * @throws ChannelException if a startup error occurs or the service is already started.
+     * @throws ChannelException if a shutdown error occurs or the service is already stopped.
      */
     protected synchronized void internalStop(int svc) throws ChannelException {
         try {
