@@ -116,18 +116,6 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * Ideally, the interceptor below this one would be the TcpFailureDetector to ensure correct memberships
  * </p>
- * <p>
- * The example above, of course can be simplified with a finite statemachine:<br>
- * But I suck at writing state machines, my head gets all confused. One day I will document this algorithm though.<br>
- * Maybe I'll do a state diagram :)
- * </p>
- * <h2>State Diagrams</h2>
- * <a href="https://people.apache.org/~fhanik/tribes/docs/leader-election-initiate-election.jpg">Initiate an
- * election</a><br>
- * <br>
- * <a href="https://people.apache.org/~fhanik/tribes/docs/leader-election-message-arrives.jpg">Receive an election
- * message</a><br>
- * <br>
  */
 public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
@@ -730,6 +718,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     @Override
     public void memberDisappeared(Member member) {
+        if (membership == null) {
+            setupMembership();
+        }
         membership.removeMember(member);
         super.memberDisappeared(member);
         try {
@@ -1012,7 +1003,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
          * Writes the message to the buffer.
          */
         public void write() {
-            buf.reset();
+            buf.clear();
             // header
             buf.append(COORD_HEADER, 0, COORD_HEADER.length);
             // leader

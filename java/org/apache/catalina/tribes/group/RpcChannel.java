@@ -300,7 +300,7 @@ public class RpcChannel implements ChannelListener {
     }
 
     /**
-     * Class that holds all response.
+     * Class that holds all responses.
      */
     public static class RpcCollector {
         /**
@@ -414,7 +414,7 @@ public class RpcChannel implements ChannelListener {
 
         @Override
         public int hashCode() {
-            return id[0] + id[1] + id[2] + id[3];
+            return java.util.Arrays.hashCode(id);
         }
 
         @Override

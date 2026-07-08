@@ -188,6 +188,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     @Override
     public boolean stop(int level) throws Exception {
+        service.getChannel().removeChannelListener(this);
         return true;
     }
 
