@@ -33,8 +33,9 @@ import org.apache.juli.logging.LogFactory;
  * A {@link org.apache.catalina.tribes.MembershipService} that uses Kubernetes API(default) or DNS to retrieve the
  * members of a cluster.<br>
  * <p>
- * The default implementation of the MembershipProvider component is the {@link KubernetesMembershipProvider}. The
- * MembershipProvider can be configured by the <code>membershipProviderClassName</code> property. Possible shortcuts are
+ * The default (and recommended) implementation of the MembershipProvider component is the
+ * {@link KubernetesMembershipProvider}. The MembershipProvider can be configured by the
+ * <code>membershipProviderClassName</code> property. Possible shortcuts are
  * {@code kubernetes} and {@code dns}. For dns look at the {@link DNSMembershipProvider}.
  * </p>
  * <p>
