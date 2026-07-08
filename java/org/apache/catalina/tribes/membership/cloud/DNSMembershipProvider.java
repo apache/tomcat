@@ -32,7 +32,21 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
+ * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.
+ * <p>
+ * Relying solely on DNS to determine cluster membership requires that all DNS caching between the cluster nodes and the
+ * authoritative name server must honour the TTL set by the authoritative name server. Experience has shown that that is
+ * often not the case. Therefore, to ensure that new cluster members are not excluded from the cluster due to a stale
+ * DNS cache, this membership service accepts messages from any node regardless of whether it or not is listed as a
+ * cluster member in DNS and adds that node to the cluster. The DNS entry is, effectively, used by new nodes to identify
+ * the other nodes in the cluster to which cluster messages should be sent.
+ * <p>
+ * If more control is required over cluster membership, users are strongly encouraged to use
+ * {@link KubernetesMembershipProvider} instead. Alternatively, the
+ * {@link org.apache.catalina.tribes.group.interceptors.EncryptInterceptor} may be used to ensure that only nodes with
+ * knowledge of the shared key are able to participate in the cluster.
+ * <p>
+ * TODO: Make the "accept messages from any node and add that node to the cluster" behaviour optional.
  * <p>
  * <strong>Configuration example for Kubernetes</strong>
  * </p>
@@ -202,7 +216,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             byte[] host = sender.getHost();
             int i = 0;
             StringBuilder buf = new StringBuilder();
-            if (host.length > 0 ) {
+            if (host.length > 0) {
                 buf.append(host[i++] & 0xff);
                 for (; i < host.length; i++) {
                     buf.append('.').append(host[i] & 0xff);

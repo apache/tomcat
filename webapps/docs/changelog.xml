@@ -137,6 +137,11 @@
         algorithms. Also explicitly state that the replay protection is only
         effective for non-malleable algorithms. (markt)
       </add>
+      <add>
+        Expand the Javadoc for the <code>DNSMembershipProvider</code> in
+        particular explaining its behaviour and providing configuration advice
+        if control more over cluster membership is required. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
