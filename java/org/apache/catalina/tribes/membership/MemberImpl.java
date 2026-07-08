@@ -184,7 +184,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * Create a data package to send over the wire representing this member. This is faster than serialization.
      *
-     * @return - the bytes for this member deserialized
+     * @return the serialized bytes for this member
      */
     public byte[] getData() {
         return getData(true);
@@ -281,6 +281,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         XByteBuffer.toBytes(udpPort, data, pos);
         pos += 4;
         // host length
+        if (host.length > 127) {
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.hostLength",
+                    Integer.toString(host.length)));
+        }
         data[pos++] = (byte) host.length;
         // host
         System.arraycopy(host, 0, data, pos, host.length);
@@ -399,6 +403,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
 
         byte hl = data[pos++];
+        if (hl < 0) {
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.hostLength",
+                    Integer.toString(hl)));
+        }
         byte[] addr = new byte[hl];
         System.arraycopy(data, pos, addr, 0, hl);
         pos += hl;
@@ -611,7 +619,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     @Override
     public int hashCode() {
-        return getHost()[0] + getHost()[1] + getHost()[2] + getHost()[3];
+        int result = Arrays.hashCode(getHost());
+        result = 31 * result + getPort();
+        result = 31 * result + Arrays.hashCode(getUniqueId());
+        return result;
     }
 
     /**

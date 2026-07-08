@@ -185,7 +185,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                 try {
                     member = new MemberImpl(ip, port, aliveTime);
                 } catch (IOException ioe) {
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
+                    log.error(sm.getString("dnsMembershipProvider.memberError"), ioe);
                     continue;
                 }
                 member.setUniqueId(id);
@@ -227,6 +227,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             member.setMemberAliveTime(-1);
             updateMember(member, true);
         }
+        // We will not actually process the message
         return false;
     }
 }

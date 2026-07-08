@@ -42,8 +42,7 @@ import org.apache.juli.logging.LogFactory;
  * A <b>membership</b> implementation using simple multicast. This is the representation of a multicast membership
  * service. This class is responsible for maintaining a list of active cluster nodes in the cluster. If a node fails to
  * send out a heartbeat, the node will be dismissed. This is the low level implementation that handles the multicasting
- * sockets. Need to fix this, could use java.nio and only need one thread to send and receive, or just use a timeout on
- * the receive
+ * sockets.
  */
 public class McastServiceImpl extends MembershipProviderBase {
 
@@ -94,10 +93,6 @@ public class McastServiceImpl extends MembershipProviderBase {
      * How often to we send out a broadcast saying we are alive, must be smaller than timeToExpiration
      */
     protected final long sendFrequency;
-    /**
-     * Reuse the sendPacket, no need to create a new one every time
-     */
-    protected DatagramPacket sendPacket;
     /**
      * Reuse the receivePacket, no need to create a new one every time
      */
@@ -196,9 +191,6 @@ public class McastServiceImpl extends MembershipProviderBase {
      */
     public void init() throws IOException {
         setupSocket();
-        sendPacket = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
-        sendPacket.setAddress(address);
-        sendPacket.setPort(port);
         receivePacket = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
         receivePacket.setAddress(address);
         receivePacket.setPort(port);
@@ -374,23 +366,19 @@ public class McastServiceImpl extends MembershipProviderBase {
     }
 
     /**
-     * Receive a datagram packet, locking wait
+     * Receive a datagram packet from the multicast socket with timeout.
      *
      * @throws IOException Received failed
      */
     public void receive() throws IOException {
         try {
             socket.receive(receivePacket);
-            if (receivePacket.getLength() > MAX_PACKET_SIZE) {
-                log.error(sm.getString("mcastServiceImpl.packet.tooLong", Integer.toString(receivePacket.getLength())));
+            byte[] data = new byte[receivePacket.getLength()];
+            System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, data.length);
+            if (XByteBuffer.firstIndexOf(data, 0, MemberImpl.TRIBES_MBR_BEGIN) == 0) {
+                memberDataReceived(data);
             } else {
-                byte[] data = new byte[receivePacket.getLength()];
-                System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, data.length);
-                if (XByteBuffer.firstIndexOf(data, 0, MemberImpl.TRIBES_MBR_BEGIN) == 0) {
-                    memberDataReceived(data);
-                } else {
-                    memberBroadcastsReceived(data);
-                }
+                memberBroadcastsReceived(data);
             }
         } catch (SocketTimeoutException ignore) {
             /*
@@ -555,10 +543,10 @@ public class McastServiceImpl extends MembershipProviderBase {
         } else if (log.isTraceEnabled()) {
             log.trace("Sending message broadcast " + packet.getLength() + " bytes from " + member);
         }
-        packet.setAddress(address);
-        packet.setPort(port);
         // TODO this operation is not thread safe
         synchronized (sendLock) {
+            packet.setAddress(address);
+            packet.setPort(port);
             socket.send(packet);
         }
         if (checkexpired) {
@@ -732,7 +720,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     protected static class RecoveryThread extends Thread {
 
         /**
-         * Flag to track if recovery is running.
+         * Flag to track if recovery is running. Only one recovery can run at a time.
          */
         private static final AtomicBoolean running = new AtomicBoolean(false);
 

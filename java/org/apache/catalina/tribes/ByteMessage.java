@@ -50,9 +50,9 @@ public class ByteMessage implements Externalizable {
     }
 
     /**
-     * Creates a byte message with
+     * Creates a byte message with the specified contents.
      *
-     * @param data byte[] - the message contents
+     * @param data the message contents
      */
     public ByteMessage(byte[] data) {
         message = data;

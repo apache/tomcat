@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -165,7 +166,9 @@ public class ChannelException extends Exception {
     /**
      * Represent a failure to a specific member when a message was sent to more than one member
      */
-    public static class FaultyMember {
+    public static class FaultyMember implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         /**
          * The cause of the failure.
          */
