@@ -216,6 +216,13 @@
         of how early in the HEADERS frame processing an error is detected.
         (markt)
       </fix>
+      <add>
+        Add new attributes (<code>unixDomainSocketParentPermissions</code> and
+        <code>unixDomainSocketParentOwner</code>) to the NIO connector to
+        provide additional control over the security of Unix Domain Sockets.
+        Additional checks (enabled by default) have also been added for the
+        directory where the Unix Domain Socket will be created.(markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
