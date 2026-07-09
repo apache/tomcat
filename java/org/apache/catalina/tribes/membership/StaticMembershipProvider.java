@@ -119,6 +119,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
     @Override
     public void init(Properties properties) throws Exception {
+        // All the default properties have been set by StaticMembershipService.setDefaults, so no need to check
         String expirationTimeStr = properties.getProperty("expirationTime");
         this.expirationTime = Long.parseLong(expirationTimeStr);
         String connectTimeoutStr = properties.getProperty("connectTimeout");
@@ -396,7 +397,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     protected void checkExpired() {
         Member[] expired = membership.expire(expirationTime);
         for (Member member : expired) {
-            membershipListener.memberDisappeared(member);
+            memberDisappeared(member);
         }
     }
 
@@ -506,8 +507,8 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
         @Override
         public String toString() {
-            return "MemberMessage[" + "name=" + new String(membershipId) + "; type=" + getTypeDesc() + "; member=" +
-                    member + ']';
+            return "MemberMessage[" + "name=" + new String(membershipId, StandardCharsets.ISO_8859_1) + "; type=" +
+                    getTypeDesc() + "; member=" + member + ']';
         }
 
         /**

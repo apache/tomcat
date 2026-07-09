@@ -21,8 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A very simple thread pool class. The pool size is set at construction time and remains fixed. Threads are cycled
- * through a FIFO idle queue.
+ * A very simple thread pool class. Threads are cycled through a FIFO idle queue.
  */
 public class RxTaskPool {
 
@@ -30,7 +29,7 @@ public class RxTaskPool {
     final List<AbstractRxTask> used = new ArrayList<>();
 
     final Object mutex = new Object();
-    boolean running = true;
+    volatile boolean running = true;
 
     private int maxTasks;
     private int minTasks;

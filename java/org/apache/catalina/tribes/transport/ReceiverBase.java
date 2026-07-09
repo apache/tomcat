@@ -145,21 +145,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         channel = null;
     }
 
-    /**
-     * Returns the message listener for this receiver.
-     *
-     * @return the message listener
-     */
     @Override
     public MessageListener getMessageListener() {
         return listener;
     }
 
-    /**
-     * Returns the port on which this receiver is listening.
-     *
-     * @return the port number
-     */
     @Override
     public int getPort() {
         return port;
@@ -183,11 +173,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return txBufSize;
     }
 
-    /**
-     * Sets the message listener for this receiver.
-     *
-     * @param listener the message listener to set
-     */
     @Override
     public void setMessageListener(MessageListener listener) {
         this.listener = listener;
@@ -280,11 +265,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
         InetSocketAddress addr = null;
+        int port = portstart;
         while (retries > 0) {
             try {
-                addr = new InetSocketAddress(getBind(), portstart);
+                addr = new InetSocketAddress(getBind(), port);
                 socket.bind(addr);
-                setUdpPort(portstart);
+                setUdpPort(port);
                 log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
             } catch (IOException ioe) {
@@ -293,13 +279,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     log.info(sm.getString("receiverBase.unable.bind.udp", addr));
                     throw ioe;
                 }
-                portstart++;
+                port++;
                 try {
                     Thread.sleep(25);
                 } catch (InterruptedException ti) {
                     Thread.currentThread().interrupt();
                 }
-                retries = bindUdp(socket, portstart, retries);
             }
         }
         return retries;
@@ -373,11 +358,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return this.host;
     }
 
-    /**
-     * Returns the host address for this receiver.
-     *
-     * @return the host address
-     */
     @Override
     public String getHost() {
         return getAddress();
@@ -397,6 +377,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      *
      * @return true if the receiver is listening
      */
+    @Deprecated
     public boolean doListen() {
         return listen;
     }
@@ -406,6 +387,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      *
      * @return the message listener
      */
+    @Deprecated
     public MessageListener getListener() {
         return listener;
     }
@@ -616,6 +598,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      *
      * @param listener the message listener to set
      */
+    @Deprecated
     public void setListener(MessageListener listener) {
         this.listener = listener;
     }

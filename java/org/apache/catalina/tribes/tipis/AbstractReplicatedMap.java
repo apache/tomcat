@@ -183,17 +183,28 @@ public abstract class AbstractReplicatedMap<K, V>
     // ------------------------------------------------------------------------------
 
     /**
-     * Creates a new map.
+     * Creates a new replicated map with the specified configuration.
      *
-     * @param owner              The map owner
-     * @param channel            The channel to use for communication
-     * @param timeout            long - timeout for RPC messages
-     * @param mapContextName     String - unique name for this map, to allow multiple maps per channel
-     * @param initialCapacity    int - the size of this map, see HashMap
-     * @param loadFactor         float - load factor, see HashMap
-     * @param channelSendOptions Send options
-     * @param cls                - a list of classloaders to be used for deserialization of objects.
-     * @param terminate          - Flag for whether to terminate this map that failed to start.
+     * Initializes the internal {@link ConcurrentHashMap} with the given capacity and load factor,
+     * then delegates to {@link #init(MapOwner, Channel, String, long, int, ClassLoader[], boolean)}
+     * to configure the map, register listeners, and perform state transfer from existing cluster members.
+     *
+     * @param owner              the object that owns this map and receives notifications when entries
+     *                           become primary on this node
+     * @param channel            the channel used for cluster communication; must not be {@code null}
+     * @param timeout            the timeout in milliseconds for RPC messages
+     * @param mapContextName     a unique name for this map that distinguishes it from other maps
+     *                           sharing the same channel
+     * @param initialCapacity    the initial capacity of the internal map, as defined by
+     *                           {@link ConcurrentHashMap#ConcurrentHashMap(int, float, int)}
+     * @param loadFactor         the load factor of the internal map, as defined by
+     *                           {@link ConcurrentHashMap#ConcurrentHashMap(int, float, int)}
+     * @param channelSendOptions the send options to use when transmitting messages through the channel
+     * @param cls                an array of class loaders used during deserialization of received objects,
+     *                           or {@code null} if no external loaders are needed
+     * @param terminate          if {@code true}, the map will terminate itself and throw a {@link RuntimeException}
+     *                           when initialization fails; if {@code false}, the failure is logged and the map
+     *                           continues in a degraded state
      */
     public AbstractReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName,
             int initialCapacity, float loadFactor, int channelSendOptions, ClassLoader[] cls, boolean terminate) {
@@ -218,16 +229,36 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
     /**
-     * Initializes the map by creating the RPC channel, registering itself as a channel listener This method is also
-     * responsible for initiating the state transfer
+     * Initializes the replicated map by configuring its internal state, registering with the channel,
+     * and performing state transfer from existing cluster members.
      *
-     * @param owner              Object
-     * @param channel            Channel
-     * @param mapContextName     String
-     * @param timeout            long
-     * @param channelSendOptions int
-     * @param cls                ClassLoader[]
-     * @param terminate          - Flag for whether to terminate this map that failed to start.
+     * This method performs the following steps:
+     * <ol>
+     *   <li>Stores the provided configuration parameters</li>
+     *   <li>Creates an {@link RpcChannel} for sending RPC messages</li>
+     *   <li>Registers this map as a {@link ChannelListener} and {@link MembershipListener} on the channel</li>
+     *   <li>Broadcasts a {@code MSG_INIT} message to announce this map to existing cluster members</li>
+     *   <li>Invokes {@link #transferState()} to receive the current map state from an existing member</li>
+     *   <li>Broadcasts a {@code MSG_START} message to signal that this map is ready for normal operation</li>
+     * </ol>
+     *
+     * If a {@link ChannelException} occurs during the broadcast or state transfer steps, the behavior
+     * depends on the {@code terminate} flag: when {@code true}, the map is torn down via {@link #breakdown()}
+     * and a {@link RuntimeException} is thrown; when {@code false}, the error is logged and the map
+     * continues in a partially initialized state.
+     *
+     * @param owner              the object that owns this map and receives notifications when entries
+     *                           become primary on this node
+     * @param channel            the channel used for cluster communication; must not be {@code null}
+     * @param mapContextName     a unique name for this map that distinguishes it from other maps
+     *                           sharing the same channel
+     * @param timeout            the timeout in milliseconds for RPC messages
+     * @param channelSendOptions the send options to use when transmitting messages through the channel
+     * @param cls                an array of class loaders used during deserialization of received objects,
+     *                           or {@code null} if no external loaders are needed
+     * @param terminate          if {@code true}, the map will terminate itself and throw a {@link RuntimeException}
+     *                           when initialization fails; if {@code false}, the failure is logged and the map
+     *                           continues in a degraded state
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,
             ClassLoader[] cls, boolean terminate) {
@@ -1323,12 +1354,8 @@ public abstract class AbstractReplicatedMap<K, V>
         entry.setCopy(false);
         entry.setPrimary(channel.getLocalMember(false));
 
-        V old = null;
-
-        // make sure that any old values get removed
-        if (containsKey(key)) {
-            old = remove(key);
-        }
+        // Make sure that any old values get removed, even if ours was only a proxy
+        V old = remove(key, notify);
         try {
             if (notify) {
                 Member[] backup = publishEntryInfo(key, value);
@@ -1390,7 +1417,7 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
     /**
-     * Returns the entire contents of the map Map.Entry.getValue() will return a LazyReplicatedMap.MapEntry object
+     * Returns the entire contents of the map Map.Entry.getValue() will return a AbstractReplicatedMap.MapEntry object
      * containing all the information about the object.
      *
      * @return Set
@@ -1426,7 +1453,7 @@ public abstract class AbstractReplicatedMap<K, V>
     public Set<Map.Entry<K,V>> entrySet() {
         LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<>(innerMap.size());
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
-            MapEntry<K,V> entry = innerMap.get(e.getKey());
+            MapEntry<K,V> entry = e.getValue();
             if (entry != null && entry.isActive()) {
                 set.add(entry);
             }
@@ -1446,7 +1473,7 @@ public abstract class AbstractReplicatedMap<K, V>
         LinkedHashSet<K> set = new LinkedHashSet<>(innerMap.size());
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             K key = e.getKey();
-            MapEntry<K,V> entry = innerMap.get(key);
+            MapEntry<K,V> entry = e.getValue();
             if (entry != null && entry.isActive()) {
                 set.add(key);
             }
@@ -1463,15 +1490,12 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     @Override
     public int size() {
-        // todo, implement a counter variable instead
         // only count active members in this node
         int counter = 0;
-        for (Entry<K,?> e : innerMap.entrySet()) {
-            if (e != null) {
-                MapEntry<K,V> entry = innerMap.get(e.getKey());
-                if (entry != null && entry.isActive() && entry.getValue() != null) {
-                    counter++;
-                }
+        for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
+            MapEntry<K,V> entry = e.getValue();
+            if (entry != null && entry.isActive() && entry.getValue() != null) {
+                counter++;
             }
         }
         return counter;
@@ -1496,7 +1520,7 @@ public abstract class AbstractReplicatedMap<K, V>
     public Collection<V> values() {
         List<V> values = new ArrayList<>();
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
-            MapEntry<K,V> entry = innerMap.get(e.getKey());
+            MapEntry<K,V> entry = e.getValue();
             if (entry != null && entry.isActive() && entry.getValue() != null) {
                 values.add(entry.getValue());
             }
@@ -1735,12 +1759,20 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public int hashCode() {
-            return key.hashCode();
+            return key == null ? 0 : key.hashCode();
         }
 
         @Override
         public boolean equals(Object o) {
-            return key.equals(o);
+            if (!(o instanceof MapEntry)) {
+                return false;
+            }
+            @SuppressWarnings("rawtypes")
+            MapEntry other = (MapEntry) o;
+            if (key == null) {
+                return other.key == null;
+            }
+            return key.equals(other.key);
         }
 
         /**
@@ -1851,8 +1883,8 @@ public abstract class AbstractReplicatedMap<K, V>
          */
         @Override
         public String toString() {
-            return "MapMessage[context=" + new String(mapId) + "; type=" + getTypeDesc() + "; key=" + key + "; value=" +
-                    value + ']';
+            return "MapMessage[context=" + new String(mapId, StandardCharsets.ISO_8859_1) + "; type=" + getTypeDesc() +
+                    "; key=" + key + "; value=" + value + ']';
         }
 
         /**

@@ -24,12 +24,14 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A pooled sender that uses {@link ParallelNioSender} instances for parallel message delivery.
  */
 public class PooledParallelSender extends PooledSender implements PooledParallelSenderMBean {
-    /** StringManager for internationalized log messages. */
+    private static final Log log = LogFactory.getLog(PooledParallelSender.class);
     protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
 
     /**
@@ -61,6 +63,9 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
                 sender.sendMessage(destination, message);
                 sender.keepalive();
             } catch (ChannelException x) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("pooledParallelSender.disconnectOnError"), x);
+                }
                 sender.disconnect();
                 throw x;
             } finally {
