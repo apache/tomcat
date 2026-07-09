@@ -42,11 +42,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A worker thread class which can drain channels and echo-back the input. Each instance is constructed with a reference
- * to the owning thread pool object. When started, the thread loops forever waiting to be awakened to service the
- * channel associated with a SelectionKey object. The worker is tasked by calling its serviceChannel() method with a
- * SelectionKey object. The serviceChannel() method stores the key reference in the thread object then calls notify() to
- * wake it up. When the channel has been drained, the worker thread returns itself to its parent pool.
+ * A worker thread class which drains a channel and processes received messages.
+ * Each instance services a single SelectionKey per invocation. After completion,
+ * the worker returns itself to its parent pool for reuse.
  */
 public class NioReplicationTask extends AbstractRxTask {
 

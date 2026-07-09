@@ -426,7 +426,11 @@ public class NioSender extends AbstractSender {
      */
     public void setMessage(byte[] data, int offset, int length) throws IOException {
         if (data != null) {
-            current = data;
+            if (offset == 0 && length == data.length) {
+                current = data;
+            } else {
+                current = Arrays.copyOfRange(data, offset, offset + length);
+            }
             remaining = length;
             ackbuf.clear();
             if (writebuf != null) {
@@ -437,8 +441,6 @@ public class NioSender extends AbstractSender {
             if (writebuf.capacity() < length) {
                 writebuf = getBuffer(length);
             }
-
-            // TODO use ByteBuffer.wrap to avoid copying the data.
             writebuf.put(data, offset, length);
             writebuf.flip();
             if (isConnected()) {

@@ -64,7 +64,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
      * @param sender the sender to return
      */
     public void returnSender(DataSender sender) {
-        sender.keepalive();
         queue.returnSender(sender);
     }
 
@@ -221,12 +220,12 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 long delta = System.currentTimeMillis() - start;
                 if (delta > timeout && timeout > 0) {
                     return null;
-                } else {
-                    try {
-                        wait(Math.max(timeout - delta, 1));
-                    } catch (InterruptedException x) {
-                        // Ignore
-                    }
+                }
+                long remaining = timeout > 0 ? Math.max(timeout - delta, 1) : 1;
+                try {
+                    wait(remaining);
+                } catch (InterruptedException x) {
+                    // Ignore
                 }
             }
         }
@@ -236,7 +235,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 sender.disconnect();
                 return;
             }
-            // to do
             inuse.remove(sender);
             // just in case the limit has changed
             if (notinuse.size() < this.getLimit()) {

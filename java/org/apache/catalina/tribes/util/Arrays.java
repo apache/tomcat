@@ -54,7 +54,7 @@ public class Arrays {
         if (keyoffset < 0 || keyoffset >= key.length) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.keyoffset.outOfBounds"));
         }
-        if (length > (key.length - keyoffset)) {
+        if (length < 0 || length > (key.length - keyoffset)) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.length.outOfBounds"));
         }
         // we don't have enough data to validate it
@@ -235,17 +235,12 @@ public class Arrays {
      * @return {@code true} if the arrays are equal
      */
     public static boolean equals(Object[] o1, Object[] o2) {
-        boolean result = o1.length == o2.length;
-        if (result) {
-            for (int i = 0; i < o1.length && result; i++) {
-                result = o1[i].equals(o2[i]);
-            }
-        }
-        return result;
+        return java.util.Arrays.equals(o1, o2);
     }
 
     /**
-     * Checks if two member arrays contain the same members.
+     * Checks if two member arrays contain the same members. Both arrays will
+     * be mutated to be sorted.
      *
      * @param m1 the first member array
      * @param m2 the second member array
@@ -258,7 +253,8 @@ public class Arrays {
     }
 
     /**
-     * Merges two member arrays, removing duplicates.
+     * Merges two member arrays, removing duplicates. Both arrays will
+     * be mutated to be sorted.
      *
      * @param m1 the first member array
      * @param m2 the second member array
