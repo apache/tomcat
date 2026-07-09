@@ -91,26 +91,27 @@ public class UUIDGenerator {
      * Generates a random UUID and stores it in the provided byte array.
      *
      * @param secure Whether to use a secure random generator
-     * @param into   The byte array to store the UUID
+     * @param dest   The byte array to store the UUID
      * @param offset The offset in the byte array
      *
      * @return The byte array containing the UUID
      *
-     * @throws ArrayIndexOutOfBoundsException If the byte array is too small
+     * @throws ArrayIndexOutOfBoundsException If the byte array is too small or null
      */
-    public static byte[] randomUUID(boolean secure, byte[] into, int offset) {
-        if ((offset + UUID_LENGTH) > into.length) {
+    public static byte[] randomUUID(boolean secure, byte[] dest, int offset) {
+        int destLength = (dest == null) ? 0 : dest.length;
+        if ((offset + UUID_LENGTH) > destLength) {
             throw new ArrayIndexOutOfBoundsException(
                     sm.getString("uuidGenerator.unable.fit", Integer.toString(UUID_LENGTH),
-                            Integer.toString(into.length), Integer.toString(offset + UUID_LENGTH)));
+                            Integer.toString(destLength), Integer.toString(offset + UUID_LENGTH)));
         }
         Random r = (secure && (secrand != null)) ? secrand : rand;
-        nextBytes(into, offset, UUID_LENGTH, r);
-        into[6 + offset] &= 0x0F;
-        into[6 + offset] |= (UUID_VERSION << 4);
-        into[8 + offset] &= 0x3F; // 0011 1111
-        into[8 + offset] |= (byte) 0x80; // 1000 0000
-        return into;
+        nextBytes(dest, offset, UUID_LENGTH, r);
+        dest[6 + offset] &= 0x0F;
+        dest[6 + offset] |= (UUID_VERSION << 4);
+        dest[8 + offset] &= 0x3F; // 0011 1111
+        dest[8 + offset] |= (byte) 0x80; // 1000 0000
+        return dest;
     }
 
     /**

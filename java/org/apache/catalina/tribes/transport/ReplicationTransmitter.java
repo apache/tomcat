@@ -108,7 +108,7 @@ public class ReplicationTransmitter implements ChannelSender {
     /**
      * Call transmitter to check for sender socket status
      *
-     * @see org.apache.catalina.ha.tcp.SimpleTcpCluster#backgroundProcess()
+     * @see org.apache.catalina.tribes.ChannelSender#heartbeat()
      */
     @Override
     public void heartbeat() {
