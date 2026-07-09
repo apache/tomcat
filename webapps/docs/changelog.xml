@@ -239,6 +239,10 @@
         Remove unnecessary calls to <code>String.intern()</code> in the parsing
         of configuration files. (markt)
       </scode>
+      <fix>
+        Extend <code>sessionAttributeValueClassNameFilter</code> to include
+        filtering of dynamic proxy interface classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
