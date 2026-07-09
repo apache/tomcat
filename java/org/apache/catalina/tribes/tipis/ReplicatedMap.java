@@ -147,8 +147,8 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
         // select a backup node
         Member[] backup = getMapMembers();
 
-        if (backup == null || backup.length == 0) {
-            return null;
+        if (backup.length == 0) {
+            return backup;
         }
 
         try {
@@ -172,7 +172,7 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             if (realFaultyMembers.length != 0) {
                 backup = excludeFromSet(realFaultyMembers, backup);
                 if (backup.length == 0) {
-                    throw e;
+                    return backup;
                 } else {
                     if (getLog().isWarnEnabled()) {
                         getLog().warn(sm.getString("replicatedMap.unableReplicate.completely", key,
@@ -246,7 +246,7 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                 }
             }
 
-        } // while
+        }
         long complete = System.currentTimeMillis() - start;
         if (log.isInfoEnabled()) {
             log.info(sm.getString("replicatedMap.relocate.complete", Long.toString(complete)));

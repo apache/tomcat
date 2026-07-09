@@ -170,7 +170,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 log.trace("Adding event to selector:" + event);
             }
             if (isListening()) {
-                selector.wakeup();
+                try {
+                    selector.wakeup();
+                } catch (ClosedSelectorException ignore) {
+                    // Selector already closed during shutdown
+                }
             }
         }
     }
@@ -298,7 +302,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException IO error
      */
     protected void listen() throws Exception {
-        if (doListen()) {
+        if (isListening()) {
             log.warn(sm.getString("nioReceiver.alreadyStarted"));
             return;
         }
@@ -313,7 +317,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
         }
 
-        while (doListen() && selector != null) {
+        while (isListening() && selector != null) {
             // this may block for a long time, upon return the
             // selected set contains keys of the ready channels
             try {
