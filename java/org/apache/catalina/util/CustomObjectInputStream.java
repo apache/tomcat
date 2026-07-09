@@ -128,19 +128,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
     public Class<?> resolveClass(ObjectStreamClass classDesc) throws ClassNotFoundException, IOException {
 
         String name = classDesc.getName();
-        if (allowedClassNamePattern != null) {
-            boolean allowed = allowedClassNamePattern.matcher(name).matches();
-            if (!allowed) {
-                boolean doLog = warnOnFailure && reportedClasses.add(name);
-                String msg = sm.getString("customObjectInputStream.nomatch", name, allowedClassNameFilter);
-                if (doLog) {
-                    log.warn(msg);
-                } else if (log.isDebugEnabled()) {
-                    log.debug(msg);
-                }
-                throw new InvalidClassException(msg);
-            }
-        }
+        checkAllowed(name);
 
         try {
             return Class.forName(name, false, classLoader);
@@ -166,6 +154,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
         Class<?>[] cinterfaces = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
+            checkAllowed(interfaces[i]);
             cinterfaces[i] = classLoader.loadClass(interfaces[i]);
         }
 
@@ -175,6 +164,28 @@ public final class CustomObjectInputStream extends ObjectInputStream {
             return proxyClass;
         } catch (IllegalArgumentException e) {
             throw new ClassNotFoundException(null, e);
+        }
+    }
+
+
+    /**
+     * Check the given class name against the configured filter, throwing an exception if it is not permitted. If no
+     * filter has been configured, all class names are permitted.
+     *
+     * @param name The fully qualified class name to check
+     *
+     * @throws InvalidClassException if the class name is not permitted by the configured filter
+     */
+    private void checkAllowed(String name) throws InvalidClassException {
+        if (allowedClassNamePattern != null && !allowedClassNamePattern.matcher(name).matches()) {
+            boolean doLog = warnOnFailure && reportedClasses.add(name);
+            String msg = sm.getString("customObjectInputStream.nomatch", name, allowedClassNameFilter);
+            if (doLog) {
+                log.warn(msg);
+            } else if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
+            throw new InvalidClassException(msg);
         }
     }
 }
