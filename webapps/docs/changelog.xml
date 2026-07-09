@@ -114,6 +114,10 @@
         Ensure that a <code>login-config</code> conflict when merging web.xml
         fragments triggers a deployment failure. (markt)
       </fix>
+      <scode>
+        Remove unnecessary calls to <code>String.intern()</code> in the parsing
+        of configuration files. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

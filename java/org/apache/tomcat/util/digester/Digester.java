@@ -1088,7 +1088,7 @@ public class Digester extends DefaultHandler2 {
         // Fire "body" events for all relevant rules
         List<Rule> rules = matches.pop();
         if ((rules != null) && (!rules.isEmpty())) {
-            String bodyText = this.bodyText.toString().intern();
+            String bodyText = this.bodyText.toString();
             for (Rule rule : rules) {
                 try {
                     if (debug) {
@@ -2135,8 +2135,7 @@ public class Digester extends DefaultHandler2 {
         for (int i = 0; i < nAttributes; ++i) {
             String value = newAttrs.getValue(i);
             try {
-                newAttrs.setValue(i,
-                        IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()).intern());
+                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()));
             } catch (Exception e) {
                 log.warn(sm.getString("digester.failedToUpdateAttributes", newAttrs.getLocalName(i), value), e);
             }

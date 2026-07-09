@@ -229,7 +229,7 @@ public class CallMethodRule extends Rule {
     public void body(String namespace, String name, String bodyText) throws Exception {
 
         if (paramCount == 0) {
-            this.bodyText = bodyText.trim().intern();
+            this.bodyText = bodyText.trim();
         }
 
     }
