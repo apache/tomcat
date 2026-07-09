@@ -24,6 +24,7 @@ public interface NodeVisitor {
      * Visits the given node.
      *
      * @param node the node to visit
+     *
      * @throws Exception if an error occurs during visitation
      */
     void visit(Node node) throws Exception;
