@@ -96,14 +96,20 @@ public class UUIDGenerator {
      *
      * @return The byte array containing the UUID
      *
-     * @throws ArrayIndexOutOfBoundsException If the byte array is too small or null
+     * @throws ArrayIndexOutOfBoundsException If the destination byte array is null, the destination byte array is too
+     *                                            small or the offset is negative
      */
     public static byte[] randomUUID(boolean secure, byte[] dest, int offset) {
-        int destLength = (dest == null) ? 0 : dest.length;
-        if ((offset + UUID_LENGTH) > destLength) {
+        if (offset < 0) {
+            throw new ArrayIndexOutOfBoundsException(sm.getString("uuidGenerator.offset.negative"));
+        }
+        if (dest == null) {
+            throw new ArrayIndexOutOfBoundsException(sm.getString("uuidGenerator.dest.null"));
+        }
+        if ((offset + UUID_LENGTH) > dest.length) {
             throw new ArrayIndexOutOfBoundsException(
                     sm.getString("uuidGenerator.unable.fit", Integer.toString(UUID_LENGTH),
-                            Integer.toString(destLength), Integer.toString(offset + UUID_LENGTH)));
+                            Integer.toString(dest.length), Integer.toString(offset + UUID_LENGTH)));
         }
         Random r = (secure && (secrand != null)) ? secrand : rand;
         nextBytes(dest, offset, UUID_LENGTH, r);
