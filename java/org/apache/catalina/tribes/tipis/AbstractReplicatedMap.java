@@ -1775,9 +1775,16 @@ public abstract class AbstractReplicatedMap<K, V>
             @SuppressWarnings("rawtypes")
             MapEntry other = (MapEntry) o;
             if (key == null) {
-                return other.key == null;
+                if (value == null) {
+                    return other.key == null && other.value == null;
+                } else {
+                    return other.key == null && value.equals(other.value);
+                }
             }
-            return key.equals(other.key);
+            if (value == null) {
+                return key.equals(other.key) && other.value == null;
+            }
+            return key.equals(other.key) && value.equals(other.value);
         }
 
         /**
