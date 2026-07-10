@@ -31,6 +31,12 @@ import org.apache.catalina.startup.LoggingBaseTest;
 
 public class TestDataSourceUserDatabase extends LoggingBaseTest {
 
+    public static final String MINIMAL_SCHEMA =
+            "create table users (\n"
+            + "  user_name         varchar(15) not null primary key,\n"
+            + "  user_pass         varchar(15) not null\n"
+            + ");";
+
     public static final String SIMPLE_SCHEMA =
             "create table users (\n"
             + "  user_name         varchar(15) not null primary key,\n"
@@ -108,6 +114,43 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
     }
 
     private DerbyUserDatabase db;
+
+    @Test
+    public void testMinimalUserRoleDatabase()
+        throws Exception {
+        // Test functionality with the DataSourceRealm schema
+
+        db = new DerbyUserDatabase("minimal");
+        db.setReadonly(false);
+        db.setUserTable("users");
+        db.setUserNameCol("user_name");
+        db.setUserCredCol("user_pass");
+        db.open();
+        // First create the DB tables
+        Connection connection = db.getConnection();
+        for (String sql: MINIMAL_SCHEMA.split(";")) {
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(sql);
+            }
+        }
+
+        Iterator<User> users = db.getUsers();
+        Assert.assertFalse("Some users found", users.hasNext());
+
+        User tomcatUser = db.createUser("tomcat", "password", "A new user");
+        db.save();
+
+        users = db.getUsers();
+        Assert.assertTrue("No users found", users.hasNext());
+        tomcatUser = users.next();
+        Assert.assertTrue("Wrong user", tomcatUser.getUsername().equals("tomcat"));
+        Assert.assertTrue("Wrong password", tomcatUser.getPassword().equals("password"));
+        // Cannot save the user full name
+        Assert.assertNull("Wrong user fullname", tomcatUser.getFullName());
+
+        db.close();
+
+    }
 
     @Test
     public void testBasicUserRoleDatabase()

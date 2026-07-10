@@ -832,7 +832,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     return null;
                 }
 
-                if (userRoleTable != null && roleNameCol != null) {
+                if (isUserRoleStoreDefined()) {
                     Connection dbConnection = openConnection();
                     if (dbConnection == null) {
                         return null;
@@ -969,7 +969,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
 
         ArrayList<Role> roles = new ArrayList<>();
-        if (userRoleTable != null && roleNameCol != null) {
+        if (isUserRoleStoreDefined()) {
             try (PreparedStatement stmt = dbConnection.prepareStatement(preparedUserRoles)) {
                 stmt.setString(1, userName);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -1052,13 +1052,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         if (log.isDebugEnabled()) {
             // As there are lots of parameters to configure, log some debug to help out
             log.debug(sm.getString("dataSourceUserDatabase.features",
-                    Boolean.toString(userRoleTable != null && roleNameCol != null),
+                    Boolean.toString(isUserRoleStoreDefined()),
                     Boolean.toString(isRoleStoreDefined()), Boolean.toString(isGroupStoreDefined())));
         }
 
         if (!isUserStoreDefined()) {
             throw new IllegalArgumentException(sm.getString("dataSourceUserDatabase.noUserConfiguration",
-                    userTable, userNameCol, userCredCol, userRoleTable, roleNameCol));
+                    userTable, userNameCol, userCredCol));
         }
 
         dbWriteLock.lock();
@@ -1085,14 +1085,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             temp.append(userTable);
             preparedAllUsers = temp.toString();
 
-            temp = new StringBuilder("SELECT ");
-            temp.append(roleNameCol);
-            temp.append(" FROM ");
-            temp.append(userRoleTable);
-            temp.append(" WHERE ");
-            temp.append(userNameCol);
-            temp.append(" = ?");
-            preparedUserRoles = temp.toString();
+            if (isUserRoleStoreDefined()) {
+                temp = new StringBuilder("SELECT ");
+                temp.append(roleNameCol);
+                temp.append(" FROM ");
+                temp.append(userRoleTable);
+                temp.append(" WHERE ");
+                temp.append(userNameCol);
+                temp.append(" = ?");
+                preparedUserRoles = temp.toString();
+            }
 
             if (isGroupStoreDefined()) {
                 temp = new StringBuilder("SELECT ");
@@ -1151,7 +1153,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp.append(" FROM ");
                 temp.append(roleTable);
                 preparedAllRoles = temp.toString();
-            } else if (userRoleTable != null && roleNameCol != null) {
+            } else if (isUserRoleStoreDefined()) {
                 // Validate roles existence from the user <-> roles table
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
@@ -1239,6 +1241,14 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             try {
                 dbConnection.setAutoCommit(false);
                 Exception exception = saveInternal(dbConnection);
+                // Commit all changes to the database
+                if (exception.getSuppressed().length == 0) {
+                    try {
+                        dbConnection.commit();
+                    } catch (SQLException e) {
+                        exception.addSuppressed(e);
+                    }
+                }
                 if (exception.getSuppressed().length > 0) {
                     // Some exception occurred so rollback everything
                     try {
@@ -1249,13 +1259,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), exception);
                     throw exception;
                 }
-                // Commit all changes to the database
-                dbConnection.commit();
                 // Everything is committed successfully, we can now clear all un-persisted changes
-                removedRoles.clear();
-                if (isRoleStoreDefined()) {
-                    createdRoles.clear();
-                    modifiedRoles.clear();
+                if (isUserRoleStoreDefined()) {
+                    removedRoles.clear();
+                    if (isRoleStoreDefined()) {
+                        createdRoles.clear();
+                        modifiedRoles.clear();
+                    }
                 }
                 if (isGroupStoreDefined()) {
                     removedGroups.clear();
@@ -1380,7 +1390,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 }
             }
 
-        } else {
+        } else if (isUserRoleStoreDefined()) {
             // Only remove role from users
             tempRelationDelete = new StringBuilder("DELETE FROM ");
             tempRelationDelete.append(userRoleTable);
@@ -1526,7 +1536,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         String userRoleRelation = null;
         String userRoleRelationDelete = null;
-        if (userRoleTable != null && roleNameCol != null) {
+        if (isUserRoleStoreDefined()) {
             tempRelation = new StringBuilder("INSERT INTO ");
             tempRelation.append(userRoleTable);
             tempRelation.append('(').append(userNameCol).append(", ");
@@ -1728,8 +1738,19 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * @return true when users are properly configured
      */
     protected boolean isUserStoreDefined() {
-        return userTable != null && userNameCol != null && userCredCol != null && userRoleTable != null && roleNameCol != null;
+        return userTable != null && userNameCol != null && userCredCol != null;
     }
+
+
+    /**
+     * User role relationship storage.
+     *
+     * @return true when user roles relationship are properly configured
+     */
+    protected boolean isUserRoleStoreDefined() {
+        return userRoleTable != null && roleNameCol != null;
+    }
+
 
     /**
      * Only use groups if the tables are fully defined.
@@ -1748,7 +1769,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * @return true when roles are used
      */
     protected boolean isRoleStoreDefined() {
-        return roleTable != null && userRoleTable != null && roleNameCol != null;
+        return roleTable != null && isUserRoleStoreDefined();
     }
 
 
