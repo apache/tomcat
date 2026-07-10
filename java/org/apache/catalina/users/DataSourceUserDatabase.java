@@ -34,6 +34,7 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1238,45 +1239,43 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         dbWriteLock.lock();
         try {
+            boolean success = false;
             try {
                 dbConnection.setAutoCommit(false);
-                Exception exception = saveInternal(dbConnection);
+                saveInternal(dbConnection);
                 // Commit all changes to the database
-                if (exception.getSuppressed().length == 0) {
-                    try {
-                        dbConnection.commit();
-                    } catch (SQLException e) {
-                        exception.addSuppressed(e);
-                    }
+                dbConnection.commit();
+                success = true;
+            } catch (Throwable t) {
+                log.error(sm.getString("dataSourceUserDatabase.exception"), t);
+                ExceptionUtils.handleThrowable(t);
+                // Some exception occurred so rollback everything
+                try {
+                    dbConnection.rollback();
+                } catch (SQLException e) {
+                    t.addSuppressed(e);
                 }
-                if (exception.getSuppressed().length > 0) {
-                    // Some exception occurred so rollback everything
-                    try {
-                        dbConnection.rollback();
-                    } catch (SQLException e) {
-                        exception.addSuppressed(e);
-                    }
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), exception);
-                    throw exception;
-                }
-                // Everything is committed successfully, we can now clear all un-persisted changes
-                if (isUserRoleStoreDefined()) {
-                    removedRoles.clear();
-                    if (isRoleStoreDefined()) {
-                        createdRoles.clear();
-                        modifiedRoles.clear();
-                    }
-                }
-                if (isGroupStoreDefined()) {
-                    removedGroups.clear();
-                    createdGroups.clear();
-                    modifiedGroups.clear();
-                }
-                removedUsers.clear();
-                createdUsers.clear();
-                modifiedUsers.clear();
+                throw t;
             } finally {
                 try {
+                    // Everything is committed successfully, we can now clear all un-persisted changes
+                    if (success) {
+                        if (isUserRoleStoreDefined()) {
+                            removedRoles.clear();
+                            if (isRoleStoreDefined()) {
+                                createdRoles.clear();
+                                modifiedRoles.clear();
+                            }
+                        }
+                        if (isGroupStoreDefined()) {
+                            removedGroups.clear();
+                            createdGroups.clear();
+                            modifiedGroups.clear();
+                        }
+                        removedUsers.clear();
+                        createdUsers.clear();
+                        modifiedUsers.clear();
+                    }
                     dbConnection.setAutoCommit(true);
                 } catch (SQLException e) {
                     // Ignore, this is for cleanup
@@ -1293,11 +1292,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * Save all pending changes to the database using the provided connection.
      *
      * @param dbConnection The database connection to use
-     * @return an Exception containing any error that occurred while saving the database as suppressed exception
+     * @throws SQLException when a database error occurs
      */
-    protected Exception saveInternal(Connection dbConnection) {
-
-        Exception mainException = new Exception(sm.getString("dataSourceUserDatabase.exception"));
+    protected void saveInternal(Connection dbConnection) throws SQLException {
         StringBuilder temp = null;
         StringBuilder tempRelation;
         StringBuilder tempRelationDelete = null;
@@ -1327,21 +1324,15 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
                             stmt.setString(1, role.getRolename());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
                         stmt.setString(1, role.getRolename());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
                         stmt.setString(1, role.getRolename());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
             }
@@ -1366,8 +1357,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(2, role.getDescription());
                         }
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
             }
@@ -1384,8 +1373,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         stmt.setString(1, role.getDescription());
                         stmt.setString(2, role.getRolename());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
             }
@@ -1401,8 +1388,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
                     stmt.setString(1, role.getRolename());
                     stmt.executeUpdate();
-                } catch (SQLException e) {
-                    mainException.addSuppressed(e);
                 }
             }
         }
@@ -1438,20 +1423,14 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(groupRoleRelationDelete)) {
                         stmt.setString(1, group.getGroupname());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
                         stmt.setString(1, group.getGroupname());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
                         stmt.setString(1, group.getGroupname());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
             }
@@ -1476,8 +1455,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(2, group.getDescription());
                         }
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                     Iterator<Role> roles = group.getRoles();
                     while (roles.hasNext()) {
@@ -1486,8 +1463,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, group.getGroupname());
                             stmt.setString(2, role.getRolename());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
@@ -1508,15 +1483,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, group.getDescription());
                             stmt.setString(2, group.getGroupname());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(groupRoleRelationDelete)) {
                         stmt.setString(1, group.getGroupname());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                     Iterator<Role> roles = group.getRoles();
                     while (roles.hasNext()) {
@@ -1525,8 +1496,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, group.getGroupname());
                             stmt.setString(2, role.getRolename());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
@@ -1580,23 +1549,17 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
                         stmt.setString(1, user.getUsername());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
                 if (userGroupRelationDelete != null) {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelationDelete)) {
                         stmt.setString(1, user.getUsername());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
                 try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
                     stmt.setString(1, user.getUsername());
                     stmt.executeUpdate();
-                } catch (SQLException e) {
-                    mainException.addSuppressed(e);
                 }
             }
         }
@@ -1623,8 +1586,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         stmt.setString(3, user.getFullName());
                     }
                     stmt.executeUpdate();
-                } catch (SQLException e) {
-                    mainException.addSuppressed(e);
                 }
                 if (userRoleRelation != null) {
                     Iterator<Role> roles = user.getRoles();
@@ -1634,8 +1595,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, user.getUsername());
                             stmt.setString(2, role.getRolename());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
@@ -1647,8 +1606,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, user.getUsername());
                             stmt.setString(2, group.getGroupname());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
@@ -1676,23 +1633,17 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         stmt.setString(2, user.getUsername());
                     }
                     stmt.executeUpdate();
-                } catch (SQLException e) {
-                    mainException.addSuppressed(e);
                 }
                 if (userRoleRelationDelete != null) {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
                         stmt.setString(1, user.getUsername());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
                 if (userGroupRelationDelete != null) {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelationDelete)) {
                         stmt.setString(1, user.getUsername());
                         stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        mainException.addSuppressed(e);
                     }
                 }
                 if (userRoleRelation != null) {
@@ -1703,8 +1654,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, user.getUsername());
                             stmt.setString(2, role.getRolename());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
@@ -1716,15 +1665,11 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                             stmt.setString(1, user.getUsername());
                             stmt.setString(2, group.getGroupname());
                             stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            mainException.addSuppressed(e);
                         }
                     }
                 }
             }
         }
-
-        return mainException;
     }
 
     @Override
