@@ -233,6 +233,9 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
         randomUser = db.findUser("random");
         Assert.assertTrue("No group for user", randomUser.isInGroup(userGroup));
 
+        Iterator<Role> roles = db.getRoles();
+        Assert.assertTrue("No roles found", roles.hasNext());
+
         db.close();
 
     }
