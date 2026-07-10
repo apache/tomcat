@@ -1179,7 +1179,7 @@ public abstract class AbstractReplicatedMap<K, V>
         MapEntry<K,V> entry = innerMap.remove(key);
 
         try {
-            if (getMapMembers().length > 0 && notify) {
+            if (getMapMembers().length > 0 && notify && entry != null) {
                 MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_REMOVE, false, (Serializable) key,
                         null, null, null, null);
                 getChannel().send(getMapMembers(), msg, getChannelSendOptions());
