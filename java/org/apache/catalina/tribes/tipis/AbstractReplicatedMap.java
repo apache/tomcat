@@ -1764,27 +1764,20 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public int hashCode() {
-            return key == null ? 0 : key.hashCode();
+            return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof MapEntry)) {
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof MapEntry)) {
                 return false;
             }
             @SuppressWarnings("rawtypes")
-            MapEntry other = (MapEntry) o;
-            if (key == null) {
-                if (value == null) {
-                    return other.key == null && other.value == null;
-                } else {
-                    return other.key == null && value.equals(other.value);
-                }
-            }
-            if (value == null) {
-                return key.equals(other.key) && other.value == null;
-            }
-            return key.equals(other.key) && value.equals(other.value);
+            MapEntry other = (MapEntry) obj;
+            return Objects.equals(key, other.key) && Objects.equals(value, other.value);
         }
 
         /**
