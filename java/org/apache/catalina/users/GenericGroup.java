@@ -32,7 +32,7 @@ import org.apache.catalina.UserDatabase;
  * Concrete implementation of {@link org.apache.catalina.Group} for a {@link UserDatabase}.
  * </p>
  *
- * @param <UD> The specific type of UserDase with which this group is associated
+ * @param <UD> The specific type of UserDatabase with which this group is associated
  */
 public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 

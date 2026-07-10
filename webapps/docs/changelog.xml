@@ -243,6 +243,11 @@
         Extend <code>sessionAttributeValueClassNameFilter</code> to include
         filtering of dynamic proxy interface classes. (markt)
       </fix>
+      <fix>
+        Attempt to use rollback when persisting user data to the
+        <code>DataSourceUserDatabase</code> fails and improve error reporting.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
