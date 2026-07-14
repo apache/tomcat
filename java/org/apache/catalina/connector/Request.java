@@ -110,6 +110,7 @@ import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUpload;
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
@@ -2695,7 +2696,7 @@ public class Request implements HttpServletRequest {
                 parts.add(part);
             }
             success = true;
-        } catch (InvalidContentTypeException e) {
+        } catch (InvalidContentTypeException | InvalidFileNameException e) {
             partsParseException = new ServletException(e);
         } catch (SizeException | FileCountLimitExceededException e) {
             checkSwallowInput();

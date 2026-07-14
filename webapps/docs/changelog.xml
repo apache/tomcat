@@ -127,6 +127,11 @@
         <code>DataSourceUserDatabase</code> fails and improve error reporting.
         (remm)
       </fix>
+      <fix>
+        <bug>70143</bug>: Handle InvalidFileNameException when parsing parts to
+        rethrow it as an <code>IllegalStateException</code> as mandated by the
+        Servlet specification. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
