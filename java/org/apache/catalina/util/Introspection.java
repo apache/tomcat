@@ -45,8 +45,9 @@ public class Introspection {
 
 
     /**
-     * Extract the Java Bean property name from the setter name. Note: This method assumes that the method name has
-     * already been checked for correctness.
+     * Extract the Java Bean property name from the setter name. Note: This
+     * method assumes that the method name starts with "set" and has a length
+     * greater than 3.
      *
      * @param setter The setter method
      *

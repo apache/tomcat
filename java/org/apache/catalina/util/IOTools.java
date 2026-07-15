@@ -94,7 +94,7 @@ public class IOTools {
      * @param is  The source to read from
      * @param buf The buffer to write to
      *
-     * @return The number of bytes read
+     * @return The number of bytes actually read
      *
      * @throws IOException If an I/O error occurs during the read
      */

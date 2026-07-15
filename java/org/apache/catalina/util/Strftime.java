@@ -29,7 +29,7 @@ import java.util.TimeZone;
  * were literals.</li>
  * <li>Certain complicated commands, like those dealing with the week of the year probably don't have exactly the same
  * behavior as strftime.</li>
- * <li>These limitations are due to use SimpleDateTime. If the conversion was done manually, all these limitations could
+ * <li>These limitations are due to use SimpleDateFormat. If the conversion was done manually, all these limitations could
  * be eliminated.</li>
  * <li>The interface looks like a subset of DateFormat. Maybe someday someone will make this class extend
  * DateFormat.</li>
