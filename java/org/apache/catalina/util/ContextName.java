@@ -99,7 +99,7 @@ public final class ContextName {
     /**
      * Construct an instance from a path and version.
      *
-     * @param path    Context path to use
+     * @param path    Context path to use, which must not contain a version marker
      * @param version Context version to use
      */
     public ContextName(String path, String version) {

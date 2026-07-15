@@ -18,6 +18,7 @@ package org.apache.catalina.util;
 
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -87,15 +88,15 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * The current lock state of this parameter map.
+     * The current lock state of this set.
      */
     private boolean locked = false;
 
 
     /**
-     * Return the locked state of this parameter map.
+     * Return the locked state of this set.
      *
-     * @return the locked state of this parameter map
+     * @return the locked state of this set
      */
     public boolean isLocked() {
         return this.locked;
@@ -103,7 +104,7 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Set the locked state of this parameter map.
+     * Set the locked state of this set.
      *
      * @param locked The new locked state
      */
@@ -216,6 +217,23 @@ public final class ResourceSet<T> extends HashSet<T> {
     public boolean removeIf(java.util.function.Predicate<? super T> filter) {
         checkLocked();
         return super.removeIf(filter);
+    }
+
+
+    @Override
+    public java.util.Spliterator<T> spliterator() {
+        if (locked) {
+            java.util.Spliterator<T> base = super.spliterator();
+            return new java.util.Spliterator<T>() {
+                @Override public boolean tryAdvance(java.util.function.Consumer<? super T> action) { return base.tryAdvance(action); }
+                @Override public java.util.Spliterator<T> trySplit() { return null; }
+                @Override public long estimateSize() { return base.estimateSize(); }
+                @Override public int characteristics() { return base.characteristics() & ~java.util.Spliterator.SORTED; }
+                @Override public void forEachRemaining(java.util.function.Consumer<? super T> action) { base.forEachRemaining(action); }
+                @Override public Comparator<? super T> getComparator() { return base.getComparator(); }
+            };
+        }
+        return super.spliterator();
     }
 
 

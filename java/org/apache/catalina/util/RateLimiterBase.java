@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.FilterConfig;
 
 /**
- * Base implementation of {@link RateLimiter}, provides runtime data maintenance mechanism monitor.
+ * Base implementation of {@link RateLimiter}, provides a runtime data maintenance mechanism and monitor.
  */
 public abstract class RateLimiterBase implements RateLimiter {
 

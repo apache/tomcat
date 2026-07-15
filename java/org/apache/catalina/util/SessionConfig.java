@@ -77,7 +77,7 @@ public class SessionConfig {
      *
      * @param context The context
      *
-     * @return the parameter name for the session
+     * @return the cookie path for the session
      */
     public static String getSessionCookiePath(Context context) {
 
