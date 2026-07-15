@@ -277,7 +277,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
             try {
                 result = SecureRandom.getInstance(DEFAULT_SECURE_RANDOM_ALGORITHM);
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm", secureRandomAlgorithm), e);
+                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm", DEFAULT_SECURE_RANDOM_ALGORITHM), e);
             }
         }
 

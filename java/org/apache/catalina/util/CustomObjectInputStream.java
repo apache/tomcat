@@ -73,8 +73,8 @@ public final class CustomObjectInputStream extends ObjectInputStream {
      * @param log                     The logger to use to report any issues. It may only be null if the filterMode does
      *                                    not require logging
      * @param allowedClassNamePattern The regular expression to use to filter deserialized classes. The fully qualified
-     *                                    class name must match this pattern for deserialization to be allowed if
-     *                                    filtering is enabled.
+     *                                    class name must match this pattern for deserialization to be allowed.
+     *                                    If null, filtering will be disabled.
      * @param warnOnFailure           Should any failures be logged?
      *
      * @exception IOException if an input/output error occurs
