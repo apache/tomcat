@@ -97,18 +97,18 @@ public class ErrorPageSupport {
 
 
     /**
-     * Find the ErrorPage, if any, for the given exception type, searching up the
+     * Find the ErrorPage, if any, for the given exception, searching up the
      * exception's class hierarchy.
      *
-     * @param exceptionType The exception instance
+     * @param exception The exception instance
      *
-     * @return The ErrorPage for the exception type, or {@code null} if none is configured
+     * @return The ErrorPage for the exception, or {@code null} if none is configured
      */
-    public ErrorPage find(Throwable exceptionType) {
-        if (exceptionType == null) {
+    public ErrorPage find(Throwable exception) {
+        if (exception == null) {
             return null;
         }
-        Class<?> clazz = exceptionType.getClass();
+        Class<?> clazz = exception.getClass();
         String name = clazz.getName();
         while (!Object.class.equals(clazz)) {
             ErrorPage errorPage = exceptionPages.get(name);

@@ -126,7 +126,7 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
     /**
      * Returns the ratio to the next power of 2 so that we can adjust the value.
      *
-     * @param value of target duration in seconds
+     * @param value of target duration in milliseconds
      *
      * @return the ratio to the next power of 2 so that we can adjust the value
      */

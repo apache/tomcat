@@ -104,7 +104,7 @@ public class NetMaskSet {
     }
 
     /**
-     * removes all entries from the set
+     * Removes all entries from the set.
      */
     public void clear() {
         netmasks.clear();

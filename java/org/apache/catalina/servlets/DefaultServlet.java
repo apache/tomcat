@@ -2143,8 +2143,12 @@ public class DefaultServlet extends HttpServlet {
                     log(sm.getString("defaultServlet.globalXSLTTooBig", f.getAbsolutePath()));
                 } else {
                     try (FileInputStream fis = new FileInputStream(f)) {
-                        byte[] b = new byte[(int) f.length()];
-                        IOTools.readFully(fis, b);
+                        int xsltLength = (int) globalXsltFileSize;
+                        byte[] b = new byte[xsltLength];
+                        if (xsltLength != IOTools.readFully(fis, b)) {
+                            log(sm.getString("defaultServlet.truncatedXSLT", f.getAbsolutePath()));
+                            return null;
+                        }
                         return new StreamSource(new ByteArrayInputStream(b));
                     }
                 }

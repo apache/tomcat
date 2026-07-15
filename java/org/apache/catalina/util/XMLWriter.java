@@ -111,7 +111,7 @@ public class XMLWriter {
      */
     public void writeProperty(String namespace, String name, String value) {
         writeElement(namespace, name, OPENING);
-        buffer.append(value);
+        buffer.append(Escape.xml(value));
         writeElement(namespace, name, CLOSING);
     }
 
@@ -243,7 +243,17 @@ public class XMLWriter {
      * @param data Data to append
      */
     public void writeData(String data) {
-        buffer.append("<![CDATA[").append(data).append("]]>");
+        buffer.append("<![CDATA[");
+        int start = 0;
+        int idx;
+        while ((idx = data.indexOf("]]>", start)) >= 0) {
+            buffer.append(data, start, idx);
+            // We terminate, then append the ]]>, and restart the sequence
+            buffer.append("]]>]]><![CDATA[");
+            start = idx + 3;
+        }
+        buffer.append(data.substring(start));
+        buffer.append("]]>");
     }
 
 
