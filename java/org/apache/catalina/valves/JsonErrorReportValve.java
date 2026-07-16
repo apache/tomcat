@@ -81,17 +81,26 @@ public class JsonErrorReportValve extends ErrorReportValve {
             if (message == null) {
                 message = "";
             }
-            String description = smClient.getString("http." + statusCode + ".desc");
-            if (description == null) {
+            String reason = null;
+            String description = null;
+            try {
+                reason = smClient.getString("http." + statusCode + ".reason");
+                description = smClient.getString("http." + statusCode + ".desc");
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+            }
+            if (reason == null || description == null) {
                 if (message.isEmpty()) {
                     return;
                 } else {
+                    reason = smClient.getString("errorReportValve.unknownReason");
                     description = smClient.getString("errorReportValve.noDescription");
                 }
             }
             sb.append(",\n");
             sb.append("  \"type\": \"").append(JSONFilter.escape(type)).append("\",\n");
             sb.append("  \"message\": \"").append(JSONFilter.escape(message)).append("\",\n");
+            sb.append("  \"reason\": \"").append(JSONFilter.escape(reason)).append("\",\n");
             sb.append("  \"description\": \"").append(JSONFilter.escape(description));
 
             if (throwable != null) {

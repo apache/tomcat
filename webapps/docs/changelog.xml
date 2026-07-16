@@ -132,6 +132,9 @@
         rethrow it as an <code>IllegalStateException</code> as mandated by the
         Servlet specification. (remm)
       </fix>
+      <fix>
+        Add missing reason to the <code>JsonErrorReportValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
