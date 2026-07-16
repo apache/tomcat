@@ -437,7 +437,12 @@ public class ErrorReportValve extends ValveBase {
      */
     public boolean setProperty(String name, String value) {
         if (name.startsWith("errorCode.")) {
-            int code = Integer.parseInt(name.substring(10));
+            int code;
+            try {
+                code = Integer.parseInt(name.substring(10));
+            } catch (NumberFormatException e) {
+                return false;
+            }
             ErrorPage ep = new ErrorPage();
             ep.setErrorCode(code);
             ep.setLocation(value);
@@ -464,7 +469,12 @@ public class ErrorReportValve extends ValveBase {
     public String getProperty(String name) {
         String result;
         if (name.startsWith("errorCode.")) {
-            int code = Integer.parseInt(name.substring(10));
+            int code;
+            try {
+                code = Integer.parseInt(name.substring(10));
+            } catch (NumberFormatException e) {
+                return null;
+            }
             ErrorPage ep = errorPageSupport.find(code);
             if (ep == null) {
                 result = null;

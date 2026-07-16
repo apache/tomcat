@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Enumeration;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 
@@ -569,8 +571,14 @@ public class RemoteIpValve extends ValveBase {
         final String originalLocalName = isChangeLocalName() ? request.getLocalName() : null;
         final int originalServerPort = request.getServerPort();
         final int originalLocalPort = request.getLocalPort();
-        final String originalProxiesHeader = request.getHeader(proxiesHeader);
-        final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
+        final List<String> originalProxiesHeaderValues = new ArrayList<>();
+        for (Enumeration<String> e = request.getHeaders(proxiesHeader); e.hasMoreElements();) {
+            originalProxiesHeaderValues.add(e.nextElement());
+        }
+        final List<String> originalRemoteIpHeaderValues = new ArrayList<>();
+        for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+            originalRemoteIpHeaderValues.add(e.nextElement());
+        }
 
         boolean isInternal = isInternalProxy(originalRemoteAddr);
 
@@ -728,16 +736,22 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (originalProxiesHeader == null || originalProxiesHeader.isEmpty()) {
+                if (originalProxiesHeaderValues.isEmpty()) {
                     headers.removeHeader(proxiesHeader);
                 } else {
-                    headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+                    headers.removeHeader(proxiesHeader);
+                    for (String v : originalProxiesHeaderValues) {
+                        headers.addValue(proxiesHeader).setString(v);
+                    }
                 }
 
-                if (originalRemoteIpHeader == null || originalRemoteIpHeader.isEmpty()) {
+                if (originalRemoteIpHeaderValues.isEmpty()) {
                     headers.removeHeader(remoteIpHeader);
                 } else {
-                    headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+                    headers.removeHeader(remoteIpHeader);
+                    for (String v : originalRemoteIpHeaderValues) {
+                        headers.addValue(remoteIpHeader).setString(v);
+                    }
                 }
             }
         }

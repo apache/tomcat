@@ -61,7 +61,7 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <pre>
  * {@code
  * <Context>
- *     <Valve className="org.apache.catalina.valves.ParameterLimitValve"
+ *     <Valve className="org.apache.catalina.valves.ParameterLimitValve"/>
  * </Context>
  * }
  * and in <code>parameter_limit.config</code>:

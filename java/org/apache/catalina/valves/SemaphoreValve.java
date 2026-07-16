@@ -79,6 +79,10 @@ public class SemaphoreValve extends ValveBase {
      * @param concurrency the concurrency level
      */
     public void setConcurrency(int concurrency) {
+        if (concurrency < 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("semaphoreValve.invalidConcurrency", Integer.valueOf(concurrency)));
+        }
         this.concurrency = concurrency;
     }
 
@@ -175,6 +179,10 @@ public class SemaphoreValve extends ValveBase {
      * @param highConcurrencyStatus the status code to return
      */
     public void setHighConcurrencyStatus(int highConcurrencyStatus) {
+        if (highConcurrencyStatus != -1 && (highConcurrencyStatus < 100 || highConcurrencyStatus >= 600)) {
+            throw new IllegalArgumentException(
+                    sm.getString("semaphoreValve.invalidStatus", Integer.valueOf(highConcurrencyStatus)));
+        }
         this.highConcurrencyStatus = highConcurrencyStatus;
     }
 
