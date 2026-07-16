@@ -74,7 +74,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Specify the regular expression (using {@link Pattern}) that will be used to identify crawlers based in the
-     * User-Agent header provided. The default is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
+     * User-Agent header provided. The default is ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*"
      *
      * @param crawlerUserAgents The regular expression using {@link Pattern}
      */
