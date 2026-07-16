@@ -287,6 +287,7 @@ public class JsonAccessLogValve extends AccessLogValve {
             if (quoteValue) {
                 buf.append('"');
             }
+            // The value will already be log escaped
             delegate.addElement(buf, request, response, time);
             if (quoteValue) {
                 buf.append('"');

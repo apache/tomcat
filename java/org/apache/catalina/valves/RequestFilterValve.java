@@ -43,8 +43,8 @@ import org.apache.juli.logging.Log;
  * this request will be rejected with a "Forbidden" HTTP response.</li>
  * <li>If there is an allow expression configured, the property will be compared to each such expression. If a match is
  * found, this request will be allowed to pass through to the next Valve in the current pipeline.</li>
- * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
- * the deny expressions matched it).
+ * <li>If a deny expression was specified but no allow expression was specified, allow this request to pass through
+ * (because none of the deny expressions matched it).</li>
  * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  * <p>
@@ -123,7 +123,7 @@ public abstract class RequestFilterValve extends ValveBase {
     private volatile boolean addConnectorPort = false;
 
     /**
-     * Flag deciding whether we use the connection peer address or the remote address. This makes a dfifference when
+     * Flag deciding whether we use the connection peer address or the remote address. This makes a difference when
      * using AJP or the RemoteIpValve.
      */
     private volatile boolean usePeerAddress = false;
@@ -284,7 +284,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Get the flag deciding whether we use the connection peer address or the remote address. This makes a dfifference
+     * Get the flag deciding whether we use the connection peer address or the remote address. This makes a difference
      * when using AJP or the RemoteIpValve.
      *
      * @return <code>true</code> if we use the connection peer address
@@ -295,7 +295,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Set the flag deciding whether we use the connection peer address or the remote address. This makes a dfifference
+     * Set the flag deciding whether we use the connection peer address or the remote address. This makes a difference
      * when using AJP or the RemoteIpValve.
      *
      * @param usePeerAddress The new flag

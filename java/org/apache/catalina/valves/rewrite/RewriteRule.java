@@ -89,6 +89,7 @@ public class RewriteRule {
         if (isNocase()) {
             flags |= Pattern.CASE_INSENSITIVE;
         }
+        // Check that the pattern compiles
         Pattern.compile(patternString, flags);
         // Parse conditions
         for (RewriteCond condition : conditions) {

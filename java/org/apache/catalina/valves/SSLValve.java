@@ -235,6 +235,7 @@ public class SSLValve extends ValveBase {
                 } catch (NoSuchProviderException e) {
                     log.error(sm.getString("sslValve.invalidProvider", providerName), e);
                 }
+                // If parsing fails, remove certificates
                 request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
             }
         }
