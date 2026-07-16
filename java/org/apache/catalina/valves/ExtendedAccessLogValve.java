@@ -342,7 +342,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            wrap(request.getAttribute(attribute), buf);
+            wrap(request == null ? "??" : request.getAttribute(attribute), buf);
         }
     }
 
@@ -368,7 +368,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 session = request.getSession(false);
                 if (session != null) {
                     wrap(session.getAttribute(attribute), buf);
+                    return;
+                } else {
+                    buf.append('-');
                 }
+            } else {
+                buf.append("??");
             }
         }
     }

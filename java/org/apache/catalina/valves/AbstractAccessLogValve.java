@@ -2209,16 +2209,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * - %to trailer response header - %V server name per UseCanonicalName setting
      *
      * The following escaped elements are not escaped in Tomcat because values that would require escaping are rejected
-     * before they reach the AccessLogValve: - %h remote host - %H request protocol - %m request method - %q query
-     * string - %r request line - %U request URI - %v canonical server name
+     * before they reach the AccessLogValve: - %h remote host - %H request protocol - %m request method
+     * - %v canonical server name
      *
      * The following escaped elements are supported by Tomcat: - %{}i request header - %{}o response header - %u remote
      * user
      *
      * The following additional Tomcat elements are escaped for consistency: - %{}c cookie value - %{}r request
-     * attribute - %{}s session attribute
+     * attribute - %{}s session attribute - %q query string - %r request line - %U request URI
      *
-     * giving a total of 6 elements that are escaped in Tomcat.
+     * giving a total of 9 elements that are escaped in Tomcat.
      *
      * Quoting from the httpd docs: "...non-printable and other special characters in %r, %i and %o are escaped using
      * \xhh sequences, where hh stands for the hexadecimal representation of the raw byte. Exceptions from this rule are
