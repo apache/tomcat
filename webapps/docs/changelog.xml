@@ -135,6 +135,14 @@
       <fix>
         Add missing reason to the <code>JsonErrorReportValve</code>. (remm)
       </fix>
+      <fix>
+        Fix evaluation of the <code>N</code> and <code>C</code> flags for
+        rewrite rules. (remm)
+      </fix>
+      <fix>
+        <code>qsd</code> flag should always discard the original query string
+        when rewriting. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
