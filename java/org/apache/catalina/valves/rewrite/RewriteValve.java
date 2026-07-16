@@ -312,6 +312,7 @@ public class RewriteValve extends ValveBase {
                 }
             } catch (IOException ioe) {
                 containerLog.error(sm.getString("rewriteValve.readError"), ioe);
+                break;
             }
         }
         this.mapsConfiguration = mapsConfiguration;
@@ -475,11 +476,7 @@ public class RewriteValve extends ValveBase {
                                         REWRITE_QUERY_ENCODER.encode(rewrittenQueryStringRewriteEncoded, uriCharset));
                                 urlStringEncoded.append('&');
                                 urlStringEncoded.append(queryStringOriginalEncoded);
-                            } else if (index == urlStringEncoded.length() - 1) {
-                                // if the ? is the last character delete it, its only purpose was to
-                                // prevent the rewrite module from appending the query string
-                                urlStringEncoded.deleteCharAt(index);
-                            } else {
+                            } else if (!rewrittenQueryStringRewriteEncoded.isEmpty()) {
                                 urlStringEncoded.append('?');
                                 urlStringEncoded.append(
                                         REWRITE_QUERY_ENCODER.encode(rewrittenQueryStringRewriteEncoded, uriCharset));
@@ -538,12 +535,15 @@ public class RewriteValve extends ValveBase {
 
                 // - chain (skip remaining chained rules if this one does not match)
                 if (rule.isChain() && newtest == null) {
-                    for (int j = i; j < rules.length; j++) {
+                    int skip = 0;
+                    for (int j = i + 1; j < rules.length; j++) {
                         if (!rules[j].isChain()) {
-                            i = j;
                             break;
+                        } else {
+                            skip++;
                         }
                     }
+                    i += skip;
                     continue;
                 }
                 // - last (stop rewriting here)
@@ -552,7 +552,7 @@ public class RewriteValve extends ValveBase {
                 }
                 // - next (redo again)
                 if (rule.isNext() && newtest != null) {
-                    i = 0;
+                    i = -1;
                     continue;
                 }
                 // - skip (n rules)
@@ -618,7 +618,7 @@ public class RewriteValve extends ValveBase {
                         request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.append(REWRITE_QUERY_ENCODER.encode(queryStringRewriteEncoded, uriCharset));
-                        if (qsa && queryStringOriginalEncoded != null && !queryStringOriginalEncoded.isEmpty()) {
+                        if (!qsd && qsa && queryStringOriginalEncoded != null && !queryStringOriginalEncoded.isEmpty()) {
                             chunk.append('&');
                             chunk.append(queryStringOriginalEncoded);
                         }
