@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.WebResource;
@@ -298,15 +297,70 @@ public class ResolverImpl extends Resolver {
 
     private String resolveComponent(String fullDN, String component) {
         HashMap<String,String> components = new HashMap<>();
-        StringTokenizer tokenizer = new StringTokenizer(fullDN, ",");
-        while (tokenizer.hasMoreElements()) {
-            String token = tokenizer.nextToken().trim();
-            int pos = token.indexOf('=');
-            if (pos > 0 && (pos + 1) < token.length()) {
-                components.put(token.substring(0, pos), token.substring(pos + 1));
+        int len = fullDN.length();
+        int start = 0;
+        while (start < len) {
+            // Skip leading whitespace
+            while (start < len && Character.isWhitespace(fullDN.charAt(start))) {
+                start++;
             }
+            if (start >= len) {
+                break;
+            }
+
+            // Find the unescaped '=' that separates key from value
+            int eqPos = -1;
+            for (int i = start; i < len; i++) {
+                char c = fullDN.charAt(i);
+                if (c == '\\' && i + 1 < len) {
+                    i++; // Skip escaped character
+                } else if (c == '=') {
+                    eqPos = i;
+                    break;
+                }
+            }
+            if (eqPos < 0) {
+                break;
+            }
+
+            String key = unescape(fullDN.substring(start, eqPos)).trim();
+            int valStart = eqPos + 1;
+
+            // Find the unescaped ',' that ends this RDN, or end of string
+            int commaPos = len;
+            for (int i = valStart; i < len; i++) {
+                char c = fullDN.charAt(i);
+                if (c == '\\' && i + 1 < len) {
+                    i++; // Skip escaped character
+                } else if (c == ',') {
+                    commaPos = i;
+                    break;
+                }
+            }
+
+            String value = unescape(fullDN.substring(valStart, commaPos)).trim();
+            if (!key.isEmpty()) {
+                components.put(key, value);
+            }
+
+            start = commaPos + 1;
         }
         return components.get(component);
+    }
+
+    private String unescape(String s) {
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\\' && i + 1 < s.length()) {
+                char next = s.charAt(i + 1);
+                sb.append(next);
+                i++;
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private String resolveAlternateName(X509Certificate certificate, int type, int n) {
