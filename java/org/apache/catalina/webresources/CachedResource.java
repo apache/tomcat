@@ -522,7 +522,7 @@ public class CachedResource implements WebResource {
                     constructedURI = new URI(u.toExternalForm());
                 } catch (URISyntaxException e) {
                     // Not ideal but consistent with API
-                    throw new IOException(e);
+                    throw new IOException(sm.getString("cachedResource.invalidURI", u.toExternalForm()), e);
                 }
                 URL constructedURL = constructedURI.toURL();
                 return constructedURL.openConnection();

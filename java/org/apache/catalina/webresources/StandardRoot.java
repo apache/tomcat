@@ -898,7 +898,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 try {
                     f = new File(new URI(fileUrl));
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
+                    throw new IllegalArgumentException(
+                            sm.getString("standardRoot.invalidJarUrl", fileUrl), e);
                 }
                 int startOfArchivePath = endOfFileUrl + 2;
                 if (jarUrl.length() > startOfArchivePath) {
@@ -910,7 +911,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 try {
                     f = new File(url.toURI());
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
+                    throw new IllegalArgumentException(
+                            sm.getString("standardRoot.invalidFileUrl", url.toExternalForm()), e);
                 }
                 archivePath = null;
             } else {

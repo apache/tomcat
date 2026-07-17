@@ -32,6 +32,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class PooledParallelSender extends PooledSender implements PooledParallelSenderMBean {
     private static final Log log = LogFactory.getLog(PooledParallelSender.class);
+    /** StringManager for internationalized log messages. */
     protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
 
     /**
