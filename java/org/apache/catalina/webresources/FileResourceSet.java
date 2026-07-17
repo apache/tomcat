@@ -59,7 +59,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
             try {
                 start();
             } catch (LifecycleException e) {
-                throw new IllegalStateException(e);
+                throw new IllegalStateException(sm.getString("fileResourceSet.startFail"), e);
             }
         }
     }

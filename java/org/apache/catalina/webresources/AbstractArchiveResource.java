@@ -205,7 +205,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
-            throw new ArrayIndexOutOfBoundsException(
+            throw new IllegalStateException(
                     sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
         }
 
@@ -229,6 +229,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
                     break;
                 }
                 pos += n;
+            }
+            if (pos < size) {
+                // Stream ended before expected size — return null to avoid partial data
+                return null;
             }
             // Once the stream has been read, read the certs
             certificates = jisw.getCertificates();

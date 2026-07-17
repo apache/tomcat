@@ -192,7 +192,7 @@ public interface WebResource {
     /**
      * Returns the certificates that were used to sign this resource to verify it.
      *
-     * @return the certificates that were used to sign this resource to verify it or @null if none.
+     * @return the certificates that were used to sign this resource to verify it or {@code null} if none.
      *
      * @see java.util.jar.JarEntry#getCertificates()
      */
@@ -201,7 +201,7 @@ public interface WebResource {
     /**
      * Returns the manifest associated with this resource.
      *
-     * @return the manifest associated with this resource or @null if none.
+     * @return the manifest associated with this resource or {@code null} if none.
      *
      * @see java.util.jar.JarFile#getManifest()
      */

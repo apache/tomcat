@@ -52,11 +52,11 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
      * @param base         The base
      * @param internalPath The internal path
      *
-     * @throws IllegalArgumentException if the {@link WebResourceRoot} is available but this resource set cannot be
+     * @throws IllegalStateException if the {@link WebResourceRoot} is available but this resource set cannot be
      *                                      started
      */
     public AbstractSingleArchiveResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath)
-            throws IllegalArgumentException {
+            throws IllegalStateException {
         setRoot(root);
         setWebAppMount(webAppMount);
         setBase(base);
@@ -66,7 +66,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
             try {
                 start();
             } catch (LifecycleException e) {
-                throw new IllegalStateException(e);
+                throw new IllegalStateException(sm.getString("abstractArchiveResourceSet.startFail"), e);
             }
         }
     }
@@ -88,7 +88,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
                 } catch (IOException ioe) {
                     // Should never happen
                     archiveEntries = null;
-                    throw new IllegalStateException(ioe);
+                    throw new IllegalStateException(
+                            sm.getString("abstractArchiveResourceSet.archiveEntriesFail", getBase()), ioe);
                 } finally {
                     if (jarFile != null) {
                         closeJarFile();
@@ -108,7 +109,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
             return jarFile.getJarEntry(pathInArchive);
         } catch (IOException ioe) {
             // Should never happen
-            throw new IllegalStateException(ioe);
+            throw new IllegalStateException(
+                    sm.getString("abstractArchiveResourceSet.archiveEntryFail", getBase()), ioe);
         } finally {
             if (jarFile != null) {
                 closeJarFile();
@@ -128,7 +130,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
                         multiRelease = Boolean.valueOf(jarFile.isMultiRelease());
                     } catch (IOException ioe) {
                         // Should never happen
-                        throw new IllegalStateException(ioe);
+                        throw new IllegalStateException(
+                                sm.getString("abstractArchiveResourceSet.multiReleaseFail", getBase()), ioe);
                     } finally {
                         if (jarFile != null) {
                             closeJarFile();
@@ -149,13 +152,15 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
         try (JarFile jarFile = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version())) {
             setManifest(jarFile.getManifest());
         } catch (IOException ioe) {
-            throw new IllegalArgumentException(ioe);
+            throw new LifecycleException(
+                    sm.getString("abstractArchiveResourceSet.manifestFail", getBase()), ioe);
         }
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
+            throw new LifecycleException(
+                    sm.getString("abstractArchiveResourceSet.baseUrlFail", getBase()), e);
         }
     }
 }
