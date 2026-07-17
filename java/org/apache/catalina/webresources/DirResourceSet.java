@@ -90,7 +90,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             try {
                 start();
             } catch (LifecycleException e) {
-                throw new IllegalStateException(e);
+                throw new IllegalStateException(sm.getString("dirResourceSet.startFail"), e);
             }
         }
     }
