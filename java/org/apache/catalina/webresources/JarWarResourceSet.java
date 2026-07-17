@@ -69,7 +69,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             try {
                 start();
             } catch (LifecycleException e) {
-                throw new IllegalStateException(e);
+                throw new IllegalStateException(sm.getString("jarWarResourceSet.startFail"), e);
             }
         }
     }
@@ -133,7 +133,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 } catch (IOException ioe) {
                     // Should never happen
                     archiveEntries = null;
-                    throw new IllegalStateException(ioe);
+                    throw new IllegalStateException(
+                            sm.getString("jarWarResourceSet.archiveEntriesFail", archivePath, getBase()), ioe);
                 } finally {
                     if (warFile != null) {
                         closeJarFile();
@@ -256,13 +257,14 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 setManifest(jarIs.getManifest());
             }
         } catch (IOException ioe) {
-            throw new IllegalArgumentException(ioe);
+            throw new LifecycleException(
+                    sm.getString("jarWarResourceSet.manifestFail", archivePath, getBase()), ioe);
         }
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
         } catch (IOException ioe) {
-            throw new IllegalArgumentException(ioe);
+            throw new LifecycleException(sm.getString("jarWarResourceSet.baseUrlFail", getBase()), ioe);
         }
     }
 

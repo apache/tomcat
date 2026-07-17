@@ -138,15 +138,19 @@ public abstract class AbstractResource implements WebResource {
                         } else {
                             byte[] buf = new byte[4096];
                             try (InputStream is = getInputStream()) {
-                                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                                while (true) {
-                                    int n = is.read(buf);
-                                    if (n <= 0) {
-                                        break;
+                                if (is == null) {
+                                    strongETag = getETag();
+                                } else {
+                                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                                    while (true) {
+                                        int n = is.read(buf);
+                                        if (n <= 0) {
+                                            break;
+                                        }
+                                        digest.update(buf, 0, n);
                                     }
-                                    digest.update(buf, 0, n);
+                                    strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
                                 }
-                                strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
                             } catch (Exception e) {
                                 strongETag = getETag();
                             }

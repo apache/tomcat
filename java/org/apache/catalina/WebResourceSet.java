@@ -71,7 +71,8 @@ public interface WebResourceSet extends Lifecycle {
      *
      * @param path      The path to be used for the new Resource. It is relative to the root of the web application and
      *                      must start with '/'.
-     * @param is        The InputStream that will provide the content for the new Resource.
+     * @param is        The InputStream that will provide the content for the new Resource. The caller is responsible
+     *                  for closing the stream if required.
      * @param overwrite If <code>true</code> and the resource already exists it will be overwritten. If
      *                      <code>false</code> and the resource already exists the write will fail.
      *

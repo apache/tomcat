@@ -356,6 +356,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
      */
     @Override
     public void setAllowLinking(boolean allowLinking) {
+        // NO-OP
     }
 
     /**
