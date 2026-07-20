@@ -156,6 +156,10 @@
         Add utility AutoCloseable URLConnection wrapper, and use it to cleanup
         existing code patterns. (remm/markt)
       </update>
+      <fix>
+        When processing an HTTP upgrade from HTTP/1.1 to HTTP/2, ensure that all
+        the HTTP/1.1 data has been processed before switching protocols. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
