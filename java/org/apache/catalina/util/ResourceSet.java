@@ -224,7 +224,7 @@ public final class ResourceSet<T> extends HashSet<T> {
     public java.util.Spliterator<T> spliterator() {
         if (locked) {
             java.util.Spliterator<T> base = super.spliterator();
-            return new java.util.Spliterator<T>() {
+            return new java.util.Spliterator<>() {
                 @Override public boolean tryAdvance(java.util.function.Consumer<? super T> action) { return base.tryAdvance(action); }
                 @Override public java.util.Spliterator<T> trySplit() { return null; }
                 @Override public long estimateSize() { return base.estimateSize(); }
