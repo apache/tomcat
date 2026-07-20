@@ -67,6 +67,30 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
 
     @Test
+    public void testUpgradeWithRequestBodyNoSavePostSize() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("maxSavePostSize", "0");
+        configureAndStartWebApplication();
+
+        openClientConnection();
+
+        byte[] upgradeRequest =
+                ("GET /simple HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Content-Length: 18\r\n" +
+                        "Connection: Upgrade,HTTP2-Settings\r\n" + "Upgrade: h2c\r\n" + EMPTY_HTTP2_SETTINGS_HEADER +
+                        "\r\n" + "Small request body").getBytes(StandardCharsets.ISO_8859_1);
+        os.write(upgradeRequest);
+        os.flush();
+
+        Assert.assertTrue("Failed to read HTTP Upgrade response", readHttpUpgradeResponse());
+
+        sendClientPreface();
+        validateHttp2InitialResponse();
+    }
+
+
+    @Test
     public void testUpgradeWithRequestBodyGet() throws Exception {
         doTestUpgradeWithRequestBody(false, false, false);
     }

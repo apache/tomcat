@@ -696,6 +696,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         // May need to acknowledge a 100-continue expectation
         request.getResponse().sendAcknowledgement(ContinueResponseTiming.ALWAYS);
 
+        // If maxSavePostSize == 0, the body will be swallowed when the processor calls inputBuffer.endRequest()
         int maxSavePostSize = request.getConnector().getMaxSavePostSize();
         if (maxSavePostSize != 0) {
             ByteChunk body = new ByteChunk();
