@@ -88,6 +88,34 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/b/../a/%255A");
     }
 
+    @Test
+    public void testChainMatch() throws Exception {
+        // The first rule matches so the chained (second) rule is applied to the result
+        doTestRewrite("RewriteRule ^/a(.*) /b$1 [C]\n" +
+                "RewriteRule ^/b(.*) /c$1", "/a/x", "/c/x");
+    }
+
+    @Test
+    public void testChainHeadNoMatch() throws Exception {
+        // The first rule does not match so the whole chain, including the
+        // terminal rule that would otherwise match, must be skipped. If the
+        // terminal rule were incorrectly applied the request would be rewritten
+        // to /W/x.
+        doTestRewrite("RewriteRule ^/never(.*) /c$1 [C]\n" +
+                "RewriteRule ^/c(.*) /W$1", "/c/x", "/c/x");
+    }
+
+    @Test
+    public void testChainMiddleNoMatch() throws Exception {
+        // The first rule matches but the second (chained) rule does not, so the
+        // rest of the chain, including the terminal rule, must be skipped and
+        // the result of the first rule is retained. If the terminal rule were
+        // incorrectly applied the request would be rewritten to /W/y.
+        doTestRewrite("RewriteRule ^/a(.*) /c$1 [C]\n" +
+                "RewriteRule ^/nomatch(.*) /x$1 [C]\n" +
+                "RewriteRule ^/c(.*) /W$1", "/a/y", "/c/y");
+    }
+
     // BZ 57863
     @Test
     public void testRewriteMap01() throws Exception {

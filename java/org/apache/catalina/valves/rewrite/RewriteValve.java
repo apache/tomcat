@@ -537,15 +537,13 @@ public class RewriteValve extends ValveBase {
 
                 // - chain (skip remaining chained rules if this one does not match)
                 if (rule.isChain() && newtest == null) {
-                    int skip = 0;
-                    for (int j = i + 1; j < rules.length; j++) {
-                        if (!rules[j].isChain()) {
-                            break;
-                        } else {
-                            skip++;
-                        }
+                    // Skip the remaining rules in the chain, including the
+                    // terminal rule that does not have the chain flag set.
+                    int j = i + 1;
+                    while (j < rules.length && rules[j].isChain()) {
+                        j++;
                     }
-                    i += skip;
+                    i = j;
                     continue;
                 }
                 // - last (stop rewriting here)
