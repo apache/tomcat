@@ -148,6 +148,10 @@
         parent directory name for directory listings produced by the default
         servlet. Ensure XML escaping is used with XML output. (markt)
       </fix>
+      <fix>
+        When processing certificate subject names and issuer names within
+        RewriteValve rules, always use the RFC 2253 format name. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

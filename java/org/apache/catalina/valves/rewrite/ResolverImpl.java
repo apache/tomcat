@@ -246,7 +246,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("M_SERIAL")) {
             return certificates[0].getSerialNumber().toString();
         } else if (key.equals("S_DN")) {
-            return certificates[0].getSubjectX500Principal().toString();
+            return certificates[0].getSubjectX500Principal().getName();
         } else if (key.startsWith("S_DN_")) {
             key = key.substring("S_DN_".length());
             return resolveComponent(certificates[0].getSubjectX500Principal().getName(), key);
@@ -262,7 +262,7 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getIssuerX500Principal().getName();
         } else if (key.startsWith("I_DN_")) {
             key = key.substring("I_DN_".length());
-            return resolveComponent(certificates[0].getIssuerX500Principal().toString(), key);
+            return resolveComponent(certificates[0].getIssuerX500Principal().getName(), key);
         } else if (key.equals("V_START")) {
             return String.valueOf(certificates[0].getNotBefore().getTime());
         } else if (key.equals("V_END")) {
@@ -352,6 +352,7 @@ public class ResolverImpl extends Resolver {
         StringBuilder sb = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
+            // Note: Does not handle hex escapes
             if (c == '\\' && i + 1 < s.length()) {
                 char next = s.charAt(i + 1);
                 sb.append(next);
