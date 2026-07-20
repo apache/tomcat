@@ -247,8 +247,8 @@ public class XMLWriter {
         int idx;
         while ((idx = data.indexOf("]]>", start)) >= 0) {
             buffer.append(data, start, idx);
-            // We terminate, then append the ]]>, and restart the sequence
-            buffer.append("]]>]]><![CDATA[");
+            // Embedded ']]>'. We append ']]', terminate, restart the sequence, append '>' and then continue.
+            buffer.append("]]]]><![CDATA[>");
             start = idx + 3;
         }
         buffer.append(data.substring(start));
