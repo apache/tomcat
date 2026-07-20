@@ -1247,8 +1247,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 dbConnection.commit();
                 success = true;
             } catch (Throwable t) {
-                log.error(sm.getString("dataSourceUserDatabase.exception"), t);
                 ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("dataSourceUserDatabase.exception"), t);
                 // Some exception occurred so rollback everything
                 try {
                     dbConnection.rollback();
