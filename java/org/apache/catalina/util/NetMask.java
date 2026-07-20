@@ -307,7 +307,7 @@ public final class NetMask {
             return false;
         }
         if (foundPort) {
-            return Objects.equals(portPattern, other.portPattern);
+            return Objects.equals(portPattern.pattern(), other.portPattern.pattern());
         }
         return true;
     }
@@ -316,7 +316,7 @@ public final class NetMask {
     public int hashCode() {
         int result = 31 * (31 * Arrays.hashCode(netaddr) + nrBytes) + lastByteShift;
         if (foundPort) {
-            result = 31 * result + portPattern.hashCode();
+            result = 31 * result + portPattern.pattern().hashCode();
         }
         return result;
     }
