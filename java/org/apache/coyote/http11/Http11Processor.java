@@ -351,6 +351,8 @@ public class Http11Processor extends AbstractProcessor {
                         Request upgradeRequest = null;
                         try {
                             upgradeRequest = cloneRequest(request);
+                            // Make sure any remaining body is swallowed before we start processing the upgraded protocol
+                            inputBuffer.endRequest();
                         } catch (ByteChunk.BufferOverflowException ioe) {
                             response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
                             setErrorState(ErrorState.CLOSE_CLEAN, null);
@@ -359,7 +361,7 @@ public class Http11Processor extends AbstractProcessor {
                             setErrorState(ErrorState.CLOSE_CLEAN, ioe);
                         }
 
-                        if (upgradeRequest != null) {
+                        if (upgradeRequest != null && !getErrorState().isError()) {
                             // Complete the HTTP/1.1 upgrade process
                             response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
                             response.setHeader("Connection", "Upgrade");
