@@ -1776,10 +1776,10 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<?xml version=\"1.0\"?>");
         sb.append("<listing ");
         sb.append(" contextPath='");
-        sb.append(contextPath);
+        sb.append(Escape.xml(contextPath));
         sb.append('\'');
         sb.append(" directory='");
-        sb.append(resource.getName());
+        sb.append(Escape.xml(resource.getName()));
         sb.append("' ");
         sb.append(" hasParent='").append(!resource.getName().equals("/"));
         sb.append("'>");
@@ -1810,7 +1810,7 @@ public class DefaultServlet extends HttpServlet {
 
             sb.append("<entry");
             sb.append(" type='").append(childResource.isDirectory() ? "dir" : "file").append('\'');
-            sb.append(" urlPath='").append(rewrittenContextPath)
+            sb.append(" urlPath='").append(Escape.xml(rewrittenContextPath))
                     .append(Escape.xml(rewriteUrl(directoryWebappPath + entry)))
                     .append(childResource.isDirectory() ? "/" : "").append('\'');
             if (childResource.isFile()) {
@@ -1820,7 +1820,7 @@ public class DefaultServlet extends HttpServlet {
             sb.append(" longDate='").append(childResource.getLastModified()).append('\'');
 
             sb.append('>');
-            sb.append(Escape.htmlElementContent(entry));
+            sb.append(Escape.xml(entry));
             if (childResource.isDirectory()) {
                 sb.append('/');
             }
@@ -1928,6 +1928,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         String directoryWebappPath = resource.getWebappPath();
+        String escapedDirectoryWebappPath = Escape.htmlElementContent(directoryWebappPath);
         WebResource[] entries = resources.listResources(directoryWebappPath);
 
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
@@ -1938,7 +1939,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<html lang=\"").append(sm.getLocale().getLanguage()).append("\">\r\n");
         sb.append("<head>\r\n");
         sb.append("<title>");
-        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", escapedDirectoryWebappPath));
         sb.append("</title>\r\n");
         sb.append("<style>");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
@@ -1946,7 +1947,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</head>\r\n");
         sb.append("<body>\r\n");
         sb.append("<h1>");
-        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", escapedDirectoryWebappPath));
 
         // Render the link to our parent (if required)
         String parentDirectory = directoryWebappPath;
@@ -1967,7 +1968,7 @@ public class DefaultServlet extends HttpServlet {
             }
             sb.append("\">");
             sb.append("<b>");
-            sb.append(sm.getString("defaultServlet.directory.parent", parent));
+            sb.append(sm.getString("defaultServlet.directory.parent", Escape.htmlElementContent(parent)));
             sb.append("</b>");
             sb.append("</a>");
         }

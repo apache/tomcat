@@ -143,6 +143,11 @@
         <code>qsd</code> flag should always discard the original query string
         when rewriting. (remm)
       </fix>
+      <fix>
+        Add appropriate escaping for context path, current directory name and
+        parent directory name for directory listings produced by the default
+        servlet. Ensure XML escaping is used with XML output. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
