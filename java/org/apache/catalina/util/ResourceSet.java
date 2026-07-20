@@ -19,7 +19,6 @@ package org.apache.catalina.util;
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -219,23 +218,6 @@ public final class ResourceSet<T> extends HashSet<T> {
     public boolean removeIf(java.util.function.Predicate<? super T> filter) {
         checkLocked();
         return super.removeIf(filter);
-    }
-
-
-    @Override
-    public java.util.Spliterator<T> spliterator() {
-        if (locked) {
-            java.util.Spliterator<T> base = super.spliterator();
-            return new java.util.Spliterator<>() {
-                @Override public boolean tryAdvance(java.util.function.Consumer<? super T> action) { return base.tryAdvance(action); }
-                @Override public java.util.Spliterator<T> trySplit() { return null; }
-                @Override public long estimateSize() { return base.estimateSize(); }
-                @Override public int characteristics() { return base.characteristics() & ~java.util.Spliterator.SORTED; }
-                @Override public void forEachRemaining(java.util.function.Consumer<? super T> action) { base.forEachRemaining(action); }
-                @Override public Comparator<? super T> getComparator() { return base.getComparator(); }
-            };
-        }
-        return super.spliterator();
     }
 
 
