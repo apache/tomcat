@@ -2717,10 +2717,9 @@
       </attribute>
 
       <attribute name="highConcurrencyStatus" required="false">
-        <p>The error status code which will be returned to the client, if the
-        value is positive, when a permit cannot be acquired from the
-        sepmaphore. The default value is <strong>-1</strong>, which will mean
-        no error status will be sent back.</p>
+        <p>The HTTP status code which will be returned to the client when a
+        permit cannot be acquired from the semaphore. The default value is
+        <strong>-1</strong>, which means no error status will be sent back.</p>
       </attribute>
 
       <attribute name="interruptible" required="false">
