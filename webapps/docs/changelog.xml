@@ -306,6 +306,10 @@
         of particular not for attributes that implement
         <code>HttpSessionBindingListener</code>. (markt)
       </fix>
+      <fix>
+        Ensure the security constraint with the longest matching path is
+        selected when more than one constraint matches the request path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
