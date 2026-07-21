@@ -37,14 +37,25 @@ public class TesterRequest extends Request {
 
     private final TesterContext context;
     private final TesterServletContext servletContext;
+    private final String requestUri;
 
 
     public TesterRequest() {
-        this(false);
+        this(false, "/level1/level2/foo.html");
     }
 
 
     public TesterRequest(boolean withSession) {
+        this(withSession, "/level1/level2/foo.html");
+    }
+
+
+    public TesterRequest(String requestUri) {
+        this(false, requestUri);
+    }
+
+
+    public TesterRequest(boolean withSession, String requestUri) {
         super(null);
         context = new TesterContext();
         servletContext = new TesterServletContext();
@@ -58,6 +69,7 @@ public class TesterRequest extends Request {
             session.setId("1234", false);
             session.setValid(true);
         }
+        this.requestUri = requestUri;
     }
 
 
@@ -79,7 +91,7 @@ public class TesterRequest extends Request {
 
     @Override
     public String getRequestURI() {
-        return "/level1/level2/foo.html";
+        return requestUri;
     }
 
 

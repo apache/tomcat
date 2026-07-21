@@ -68,9 +68,8 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
 /**
- * Abstract base class for Realm implementations.
- * Provides common functionality including credential handling, security constraint evaluation,
- * and GSS-API authentication support.
+ * Abstract base class for Realm implementations. Provides common functionality including credential handling, security
+ * constraint evaluation, and GSS-API authentication support.
  */
 public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
@@ -324,8 +323,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Returns the comma separated names of user attributes to additionally query from the realm. These will be
-     * provided to the user through the created Principal's <i>attributes</i> map.
+     * Returns the comma separated names of user attributes to additionally query from the realm. These will be provided
+     * to the user through the created Principal's <i>attributes</i> map.
      *
      * @return The comma separated names of user attributes to additionally query from the realm
      */
@@ -644,7 +643,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 boolean matched = false;
                 int length = -1;
                 for (String pattern : patterns) {
-                    if (pattern.startsWith("/") && pattern.endsWith("/*") && pattern.length() >= longest) {
+                    if (pattern.startsWith("/") && pattern.endsWith("/*") && pattern.length() >= longest &&
+                            pattern.length() >= length) {
 
                         if (pattern.length() == 2) {
                             matched = true;
@@ -1138,8 +1138,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Check whether the current credential handler uses the specified message digest algorithm.
      *
      * @param algorithm The name of the message digest algorithm to check
-     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler}
-     *             using the specified algorithm
+     *
+     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler} using the specified
+     *             algorithm
      */
     protected boolean hasMessageDigest(String algorithm) {
         CredentialHandler ch = credentialHandler;
