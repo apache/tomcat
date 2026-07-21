@@ -745,22 +745,14 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (originalProxiesHeaderValues.isEmpty()) {
-                    headers.removeHeader(proxiesHeader);
-                } else {
-                    headers.removeHeader(proxiesHeader);
-                    for (String v : originalProxiesHeaderValues) {
-                        headers.addValue(proxiesHeader).setString(v);
-                    }
+                headers.removeHeader(proxiesHeader);
+                for (String v : originalProxiesHeaderValues) {
+                    headers.addValue(proxiesHeader).setString(v);
                 }
 
-                if (originalRemoteIpHeaderValues.isEmpty()) {
-                    headers.removeHeader(remoteIpHeader);
-                } else {
-                    headers.removeHeader(remoteIpHeader);
-                    for (String v : originalRemoteIpHeaderValues) {
-                        headers.addValue(remoteIpHeader).setString(v);
-                    }
+                headers.removeHeader(remoteIpHeader);
+                for (String v : originalRemoteIpHeaderValues) {
+                    headers.addValue(remoteIpHeader).setString(v);
                 }
             }
         }
