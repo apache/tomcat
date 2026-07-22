@@ -606,7 +606,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         } else {
             // All other methods
-            if (coyoteRequest.scheme().isNull() || coyoteRequest.requestURI().isNull()) {
+            if (coyoteRequest.scheme().isNull() || coyoteRequest.requestURI().isNull() ||
+                    coyoteRequest.serverName().isNull()) {
                 missingHeader = true;
             }
         }
