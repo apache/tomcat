@@ -313,6 +313,11 @@
         When processing an HTTP upgrade from HTTP/1.1 to HTTP/2, ensure that all
         the HTTP/1.1 data has been processed before switching protocols. (markt)
       </fix>
+      <fix>
+        Require every HTTP/2 request to provide an authority (either an
+        <code>:authority</code> pseudo header or a <code>Host</code> header).
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
