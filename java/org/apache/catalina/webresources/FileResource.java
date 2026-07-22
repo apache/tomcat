@@ -259,6 +259,10 @@ public class FileResource extends AbstractResource {
                 }
                 pos += n;
             }
+            if (pos < size) {
+                // Stream ended before expected size — return null to avoid partial data
+                return null;
+            }
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractResource.getContentFail", getWebappPath()), ioe);
@@ -275,7 +279,7 @@ public class FileResource extends AbstractResource {
             try {
                 result = str.getBytes(StandardCharsets.UTF_8);
             } catch (Exception e) {
-                result = null;
+                return null;
             }
         }
         return result;
