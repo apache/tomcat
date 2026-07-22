@@ -219,8 +219,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
-            throw new IllegalStateException(
-                    sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
+            }
+            return null;
         }
 
         if (len < 0) {

@@ -65,7 +65,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
             try {
                 start();
             } catch (LifecycleException e) {
-                throw new IllegalStateException(sm.getString("abstractArchiveResourceSet.startFail"), e);
+                throw new IllegalStateException(sm.getString("abstractSingleArchiveResourceSet.startFail"), e);
             }
         }
     }
