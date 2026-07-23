@@ -34,6 +34,7 @@ Export-Package: \
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
     org.apache.catalina.startup,\
+    org.apache.catalina.startup.validator,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
     org.apache.catalina.valves,\
