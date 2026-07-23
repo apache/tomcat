@@ -804,8 +804,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             } else {
                 seen[checkIndex] = true;
-                seen[count % seen.length] = false;
                 count++;
+                seen[count % seen.length] = false;
                 return true;
             }
         }
