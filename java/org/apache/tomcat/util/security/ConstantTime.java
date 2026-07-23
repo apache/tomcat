@@ -121,6 +121,48 @@ public class ConstantTime {
         return result == 0;
     }
 
+    /**
+     * Implements String / ByteChunk equality which always compares all characters, without stopping early if any
+     * characters do not match.
+     * <p>
+     * <i>Note:</i> This implementation was adapted from {@link MessageDigest#isEqual} which we assume is as
+     * optimizer-defeating as possible.
+     *
+     * @param s  The string to compare.
+     * @param bc The ByteChunk to compare.
+     *
+     * @return <code>true</code> if the strings are equal to each other, <code>false</code> otherwise.
+     */
+    public static boolean equals(final String s, final ByteChunk bc) {
+        if (s == null && bc == null) {
+            return true;
+        }
+        if (s == null || bc == null) {
+            return false;
+        }
+
+        final int len1 = s.length();
+        final int len2 = bc.getLength();
+
+        byte[] bytes = bc.getBytes();
+
+        if (len2 == 0) {
+            return len1 == 0;
+        }
+
+        int result = 0;
+        result |= len1 - len2;
+
+        // time-constant comparison
+        for (int i = 0; i < len1; i++) {
+            // If i >= len2, index2 is 0; otherwise, i.
+            final int index2 = ((i - len2) >>> 31) * i;
+            char c = s.charAt(i);
+            byte b = bytes[bc.getStart() + index2];
+            result |= c ^ (b & 0xFF);
+        }
+        return result == 0;
+    }
 
     /**
      * Implements byte-array equality which always compares all bytes in the array, without stopping early if any bytes
