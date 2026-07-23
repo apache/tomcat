@@ -203,6 +203,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>70160</bug>: Correct various references to the Servlet
+        specification to use version 6.1. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.24 (markt)" rtext="2026-07-08">
   <subsection name="Catalina">

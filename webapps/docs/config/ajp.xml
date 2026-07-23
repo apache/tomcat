@@ -304,7 +304,7 @@
 
     <attribute name="rejectSuspiciousURIs" required="false">
       <p>Should this <strong>Connector</strong> reject a requests if the URI
-      matches one of the suspicious URIs patterns identified by the Servlet 6.0
+      matches one of the suspicious URIs patterns identified by the Servlet 6.1
       specification? The default value is <code>false</code>.</p>
     </attribute>
 

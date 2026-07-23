@@ -69,8 +69,8 @@ web applications with Tomcat.</p>
     what a portable JSP page is allowed to contain.  Specific
     information on scripting (Chapter 9), tag extensions (Chapter 7),
     and packaging JSP pages (Appendix A) is useful..</p></li>
-<li><p><a href="https://jakarta.ee/specifications/servlet/6.0/">https://jakarta.ee/specifications/servlet/6.0/</a> -
-    <i>Jakarta Servlet API Specification, Version 6.0</i>.  Describes the
+<li><p><a href="https://jakarta.ee/specifications/servlet/6.1/">https://jakarta.ee/specifications/servlet/6.1/</a> -
+    <i>Jakarta Servlet API Specification, Version 6.1</i>.  Describes the
     programming environment that must be provided by all servlet
     containers conforming to this specification.  In particular, you
     will need this document to understand the web application
