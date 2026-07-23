@@ -180,8 +180,8 @@ public class Http11Processor extends AbstractProcessor {
 
         // Create and add the chunked filters.
         inputBuffer.addFilter(new ChunkedInputFilter(request, protocol.getMaxTrailerSize(),
-                protocol.getAllowedTrailerHeadersInternal(), protocol.getMaxExtensionSize(),
-                protocol.getMaxSwallowSize()));
+                protocol.getMaxTrailerCount(), protocol.getAllowedTrailerHeadersInternal(),
+                protocol.getMaxExtensionSize(), protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
