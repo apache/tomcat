@@ -273,6 +273,11 @@
         When processing certificate subject names and issuer names within
         RewriteValve rules, always use the RFC 2253 format name. (markt)
       </fix>
+      <fix>
+        Fix the incorrect rejection of requests using digest authentication when
+        the client provided nonce count is at the upper boundary of the window
+        (markt).
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
