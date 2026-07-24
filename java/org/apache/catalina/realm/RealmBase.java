@@ -902,9 +902,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
         // Check for a role alias
         if (wrapper != null) {
-            String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null) {
-                role = realRole;
+            if (wrapper.getParent() instanceof Context context) {
+                String realRole = context.findRoleMapping(role);
+                if (realRole != null) {
+                    role = realRole;
+                }
             }
         }
 

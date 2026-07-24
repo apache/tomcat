@@ -667,15 +667,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             referencesLock.readLock().unlock();
         }
 
-        // If not specified on the Wrapper, check the Context
-        if (getParent() instanceof Context context) {
-            if (reference != null) {
-                reference = context.findRoleMapping(reference);
-            } else {
-                reference = context.findRoleMapping(name);
-            }
-        }
-
         return reference;
     }
 

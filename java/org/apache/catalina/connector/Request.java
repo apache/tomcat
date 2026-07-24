@@ -2344,8 +2344,17 @@ public class Request implements HttpServletRequest {
             return false;
         }
 
+        // Check for a role alias defined in a <security-role-ref> element
+        Wrapper wrapper = getWrapper();
+        if (wrapper != null) {
+            String realRole = wrapper.findSecurityReference(role);
+            if (realRole != null) {
+                return realm.hasRole(wrapper, userPrincipal, realRole);
+            }
+        }
+
         // Check for a role defined directly as a <security-role>
-        return realm.hasRole(getWrapper(), userPrincipal, role);
+        return realm.hasRole(wrapper, userPrincipal, role);
     }
 
 
