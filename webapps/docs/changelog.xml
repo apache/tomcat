@@ -278,6 +278,10 @@
         the client provided nonce count is at the upper boundary of the window
         (markt).
       </fix>
+      <update>
+        Separate the <code>Context</code> role mapping from the Servlet
+        specification <code>security-role-ref</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
