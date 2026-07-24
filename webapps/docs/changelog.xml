@@ -484,6 +484,11 @@
         Update Checkstyle to 13.7.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Examples: Limit the buffering of messages in the WebSocket chat example
+        to prevent a malicious client triggering excessive memory usage that
+        could lead to a DoS. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
