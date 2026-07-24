@@ -71,6 +71,17 @@ public class Constants {
      * Default I/O timeout in milliseconds for WebSocket client connections.
      */
     public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
+    /**
+     * Property name to set to configure the maximum number of bytes that will be allowed for the HTTP response to a
+     * WebSocket handshake request. The default is {@link #MAX_HTTP_RESPONSE_HEADER_BYTES_DEFAULT}.
+     */
+    public static final String MAX_HTTP_RESPONSE_HEADER_BYTES_PROPERTY =
+            "org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES";
+    /**
+     * Default maximum number of bytes that will be allowed for the HTTP response to a
+     * WebSocket handshake request.
+     */
+    public static final long MAX_HTTP_RESPONSE_HEADER_BYTES_DEFAULT = 8192;
 
     // RFC 2068 recommended a limit of 5
     // Most browsers have a default limit of 20

@@ -203,6 +203,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Add a limit (defaults to 8KB) on the size of the HTTP response headers
+        accepted during a WebSocket HTTP upgrade. This is configured via the
+        <code>org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES</code>
+        user property. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
