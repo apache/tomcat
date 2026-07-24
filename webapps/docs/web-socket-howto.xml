@@ -164,6 +164,13 @@
    is 20. Redirection support can be disabled by configuring a value of zero.
    </p>
 
+<p>When using the WebSocket client to connect to server endpoints, the maximum
+   number of bytes permitted in the HTTP response headers is controlled by the
+   <code>userProperties</code> of the provided
+   <code>jakarta.websocket.ClientEndpointConfig</code>. The property is
+   <code>org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES</code>. The
+   default is 8192 (8KB).</p>
+
 <p>When using the WebSocket client to connect to a server endpoint that requires
    BASIC or DIGEST authentication, the following user properties must be set:
    </p>
