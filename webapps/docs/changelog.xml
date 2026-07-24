@@ -237,6 +237,11 @@
         and add a note that the exact configuration required will depend on the
         overall httpd configuration. (markt)
       </fix>
+      <fix>
+        Examples: Limit the buffering of messages in the WebSocket chat example
+        to prevent a malicious client triggering excessive memory usage that
+        could lead to a DoS. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
