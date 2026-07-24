@@ -306,6 +306,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         Transformation transformation = null;
         AsyncChannelWrapper channel = null;
 
+        long maxHttpResponseHeaderBytes = Constants.MAX_HTTP_RESPONSE_HEADER_BYTES_DEFAULT;
+        String maxHttpResponseHeaderBytesValue =
+                (String) userProperties.get(Constants.MAX_HTTP_RESPONSE_HEADER_BYTES_PROPERTY);
+        if (maxHttpResponseHeaderBytesValue != null) {
+            maxHttpResponseHeaderBytes = Long.parseLong(maxHttpResponseHeaderBytesValue);
+        }
+
         try {
             // Open the connection
             Future<Void> fConnect = socketChannel.connect(sa);
@@ -315,7 +322,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 // Proxy CONNECT is clear text
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
                 writeRequest(channel, proxyConnect, timeout);
-                HttpResponse httpResponse = processResponse(response, channel, timeout);
+                HttpResponse httpResponse = processResponse(response, channel, timeout, maxHttpResponseHeaderBytes);
                 if (httpResponse.status == Constants.PROXY_AUTHENTICATION_REQUIRED) {
                     return processAuthenticationChallenge(clientEndpointHolder, clientEndpointConfiguration,
                             serverEndpointUri, redirectSet, userProperties, Method.CONNECT,
@@ -358,7 +365,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
             writeRequest(channel, upgradeRequest, timeout);
 
-            HttpResponse httpResponse = processResponse(response, channel, timeout);
+            HttpResponse httpResponse = processResponse(response, channel, timeout, maxHttpResponseHeaderBytes);
 
             // Check maximum permitted redirects
             int maxRedirects = Constants.MAX_REDIRECTIONS_DEFAULT;
@@ -854,8 +861,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      * @throws DeploymentException  if the response status line is not correctly formatted
      * @throws TimeoutException     if the response was not read within the expected timeout
      */
-    private HttpResponse processResponse(ByteBuffer response, AsyncChannelWrapper channel, long timeout)
-            throws InterruptedException, ExecutionException, DeploymentException, EOFException, TimeoutException {
+    private HttpResponse processResponse(ByteBuffer response, AsyncChannelWrapper channel, long timeout,
+            long maxHttpResponseHeaderBytes) throws InterruptedException, ExecutionException, DeploymentException,
+            EOFException, TimeoutException {
 
         Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
@@ -864,6 +872,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         boolean readHeaders = false;
         StringBuilder lineBuffer = new StringBuilder();
         String line = null;
+        long headerByteCount = 0;
         while (!readHeaders) {
             // On entering loop buffer will be empty and at the start of a new
             // loop the buffer will have been fully read.
@@ -883,6 +892,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 throw new EOFException(
                         sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
             }
+            headerByteCount += bytesRead.intValue();
             response.flip();
             while (response.hasRemaining() && !readHeaders) {
                 if (readLine(response, lineBuffer)) {
@@ -900,6 +910,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     }
                     line = null;
                 }
+            }
+            if (readHeaders) {
+                headerByteCount -= response.remaining();
+            }
+            if (headerByteCount > maxHttpResponseHeaderBytes) {
+                throw new DeploymentException(sm.getString("wsWebSocketContainer.responseHeadersLimit"));
             }
         }
 
