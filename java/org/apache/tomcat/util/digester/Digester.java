@@ -2126,10 +2126,12 @@ public class Digester extends DefaultHandler2 {
 
         AttributesImpl newAttrs = new AttributesImpl(list);
         int nAttributes = newAttrs.getLength();
+        // The class loader is invariant for the duration of this call so resolve it once rather than per attribute.
+        ClassLoader classLoader = getClassLoader();
         for (int i = 0; i < nAttributes; ++i) {
             String value = newAttrs.getValue(i);
             try {
-                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()));
+                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source, classLoader));
             } catch (Exception e) {
                 log.warn(sm.getString("digester.failedToUpdateAttributes", newAttrs.getLocalName(i), value), e);
             }

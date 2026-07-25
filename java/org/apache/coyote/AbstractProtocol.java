@@ -932,8 +932,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      */
     @Override
     public void init() throws Exception {
+        // getName() is not a simple field getter (it builds and quotes the name) and is invariant here, so compute
+        // it once.
+        String name = getName();
         if (getLog().isInfoEnabled()) {
-            getLog().info(sm.getString("abstractProtocolHandler.init", getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.init", name));
             logPortOffset();
         }
 
@@ -946,13 +949,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         if (this.domain != null) {
-            ObjectName rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
+            ObjectName rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + name);
             this.rgOname = rgOname;
             Registry.getRegistry(null).registerComponent(getHandler().getGlobal(), rgOname, null);
         }
 
-        String endpointName = getName();
-        endpoint.setName(endpointName.substring(1, endpointName.length() - 1));
+        endpoint.setName(name.substring(1, name.length() - 1));
         endpoint.setDomain(domain);
 
         endpoint.init();

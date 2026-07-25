@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -457,10 +459,125 @@ public final class Mapper {
      * @param wrappers       Information on wrapper mappings
      */
     private void addWrappers(ContextVersion contextVersion, Collection<WrapperMappingInfo> wrappers) {
+        // Group the incoming wrappers by category so that each of the copy-on-write wrapper arrays is rebuilt and
+        // assigned once rather than once per wrapper. Inserting one at a time reallocates the whole array and is
+        // O(n^2) in array copies for a context with many mappings of the same category.
+        List<MappedWrapper> newExactWrappers = new ArrayList<>();
+        List<MappedWrapper> newWildcardWrappers = new ArrayList<>();
+        List<MappedWrapper> newExtensionWrappers = new ArrayList<>();
+        MappedWrapper newDefaultWrapper = null;
+
         for (WrapperMappingInfo wrapper : wrappers) {
-            addWrapper(contextVersion, wrapper.mapping(), wrapper.wrapper(), wrapper.jspWildCard(),
-                    wrapper.resourceOnly());
+            String path = wrapper.mapping();
+            if (path.endsWith("/*")) {
+                // Wildcard wrapper
+                String name = path.substring(0, path.length() - 2);
+                newWildcardWrappers
+                        .add(new MappedWrapper(name, wrapper.wrapper(), wrapper.jspWildCard(), wrapper.resourceOnly()));
+            } else if (path.startsWith("*.")) {
+                // Extension wrapper
+                String name = path.substring(2);
+                newExtensionWrappers
+                        .add(new MappedWrapper(name, wrapper.wrapper(), wrapper.jspWildCard(), wrapper.resourceOnly()));
+            } else if (path.equals("/")) {
+                // Default wrapper - the last one processed wins, matching sequential insertion
+                newDefaultWrapper = new MappedWrapper("", wrapper.wrapper(), wrapper.jspWildCard(),
+                        wrapper.resourceOnly());
+            } else {
+                // Exact wrapper
+                final String name;
+                if (path.isEmpty()) {
+                    // Special case for the Context Root mapping which is treated as an exact match
+                    name = "/";
+                } else {
+                    name = path;
+                }
+                newExactWrappers
+                        .add(new MappedWrapper(name, wrapper.wrapper(), wrapper.jspWildCard(), wrapper.resourceOnly()));
+            }
         }
+
+        synchronized (contextVersion) {
+            if (!newExactWrappers.isEmpty()) {
+                contextVersion.exactWrappers = mergeWrappers(contextVersion.exactWrappers, newExactWrappers, false,
+                        contextVersion);
+            }
+            if (!newExtensionWrappers.isEmpty()) {
+                contextVersion.extensionWrappers = mergeWrappers(contextVersion.extensionWrappers,
+                        newExtensionWrappers, false, contextVersion);
+            }
+            if (!newWildcardWrappers.isEmpty()) {
+                contextVersion.wildcardWrappers = mergeWrappers(contextVersion.wildcardWrappers, newWildcardWrappers,
+                        true, contextVersion);
+            }
+            if (newDefaultWrapper != null) {
+                contextVersion.defaultWrapper = newDefaultWrapper;
+            }
+        }
+    }
+
+    /**
+     * Merge a batch of new wrappers into an existing sorted, duplicate-free copy-on-write wrapper array, reproducing
+     * the behaviour of repeated {@link #insertMap(MapElement[], MapElement[], MapElement)} calls: the result stays
+     * sorted by name, an entry already present (in the existing array or earlier in the batch) is kept in preference
+     * to a later duplicate and, for wildcard wrappers, {@link ContextVersion#nesting} is raised to the largest slash
+     * count amongst the entries actually added.
+     *
+     * @param oldWrappers    the existing, sorted, duplicate-free array
+     * @param newWrappers    the batch of candidate wrappers, in insertion order
+     * @param updateNesting  whether to update the context nesting (true only for wildcard wrappers)
+     * @param contextVersion the context whose nesting may be updated
+     *
+     * @return the merged array, or {@code oldWrappers} unchanged if every candidate was a duplicate
+     */
+    private static MappedWrapper[] mergeWrappers(MappedWrapper[] oldWrappers, List<MappedWrapper> newWrappers,
+            boolean updateNesting, ContextVersion contextVersion) {
+        // Existing names win over new ones; the first occurrence of a name in the batch wins over later duplicates.
+        Set<String> names = new HashSet<>();
+        for (MappedWrapper oldWrapper : oldWrappers) {
+            names.add(oldWrapper.name);
+        }
+        List<MappedWrapper> added = new ArrayList<>(newWrappers.size());
+        for (MappedWrapper newWrapper : newWrappers) {
+            if (names.add(newWrapper.name)) {
+                added.add(newWrapper);
+            }
+        }
+        if (added.isEmpty()) {
+            // Every candidate was a duplicate so, as with insertMap() returning false each time, nothing changes.
+            return oldWrappers;
+        }
+
+        if (updateNesting) {
+            for (MappedWrapper addedWrapper : added) {
+                int slashCount = slashCount(addedWrapper.name);
+                if (slashCount > contextVersion.nesting) {
+                    contextVersion.nesting = slashCount;
+                }
+            }
+        }
+
+        // Both inputs are sorted by name using String natural ordering (the ordering used by find()) and, having had
+        // duplicates removed above, share no names. Merge them into a single sorted array.
+        added.sort((wrapper1, wrapper2) -> wrapper1.name.compareTo(wrapper2.name));
+        MappedWrapper[] mergedWrappers = new MappedWrapper[oldWrappers.length + added.size()];
+        int oldPos = 0;
+        int addedPos = 0;
+        int mergedPos = 0;
+        while (oldPos < oldWrappers.length && addedPos < added.size()) {
+            if (oldWrappers[oldPos].name.compareTo(added.get(addedPos).name) < 0) {
+                mergedWrappers[mergedPos++] = oldWrappers[oldPos++];
+            } else {
+                mergedWrappers[mergedPos++] = added.get(addedPos++);
+            }
+        }
+        while (oldPos < oldWrappers.length) {
+            mergedWrappers[mergedPos++] = oldWrappers[oldPos++];
+        }
+        while (addedPos < added.size()) {
+            mergedWrappers[mergedPos++] = added.get(addedPos++);
+        }
+        return mergedWrappers;
     }
 
     /**

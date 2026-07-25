@@ -296,6 +296,10 @@ public class TestContextConfigAnnotation {
         config.typeInitializerMap.put(Object.class, new HashSet<>());
         config.typeInitializerMap.get(Object.class).add(sciObject);
 
+        // Build the name-keyed indexes derived from typeInitializerMap. In the
+        // normal flow this happens at the start of processClasses().
+        config.buildTypeInitializerIndexes();
+
         // Scan Servlet, Filter, Servlet, Listener
         WebXml ignore = new WebXml();
         File file = paramClassResource(
