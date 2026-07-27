@@ -447,6 +447,11 @@
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Documentation: Better sample httpd configuration for use with SSLValve
+        and add a note that the exact configuration required will depend on the
+        overall httpd configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
