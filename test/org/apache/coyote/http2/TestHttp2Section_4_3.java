@@ -43,7 +43,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Process the request
         writeFrame(frameHeader, headersPayload);
 
-        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
+        handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
     }
 
 
@@ -84,6 +84,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         sendPing();
 
-        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
+        handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
     }
 }
