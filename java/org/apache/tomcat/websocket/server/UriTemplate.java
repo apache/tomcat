@@ -65,16 +65,11 @@ public class UriTemplate {
         for (int i = 0; i < segments.length; i++) {
             String segment = segments[i];
             if (segment.isEmpty()) {
-                if (i == 0 || (i == segments.length - 1 && paramCount == 0)) {
-                    // Ignore the first empty segment as the path must always
-                    // start with '/'
-                    // Ending with a '/' is also OK for instances used for
-                    // matches but not for parameterised templates.
+                if (i == 0) {
+                    // Ignore the first empty segment as the path must always start with '/'.
                     continue;
-                } else {
-                    // As per EG discussion, all other empty segments are
-                    // invalid
-                    throw new DeploymentException(sm.getString("uriTemplate.emptySegment", path));
+                } else if (i == segments.length - 1) {
+                    // Ending with a '/' is allowed.
                 }
             }
             normalized.append('/');
