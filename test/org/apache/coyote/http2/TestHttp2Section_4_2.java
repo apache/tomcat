@@ -124,7 +124,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         os.write(headers);
         os.flush();
 
-        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
+        handleGoAwayResponse(3, Http2Error.FRAME_SIZE_ERROR);
     }
 
 

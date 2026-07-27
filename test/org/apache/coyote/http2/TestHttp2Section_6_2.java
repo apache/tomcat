@@ -63,7 +63,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
 
         sendSimpleGetRequest(3, padding);
 
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 
@@ -87,7 +87,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         os.write(headerFrame);
         os.flush();
 
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 
@@ -121,9 +121,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         os.write(headerFrame);
         os.flush();
 
-        // 1 is the last stream processed before the connection error (stream 1
-        // from the initial HTTP/1.1 upgrade)
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 

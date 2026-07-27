@@ -88,6 +88,6 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
         os.write(UNKNOWN_FRAME);
         os.flush();
 
-        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
+        handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
     }
 }
