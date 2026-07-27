@@ -116,21 +116,24 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
-                    if (name.charAt(name.length() - 1) == '/') {
-                        name = name.substring(pathInJar.length(), name.length() - 1);
-                    } else {
-                        name = name.substring(pathInJar.length());
-                    }
-                    if (name.isEmpty()) {
-                        continue;
-                    }
-                    if (name.charAt(0) == '/') {
-                        name = name.substring(1);
-                    }
-                    if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
-                        result.add(name);
+            Map<String, JarEntry> archiveEntries = getArchiveEntries(false);
+            if (archiveEntries != null) {
+                for (String name : archiveEntries.keySet()) {
+                    if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
+                        if (name.charAt(name.length() - 1) == '/') {
+                            name = name.substring(pathInJar.length(), name.length() - 1);
+                        } else {
+                            name = name.substring(pathInJar.length());
+                        }
+                        if (name.isEmpty()) {
+                            continue;
+                        }
+                        if (name.charAt(0) == '/') {
+                            name = name.substring(1);
+                        }
+                        if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
+                            result.add(name);
+                        }
                     }
                 }
             }
@@ -170,13 +173,16 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
             }
 
-            for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
-                    int nextSlash = name.indexOf('/', pathInJar.length());
-                    if (nextSlash != -1 && nextSlash != name.length() - 1) {
-                        name = name.substring(0, nextSlash + 1);
+            Map<String, JarEntry> archiveEntries = getArchiveEntries(false);
+            if (archiveEntries != null) {
+                for (String name : archiveEntries.keySet()) {
+                    if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
+                        int nextSlash = name.indexOf('/', pathInJar.length());
+                        if (nextSlash != -1 && nextSlash != name.length() - 1) {
+                            name = name.substring(0, nextSlash + 1);
+                        }
+                        result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                     }
-                    result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                 }
             }
         } else {
