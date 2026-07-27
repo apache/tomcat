@@ -230,6 +230,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation: Better sample httpd configuration for use with SSLValve
+        and add a note that the exact configuration required will depend on the
+        overall httpd configuration. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

@@ -1302,13 +1302,22 @@
     <p>Note: Ensure that the headers are always set by httpd for all requests to
     prevent a client spoofing SSL information by sending fake headers.</p>
 
-    <p>To configure httpd to set the necessary headers, add the following:</p>
+    <p>The exact configuration required in httpd will vary depending on the
+    details of the full httpd configuration but it is likely that the
+    configuration required will be similar to the following:</p>
 <source>&lt;IfModule ssl_module&gt;
   RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
   RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
   RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
   RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
-&lt;/IfModule&gt;</source>
+&lt;/IfModule&gt;
+&lt;IfModule !ssl_module&gt;
+  RequestHeader unset SSL_CLIENT_CERT
+  RequestHeader unset SSL_CIPHER
+  RequestHeader unset SSL_SESSION_ID
+  RequestHeader unset SSL_CIPHER_USEKEYSIZE
+&lt;/IfModule&gt;
+RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
 
   </subsection>
 
