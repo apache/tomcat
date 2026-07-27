@@ -1757,6 +1757,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (streamId > maxProcessedStreamId) {
                     stream = createRemoteStream(streamId);
                     activeRemoteStreamCount.incrementAndGet();
+                    maxProcessedStreamId = streamId;
                 } else {
                     // ID for new stream must always be greater than any previous stream
                     throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
@@ -1821,7 +1822,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             boolean processStream = false;
-            setMaxProcessedStream(streamId);
             Stream stream = (Stream) abstractNonZeroStream;
             if (stream.isActive()) {
                 if (stream.receivedEndOfHeaders()) {
@@ -1871,13 +1871,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         stream.receivedEndOfStream();
         if (!stream.isActive()) {
             decrementActiveRemoteStreamCount(stream);
-        }
-    }
-
-
-    private void setMaxProcessedStream(int streamId) {
-        if (maxProcessedStreamId < streamId) {
-            maxProcessedStreamId = streamId;
         }
     }
 
