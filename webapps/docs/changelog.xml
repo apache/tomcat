@@ -236,6 +236,11 @@
         <bug>70160</bug>: Correct various references to the Servlet
         specification to use version 6.1. (markt)
       </fix>
+      <fix>
+        Documentation: Better sample httpd configuration for use with SSLValve
+        and add a note that the exact configuration required will depend on the
+        overall httpd configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
