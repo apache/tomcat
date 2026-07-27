@@ -4796,10 +4796,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private void mergeParameters() {
         Map<String,String> mergedParams = new HashMap<>();
 
-        String[] names = findParameters();
-        for (String s : names) {
-            mergedParams.put(s, findParameter(s));
-        }
+        mergedParams.putAll(parameters);
 
         ApplicationParameter[] params = findApplicationParameters();
         for (ApplicationParameter param : params) {
@@ -4814,7 +4811,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
             sc.setInitParameter(entry.getKey(), entry.getValue());
         }
-
     }
 
 
