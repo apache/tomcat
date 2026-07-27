@@ -443,6 +443,9 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        Update Maven Resolver Ant Tasks to 1.6.1. (rjung)
+      </update>
       <add>
         Add test profile system for selective test execution. Profiles can be
         specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
