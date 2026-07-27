@@ -217,6 +217,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Maven Resolver Ant Tasks to 1.6.1. (rjung)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.120 (remm)" rtext="release in progress">
   <subsection name="Catalina">
