@@ -23,6 +23,9 @@ import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.http.Method;
+import org.apache.tomcat.util.http.MimeHeaders;
+
 /**
  * Unit tests for Section 5.§ of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
@@ -429,5 +432,47 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame();
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("0-Goaway-[5]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
+    }
+
+
+    @Test
+    public void testReuseAfterReset() throws Exception {
+        http2Connect();
+
+        // Create an invalid request
+        // Generate headers
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString(Method.GET);
+        headers.addValue(":scheme").setString("http");
+        headers.addValue(":path").setString("/simple");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        headers.addValue("Connection").setString("close");
+
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        // Stream id
+        ByteUtil.set31Bits(headersFrameHeader, 5, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+        Assert.assertEquals("Reset expected due to invalid header", "3-RST-[1]\n", output.getTrace());
+        output.clearTrace();
+
+        // Re-use stream 3 for a valid request
+        sendSimpleGetRequest(3);
+        parser.readFrame();
+        String trace = output.getTrace();
+        Assert.assertTrue("Goaway expected due to stream reuse [" + trace + "]",
+                trace.startsWith("0-Goaway-[3]-[1]-["));
     }
 }

@@ -51,7 +51,7 @@ public class TestHttp2Section_6_3 extends Http2TestBase {
 
         sendPriority(5, 3, 15);
 
-        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
+        handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
     }
 
 

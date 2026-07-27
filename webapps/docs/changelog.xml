@@ -178,6 +178,12 @@
         <code>:authority</code> pseudo header or a <code>Host</code> header).
         (markt)
       </fix>
+      <fix>
+        Register the use of an HTTP/2 stream identifier earlier so that there is
+        no possibility of a re-used stream identifier being accepted, regardless
+        of how early in the HEADERS frame processing an error is detected.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
