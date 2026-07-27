@@ -97,6 +97,12 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 try {
                     warFile = openJarFile();
                     JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+                    if (jarFileInWar == null) {
+                        // Should never happen
+                        archiveEntries = null;
+                        throw new IllegalStateException(
+                                sm.getString("jarWarResourceSet.jarNotFound", archivePath, getBase()));
+                    }
                     jarFileIs = warFile.getInputStream(jarFileInWar);
 
                     try (TomcatJarInputStream jarIs = new TomcatJarInputStream(jarFileIs)) {
@@ -252,6 +258,10 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         try (JarFile warFile = new JarFile(getBase())) {
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+            if (jarFileInWar == null) {
+                throw new LifecycleException(
+                        sm.getString("jarWarResourceSet.jarNotFound", archivePath, getBase()));
+            }
             InputStream jarFileIs = warFile.getInputStream(jarFileInWar);
 
             try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {

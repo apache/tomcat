@@ -295,7 +295,7 @@ public class FileResource extends AbstractResource {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), ioe);
             }
-            return 0;
+            return resource.lastModified();
         }
     }
 

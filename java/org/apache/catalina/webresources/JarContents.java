@@ -136,11 +136,8 @@ public final class JarContents {
         for (int i = startPos; i < endPos; i++) {
             h = hashPrime * h + content.charAt(i);
         }
-
-        if (h < 0) {
-            h = h * -1;
-        }
-        return h;
+        // Use bitwise AND to ensure non-negative result, handles Integer.MIN_VALUE
+        return h & Integer.MAX_VALUE;
     }
 
 
