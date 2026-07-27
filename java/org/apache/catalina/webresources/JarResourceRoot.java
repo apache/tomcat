@@ -17,14 +17,11 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
@@ -131,15 +128,7 @@ public class JarResourceRoot extends AbstractResource {
 
     @Override
     public long getCreation() {
-        try {
-            BasicFileAttributes attrs = Files.readAttributes(base.toPath(), BasicFileAttributes.class);
-            return attrs.creationTime().toMillis();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", base.getPath()), ioe);
-            }
-            return base.lastModified();
-        }
+        return getCreation(base);
     }
 
     @Override
