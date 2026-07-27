@@ -90,8 +90,8 @@ public class TestUriTemplate {
 
     @Test
     public void testSpecExample1_01() throws Exception {
-        UriTemplate t = new UriTemplate("/a/b");
-        Map<String, String> result = t.match(new UriTemplate("/a/b"));
+        UriTemplate t = new UriTemplate("/a/b/");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/"));
 
         Assert.assertEquals(0, result.size());
     }
@@ -99,8 +99,8 @@ public class TestUriTemplate {
 
     @Test
     public void testSpecExample1_02() throws Exception {
-        UriTemplate t = new UriTemplate("/a/b");
-        Map<String, String> result = t.match(new UriTemplate("/a"));
+        UriTemplate t = new UriTemplate("/a/b/");
+        Map<String, String> result = t.match(new UriTemplate("/a/b"));
 
         Assert.assertNull(result);
     }
@@ -108,7 +108,16 @@ public class TestUriTemplate {
 
     @Test
     public void testSpecExample1_03() throws Exception {
-        UriTemplate t = new UriTemplate("/a/b");
+        UriTemplate t = new UriTemplate("/a/b/");
+        Map<String, String> result = t.match(new UriTemplate("/a"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testSpecExample1_04() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/");
         Map<String, String> result = t.match(new UriTemplate("/a/bb"));
 
         Assert.assertNull(result);
@@ -147,9 +156,29 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample2_04() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testSpecExample2_05() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
         Map<String, String> result = t.match(new UriTemplate("/a/b/c"));
 
         Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testSpecExample2_06() throws Exception {
+        // Extra test based on RFC 6570, 2.3
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String, String> result = t.match(new UriTemplate("/a/"));
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("", result.get("var"));
     }
 
 
@@ -170,45 +199,12 @@ public class TestUriTemplate {
         Assert.assertEquals("x", result.get("b"));
     }
 
-
-    public void testEgMailingList01() throws Exception {
-        UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String, String> result = t.match(new UriTemplate("/a/b/"));
-
-        Assert.assertNull(result);
-    }
-
-
-    public void testEgMailingList02() throws Exception {
-        UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String, String> result = t.match(new UriTemplate("/a/"));
-
-        Assert.assertNull(result);
-    }
-
-
     @Test
-    public void testEgMailingList03() throws Exception {
-        UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String, String> result = t.match(new UriTemplate("/a"));
-
-        Assert.assertNull(result);
-    }
-
-
-    @Test(expected = jakarta.websocket.DeploymentException.class)
-    public void testEgMailingList04() throws Exception {
-        UriTemplate t = new UriTemplate("/a/{var1}/{var2}");
-        @SuppressWarnings("unused")
-        Map<String, String> result = t.match(new UriTemplate("/a//c"));
-    }
-
-
-    @Test(expected = jakarta.websocket.DeploymentException.class)
-    public void testEgMailingList05() throws Exception {
+    public void testEgMailingList01() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}/");
-        @SuppressWarnings("unused")
         Map<String, String> result = t.match(new UriTemplate("/a/b/"));
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("b", result.get("var"));
     }
 
 

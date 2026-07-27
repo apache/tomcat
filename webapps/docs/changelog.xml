@@ -221,6 +221,13 @@
         <code>org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES</code>
         user property. (markt)
       </add>
+      <fix>
+        Improve URI template matching for WebSocket end points. Trailing slashes
+        are now significant both for template definitions and URIs considered
+        for potential matches to those URIs. Note that this means if a URI
+        template ends in a variable without a trailing slash, that variable
+        might be expanded to the empty string. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
