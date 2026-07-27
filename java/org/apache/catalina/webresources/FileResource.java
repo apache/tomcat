@@ -26,8 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
@@ -288,15 +286,7 @@ public class FileResource extends AbstractResource {
 
     @Override
     public long getCreation() {
-        try {
-            BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
-            return attrs.creationTime().toMillis();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), ioe);
-            }
-            return resource.lastModified();
-        }
+        return getCreation(resource);
     }
 
     @Override
