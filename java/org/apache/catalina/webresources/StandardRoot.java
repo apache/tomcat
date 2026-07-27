@@ -807,7 +807,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
                 mainResourceSet.setReadOnly(readOnly);
-            } else if (f.isFile() && docBase.endsWith(".war")) {
+            } else if (f.isFile() && docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
                 throw new IllegalArgumentException(sm.getString("standardRoot.startInvalidMain", f.getAbsolutePath()));
@@ -885,6 +885,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 } else {
                     endOfFileUrl = jarUrl.indexOf(UriUtil.getWarSeparator());
                 }
+                if (endOfFileUrl == -1) {
+                    throw new IllegalArgumentException(sm.getString("standardRoot.missingSeparator", jarUrl));
+                }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {
                     f = new File(new URI(fileUrl));
@@ -892,7 +895,12 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                     throw new IllegalArgumentException(
                             sm.getString("standardRoot.invalidJarUrl", fileUrl), e);
                 }
-                int startOfArchivePath = endOfFileUrl + 2;
+                int startOfArchivePath;
+                if ("jar".equals(url.getProtocol())) {
+                    startOfArchivePath = endOfFileUrl + 2;  // "!/" is always 2 chars
+                } else {
+                    startOfArchivePath = endOfFileUrl + UriUtil.getWarSeparator().length();
+                }
                 if (jarUrl.length() > startOfArchivePath) {
                     archivePath = jarUrl.substring(startOfArchivePath);
                 } else {
