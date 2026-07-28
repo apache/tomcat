@@ -232,6 +232,20 @@ public class ContextConfig implements LifecycleListener {
     protected final Map<Class<?>,Set<ServletContainerInitializer>> typeInitializerMap = new HashMap<>();
 
     /**
+     * Index of {@link #typeInitializerMap} entries that represent annotations, keyed by class name. Used to avoid a
+     * linear scan of {@link #typeInitializerMap} for every annotation of every scanned class. The values are the same
+     * {@link Set} instances held by {@link #typeInitializerMap}.
+     */
+    private final Map<String,Set<ServletContainerInitializer>> typeInitializerAnnotationsMap = new HashMap<>();
+
+    /**
+     * Index of {@link #typeInitializerMap} entries that represent non-annotations (classes and interfaces), keyed by
+     * class name. Used to avoid a linear scan of {@link #typeInitializerMap} for every super class and interface of
+     * every scanned class. The values are the same {@link Set} instances held by {@link #typeInitializerMap}.
+     */
+    private final Map<String,Set<ServletContainerInitializer>> typeInitializerClassMap = new HashMap<>();
+
+    /**
      * Flag that indicates if at least one {@link HandlesTypes} entry is present that represents an annotation.
      */
     protected boolean handlesTypesAnnotations = false;
@@ -240,6 +254,15 @@ public class ContextConfig implements LifecycleListener {
      * Flag that indicates if at least one {@link HandlesTypes} entry is present that represents a non-annotation.
      */
     protected boolean handlesTypesNonAnnotations = false;
+
+    /**
+     * Records, keyed by JAR URL (external form), whether a fragment JAR that was scanned for annotations also contains
+     * a <code>META-INF/resources/</code> entry. Populated during the annotation scan so that
+     * {@link #processResourceJARs(Set)} does not need to re-open and re-scan JARs that have already been fully
+     * examined. Reset at the start of each {@link #webConfig()}. A concurrent map is used because annotation scanning
+     * may run in parallel; each JAR writes its own distinct key.
+     */
+    private final Map<String,Boolean> resourceJarScanCache = new ConcurrentHashMap<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -1177,6 +1200,8 @@ public class ContextConfig implements LifecycleListener {
         // Reset ServletContextInitializer scanning
         initializerClassMap.clear();
         typeInitializerMap.clear();
+        typeInitializerAnnotationsMap.clear();
+        typeInitializerClassMap.clear();
 
         ok = true;
 
@@ -1314,6 +1339,9 @@ public class ContextConfig implements LifecycleListener {
         WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(), context.getXmlValidation(),
                 context.getXmlBlockExternal());
 
+        // Reset any state left over from a previous run on this instance.
+        resourceJarScanCache.clear();
+
         Set<WebXml> defaults = new HashSet<>();
         defaults.add(getDefaultWebXmlFragment(webXmlParser));
 
@@ -1426,6 +1454,11 @@ public class ContextConfig implements LifecycleListener {
     protected void processClasses(WebXml webXml, Set<WebXml> orderedFragments) {
         // Step 4. Process /WEB-INF/classes for annotations and
         // @HandlesTypes matches
+
+        // Build the name-keyed indexes of typeInitializerMap now that it is
+        // fully populated and before scanning (which may run in parallel via
+        // processAnnotations) starts.
+        buildTypeInitializerIndexes();
 
         Map<String,JavaClassCacheEntry> javaClassCache;
 
@@ -1691,30 +1724,8 @@ public class ContextConfig implements LifecycleListener {
         InputSource globalWebXml = getGlobalWebXmlSource();
         InputSource hostWebXml = getHostWebXmlSource();
 
-        long globalTimeStamp = 0;
-        long hostTimeStamp = 0;
-
-        if (globalWebXml != null) {
-            try {
-                URI uri = new URI(globalWebXml.getSystemId());
-                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
-                    globalTimeStamp = uc.getLastModified();
-                }
-            } catch (IOException | URISyntaxException | IllegalArgumentException e) {
-                globalTimeStamp = -1;
-            }
-        }
-
-        if (hostWebXml != null) {
-            try {
-                URI uri = new URI(hostWebXml.getSystemId());
-                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
-                    hostTimeStamp = uc.getLastModified();
-                }
-            } catch (IOException | URISyntaxException | IllegalArgumentException e) {
-                hostTimeStamp = -1;
-            }
-        }
+        long globalTimeStamp = getWebXmlTimeStamp(globalWebXml);
+        long hostTimeStamp = getWebXmlTimeStamp(hostWebXml);
 
         if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                 entry.getHostTimeStamp() == hostTimeStamp) {
@@ -1773,6 +1784,35 @@ public class ContextConfig implements LifecycleListener {
             }
 
             return webXmlDefaultFragment;
+        }
+    }
+
+
+    /**
+     * Determine the last modified time of a default web.xml {@link InputSource} for the {@link #hostWebXmlCache}
+     * freshness check. A {@code null} source is reported as {@code 0} (no source). For {@code file:} URIs this uses
+     * {@link File#lastModified()} rather than opening a {@link java.net.URLConnection} since, for the file protocol,
+     * reading the last modified time via a connection opens the file as a side effect. Any error is reported as
+     * {@code -1} so that the result is not cached.
+     *
+     * @param source the web.xml source, or {@code null} if none
+     *
+     * @return the last modified time in milliseconds, {@code 0} if there is no source, or {@code -1} on error
+     */
+    private long getWebXmlTimeStamp(InputSource source) {
+        if (source == null) {
+            return 0;
+        }
+        try {
+            URI uri = new URI(source.getSystemId());
+            if ("file".equals(uri.getScheme())) {
+                return new File(uri).lastModified();
+            }
+            try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
+                return uc.getLastModified();
+            }
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            return -1;
         }
     }
 
@@ -1889,17 +1929,27 @@ public class ContextConfig implements LifecycleListener {
             URL url = fragment.getURL();
             try {
                 if ("jar".equals(url.getProtocol()) || url.toString().endsWith(".jar")) {
-                    try (Jar jar = JarFactory.newInstance(url)) {
-                        jar.nextEntry();
-                        String entryName = jar.getEntryName();
-                        while (entryName != null) {
-                            if (entryName.startsWith("META-INF/resources/")) {
-                                context.getResources().createWebResourceSet(
-                                        WebResourceRoot.ResourceSetType.RESOURCE_JAR, "/", url, "/META-INF/resources");
-                                break;
-                            }
+                    Boolean scannedHasResources = resourceJarScanCache.get(url.toExternalForm());
+                    if (scannedHasResources != null) {
+                        // This JAR was fully scanned during annotation processing so there is no need to re-open it.
+                        if (scannedHasResources.booleanValue()) {
+                            context.getResources().createWebResourceSet(
+                                    WebResourceRoot.ResourceSetType.RESOURCE_JAR, "/", url, "/META-INF/resources");
+                        }
+                    } else {
+                        try (Jar jar = JarFactory.newInstance(url)) {
                             jar.nextEntry();
-                            entryName = jar.getEntryName();
+                            String entryName = jar.getEntryName();
+                            while (entryName != null) {
+                                if (entryName.startsWith("META-INF/resources/")) {
+                                    context.getResources().createWebResourceSet(
+                                            WebResourceRoot.ResourceSetType.RESOURCE_JAR, "/", url,
+                                            "/META-INF/resources");
+                                    break;
+                                }
+                                jar.nextEntry();
+                                entryName = jar.getEntryName();
+                            }
                         }
                     }
                 } else if ("file".equals(url.getProtocol())) {
@@ -2157,10 +2207,9 @@ public class ContextConfig implements LifecycleListener {
         annotations.setDistributable(true);
         URL url = fragment.getURL();
         processAnnotationsUrl(url, annotations, htOnly, javaClassCache);
-        Set<WebXml> set = new HashSet<>();
-        set.add(annotations);
-        // Merge annotations into fragment - fragment takes priority
-        fragment.merge(set);
+        // Merge annotations into fragment - fragment takes priority. merge() only iterates the set so an immutable
+        // single-element set avoids allocating a HashMap-backed HashSet per fragment.
+        fragment.merge(Collections.singleton(annotations));
     }
 
     /**
@@ -2293,6 +2342,10 @@ public class ContextConfig implements LifecycleListener {
                 log.trace(sm.getString("contextConfig.processAnnotationsJar.debug", url));
             }
 
+            // While iterating every entry, also note whether the JAR contains static resources so that
+            // processResourceJARs() can avoid re-opening and re-scanning this JAR.
+            boolean hasResources = false;
+
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -2303,9 +2356,15 @@ public class ContextConfig implements LifecycleListener {
                         log.error(sm.getString("contextConfig.inputStreamJar", entryName, url), e);
                     }
                 }
+                if (!hasResources && entryName.startsWith("META-INF/resources/")) {
+                    hasResources = true;
+                }
                 jar.nextEntry();
                 entryName = jar.getEntryName();
             }
+
+            // Only cache the result once the JAR has been fully and successfully scanned.
+            resourceJarScanCache.put(url.toExternalForm(), Boolean.valueOf(hasResources));
         } catch (IOException ioe) {
             log.error(sm.getString("contextConfig.jarFile", url), ioe);
         }
@@ -2449,24 +2508,21 @@ public class ContextConfig implements LifecycleListener {
         if (handlesTypesAnnotations) {
             AnnotationEntry[] annotationEntries = javaClass.getAllAnnotationEntries();
             if (annotationEntries != null) {
-                for (Map.Entry<Class<?>,Set<ServletContainerInitializer>> entry : typeInitializerMap.entrySet()) {
-                    if (entry.getKey().isAnnotation()) {
-                        String entryClassName = entry.getKey().getName();
-                        for (AnnotationEntry annotationEntry : annotationEntries) {
-                            if (entryClassName.equals(getClassName(annotationEntry.getAnnotationType()))) {
-                                if (clazz == null) {
-                                    clazz = Introspection.loadClass(context, className);
-                                    if (clazz == null) {
-                                        // Can't load the class so no point
-                                        // continuing
-                                        return;
-                                    }
-                                }
-                                for (ServletContainerInitializer sci : entry.getValue()) {
-                                    initializerClassMap.get(sci).add(clazz);
-                                }
-                                break;
+                for (AnnotationEntry annotationEntry : annotationEntries) {
+                    // getAnnotationType() returns the internal descriptor form which the index is keyed on, so no
+                    // per-entry conversion is required.
+                    Set<ServletContainerInitializer> scis =
+                            typeInitializerAnnotationsMap.get(annotationEntry.getAnnotationType());
+                    if (scis != null) {
+                        if (clazz == null) {
+                            clazz = Introspection.loadClass(context, className);
+                            if (clazz == null) {
+                                // Can't load the class so no point continuing
+                                return;
                             }
+                        }
+                        for (ServletContainerInitializer sci : scis) {
+                            initializerClassMap.get(sci).add(clazz);
                         }
                     }
                 }
@@ -2572,24 +2628,35 @@ public class ContextConfig implements LifecycleListener {
     }
 
     private Set<ServletContainerInitializer> getSCIsForClass(String className) {
-        for (Map.Entry<Class<?>,Set<ServletContainerInitializer>> entry : typeInitializerMap.entrySet()) {
-            Class<?> clazz = entry.getKey();
-            if (!clazz.isAnnotation()) {
-                if (clazz.getName().equals(className)) {
-                    return entry.getValue();
-                }
-            }
-        }
-        return EMPTY_SCI_SET;
+        Set<ServletContainerInitializer> scis = typeInitializerClassMap.get(className);
+        return scis == null ? EMPTY_SCI_SET : scis;
     }
 
-    private static String getClassName(String internalForm) {
-        if (!internalForm.startsWith("L")) {
-            return internalForm;
+    /**
+     * (Re)builds the name-keyed indexes of {@link #typeInitializerMap} used by {@link #checkHandlesTypes(JavaClass,
+     * Map)}. This must be called after {@link #typeInitializerMap} has been fully populated and before scanning starts
+     * (scanning may run concurrently) so the per-class {@link HandlesTypes} matching can look up interested
+     * {@link ServletContainerInitializer}s by class name rather than performing a linear scan of the whole map. The
+     * indexes share the {@link Set} instances held by {@link #typeInitializerMap}.
+     */
+    void buildTypeInitializerIndexes() {
+        typeInitializerAnnotationsMap.clear();
+        typeInitializerClassMap.clear();
+        for (Map.Entry<Class<?>,Set<ServletContainerInitializer>> entry : typeInitializerMap.entrySet()) {
+            Class<?> type = entry.getKey();
+            if (type.isAnnotation()) {
+                Set<ServletContainerInitializer> scis = entry.getValue();
+                // Index annotation types by both the internal descriptor form (e.g. "Lpkg/Ann;") and the binary
+                // class name. Class files reference annotations using the descriptor form, so indexing it lets the
+                // per-class scan look the type up directly without converting each entry. The binary name is also
+                // indexed so matching remains identical to the previous descriptor-to-binary conversion for any
+                // non-descriptor input.
+                typeInitializerAnnotationsMap.put('L' + type.getName().replace('.', '/') + ';', scis);
+                typeInitializerAnnotationsMap.put(type.getName(), scis);
+            } else {
+                typeInitializerClassMap.put(type.getName(), entry.getValue());
+            }
         }
-
-        // Assume starts with L, ends with ; and uses / rather than .
-        return internalForm.substring(1, internalForm.length() - 1).replace('/', '.');
     }
 
     /**

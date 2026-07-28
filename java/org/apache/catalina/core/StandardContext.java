@@ -4748,6 +4748,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
             sc.setInitParameter(entry.getKey(), entry.getValue());
         }
+
     }
 
 

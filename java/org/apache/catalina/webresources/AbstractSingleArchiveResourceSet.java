@@ -76,9 +76,10 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
         synchronized (archiveLock) {
             if (archiveEntries == null && !single) {
                 JarFile jarFile = null;
-                archiveEntries = new HashMap<>();
                 try {
                     jarFile = openJarFile();
+                    // Pre-size the map from the known entry count to avoid resize/rehash cycles for large JARs.
+                    archiveEntries = new HashMap<>((int) (jarFile.size() / 0.75f) + 1);
                     Enumeration<JarEntry> entries = jarFile.entries();
                     while (entries.hasMoreElements()) {
                         JarEntry entry = entries.nextElement();

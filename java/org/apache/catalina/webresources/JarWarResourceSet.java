@@ -153,11 +153,13 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         }
                     }
                 }
-            }
-            WebResourceRoot root = getRoot();
-            if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
-                jarContents = new JarContents(archiveEntries.values());
-                retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
+                // Build the bloom filter once, when the entries are (re)built, rather than on every call. gc() clears
+                // archiveEntries and jarContents together so the filter is rebuilt whenever the entries are.
+                WebResourceRoot root = getRoot();
+                if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
+                    jarContents = new JarContents(archiveEntries.values());
+                    retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
+                }
             }
             return archiveEntries;
         }

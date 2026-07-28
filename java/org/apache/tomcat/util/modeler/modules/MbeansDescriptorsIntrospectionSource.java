@@ -126,10 +126,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
         specialMethods.put("postDeregister", "");
     }
 
-    private static final Class<?>[] supportedTypes = new Class[] { Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE,
+    private static final Set<Class<?>> supportedTypes = Set.of(Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE,
             Character.class, Character.TYPE, Short.class, Short.TYPE, Integer.class, Integer.TYPE, Long.class,
             Long.TYPE, Float.class, Float.TYPE, Double.class, Double.TYPE, String.class, String[].class,
-            BigDecimal.class, BigInteger.class, ObjectName.class, Object[].class, java.io.File.class, };
+            BigDecimal.class, BigInteger.class, ObjectName.class, Object[].class, java.io.File.class);
 
     /**
      * Check if this class is one of the supported types. If the class is supported, returns true. Otherwise, returns
@@ -140,10 +140,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
      * @return boolean True if class is supported
      */
     private boolean supportedType(Class<?> ret) {
-        for (Class<?> supportedType : supportedTypes) {
-            if (ret == supportedType) {
-                return true;
-            }
+        // Class equality is reference identity so a Set membership test matches the previous identity comparison.
+        if (supportedTypes.contains(ret)) {
+            return true;
         }
         return isBeanCompatible(ret);
     }
@@ -163,7 +162,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
 
         // Anything in the java or javax package that
         // does not have a defined mapping is excluded.
-        if (javaType.getName().startsWith("java.") || javaType.getName().startsWith("javax.")) {
+        String name = javaType.getName();
+        if (name.startsWith("java.") || name.startsWith("javax.")) {
             return false;
         }
 

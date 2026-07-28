@@ -24,7 +24,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -337,7 +336,7 @@ public class StandardJarScanner implements JarScanner {
                     isWebapp = isWebappClassLoader(classLoader);
                 }
 
-                classPathUrlsToProcess.addAll(Arrays.asList(((URLClassLoader) classLoader).getURLs()));
+                Collections.addAll(classPathUrlsToProcess, ((URLClassLoader) classLoader).getURLs());
 
                 processURLs(scanType, callback, processedURLs, isWebapp, classPathUrlsToProcess);
             }
@@ -531,15 +530,24 @@ public class StandardJarScanner implements JarScanner {
                 return;
             }
             String[] classPathEntries = classPathAttribute.split(" ");
+            // The JAR URL and its URI form are invariant across all Class-Path entries so resolve them once.
+            URL jarURL = jar.getJarFileURL();
+            URI jarURI;
+            try {
+                jarURI = jarURL.toURI();
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("jarScan.invalidUri", jarURL), e);
+                }
+                return;
+            }
             for (String classPathEntry : classPathEntries) {
                 classPathEntry = classPathEntry.trim();
                 if (classPathEntry.isEmpty()) {
                     continue;
                 }
-                URL jarURL = jar.getJarFileURL();
                 URL classPathEntryURL;
                 try {
-                    URI jarURI = jarURL.toURI();
                     /*
                      * Note: Resolving the relative URLs from the manifest has the potential to introduce security
                      * concerns. However, since only JARs provided by the container and NOT those provided by web

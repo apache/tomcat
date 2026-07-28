@@ -23,7 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -135,7 +135,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {
                     String[] entries = webResourceSet.list(path);
-                    result.addAll(Arrays.asList(entries));
+                    Collections.addAll(result, entries);
                 }
             }
         }
@@ -379,12 +379,10 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         String[] resources = list(path, false);
         WebResource[] result = new WebResource[resources.length];
+        // path is loop invariant so build the prefix (ending in '/') once.
+        String prefix = path.charAt(path.length() - 1) == '/' ? path : path + '/';
         for (int i = 0; i < resources.length; i++) {
-            if (path.charAt(path.length() - 1) == '/') {
-                result[i] = getResource(path + resources[i], false, false);
-            } else {
-                result[i] = getResource(path + '/' + resources[i], false, false);
-            }
+            result[i] = getResource(prefix + resources[i], false, false);
         }
         return result;
     }

@@ -110,6 +110,11 @@ public abstract class LifecycleBase implements Lifecycle {
      * @param data Data associated with event.
      */
     protected void fireLifecycleEvent(String type, Object data) {
+        // Many components (e.g. every Wrapper) have no lifecycle listeners but still fire several events per state
+        // transition, so avoid allocating an event object that no one would receive.
+        if (lifecycleListeners.isEmpty()) {
+            return;
+        }
         LifecycleEvent event = new LifecycleEvent(this, type, data);
         for (LifecycleListener listener : lifecycleListeners) {
             listener.lifecycleEvent(event);

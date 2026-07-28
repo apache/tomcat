@@ -282,10 +282,79 @@
         Separate the <code>Context</code> role mapping from the Servlet
         specification <code>security-role-ref</code>. (remm)
       </update>
+      <update>
+        Improve web application start time by indexing the
+        <code>@HandlesTypes</code> types by class name so that matching a
+        scanned class no longer requires a linear scan of all
+        <code>ServletContainerInitializer</code> handled types. (tandraschko)
+      </update>
+      <update>
+        Avoid an unnecessary file open per deployed web application when
+        checking whether the cached default <code>web.xml</code> is still
+        current by reading the last modified time of <code>file:</code> based
+        global and host <code>web.xml</code> resources directly rather than via
+        a <code>URLConnection</code>. (tandraschko)
+      </update>
+      <update>
+        Avoid re-opening and re-scanning each web application fragment JAR when
+        looking for JARs that contain static resources under
+        <code>META-INF/resources/</code> by recording that information during
+        the annotation scan that has already iterated every JAR entry.
+        (tandraschko)
+      </update>
+      <update>
+        Reduce redundant work during web application start: key the
+        <code>@HandlesTypes</code> annotation index by the class file descriptor
+        form to remove a per-annotation string conversion while scanning
+        classes, hoist loop invariant lookups out of the manifest
+        <code>Class-Path</code>, attribute property replacement and class path
+        scanning loops, and avoid an unnecessary per fragment collection
+        allocation. (tandraschko)
+      </update>
+      <fix>
+        Build the bloom filter used to index the entries of a JAR nested inside
+        a packed WAR only once when the entries are read rather than rebuilding
+        it on every resource lookup. (tandraschko)
+      </fix>
+      <update>
+        Further reduce allocations while reading web application resources:
+        pre-size the archive entry map from the known JAR entry count and hoist
+        a loop invariant out of resource listing. (tandraschko)
+      </update>
+      <update>
+        When registering a web application with the <code>Mapper</code>, add its
+        servlet mappings to each of the copy-on-write wrapper arrays in a single
+        merge per mapping category rather than reallocating the array once per
+        mapping, which was <code>O(n^2)</code> for contexts with many mappings.
+        (tandraschko)
+      </update>
+      <update>
+        Do not allocate a <code>LifecycleEvent</code> when a component has no
+        lifecycle listeners. Components such as each <code>Wrapper</code> fire
+        several state transition events during start but commonly have no
+        listeners. (tandraschko)
+      </update>
+      <update>
+        Use a <code>Set</code> rather than a linear array scan when checking
+        whether a type is a supported attribute type during JMX MBean
+        introspection. (tandraschko)
+      </update>
+      <update>
+        Avoid resolving the canonical path of a file based web resource twice.
+        The path is already resolved when the resource set validates that the
+        file is located under its base, so pass it to the created
+        <code>FileResource</code> rather than having
+        <code>FileResource.getCanonicalPath()</code> resolve the same file
+        again. (tandraschko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        Compute the protocol handler name once during <code>init()</code>
+        instead of rebuilding and re-quoting it several times. (tandraschko)
+      </update>
       <update>
         Change the default value of the <code>cookiesWithoutEquals</code>
         attribute of the <code>Rfc6265CookieProcessor</code> from
