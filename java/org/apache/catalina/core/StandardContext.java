@@ -4733,9 +4733,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private void mergeParameters() {
         Map<String,String> mergedParams = new HashMap<>();
 
-        for (Map.Entry<String,String> parameter : parameters.entrySet()) {
-            mergedParams.put(parameter.getKey(), parameter.getValue());
-        }
+        mergedParams.putAll(parameters);
 
         ApplicationParameter[] params = findApplicationParameters();
         for (ApplicationParameter param : params) {

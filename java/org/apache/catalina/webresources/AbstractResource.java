@@ -16,7 +16,11 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 
 import org.apache.catalina.WebResource;
@@ -224,4 +228,17 @@ public abstract class AbstractResource implements WebResource {
      * @return the logger
      */
     protected abstract Log getLog();
+
+
+    protected long getCreation(File file) {
+        try {
+            BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            return attrs.creationTime().toMillis();
+        } catch (IOException ioe) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractResource.getCreationFail", file.getPath()), ioe);
+            }
+            return file.lastModified();
+        }
+    }
 }

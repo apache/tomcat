@@ -128,7 +128,7 @@ public class JarResourceRoot extends AbstractResource {
 
     @Override
     public long getCreation() {
-        return base.lastModified();
+        return getCreation(base);
     }
 
     @Override

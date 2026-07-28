@@ -388,6 +388,12 @@
         <code>:authority</code> pseudo header or a <code>Host</code> header).
         (markt)
       </fix>
+      <fix>
+        Register the use of an HTTP/2 stream identifier earlier so that there is
+        no possibility of a re-used stream identifier being accepted, regardless
+        of how early in the HEADERS frame processing an error is detected.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -486,6 +492,13 @@
         <code>org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES</code>
         user property. (markt)
       </add>
+      <fix>
+        Improve URI template matching for WebSocket end points. Trailing slashes
+        are now significant both for template definitions and URIs considered
+        for potential matches to those URIs. Note that this means if a URI
+        template ends in a variable without a trailing slash, that variable
+        might be expanded to the empty string. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -495,6 +508,11 @@
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Documentation: Better sample httpd configuration for use with SSLValve
+        and add a note that the exact configuration required will depend on the
+        overall httpd configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
@@ -504,6 +522,9 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        Update Maven Resolver Ant Tasks to 1.6.1. (rjung)
+      </update>
       <add>
         Add test profile system for selective test execution. Profiles can be
         specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
@@ -524,6 +545,11 @@
         Update Checkstyle to 13.7.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Examples: Limit the buffering of messages in the WebSocket chat example
+        to prevent a malicious client triggering excessive memory usage that
+        could lead to a DoS. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
