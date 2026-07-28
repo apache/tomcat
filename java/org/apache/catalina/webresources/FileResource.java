@@ -64,6 +64,7 @@ public class FileResource extends AbstractResource {
     private final boolean needConvert;
     private final WebResourceLockSet lockSet;
     private final String lockPath;
+    private final String canonicalPath;
 
    /**
      * Creates a FileResource without locking support.
@@ -78,6 +79,22 @@ public class FileResource extends AbstractResource {
         this(root, webAppPath, resource, readOnly, manifest, null, null);
     }
 
+    /**
+     * Creates a FileResource with optional locking support.
+     *
+     * @param root       The web resource root
+     * @param webAppPath The web application path
+     * @param resource   The underlying file
+     * @param readOnly   Whether the resource is read-only
+     * @param manifest   The JAR manifest, or null if not applicable
+     * @param lockSet    The lock set for concurrent access control, or null if locking is not required
+     * @param lockPath   The path used for locking, or null if locking is not required
+     */
+    public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest,
+            WebResourceLockSet lockSet, String lockPath) {
+        this(root, webAppPath, resource, readOnly, manifest, lockSet, lockPath, null);
+    }
+
 
     /**
      * Creates a FileResource with optional locking support.
@@ -89,13 +106,16 @@ public class FileResource extends AbstractResource {
      * @param manifest The JAR manifest, or null if not applicable
      * @param lockSet The lock set for concurrent access control, or null if locking is not required
      * @param lockPath The path used for locking, or null if locking is not required
+     * @param canonicalPath The canonical path of the resource if it has already been resolved, else null
+     *                          to resolve it on demand
      */
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest,
-            WebResourceLockSet lockSet, String lockPath) {
+            WebResourceLockSet lockSet, String lockPath, String canonicalPath) {
         super(root, webAppPath);
         this.resource = resource;
         this.lockSet = lockSet;
         this.lockPath = lockPath;
+        this.canonicalPath = canonicalPath;
 
         if (webAppPath.charAt(webAppPath.length() - 1) == '/') {
             String realName = resource.getName() + '/';
@@ -195,6 +215,10 @@ public class FileResource extends AbstractResource {
 
     @Override
     public String getCanonicalPath() {
+        if (canonicalPath != null) {
+            // resolved while the resource set validated this file, so no need to resolve it again
+            return canonicalPath;
+        }
         try {
             return resource.getCanonicalPath();
         } catch (IOException ioe) {

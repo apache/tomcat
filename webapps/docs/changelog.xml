@@ -339,6 +339,14 @@
         whether a type is a supported attribute type during JMX MBean
         introspection. (tandraschko)
       </update>
+      <update>
+        Avoid resolving the canonical path of a file based web resource twice.
+        The path is already resolved when the resource set validates that the
+        file is located under its base, so pass it to the created
+        <code>FileResource</code> rather than having
+        <code>FileResource.getCanonicalPath()</code> resolve the same file
+        again. (tandraschko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

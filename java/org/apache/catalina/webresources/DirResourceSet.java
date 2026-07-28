@@ -113,17 +113,19 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                 readLock.lock();
             }
             try {
-                File f = file(path.substring(webAppMount.length()), false);
-                if (f == null) {
+                ValidatedFile validated = validatedFile(path.substring(webAppMount.length()), false);
+                if (validated == null) {
                     return new EmptyResource(root, path);
                 }
+                File f = validated.file();
                 if (!f.exists()) {
                     return new EmptyResource(root, path, f);
                 }
                 if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                     path = path + '/';
                 }
-                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path);
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path,
+                        validated.canonicalPath());
             } finally {
                 if (readLock != null) {
                     readLock.unlock();

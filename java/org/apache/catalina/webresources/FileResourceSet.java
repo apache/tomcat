@@ -72,11 +72,12 @@ public class FileResourceSet extends AbstractFileResourceSet {
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
         if (path.equals(webAppMount)) {
-            File f = file("", true);
-            if (f == null) {
+            ValidatedFile validated = validatedFile("", true);
+            if (validated == null) {
                 return new EmptyResource(root, path);
             }
-            return new FileResource(root, path, f, isReadOnly(), null);
+            return new FileResource(root, path, validated.file(), isReadOnly(), null, null, null,
+                    validated.canonicalPath());
         }
 
         if (path.charAt(path.length() - 1) != '/') {

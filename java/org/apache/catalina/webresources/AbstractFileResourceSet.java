@@ -91,6 +91,18 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     }
 
     /**
+     * A file that has passed this resource set's validation, along with the canonical path that the
+     * validation resolved. Callers that need the canonical path can reuse it instead of resolving the
+     * same file again.
+     *
+     * @param file          the validated file
+     * @param canonicalPath the canonical path of the file, or {@code null} if it was not resolved
+     *                          because linking is allowed
+     */
+    protected record ValidatedFile(File file, String canonicalPath) {
+    }
+
+    /**
      * Return a File for the specified resource name.
      *
      * @param name     Name of the resource
@@ -98,6 +110,19 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
      * @return the file for the specified resource
      */
     protected final File file(String name, boolean mustExist) {
+        ValidatedFile validated = validatedFile(name, mustExist);
+        return validated == null ? null : validated.file();
+    }
+
+    /**
+     * Return a File for the specified resource name, along with the canonical path resolved while
+     * validating it.
+     *
+     * @param name     Name of the resource
+     * @param mustExist Whether the file must exist
+     * @return the validated file for the specified resource, or {@code null} if there is none
+     */
+    protected final ValidatedFile validatedFile(String name, boolean mustExist) {
 
         if (name.equals("/")) {
             name = "";
@@ -120,7 +145,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // If allow linking is enabled, files are not limited to being located
         // under the fileBase so all further checks are disabled.
         if (getAllowLinking()) {
-            return file;
+            return new ValidatedFile(file, null);
         }
 
         // Additional Windows specific checks to handle known problems with
@@ -139,6 +164,8 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         if (canPath == null || !canPath.startsWith(canonicalBase)) {
             return null;
         }
+        // canPath is trimmed to a resource set relative path by the checks below
+        String fullCanonicalPath = canPath;
 
         /*
          * Ensure that the file is not outside the fileBase. This should not be possible for standard requests (the
@@ -186,7 +213,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             return null;
         }
 
-        return file;
+        return new ValidatedFile(file, fullCanonicalPath);
     }
 
 
