@@ -143,14 +143,17 @@ public class JNDIRealm extends RealmBase {
      */
     public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
+    // Note: Usage assumes this value is escaped / doesn't need escaping
+    private static final String NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER = "tomcat-unset-ignore";
+
+    private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
+
+
     /**
      * Constructs a new JNDIRealm.
      */
     public JNDIRealm() {
     }
-
-    private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
-
 
     /**
      * The type of authentication to use
@@ -2091,6 +2094,29 @@ public class JNDIRealm extends RealmBase {
             return list;
         }
 
+        /*
+         * If the userRoleAttribute is unavailable (not configured or not set) for the current user, it would be more
+         * efficient to skip any role search using that attribute. However, filters can use boolean expressions and
+         * there is no standard Java API to parse a filter string into an abstract syntax tree. So, without writing a
+         * custom parser / importing a parser library, there is no way to determine if the filter is unaffected by the
+         * unavailable attribute, is a NO-OP if the attribute is unavailable or if the filter could be more efficiently
+         * expressed knowing the attribute is unavailable.
+         *
+         * Therefore, the solution chosen is to allow the lookup with a potentially inefficient filter to proceed.
+         *
+         * If userRoleId is left as null, that will result in it being treated as "null" by the filter. While it is
+         * considered that a role with a name containing "null" would not be present in the directory it is
+         * theoretically possible which would lead to the role being incorrectly included in the results. Therefore,
+         * userRoleId is modified to "tomcat-unset-ignore" as it is even less likely that a role with a name containing
+         * that string would exist. In the extremely unlikely event a role with such a name is returned, it is removed
+         * from the results below.
+         */
+        boolean placeholderUsed = false;
+        if (userRoleId == null && connection.roleFormatUsesUserRoleAttribute) {
+            userRoleId = NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER;
+            placeholderUsed = true;
+        }
+
         // Set up parameters for an appropriate search filter
         // The dn is already attribute value escaped but the others are not
         // This is a filter so all input will require filter escaping
@@ -2138,7 +2164,9 @@ public class JNDIRealm extends RealmBase {
                 }
                 String dname = getDistinguishedName(connection.context, base, result);
                 String name = getAttributeValue(roleName, attrs);
-                if (name != null && dname != null) {
+                // Also filters out roles with names containing NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER - see above
+                if (name != null && dname != null &&
+                        !(placeholderUsed && dname.contains(NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER))) {
                     groupMap.put(dname, name);
                 }
             }
@@ -2670,6 +2698,7 @@ public class JNDIRealm extends RealmBase {
         }
         if (roleSearch != null) {
             connection.roleFormat = new MessageFormat(roleSearch);
+            connection.roleFormatUsesUserRoleAttribute = roleSearch.contains("{2}");
         }
         return connection;
     }
@@ -3353,9 +3382,13 @@ public class JNDIRealm extends RealmBase {
         public MessageFormat roleFormat = null;
 
         /**
+         * A flag that indicates that roleSearch includes a reference to the {2} placeholder.
+         */
+        public boolean roleFormatUsesUserRoleAttribute = false;
+
+        /**
          * The directory context linking us to our directory server.
          */
         public DirContext context = null;
-
     }
 }

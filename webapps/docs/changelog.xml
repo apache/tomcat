@@ -161,6 +161,12 @@
         Separate the <code>Context</code> role mapping from the Servlet
         specification <code>security-role-ref</code>. (remm)
       </update>
+      <fix>
+        Handle the case where the <code>JNDIRealm</code> is configured to
+        perform role searches with <code>userRoleAttribute</code> but the
+        attribute is not available or not configured for the current user.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
