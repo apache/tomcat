@@ -187,7 +187,7 @@ public class TestRfc9218 extends Http2TestBase {
         trace = trace.replace("21-Body-1365\n", "");
         Assert.assertEquals(0, trace.length());
 
-        // 19 - 5641 body left
+        // 19 - 5461 body left
         // 21 - 4778 body left
 
         // Add 16k to the connection window. Should fully allocate 19 and 21.
@@ -200,6 +200,29 @@ public class TestRfc9218 extends Http2TestBase {
             // Dump for debugging purposes
             ioe.printStackTrace();
         }
+
+        output.clearTrace();
+
+        /*
+         * The final window update was 6145 bytes larger than the outstanding backlog. Those bytes must remain available
+         * in the connection window for the next stream.
+         */
+        sendSimpleGetRequest(23);
+        parser.readFrame();
+        // The headers for stream 23 will always arrive. If the surplus was lost, no body will be sent and the read
+        // below would block for the default timeout - so use a short timeout to fail quickly.
+        s.setSoTimeout(1000);
+        parser.readFrame();
+
+        Assert.assertTrue(output.getTrace().contains("23-Body-6145\n"));
+        output.clearTrace();
+
+        // 2047 completes the 8192 byte response body for stream 23, confirming that exactly 6145 surplus bytes were
+        // available in the connection window.
+        sendWindowUpdate(0, 2047);
+        parser.readFrame();
+
+        Assert.assertEquals("23-Body-2047\n23-EndOfStream\n", output.getTrace());
     }
 
 
