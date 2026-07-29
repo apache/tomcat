@@ -51,7 +51,14 @@ public class TestJNDIRealmIntegration {
     private static final String ROLE_SEARCH_A = "member={0}";
     private static final String ROLE_SEARCH_B = "member=cn={1},ou=people,dc=example,dc=com";
     private static final String ROLE_SEARCH_C = "member=cn={2},ou=people,dc=example,dc=com";
+    private static final String ROLE_SEARCH_D = "(|(member={0})(member=cn={2},ou=people,dc=example,dc=com))";
     private static final String ROLE_BASE = "ou=people,dc=example,dc=com";
+
+    /*
+     * An attribute that is valid for the user entries used by these tests but that none of them actually has, so the
+     * value for {2} in the role search is unavailable even though userRoleAttribute is configured.
+     */
+    private static final String USER_ROLE_ATTRIBUTE_ABSENT = "ou";
 
     private static InMemoryDirectoryServer ldapServer;
 
@@ -73,6 +80,25 @@ public class TestJNDIRealmIntegration {
             parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
                     "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
                     userRoleAttribute, Integer.valueOf(4) });
+        }
+        /*
+         * Role searches that use {2} - the value of userRoleAttribute - when no value is available for the user,
+         * either because userRoleAttribute is not configured or because the user's entry does not have that attribute.
+         * See the additional directory entries added by createLDAP() for these tests.
+         */
+        for (String userRoleAttribute : new String[] { null, USER_ROLE_ATTRIBUTE_ABSENT }) {
+            for (int poolSize : new int[] { 1, 4 }) {
+                // The role search can only match via {2} so no roles are expected
+                parameterSets.add(new Object[] { USER_PATTERN, null, null, ROLE_SEARCH_C, ROLE_BASE,
+                        "test", "test", new String[0], userRoleAttribute, Integer.valueOf(poolSize) });
+                parameterSets.add(new Object[] { null, USER_SEARCH, USER_BASE, ROLE_SEARCH_C, ROLE_BASE,
+                        "test", "test", new String[0], userRoleAttribute, Integer.valueOf(poolSize) });
+                // The role search can also match via {0} so the roles found that way are still expected
+                parameterSets.add(new Object[] { USER_PATTERN, null, null, ROLE_SEARCH_D, ROLE_BASE,
+                        "test", "test", new String[] { "TestGroup" }, userRoleAttribute, Integer.valueOf(poolSize) });
+                parameterSets.add(new Object[] { null, USER_SEARCH, USER_BASE, ROLE_SEARCH_D, ROLE_BASE,
+                        "test", "test", new String[] { "TestGroup" }, userRoleAttribute, Integer.valueOf(poolSize) });
+            }
         }
         return parameterSets;
     }
@@ -303,6 +329,56 @@ public class TestJNDIRealmIntegration {
                     "sn: Bug 65373",
                     "userPassword: <>+=\"#;,rrr");
             result = conn.processOperation(addUserBug65373);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            /*
+             * The following entries exist so the role searches that use {2} have something they could match when no
+             * value is available for the user. They must not appear in the roles returned for any user.
+             */
+
+            // A role search that used the unavailable value directly would look for "cn=null" so make sure such an
+            // entry exists and is a member of a role
+            AddRequest addUserNull = new AddRequest(
+                    "dn: cn=null,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: null",
+                    "sn: Null",
+                    "userPassword: test");
+            result = conn.processOperation(addUserNull);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addGroupNull = new AddRequest(
+                    "dn: cn=NullRoleGroup,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: groupOfNames",
+                    "cn: NullRoleGroup",
+                    "member: cn=null,ou=people,dc=example,dc=com");
+            result = conn.processOperation(addGroupNull);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            // The role search uses the placeholder JNDIRealm substitutes for the unavailable value, so make sure an
+            // entry it matches exists. The name of the role contains the placeholder so JNDIRealm must remove it from
+            // the search results. Note: this deliberately depends on the placeholder value used by JNDIRealm.
+            AddRequest addUserPlaceholder = new AddRequest(
+                    "dn: cn=tomcat-unset-ignore,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: tomcat-unset-ignore",
+                    "sn: Placeholder",
+                    "userPassword: test");
+            result = conn.processOperation(addUserPlaceholder);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addGroupPlaceholder = new AddRequest(
+                    "dn: cn=tomcat-unset-ignore-group,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: groupOfNames",
+                    "cn: tomcat-unset-ignore-group",
+                    "member: cn=tomcat-unset-ignore,ou=people,dc=example,dc=com");
+            result = conn.processOperation(addGroupPlaceholder);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }
     }
