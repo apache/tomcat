@@ -536,34 +536,14 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             return;
         }
 
-        // Make sure that constrained resources are not cached by web proxies
-        // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !Method.POST.equals(request.getMethod())) {
-            if (securePagesWithPragma) {
-                // Note: These can cause problems with downloading files with IE
-                response.setHeader("Pragma", "No-cache");
-                response.setHeader("Cache-Control", "no-cache");
-                response.setHeader("Expires", DATE_ONE);
-            } else {
-                response.setHeader("Cache-Control", "private");
-            }
-        }
+        /*
+         * Make sure that constrained resources are not cached by web proxies or browsers as caching can provide a
+         * security hole.
+         */
+        disableCaching(constraints, request, response);
 
-        if (constraints != null) {
-            // Enforce any user data constraint for this security constraint
-            if (log.isTraceEnabled()) {
-                log.trace("Calling hasUserDataPermission()");
-            }
-            if (!realm.hasUserDataPermission(request, response, constraints)) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("authenticator.userDataPermissionFail"));
-                }
-                /*
-                 * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
-                 * special
-                 */
-                return;
-            }
+        if (!checkUserDataConstraints(realm, constraints, request, response)) {
+            return;
         }
 
         // Since authenticate modifies the response on failure,
@@ -608,15 +588,29 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 log.trace("Calling authenticate()");
             }
 
-            if (jaspicProvider != null) {
+            boolean authenticated;
+            if (jaspicProvider == null) {
+                AuthenticationResult authenticationResult = doAuthenticateExtended(request, response);
+                if (authenticationResult == AuthenticationResult.PASSED_CONSTRAINTS_NEED_REFRESH) {
+                    // Recalculate constraints since the request has changed
+                    constraints = realm.findSecurityConstraints(request, this.context);
+                    // Re-check if caching needs to be disabled since the request (and maybe constraints) have changed
+                    disableCaching(constraints, request, response);
+                    // Re-check user data constraints as constraints may have changed
+                    if (!checkUserDataConstraints(realm, constraints, request, response)) {
+                        return;
+                    }
+                }
+                authenticated = authenticationResult.getAuthenticated();
+            } else {
                 jaspicState = getJaspicState(jaspicProvider, request, response, hasAuthConstraint);
                 if (jaspicState == null) {
                     return;
                 }
+                authenticated = authenticateJaspic(request, response, jaspicState, false);
             }
 
-            if (jaspicProvider == null && !doAuthenticate(request, response) ||
-                    jaspicProvider != null && !authenticateJaspic(request, response, jaspicState, false)) {
+            if (!authenticated) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("authenticator.authenticationFail"));
                 }
@@ -655,6 +649,43 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (jaspicProvider != null) {
             secureResponseJspic(request, response, jaspicState);
         }
+    }
+
+
+    private void disableCaching(SecurityConstraint[] constraints, Request request, Response response) {
+        // Only disable caching where necessary
+        if (constraints != null && disableProxyCaching && !Method.POST.equals(request.getMethod())) {
+            if (securePagesWithPragma) {
+                // Note: These can cause problems with downloading files with IE
+                response.setHeader("Pragma", "No-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", DATE_ONE);
+            } else {
+                response.setHeader("Cache-Control", "private");
+            }
+        }
+    }
+
+
+    private boolean checkUserDataConstraints(Realm realm, SecurityConstraint[] constraints, Request request,
+            Response response) throws IOException {
+        if (constraints != null) {
+            // Enforce any user data constraint for this security constraint
+            if (log.isTraceEnabled()) {
+                log.trace("Calling hasUserDataPermission()");
+            }
+            if (!realm.hasUserDataPermission(request, response, constraints)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("authenticator.userDataPermissionFail"));
+                }
+                /*
+                 * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
+                 * special
+                 */
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -723,7 +754,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         AuthConfigProvider jaspicProvider = getJaspicProvider();
 
         if (jaspicProvider == null) {
-            return doAuthenticate(request, httpResponse);
+            // Just authenticating so no requirement to refresh constraints
+            return doAuthenticateExtended(request, httpResponse).getAuthenticated();
         } else {
             Response response = request.getResponse();
             JaspicState jaspicState = getJaspicState(jaspicProvider, request, response, true);
@@ -825,6 +857,28 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @throws IOException If an I/O problem occurred during the authentication process
      */
     protected abstract boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException;
+
+
+    /**
+     * Extended mechanism for sub-class authentication that adds the option to trigger a refresh of the security
+     * constraints as required with FORM authentication if the method changes. Most sub-classes will just implement
+     * {@link #doAuthenticate(Request, HttpServletResponse)}.
+     *
+     * @param request  The request that triggered the authentication
+     * @param response The response associated with the request
+     *
+     * @return the result of the authentication
+     *
+     * @throws IOException If an I/O problem occurred during the authentication process
+     */
+    protected AuthenticationResult doAuthenticateExtended(Request request, HttpServletResponse response)
+            throws IOException {
+        if (doAuthenticate(request, response)) {
+            return AuthenticationResult.PASSED;
+        } else {
+            return AuthenticationResult.FAILED;
+        }
+    }
 
 
     /**
@@ -1454,5 +1508,38 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
          * Always require full re-authentication.
          */
         FULL
+    }
+
+
+    /**
+     * Used to pass authentication results that are more complex than a simple pass/fail.
+     */
+    protected enum AuthenticationResult {
+
+        /**
+         * The authentication failed.
+         */
+        FAILED(false),
+
+        /**
+         * The authentication was successful but before proceeding the constraints need to be refreshed because one or
+         * more relevant properties of the request (method, URI) have changed.
+         */
+        PASSED_CONSTRAINTS_NEED_REFRESH(true),
+
+        /**
+         * The authentication was successful.
+         */
+        PASSED(true);
+
+        private final boolean authenticated;
+
+        AuthenticationResult(boolean authenticated) {
+            this.authenticated = authenticated;
+        }
+
+        public boolean getAuthenticated() {
+            return authenticated;
+        }
     }
 }
