@@ -193,6 +193,15 @@
         Ensure the security constraint with the longest matching path is
         selected when more than one constraint matches the request path. (markt)
       </fix>
+      <fix>
+        If the request saved by FORM authentication uses a method other than
+        GET, ensure that the security constraints are re-assessed after the
+        saved request is restored and before it is processed. Custom
+        <code>Authenticator</code> implementations that extend
+        <code>FormAuthenticator</code> and override
+        <code>doAuthenticate()</code> and/or <code>restoreRequest()</code> will
+        require modification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
