@@ -150,18 +150,10 @@ public class FormAuthenticator extends AuthenticatorBase {
 
     // ------------------------------------------------------ Protected Methods
 
-    /**
-     * Authenticate the user making this request, based on the specified login configuration. Return <code>true</code>
-     * if any specified constraint has been satisfied, or <code>false</code> if we have created a response challenge
-     * already.
-     *
-     * @param request  Request we are processing
-     * @param response Response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     */
+
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
+    protected AuthenticationResult doAuthenticateExtended(Request request, HttpServletResponse response)
+            throws IOException {
 
         // References to objects we will need later
         Session session = null;
@@ -183,7 +175,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 if (principal != null) {
                     register(request, response, principal, HttpServletRequest.FORM_AUTH, username, password);
                     if (!matchRequest(request)) {
-                        return true;
+                        return AuthenticationResult.PASSED;
                     }
                 }
                 if (log.isDebugEnabled()) {
@@ -199,24 +191,24 @@ public class FormAuthenticator extends AuthenticatorBase {
             if (log.isTraceEnabled()) {
                 log.trace("Restore request from session '" + session.getIdInternal() + "'");
             }
-            if (restoreRequest(request, session)) {
+            AuthenticationResult result = restoreRequest(request, session);
+            if (result.getAuthenticated()) {
                 if (log.isTraceEnabled()) {
                     log.trace("Proceed to restored request");
                 }
-                return true;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("formAuthenticator.restoreFailed"));
                 }
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return false;
             }
+            return result;
         }
 
         // This check has to be after the previous check for a matching request
         // because that matching request may also include a cached Principal.
         if (checkForCachedAuthentication(request, response, true)) {
-            return true;
+            return AuthenticationResult.PASSED;
         }
 
         // Acquire references to objects we will need to evaluate
@@ -241,7 +233,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                     location.append(request.getQueryString());
                 }
                 response.sendRedirect(response.encodeRedirectURL(location.toString()));
-                return false;
+                return AuthenticationResult.FAILED;
             }
 
             session = request.getSessionInternal(true);
@@ -253,10 +245,10 @@ public class FormAuthenticator extends AuthenticatorBase {
             } catch (IOException ioe) {
                 log.debug(sm.getString("authenticator.requestBodyTooBig"), ioe);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, sm.getString("authenticator.requestBodyTooBig"));
-                return false;
+                return AuthenticationResult.FAILED;
             }
             forwardToLoginPage(request, response, config);
-            return false;
+            return AuthenticationResult.FAILED;
         }
 
         // Yes -- Acknowledge the request, validate the specified credentials
@@ -274,7 +266,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         principal = realm.authenticate(username, password);
         if (principal == null) {
             forwardToErrorPage(request, response, config);
-            return false;
+            return AuthenticationResult.FAILED;
         }
 
         if (log.isTraceEnabled()) {
@@ -313,7 +305,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
                 response.sendRedirect(response.encodeRedirectURL(uri));
             }
-            return false;
+            return AuthenticationResult.FAILED;
         }
 
         register(request, response, principal, HttpServletRequest.FORM_AUTH, username, password);
@@ -349,7 +341,14 @@ public class FormAuthenticator extends AuthenticatorBase {
                 internalResponse.sendRedirect(location, HttpServletResponse.SC_FOUND);
             }
         }
-        return false;
+        return AuthenticationResult.FAILED;
+    }
+
+
+    @Override
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
+        // This method should never be called
+        throw new UnsupportedOperationException();
     }
 
 
@@ -519,7 +518,7 @@ public class FormAuthenticator extends AuthenticatorBase {
      *
      * @param request The request to be verified
      * @param strict  <code>true</code> to check for a valid Principal and valid Session ID, <code>false</code> to only
-     * check for a valid saved request and matching URI
+     *                    check for a valid saved request and matching URI
      *
      * @return <code>true</code> if the requests matched the saved one
      */
@@ -562,23 +561,23 @@ public class FormAuthenticator extends AuthenticatorBase {
 
     /**
      * Restore the original request from information stored in our session. If the original request is no longer present
-     * (because the session timed out), return <code>false</code>; otherwise, return <code>true</code>.
+     * (because the session timed out), it will be treated as a failure to restore the request.
      *
      * @param request The request to be restored
      * @param session The session containing the saved information
      *
-     * @return <code>true</code> if the request was successfully restored
+     * @return the status of the FORM authentication process based on whether the original request could be restored
      *
      * @throws IOException if an IO error occurred during the process
      */
-    protected boolean restoreRequest(Request request, Session session) throws IOException {
+    protected AuthenticationResult restoreRequest(Request request, Session session) throws IOException {
 
         // Retrieve and remove the SavedRequest object from our session
         SavedRequest saved = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
         session.removeNote(Constants.FORM_REQUEST_NOTE);
         session.removeNote(Constants.SESSION_ID_NOTE);
         if (saved == null) {
-            return false;
+            return AuthenticationResult.FAILED;
         }
 
         // Swallow any request body since we will be replacing it
@@ -643,6 +642,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             request.getCoyoteRequest().setContentType(contentType);
         }
 
+        boolean methodChanged = !request.getCoyoteRequest().getMethod().equals(method);
         request.getCoyoteRequest().setMethod(method);
         // The method, URI, queryString and protocol are normally stored as
         // bytes in the HttpInputBuffer and converted lazily to String. At this
@@ -661,7 +661,11 @@ public class FormAuthenticator extends AuthenticatorBase {
             session.setMaxInactiveInterval(saved.getOriginalMaxInactiveIntervalOptional().intValue());
         }
 
-        return true;
+        if (methodChanged) {
+            return AuthenticationResult.PASSED_CONSTRAINTS_NEED_REFRESH;
+        } else {
+            return AuthenticationResult.PASSED;
+        }
     }
 
 
