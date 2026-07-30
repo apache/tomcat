@@ -267,6 +267,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>70164</bug>: Correct the documentation for the
+        <code>testOnBorrow</code> attribute. Pull request <pr>1033</pr> provided
+        by Kohei Tamura. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
