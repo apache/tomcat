@@ -380,7 +380,7 @@ public class CompressionConfig {
                 MessageBytes userAgentValueMB = request.getMimeHeaders().getValue("user-agent");
                 if (userAgentValueMB != null) {
                     String userAgentValue = userAgentValueMB.toString();
-                    if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
+                    if (noCompressionUserAgents.matcher(userAgentValue).find()) {
                         return false;
                     }
                 }
