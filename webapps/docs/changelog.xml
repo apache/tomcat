@@ -190,6 +190,12 @@
         of how early in the HEADERS frame processing an error is detected.
         (markt)
       </fix>
+      <fix>
+        Fix matching the compression config
+        <code>noCompressionUserAgents</code> with patterns of the style
+        of the example <code>gorilla|desesplorer|tigrus</code> pattern
+        documented in the javadoc. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
