@@ -248,7 +248,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
                     log.trace(request.hashCode() + ": UserAgent=" + uaHeader);
                 }
 
-                if (uaPattern != null && uaPattern.matcher(uaHeader).find()) {
+                if (uaPattern != null && uaPattern.matcher(uaHeader).matches()) {
                     isBot = true;
 
                     if (log.isTraceEnabled()) {
