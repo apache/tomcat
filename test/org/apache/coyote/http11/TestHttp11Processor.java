@@ -2202,6 +2202,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertFalse(newEncodings.contains("gzip"));
     }
 
+
     @Test
     public void testRestrictedUserAgents() throws Exception {
         Tomcat tomcat = getTomcatInstance();
