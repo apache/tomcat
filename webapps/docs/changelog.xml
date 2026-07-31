@@ -345,6 +345,12 @@
         of the example <code>gorilla|desesplorer|tigrus</code> pattern
         documented in the javadoc. (remm)
       </fix>
+      <fix>
+        Fix matching the HTTP/1.1 connector
+        <code>restrictedUserAgents</code> with patterns of the style
+        of the example <code>gorilla|desesplorer|tigrus</code> pattern
+        documented in the javadoc. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
