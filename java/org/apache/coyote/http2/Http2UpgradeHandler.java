@@ -327,7 +327,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Process the connection initialization, sending initial ping and processing the first stream.
      *
      * @param webConnection the web connection, may be null for direct HTTP/2
-     * @param stream the initial stream
+     * @param stream        the initial stream
      */
     protected void processConnection(WebConnection webConnection, Stream stream) {
         // Send a ping to get an idea of round trip time as early as possible
@@ -542,8 +542,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     /**
-     * Sets the connection timeout based on the current number of active streams.
-     * When no streams are active, uses the keep-alive timeout. Otherwise keeps the connection open.
+     * Sets the connection timeout based on the current number of active streams. When no streams are active, uses the
+     * keep-alive timeout. Otherwise keeps the connection open.
      *
      * @param streamCount the current number of active streams
      */
@@ -779,8 +779,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Write a GOAWAY frame to signal the peer that no more streams will be accepted.
      *
      * @param maxStreamId the maximum stream ID processed
-     * @param errorCode the error code
-     * @param debugMsg optional debug message
+     * @param errorCode   the error code
+     * @param debugMsg    optional debug message
      *
      * @throws IOException if an I/O error occurs
      */
@@ -827,11 +827,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     /**
-     * Write headers for a stream without synchronizing on socketWrapper.
-     * Separate method to allow Http2AsyncUpgradeHandler to call this code without synchronizing on socketWrapper since
-     * it doesn't need to.
+     * Write headers for a stream without synchronizing on socketWrapper. Separate method to allow
+     * Http2AsyncUpgradeHandler to call this code without synchronizing on socketWrapper since it doesn't need to.
      *
-     * @param stream the stream to write headers for
+     * @param stream      the stream to write headers for
      * @param mimeHeaders the headers to write
      * @param endOfStream whether this is the end of the stream
      * @param payloadSize the initial payload size for the header frame
@@ -968,7 +967,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Handles an I/O error on the socket underlying the HTTP/2 connection when it is triggered by application code
      * (usually reading the request or writing the response). Such I/O errors are fatal so the connection is closed. The
      * exception is re-thrown to make the client code aware of the problem.
-     *
+     * <p>
      * Note: We can not rely on this exception reaching the socket processor since the application code may swallow it.
      *
      * @param ioe the I/O exception
@@ -1084,24 +1083,26 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                      * stream was not already added to the backlog due to a partial reservation (see next else if block)
                      * add it to the backlog so it can obtain an allocation when capacity is available.
                      */
-                    if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {
+                    if (stream.getConnectionAllocationRequested() == 0) {
                         stream.setConnectionAllocationRequested(reservation);
                         backLogSize += reservation;
                         backLogStreams.add(stream);
                     }
                 } else if (windowSize < reservation) {
                     /*
-                     * The connection window has some capacity but not enough to fill this reservation. Allocate what
-                     * capacity is available and add the stream to the backlog so it can obtain a further allocation
-                     * when capacity is available.
+                     * The connection window has some capacity but not enough to fill this reservation. If the stream
+                     * has not been granted an allocation and the stream was not already added to the backlog, allocate
+                     * what capacity is available and add the stream to the backlog so it can obtain a further
+                     * allocation when capacity is available.
                      */
-                    allocation = (int) windowSize;
-                    decrementWindowSize(allocation);
-                    int reservationRemaining = reservation - allocation;
-                    stream.setConnectionAllocationRequested(reservationRemaining);
-                    backLogSize += reservationRemaining;
-                    backLogStreams.add(stream);
-
+                    if (stream.getConnectionAllocationRequested() == 0) {
+                        allocation = (int) windowSize;
+                        decrementWindowSize(allocation);
+                        int reservationRemaining = reservation - allocation;
+                        stream.setConnectionAllocationRequested(reservationRemaining);
+                        backLogSize += reservationRemaining;
+                        backLogStreams.add(stream);
+                    }
                 } else {
                     // The connection window has sufficient capacity for this reservation. Allocate the full amount.
                     allocation = reservation;
@@ -1143,8 +1144,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             // stream is closing
                             stream.doStreamCancel(msg, error);
                         } else {
-                            allocation = stream.getConnectionAllocationMade();
-                            stream.setConnectionAllocationMade(0);
+                            // Don't consume the allocation if the stream can no longer use it.
+                            if (stream.canWrite()) {
+                                allocation = stream.getConnectionAllocationMade();
+                                stream.setConnectionAllocationMade(0);
+                            } else {
+                                stream.doStreamCancel(sm.getString("upgradeHandler.clientCancel"),
+                                        Http2Error.STREAM_CLOSED);
+                            }
                         }
                     } catch (InterruptedException e) {
                         throw new IOException(sm.getString("upgradeHandler.windowSizeReservationInterrupted",
@@ -1210,7 +1217,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private Set<AbstractStream> releaseBackLog(int increment) throws Http2Exception {
+    private Set<AbstractStream> releaseBackLog(final int increment) throws Http2Exception {
         windowAllocationLock.lock();
         try {
             Set<AbstractStream> result = new HashSet<>();
@@ -1332,6 +1339,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 int allocatedThisTime = Math.min(allocation, stream.getConnectionAllocationRequested());
                 stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
                 stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
+                backLogSize -= allocatedThisTime;
                 leftToAllocate = leftToAllocate - allocatedThisTime;
             }
 
@@ -1965,6 +1973,47 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 log.trace(sm.getString("upgradeHandler.replace.first", getConnectionId(), original.getIdAsString()));
             }
             streams.put(original.getIdentifier(), replacement);
+
+            int made;
+            original.windowAllocationLock.lock();
+            try {
+                windowAllocationLock.lock();
+                try {
+                    /*
+                     * If the stream being replaced is still in the backlog (usually because it has been reset) remove
+                     * the stream from the backlog along with its allocation request
+                     */
+                    if (backLogStreams.remove(original)) {
+                        // Remove unallocated request from the backlog
+                        backLogSize -= original.getConnectionAllocationRequested();
+                        // Not strictly necessary, but set for consistency
+                        original.setConnectionAllocationRequested(0);
+                    }
+                    made = original.getConnectionAllocationMade();
+                    // Not strictly necessary, but set for consistency
+                    original.setConnectionAllocationMade(0);
+                } finally {
+                    windowAllocationLock.unlock();
+                }
+            } finally {
+                original.windowAllocationLock.unlock();
+            }
+
+            /*
+             * If the stream had received an allocation but not used it, return that allocation to the connection
+             * window.
+             */
+            if (made > 0) {
+                try {
+                    incrementWindowSize(made);
+                } catch (Http2Exception e) {
+                    /*
+                     * Should not happen in normal usage. The exception only occurs if the Window size is increased
+                     * beyond 2^31-1. If a client tries hard enough, it will be able to break its own connection.
+                     */
+                    throw new IllegalStateException(e);
+                }
+            }
         } else {
             if (log.isTraceEnabled()) {
                 log.trace(
@@ -2033,7 +2082,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
          * Handle a received PING frame.
          *
          * @param payload the PING payload
-         * @param ack whether this is a PING ACK
+         * @param ack     whether this is a PING ACK
          *
          * @throws IOException if an I/O error occurs
          */

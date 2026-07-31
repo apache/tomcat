@@ -114,4 +114,53 @@ public class TestHttp2Section_5_2 extends Http2TestBase {
         sendWindowUpdate(3, 8192);
         parser.readFrame();
     }
+
+
+    @Test
+    public void testFlowControlAndStreamReset() throws Exception {
+        // At start of test Stream 3 has 1k of 8k written and no capacity left
+
+        // Empty the connection window
+        sendWindowUpdate(3, 7 * 1024);
+        parser.readFrame();
+
+        sendWindowUpdate(0, 1);
+
+        for (int i = 5; i < 17; i += 2) {
+            sendSimpleGetRequest(i);
+            parser.readFrame();
+            parser.readFrame();
+            sendWindowUpdate(i, 7 * 1024);
+            parser.readFrame();
+        }
+
+        // Connection flow control window is now empty
+
+        // Put a stream on the backlog and then immediately cancel it
+        sendSimpleGetRequest(17);
+        sendRst(17, Http2Error.NO_ERROR.getCode());
+        // Read headers
+        parser.readFrame();
+        // Read reset from server
+        parser.readFrame();
+
+        // Increase default window size to 8k
+        sendSettings(0, false, new SettingValue(4, 8 * 1024));
+        // Settings ACK
+        parser.readFrame();
+
+        sendSimpleGetRequest(19);
+        // Read headers
+        parser.readFrame();
+
+        // Clear trace as what happens from this point is of primary interest in this test
+        output.clearTrace();
+
+        // This should release the entire body for stream 19
+        sendWindowUpdate(19, 7 * 1024);
+        sendWindowUpdate(0, 8 * 1024);
+
+        parser.readFrame();
+        Assert.assertEquals("19-Body-8192\n19-EndOfStream\n", output.getTrace());
+    }
 }

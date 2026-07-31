@@ -385,6 +385,10 @@
         Additional checks (enabled by default) have also been added for the
         directory where the Unix Domain Socket will be created.(markt)
       </add>
+      <fix>
+        Fix an allocation leak in the HTTP/2 backlog tracking when a stream is
+        reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
