@@ -288,6 +288,13 @@
         attribute is not available or not configured for the current user.
         (markt)
       </fix>
+      <fix>
+        Fix matching the crawler user-agents of
+        <code>CrawlerSessionManagerValve</code> with patterns of the style
+        of the default
+        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code>
+        pattern and documentation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
