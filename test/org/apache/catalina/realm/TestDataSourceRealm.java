@@ -148,7 +148,14 @@ public class TestDataSourceRealm extends LoggingBaseTest {
         List<String> roles = db.getRoles("tomcat");
         Assert.assertEquals(2, roles.size());
 
-        db.stop();
+        p = db.getPrincipal("blabla");
+        Assert.assertNull(p);
 
+        p = db.getPrincipal("random");
+        Assert.assertTrue(p instanceof GenericPrincipal);
+        gp = (GenericPrincipal) p;
+        Assert.assertEquals(0, gp.getRoles().length);
+
+        db.stop();
     }
 }
