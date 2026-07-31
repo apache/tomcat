@@ -202,6 +202,14 @@
         <code>doAuthenticate()</code> and/or <code>restoreRequest()</code> will
         require modification. (markt)
       </fix>
+      <fix>
+        Various improvements to the <code>DataSourceRealm</code>. A failure to
+        connect to the database or an exception during either user or role
+        lookup will now result in an authentication failure rather than a
+        partially populated Principal. For <code>CLIENT-CERT</code> and
+        <code>SPNEGO</code> authentication, the user must exist in the database
+        for authentication to succeed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
