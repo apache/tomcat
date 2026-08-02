@@ -103,14 +103,14 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     /**
      * Gets whether AJP flush packets are used.
      *
-     * @return <code>true</code> if flush packets are used
+     * @return {@code true} if flush packets are used
      */
     public boolean getAjpFlush() {
         return ajpFlush;
     }
 
     /**
-     * Configure whether to aend an AJP flush packet when flushing. A flush packet is a zero byte AJP13 SEND_BODY_CHUNK
+     * Configure whether to send an AJP flush packet when flushing. A flush packet is a zero byte AJP13 SEND_BODY_CHUNK
      * packet. mod_jk and mod_proxy_ajp interpret this as a request to flush data to the client. AJP always does flush
      * at the end of the response, so if it is not important, that the packets get streamed up to the client, do not use
      * extra flush packets. For compatibility and to stay on the safe side, flush packets are enabled by default.

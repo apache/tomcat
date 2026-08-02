@@ -111,7 +111,7 @@ public enum ActionCode {
     REQ_LOCAL_ADDR_ATTRIBUTE,
 
     /**
-     * Callback for lazy evaluation - local address.
+     * Callback for lazy evaluation - local name (reverse DNS hostname).
      */
     REQ_LOCAL_NAME_ATTRIBUTE,
 
