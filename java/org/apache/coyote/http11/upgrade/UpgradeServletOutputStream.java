@@ -152,7 +152,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // Container is responsible for first call to onWritePossible().
         synchronized (registeredLock) {
             registered = true;
-            // Container is responsible for first call to onDataAvailable().
             Request request = processor.getRequest();
             if (request != null && request.isRequestThread()) {
                 processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);

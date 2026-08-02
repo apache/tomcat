@@ -123,8 +123,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (getLog().isDebugEnabled()) {
             getLog().debug(sm.getString("abstractProcessor.setErrorState", errorState), t);
         }
-        // Use the return value to avoid processing more than one async error
-        // in a single async cycle.
+        // Mark the response as errored. Async error deduplication is
+        // handled by asyncStateMachine.asyncError() below.
         response.setError();
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);

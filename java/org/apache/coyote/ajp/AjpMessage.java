@@ -240,8 +240,9 @@ public class AjpMessage {
 
 
     /**
-     * Read an integer from packet, and advance the read position past it. Integers are encoded as two unsigned bytes
-     * with the high-order byte first, and, as far as I can tell, in little-endian order within each byte.
+     * Read an integer from packet, and advance the read position past it.
+     * Integers are encoded as two unsigned bytes in big-endian order
+     * (high-order byte first).
      *
      * @return The integer value read from the message
      */
@@ -298,7 +299,7 @@ public class AjpMessage {
 
     private void doGetBytes(MessageBytes mb, boolean terminated) {
         int length = getInt();
-        if (length == 0xFFFF || length == -1) {
+        if (length == 0xFFFF) {
             mb.recycle();
             return;
         }
@@ -317,10 +318,11 @@ public class AjpMessage {
 
 
     /**
-     * Read a 32 bits integer from packet, and advance the read position past it. Integers are encoded as four unsigned
-     * bytes with the high-order byte first, and, as far as I can tell, in little-endian order within each byte.
+     * Read a 32-bit integer from packet, and advance the read position past it.
+     * The integer is encoded as four unsigned bytes in big-endian order
+     * (high-order byte first).
      *
-     * @return The long value read from the message
+     * @return The integer value read from the message
      */
     public int getLongInt() {
         int b1 = buf[pos++] & 0xFF; // No swap, Java order
