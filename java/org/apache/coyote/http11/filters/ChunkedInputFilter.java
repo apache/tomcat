@@ -40,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Chunked input filter. Parses chunked data according to <a href=
- * "http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
+ * "https://www.rfc-editor.org/info/rfc9112/#section-7.1">https://www.rfc-editor.org/info/rfc9112/#section-7.1</a><br>
  */
 public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler, HeaderDataSource {
 
@@ -405,7 +405,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 extensionState = State.PRE_NAME;
                 long extSize = extensionSize.incrementAndGet();
                 if (maxExtensionSize > -1 && extSize > maxExtensionSize) {
-                    return false;
+                    throwBadRequestException(sm.getString("chunkedInputFilter.maxExtension"));
                 }
             } else {
                 int charValue = HexUtils.getDec(chr);

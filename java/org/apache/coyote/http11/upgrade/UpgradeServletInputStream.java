@@ -175,7 +175,6 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
 
         if (count > 0) {
-            upgradeInfo.addBytesReceived(count);
             return count;
         } else {
             return -1;
@@ -233,7 +232,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             throw ioe;
         }
         if (result == 0) {
-            return -1;
+            throw new IllegalStateException(sm.getString("upgrade.sis.read.ise"));
         } else if (result == -1) {
             eof = true;
             return -1;

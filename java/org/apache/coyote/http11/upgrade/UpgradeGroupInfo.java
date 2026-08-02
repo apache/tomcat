@@ -102,11 +102,12 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     /**
      * Resets the bytes received counter.
      *
-     * @param bytesReceived the new value (ignored, used for MBean reset)
+     * @param bytesReceived the value to restore (0 to reset completely,
+     *        non-zero values are added to the dead counter)
      */
     public void setBytesReceived(long bytesReceived) {
         deadBytesReceived.reset();
-        if (bytesReceived != 0) {
+        if (bytesReceived > 0) {
             deadBytesReceived.add(bytesReceived);
         }
         for (UpgradeInfo ui : upgradeInfos) {

@@ -650,6 +650,9 @@ public class AjpProcessor extends AbstractProcessor {
         byte methodCode = requestHeaderMessage.getByte();
         if (methodCode != Constants.SC_M_JK_STORED) {
             String methodName = Constants.getMethodForCode(methodCode - 1);
+            if (methodName == null) {
+                throw new IllegalArgumentException(sm.getString("ajpprocessor.request.invalidMethod", String.valueOf(methodCode)));
+            }
             request.setMethod(methodName);
         }
 
@@ -692,6 +695,9 @@ public class AjpProcessor extends AbstractProcessor {
             if (0xA000 == isc) {
                 requestHeaderMessage.getInt(); // To advance the read position
                 hName = Constants.getHeaderForCode(hId - 1);
+                if (hName == null) {
+                    throw new IllegalArgumentException(sm.getString("ajpprocessor.request.invalidHeader", String.valueOf(hId)));
+                }
                 vMB = headers.addValue(hName);
             } else {
                 // reset hId -- if the header currently being read
@@ -709,14 +715,18 @@ public class AjpProcessor extends AbstractProcessor {
             requestHeaderMessage.getBytes(vMB);
 
             if (hId == Constants.SC_REQ_CONTENT_LENGTH || (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
-                long cl = vMB.getLong();
-                if (contentLengthSet) {
+                try {
+                    long cl = vMB.getLong();
+                    if (contentLengthSet) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        setErrorState(ErrorState.CLOSE_CLEAN, null);
+                    } else {
+                        contentLengthSet = true;
+                        request.setContentLength(cl);
+                    }
+                } catch (NumberFormatException e) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    setErrorState(ErrorState.CLOSE_CLEAN, null);
-                } else {
-                    contentLengthSet = true;
-                    // Set the content-length header for the request
-                    request.setContentLength(cl);
+                    setErrorState(ErrorState.CLOSE_CLEAN, e);
                 }
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE || (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
@@ -995,7 +1005,6 @@ public class AjpProcessor extends AbstractProcessor {
     protected final void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
-        // TODO Validate the assertion above
         if (!responseFinished) {
             if (protocol.getAjpFlush()) {
                 // Send the flush message
