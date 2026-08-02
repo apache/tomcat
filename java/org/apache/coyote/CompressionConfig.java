@@ -38,8 +38,8 @@ import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
-     * Configuration for HTTP response compression settings.
-     */
+ * Configuration for HTTP response compression settings.
+ */
 public class CompressionConfig {
 
     /**

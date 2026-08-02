@@ -788,6 +788,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 }
             }
             allowedTrailerHeaders.removeAll(toRemove);
+        } else {
+            allowedTrailerHeaders.clear();
         }
     }
 

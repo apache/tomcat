@@ -60,6 +60,9 @@ public enum ContinueResponseTiming {
          * Do this for two reasons: - Not all of the Enum values are intended to be used in configuration - the naming
          * convention for Enum constants and configuration values - is not consistent
          */
+        if (value == null) {
+            throw new IllegalArgumentException(sm.getString("continueResponseTiming.invalid", value));
+        }
         if (IMMEDIATELY.toString().equalsIgnoreCase(value)) {
             return IMMEDIATELY;
         } else if (ON_REQUEST_BODY_READ.toString().equalsIgnoreCase(value)) {

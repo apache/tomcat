@@ -201,7 +201,7 @@ public class HttpParser {
      * @return {@code true} if the character is valid for an absolute path
      */
     public boolean isAbsolutePathRelaxed(int c) {
-        // Fast for valid user info characters, slower for some incorrect
+        // Fast for valid absolute path characters, slower for some incorrect
         // ones
         try {
             return IS_ABSOLUTEPATH_RELAXED[c];
@@ -218,7 +218,7 @@ public class HttpParser {
      * @return {@code true} if the character is valid for a query string
      */
     public boolean isQueryRelaxed(int c) {
-        // Fast for valid user info characters, slower for some incorrect
+        // Fast for valid query string characters, slower for some incorrect
         // ones
         try {
             return IS_QUERY_RELAXED[c];

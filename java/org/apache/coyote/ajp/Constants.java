@@ -47,12 +47,12 @@ public final class Constants {
     /**
      * AJP13 shutdown message prefix code.
      */
-    public static final byte JK_AJP13_SHUTDOWN = 7; // XXX Unused
+    public static final byte JK_AJP13_SHUTDOWN = 7; // Unused
 
     /**
      * AJP13 ping request message prefix code.
      */
-    public static final byte JK_AJP13_PING_REQUEST = 8; // XXX Unused
+    public static final byte JK_AJP13_PING_REQUEST = 8; // Unused
 
     /**
      * AJP13 cping request message prefix code.
@@ -153,12 +153,12 @@ public final class Constants {
     /**
      * Attribute code for context.
      */
-    public static final byte SC_A_CONTEXT = 1; // XXX Unused
+    public static final byte SC_A_CONTEXT = 1; // Unused
 
     /**
      * Attribute code for servlet path.
      */
-    public static final byte SC_A_SERVLET_PATH = 2; // XXX Unused
+    public static final byte SC_A_SERVLET_PATH = 2; // Unused
 
     /**
      * Attribute code for remote user.
@@ -283,6 +283,9 @@ public final class Constants {
      * @return the string value of the method
      */
     public static String getMethodForCode(final int code) {
+        if (code < 0 || code >= methodTransArray.length) {
+            return null;
+        }
         return methodTransArray[code];
     }
 
@@ -376,6 +379,9 @@ public final class Constants {
      * @return the string value of the header name
      */
     public static String getHeaderForCode(final int code) {
+        if (code < 0 || code >= headerTransArray.length) {
+            return null;
+        }
         return headerTransArray[code];
     }
 

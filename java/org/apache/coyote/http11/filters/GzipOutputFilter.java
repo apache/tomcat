@@ -167,7 +167,8 @@ public class GzipOutputFilter implements OutputFilter {
         public void write(int b) throws IOException {
             // Shouldn't get used for good performance, but is needed for
             // compatibility with Sun JDK 1.4.0
-            outputChunk.put(0, (byte) (b & 0xff));
+            outputChunk.clear();
+            outputChunk.put((byte) (b & 0xff));
             buffer.doWrite(outputChunk);
         }
 
