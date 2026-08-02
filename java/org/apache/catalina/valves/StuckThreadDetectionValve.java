@@ -71,7 +71,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     /**
      * In seconds. Default is -1 to disable interruption.
      */
-    private int interruptThreadThreshold;
+    private int interruptThreadThreshold = -1;
 
     /**
      * The only references we keep to actual running Thread objects are in this Map (which is automatically cleaned in
