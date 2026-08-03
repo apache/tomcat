@@ -674,7 +674,7 @@ public class Http11Processor extends AbstractProcessor {
             // and keepAlive flags accordingly
             if (userAgentValueMB != null && !userAgentValueMB.isNull()) {
                 String userAgentValue = userAgentValueMB.toString();
-                if (restrictedUserAgents.matcher(userAgentValue).find()) {
+                if (restrictedUserAgents.matcher(userAgentValue).matches()) {
                     http11 = false;
                     keepAlive = false;
                 }
