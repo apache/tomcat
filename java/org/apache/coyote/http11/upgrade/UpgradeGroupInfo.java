@@ -41,22 +41,22 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     /**
      * Bytes received from completed connections.
      */
-    private final LongAdder deadBytesReceived = new LongAdder();
+    private final LongAdder completedConnectionsBytesReceived = new LongAdder();
 
     /**
      * Bytes sent to completed connections.
      */
-    private final LongAdder deadBytesSent = new LongAdder();
+    private final LongAdder completedConnectionsBytesSent = new LongAdder();
 
     /**
      * Messages received from completed connections.
      */
-    private final LongAdder deadMsgsReceived = new LongAdder();
+    private final LongAdder completedConnectionsMsgsReceived = new LongAdder();
 
     /**
      * Messages sent to completed connections.
      */
-    private final LongAdder deadMsgsSent = new LongAdder();
+    private final LongAdder completedConnectionsMsgsSent = new LongAdder();
 
 
     /**
@@ -76,10 +76,10 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      */
     public void removeUpgradeInfo(UpgradeInfo ui) {
         if (ui != null) {
-            deadBytesReceived.add(ui.getBytesReceived());
-            deadBytesSent.add(ui.getBytesSent());
-            deadMsgsReceived.add(ui.getMsgsReceived());
-            deadMsgsSent.add(ui.getMsgsSent());
+            completedConnectionsBytesReceived.add(ui.getBytesReceived());
+            completedConnectionsBytesSent.add(ui.getBytesSent());
+            completedConnectionsMsgsReceived.add(ui.getMsgsReceived());
+            completedConnectionsMsgsSent.add(ui.getMsgsSent());
 
             upgradeInfos.remove(ui);
         }
@@ -92,7 +92,7 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      * @return the total bytes received
      */
     public long getBytesReceived() {
-        long bytes = deadBytesReceived.longValue();
+        long bytes = completedConnectionsBytesReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             bytes += ui.getBytesReceived();
         }
@@ -106,9 +106,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      *        positive values are added to the bytes received counter)
      */
     public void setBytesReceived(long bytesReceived) {
-        deadBytesReceived.reset();
+        completedConnectionsBytesReceived.reset();
         if (bytesReceived > 0) {
-            deadBytesReceived.add(bytesReceived);
+            completedConnectionsBytesReceived.add(bytesReceived);
         }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesReceived(bytesReceived);
@@ -122,7 +122,7 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      * @return the total bytes sent
      */
     public long getBytesSent() {
-        long bytes = deadBytesSent.longValue();
+        long bytes = completedConnectionsBytesSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             bytes += ui.getBytesSent();
         }
@@ -136,9 +136,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      *        positive values are added to the bytes sent counter)
      */
     public void setBytesSent(long bytesSent) {
-        deadBytesSent.reset();
+        completedConnectionsBytesSent.reset();
         if (bytesSent > 0) {
-            deadBytesSent.add(bytesSent);
+            completedConnectionsBytesSent.add(bytesSent);
         }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesSent(bytesSent);
@@ -152,7 +152,7 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      * @return the total messages received
      */
     public long getMsgsReceived() {
-        long msgs = deadMsgsReceived.longValue();
+        long msgs = completedConnectionsMsgsReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             msgs += ui.getMsgsReceived();
         }
@@ -166,9 +166,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      *        positive values are added to the messages received counter)
      */
     public void setMsgsReceived(long msgsReceived) {
-        deadMsgsReceived.reset();
+        completedConnectionsMsgsReceived.reset();
         if (msgsReceived > 0) {
-            deadMsgsReceived.add(msgsReceived);
+            completedConnectionsMsgsReceived.add(msgsReceived);
         }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsReceived(msgsReceived);
@@ -182,7 +182,7 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      * @return the total messages sent
      */
     public long getMsgsSent() {
-        long msgs = deadMsgsSent.longValue();
+        long msgs = completedConnectionsMsgsSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             msgs += ui.getMsgsSent();
         }
@@ -196,9 +196,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      *        positive values are added to the message sent counter)
      */
     public void setMsgsSent(long msgsSent) {
-        deadMsgsSent.reset();
+        completedConnectionsMsgsSent.reset();
         if (msgsSent > 0) {
-            deadMsgsSent.add(msgsSent);
+            completedConnectionsMsgsSent.add(msgsSent);
         }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsSent(msgsSent);
