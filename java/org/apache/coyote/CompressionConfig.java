@@ -168,8 +168,7 @@ public class CompressionConfig {
 
 
     /**
-     * Set no compression user agent pattern. Regular expression as supported by {@link Pattern}. e.g.:
-     * <code>gorilla|desesplorer|tigrus</code>.
+     * Set no compression user agent pattern. Regular expression as supported by {@link Pattern}.
      *
      * @param noCompressionUserAgents The regular expression for user agent strings for which compression should not be
      *                                    applied
@@ -375,7 +374,7 @@ public class CompressionConfig {
                 MessageBytes userAgentValueMB = request.getMimeHeaders().getValue("user-agent");
                 if (userAgentValueMB != null) {
                     String userAgentValue = userAgentValueMB.toString();
-                    if (noCompressionUserAgents.matcher(userAgentValue).find()) {
+                    if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
                         return false;
                     }
                 }
