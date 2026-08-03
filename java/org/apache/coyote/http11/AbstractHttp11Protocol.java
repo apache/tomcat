@@ -610,8 +610,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Set restricted user agent list (which will downgrade the connector to HTTP/1.0 mode). Regular expression as
      * supported by {@link Pattern}.
      *
-     * @param restrictedUserAgents The regular expression as supported by {@link Pattern} for the user agents e.g.
-     *                                 "gorilla|desesplorer|tigrus"
+     * @param restrictedUserAgents The regular expression as supported by {@link Pattern} for the user agents
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
         if (restrictedUserAgents == null || restrictedUserAgents.isEmpty()) {

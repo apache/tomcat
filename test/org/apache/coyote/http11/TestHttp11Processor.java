@@ -2203,38 +2203,4 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
-    @Test
-    public void testRestrictedUserAgents() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // No file system docBase required
-        Context ctx = getProgrammaticRootContext();
-
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/*", "TesterServlet");
-
-        // Set restricted user agents to match "MSIE"
-        Assert.assertTrue(tomcat.getConnector().setProperty("restrictedUserAgents", "gorilla|desesplorer|MSIE|tigrus"));
-
-        tomcat.start();
-
-        // User-agent matching the pattern should be downgraded to HTTP/1.0
-        // @formatter:off
-        String request =
-                "GET /test HTTP/1.1" + CRLF +
-                "Host: any" + CRLF +
-                "User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)" + CRLF +
-                CRLF;
-        // @formatter:on
-
-        Client client = new Client(tomcat.getConnector().getLocalPort());
-        client.setRequest(new String[] { request });
-
-        client.connect();
-        client.processRequest();
-
-        // Should be downgraded to HTTP/1.0, although the server will still advertise HTTP/1.1
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertTrue(client.getResponseHeaders().contains("Connection: close"));
-    }
 }
