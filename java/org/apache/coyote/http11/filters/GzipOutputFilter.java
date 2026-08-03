@@ -169,6 +169,7 @@ public class GzipOutputFilter implements OutputFilter {
             // compatibility with Sun JDK 1.4.0
             outputChunk.clear();
             outputChunk.put((byte) (b & 0xff));
+            outputChunk.flip();
             buffer.doWrite(outputChunk);
         }
 
