@@ -103,7 +103,7 @@ public class UpgradeGroupInfo extends BaseModelMBean {
      * Resets the bytes received counter.
      *
      * @param bytesReceived the value to restore (0 to reset completely,
-     *        non-zero values are added to the dead counter)
+     *        positive values are added to the bytes received counter)
      */
     public void setBytesReceived(long bytesReceived) {
         deadBytesReceived.reset();
@@ -132,11 +132,12 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     /**
      * Resets the bytes sent counter.
      *
-     * @param bytesSent the new value (ignored, used for MBean reset)
+     * @param bytesSent the value to restore (0 to reset completely,
+     *        positive values are added to the bytes sent counter)
      */
     public void setBytesSent(long bytesSent) {
         deadBytesSent.reset();
-        if (bytesSent != 0) {
+        if (bytesSent > 0) {
             deadBytesSent.add(bytesSent);
         }
         for (UpgradeInfo ui : upgradeInfos) {
@@ -161,11 +162,12 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     /**
      * Resets the messages received counter.
      *
-     * @param msgsReceived the new value (ignored, used for MBean reset)
+     * @param msgsReceived the value to restore (0 to reset completely,
+     *        positive values are added to the messages received counter)
      */
     public void setMsgsReceived(long msgsReceived) {
         deadMsgsReceived.reset();
-        if (msgsReceived != 0) {
+        if (msgsReceived > 0) {
             deadMsgsReceived.add(msgsReceived);
         }
         for (UpgradeInfo ui : upgradeInfos) {
@@ -190,11 +192,12 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     /**
      * Resets the messages sent counter.
      *
-     * @param msgsSent the new value (ignored, used for MBean reset)
+     * @param msgsSent the value to restore (0 to reset completely,
+     *        positive values are added to the message sent counter)
      */
     public void setMsgsSent(long msgsSent) {
         deadMsgsSent.reset();
-        if (msgsSent != 0) {
+        if (msgsSent > 0) {
             deadMsgsSent.add(msgsSent);
         }
         for (UpgradeInfo ui : upgradeInfos) {
