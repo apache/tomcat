@@ -2201,6 +2201,4 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(newEncodings.contains("br"));
         Assert.assertFalse(newEncodings.contains("gzip"));
     }
-
-
 }
