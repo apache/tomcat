@@ -248,6 +248,10 @@
         to prevent a malicious client triggering excessive memory usage that
         could lead to a DoS. (markt)
       </fix>
+      <fix>
+        Documentation: Expand the description of the <code>%S</code> (session ID)
+        access log pattern token. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

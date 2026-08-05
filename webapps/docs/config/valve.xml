@@ -302,7 +302,7 @@
     <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists)</li>
     <li><b><code>%r</code></b> - First line of the request (method and request URI)</li>
     <li><b><code>%s</code></b> - HTTP status code of the response</li>
-    <li><b><code>%S</code></b> - User session ID</li>
+    <li><b><code>%S</code></b> - User session ID, if a valid session exists when the access log entry is written</li>
     <li><b><code>%t</code></b> - Date and time, in Common Log Format</li>
     <li><b><code>%T</code></b> - Time taken to process the request, in seconds</li>
     <li><b><code>%u</code></b> - Remote user that was authenticated (if any), else '-' (escaped if required)</li>
