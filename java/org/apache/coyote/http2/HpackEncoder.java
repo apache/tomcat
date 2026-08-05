@@ -112,7 +112,11 @@ class HpackEncoder {
     private final HpackHeaderFunction hpackHeaderFunction;
 
     HpackEncoder() {
-        this.hpackHeaderFunction = DEFAULT_HEADER_FUNCTION;
+        this(DEFAULT_HEADER_FUNCTION);
+    }
+
+    HpackEncoder(HpackHeaderFunction hpackHeaderFunction) {
+        this.hpackHeaderFunction = hpackHeaderFunction;
     }
 
     /**
@@ -401,7 +405,7 @@ class HpackEncoder {
         }
     }
 
-    private interface HpackHeaderFunction {
+    interface HpackHeaderFunction {
         boolean shouldUseIndexing(String header, String value);
 
         /**

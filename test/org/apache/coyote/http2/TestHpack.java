@@ -32,11 +32,26 @@ public class TestHpack {
         headers.setValue(":status").setString("200");
         headers.setValue("header2").setString("value2");
         ByteBuffer output = ByteBuffer.allocate(512);
-        HpackEncoder encoder = new HpackEncoder();
+        HpackEncoder encoder = new HpackEncoder(new HpackEncoder.HpackHeaderFunction() {
+
+            @Override
+            public boolean shouldUseIndexing(String header, String value) {
+                return true;
+            }
+
+            @Override
+            public boolean shouldUseHuffman(String header, String value) {
+                return true;
+            }
+
+            @Override
+            public boolean shouldUseHuffman(String header) {
+                return true;
+            }
+        });
         encoder.encode(headers, output);
         output.flip();
-        // Size is supposed to be 33 without huffman, or 27 with it
-        // TODO: use the HpackHeaderFunction to enable huffman predictably
+        // Size is 27 with Huffman encoding
         Assert.assertEquals(27, output.remaining());
         output.clear();
         encoder.encode(headers, output);
