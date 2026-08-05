@@ -458,6 +458,10 @@
         and add a note that the exact configuration required will depend on the
         overall httpd configuration. (markt)
       </fix>
+      <fix>
+        Documentation: Expand the description of the <code>%S</code> (session ID)
+        access log pattern token. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
