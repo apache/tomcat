@@ -660,12 +660,17 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
             }
 
-            // We have completed expire of this session
-            setValid(false);
-            expiring = false;
+            String[] keys;
+            synchronized (attributes) {
+                // We have completed expire of this session
+                setValid(false);
+                expiring = false;
+
+                // Snapshot the attributes before permitting any racing setAttribute() call to observe the invalid state
+                keys = keys();
+            }
 
             // Unbind any objects associated with this session
-            String[] keys = keys();
             ClassLoader oldContextClassLoader = null;
             try {
                 oldContextClassLoader = context.bind(null);
@@ -999,11 +1004,13 @@ public class StandardSession implements HttpSession, Session, Serializable {
         HttpSessionBindingEvent event = null;
 
         // Call the valueBound() method if necessary
+        boolean valueBoundHasBeenCalled = false;
         if (notify && value instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             // unless configured to do so
             Object oldValue = attributes.get(name);
             if (value != oldValue || manager.getNotifyBindingListenerOnUnchangedValue()) {
+                valueBoundHasBeenCalled = true;
                 event = new HttpSessionBindingEvent(getSession(), name, value);
                 try {
                     ((HttpSessionBindingListener) value).valueBound(event);
@@ -1014,20 +1021,35 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         // Replace or add this attribute
-        Object unbound = attributes.put(name, value);
+        Object unbound = null;
+        boolean valid;
+        synchronized (attributes) {
+            valid = isValidInternal();
+            if (valid) {
+                unbound = attributes.put(name, value);
+            }
+        }
+
+        if (!valid) {
+            if (notify && value instanceof HttpSessionBindingListener) {
+                /*
+                 * The session has expired since setAttribute() started. Although the attribute never made it as far as
+                 * being added to the session, call valueUnbound() if valueBound() was called.
+                 */
+                if (valueBoundHasBeenCalled) {
+                    notifyAttributeUnbound(name, value);
+                }
+                return;
+            }
+            throw new IllegalStateException(sm.getString("standardSession.setAttribute.ise", getIdInternal()));
+        }
 
         // Call the valueUnbound() method if necessary
         if (notify && unbound instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             // unless configured to do so
             if (unbound != value || manager.getNotifyBindingListenerOnUnchangedValue()) {
-                try {
-                    ((HttpSessionBindingListener) unbound)
-                            .valueUnbound(new HttpSessionBindingEvent(getSession(), name));
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    manager.getContext().getLogger().error(sm.getString("standardSession.bindingEvent"), t);
-                }
+                notifyAttributeUnbound(name, unbound);
             }
         }
 
@@ -1077,6 +1099,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 manager.getContext().getLogger().error(sm.getString("standardSession.attributeEvent"), t);
             }
+        }
+    }
+
+
+    private void notifyAttributeUnbound(String name, Object value) {
+        try {
+            ((HttpSessionBindingListener) value).valueUnbound(new HttpSessionBindingEvent(getSession(), name));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            manager.getContext().getLogger().error(sm.getString("standardSession.bindingEvent"), t);
         }
     }
 
