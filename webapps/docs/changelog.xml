@@ -288,6 +288,14 @@
         attribute is not available or not configured for the current user.
         (markt)
       </fix>
+      <fix>
+        Improve handling of session attribute addition concurrent with session
+        expiration. An application will now either see a successful addition
+        followed by expiration or the addition will not succeed. It is no longer
+        possible for the session to expire and the addition to succeed. This is
+        of particular not for attributes that implement
+        <code>HttpSessionBindingListener</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
