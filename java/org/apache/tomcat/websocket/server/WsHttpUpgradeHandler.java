@@ -90,14 +90,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     /**
      * Performs initialization before the WebSocket handshake is completed.
      *
-     * @param serverEndpointConfig the endpoint configuration
-     * @param wsc the WebSocket server container
-     * @param handshakeRequest the handshake request
+     * @param serverEndpointConfig       the endpoint configuration
+     * @param wsc                        the WebSocket server container
+     * @param handshakeRequest           the handshake request
      * @param negotiatedExtensionsPhase2 negotiated extensions
-     * @param subProtocol the negotiated sub-protocol
-     * @param transformation the data transformation
-     * @param pathParameters the path parameters
-     * @param secure whether the connection is secure
+     * @param subProtocol                the negotiated sub-protocol
+     * @param transformation             the data transformation
+     * @param pathParameters             the path parameters
+     * @param secure                     whether the connection is secure
      */
     public void preInit(ServerEndpointConfig serverEndpointConfig, WsServerContainer wsc,
             WsHandshakeRequest handshakeRequest, List<Extension> negotiatedExtensionsPhase2, String subProtocol,
@@ -158,7 +158,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 }
                 throw new IllegalArgumentException(t);
             }
-            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession);
+            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession, session);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
