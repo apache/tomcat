@@ -507,6 +507,9 @@
         to prevent a malicious client triggering excessive memory usage that
         could lead to a DoS. (markt)
       </fix>
+      <update>
+        Update Objenesis to 3.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
