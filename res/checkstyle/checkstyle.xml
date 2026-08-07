@@ -88,19 +88,12 @@
     <module name="InvalidJavadocPosition"/>
     <module name="JavadocBlockTagLocation"/>
     <module name="JavadocContentLocationCheck"/>
+    <module name="JavadocLeadingAsteriskAlign"/>
     <module name="JavadocMethod">
         <property name="accessModifiers" value="public,protected"/>
     </module>
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
-    <module name="JavadocStyle">
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1600 errors -->
-        <property name="checkFirstSentence" value="false"/>
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1500 errors -->
-        <property name="checkEmptyJavadoc" value="false"/>
-        <!-- Does not handle HTML tags in {@code ...} correctly -->
-        <property name="checkHtml" value="false"/>
-    </module>
     <!-- ~9000 errors
     <module name="MissingJavadocMethod"/>
     -->
@@ -112,6 +105,9 @@
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     -->
     <module name="SingleLineJavadoc"/>
+    <!-- ~1900 errors
+    <module name="SummaryJavadoc"/>
+    -->
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
