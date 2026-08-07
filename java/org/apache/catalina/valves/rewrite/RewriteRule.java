@@ -421,7 +421,7 @@ public class RewriteRule {
      */
     protected boolean valveSkip = false;
 
-   /**
+    /**
      * Get whether back references are escaped.
      * @return true if back references are escaped
      */

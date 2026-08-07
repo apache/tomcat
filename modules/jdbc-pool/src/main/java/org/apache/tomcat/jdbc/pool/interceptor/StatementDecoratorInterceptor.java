@@ -77,7 +77,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * performance, continue to use Proxy.getProxyClass(). This will need to be
      * revisited if that method is marked for removal.
      */
-   /**
+    /**
      * Gets the constructor for creating ResultSet proxies.
      * @return the ResultSet proxy constructor
      * @throws NoSuchMethodException if the constructor is not found

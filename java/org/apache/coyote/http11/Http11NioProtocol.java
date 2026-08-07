@@ -56,7 +56,7 @@ public class Http11NioProtocol extends AbstractHttp11Protocol<NioChannel> {
 
     // -------------------- Pool setup --------------------
 
-     /**
+    /**
      * Sets the selector timeout for the NIO endpoint.
      *
      * @param timeout the selector timeout in milliseconds
