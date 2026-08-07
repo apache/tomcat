@@ -81,17 +81,12 @@
     <module name="InvalidJavadocPosition"/>
     <module name="JavadocBlockTagLocation"/>
     <module name="JavadocContentLocationCheck"/>
+    <module name="JavadocLeadingAsteriskAlign"/>
     <module name="JavadocMethod">
         <property name="accessModifiers" value="public,protected"/>
     </module>
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
-    <module name="JavadocStyle">
-        <property name="checkFirstSentence" value="false"/>
-        <property name="checkEmptyJavadoc" value="false"/>
-        <!-- Does not handle HTML tags in {@code ...} correctly -->
-        <property name="checkHtml" value="false"/>
-    </module>
     <module name="NonEmptyAtclauseDescription"/>
     <module name="SingleLineJavadoc"/>
 
