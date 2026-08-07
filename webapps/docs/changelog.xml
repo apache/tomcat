@@ -513,6 +513,9 @@
       <update>
         Update JSign to 7.5. (markt)
       </update>
+      <update>
+        Update Bouncy Castle to 1.85. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
