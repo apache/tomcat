@@ -116,7 +116,7 @@ public interface RemoteEndpoint {
 
     }
 
-   /**
+    /**
      * Synchronous (blocking) API for sending messages to the remote endpoint.
      */
     interface Basic extends RemoteEndpoint {

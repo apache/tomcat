@@ -1520,7 +1520,7 @@ public class RemoteIpFilter extends GenericFilter {
         this.enableLookups = enableLookups;
     }
 
-   /**
+    /**
      * Restores the log after deserialization.
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...

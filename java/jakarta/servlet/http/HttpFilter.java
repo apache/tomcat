@@ -33,8 +33,8 @@ public abstract class HttpFilter extends GenericFilter {
     private static final long serialVersionUID = 1L;
 
     /**
-      * Constructs a new HttpFilter.
-      */
+     * Constructs a new HttpFilter.
+     */
     public HttpFilter() {
         // NO-OP
     }

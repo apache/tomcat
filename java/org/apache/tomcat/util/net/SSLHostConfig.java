@@ -1316,7 +1316,7 @@ public class SSLHostConfig implements Serializable {
     }
 
 
- /**
+    /**
      * Sets the truststore type.
      *
      * @param truststoreType the truststore type

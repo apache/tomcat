@@ -1198,8 +1198,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * awaitTermination} to do that.
      *
      * @throws SecurityException If a security manager exists and shutting down this
-      *             pool requires the {@link RuntimePermission}{@code ("shutdownNow")} permission
-      */
+     *             pool requires the {@link RuntimePermission}{@code ("shutdownNow")} permission
+     */
     @Override
     public void shutdown() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1227,9 +1227,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * implementation interrupts tasks via {@link Thread#interrupt}; any task that fails to respond to interrupts may
      * never terminate.
      *
-    * @throws SecurityException If a security manager exists and shutting down this
-      *             pool requires the {@link RuntimePermission}{@code ("shutdownNow")} permission
-      */
+     * @throws SecurityException If a security manager exists and shutting down this
+     *             pool requires the {@link RuntimePermission}{@code ("shutdownNow")} permission
+     */
     @Override
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;

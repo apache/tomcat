@@ -402,7 +402,7 @@ public abstract class WsFrameBase {
     }
 
 
-     /**
+    /**
      * Sends a text message to the remote endpoint.
      *
      * @param last Whether this is the last fragment of the message
@@ -586,7 +586,7 @@ public abstract class WsFrameBase {
     }
 
 
-     /**
+    /**
      * Sends a binary message to the remote endpoint.
      *
      * @param msg  The message data

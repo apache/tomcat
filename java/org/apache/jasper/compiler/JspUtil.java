@@ -526,7 +526,7 @@ public class JspUtil {
         }
     }
 
-   /**
+    /**
      * Generates code to coerce a string to a Double object.
      *
      * @param s The string expression

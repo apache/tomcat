@@ -29,7 +29,7 @@ public interface UserDatabase {
 
     // ------------------------------------------------------------- Properties
 
-   /**
+    /**
      * Get the set of {@link Group}s defined in this user database.
      *
      * @return the set of {@link Group}s defined in this user database.
@@ -37,7 +37,7 @@ public interface UserDatabase {
     Iterator<Group> getGroups();
 
 
-   /**
+    /**
      * Get the unique global identifier of this user database.
      *
      * @return the unique global identifier of this user database.
@@ -45,7 +45,7 @@ public interface UserDatabase {
     String getId();
 
 
-   /**
+    /**
      * Get the set of {@link Role}s defined in this user database.
      *
      * @return the set of {@link Role}s defined in this user database.
@@ -53,7 +53,7 @@ public interface UserDatabase {
     Iterator<Role> getRoles();
 
 
-   /**
+    /**
      * Get the set of {@link User}s defined in this user database.
      *
      * @return the set of {@link User}s defined in this user database.
@@ -105,7 +105,7 @@ public interface UserDatabase {
     User createUser(String username, String password, String fullName);
 
 
-   /**
+    /**
      * Find the {@link Group} with the specified group name.
      *
      * @param groupname Name of the group to return
@@ -114,7 +114,7 @@ public interface UserDatabase {
     Group findGroup(String groupname);
 
 
-   /**
+    /**
      * Find the {@link Role} with the specified role name.
      *
      * @param rolename Name of the role to return
@@ -123,7 +123,7 @@ public interface UserDatabase {
     Role findRole(String rolename);
 
 
-   /**
+    /**
      * Find the {@link User} with the specified username.
      *
      * @param username Name of the user to return

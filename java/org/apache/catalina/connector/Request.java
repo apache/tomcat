@@ -814,12 +814,12 @@ public class Request implements HttpServletRequest {
 
 
     /**
-      * Return the object bound with the specified name to the internal notes for this request, or {@code null} if
-      * no such binding exists.
-      *
-      * @param name Name of the note to be returned
-      * @return the note object, or {@code null}
-      */
+     * Return the object bound with the specified name to the internal notes for this request, or {@code null} if
+     * no such binding exists.
+     *
+     * @param name Name of the note to be returned
+     * @return the note object, or {@code null}
+     */
     public Object getNote(String name) {
         return notes.get(name);
     }

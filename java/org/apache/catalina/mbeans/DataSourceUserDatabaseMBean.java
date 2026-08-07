@@ -59,7 +59,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
 
     // ------------------------------------------------------------- Attributes
 
-  /**
+    /**
      * Get the names of all groups defined in this database.
      *
      * @return the names of all groups defined in this database.
@@ -76,7 +76,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     }
 
 
-  /**
+    /**
      * Get the names of all roles defined in this database.
      *
      * @return the names of all roles defined in this database.
@@ -93,7 +93,7 @@ public class DataSourceUserDatabaseMBean extends BaseModelMBean {
     }
 
 
-  /**
+    /**
      * Get the names of all users defined in this database.
      *
      * @return the names of all users defined in this database.

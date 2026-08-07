@@ -484,7 +484,7 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-   /**
+    /**
      * Returns whether the encoding must be enforced when calling getWriter().
      * @return {@code true} if the encoding must be enforced when calling getWriter()
      */
