@@ -65,7 +65,7 @@ public class FileResource extends AbstractResource {
     private final WebResourceLockSet lockSet;
     private final String lockPath;
 
-   /**
+    /**
      * Creates a FileResource without locking support.
      *
      * @param root The web resource root

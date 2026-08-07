@@ -749,7 +749,7 @@ public class DataSourceFactory implements ObjectFactory {
     public DataSource createDataSource(Properties properties) throws Exception {
         return createDataSource(properties,null,false);
     }
-   /**
+    /**
      * Creates and configures a {@link DataSource} instance based on the given properties.
      *
      * @param properties The datasource configuration properties
@@ -773,7 +773,7 @@ public class DataSourceFactory implements ObjectFactory {
         return dataSource;
     }
 
-   /**
+    /**
      * Perform a JNDI lookup for the data source.
      *
      * @param context        The JNDI context

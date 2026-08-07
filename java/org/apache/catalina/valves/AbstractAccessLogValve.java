@@ -1007,7 +1007,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
-   /**
+    /**
      * Write remote host name - %h.
      */
     protected class HostElement implements AccessLogElement, CachedElement {

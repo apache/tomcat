@@ -174,7 +174,7 @@ public abstract class SocketWrapperBase<E> {
         return socket;
     }
 
-   /**
+    /**
      * Resets the wrapped socket with a new socket instance.
      *
      * @param closedSocket the new socket to wrap
@@ -385,7 +385,7 @@ public abstract class SocketWrapperBase<E> {
         return remoteHost;
     }
 
-  /**
+    /**
      * Populates the cached remote host name from the underlying socket.
      */
     protected abstract void populateRemoteHost();
@@ -402,7 +402,7 @@ public abstract class SocketWrapperBase<E> {
         return remoteAddr;
     }
 
-  /**
+    /**
      * Populates the cached remote IP address from the underlying socket.
      */
     protected abstract void populateRemoteAddr();
@@ -419,7 +419,7 @@ public abstract class SocketWrapperBase<E> {
         return remotePort;
     }
 
- /**
+    /**
      * Populates the cached remote port number from the underlying socket.
      */
     protected abstract void populateRemotePort();
@@ -436,7 +436,7 @@ public abstract class SocketWrapperBase<E> {
         return localName;
     }
 
-/**
+    /**
      * Populates the cached local host name from the underlying socket.
      */
     protected abstract void populateLocalName();
@@ -453,7 +453,7 @@ public abstract class SocketWrapperBase<E> {
         return localAddr;
     }
 
-/**
+    /**
      * Populates the cached local IP address from the underlying socket.
      */
     protected abstract void populateLocalAddr();
@@ -470,7 +470,7 @@ public abstract class SocketWrapperBase<E> {
         return localPort;
     }
 
-/**
+    /**
      * Populates the cached local port number from the underlying socket.
      */
     protected abstract void populateLocalPort();
@@ -947,7 +947,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
- /**
+    /**
      * Flushes remaining buffered data using a non-blocking write.
      *
      * @return {@code true} if data remains to be flushed after this method completes, otherwise {@code false}
@@ -1251,7 +1251,7 @@ public abstract class SocketWrapperBase<E> {
         /** Indicates whether the vectored I/O completion processing is done. */
         protected boolean completionDone = true;
 
-      /**
+        /**
          * Determines whether the operation is still executing on the original caller thread.
          *
          * @return {@code true} if the operation is still inline, {@code false} if running on a separate thread
@@ -1259,10 +1259,10 @@ public abstract class SocketWrapperBase<E> {
         protected abstract boolean isInline();
 
         /**
-      * Checks if there is remaining outbound data in the buffers.
-      *
-      * @return {@code false} by default; overridden by NIO implementations
-      */
+         * Checks if there is remaining outbound data in the buffers.
+         *
+         * @return {@code false} by default; overridden by NIO implementations
+         */
         protected boolean hasOutboundRemaining() {
             // NIO2 and APR never have remaining outbound data when the
             // completion handler is called. NIO needs to override this.

@@ -126,7 +126,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     //=================================================================
     //       NOTIFICATION INFO
     //=================================================================
-   /**
+    /**
      * Notification type sent when pool initialization fails.
      */
     public static final String NOTIFY_INIT = "INIT FAILED";

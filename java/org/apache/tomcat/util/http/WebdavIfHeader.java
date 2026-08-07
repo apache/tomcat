@@ -704,7 +704,7 @@ public class WebdavIfHeader {
      * <pre>
      *    IfList = { [ "Not" ] ( ("&lt;" Word "&gt;" ) | ( "[" Word "]" ) ) } .
      * </pre>
-      */
+     */
     private static class IfList extends ArrayList<IfListEntry> {
 
         @Serial

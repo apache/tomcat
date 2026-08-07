@@ -27,10 +27,10 @@ import jakarta.servlet.DispatcherType;
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
-     * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
-     * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
-     * servlet name.
-     */
+ * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
+ * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
+ * servlet name.
+ */
 public class FilterMap extends XmlEncodingBase implements Serializable {
 
     /**

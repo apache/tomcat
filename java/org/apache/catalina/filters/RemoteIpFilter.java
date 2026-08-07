@@ -1491,7 +1491,7 @@ public class RemoteIpFilter extends GenericFilter {
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
      */
-   /**
+    /**
      * Restores the log after deserialization.
      * @param ois the object input stream
      * @throws ClassNotFoundException if the class is not found
