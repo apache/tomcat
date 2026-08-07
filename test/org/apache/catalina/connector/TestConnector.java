@@ -215,4 +215,25 @@ public class TestConnector extends TomcatBaseTest {
             Assert.assertFalse(foundTrace);
         }
     }
+
+
+    @Test
+    public void doTestBug70144() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = getProgrammaticRootContext();
+        Tomcat.addServlet(root, "default", new TesterServlet());
+        root.addServletMappingDecoded("/", "default");
+
+        Connector connector = tomcat.getConnector();
+        connector.setAllowBackslash(true);
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/bug%5C70144", body, true);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("OK", body.toString());
+    }
 }
