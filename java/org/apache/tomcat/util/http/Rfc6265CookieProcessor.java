@@ -32,9 +32,9 @@ import org.apache.tomcat.util.http.parser.Cookie;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
-  * A {@link CookieProcessor} implementation that follows RFC 6265 for cookie
-  * parsing and generation.
-  */
+ * A {@link CookieProcessor} implementation that follows RFC 6265 for cookie
+ * parsing and generation.
+ */
 public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(Rfc6265CookieProcessor.class);

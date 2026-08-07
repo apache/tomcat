@@ -73,7 +73,7 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-   /**
+    /**
      * Check if this proxy wraps an instance of the given interface.
      * This implementation always returns {@code false}.
      * <p>
@@ -89,17 +89,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-   /**
-      * Unwrap the proxy to the given interface.
-      * This implementation always returns {@code null}.
-      * <p>
-      * Has to match signature in DataSource
-      *
-      * @param <T> The interface type
-      * @param iface The interface to unwrap to - ignored
-      * @return null
-      * @throws SQLException never thrown
-      */
+    /**
+     * Unwrap the proxy to the given interface.
+     * This implementation always returns {@code null}.
+     * <p>
+     * Has to match signature in DataSource
+     *
+     * @param <T> The interface type
+     * @param iface The interface to unwrap to - ignored
+     * @return null
+     * @throws SQLException never thrown
+     */
     public <T> T unwrap(Class<T> iface) throws SQLException {
         //we can't unwrap anything
         return null;
@@ -124,7 +124,7 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-   /**
+    /**
      * Return the pool configuration properties.
      *
      * @return the pool configuration
@@ -249,7 +249,7 @@ public class DataSourceProxy implements PoolConfiguration {
         return (javax.sql.PooledConnection) getConnection();
     }
 
-   /**
+    /**
      * Return the underlying connection pool, creating it if necessary.
      *
      * @return the connection pool or null if creation failed
@@ -264,7 +264,7 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-   /**
+    /**
      * Close the connection pool, returning connections to the database.
      */
     public void close() {
@@ -289,7 +289,7 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-   /**
+    /**
      * Return the current number of connections in the pool.
      *
      * @return the pool size
@@ -321,7 +321,7 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-   /**
+    /**
      * Set the pool configuration properties directly.
      *
      * @param poolProperties The new pool configuration
@@ -1225,7 +1225,7 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setUseStatementFacade(useStatementFacade);
     }
 
-   /**
+    /**
      * Purge all connections from the pool.
      */
     public void purge()  {
@@ -1236,7 +1236,7 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-   /**
+    /**
      * Enable purging of connections on return to the pool.
      */
     public void purgeOnReturn() {

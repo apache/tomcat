@@ -292,11 +292,11 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
 
         /**
-          * Creates a new JarInputStreamWrapper.
-          *
-          * @param jarEntry The JAR entry
-          * @param is       The input stream
-          */
+         * Creates a new JarInputStreamWrapper.
+         *
+         * @param jarEntry The JAR entry
+         * @param is       The input stream
+         */
         public JarInputStreamWrapper(JarEntry jarEntry, InputStream is) {
             this.jarEntry = jarEntry;
             this.is = is;

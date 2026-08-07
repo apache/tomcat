@@ -24,7 +24,7 @@ import javax.management.ObjectName;
  * and provide management information about the requests being processed. Each thread uses a Request/Response pair that
  * is recycled on each request. This object provides a place to collect global low-level statistics - without having to
  * deal with synchronization (since each thread will have its own RequestProcessorMX).
-  */
+ */
 public class RequestInfo {
     /**
      * Global request group info.

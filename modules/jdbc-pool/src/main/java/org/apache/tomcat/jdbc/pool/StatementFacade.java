@@ -196,7 +196,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         }
     }
 
-   /**
+    /**
      * Proxy for a ResultSet.
      */
     protected class ResultSetProxy implements InvocationHandler {

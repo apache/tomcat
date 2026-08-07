@@ -19,8 +19,8 @@ package org.apache.tomcat.jni;
 import java.nio.ByteBuffer;
 
 /**
-  * Provides access to APR memory pools which are used to manage memory allocations for natively created instances.
-  */
+ * Provides access to APR memory pools which are used to manage memory allocations for natively created instances.
+ */
 public class Pool {
 
     /**

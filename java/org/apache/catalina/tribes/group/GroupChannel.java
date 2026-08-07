@@ -704,11 +704,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         private ChannelInterceptor start;
 
         /**
-     * Creates an InterceptorIterator.
-     *
-     * @param start The first interceptor to iterate from
-     * @param end   The end marker interceptor (not included in iteration)
-     */
+         * Creates an InterceptorIterator.
+         *
+         * @param start The first interceptor to iterate from
+         * @param end   The end marker interceptor (not included in iteration)
+         */
         public InterceptorIterator(ChannelInterceptor start, ChannelInterceptor end) {
             this.end = end;
             this.start = start;

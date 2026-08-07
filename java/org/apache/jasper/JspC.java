@@ -2008,7 +2008,7 @@ public class JspC extends Task implements Options {
         }
     }
 
-   /**
+    /**
      * Runnable task that processes a single JSP file.
      */
     private class ProcessFile implements Callable<Void> {

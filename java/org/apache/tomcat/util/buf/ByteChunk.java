@@ -141,7 +141,7 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
-   /**
+    /**
      * Serializes this ByteChunk, writing the charset name.
      * @param oos the object output stream
      * @throws IOException if an I/O error occurs
