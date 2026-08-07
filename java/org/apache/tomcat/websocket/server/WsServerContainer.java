@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +35,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.DeploymentException;
@@ -69,7 +72,9 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
     private final Map<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>> configTemplateMatchMap =
             new ConcurrentHashMap<>();
-    private final Map<String,Set<WsSession>> authenticatedSessions = new ConcurrentHashMap<>();
+    private final Object authenticatedSessionMapLock = new Object();
+    private final Map<String,Set<WsSession>> httpSessionKeyToWebSocketSession = new HashMap<>();
+    private final Map<WsSession,String> webSocketSessionToHttpSessionKey = new HashMap<>();
     private volatile boolean endpointsRegistered = false;
     private volatile boolean deploymentFailed = false;
 
@@ -273,7 +278,9 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
 
     /**
      * Finds the endpoint configuration that matches the given path.
+     *
      * @param path the URI path to match
+     *
      * @return the mapping result, or null if no match is found
      */
     public WsMappingResult findMapping(String path) {
@@ -326,6 +333,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
 
     /**
      * Returns the write timeout handler.
+     *
      * @return the write timeout handler
      */
     protected WsWriteTimeout getTimeout() {
@@ -342,14 +350,10 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
-    /**
-     * {@inheritDoc} Overridden to make it visible to other classes in this package.
-     */
-    @Override
-    protected void registerSession(Object key, WsSession wsSession) {
+    protected void registerSession(Object key, WsSession wsSession, Object httpSession) {
         super.registerSession(key, wsSession);
-        if (wsSession.isOpen() && wsSession.getUserPrincipal() != null && wsSession.getHttpSessionId() != null) {
-            registerAuthenticatedSession(wsSession, wsSession.getHttpSessionId());
+        if (wsSession.isOpen() && wsSession.getUserPrincipal() != null && httpSession != null) {
+            registerAuthenticatedSession(wsSession, (HttpSession) httpSession);
         }
     }
 
@@ -359,49 +363,102 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
      */
     @Override
     protected void unregisterSession(Object key, WsSession wsSession) {
-        if (wsSession.getUserPrincipalInternal() != null && wsSession.getHttpSessionId() != null) {
-            unregisterAuthenticatedSession(wsSession, wsSession.getHttpSessionId());
+        if (wsSession.getUserPrincipalInternal() != null) {
+            unregisterAuthenticatedSession(wsSession);
         }
         super.unregisterSession(key, wsSession);
     }
 
 
-    private void registerAuthenticatedSession(WsSession wsSession, String httpSessionId) {
-        Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
-        if (wsSessions == null) {
-            wsSessions = ConcurrentHashMap.newKeySet();
-            authenticatedSessions.putIfAbsent(httpSessionId, wsSessions);
-            wsSessions = authenticatedSessions.get(httpSessionId);
+    private void registerAuthenticatedSession(WsSession wsSession, HttpSession httpSession) {
+        boolean mustCloseWsSession = false;
+        String httpSessionKey = null;
+
+        synchronized (authenticatedSessionMapLock) {
+            try {
+                boolean mustAddSessionAttribute = false;
+                WsHttpSessionBindingListener listener = (WsHttpSessionBindingListener) httpSession
+                        .getAttribute(WsHttpSessionBindingListener.class.getCanonicalName());
+                if (listener == null) {
+                    httpSessionKey = httpSession.getId();
+                    mustAddSessionAttribute = true;
+                } else {
+                    httpSessionKey = listener.getKey();
+                }
+                if (mustAddSessionAttribute) {
+                    /*
+                     * It is possible that the session expires concurrently with the attribute being added. Depending on
+                     * the exact timing, one of two things will happen. Either an IllegalStateException will be thrown
+                     * or the attribute will be added and then immediately removed from the session. Handle both of
+                     * these scenarios here.
+                     */
+                    httpSession.setAttribute(WsHttpSessionBindingListener.class.getCanonicalName(),
+                            new WsHttpSessionBindingListener(httpSessionKey));
+                    if (httpSession.getAttribute(WsHttpSessionBindingListener.class.getCanonicalName()) == null) {
+                        mustCloseWsSession = true;
+                    }
+                }
+            } catch (IllegalStateException ise) {
+                // Failing to set the attribute indicates that the session has already expired
+                mustCloseWsSession = true;
+            }
+
+            if (!mustCloseWsSession) {
+                Set<WsSession> wsSessions = httpSessionKeyToWebSocketSession.get(httpSessionKey);
+                if (wsSessions == null) {
+                    wsSessions = new HashSet<>();
+                    httpSessionKeyToWebSocketSession.put(httpSessionKey, wsSessions);
+                }
+                wsSessions.add(wsSession);
+                webSocketSessionToHttpSessionKey.put(wsSession, httpSessionKey);
+            }
         }
-        wsSessions.add(wsSession);
+
+        if (mustCloseWsSession) {
+            closeAuthenticatedWebSocketSession(wsSession);
+        }
     }
 
 
-    private void unregisterAuthenticatedSession(WsSession wsSession, String httpSessionId) {
-        Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
-        // wsSessions will be null if the HTTP session has ended
-        if (wsSessions != null) {
-            wsSessions.remove(wsSession);
+    private void unregisterAuthenticatedSession(WsSession wsSession) {
+        synchronized (authenticatedSessionMapLock) {
+            String httpSessionKey = webSocketSessionToHttpSessionKey.remove(wsSession);
+            if (httpSessionKey != null) {
+                Set<WsSession> wsSessions = httpSessionKeyToWebSocketSession.get(httpSessionKey);
+                if (wsSessions != null) {
+                    wsSessions.remove(wsSession);
+                }
+            }
         }
     }
 
 
     /**
      * Closes all WebSocket sessions associated with the given authenticated HTTP session.
-     * @param httpSessionId the HTTP session ID
+     *
+     * @param httpSessionKey the HTTP session key
      */
-    public void closeAuthenticatedSession(String httpSessionId) {
-        Set<WsSession> wsSessions = authenticatedSessions.remove(httpSessionId);
+    public void handleHttpSessionKeyUnbound(String httpSessionKey) {
+        Set<WsSession> wsSessions;
 
-        if (wsSessions != null && !wsSessions.isEmpty()) {
+        synchronized (authenticatedSessionMapLock) {
+            wsSessions = httpSessionKeyToWebSocketSession.remove(httpSessionKey);
+        }
+
+        if (wsSessions != null) {
             for (WsSession wsSession : wsSessions) {
-                try {
-                    wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
-                } catch (IOException ignore) {
-                    // Any IOExceptions during close will have been caught and the
-                    // onError method called.
-                }
+                closeAuthenticatedWebSocketSession(wsSession);
             }
+        }
+    }
+
+
+    private void closeAuthenticatedWebSocketSession(WsSession wsSession) {
+        try {
+            wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
+        } catch (IOException ignore) {
+            // Any IOExceptions during close will have been caught and the
+            // onError method called.
         }
     }
 

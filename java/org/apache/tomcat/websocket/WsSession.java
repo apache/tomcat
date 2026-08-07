@@ -278,6 +278,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the instance manager for this session.
+     *
      * @return the instance manager
      */
     public InstanceManager getInstanceManager() {
@@ -459,6 +460,7 @@ public class WsSession implements Session {
 
     /**
      * Checks if the session is closed.
+     *
      * @return true if the session is closed
      */
     public boolean isClosed() {
@@ -673,6 +675,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the session close timeout in milliseconds.
+     *
      * @return the session close timeout
      */
     protected long getSessionCloseTimeout() {
@@ -944,6 +947,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the user principal for this session.
+     *
      * @return the user principal
      */
     public Principal getUserPrincipalInternal() {
@@ -973,6 +977,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the local endpoint for this session.
+     *
      * @return the local endpoint
      */
     public Endpoint getLocal() {
@@ -981,9 +986,13 @@ public class WsSession implements Session {
 
 
     /**
-     * Returns the HTTP session ID associated with this WebSocket session.
+     * Returns the HTTP session ID associated with this WebSocket session at the time the WebSocket session was created.
+     *
      * @return the HTTP session ID, or null if not associated
+     *
+     * @deprecated Unused. Will be removed from Tomcat 12 onwards
      */
+    @Deprecated
     public String getHttpSessionId() {
         return httpSessionId;
     }
@@ -991,6 +1000,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the text message handler for this session.
+     *
      * @return the text message handler
      */
     protected MessageHandler getTextMessageHandler() {
@@ -1000,6 +1010,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the binary message handler for this session.
+     *
      * @return the binary message handler
      */
     protected MessageHandler getBinaryMessageHandler() {
@@ -1009,6 +1020,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the pong message handler for this session.
+     *
      * @return the pong message handler
      */
     protected MessageHandler.Whole<PongMessage> getPongMessageHandler() {
