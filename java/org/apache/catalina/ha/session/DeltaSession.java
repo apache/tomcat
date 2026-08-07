@@ -116,11 +116,11 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
     /**
-     * Create a DeltaRequest instance. This protected method enables subclasses to override and use
-     * custom DeltaRequest implementations.
+     * Create a DeltaRequest instance. This protected method enables subclasses to override and use custom DeltaRequest
+     * implementations.
      *
-     * @param sessionId         Session identifier
-     * @param recordAllActions  Record all actions, including duplicates
+     * @param sessionId        Session identifier
+     * @param recordAllActions Record all actions, including duplicates
      *
      * @return New DeltaRequest instance
      */
@@ -311,8 +311,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set the maximum inactive interval.
      *
-     * @param interval          Max inactive interval in seconds
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param interval        Max inactive interval in seconds
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void setMaxInactiveInterval(int interval, boolean addDeltaRequest) {
         super.maxInactiveInterval = interval;
@@ -334,8 +334,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set the new flag.
      *
-     * @param isNew             New flag value
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param isNew           New flag value
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void setNew(boolean isNew, boolean addDeltaRequest) {
         super.setNew(isNew);
@@ -357,8 +357,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set the session principal.
      *
-     * @param principal         Session principal
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param principal       Session principal
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void setPrincipal(Principal principal, boolean addDeltaRequest) {
         lockInternal();
@@ -380,8 +380,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set the authentication type.
      *
-     * @param authType          Authentication type
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param authType        Authentication type
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void setAuthType(String authType, boolean addDeltaRequest) {
         lockInternal();
@@ -444,8 +444,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Expire this session.
      *
-     * @param notify          Whether to notify session listeners
-     * @param notifyCluster   Whether to notify the cluster of expiration
+     * @param notify        Whether to notify session listeners
+     * @param notifyCluster Whether to notify the cluster of expiration
      */
     public void expire(boolean notify, boolean notifyCluster) {
 
@@ -516,8 +516,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Add a session listener.
      *
-     * @param listener          Session listener to add
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param listener        Session listener to add
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void addSessionListener(SessionListener listener, boolean addDeltaRequest) {
         lockInternal();
@@ -539,8 +539,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Remove a session listener.
      *
-     * @param listener          Session listener to remove
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param listener        Session listener to remove
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void removeSessionListener(SessionListener listener, boolean addDeltaRequest) {
         lockInternal();
@@ -695,9 +695,9 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Remove an attribute from this session.
      *
-     * @param name              Attribute name
-     * @param notify            Whether to notify listeners
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param name            Attribute name
+     * @param notify          Whether to notify listeners
+     * @param addDeltaRequest Whether to add a delta request entry
      *
      * @throws IllegalStateException If this session is no longer valid
      */
@@ -717,10 +717,10 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set an attribute on this session.
      *
-     * @param name              Attribute name
-     * @param value             Attribute value
-     * @param notify            Whether to notify listeners
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param name            Attribute name
+     * @param value           Attribute value
+     * @param notify          Whether to notify listeners
+     * @param addDeltaRequest Whether to add a delta request entry
      *
      * @throws IllegalArgumentException If name is null
      */
@@ -740,7 +740,13 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         lockInternal();
         try {
             super.setAttribute(name, value, notify);
-            if (addDeltaRequest && !exclude(name, value)) {
+            /*
+             * It is possible that the session expires concurrently with the attribute being added. Depending on the
+             * exact timing, one of two things will happen. Either an IllegalStateException will be thrown or the
+             * attribute will be added and then immediately removed from the session. The exception will be re-thrown.
+             * If the attribute is removed, don't update the deltaRequest.
+             */
+            if (getAttribute(name) != null && addDeltaRequest && !exclude(name, value)) {
                 deltaRequest.setAttribute(name, value);
             }
         } finally {
@@ -757,8 +763,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Remove a note from this session.
      *
-     * @param name              Note name
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param name            Note name
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void removeNote(String name, boolean addDeltaRequest) {
         lockInternal();
@@ -781,9 +787,9 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Set a note on this session.
      *
-     * @param name              Note name
-     * @param value             Note value
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param name            Note name
+     * @param value           Note value
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     public void setNote(String name, Object value, boolean addDeltaRequest) {
 
@@ -983,9 +989,9 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     /**
      * Remove an attribute from this session without additional validation.
      *
-     * @param name              Attribute name
-     * @param notify            Whether to notify listeners
-     * @param addDeltaRequest   Whether to add a delta request entry
+     * @param name            Attribute name
+     * @param notify          Whether to notify listeners
+     * @param addDeltaRequest Whether to add a delta request entry
      */
     protected void removeAttributeInternal(String name, boolean notify, boolean addDeltaRequest) {
         lockInternal();

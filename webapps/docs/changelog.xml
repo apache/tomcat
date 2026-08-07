@@ -288,6 +288,11 @@
         template ends in a variable without a trailing slash, that variable
         might be expanded to the empty string. (markt)
       </fix>
+      <fix>
+        Account for session ID changes when tracking WebSocket connections for
+        closure because they were created under an authenticated HTTP session
+        that has since ended. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
