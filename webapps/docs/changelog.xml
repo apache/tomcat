@@ -271,6 +271,9 @@
       <update>
         Update Maven Resolver Ant Tasks to 1.6.1. (rjung)
       </update>
+      <update>
+        Update Objenesis to 3.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
