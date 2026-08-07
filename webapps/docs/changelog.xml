@@ -274,6 +274,9 @@
       <update>
         Update Objenesis to 3.6. (markt)
       </update>
+      <update>
+        Update JSign to 7.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
