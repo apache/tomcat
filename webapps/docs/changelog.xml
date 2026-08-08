@@ -264,6 +264,10 @@
         Documentation: Expand the description of the <code>%S</code> (session ID)
         access log pattern token. (markt)
       </fix>
+      <fix>
+        Manager: Use reflection to load clustering classes in
+        <code>sessionsList.jsp</code> so the sessions list page renders
+        correctly when clustering JARs are not present. (csutherl)
     </changelog>
   </subsection>
   <subsection name="Other">
