@@ -172,6 +172,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
     private final Set<Stream> backLogStreams = new HashSet<>();
+    // The sum of the connection allocations requested by the streams in backLogStreams. Any change to a stream's
+    // requested allocation must be mirrored here so releaseBackLog() can correctly determine whether an increment
+    // clears the backlog.
     private long backLogSize = 0;
     // The time at which the connection will timeout unless data arrives before
     // then. -1 means no timeout.
@@ -1332,6 +1335,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 int allocatedThisTime = Math.min(allocation, stream.getConnectionAllocationRequested());
                 stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
                 stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
+                backLogSize -= allocatedThisTime;
                 leftToAllocate = leftToAllocate - allocatedThisTime;
             }
 
