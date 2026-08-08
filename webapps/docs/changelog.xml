@@ -264,6 +264,7 @@
         Manager: Use reflection to load clustering classes in
         <code>sessionsList.jsp</code> so the sessions list page renders
         correctly when clustering JARs are not present. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
