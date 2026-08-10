@@ -617,7 +617,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         }
     }
 
-    /**
+    /*
      * Verify that manager JSPs compile and render correctly.
      */
     @Test
