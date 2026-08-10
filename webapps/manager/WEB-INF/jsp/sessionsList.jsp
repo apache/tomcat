@@ -37,8 +37,8 @@ static {
     try {
         clazz = Class.forName("org.apache.catalina.ha.session.DeltaSession");
         method = clazz.getMethod("isPrimarySession");
-    } catch (ClassNotFoundException e) {
-        // Expected when clustering JARs are not present
+    } catch (ClassNotFoundException | NoClassDefFoundError e) {
+        // Expected when either or both clustering JARs are not present
     } catch (NoSuchMethodException e) {
         // Should not happen if the class is available
     }
