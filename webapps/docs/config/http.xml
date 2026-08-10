@@ -121,7 +121,7 @@
       </p>
       <p>When set to <code>decoded</code>, the
       <code>org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH</code>
-      system proeprty will be applied after decoding.
+      system property will be applied after decoding.
       </p>
       <p>If <code>passthrough</code> is used then it is the application's
       responsibility to perform any further <code>%nn</code> decoding required.
