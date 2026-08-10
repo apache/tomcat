@@ -275,7 +275,7 @@
 
     <attribute name="testOnBorrow" required="false">
       <p>(boolean) The indication of whether objects will be validated before being borrowed from the pool.
-         If the object fails to validate, a reconnection is attempted using the same object. 
+         If the object fails to validate, a reconnection is attempted using the same object.
          If the reconnection also fails, the object is dropped from the pool and an <code>SQLException</code> is thrown.
          In order to have a more efficient validation, see <code>validationInterval</code>.
          Default value is <code>false</code>

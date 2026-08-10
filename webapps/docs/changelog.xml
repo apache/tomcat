@@ -480,6 +480,11 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>70164</bug>: Correct the documentation for the
+        <code>testOnBorrow</code> attribute. Pull request <pr>1033</pr> provided
+        by Kohei Tamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
