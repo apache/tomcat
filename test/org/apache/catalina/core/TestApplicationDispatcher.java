@@ -47,10 +47,10 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "errorTrigger", new ErrorTriggerServlet());
-        ctx.addServletMappingDecoded("/trigger", "errorTrigger");
+        ctx.addServletMapping("/trigger", "errorTrigger");
 
         Tomcat.addServlet(ctx, "errorHandling", new ErrorHandlingServlet());
-        ctx.addServletMappingDecoded("/error", "errorHandling");
+        ctx.addServletMapping("/error", "errorHandling");
 
         ErrorPage ep = new ErrorPage();
         ep.setExceptionType(Throwable.class.getName());
@@ -86,7 +86,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
         Context ctx = (Context) tomcat.getHost().findChildren()[0];
 
         Tomcat.addServlet(ctx, "errorHandling", new ErrorHandlingServlet());
-        ctx.addServletMappingDecoded("/error", "errorHandling");
+        ctx.addServletMapping("/error", "errorHandling");
 
         ErrorPage ep = new ErrorPage();
         ep.setExceptionType(Throwable.class.getName());

@@ -57,7 +57,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
         Tomcat.addServlet(ctx, "largeBodyServlet", largeBodyServlet);
-        ctx.addServletMappingDecoded("/", "largeBodyServlet");
+        ctx.addServletMapping("/", "largeBodyServlet");
 
         tomcat.start();
 
@@ -94,11 +94,11 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Bug57602ServletOuter outer = new Bug57602ServletOuter();
         Tomcat.addServlet(ctx, "Bug57602ServletOuter", outer);
-        ctx.addServletMappingDecoded("/outer", "Bug57602ServletOuter");
+        ctx.addServletMapping("/outer", "Bug57602ServletOuter");
 
         Bug57602ServletInner inner = new Bug57602ServletInner();
         Tomcat.addServlet(ctx, "Bug57602ServletInner", inner);
-        ctx.addServletMappingDecoded("/inner", "Bug57602ServletInner");
+        ctx.addServletMapping("/inner", "Bug57602ServletInner");
 
         tomcat.start();
 
@@ -167,7 +167,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctx, "TestServlet", servlet);
         // Not all need/use this but it is simpler to set it for all
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/test", "TestServlet");
+        ctx.addServletMapping("/test", "TestServlet");
 
         tomcat.start();
 
@@ -241,7 +241,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         OptionsServletQuery servlet = new OptionsServletQuery();
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -278,7 +278,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         OptionsServletQuery servlet = new OptionsServletQuery();
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -313,7 +313,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         ParamsServlet servlet = new ParamsServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -350,7 +350,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         // Map the test Servlet
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -422,7 +422,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         // Map the test Servlet
         Tomcat.addServlet(ctx, "servlet", new SimpleServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -485,7 +485,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "TesterServlet", new TesterServlet());
-            root.addServletMappingDecoded("/test", "TesterServlet");
+            root.addServletMapping("/test", "TesterServlet");
 
             try {
                 tomcat.start();

@@ -280,7 +280,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
         // Map the test Servlet
         TesterServlet servlet = new TesterServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         CharArrayWriter writer = new CharArrayWriter();
         if (TEXT_TYPE.equals(type)) {

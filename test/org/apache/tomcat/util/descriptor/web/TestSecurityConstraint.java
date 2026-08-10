@@ -52,7 +52,7 @@ public class TestSecurityConstraint {
         GET_ONLY.addAuthRole(ROLE1);
         SecurityCollection scGetOnly = new SecurityCollection();
         scGetOnly.addMethod(Method.GET);
-        scGetOnly.addPatternDecoded(URL_PATTERN);
+        scGetOnly.addPattern(URL_PATTERN);
         scGetOnly.setName("GET-ONLY");
         GET_ONLY.addCollection(scGetOnly);
 
@@ -60,7 +60,7 @@ public class TestSecurityConstraint {
         POST_ONLY.addAuthRole(ROLE1);
         SecurityCollection scPostOnly = new SecurityCollection();
         scPostOnly.addMethod(Method.POST);
-        scPostOnly.addPatternDecoded(URL_PATTERN);
+        scPostOnly.addPattern(URL_PATTERN);
         scPostOnly.setName("POST_ONLY");
         POST_ONLY.addCollection(scPostOnly);
 
@@ -68,7 +68,7 @@ public class TestSecurityConstraint {
         GET_OMIT.addAuthRole(ROLE1);
         SecurityCollection scGetOmit = new SecurityCollection();
         scGetOmit.addOmittedMethod(Method.GET);
-        scGetOmit.addPatternDecoded(URL_PATTERN);
+        scGetOmit.addPattern(URL_PATTERN);
         scGetOmit.setName("GET_OMIT");
         GET_OMIT.addCollection(scGetOmit);
 
@@ -76,7 +76,7 @@ public class TestSecurityConstraint {
         POST_OMIT.addAuthRole(ROLE1);
         SecurityCollection scPostOmit = new SecurityCollection();
         scPostOmit.addOmittedMethod(Method.POST);
-        scPostOmit.addPatternDecoded(URL_PATTERN);
+        scPostOmit.addPattern(URL_PATTERN);
         scPostOmit.setName("POST_OMIT");
         POST_OMIT.addCollection(scPostOmit);
     }

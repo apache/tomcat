@@ -114,7 +114,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         EchoHeaderServlet servlet = new EchoHeaderServlet(expectPass);
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -196,7 +196,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         BodyReadServlet servlet = new BodyReadServlet(false, Integer.MAX_VALUE);
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -226,7 +226,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new CommitResponseServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -291,7 +291,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(false));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         // Limit the size of the trailing header
         Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerSize", Integer.toString(trailerSizeLimit)));
@@ -387,7 +387,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(ok));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -437,7 +437,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(true));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -538,7 +538,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         BodyReadServlet servlet = new BodyReadServlet(expectPass, readLimit);
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -612,7 +612,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new SwallowBodyServlet(swallowException));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -817,7 +817,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new SwallowBodyServlet(false));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -876,7 +876,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new TesterServlet(false));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -1039,7 +1039,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         BodyReadLineServlet servlet = new BodyReadLineServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/test", "servlet");
+        ctx.addServletMapping("/test", "servlet");
 
         tomcat.getConnector().setProperty("connectionTimeout", "300000");
         tomcat.start();
@@ -1093,7 +1093,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         NonBlockingReadLineServlet servlet = new NonBlockingReadLineServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/test", "servlet");
+        ctx.addServletMapping("/test", "servlet");
 
         tomcat.getConnector().setProperty("connectionTimeout", "300000");
         tomcat.start();
@@ -1189,7 +1189,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(ok));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 

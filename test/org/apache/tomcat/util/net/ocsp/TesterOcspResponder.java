@@ -73,7 +73,7 @@ public class TesterOcspResponder {
         // No file system docBase required
         Context ctx = ocspResponder.addContext("", null);
         Wrapper w = Tomcat.addServlet(ctx, "responder", new TesterOcspResponderServlet());
-        ctx.addServletMappingDecoded("/", "responder");
+        ctx.addServletMapping("/", "responder");
         if (fixedResponse != null) {
             w.addInitParameter(TesterOcspResponderServlet.INIT_FIXED_RESPONSE, fixedResponse.toString());
         }

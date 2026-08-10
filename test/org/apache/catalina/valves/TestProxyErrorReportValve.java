@@ -52,12 +52,12 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "error", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
-        ctx.addServletMappingDecoded("/", "error");
+        ctx.addServletMapping("/", "error");
 
         // Register an error page at the Host's error report valve level
         // so findErrorPage() returns a URL for the redirect
         Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/error-page", "errorPage");
+        ctx.addServletMapping("/error-page", "errorPage");
 
         tomcat.start();
 
@@ -89,10 +89,10 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "error", new SendErrorServlet(
                 HttpServletResponse.SC_NOT_FOUND, "Not found"));
-        ctx.addServletMappingDecoded("/", "error");
+        ctx.addServletMapping("/", "error");
 
         Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/error-page", "errorPage");
+        ctx.addServletMapping("/error-page", "errorPage");
 
         tomcat.start();
 
@@ -126,7 +126,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "error", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No page configured"));
-        ctx.addServletMappingDecoded("/", "error");
+        ctx.addServletMapping("/", "error");
 
         tomcat.start();
 
@@ -151,7 +151,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         tomcat.start();
 
@@ -172,7 +172,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "notFound", new SendErrorServlet(
                 HttpServletResponse.SC_NOT_FOUND, "Resource not found"));
-        ctx.addServletMappingDecoded("/", "notFound");
+        ctx.addServletMapping("/", "notFound");
 
         tomcat.start();
 
@@ -213,7 +213,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "error", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, customErrorMessage));
-        ctx.addServletMappingDecoded("/", "error");
+        ctx.addServletMapping("/", "error");
 
         tomcat.start();
 
@@ -237,7 +237,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "exception", new ExceptionServlet());
-        ctx.addServletMappingDecoded("/", "exception");
+        ctx.addServletMapping("/", "exception");
 
         tomcat.start();
 
@@ -262,10 +262,10 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
-        ctx.addServletMappingDecoded("/", "sendError");
+        ctx.addServletMapping("/", "sendError");
 
         Tomcat.addServlet(ctx, "errorPage", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/error-page", "errorPage");
+        ctx.addServletMapping("/error-page", "errorPage");
 
         tomcat.start();
 
@@ -311,7 +311,7 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
-        ctx.addServletMappingDecoded("/", "sendError");
+        ctx.addServletMapping("/", "sendError");
 
         tomcat.start();
 

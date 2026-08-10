@@ -783,6 +783,13 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public void addServletMapping(String pattern, String name,
+            boolean jspWildcard) {
+        // NO-OP
+    }
+
+    @Override
+    @Deprecated
     public void addServletMappingDecoded(String pattern, String name,
             boolean jspWildcard) {
         // NO-OP

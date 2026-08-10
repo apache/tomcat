@@ -62,7 +62,7 @@ public class TestWsWebSocketContainerTimeoutClient extends WsWebSocketContainerB
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(BlockingConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 

@@ -239,7 +239,7 @@ public class TestAccessLogValveFile extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         logDir = getLogDir();
         AccessLogValve valve = new AccessLogValve();

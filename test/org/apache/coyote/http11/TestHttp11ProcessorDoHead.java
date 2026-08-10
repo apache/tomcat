@@ -101,7 +101,7 @@ public class TestHttp11ProcessorDoHead extends TomcatBaseTest {
             w.addInitParameter(HttpServlet.LEGACY_DO_HEAD, "true");
         }
 
-        ctx.addServletMappingDecoded("/head", "DoHeadServlet");
+        ctx.addServletMapping("/head", "DoHeadServlet");
 
         tomcat.start();
 

@@ -65,7 +65,7 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
         // Map the test Servlet
         ParameterParsingServlet parameterParsingServlet = new ParameterParsingServlet();
         Tomcat.addServlet(ctx, "parameterParsingServlet", parameterParsingServlet);
-        ctx.addServletMappingDecoded("/", "parameterParsingServlet");
+        ctx.addServletMapping("/", "parameterParsingServlet");
 
         tomcat.start();
 

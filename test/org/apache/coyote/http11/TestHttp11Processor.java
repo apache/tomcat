@@ -81,7 +81,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add protected servlet
         Tomcat.addServlet(ctx, "ChunkedResponseWithErrorServlet", new ResponseWithErrorServlet(true));
-        ctx.addServletMappingDecoded("/*", "ChunkedResponseWithErrorServlet");
+        ctx.addServletMapping("/*", "ChunkedResponseWithErrorServlet");
 
         tomcat.start();
 
@@ -318,7 +318,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add protected servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -374,7 +374,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // Add protected servlet
         Wrapper w = Tomcat.addServlet(ctx, "servlet", new Bug64974Servlet());
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/foo", "servlet");
+        ctx.addServletMapping("/foo", "servlet");
 
         tomcat.start();
 
@@ -417,7 +417,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "NoContentLengthFlushingServlet", new NoContentLengthFlushingServlet());
-        ctx.addServletMappingDecoded("/test", "NoContentLengthFlushingServlet");
+        ctx.addServletMapping("/test", "NoContentLengthFlushingServlet");
 
         tomcat.start();
 
@@ -441,7 +441,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "NoContentLengthConnectionCloseFlushingServlet",
                 new NoContentLengthConnectionCloseFlushingServlet());
-        ctx.addServletMappingDecoded("/test", "NoContentLengthConnectionCloseFlushingServlet");
+        ctx.addServletMapping("/test", "NoContentLengthConnectionCloseFlushingServlet");
 
         tomcat.start();
 
@@ -476,7 +476,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "LargeHeaderServlet", new LargeHeaderServlet(flush));
-        ctx.addServletMappingDecoded("/test", "LargeHeaderServlet");
+        ctx.addServletMapping("/test", "LargeHeaderServlet");
 
         tomcat.start();
 
@@ -509,7 +509,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "async", new Bug55772Servlet());
-        ctx.addServletMappingDecoded("/*", "async");
+        ctx.addServletMapping("/*", "async");
 
         tomcat.start();
 
@@ -572,10 +572,10 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
-        ctx.addServletMappingDecoded("/echo", "echo");
+        ctx.addServletMapping("/echo", "echo");
 
         SecurityCollection collection = new SecurityCollection("All", "");
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
         SecurityConstraint constraint = new SecurityConstraint();
         constraint.addAuthRole("Any");
         constraint.addCollection(collection);
@@ -744,7 +744,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context root = getProgrammaticRootContext();
         Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet(delayAsyncThread));
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/test", "Bug57621");
+        root.addServletMapping("/test", "Bug57621");
 
         tomcat.start();
 
@@ -850,7 +850,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "Bug59310", new Bug59310Servlet());
-        ctx.addServletMappingDecoded("/test", "Bug59310");
+        ctx.addServletMapping("/test", "Bug59310");
 
         tomcat.start();
 
@@ -905,7 +905,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         DispatchingServlet servlet = new DispatchingServlet();
         Wrapper w = Tomcat.addServlet(ctx, "Test", servlet);
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/test", "Test");
+        ctx.addServletMapping("/test", "Test");
 
         tomcat.start();
 
@@ -993,7 +993,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Bug61086Servlet servlet = new Bug61086Servlet();
         Tomcat.addServlet(ctx, "Test", servlet);
-        ctx.addServletMappingDecoded("/test", "Test");
+        ctx.addServletMapping("/test", "Test");
 
         tomcat.start();
 
@@ -1033,7 +1033,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1071,7 +1071,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1106,7 +1106,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1135,7 +1135,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1169,7 +1169,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1203,7 +1203,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1240,7 +1240,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1277,7 +1277,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1314,7 +1314,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1352,7 +1352,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1391,7 +1391,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1431,7 +1431,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1470,7 +1470,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1510,7 +1510,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1550,7 +1550,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1646,7 +1646,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(explicitClose));
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1762,7 +1762,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new SwallowBodyTesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1922,7 +1922,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(false));
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -1989,7 +1989,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TestPostNoReadServlet", new TestPostNoReadServlet());
-        ctx.addServletMappingDecoded("/foo", "TestPostNoReadServlet");
+        ctx.addServletMapping("/foo", "TestPostNoReadServlet");
 
         tomcat.start();
 
@@ -2061,7 +2061,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "EarlyHintsServlet", new EarlyHintsServlet());
-        ctx.addServletMappingDecoded("/ehs", "EarlyHintsServlet");
+        ctx.addServletMapping("/ehs", "EarlyHintsServlet");
 
         tomcat.start();
 
@@ -2093,7 +2093,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "EarlyHintsServlet", new EarlyHintsServlet(true, null));
-        ctx.addServletMappingDecoded("/ehs", "EarlyHintsServlet");
+        ctx.addServletMapping("/ehs", "EarlyHintsServlet");
 
         tomcat.start();
 
@@ -2126,7 +2126,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "EarlyHintsServlet", new EarlyHintsServlet(true, "ignored"));
-        ctx.addServletMappingDecoded("/ehs", "EarlyHintsServlet");
+        ctx.addServletMapping("/ehs", "EarlyHintsServlet");
 
         tomcat.start();
 

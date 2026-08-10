@@ -141,7 +141,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RateLimitFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         root.addFilterMap(filterMap);
 
         return rateLimitFilter;

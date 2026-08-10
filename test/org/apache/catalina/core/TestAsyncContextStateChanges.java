@@ -105,7 +105,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         AsyncServlet bug63816Servlet = new AsyncServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/*", "bug63816Servlet");
+        ctx.addServletMapping("/*", "bug63816Servlet");
 
         tomcat.start();
 

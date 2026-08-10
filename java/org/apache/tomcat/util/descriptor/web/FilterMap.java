@@ -31,6 +31,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
  * servlet name.
  */
+@SuppressWarnings("deprecation")
 public class FilterMap extends XmlEncodingBase implements Serializable {
 
     /**
@@ -197,7 +198,10 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
      * Adds a decoded URL pattern to the set of URL patterns this mapping matches.
      *
      * @param urlPattern The decoded URL pattern to add
+     *
+     * @deprecated This method will be removed in Tomcat 12 onwards
      */
+    @Deprecated
     public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;

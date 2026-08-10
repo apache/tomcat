@@ -61,7 +61,7 @@ public class TestLargeClientHello extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         TesterSupport.initSsl(tomcat, keystoreFile.getAbsolutePath(), false);
 

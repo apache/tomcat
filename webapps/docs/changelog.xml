@@ -296,6 +296,20 @@
         of particular not for attributes that implement
         <code>HttpSessionBindingListener</code>. (markt)
       </fix>
+      <fix>
+        Add a new attribute to the <code>Context</code>,
+        <code>urlPatternsProvidedInDecodedForm</code>. This attribute controls
+        whether URLs and URL patterns provided in the deployment descriptor
+        (web.xml), annotations and/or their programmatic equivalents are treated
+        as being provided in URL-encoded form (i.e. using %nn encoding) or in
+        decoded form. The Servlet specification requires that they are provided
+        in decoded form. However, Tomcat has historically treated them as if
+        they are provided in encoded form. In Tomcat 12, they will always be
+        treated as if they are provided in decoded form. This setting enables
+        migration from encoded form to decoded form on an application by
+        application basis. This attribute will be removed in Tomcat 12 where it
+        will effectively be hard-coded to <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

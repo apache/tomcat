@@ -55,10 +55,10 @@ public class TestStreamProcessor extends Http2TestBase {
         // logic from the super class.
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncComplete());
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/async", "async");
+        ctxt.addServletMapping("/async", "async");
 
         tomcat.start();
 
@@ -94,10 +94,10 @@ public class TestStreamProcessor extends Http2TestBase {
         // logic from the super class.
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncDispatch());
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/async", "async");
+        ctxt.addServletMapping("/async", "async");
 
         tomcat.start();
 
@@ -126,7 +126,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 
@@ -178,9 +178,9 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "noContent", new NoContentServlet());
-        ctxt.addServletMappingDecoded("/noContent", "noContent");
+        ctxt.addServletMapping("/noContent", "noContent");
 
 
         tomcat.start();
@@ -226,7 +226,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 
@@ -270,7 +270,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 
@@ -312,7 +312,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 
@@ -356,7 +356,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 
@@ -400,7 +400,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.getConnector().setProperty("relaxedQueryChars", "[]");
 
@@ -501,9 +501,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "compression", new CompressionServlet());
-        ctxt.addServletMappingDecoded("/compression", "compression");
+        ctxt.addServletMapping("/compression", "compression");
 
         // Enable compression
         Connector connector = tomcat.getConnector();
@@ -595,9 +595,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "ehs", new EarlyHintsServlet());
-        ctxt.addServletMappingDecoded("/ehs", "ehs");
+        ctxt.addServletMapping("/ehs", "ehs");
         tomcat.start();
 
         openClientConnection();
@@ -660,9 +660,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
-        ctxt.addServletMappingDecoded("/server", "server");
+        ctxt.addServletMapping("/server", "server");
         tomcat.start();
 
         openClientConnection();
@@ -703,9 +703,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
-        ctxt.addServletMappingDecoded("/server", "server");
+        ctxt.addServletMapping("/server", "server");
         tomcat.start();
 
         openClientConnection();
@@ -743,9 +743,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
-        ctxt.addServletMappingDecoded("/server", "server");
+        ctxt.addServletMapping("/server", "server");
         tomcat.start();
 
         openClientConnection();

@@ -145,13 +145,13 @@ public class TestStandardContext extends TomcatBaseTest {
         context.addFilterDef(filterDef);
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName("Bug46243");
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         context.addFilterMap(filterMap);
 
         // Add a test servlet so there is something to generate a response if
         // it works (although it shouldn't)
         Tomcat.addServlet(context, "Bug46243", new HelloWorldServlet());
-        context.addServletMappingDecoded("/", "Bug46243");
+        context.addServletMapping("/", "Bug46243");
     }
 
     private static final class Bug46243Client extends SimpleHttpClient {
@@ -715,8 +715,8 @@ public class TestStandardContext extends TomcatBaseTest {
             // to set our own MultipartConfigElement.
             w.setMultipartConfigElement(new MultipartConfigElement(""));
 
-            context.addServletMappingDecoded("/regular", "regular");
-            context.addServletMappingDecoded("/multipart", "multipart");
+            context.addServletMapping("/regular", "regular");
+            context.addServletMapping("/multipart", "multipart");
             tomcat.start();
 
             setPort(tomcat.getConnector().getLocalPort());

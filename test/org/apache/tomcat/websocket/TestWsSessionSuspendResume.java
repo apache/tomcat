@@ -55,7 +55,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         ctx.addApplicationListener(SuspendResumeConfig.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -156,7 +156,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         ctx.addApplicationListener(WebSocketFastServerTimeout.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

@@ -45,7 +45,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
-        ctx.addServletMappingDecoded("/echo", "echo");
+        ctx.addServletMapping("/echo", "echo");
 
         tomcat.start();
 
@@ -93,7 +93,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "header", new HeaderServlet(customHeaderValue));
-        ctx.addServletMappingDecoded("/header", "header");
+        ctx.addServletMapping("/header", "header");
 
         tomcat.start();
 
