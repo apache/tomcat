@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.servlet.Servlet;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -214,5 +215,48 @@ public class TestConnector extends TomcatBaseTest {
         } else {
             Assert.assertFalse(foundTrace);
         }
+    }
+
+
+    /*
+     * This is applies to the entire test class although it is only required for the following two tests. That makes it
+     * fragile. This setting and the tests that depend on it may need to be moved to a dedicated test class in the
+     * future.
+     */
+    @BeforeClass
+    public static void setup() {
+        System.setProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "true");
+    }
+
+
+    @Test
+    public void testBug70144a() throws Exception {
+        // Simple test case
+        doTestBug70144("/bug%5C70144");
+    }
+
+
+    @Test
+    public void testBug70144b() throws Exception {
+        // User provided test case
+        doTestBug70144("/search/%22F%5C%22%22");
+    }
+
+
+    private void doTestBug70144(String path) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = getProgrammaticRootContext();
+        Tomcat.addServlet(root, "default", new TesterServlet());
+        root.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + path, body, true);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("OK", body.toString());
     }
 }
