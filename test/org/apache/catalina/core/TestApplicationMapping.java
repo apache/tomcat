@@ -126,7 +126,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Context ctx = tomcat.addContext(contextPath, null);
 
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded(mapping, "Mapping");
+        ctx.addServletMapping(mapping, "Mapping");
 
         tomcat.start();
 
@@ -147,9 +147,9 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Context ctx = tomcat.addContext(contextPath, null);
 
         Tomcat.addServlet(ctx, "Include", new IncludeServlet());
-        ctx.addServletMappingDecoded(mapping, "Include");
+        ctx.addServletMapping(mapping, "Include");
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded("/mapping", "Mapping");
+        ctx.addServletMapping("/mapping", "Mapping");
 
         tomcat.start();
 
@@ -175,9 +175,9 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Context ctx = tomcat.addContext(contextPath, null);
 
         Tomcat.addServlet(ctx, "Include", new NamedIncludeServlet());
-        ctx.addServletMappingDecoded(mapping, "Include");
+        ctx.addServletMapping(mapping, "Include");
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded("/mapping", "Mapping");
+        ctx.addServletMapping("/mapping", "Mapping");
 
         tomcat.start();
 
@@ -198,9 +198,9 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Context ctx = tomcat.addContext(contextPath, null);
 
         Tomcat.addServlet(ctx, "Forward", new ForwardServlet());
-        ctx.addServletMappingDecoded(mapping, "Forward");
+        ctx.addServletMapping(mapping, "Forward");
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded("/mapping", "Mapping");
+        ctx.addServletMapping("/mapping", "Mapping");
 
         tomcat.start();
 
@@ -226,9 +226,9 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Context ctx = tomcat.addContext(contextPath, null);
 
         Tomcat.addServlet(ctx, "Forward", new NamedForwardServlet());
-        ctx.addServletMappingDecoded(mapping, "Forward");
+        ctx.addServletMapping(mapping, "Forward");
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded("/mapping", "Mapping");
+        ctx.addServletMapping("/mapping", "Mapping");
 
         tomcat.start();
 
@@ -250,9 +250,9 @@ public class TestApplicationMapping extends TomcatBaseTest {
 
         Wrapper w = Tomcat.addServlet(ctx, "Async", new AsyncServlet());
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded(mapping, "Async");
+        ctx.addServletMapping(mapping, "Async");
         Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
-        ctx.addServletMappingDecoded("/mapping", "Mapping");
+        ctx.addServletMapping("/mapping", "Mapping");
 
         tomcat.start();
 

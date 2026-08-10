@@ -37,9 +37,9 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeHeaderServlet());
-        ctxt.addServletMappingDecoded("/large", "large");
+        ctxt.addServletMapping("/large", "large");
 
         tomcat.start();
 
@@ -145,7 +145,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "ReadRequestBodyServlet", new ReadRequestBodyServlet());
-        ctxt.addServletMappingDecoded("/", "ReadRequestBodyServlet");
+        ctxt.addServletMapping("/", "ReadRequestBodyServlet");
 
         if (tooBig) {
             // Reduce maxSavePostSize rather than use a larger request body
@@ -203,7 +203,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         tomcat.start();
 

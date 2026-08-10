@@ -97,7 +97,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/", "snoop");
+        ctx.addServletMapping("/", "snoop");
 
         SimpleAjpClient ajpClient = new SimpleAjpClient(ajpPacketSize);
 
@@ -514,7 +514,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "helloWorld");
+        ctx.addServletMapping("/", "helloWorld");
 
         StringManager smClient = StringManager.getManager("org.apache.catalina.valves");
         String expectedBody = "<p><b>" + smClient.getString("errorReportValve.type") + "</b> " +
@@ -578,7 +578,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "helloWorld");
+        ctx.addServletMapping("/", "helloWorld");
 
         SimpleAjpClient ajpClient = new SimpleAjpClient();
 
@@ -685,7 +685,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
-        ctx.addServletMappingDecoded("/", "bug55453");
+        ctx.addServletMapping("/", "bug55453");
 
         tomcat.start();
 
@@ -740,7 +740,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         ReadBodyServlet servlet = new ReadBodyServlet(callAvailable);
         Tomcat.addServlet(ctx, "ReadBody", servlet);
-        ctx.addServletMappingDecoded("/", "ReadBody");
+        ctx.addServletMapping("/", "ReadBody");
 
         tomcat.start();
 
@@ -795,7 +795,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
-        ctx.addServletMappingDecoded("/", "FixedResponseSizeServlet");
+        ctx.addServletMapping("/", "FixedResponseSizeServlet");
 
         tomcat.start();
 
@@ -836,7 +836,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug66512", new InvalidHeaderServlet());
-        ctx.addServletMappingDecoded("/", "bug66512");
+        ctx.addServletMapping("/", "bug66512");
 
         tomcat.start();
 
@@ -899,7 +899,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug66591", new NoHeadersServlet());
-        ctx.addServletMappingDecoded("/", "bug66591");
+        ctx.addServletMapping("/", "bug66591");
 
         tomcat.start();
 

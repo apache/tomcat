@@ -96,7 +96,7 @@ public class TestHttp11ProcessorDoHead extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "DoHeadServlet",
                 new DoHeadServlet(explicitContentLength, contentLength, headSource));
 
-        ctx.addServletMappingDecoded("/head", "DoHeadServlet");
+        ctx.addServletMapping("/head", "DoHeadServlet");
 
         tomcat.start();
 

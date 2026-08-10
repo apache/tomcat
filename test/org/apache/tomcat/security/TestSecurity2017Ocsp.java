@@ -80,7 +80,7 @@ public class TestSecurity2017Ocsp extends OcspBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
-        ctx.addServletMappingDecoded("/simple", "simple");
+        ctx.addServletMapping("/simple", "simple");
 
         // Use the default (valid, non-revoked) server certificate
         TesterSupport.initSsl(tomcat, useOpenSSLTrust);

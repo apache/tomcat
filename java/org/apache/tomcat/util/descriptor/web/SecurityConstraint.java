@@ -45,6 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * single thread, before the instance is made visible to the remainder of the application. After that, only read access
  * is expected. Therefore, none of the read and write access within this class is synchronized.
  */
+@SuppressWarnings("deprecation")
 public class SecurityConstraint extends XmlEncodingBase implements Serializable {
 
     private static final long serialVersionUID = 1L;

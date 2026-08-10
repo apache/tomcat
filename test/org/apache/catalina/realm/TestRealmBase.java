@@ -661,7 +661,7 @@ public class TestRealmBase {
         deleteConstraint.addAuthRole(ROLE1);
         SecurityCollection deleteCollection = new SecurityCollection();
         deleteCollection.addMethod(Method.DELETE);
-        deleteCollection.addPatternDecoded("/*");
+        deleteCollection.addPattern("/*");
         deleteConstraint.addCollection(deleteCollection);
 
         TesterMapRealm mapRealm = new TesterMapRealm();
@@ -800,12 +800,12 @@ public class TestRealmBase {
         // Add a collection for GET
         SecurityCollection getCollection = new SecurityCollection();
         getCollection.addMethod(Method.GET);
-        getCollection.addPatternDecoded("*.html");
+        getCollection.addPattern("*.html");
         constraint.addCollection(getCollection);
         // Add a collection for POST
         SecurityCollection postCollection = new SecurityCollection();
         postCollection.addMethod(Method.POST);
-        postCollection.addPatternDecoded("*.html");
+        postCollection.addPattern("*.html");
         constraint.addCollection(postCollection);
 
         TesterMapRealm mapRealm = new TesterMapRealm();
@@ -880,13 +880,13 @@ public class TestRealmBase {
         SecurityConstraint allowConstraint = new SecurityConstraint();
         SecurityCollection allowCollection = new SecurityCollection();
         allowCollection.addMethod(Method.GET);
-        allowCollection.addPatternDecoded("/");
+        allowCollection.addPattern("/");
         allowConstraint.addCollection(allowCollection);
         // Create a constraint that disallows everything but GET
         SecurityConstraint blockConstraint = new SecurityConstraint();
         SecurityCollection blockCollection = new SecurityCollection();
         blockCollection.addOmittedMethod(Method.GET);
-        blockCollection.addPatternDecoded("/");
+        blockCollection.addPattern("/");
         blockConstraint.addCollection(blockCollection);
         blockConstraint.addAuthRole(ROLE1);
 

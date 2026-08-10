@@ -57,7 +57,7 @@ public class TestSecurity2019 extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "ssi", new SSIServlet());
-        ctx.addServletMappingDecoded("*.shtml", "ssi");
+        ctx.addServletMapping("*.shtml", "ssi");
 
         ctx.setPrivileged(true);
 
@@ -92,11 +92,11 @@ public class TestSecurity2019 extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName("ssi");
-        filterMap.addURLPatternDecoded("*.shtml");
+        filterMap.addURLPattern("*.shtml");
         ctx.addFilterMap(filterMap);
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
         ctx.addMimeMapping("shtml", "text/x-server-parsed-html");
 
         ctx.setPrivileged(true);
@@ -164,7 +164,7 @@ public class TestSecurity2019 extends TomcatBaseTest {
         cgi.addInitParameter("cgiPathPrefix", "WEB-INF/cgi");
         cgi.addInitParameter("executable", "");
         cgi.addInitParameter("enableCmdLineArguments", "true");
-        ctx.addServletMappingDecoded("/cgi/*", "cgi");
+        ctx.addServletMapping("/cgi/*", "cgi");
 
         tomcat.start();
 

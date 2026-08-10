@@ -57,7 +57,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -97,11 +97,11 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
         Context ctx2 = tomcat.addContext("/foo", null);
         ctx2.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx2, "default", new DefaultServlet());
-        ctx2.addServletMappingDecoded("/", "default");
+        ctx2.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -147,10 +147,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/");
+        collection.addPattern("/");
         String utf8User = "test";
         String utf8Pass = "123\u00A3"; // pound sign
 
@@ -185,10 +185,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
 
         tomcat.addUser(USER, PWD);
         tomcat.addRole(USER, ROLE);

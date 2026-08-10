@@ -873,10 +873,45 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Add a new servlet mapping, replacing any existing mapping for the specified pattern.
+     * <p>
+     * No URL-decoding of the pattern will be performed.
      *
      * @param pattern URL pattern to be mapped
      * @param name    Name of the corresponding servlet to execute
      */
+    default void addServletMapping(String pattern, String name) {
+        addServletMapping(pattern, name, false);
+    }
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for the specified pattern.
+     * <p>
+     * No URL-decoding of the pattern will be performed.
+     * <p>
+     * Implementation Note: As of Tomcat 12 this default implementation will be removed. Implementors are encouraged to
+     * provide their own implementation of this method before then.
+     *
+     * @param pattern     URL pattern to be mapped
+     * @param name        Name of the corresponding servlet to execute
+     * @param jspWildcard true if name identifies the JspServlet and pattern contains a wildcard; false otherwise
+     */
+    default void addServletMapping(String pattern, String name, boolean jspWildcard) {
+        addServletMappingDecoded(pattern, name, jspWildcard);
+    }
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for the specified pattern.
+     * <p>
+     * No URL-decoding of the pattern will be performed.
+     *
+     * @param pattern URL pattern to be mapped
+     * @param name    Name of the corresponding servlet to execute
+     *
+     * @deprecated Will be removed in Tomcat 12 onwards.
+     */
+    @Deprecated
     default void addServletMappingDecoded(String pattern, String name) {
         addServletMappingDecoded(pattern, name, false);
     }
@@ -884,11 +919,21 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Add a new servlet mapping, replacing any existing mapping for the specified pattern.
+     * <p>
+     * No URL-decoding of the pattern will be performed.
      *
      * @param pattern     URL pattern to be mapped
      * @param name        Name of the corresponding servlet to execute
      * @param jspWildcard true if name identifies the JspServlet and pattern contains a wildcard; false otherwise
+     *
+     * @deprecated This method will be removed in Tomcat 12. Implementors are expected to implement this method without
+     *                 delegating the implementation to one of the other {@code addServletMapping*} methods as that may
+     *                 trigger infinite loops. Once this method has been removed from the interface, implementors may
+     *                 wish to move their implementation of this method to
+     *                 {@link Context#addServletMapping(String, String, boolean)} and remove their implementation of
+     *                 this method.
      */
+    @Deprecated
     void addServletMappingDecoded(String pattern, String name, boolean jspWildcard);
 
 
@@ -1183,8 +1228,7 @@ public interface Context extends Container, ContextBind {
     /**
      * Returns the array of welcome files defined for this Context.
      *
-     * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is
-     *             returned
+     * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is returned
      */
     String[] findWelcomeFiles();
 
@@ -1988,5 +2032,37 @@ public interface Context extends Container, ContextBind {
      */
     default EncodedSolidusHandling getEncodedSolidusHandlingEnum() {
         return EncodedSolidusHandling.DECODE;
+    }
+
+
+    /**
+     * Configures whether the Context expects URLs and URL patterns provided in web.xml, annotations and their
+     * programmatic equivalents to be in URL-decoded form.
+     *
+     * @param urlPatternsProvidedInDecodedForm {@code true} if URLs and URL patterns are expected to be decoded.
+     *                                             {@code false} if they are expected to be URL-encoded (i.e.
+     *                                             {@code %nn} encoding)
+     *
+     * @deprecated This is a transitional setting that will be removed in Tomcat 12 where it will be hard-coded to
+     *                 {@code true}
+     */
+    @Deprecated
+    default void setUrlPatternsProvidedInDecodedForm(boolean urlPatternsProvidedInDecodedForm) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Does this Context expect URLs and URL patterns provided in web.xml, annotations and their programmatic
+     * equivalents to be in URL-decoded form?
+     *
+     * @return This default implementation returns {@code false}
+     *
+     * @deprecated This is a transitional setting that will be removed in Tomcat 12 where it will be hard-coded to
+     *                 {@code true}
+     */
+    @Deprecated
+    default boolean getUrlPatternsProvidedInDecodedForm() {
+        return false;
     }
 }

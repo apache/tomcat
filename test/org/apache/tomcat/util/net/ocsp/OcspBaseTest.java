@@ -120,7 +120,7 @@ public class OcspBaseTest extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
-        ctx.addServletMappingDecoded("/simple", "simple");
+        ctx.addServletMapping("/simple", "simple");
 
         if (serverCertValid) {
             TesterSupport.initSsl(tomcat, useOpenSSLTrust);

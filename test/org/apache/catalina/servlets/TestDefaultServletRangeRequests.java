@@ -171,7 +171,7 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         if (ifRangeHeader != null && ifRangeHeader.startsWith("\"")) {
             wrapper.addInitParameter("useStrongETags", "true");
         }
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

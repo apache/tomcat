@@ -167,6 +167,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public Set<String> addMapping(String... urlPatterns) {
         if (urlPatterns == null) {
@@ -178,7 +179,11 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             if (urlPatterns[i] == null) {
                 throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
             }
-            decodedUrlPatterns[i] = UDecoder.URLDecode(urlPatterns[i], StandardCharsets.UTF_8);
+            if (context.getUrlPatternsProvidedInDecodedForm()) {
+                decodedUrlPatterns[i] = urlPatterns[i];
+            } else {
+                decodedUrlPatterns[i] = UDecoder.URLDecode(urlPatterns[i], StandardCharsets.UTF_8);
+            }
         }
 
         Set<String> conflicts = new HashSet<>();
@@ -210,7 +215,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
         overrides.forEach(p -> context.removeServletMapping(p));
 
         for (String urlPattern : decodedUrlPatterns) {
-            context.addServletMappingDecoded(urlPattern, wrapper.getName());
+            context.addServletMapping(urlPattern, wrapper.getName());
         }
 
         if (constraint != null) {

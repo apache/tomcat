@@ -577,7 +577,7 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         w.addInitParameter("readonly", "false");
         w.addInitParameter("allowPartialPut", "true");
         w.addInitParameter("useStrongETags", Boolean.toString(useStrongETags));
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

@@ -26,6 +26,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 /**
  * Representation of a jsp-property-group element in web.xml.
  */
+@SuppressWarnings("deprecation")
 public class JspPropertyGroup extends XmlEncodingBase {
 
     /**
@@ -210,7 +211,9 @@ public class JspPropertyGroup extends XmlEncodingBase {
      * Adds a pre-decoded URL pattern to this property group.
      *
      * @param urlPattern the decoded URL pattern to add
+     * @deprecated This method will be removed in Tomcat 12
      */
+    @Deprecated
     public void addUrlPatternDecoded(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }

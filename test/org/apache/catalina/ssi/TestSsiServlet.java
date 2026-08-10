@@ -44,11 +44,11 @@ public class TestSsiServlet extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "default", new DefaultServlet());
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         Wrapper ssi = Tomcat.addServlet(ctxt, "ssi", new SSIServlet());
         ssi.addInitParameter("allowExec", "true");
-        ctxt.addServletMappingDecoded("*.shtml", "ssi");
+        ctxt.addServletMapping("*.shtml", "ssi");
 
         tomcat.start();
 

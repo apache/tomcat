@@ -47,7 +47,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         }
 
         Tomcat.addServlet(ctx, "taskServlet", new TaskServlet());
-        ctx.addServletMappingDecoded("/", "taskServlet");
+        ctx.addServletMapping("/", "taskServlet");
 
         tomcat.start();
 

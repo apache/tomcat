@@ -138,14 +138,14 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         } else {
             Tomcat.addServlet(ctx, "target", new TesterServlet(throwException));
         }
-        ctx.addServletMappingDecoded("/target", "target");
+        ctx.addServletMapping("/target", "target");
         Tomcat.addServlet(ctx, "dispatch", new TesterDispatchServlet());
-        ctx.addServletMappingDecoded("/dispatch", "dispatch");
+        ctx.addServletMapping("/dispatch", "dispatch");
 
         Tomcat.addServlet(ctx, "error599", new ErrorServletStatic599());
-        ctx.addServletMappingDecoded("/error599", "error599");
+        ctx.addServletMapping("/error599", "error599");
         Tomcat.addServlet(ctx, "errorException", new ErrorServletStaticException());
-        ctx.addServletMappingDecoded("/errorException", "errorException");
+        ctx.addServletMapping("/errorException", "errorException");
 
         ErrorPage ep1 = new ErrorPage();
         ep1.setErrorCode(599);

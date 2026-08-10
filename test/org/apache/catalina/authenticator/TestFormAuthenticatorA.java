@@ -594,18 +594,18 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
             Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
             Tomcat.addServlet(ctx, "SelectedMethods", new SelectedMethodsServlet());
-            ctx.addServletMappingDecoded("/test", "SelectedMethods");
+            ctx.addServletMapping("/test", "SelectedMethods");
             // Login servlet just needs to respond "OK". Client will handle
             // creating a valid response. No need for a form.
             Tomcat.addServlet(ctx, "Login", new TesterServlet());
-            ctx.addServletMappingDecoded("/login", "Login");
+            ctx.addServletMapping("/login", "Login");
 
             // Configure the security constraints
             SecurityConstraint constraint = new SecurityConstraint();
             SecurityCollection collection = new SecurityCollection();
             collection.setName("Protect PUT");
             collection.addMethod(Method.PUT);
-            collection.addPatternDecoded("/test");
+            collection.addPattern("/test");
             constraint.addCollection(collection);
             constraint.addAuthRole("tomcat");
             ctx.addConstraint(constraint);

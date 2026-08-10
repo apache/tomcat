@@ -69,7 +69,7 @@ public class EmbeddedTomcat {
         skipTldsForResourceJars(ctx);
         CounterServlet counterServlet = new CounterServlet();
         Tomcat.addServlet(ctx, "counterServlet", counterServlet);
-        ctx.addServletMappingDecoded("/", "counterServlet");
+        ctx.addServletMapping("/", "counterServlet");
         //ctx.addApplicationListener(new WsContextListener());
 
         tomcat.start();

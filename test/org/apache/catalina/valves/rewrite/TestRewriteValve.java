@@ -909,12 +909,12 @@ public class TestRewriteValve extends TomcatBaseTest {
         rewriteValve.setConfiguration(config);
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/a/Z", "snoop");
-        ctx.addServletMappingDecoded("/a/%5A", "snoop");
-        ctx.addServletMappingDecoded("/c/*", "snoop");
-        ctx.addServletMappingDecoded("/W/*", "snoop");
+        ctx.addServletMapping("/a/Z", "snoop");
+        ctx.addServletMapping("/a/%5A", "snoop");
+        ctx.addServletMapping("/c/*", "snoop");
+        ctx.addServletMapping("/W/*", "snoop");
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -965,8 +965,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         rewriteValve.setConfiguration(config);
 
         Tomcat.addServlet(ctx, "tester", new TesterServlet());
-        ctx.addServletMappingDecoded("/from/a", "tester");
-        ctx.addServletMappingDecoded("/to/b", "tester");
+        ctx.addServletMapping("/from/a", "tester");
+        ctx.addServletMapping("/to/b", "tester");
 
         tomcat.start();
 
@@ -1007,7 +1007,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "cookieTest", new CookieTestServlet());
 
-        ctx.addServletMappingDecoded("/", "cookieTest");
+        ctx.addServletMapping("/", "cookieTest");
 
         tomcat.start();
 
@@ -1132,7 +1132,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         rewriteValve.setConfiguration("RewriteRule ^/source/(.*)$ /target/$1");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/target/*", "snoop");
+        ctx.addServletMapping("/target/*", "snoop");
 
         tomcat.start();
 
@@ -1165,7 +1165,7 @@ public class TestRewriteValve extends TomcatBaseTest {
                 "RewriteRule ^(.*) /blocked$1 [R]");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/other", "snoop");
+        ctx.addServletMapping("/other", "snoop");
 
         tomcat.start();
 

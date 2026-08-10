@@ -48,7 +48,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(10);
@@ -70,7 +70,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(10);
@@ -96,7 +96,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         CountDownLatch insideServlet = new CountDownLatch(1);
         CountDownLatch canReturn = new CountDownLatch(1);
         Tomcat.addServlet(ctx, "slow", new SlowServlet(insideServlet, canReturn));
-        ctx.addServletMappingDecoded("/", "slow");
+        ctx.addServletMapping("/", "slow");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(1);
@@ -143,7 +143,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         CountDownLatch insideServlet = new CountDownLatch(1);
         CountDownLatch canReturn = new CountDownLatch(1);
         Tomcat.addServlet(ctx, "slow", new SlowServlet(insideServlet, canReturn));
-        ctx.addServletMappingDecoded("/", "slow");
+        ctx.addServletMapping("/", "slow");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(1);
@@ -213,7 +213,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(5);
@@ -242,7 +242,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         CountDownLatch insideServlet = new CountDownLatch(1);
         CountDownLatch canReturn = new CountDownLatch(1);
         Tomcat.addServlet(ctx, "slow", new SlowServlet(insideServlet, canReturn));
-        ctx.addServletMappingDecoded("/", "slow");
+        ctx.addServletMapping("/", "slow");
 
         SemaphoreValve valve = new SemaphoreValve();
         valve.setConcurrency(1);
@@ -299,10 +299,10 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         CountDownLatch insideServlet = new CountDownLatch(1);
         CountDownLatch canReturn = new CountDownLatch(1);
         Tomcat.addServlet(ctx, "slow", new SlowServlet(insideServlet, canReturn));
-        ctx.addServletMappingDecoded("/slow", "slow");
+        ctx.addServletMapping("/slow", "slow");
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/bypass", "hello");
+        ctx.addServletMapping("/bypass", "hello");
 
         SemaphoreValve valve = new SemaphoreValve() {
             @Override

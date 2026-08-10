@@ -21,16 +21,21 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Base class for those elements that need to track the encoding used in the source XML.
+ *
+ * @deprecated This abstract class will be removed in Tomcat 12 onwards
  */
+@Deprecated
 public abstract class XmlEncodingBase {
+
+    private Charset charset = StandardCharsets.UTF_8;
+
 
     /**
      * Default constructor.
      */
+    @Deprecated
     public XmlEncodingBase() {
     }
-
-    private Charset charset = StandardCharsets.UTF_8;
 
 
     /**
@@ -38,6 +43,7 @@ public abstract class XmlEncodingBase {
      *
      * @param charset The character encoding
      */
+    @Deprecated
     public void setCharset(Charset charset) {
         this.charset = charset;
     }
@@ -49,6 +55,7 @@ public abstract class XmlEncodingBase {
      * @return The character encoding of the associated XML source or <code>UTF-8</code> if the encoding could not be
      *             determined
      */
+    @Deprecated
     public Charset getCharset() {
         return charset;
     }

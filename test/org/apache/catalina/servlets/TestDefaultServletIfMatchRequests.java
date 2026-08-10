@@ -178,7 +178,7 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         if (resourceHasStrongETag) {
             wrapper.addInitParameter("useStrongETags", "true");
         }
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

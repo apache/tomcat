@@ -80,7 +80,7 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
         servletWrapper.setAsyncSupported(true);
         servletWrapper.setLoadOnStartup(1);
 
-        ctx.addServletMappingDecoded("/", "repro-servlet");
+        ctx.addServletMapping("/", "repro-servlet");
 
         tomcat.start();
         Thread.sleep(2000);

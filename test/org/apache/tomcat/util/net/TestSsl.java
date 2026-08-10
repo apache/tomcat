@@ -149,7 +149,7 @@ public class TestSsl extends TomcatBaseTest {
 
         ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
-        ctxt.addServletMappingDecoded("/post", "post");
+        ctxt.addServletMapping("/post", "post");
 
         TesterSupport.initSsl(tomcat);
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
@@ -182,7 +182,7 @@ public class TestSsl extends TomcatBaseTest {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
-        ctxt.addServletMappingDecoded("/post", "post");
+        ctxt.addServletMapping("/post", "post");
         tomcat.start();
         int iterations = 8;
         CountDownLatch latch = new CountDownLatch(iterations);
@@ -461,7 +461,7 @@ public class TestSsl extends TomcatBaseTest {
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/", "tester");
+        root.addServletMapping("/", "tester");
 
         tomcat.start();
 

@@ -61,7 +61,7 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "leakServlet1", "org.apache.tomcat.unittest.TesterLeakingServlet1");
-        ctx.addServletMappingDecoded("/leak1", "leakServlet1");
+        ctx.addServletMapping("/leak1", "leakServlet1");
 
         tomcat.start();
 
@@ -110,7 +110,7 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "leakServlet2", "org.apache.tomcat.unittest.TesterLeakingServlet2");
-        ctx.addServletMappingDecoded("/leak2", "leakServlet2");
+        ctx.addServletMapping("/leak2", "leakServlet2");
 
         tomcat.start();
 

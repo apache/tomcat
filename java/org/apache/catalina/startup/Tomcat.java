@@ -1052,9 +1052,9 @@ public class Tomcat {
         servlet.setOverridable(true);
 
         // Servlet mappings
-        ctx.addServletMappingDecoded("/", "default");
-        ctx.addServletMappingDecoded("*.jsp", "jsp");
-        ctx.addServletMappingDecoded("*.jspx", "jsp");
+        ctx.addServletMapping("/", "default");
+        ctx.addServletMapping("*.jsp", "jsp");
+        ctx.addServletMapping("*.jspx", "jsp");
 
         // Sessions
         ctx.setSessionTimeout(30);

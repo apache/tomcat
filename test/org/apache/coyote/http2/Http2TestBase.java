@@ -667,15 +667,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
-        ctxt.addServletMappingDecoded("/empty", "empty");
+        ctxt.addServletMapping("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeServlet());
-        ctxt.addServletMappingDecoded("/large", "large");
+        ctxt.addServletMapping("/large", "large");
         Tomcat.addServlet(ctxt, "cookie", new CookieServlet());
-        ctxt.addServletMappingDecoded("/cookie", "cookie");
+        ctxt.addServletMapping("/cookie", "cookie");
         Tomcat.addServlet(ctxt, "parameter", new ParameterServlet());
-        ctxt.addServletMappingDecoded("/parameter", "parameter");
+        ctxt.addServletMapping("/parameter", "parameter");
 
         tomcat.start();
     }

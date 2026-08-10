@@ -51,7 +51,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "errorServlet", new ErrorServlet());
-        ctx.addServletMappingDecoded("/", "errorServlet");
+        ctx.addServletMapping("/", "errorServlet");
 
         tomcat.start();
 
@@ -84,7 +84,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(false));
-        ctx.addServletMappingDecoded("/", "bug54220");
+        ctx.addServletMapping("/", "bug54220");
 
         tomcat.start();
 
@@ -104,7 +104,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(true));
-        ctx.addServletMappingDecoded("/", "bug54220");
+        ctx.addServletMapping("/", "bug54220");
 
         tomcat.start();
 
@@ -147,7 +147,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54536", new Bug54536Servlet());
-        ctx.addServletMappingDecoded("/", "bug54536");
+        ctx.addServletMapping("/", "bug54536");
 
         tomcat.start();
 
@@ -184,7 +184,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Bug56042Servlet bug56042Servlet = new Bug56042Servlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug56042Servlet", bug56042Servlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/bug56042Servlet", "bug56042Servlet");
+        ctx.addServletMapping("/bug56042Servlet", "bug56042Servlet");
 
         tomcat.start();
 
@@ -245,9 +245,9 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "exception", new ExceptionServlet());
-        ctx.addServletMappingDecoded("/exception", "exception");
+        ctx.addServletMapping("/exception", "exception");
         Tomcat.addServlet(ctx, "erropage", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/erropage", "erropage");
+        ctx.addServletMapping("/erropage", "erropage");
         ErrorPage errorPage = new ErrorPage();
         errorPage.setErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         errorPage.setLocation("/erropage");

@@ -53,7 +53,7 @@ public class TestStandardContextAliases extends TomcatBaseTest {
 
 
         Tomcat.addServlet(ctx, "test", new TestServlet());
-        ctx.addServletMappingDecoded("/", "test");
+        ctx.addServletMapping("/", "test");
 
         tomcat.start();
 

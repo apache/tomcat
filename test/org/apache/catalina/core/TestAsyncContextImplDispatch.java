@@ -86,11 +86,11 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
 
         Wrapper w1 = Tomcat.addServlet(ctx, "target", new TesterServlet());
         w1.setAsyncSupported(targetAsyncSupported);
-        ctx.addServletMappingDecoded("/target", "target");
+        ctx.addServletMapping("/target", "target");
 
         Wrapper w2 = Tomcat.addServlet(ctx, "dispatch", new TesterDispatchServlet(dispatchAsyncStart));
         w2.setAsyncSupported(dispatchAsyncSupported);
-        ctx.addServletMappingDecoded("/dispatch", "dispatch");
+        ctx.addServletMapping("/dispatch", "dispatch");
 
         tomcat.start();
 

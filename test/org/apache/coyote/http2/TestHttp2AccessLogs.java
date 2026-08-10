@@ -46,10 +46,10 @@ public class TestHttp2AccessLogs extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "trailers", new TrailersServlet());
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/trailers", "trailers");
+        ctxt.addServletMapping("/trailers", "trailers");
         TesterAccessLogValve valve = new TesterAccessLogValve(writer);
         valve.setPattern("%{header-key}o %{trailer-key}o");
         tomcat.getHost().getPipeline().addValve(valve);

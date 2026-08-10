@@ -118,7 +118,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         Tomcat.addServlet(context, "InjectionServlet", "org.apache.naming.TesterInjectionServlet");
-        context.addServletMappingDecoded("/injection", "InjectionServlet");
+        context.addServletMapping("/injection", "InjectionServlet");
 
         tomcat.enableNaming();
         tomcat.start();

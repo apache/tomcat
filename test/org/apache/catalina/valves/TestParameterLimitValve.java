@@ -63,7 +63,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         parameterLimitValve.setUrlPatternLimits("/special/.*=2");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx.addServletMapping("/special/endpoint", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -139,7 +139,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         parameterLimitValve.setUrlPatternLimits("/special====2");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/special===", "snoop");
+        ctx.addServletMapping("/special===", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -162,7 +162,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         parameterLimitValve.setUrlPatternLimits("/special%20endpoint=2");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/special endpoint", "snoop");
+        ctx.addServletMapping("/special endpoint", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -189,10 +189,10 @@ public class TestParameterLimitValve extends TomcatBaseTest {
                 .setUrlPatternLimits("/special/.*=2" + CRLF + "/special2/.*=3" + CRLF + "/my/special/url1=1");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
-        ctx.addServletMappingDecoded("/special2/endpoint", "snoop");
-        ctx.addServletMappingDecoded("/my/special/url1", "snoop");
-        ctx.addServletMappingDecoded("/my/special/url2", "snoop");
+        ctx.addServletMapping("/special/endpoint", "snoop");
+        ctx.addServletMapping("/special2/endpoint", "snoop");
+        ctx.addServletMapping("/my/special/url1", "snoop");
+        ctx.addServletMapping("/my/special/url2", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -245,7 +245,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         parameterLimitValve.setUrlPatternLimits("/special/.*=2");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/other/endpoint", "snoop");
+        ctx.addServletMapping("/other/endpoint", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -278,7 +278,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         }
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/api/test", "snoop");
+        ctx.addServletMapping("/api/test", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -308,7 +308,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         }
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/api/test", "snoop");
+        ctx.addServletMapping("/api/test", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -341,8 +341,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         }
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/api/test", "snoop");
-        ctx.addServletMappingDecoded("/admin/test", "snoop");
+        ctx.addServletMapping("/api/test", "snoop");
+        ctx.addServletMapping("/admin/test", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -375,7 +375,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         parameterLimitValve.setUrlPatternLimits("/.*=2");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx.addServletMapping("/special/endpoint", "snoop");
 
         addFailedRequestFilter(ctx);
 
@@ -419,13 +419,13 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         context3ParameterLimitValve.setUrlPatternLimits("/special/.*=1");
 
         Tomcat.addServlet(ctx1, "snoop", new SnoopServlet());
-        ctx1.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx1.addServletMapping("/special/endpoint", "snoop");
 
         Tomcat.addServlet(ctx2, "snoop", new SnoopServlet());
-        ctx2.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx2.addServletMapping("/special/endpoint", "snoop");
 
         Tomcat.addServlet(ctx3, "snoop", new SnoopServlet());
-        ctx3.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx3.addServletMapping("/special/endpoint", "snoop");
 
         addFailedRequestFilter(ctx1);
         addFailedRequestFilter(ctx2);
@@ -493,7 +493,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctx, "multipart", new MultipartServlet());
         // Use defaults for Multipart
         w.setMultipartConfigElement(new MultipartConfigElement(""));
-        ctx.addServletMappingDecoded("/upload/*", "multipart");
+        ctx.addServletMapping("/upload/*", "multipart");
 
         addFailedRequestFilter(ctx);
 
@@ -606,7 +606,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctx, "multipart", new MultipartServlet());
         // Use defaults for Multipart
         w.setMultipartConfigElement(new MultipartConfigElement(""));
-        ctx.addServletMappingDecoded("/upload/*", "multipart");
+        ctx.addServletMapping("/upload/*", "multipart");
 
         addFailedRequestFilter(ctx);
 

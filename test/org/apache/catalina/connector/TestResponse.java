@@ -56,7 +56,7 @@ public class TestResponse extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug49598Servlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -110,7 +110,7 @@ public class TestResponse extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new CharsetServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -148,7 +148,7 @@ public class TestResponse extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug52811Servlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -973,7 +973,7 @@ public class TestResponse extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/error", "servlet");
+        ctx.addServletMapping("/error", "servlet");
         ErrorPage servletErrorPage = new ErrorPage();
         servletErrorPage.setErrorCode(404);
         servletErrorPage.setLocation("/error");

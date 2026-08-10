@@ -807,8 +807,28 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.DECODE;
 
+    // Defaults to false for backwards compatibility but will be hard-coded to true for Tomcat 12 onwards.
+    private boolean urlPatternsProvidedInDecodedForm = false;
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setUrlPatternsProvidedInDecodedForm(boolean urlPatternsProvidedInDecodedForm) {
+        this.urlPatternsProvidedInDecodedForm = urlPatternsProvidedInDecodedForm;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@code true} if URLs and URL patterns are expected in URL-decoded form, otherwise {@code false}
+     */
+    @Override
+    public boolean getUrlPatternsProvidedInDecodedForm() {
+        return urlPatternsProvidedInDecodedForm;
+    }
+
 
     @Override
     public String getEncodedReverseSolidusHandling() {
@@ -1934,6 +1954,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setLoginConfig(LoginConfig config) {
 
@@ -1947,6 +1968,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.loginWarning", loginPage));
                 }
+                // Use decoded variant to avoid double decoding
                 config.setLoginPageDecoded("/" + loginPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.loginPage", loginPage));
@@ -1958,6 +1980,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.errorWarning", errorPage));
                 }
+                // Use decoded variant to avoid double decoding
                 config.setErrorPageDecoded("/" + errorPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.errorPage", errorPage));
@@ -2770,7 +2793,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
              */
             String[] jspMappings = oldJspServlet.findMappings();
             for (int i = 0; jspMappings != null && i < jspMappings.length; i++) {
-                addServletMappingDecoded(jspMappings[i], child.getName());
+                addServletMapping(jspMappings[i], child.getName());
             }
         }
     }
@@ -2805,6 +2828,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void addErrorPage(ErrorPage errorPage) {
         // Validate the input parameters
@@ -2817,6 +2841,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.errorPage.warning", location));
                 }
+                // Error page is already decoded, so don't decode a second time
                 errorPage.setLocationDecoded("/" + location);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.errorPage.error", location));
@@ -2967,6 +2992,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
+    public void addServletMapping(String pattern, String name, boolean jspWildCard) {
+        addServletMappingDecoded(pattern, name, jspWildCard);
+    }
+
+
+    @Override
+    @Deprecated
     public void addServletMappingDecoded(String pattern, String name, boolean jspWildCard) {
         // Validate the proposed mapping
         if (findChild(name) == null) {
