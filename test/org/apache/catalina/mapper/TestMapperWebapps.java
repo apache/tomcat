@@ -51,7 +51,7 @@ public class TestMapperWebapps extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "Bug53356", new Bug53356Servlet());
-        ctx.addServletMappingDecoded("", "Bug53356");
+        ctx.addServletMapping("", "Bug53356");
 
         tomcat.start();
 
@@ -215,8 +215,8 @@ public class TestMapperWebapps extends TomcatBaseTest {
         // Add a security constraint
         SecurityConstraint constraint = new SecurityConstraint();
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/welcome-files/*");
-        collection.addPatternDecoded("/welcome-files");
+        collection.addPattern("/welcome-files/*");
+        collection.addPattern("/welcome-files");
         constraint.addCollection(collection);
         constraint.addAuthRole("foo");
         root.addConstraint(constraint);

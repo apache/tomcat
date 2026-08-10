@@ -250,7 +250,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", RoleAllowServlet.class.getName());
         wrapper.addSecurityReference("testSecurityRoleRef", "very-complex-role-name");
         wrapper.addSecurityReference("testSecurityRoleRef2", "testRole");
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         ctx.setLoginConfig(new LoginConfig("BASIC", null, null, null));
         ctx.getPipeline().addValve(new BasicAuthenticator());
@@ -347,7 +347,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servletClassName);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         if (useRole) {
             TesterMapRealm realm = new TesterMapRealm();

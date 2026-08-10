@@ -94,7 +94,7 @@ public class TestPQC extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/*", "TesterServlet");
+        ctx.addServletMapping("/*", "TesterServlet");
     }
 
     @Test

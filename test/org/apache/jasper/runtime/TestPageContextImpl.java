@@ -64,7 +64,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "bug56010", new Bug56010());
-        ctx.addServletMappingDecoded("/bug56010", "bug56010");
+        ctx.addServletMapping("/bug56010", "bug56010");
 
         tomcat.start();
 

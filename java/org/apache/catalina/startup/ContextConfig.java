@@ -1313,8 +1313,9 @@ public class ContextConfig implements LifecycleListener {
          * - If an SCI has a @HandlesType annotation then all classes (except those in JARs excluded from an absolute
          * ordering) need to be scanned to check if they match.
          */
+        @SuppressWarnings("deprecation")
         WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(), context.getXmlValidation(),
-                context.getXmlBlockExternal());
+                context.getXmlBlockExternal(), context.getUrlPatternsProvidedInDecodedForm());
 
         Set<WebXml> defaults = new HashSet<>();
         defaults.add(getDefaultWebXmlFragment(webXmlParser));
@@ -1595,7 +1596,7 @@ public class ContextConfig implements LifecycleListener {
             context.addChild(wrapper);
         }
         for (Entry<String,String> entry : webxml.getServletMappings().entrySet()) {
-            context.addServletMappingDecoded(entry.getKey(), entry.getValue());
+            context.addServletMapping(entry.getKey(), entry.getValue());
         }
         SessionConfig sessionConfig = webxml.getSessionConfig();
         if (sessionConfig != null) {
@@ -1633,7 +1634,7 @@ public class ContextConfig implements LifecycleListener {
             }
             if (context.findChild(jspServletName) != null) {
                 for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                    context.addServletMappingDecoded(urlPattern, jspServletName, true);
+                    context.addServletMapping(urlPattern, jspServletName, true);
                 }
             } else {
                 if (log.isDebugEnabled()) {
@@ -1826,8 +1827,9 @@ public class ContextConfig implements LifecycleListener {
      *
      * @return a new WebXml instance
      */
+    @SuppressWarnings("deprecation")
     protected WebXml createWebXml() {
-        return new WebXml();
+        return new WebXml(context.getUrlPatternsProvidedInDecodedForm());
     }
 
     /**
@@ -2155,7 +2157,8 @@ public class ContextConfig implements LifecycleListener {
         // - this fragment has metadata-complete="true"
         boolean htOnly = handlesTypesOnly || !fragment.getWebappJar() || fragment.isMetadataComplete();
 
-        WebXml annotations = new WebXml();
+        @SuppressWarnings("deprecation")
+        WebXml annotations = new WebXml(context.getUrlPatternsProvidedInDecodedForm());
         // no impact on distributable
         annotations.setDistributable(true);
         URL url = fragment.getURL();
@@ -2701,6 +2704,7 @@ public class ContextConfig implements LifecycleListener {
      * @param ae        The filter annotation
      * @param fragment  The corresponding fragment
      */
+    @SuppressWarnings("deprecation")
     protected void processAnnotationWebFilter(String className, AnnotationEntry ae, WebXml fragment) {
         String filterName = null;
         // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
@@ -2744,8 +2748,12 @@ public class ContextConfig implements LifecycleListener {
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
                 urlPatternsSet = urlPatterns.length > 0;
                 for (String urlPattern : urlPatterns) {
-                    // % decoded (if required) using UTF-8
-                    filterMap.addURLPattern(urlPattern);
+                    if (fragment.getUrlPatternsProvidedInDecodedForm()) {
+                        filterMap.addURLPatternDecoded(urlPattern);
+                    } else {
+                        // % decoded (if required) using UTF-8
+                        filterMap.addURLPattern(urlPattern);
+                    }
                 }
             } else if ("servletNames".equals(name)) {
                 String[] servletNames = processAnnotationsStringArray(evp.getValue());

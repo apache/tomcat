@@ -71,7 +71,7 @@ public class TestErrorHandling extends HttpdIntegrationBaseTest {
                 throw new ServletException("Expected error");
             }
         });
-        ctx.addServletMappingDecoded("/error", "error");
+        ctx.addServletMapping("/error", "error");
         int rc = getUrl("http://localhost:" + getHttpdPort() + "/error", new ByteChunk(), false);
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }

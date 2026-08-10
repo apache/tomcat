@@ -67,7 +67,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug48839", new Bug48839Servlet());
-            root.addServletMappingDecoded("/test", "Bug48839");
+            root.addServletMapping("/test", "Bug48839");
 
             try {
                 tomcat.start();
@@ -317,7 +317,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug51557", new Bug51557Servlet(headerName));
-            root.addServletMappingDecoded("/test", "Bug51557");
+            root.addServletMapping("/test", "Bug51557");
 
             try {
                 Connector connector = tomcat.getConnector();
@@ -452,7 +452,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "test", new TesterServlet());
-            root.addServletMappingDecoded("/test", "test");
+            root.addServletMapping("/test", "test");
 
             try {
                 tomcat.start();
@@ -523,7 +523,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug54947", new TesterServlet());
-            root.addServletMappingDecoded("/test", "Bug54947");
+            root.addServletMapping("/test", "Bug54947");
 
             try {
                 tomcat.start();
@@ -798,7 +798,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 

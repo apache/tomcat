@@ -58,12 +58,28 @@ import org.apache.tomcat.util.security.Escape;
  * (e.g. single login-config) This class checks for invalid duplicates (e.g. filter/servlet names) StandardContext will
  * check validity of values (e.g. URL formats etc)
  */
+@SuppressWarnings("deprecation")
 public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
 
     /**
      * Constructs a new WebXml.
      */
     public WebXml() {
+        this(false);
+    }
+
+    /**
+     * Constructs a new WebXml with configurable behaviour for URL and URL pattern decoding.
+     *
+     * @param urlPatternsProvidedInDecodedForm {@code true} if URLs and URL patterns are expected to be decoded.
+     *                                             {@code false} if they are expected to be URL-encoded (i.e.
+     *                                             {@code %nn} encoding)
+     *
+     * @deprecated This constructor will be removed in Tomcat 12
+     */
+    @Deprecated
+    public WebXml(boolean urlPatternsProvidedInDecodedForm) {
+        this.urlPatternsProvidedInDecodedForm = urlPatternsProvidedInDecodedForm;
     }
 
     /**
@@ -76,6 +92,26 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Log log = LogFactory.getLog(WebXml.class); // must not be static
 
     private final UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
+
+    private final boolean urlPatternsProvidedInDecodedForm;
+
+
+    /**
+     * Does this Context expect URLs and URL patterns provided in web.xml, annotations and their programmatic
+     * equivalents to be in URL-decoded form?
+     * <p>
+     * As per the Servlet specification, "URI paths specified in the deployment descriptor are assumed to be in
+     * URL-decoded form.".
+     *
+     * @return {@code true} if URLs and URL patterns are expected in URL-decoded form, otherwise {@code false}
+     *
+     * @deprecated This method will be removed in Tomcat 12 where the field will be effectively hard-coded to
+     *                 {@code true}
+     */
+    @Deprecated
+    public boolean getUrlPatternsProvidedInDecodedForm() {
+        return urlPatternsProvidedInDecodedForm;
+    }
 
     /**
      * Global defaults are overridable but Servlets and Servlet mappings need to be unique. Duplicates normally trigger
@@ -484,8 +520,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Adds a context parameter.
      *
-     * @param param  The parameter name
-     * @param value  The parameter value
+     * @param param The parameter name
+     * @param value The parameter value
      */
     public void addContextParam(String param, String value) {
         contextParams.put(param, value);
@@ -617,21 +653,27 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Adds a servlet URL mapping.
      *
-     * @param urlPattern   The URL pattern
-     * @param servletName  The servlet name
+     * @param urlPattern  The URL pattern
+     * @param servletName The servlet name
      */
     public void addServletMapping(String urlPattern, String servletName) {
-        addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getCharset()), servletName);
+        if (!urlPatternsProvidedInDecodedForm) {
+            urlPattern = UDecoder.URLDecode(urlPattern, getCharset());
+        }
+        addServletMappingDecoded(urlPattern, servletName);
     }
 
     /**
      * Adds a servlet URL mapping (already decoded).
      *
-     * @param urlPattern   The URL pattern
-     * @param servletName  The servlet name
+     * @param urlPattern  The URL pattern
+     * @param servletName The servlet name
      *
      * @throws IllegalArgumentException If a duplicate mapping exists
+     *
+     * @deprecated Will be removed in Tomcat 12 onwards
      */
+    @Deprecated
     public void addServletMappingDecoded(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
@@ -680,8 +722,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Adds a MIME mapping.
      *
-     * @param extension  The file extension
-     * @param mimeType   The MIME type
+     * @param extension The file extension
+     * @param mimeType  The MIME type
      */
     public void addMimeMapping(String extension, String mimeType) {
         mimeMappings.put(extension, mimeType);
@@ -1765,7 +1807,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 }
                 sb.append("    </web-resource-collection>\n");
             }
-            if (constraint.findAuthRoles().length > 0 || constraint.getAllRoles() || constraint.getAuthenticatedUsers()) {
+            if (constraint.findAuthRoles().length > 0 || constraint.getAllRoles() ||
+                    constraint.getAuthenticatedUsers()) {
                 sb.append("    <auth-constraint>\n");
                 for (String role : constraint.findAuthRoles()) {
                     appendElement(sb, INDENT6, "role-name", role);
@@ -2078,7 +2121,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // Merge rules vary from element to element. See SRV.8.2.3
 
-        WebXml temp = new WebXml();
+        WebXml temp = new WebXml(urlPatternsProvidedInDecodedForm);
 
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getContextParams(), contextParams, temp.getContextParams(), fragment,

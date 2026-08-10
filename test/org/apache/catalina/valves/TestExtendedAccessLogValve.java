@@ -127,7 +127,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
                 resp.getWriter().write("Test response");
             }
         });
-        ctx.addServletMappingDecoded("/test", "testServlet");
+        ctx.addServletMapping("/test", "testServlet");
 
         tomcat.start();
 

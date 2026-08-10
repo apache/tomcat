@@ -100,7 +100,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
 
@@ -146,7 +146,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("gzip", "true");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
 
@@ -203,7 +203,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("precompressed", "true");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -266,7 +266,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "gzip=.gz,custom=.br");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -329,7 +329,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -391,7 +391,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "true");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -454,9 +454,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         // Override the default servlet with our own mappings
         Tomcat.addServlet(ctx, "default2", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default2");
-        ctx.addServletMappingDecoded("/servlets/*", "default2");
-        ctx.addServletMappingDecoded("/static/*", "default2");
+        ctx.addServletMapping("/", "default2");
+        ctx.addServletMapping("/servlets/*", "default2");
+        ctx.addServletMapping("/static/*", "default2");
 
         tomcat.start();
 
@@ -524,7 +524,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
         ErrorPage ep = new ErrorPage();
         ep.setErrorCode(404);
@@ -709,7 +709,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("listings", "true");
         defaultServlet.addInitParameter("localXsltFile", "_listing.xslt");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -733,7 +733,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("sortListings", "true");
         defaultServlet.addInitParameter("sortDirectoriesFirst", "true");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

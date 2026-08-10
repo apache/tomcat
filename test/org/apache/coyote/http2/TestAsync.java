@@ -107,10 +107,10 @@ public class TestAsync extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncServlet(blockCount, useNonContainerThreadForWrite));
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/async", "async");
+        ctxt.addServletMapping("/async", "async");
         tomcat.start();
 
         int startingWindowSize;

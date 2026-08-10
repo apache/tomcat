@@ -69,7 +69,7 @@ public class TesterWsRemoteEndpointImplServer extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug58624Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 

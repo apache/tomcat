@@ -51,7 +51,7 @@ public class TestAsyncMessagesPerformance extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterAsyncTiming.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

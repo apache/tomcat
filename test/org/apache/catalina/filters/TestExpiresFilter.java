@@ -75,7 +75,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(ExpiresFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
 
         tomcat.start();
         try {
@@ -388,11 +388,11 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(ExpiresFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         root.addFilterMap(filterMap);
 
         Tomcat.addServlet(root, servlet.getClass().getName(), servlet);
-        root.addServletMappingDecoded("/test", servlet.getClass().getName());
+        root.addServletMapping("/test", servlet.getClass().getName());
 
         tomcat.start();
 
@@ -507,7 +507,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(ExpiresFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         ctxt.addFilterMap(filterMap);
 
         tomcat.start();

@@ -214,7 +214,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         StandardContext ctxt = (StandardContext) getProgrammaticRootContext();
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         HeadTestServlet s = new HeadTestServlet(bufferSize, useWriter, invalidWriteCount, resetType, validWriteCount,
                 explicitFlush);
@@ -222,7 +222,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         if (useLegacy) {
             w.addInitParameter(HttpServlet.LEGACY_DO_HEAD, "true");
         }
-        ctxt.addServletMappingDecoded("/test", "HeadTestServlet");
+        ctxt.addServletMapping("/test", "HeadTestServlet");
 
         tomcat.start();
     }

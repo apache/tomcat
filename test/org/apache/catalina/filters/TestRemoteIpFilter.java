@@ -670,7 +670,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RemoteIpFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         root.addFilterMap(filterMap);
 
         getTomcatInstance().start();
@@ -755,13 +755,13 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RemoteIpFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         root.addFilterMap(filterMap);
 
         MockHttpServlet mockServlet = new MockHttpServlet();
 
         Tomcat.addServlet(root, mockServlet.getClass().getName(), mockServlet);
-        root.addServletMappingDecoded("/test", mockServlet.getClass().getName());
+        root.addServletMapping("/test", mockServlet.getClass().getName());
 
         getTomcatInstance().start();
 
@@ -806,13 +806,13 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RemoteIpFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         root.addFilterMap(filterMap);
 
         Bug66471Servlet bug66471Servlet = new Bug66471Servlet();
 
         Tomcat.addServlet(root, bug66471Servlet.getClass().getName(), bug66471Servlet);
-        root.addServletMappingDecoded("/test", bug66471Servlet.getClass().getName());
+        root.addServletMapping("/test", bug66471Servlet.getClass().getName());
 
         getTomcatInstance().start();
 

@@ -52,24 +52,43 @@ public class WebXmlParser {
      */
     private final Digester webFragmentDigester;
     private final WebRuleSet webFragmentRuleSet;
+    private final boolean urlPatternsProvidedInDecodedForm;
+
+    /**
+     * Constructs a new WebXmlParser.
+     *
+     * @param namespaceAware Whether the parser is namespace aware
+     * @param validation     Whether validation is enabled
+     * @param blockExternal  Whether external entities are blocked
+     */
+    public WebXmlParser(boolean namespaceAware, boolean validation, boolean blockExternal) {
+        this(namespaceAware, validation, blockExternal, false);
+    }
 
 
     /**
      * Constructs a new WebXmlParser.
      *
-     * @param namespaceAware  Whether the parser is namespace aware
-     * @param validation      Whether validation is enabled
-     * @param blockExternal   Whether external entities are blocked
+     * @param namespaceAware                   Whether the parser is namespace aware
+     * @param validation                       Whether validation is enabled
+     * @param blockExternal                    Whether external entities are blocked
+     * @param urlPatternsProvidedInDecodedForm Whether URL and URL patterns will be provided in decoded form
+     *
+     * @deprecated This constructor will be removed in Tomcat 12
      */
-    public WebXmlParser(boolean namespaceAware, boolean validation, boolean blockExternal) {
-        webRuleSet = new WebRuleSet(false);
+    @Deprecated
+    public WebXmlParser(boolean namespaceAware, boolean validation, boolean blockExternal,
+            boolean urlPatternsProvidedInDecodedForm) {
+
+        webRuleSet = new WebRuleSet("",  false, urlPatternsProvidedInDecodedForm);
         webDigester = DigesterFactory.newDigester(validation, namespaceAware, webRuleSet, blockExternal);
         webDigester.getParser();
 
-        webFragmentRuleSet = new WebRuleSet(true);
+        webFragmentRuleSet = new WebRuleSet("", true, urlPatternsProvidedInDecodedForm);
         webFragmentDigester =
                 DigesterFactory.newDigester(validation, namespaceAware, webFragmentRuleSet, blockExternal);
         webFragmentDigester.getParser();
+        this.urlPatternsProvidedInDecodedForm = urlPatternsProvidedInDecodedForm;
     }
 
     /**
@@ -162,5 +181,19 @@ public class WebXmlParser {
     public void setClassLoader(ClassLoader classLoader) {
         webDigester.setClassLoader(classLoader);
         webFragmentDigester.setClassLoader(classLoader);
+    }
+
+
+    /**
+     * Does this parser expect URLs and URL patterns provided in web.xml, annotations and their programmatic
+     * equivalents to be in URL-decoded form?
+     *
+     * @return {@code true} if URLs and URL patterns are expected in URL-decoded form, otherwise {@code false}
+     *
+     * @deprecated This method will be removed in Tomcat 12 where it will effectively be hard-coded to {@code true}
+     */
+    @Deprecated
+    public boolean getUrlPatternsProvidedInDecodedForm() {
+        return urlPatternsProvidedInDecodedForm;
     }
 }

@@ -136,7 +136,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async, null);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.start();
 
@@ -628,7 +628,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadServlet servlet = new NBReadServlet(false, true, expectedTrailerFieldValue);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.getConnector().setProperty("allowedTrailerHeaders", TRAILER_HEADER_NAME);
 
@@ -691,7 +691,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
         // Note: Low values of socket.txBufSize can trigger very poor
         // performance. Set it just low enough to ensure that the
         // non-blocking write servlet will see isReady() == false
@@ -871,7 +871,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete, true, listenerCompletesOnError);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
         // Note: Low values of socket.txBufSize can trigger very poor
         // performance. Set it just low enough to ensure that the
         // non-blocking write servlet will see isReady() == false
@@ -957,7 +957,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadWriteServlet servlet = new NBReadWriteServlet();
         String servletName = NBReadWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.start();
 
@@ -1468,7 +1468,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         DelayedNBWriteServlet servlet = new DelayedNBWriteServlet(latch1);
         String servletName = DelayedNBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.start();
 
@@ -1500,7 +1500,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         DelayedNBReadWriteServlet servlet = new DelayedNBReadWriteServlet(latch1);
         String servletName = DelayedNBReadWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.start();
 
@@ -1757,7 +1757,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadWithDispatchServlet servlet = new NBReadWithDispatchServlet();
         String servletName = NBReadWithDispatchServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMappingDecoded("/", servletName);
+        ctx.addServletMapping("/", servletName);
 
         tomcat.start();
 
@@ -1881,7 +1881,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         PostServlet postServlet = new PostServlet(partialReadLatch, completeLatch, testFailed);
         Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/*", "postServlet");
+        ctx.addServletMapping("/*", "postServlet");
 
         tomcat.start();
 
@@ -2054,7 +2054,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch, swallowIoException);
         Wrapper wrapper = Tomcat.addServlet(ctx, "writeServlet", writeServlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/*", "writeServlet");
+        ctx.addServletMapping("/*", "writeServlet");
 
         tomcat.start();
 

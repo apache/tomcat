@@ -122,7 +122,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -230,7 +230,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

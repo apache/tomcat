@@ -97,10 +97,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         String contextPath="";
         if (useSubpathWebdav) {
-            ctx.addServletMappingDecoded("/webdav/*", "webdav");
+            ctx.addServletMapping("/webdav/*", "webdav");
             contextPath = "/webdav";
         } else {
-            ctx.addServletMappingDecoded("/*", "webdav");
+            ctx.addServletMapping("/*", "webdav");
         }
 
         tomcat.start();
@@ -146,7 +146,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
-        ctx.addServletMappingDecoded("/webdav/*", "webdav");
+        ctx.addServletMapping("/webdav/*", "webdav");
         ctx.addApplicationListener(WsContextListener.class.getName());
 
         tomcat.start();
@@ -216,7 +216,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
         defaultServlet.addInitParameter("listings", "true");
 
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -305,7 +305,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         ctxt.addMimeMapping("txt", "text/plain");
         tomcat.start();
 
@@ -451,7 +451,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
         webdavServlet.addInitParameter("useStrongETags", "true");
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         tomcat.start();
 
         ctxt.getResources().setCacheMaxSize(10);
@@ -937,7 +937,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("readonly", "false");
         webdavServlet.addInitParameter("serveSubpathOnly", "true");
-        ctxt.addServletMappingDecoded("/aaa/*", "webdav");
+        ctxt.addServletMapping("/aaa/*", "webdav");
         tomcat.start();
 
         ctxt.getResources().setCacheMaxSize(10);
@@ -1032,7 +1032,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         tomcat.start();
 
         Client client = new Client();
@@ -1429,7 +1429,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         tomcat.start();
 
         Client client = new Client();
@@ -1554,7 +1554,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("propertyStore", "org.apache.catalina.servlets.TestWebdavServlet$CustomPropertyStore");
         webdavServlet.addInitParameter("store.propertyName", "mytestproperty");
         webdavServlet.addInitParameter("store.propertyValue", "testvalue");
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         ctxt.addMimeMapping("txt", "text/plain");
         tomcat.start();
 
@@ -1609,7 +1609,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("useStrongETags", "true");
         webdavServlet.addInitParameter("maxRequestBodySize", "10");
 
-        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addServletMapping("/*", "webdav");
         tomcat.start();
 
         // With content length

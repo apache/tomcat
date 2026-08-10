@@ -47,7 +47,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
         Map<String,String> cookies = new HashMap<>();
         cookies.put("Test", "\u0120");
         Tomcat.addServlet(ctx, "test", new CookieServlet(cookies));
-        ctx.addServletMappingDecoded("/test", "test");
+        ctx.addServletMapping("/test", "test");
         tomcat.start();
 
         Map<String,List<String>> headers = new HashMap<>();
@@ -99,7 +99,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
         cookies.put("aaa", "zzz");
         cookies.put("aAa", "yyy");
         Tomcat.addServlet(ctx, "test", new CookieServlet(cookies));
-        ctx.addServletMappingDecoded("/test", "test");
+        ctx.addServletMapping("/test", "test");
         tomcat.start();
 
         Map<String,List<String>> headers = new HashMap<>();

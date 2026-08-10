@@ -46,7 +46,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
-        root.addServletMappingDecoded("/test", "Echo");
+        root.addServletMapping("/test", "Echo");
 
         tomcat.start();
 
@@ -65,7 +65,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "Bug60400Servlet", new Bug60400Servlet());
-        root.addServletMappingDecoded("/", "Bug60400Servlet");
+        root.addServletMapping("/", "Bug60400Servlet");
 
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "9000"));
         tomcat.start();
@@ -84,7 +84,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
-        root.addServletMappingDecoded("/test", "Echo");
+        root.addServletMapping("/test", "Echo");
 
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "10500"));
 

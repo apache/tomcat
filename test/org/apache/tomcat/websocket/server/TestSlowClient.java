@@ -48,7 +48,7 @@ public class TestSlowClient extends WebSocketBaseTest {
         // in response to any message received.
         ctx.addApplicationListener(TesterFirehoseServer.ConfigThread.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
