@@ -1926,6 +1926,7 @@
         <include name="**/service-config.txt"/>
         <include name="**/logging-non-rotatable.properties"/>
         <include name="**/TestStrings.properties"/>
+        <include name="**/*-web.xml"/>
       </fileset>
     </copy>
   </target>
