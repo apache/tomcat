@@ -68,7 +68,7 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
 
         Context context = getProgrammaticRootContext();
         Tomcat.addServlet(context, "hello", new HelloWorldServlet());
-        context.addServletMappingDecoded("/", "hello");
+        context.addServletMapping("/", "hello");
 
         tomcat.start();
 

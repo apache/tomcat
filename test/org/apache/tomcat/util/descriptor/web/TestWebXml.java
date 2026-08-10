@@ -286,7 +286,7 @@ public class TestWebXml {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName("Dummy");
-        filterMap.addURLPatternDecoded("/*");
+        filterMap.addURLPattern("/*");
         webXmlDefaultFragment.addFilterMapping(filterMap);
 
         // Listeners were added in 2.3 so should be excluded in 2.2
@@ -331,7 +331,7 @@ public class TestWebXml {
         sc.setDisplayName("dummy");
         SecurityCollection collection = new SecurityCollection();
         collection.setName("dummy");
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
         collection.addMethod(Method.DELETE);
         sc.addCollection(collection);
         webXmlDefaultFragment.addSecurityConstraint(sc);
@@ -528,6 +528,7 @@ public class TestWebXml {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testEncoding() {
         WebXml webXml = new WebXml();

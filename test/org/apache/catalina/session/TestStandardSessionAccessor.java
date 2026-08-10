@@ -48,7 +48,7 @@ public class TestStandardSessionAccessor extends TomcatBaseTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         Tomcat.addServlet(ctx, "accessor", new AccessorServlet(latch));
-        ctx.addServletMappingDecoded("/accessor", "accessor");
+        ctx.addServletMapping("/accessor", "accessor");
 
         tomcat.start();
 

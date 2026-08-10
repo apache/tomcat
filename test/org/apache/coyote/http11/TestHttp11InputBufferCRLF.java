@@ -181,7 +181,7 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "TesterServlet", new TesterServlet());
-            root.addServletMappingDecoded("/test", "TesterServlet");
+            root.addServletMapping("/test", "TesterServlet");
 
             try {
                 tomcat.start();

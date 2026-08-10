@@ -125,7 +125,7 @@ public class TestMapperWebapps extends TomcatBaseTest {
         ctx.setMapperContextRootRedirectEnabled(rootRedirect);
 
         Tomcat.addServlet(ctx, "ReportMapping", new ReportMappingServlet());
-        ctx.addServletMappingDecoded("", "ReportMapping");
+        ctx.addServletMapping("", "ReportMapping");
 
         tomcat.start();
 
@@ -286,8 +286,8 @@ public class TestMapperWebapps extends TomcatBaseTest {
         // Add a security constraint
         SecurityConstraint constraint = new SecurityConstraint();
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/welcome-files/*");
-        collection.addPatternDecoded("/welcome-files");
+        collection.addPattern("/welcome-files/*");
+        collection.addPattern("/welcome-files");
         constraint.addCollection(collection);
         constraint.addAuthRole("foo");
         root.addConstraint(constraint);

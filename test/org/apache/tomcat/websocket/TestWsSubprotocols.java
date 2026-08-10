@@ -49,7 +49,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
         ctx.addApplicationListener(Config.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

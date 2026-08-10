@@ -31,6 +31,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * single thread, before the instance is made visible to the remainder of the application. After that, only read access
  * is expected. Therefore, none of the read and write access within this class is synchronized.
  */
+@SuppressWarnings("deprecation")
 public class SecurityCollection extends XmlEncodingBase implements Serializable {
 
     @Serial
@@ -211,7 +212,10 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
      * Add a URL pattern (already decoded) to be part of this web resource collection.
      *
      * @param pattern The decoded pattern
+     *
+     * @deprecated Will be removed in Tomcat 12 onwards
      */
+    @Deprecated
     public void addPatternDecoded(String pattern) {
 
         if (pattern == null) {

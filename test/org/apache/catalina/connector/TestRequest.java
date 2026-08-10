@@ -147,7 +147,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-            root.addServletMappingDecoded("/test", "Bug37794");
+            root.addServletMapping("/test", "Bug37794");
 
             tomcat.start();
 
@@ -241,7 +241,7 @@ public class TestRequest extends TomcatBaseTest {
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -287,7 +287,7 @@ public class TestRequest extends TomcatBaseTest {
         ctx.getPipeline().addValve(new BasicAuthenticator());
 
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
@@ -336,7 +336,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMappingDecoded("/", "Bug37794");
+        root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -349,7 +349,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMappingDecoded("/", "Bug37794");
+        root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -418,7 +418,7 @@ public class TestRequest extends TomcatBaseTest {
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         root.setAllowCasualMultipartParsing(true);
         Tomcat.addServlet(root, "Bug54984", new Bug54984Servlet());
-        root.addServletMappingDecoded("/", "Bug54984");
+        root.addServletMapping("/", "Bug54984");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parseParametersBeforeParseParts");
@@ -493,7 +493,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
-            root.addServletMappingDecoded("/echo", "EchoParameters");
+            root.addServletMapping("/echo", "EchoParameters");
             tomcat.start();
 
             setPort(tomcat.getConnector().getLocalPort());
@@ -767,7 +767,7 @@ public class TestRequest extends TomcatBaseTest {
         ctx.setAllowMultipleLeadingForwardSlashInPath(true);
 
         Tomcat.addServlet(ctx, "servlet", new Bug56501Servlet());
-        ctx.addServletMappingDecoded("/*", "servlet");
+        ctx.addServletMapping("/*", "servlet");
 
         tomcat.start();
 
@@ -841,7 +841,7 @@ public class TestRequest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug61264GetReaderServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -912,7 +912,7 @@ public class TestRequest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug69442Servlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -953,7 +953,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
-        ctx.addServletMappingDecoded("/", "Bug69690");
+        ctx.addServletMapping("/", "Bug69690");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parameter?a=b");
@@ -987,7 +987,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
-        ctx.addServletMappingDecoded("/", "Bug69690");
+        ctx.addServletMapping("/", "Bug69690");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/part?a=b");

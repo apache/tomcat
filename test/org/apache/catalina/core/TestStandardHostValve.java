@@ -84,11 +84,11 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ErrorServlet());
-        ctx.addServletMappingDecoded("/error", "error");
+        ctx.addServletMapping("/error", "error");
 
         // Add the error handling page
         Tomcat.addServlet(ctx, "report", new ReportServlet());
-        ctx.addServletMappingDecoded("/report/*", "report");
+        ctx.addServletMapping("/report/*", "report");
 
         // Add the handling for 400 responses
         ErrorPage errorPage400 = new ErrorPage();
@@ -158,7 +158,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ErrorServlet());
-        ctx.addServletMappingDecoded("/error", "error");
+        ctx.addServletMapping("/error", "error");
 
         final List<String> result = new ArrayList<>();
 
@@ -200,11 +200,11 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ExceptionServlet());
-        ctx.addServletMappingDecoded("/error", "error");
+        ctx.addServletMapping("/error", "error");
 
         // Add the error handling page
         Tomcat.addServlet(ctx, "report", new ReportServlet());
-        ctx.addServletMappingDecoded("/report/*", "report");
+        ctx.addServletMapping("/report/*", "report");
 
         // Add the handling for 500 responses
         ErrorPage errorPage500 = new ErrorPage();

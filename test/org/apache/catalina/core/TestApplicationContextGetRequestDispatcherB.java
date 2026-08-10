@@ -333,11 +333,11 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new Target());
-        ctx.addServletMappingDecoded(targetMapping, "target");
+        ctx.addServletMapping(targetMapping, "target");
 
         Wrapper w = Tomcat.addServlet(ctx, "rd", new Dispatch());
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded(startMapping, "rd");
+        ctx.addServletMapping(startMapping, "rd");
 
         tomcat.start();
 

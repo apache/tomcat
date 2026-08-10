@@ -50,7 +50,7 @@ public class TestConnector extends TomcatBaseTest {
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/", "tester");
+        root.addServletMapping("/", "tester");
 
         Connector connector = tomcat.getConnector();
 
@@ -188,7 +188,7 @@ public class TestConnector extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context root = tomcat.addContext("", appDir.getAbsolutePath());
         Tomcat.addServlet(root, "default", servlet);
-        root.addServletMappingDecoded("/", "default");
+        root.addServletMapping("/", "default");
 
         Connector connector = tomcat.getConnector();
         connector.setAllowTrace(allowTrace);
@@ -236,7 +236,7 @@ public class TestConnector extends TomcatBaseTest {
 
         Context root = getProgrammaticRootContext();
         Tomcat.addServlet(root, "default", new TesterServlet());
-        root.addServletMappingDecoded("/", "default");
+        root.addServletMapping("/", "default");
 
         Connector connector = tomcat.getConnector();
         connector.setAllowBackslash(true);

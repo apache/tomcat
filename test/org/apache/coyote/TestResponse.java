@@ -48,7 +48,7 @@ public class TestResponse extends TomcatBaseTest {
 
         // Add  servlet
         Tomcat.addServlet(ctx, "CharsetServlet", new CharsetServlet());
-        ctx.addServletMappingDecoded("/*", "CharsetServlet");
+        ctx.addServletMapping("/*", "CharsetServlet");
 
         tomcat.start();
 
@@ -99,7 +99,7 @@ public class TestResponse extends TomcatBaseTest {
 
         // Add  servlet
         Tomcat.addServlet(ctx, "ContentTypeServlet", new ContentTypeServlet());
-        ctx.addServletMappingDecoded("/*", "ContentTypeServlet");
+        ctx.addServletMapping("/*", "ContentTypeServlet");
 
         tomcat.start();
 

@@ -170,7 +170,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
         UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 

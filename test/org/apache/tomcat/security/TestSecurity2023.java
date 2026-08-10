@@ -73,7 +73,7 @@ public class TestSecurity2023 extends TomcatBaseTest {
         Context context = tomcat.addContext("", null);
         Wrapper wrapper = Tomcat.addServlet(context, "test", new TestServlet());
         wrapper.setMultipartConfigElement(new MultipartConfigElement(""));
-        context.addServletMappingDecoded("/", "test");
+        context.addServletMapping("/", "test");
 
         tomcat.start();
 
@@ -122,11 +122,11 @@ public class TestSecurity2023 extends TomcatBaseTest {
         tomcat.addRole("admin", "admin");
 
         Tomcat.addServlet(context, "login", new TestServlet());
-        context.addServletMappingDecoded("/login", "login");
+        context.addServletMapping("/login", "login");
         Tomcat.addServlet(context, "secret", new TestServlet());
-        context.addServletMappingDecoded("/secret.html", "secret");
+        context.addServletMapping("/secret.html", "secret");
         Tomcat.addServlet(context, "example", new TestServlet());
-        context.addServletMappingDecoded("/example.com", "example");
+        context.addServletMapping("/example.com", "example");
 
         tomcat.start();
 

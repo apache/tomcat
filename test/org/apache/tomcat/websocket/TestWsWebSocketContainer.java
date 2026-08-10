@@ -78,7 +78,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -192,7 +192,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -366,7 +366,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -416,7 +416,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -456,7 +456,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -554,7 +554,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -636,7 +636,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

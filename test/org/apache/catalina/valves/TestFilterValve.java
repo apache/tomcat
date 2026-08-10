@@ -48,7 +48,7 @@ public class TestFilterValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         FilterValve valve = new FilterValve();
         valve.setFilterClass(PassthroughFilter.class.getName());
@@ -71,7 +71,7 @@ public class TestFilterValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         FilterValve valve = new FilterValve();
         valve.setFilterClass(BlockingFilter.class.getName());
@@ -92,7 +92,7 @@ public class TestFilterValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         FilterValve valve = new FilterValve();
         valve.setFilterClass(WrappingFilter.class.getName());

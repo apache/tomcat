@@ -128,7 +128,7 @@ public class TestStartupIPv6Connectors extends TomcatBaseTest {
         tomcat.setBaseDir(baseDir.getAbsolutePath());
         Context context = tomcat.addContext("", null);
         Tomcat.addServlet(context, "simple", new HelloWorldServlet());
-        context.addServletMappingDecoded("/", "simple");
+        context.addServletMapping("/", "simple");
 
         try {
             tomcat.start();

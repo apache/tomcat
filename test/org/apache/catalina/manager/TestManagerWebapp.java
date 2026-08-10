@@ -633,7 +633,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
         Context ctx = tomcat.addContext("/testapp", null);
         Tomcat.addServlet(ctx, "default", new org.apache.catalina.servlets.DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 

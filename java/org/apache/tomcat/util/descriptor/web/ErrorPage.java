@@ -26,6 +26,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * Representation of an error page element for a web application, as represented in a <code>&lt;error-page&gt;</code>
  * element in the deployment descriptor.
  */
+@SuppressWarnings("deprecation")
 public class ErrorPage extends XmlEncodingBase implements Serializable {
 
     /**
@@ -142,7 +143,10 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
      * Set the already URL decoded location.
      *
      * @param location The new location
+     *
+     * @deprecated This method will be removed in Tomcat 12
      */
+    @Deprecated
     public void setLocationDecoded(String location) {
         this.location = location;
     }

@@ -60,7 +60,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
 
         Wrapper wrapper = Tomcat.addServlet(context, "async-complete", new AsyncCompleteServlet());
         wrapper.setAsyncSupported(true);
-        context.addServletMappingDecoded("/async-complete", "async-complete");
+        context.addServletMapping("/async-complete", "async-complete");
 
         TesterStore store = new TesterStore();
         PersistentManager manager = configurePersistentManager(context, store, new PersistentValve());
@@ -84,7 +84,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
 
         Wrapper wrapper = Tomcat.addServlet(context, "async-dispatch", new AsyncDispatchServlet());
         wrapper.setAsyncSupported(true);
-        context.addServletMappingDecoded("/async-dispatch", "async-dispatch");
+        context.addServletMapping("/async-dispatch", "async-dispatch");
 
         TesterStore store = new TesterStore();
         PersistentManager manager = configurePersistentManager(context, store, new PersistentValve());
@@ -139,7 +139,7 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         StandardContext context = addSemaphoreTestServlets("async-error",
                 new ErrorDispatchingAsyncServlet(asyncStarted, allowAsyncError), "/async-error");
         Tomcat.addServlet(context, "async-error-target", new ErrorServlet());
-        context.addServletMappingDecoded("/async-error-target", "async-error-target");
+        context.addServletMapping("/async-error-target", "async-error-target");
         tomcat.start();
 
         assertSemaphoreHeldUntilAsyncRequestCompletes("/async-error", asyncStarted, allowAsyncError,
@@ -178,11 +178,11 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         context.setDistributable(true);
 
         Tomcat.addServlet(context, "session", new SessionServlet());
-        context.addServletMappingDecoded("/session", "session");
+        context.addServletMapping("/session", "session");
 
         Wrapper asyncWrapper = Tomcat.addServlet(context, asyncServletName, asyncServlet);
         asyncWrapper.setAsyncSupported(true);
-        context.addServletMappingDecoded(asyncPath, asyncServletName);
+        context.addServletMapping(asyncPath, asyncServletName);
 
         TesterStore store = new TesterStore();
         PersistentValve persistentValve = new PersistentValve();

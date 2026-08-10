@@ -37,7 +37,7 @@ public class TestAlpnFallback extends Http2TestBase {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/", "snoop");
+        ctx.addServletMapping("/", "snoop");
 
         tomcat.start();
 

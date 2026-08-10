@@ -56,7 +56,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
-        ctx.addServletMappingDecoded("/", "sendError");
+        ctx.addServletMapping("/", "sendError");
 
         tomcat.start();
 
@@ -93,7 +93,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "exception",
                 new ExceptionServlet("Something went wrong"));
-        ctx.addServletMappingDecoded("/", "exception");
+        ctx.addServletMapping("/", "exception");
 
         tomcat.start();
 
@@ -137,7 +137,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         String specialMessage = "Error with \"quotes\" and \\backslash\\";
         Tomcat.addServlet(ctx, "specialChars", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, specialMessage));
-        ctx.addServletMappingDecoded("/", "specialChars");
+        ctx.addServletMapping("/", "specialChars");
 
         tomcat.start();
 
@@ -172,7 +172,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "customError",
                 new SendErrorServlet(999, "The sky is falling"));
-        ctx.addServletMappingDecoded("/", "customError");
+        ctx.addServletMapping("/", "customError");
 
         tomcat.start();
 
@@ -201,7 +201,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "notFound", new SendErrorServlet(
                 HttpServletResponse.SC_NOT_FOUND, "Resource not found"));
-        ctx.addServletMappingDecoded("/", "notFound");
+        ctx.addServletMapping("/", "notFound");
 
         tomcat.start();
 
@@ -232,7 +232,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "chained", new ChainedExceptionServlet());
-        ctx.addServletMappingDecoded("/", "chained");
+        ctx.addServletMapping("/", "chained");
 
         tomcat.start();
 
@@ -271,7 +271,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "noMessage", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null));
-        ctx.addServletMappingDecoded("/", "noMessage");
+        ctx.addServletMapping("/", "noMessage");
 
         tomcat.start();
 
@@ -298,7 +298,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         tomcat.start();
 
@@ -322,7 +322,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         String unicodeMessage = "Error: \u00e9\u00e8\u00ea \u4e2d\u6587 \u00f1";
         Tomcat.addServlet(ctx, "unicode", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, unicodeMessage));
-        ctx.addServletMappingDecoded("/", "unicode");
+        ctx.addServletMapping("/", "unicode");
 
         tomcat.start();
 
@@ -350,7 +350,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "sendError", new SendErrorServlet(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
-        ctx.addServletMappingDecoded("/", "sendError");
+        ctx.addServletMapping("/", "sendError");
 
         tomcat.start();
 
@@ -386,7 +386,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "exception", new ExceptionServlet("Something went wrong"));
-        ctx.addServletMappingDecoded("/", "exception");
+        ctx.addServletMapping("/", "exception");
 
         tomcat.start();
 
@@ -421,7 +421,7 @@ public class TestJsonErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "unknownNoMessage", new SendErrorServlet(999, null));
-        ctx.addServletMappingDecoded("/", "unknownNoMessage");
+        ctx.addServletMapping("/", "unknownNoMessage");
 
         tomcat.start();
 

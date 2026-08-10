@@ -85,7 +85,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         w.addInitParameter("listings", Boolean.toString(listings));
         w.addInitParameter("readonly", Boolean.toString(readonly));
 
-        ctx.addServletMappingDecoded("/*", "servlet");
+        ctx.addServletMapping("/*", "servlet");
 
         // Disable class path scanning - it slows the tests down by almost an order of magnitude
         ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
