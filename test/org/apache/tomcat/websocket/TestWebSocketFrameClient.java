@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -278,7 +279,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         if (rotateSessionID) {
             Assert.assertNotNull(sessionCookie.get());
             Map<String,List<String>> requestHeaders = new HashMap<>();
-            requestHeaders.put("Cookie", List.of(sessionCookie.get()));
+            requestHeaders.put("Cookie", Arrays.asList(sessionCookie.get()));
             Map<String,List<String>> responseHeaders = new HashMap<>();
             int status = getUrl("http://localhost:" + getPort() + URI_PROTECTED + "/changeSessionID", new ByteChunk(),
                     requestHeaders, responseHeaders);
@@ -304,7 +305,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         Assert.assertNotNull(sessionCookie.get());
         Map<String,List<String>> requestHeaders = new HashMap<>();
-        requestHeaders.put("Cookie", List.of(sessionCookie.get()));
+        requestHeaders.put("Cookie", Arrays.asList(sessionCookie.get()));
         int status = getUrl("http://localhost:" + getPort() + URI_PROTECTED + "/invalidate", new ByteChunk(),
                 requestHeaders, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, status);
