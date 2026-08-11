@@ -104,7 +104,7 @@ gpg.exec=/path/to/gpg
 gpg.sign.files=true
 
 # Code signing of Windows installer
-# See https://infra.apache.org/digicert-use.html for setup instructions
+# See https://infra.apache.org/code-signing-use.html for setup instructions
 do.codesigning=false
 codesigning.alias=d97c5110-c66a-4c0c-ac0c-1cd6af812ee6
 codesigning.digest=SHA256
