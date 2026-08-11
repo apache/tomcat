@@ -345,6 +345,9 @@
       <update>
         Update Bouncy Castle to 1.85. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
