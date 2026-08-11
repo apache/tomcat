@@ -89,10 +89,10 @@ public class TestHttp2Section_6_6 extends Http2TestBase {
         Context ctxt = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         Tomcat.addServlet(ctxt, "push", new PushServlet());
-        ctxt.addServletMappingDecoded("/push", "push");
+        ctxt.addServletMapping("/push", "push");
 
         tomcat.start();
     }

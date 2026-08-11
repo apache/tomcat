@@ -62,7 +62,7 @@ public class TestBug49158 extends CookiesBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, path, new TestBug49158Servlet());
-        ctx.addServletMappingDecoded("/"+path, path);
+        ctx.addServletMapping("/"+path, path);
     }
 
     public static class TestBug49158Servlet extends HttpServlet {

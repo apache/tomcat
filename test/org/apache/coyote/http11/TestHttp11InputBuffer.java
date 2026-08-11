@@ -589,7 +589,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug59089", new TesterServlet());
-            root.addServletMappingDecoded("/test", "Bug59089");
+            root.addServletMapping("/test", "Bug59089");
 
             try {
                 Connector connector = tomcat.getConnector();

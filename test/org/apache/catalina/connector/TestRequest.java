@@ -179,7 +179,7 @@ public class TestRequest extends TomcatBaseTest {
                 failedRequestFilter.setFilterClass(FailedRequestFilter.class.getName());
                 FilterMap failedRequestFilterMap = new FilterMap();
                 failedRequestFilterMap.setFilterName("failedRequestFilter");
-                failedRequestFilterMap.addURLPatternDecoded("/*");
+                failedRequestFilterMap.addURLPattern("/*");
                 root.addFilterDef(failedRequestFilter);
                 root.addFilterMap(failedRequestFilterMap);
             }

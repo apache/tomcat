@@ -498,7 +498,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "Bug51445", new Bug51445Servlet());
-        ctx.addServletMappingDecoded("/", "Bug51445");
+        ctx.addServletMapping("/", "Bug51445");
 
         tomcat.start();
 
@@ -544,7 +544,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         wrapper.setServletName("Bug51445");
         wrapper.setServletClass(Bug51445Servlet.class.getName());
         ctx.addChild(wrapper);
-        ctx.addServletMappingDecoded("/", "Bug51445");
+        ctx.addServletMapping("/", "Bug51445");
 
         tomcat.start();
 

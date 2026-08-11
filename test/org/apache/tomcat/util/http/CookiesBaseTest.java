@@ -72,21 +72,21 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
         ctx.setCookieProcessor(new LegacyCookieProcessor());
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
-        ctx.addServletMappingDecoded("/invalid", "invalid");
+        ctx.addServletMapping("/invalid", "invalid");
         Tomcat.addServlet(ctx, "null", new CookieServlet(null, "value"));
-        ctx.addServletMappingDecoded("/null", "null");
+        ctx.addServletMapping("/null", "null");
         Tomcat.addServlet(ctx, "blank", new CookieServlet("", "value"));
-        ctx.addServletMappingDecoded("/blank", "blank");
+        ctx.addServletMapping("/blank", "blank");
         Tomcat.addServlet(ctx, "invalidFwd",
                 new CookieServlet("na/me", "value"));
-        ctx.addServletMappingDecoded("/invalidFwd", "invalidFwd");
+        ctx.addServletMapping("/invalidFwd", "invalidFwd");
         Tomcat.addServlet(ctx, "invalidStrict",
                 new CookieServlet("$name", "value"));
-        ctx.addServletMappingDecoded("/invalidStrict", "invalidStrict");
+        ctx.addServletMapping("/invalidStrict", "invalidStrict");
         Tomcat.addServlet(ctx, "valid", new CookieServlet("name", "value"));
-        ctx.addServletMappingDecoded("/valid", "valid");
+        ctx.addServletMapping("/valid", "valid");
         Tomcat.addServlet(ctx, "switch", new CookieServlet("name", "val?ue"));
-        ctx.addServletMappingDecoded("/switch", "switch");
+        ctx.addServletMapping("/switch", "switch");
 
     }
 
