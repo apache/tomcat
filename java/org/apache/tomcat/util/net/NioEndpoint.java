@@ -236,7 +236,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             derivePermissions = true;
         }
 
-        if (permissionString == null || permissionString.isBlank()) {
+        if (permissionString == null || permissionString.length() == 0) {
             return null;
         }
 
