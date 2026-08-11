@@ -18,7 +18,6 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -263,7 +262,7 @@ public class TestFormAuthenticatorD extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/html");
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
             pw.println("<html>");
             pw.println("<body>");
@@ -285,7 +284,7 @@ public class TestFormAuthenticatorD extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
             pw.println("Login failed");
         }
@@ -299,7 +298,7 @@ public class TestFormAuthenticatorD extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
             pw.println(req.getMethod());
             pw.println(req.getRemoteUser());
