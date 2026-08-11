@@ -205,7 +205,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
         Tomcat.addServlet(ctx, "invalidate", new HttpServlet() {
 
             @Override
@@ -213,7 +213,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
                 req.getSession(false).invalidate();
             }
         });
-        ctx.addServletMappingDecoded("/invalidate", "invalidate");
+        ctx.addServletMapping("/invalidate", "invalidate");
         Tomcat.addServlet(ctx, "changeSessionID", new HttpServlet() {
 
             @Override
@@ -221,10 +221,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
                 req.changeSessionId();
             }
         });
-        ctx.addServletMappingDecoded("/changeSessionID", "changeSessionID");
+        ctx.addServletMapping("/changeSessionID", "changeSessionID");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
 
         tomcat.addUser(USER, PWD);
         tomcat.addRole(USER, ROLE);
