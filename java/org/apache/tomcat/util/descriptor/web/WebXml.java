@@ -44,11 +44,9 @@ import jakarta.servlet.descriptor.TaglibDescriptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
-import org.apache.tomcat.util.digester.DocumentProperties;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -58,28 +56,12 @@ import org.apache.tomcat.util.security.Escape;
  * (e.g. single login-config) This class checks for invalid duplicates (e.g. filter/servlet names) StandardContext will
  * check validity of values (e.g. URL formats etc)
  */
-@SuppressWarnings("deprecation")
-public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
+public class WebXml {
 
     /**
      * Constructs a new WebXml.
      */
     public WebXml() {
-        this(false);
-    }
-
-    /**
-     * Constructs a new WebXml with configurable behaviour for URL and URL pattern decoding.
-     *
-     * @param urlPatternsProvidedInDecodedForm {@code true} if URLs and URL patterns are expected to be decoded.
-     *                                             {@code false} if they are expected to be URL-encoded (i.e.
-     *                                             {@code %nn} encoding)
-     *
-     * @deprecated This constructor will be removed in Tomcat 12
-     */
-    @Deprecated
-    public WebXml(boolean urlPatternsProvidedInDecodedForm) {
-        this.urlPatternsProvidedInDecodedForm = urlPatternsProvidedInDecodedForm;
     }
 
     /**
@@ -93,25 +75,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     private final UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
 
-    private final boolean urlPatternsProvidedInDecodedForm;
-
-
-    /**
-     * Does this Context expect URLs and URL patterns provided in web.xml, annotations and their programmatic
-     * equivalents to be in URL-decoded form?
-     * <p>
-     * As per the Servlet specification, "URI paths specified in the deployment descriptor are assumed to be in
-     * URL-decoded form.".
-     *
-     * @return {@code true} if URLs and URL patterns are expected in URL-decoded form, otherwise {@code false}
-     *
-     * @deprecated This method will be removed in Tomcat 12 where the field will be effectively hard-coded to
-     *                 {@code true}
-     */
-    @Deprecated
-    public boolean getUrlPatternsProvidedInDecodedForm() {
-        return urlPatternsProvidedInDecodedForm;
-    }
 
     /**
      * Global defaults are overridable but Servlets and Servlet mappings need to be unique. Duplicates normally trigger
@@ -585,7 +548,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param filterMap The filter mapping
      */
     public void addFilterMapping(FilterMap filterMap) {
-        filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
@@ -652,9 +614,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return servlets;
     }
 
-    // servlet-mapping
-    // Note: URLPatterns from web.xml may be URL encoded
-    // (https://svn.apache.org/r285186)
+    /*
+     * The Servlet specification states that URLs and URL patterns provided in web.xml (and by extension annotations
+     * and the programmatic equivalents to web.xml) must be in URL-decoded form.
+     */
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
 
@@ -663,26 +626,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      *
      * @param urlPattern  The URL pattern
      * @param servletName The servlet name
-     */
-    public void addServletMapping(String urlPattern, String servletName) {
-        if (!urlPatternsProvidedInDecodedForm) {
-            urlPattern = UDecoder.URLDecode(urlPattern, getCharset());
-        }
-        addServletMappingDecoded(urlPattern, servletName);
-    }
-
-    /**
-     * Adds a servlet URL mapping (already decoded).
-     *
-     * @param urlPattern  The URL pattern
-     * @param servletName The servlet name
      *
      * @throws IllegalArgumentException If a duplicate mapping exists
-     *
-     * @deprecated Will be removed in Tomcat 12 onwards
      */
-    @Deprecated
-    public void addServletMappingDecoded(String urlPattern, String servletName) {
+    public void addServletMapping(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
             // Duplicate mapping. As per clarification from the Servlet EG,
@@ -803,7 +750,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param errorPage The error page
      */
     public void addErrorPage(ErrorPage errorPage) {
-        errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
 
@@ -852,7 +798,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param propertyGroup The JSP property group
      */
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
-        propertyGroup.setCharset(getCharset());
         jspPropertyGroups.add(propertyGroup);
     }
 
@@ -876,7 +821,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param securityConstraint The security constraint
      */
     public void addSecurityConstraint(SecurityConstraint securityConstraint) {
-        securityConstraint.setCharset(getCharset());
         securityConstraints.add(securityConstraint);
     }
 
@@ -899,7 +843,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param loginConfig The login configuration
      */
     public void setLoginConfig(LoginConfig loginConfig) {
-        loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
 
@@ -2135,7 +2078,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // Merge rules vary from element to element. See SRV.8.2.3
 
-        WebXml temp = new WebXml(urlPatternsProvidedInDecodedForm);
+        WebXml temp = new WebXml();
 
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getContextParams(), contextParams, temp.getContextParams(), fragment,
@@ -2374,7 +2317,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // Add fragment mappings
         for (Map.Entry<String,String> mapping : servletMappingsToAdd) {
-            addServletMappingDecoded(mapping.getKey(), mapping.getValue());
+            addServletMapping(mapping.getKey(), mapping.getValue());
         }
 
         for (WebXml fragment : fragments) {

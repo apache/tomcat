@@ -789,13 +789,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    @Deprecated
-    public void addServletMappingDecoded(String pattern, String name,
-            boolean jspWildcard) {
-        // NO-OP
-    }
-
-    @Override
     public void addWatchedResource(String name) {
         // NO-OP
     }

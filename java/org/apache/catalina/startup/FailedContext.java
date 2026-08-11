@@ -983,12 +983,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    @Deprecated
-    public void addServletMappingDecoded(String pattern, String name, boolean jspWildcard) {
-        // NO-OP
-    }
-
-    @Override
     public String findServletMapping(String pattern) {
         return null;
     }

@@ -23,11 +23,8 @@
   metadata-complete="true">
 
   <!--
-    Used by TestUrlPatternsProvidedInDecodedForm. The %25 in the URL patterns
-    is decoded to "%" if the patterns are treated as being provided in encoded
-    form and left as "%25" if they are treated as being provided in decoded
-    form. The request URI required to reach each mapping therefore differs
-    between the two modes.
+    Used by TestUrlPatterns. URL patterns in web.xml are in URL-decoded form so
+    the %25 in the URL patterns should not be decoded.
   -->
 
   <servlet>

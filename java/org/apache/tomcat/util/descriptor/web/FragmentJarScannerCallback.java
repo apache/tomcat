@@ -58,8 +58,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     public void scan(Jar jar, String webappPath, boolean isWebapp) throws IOException {
 
         InputStream is = null;
-        @SuppressWarnings("deprecation")
-        WebXml fragment = new WebXml(webXmlParser.getUrlPatternsProvidedInDecodedForm());
+        WebXml fragment = new WebXml();
         fragment.setWebappJar(isWebapp);
         fragment.setDelegate(delegate);
 
@@ -105,8 +104,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     @Override
     public void scan(File file, String webappPath, boolean isWebapp) throws IOException {
 
-        @SuppressWarnings("deprecation")
-        WebXml fragment = new WebXml(webXmlParser.getUrlPatternsProvidedInDecodedForm());
+        WebXml fragment = new WebXml();
         fragment.setWebappJar(isWebapp);
         fragment.setDelegate(delegate);
 

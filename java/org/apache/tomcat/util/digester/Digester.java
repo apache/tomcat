@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +42,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.IntrospectionUtils.PropertySource;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ToStringUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
@@ -58,7 +56,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.ext.EntityResolver2;
-import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -1275,19 +1272,6 @@ public class Digester extends DefaultHandler2 {
 
         if (saxLog.isTraceEnabled()) {
             saxLog.trace("startDocument()");
-        }
-
-        if (locator instanceof Locator2) {
-            if (root instanceof DocumentProperties.Charset) {
-                String enc = ((Locator2) locator).getEncoding();
-                if (enc != null) {
-                    try {
-                        ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
-                    } catch (UnsupportedEncodingException e) {
-                        log.warn(sm.getString("digester.encodingInvalid", enc), e);
-                    }
-                }
-            }
         }
 
         // ensure that the digester is properly configured, as

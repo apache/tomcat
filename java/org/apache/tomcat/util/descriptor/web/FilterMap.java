@@ -24,15 +24,12 @@ import java.util.Locale;
 
 import jakarta.servlet.DispatcherType;
 
-import org.apache.tomcat.util.buf.UDecoder;
-
 /**
  * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
  * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
  * servlet name.
  */
-@SuppressWarnings("deprecation")
-public class FilterMap extends XmlEncodingBase implements Serializable {
+public class FilterMap implements Serializable {
 
     /**
      * Default constructor for FilterMap.
@@ -191,18 +188,6 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
      * @param urlPattern The URL pattern to add
      */
     public void addURLPattern(String urlPattern) {
-        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
-    }
-
-    /**
-     * Adds a decoded URL pattern to the set of URL patterns this mapping matches.
-     *
-     * @param urlPattern The decoded URL pattern to add
-     *
-     * @deprecated This method will be removed in Tomcat 12 onwards
-     */
-    @Deprecated
-    public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;
         } else {

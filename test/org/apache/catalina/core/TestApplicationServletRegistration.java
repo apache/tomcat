@@ -24,18 +24,8 @@ import org.apache.catalina.Wrapper;
 public class TestApplicationServletRegistration {
 
     @Test
-    public void testUrlPatternEncoded() {
-        doTestUrlPattern(false, "/servlet%");
-    }
-
-    @Test
-    public void testUrlPatternDecoded() {
-        doTestUrlPattern(true, "/servlet%25");
-    }
-
-    private void doTestUrlPattern(boolean urlPatternsProvidedInDecodedForm, String expectedPattern) {
+    public void testUrlPatternsAreTreatedAsUrlDecoded() {
         StandardContext context = new StandardContext();
-        context.setUrlPatternsProvidedInDecodedForm(urlPatternsProvidedInDecodedForm);
 
         Wrapper wrapper = context.createWrapper();
         wrapper.setName("servlet");
@@ -43,6 +33,7 @@ public class TestApplicationServletRegistration {
 
         ApplicationServletRegistration registration = new ApplicationServletRegistration(wrapper, context);
         Assert.assertTrue(registration.addMapping("/servlet%25").isEmpty());
-        Assert.assertEquals("servlet", context.findServletMapping(expectedPattern));
+        // Ensure pattern has not been decoded
+        Assert.assertEquals("servlet", context.findServletMapping("/servlet%25"));
     }
 }

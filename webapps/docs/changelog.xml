@@ -230,6 +230,16 @@
         10008. Based on pull request <pr>1026</pr> by Mario Daniel Ruiz
         Saavedra. (markt)
       </add>
+      <fix>
+        Remove the <code>Context</code> attribute
+        <code>urlPatternsProvidedInDecodedForm</code> and all supporting code.
+        The attribute is now effectively hard-coded to <code>true</code> for all
+        web applications which is a change from the default of
+        <code>false</code> in Tomcat 11 and earlier. The default implementation
+        of <code>Context.addServletMapping(String,String,boolean)</code> has
+        been removed so classes that implement the <code>Context</code>
+        interface must implement this method. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Ensure that a <code>login-config</code> conflict when merging web.xml
@@ -295,20 +305,6 @@
         possible for the session to expire and the addition to succeed. This is
         of particular not for attributes that implement
         <code>HttpSessionBindingListener</code>. (markt)
-      </fix>
-      <fix>
-        Add a new attribute to the <code>Context</code>,
-        <code>urlPatternsProvidedInDecodedForm</code>. This attribute controls
-        whether URLs and URL patterns provided in the deployment descriptor
-        (web.xml), annotations and/or their programmatic equivalents are treated
-        as being provided in URL-encoded form (i.e. using %nn encoding) or in
-        decoded form. The Servlet specification requires that they are provided
-        in decoded form. However, Tomcat has historically treated them as if
-        they are provided in encoded form. In Tomcat 12, they will always be
-        treated as if they are provided in decoded form. This setting enables
-        migration from encoded form to decoded form on an application by
-        application basis. This attribute will be removed in Tomcat 12 where it
-        will effectively be hard-coded to <code>true</code>. (markt)
       </fix>
     </changelog>
   </subsection>

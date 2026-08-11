@@ -704,22 +704,6 @@
         penalty.</p>
       </attribute>
 
-      <attribute name="urlPatternsProvidedInDecodedForm" required="false">
-        <p>This attribute controls whether URLs and URL patterns provided in
-        the deployment descriptor (web.xml), annotations and/or their
-        programmatic equivalents are treated as being provided in URL-encoded
-        form (i.e. using %nn encoding) or in decoded form. The Servlet
-        specification requires that they are provided in decoded form. However,
-        Tomcat has historically treated them as if they are provided in encoded
-        form. In Tomcat 12, they will always be treated as if they are provided
-        in decoded form. This setting enables migration from encoded form to
-        decoded form on an application by application basis.</p>
-        <p>If not specified, the default value of <code>false</code> will be
-        used.</p>
-        <p>This attribute will be removed in Tomcat 12 where it will effectively
-        be hard-coded to <code>true</code>.</p>
-      </attribute>
-
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to

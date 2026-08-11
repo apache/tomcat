@@ -19,14 +19,11 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.apache.tomcat.util.buf.UDecoder;
-
 /**
  * Representation of a login configuration element for a web application, as represented in a
  * <code>&lt;login-config&gt;</code> element in the deployment descriptor.
  */
-@SuppressWarnings("deprecation")
-public class LoginConfig extends XmlEncodingBase implements Serializable {
+public class LoginConfig implements Serializable {
 
 
     @Serial
@@ -111,19 +108,6 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      * @param errorPage the errorPage to set
      */
     public void setErrorPage(String errorPage) {
-        this.errorPage = UDecoder.URLDecode(errorPage, getCharset());
-    }
-
-
-    /**
-     * Set the already decoded error page URI.
-     *
-     * @param errorPage the decoded errorPage to set
-     *
-     * @deprecated Will be removed in Tomcat 12 onwards
-     */
-    @Deprecated
-    public void setErrorPageDecoded(String errorPage) {
         this.errorPage = errorPage;
     }
 
@@ -148,19 +132,6 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      * @param loginPage the loginPage to set
      */
     public void setLoginPage(String loginPage) {
-        this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
-    }
-
-
-    /**
-     * Set the already decoded login page URI.
-     *
-     * @param loginPage the decoded loginPage to set
-     *
-     * @deprecated Will be removed in Tomcat 12 onwards
-     */
-    @Deprecated
-    public void setLoginPageDecoded(String loginPage) {
         this.loginPage = loginPage;
     }
 

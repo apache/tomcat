@@ -20,14 +20,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.apache.tomcat.util.buf.UDecoder;
-
 /**
  * Representation of an error page element for a web application, as represented in a <code>&lt;error-page&gt;</code>
  * element in the deployment descriptor.
  */
-@SuppressWarnings("deprecation")
-public class ErrorPage extends XmlEncodingBase implements Serializable {
+public class ErrorPage implements Serializable {
 
     /**
      * Default constructor for ErrorPage.
@@ -135,25 +132,11 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
      * @param location The new location
      */
     public void setLocation(String location) {
-        this.location = UDecoder.URLDecode(location, getCharset());
-    }
-
-
-    /**
-     * Set the already URL decoded location.
-     *
-     * @param location The new location
-     *
-     * @deprecated This method will be removed in Tomcat 12
-     */
-    @Deprecated
-    public void setLocationDecoded(String location) {
         this.location = location;
     }
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Render a String representation of this object.

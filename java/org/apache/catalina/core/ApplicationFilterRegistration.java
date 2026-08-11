@@ -89,7 +89,6 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... urlPatterns) {
@@ -109,12 +108,7 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
                 if (urlPattern == null) {
                     throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullUrlPattern"));
                 }
-                if (context.getUrlPatternsProvidedInDecodedForm()) {
-                    filterMap.addURLPatternDecoded(urlPattern);
-                } else {
-                    // % decoded (if required) using UTF-8
-                    filterMap.addURLPattern(urlPattern);
-                }
+                filterMap.addURLPattern(urlPattern);
             }
 
             if (isMatchAfter) {

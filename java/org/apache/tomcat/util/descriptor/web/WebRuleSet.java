@@ -96,9 +96,6 @@ public class WebRuleSet implements RuleSet {
     protected final RelativeOrderingRule relativeOrdering;
 
 
-    private final boolean urlPatternsProvidedInDecodedForm;
-
-
     // ------------------------------------------------------------ Constructor
 
     /**
@@ -131,22 +128,6 @@ public class WebRuleSet implements RuleSet {
      * @param fragment <code>true</code> if this is a web fragment
      */
     public WebRuleSet(String prefix, boolean fragment) {
-        this(prefix, fragment, false);
-    }
-
-
-    /**
-     * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
-     *
-     * @param prefix                           Prefix for matching pattern rules (including the trailing slash
-     *                                             character)
-     * @param fragment                         <code>true</code> if this is a web fragment
-     * @param urlPatternsProvidedInDecodedForm Whether URL and URL patterns will be provided in decoded form
-     *
-     * @deprecated This constructor will be removed in Tomcat 12
-     */
-    @Deprecated
-    public WebRuleSet(String prefix, boolean fragment, boolean urlPatternsProvidedInDecodedForm) {
         this.prefix = prefix;
         this.fragment = fragment;
 
@@ -158,7 +139,6 @@ public class WebRuleSet implements RuleSet {
 
         absoluteOrdering = new AbsoluteOrderingRule(fragment);
         relativeOrdering = new RelativeOrderingRule(fragment);
-        this.urlPatternsProvidedInDecodedForm = urlPatternsProvidedInDecodedForm;
     }
 
 
@@ -214,11 +194,7 @@ public class WebRuleSet implements RuleSet {
 
         digester.addCallMethod(fullPrefix + "/error-page/error-code", "setErrorCode", 0);
         digester.addCallMethod(fullPrefix + "/error-page/exception-type", "setExceptionType", 0);
-        if (urlPatternsProvidedInDecodedForm) {
-            digester.addCallMethod(fullPrefix + "/error-page/location", "setLocationDecoded", 0);
-        } else {
-            digester.addCallMethod(fullPrefix + "/error-page/location", "setLocation", 0);
-        }
+        digester.addCallMethod(fullPrefix + "/error-page/location", "setLocation", 0);
 
         digester.addObjectCreate(fullPrefix + "/filter", "org.apache.tomcat.util.descriptor.web.FilterDef");
         digester.addSetNext(fullPrefix + "/filter", "addFilter", "org.apache.tomcat.util.descriptor.web.FilterDef");
@@ -241,11 +217,7 @@ public class WebRuleSet implements RuleSet {
 
         digester.addCallMethod(fullPrefix + "/filter-mapping/filter-name", "setFilterName", 0);
         digester.addCallMethod(fullPrefix + "/filter-mapping/servlet-name", "addServletName", 0);
-        if (urlPatternsProvidedInDecodedForm) {
-            digester.addCallMethod(fullPrefix + "/filter-mapping/url-pattern", "addURLPatternDecoded", 0);
-        } else {
-            digester.addCallMethod(fullPrefix + "/filter-mapping/url-pattern", "addURLPattern", 0);
-        }
+        digester.addCallMethod(fullPrefix + "/filter-mapping/url-pattern", "addURLPattern", 0);
 
         digester.addCallMethod(fullPrefix + "/filter-mapping/dispatcher", "setDispatcher", 0);
 
@@ -270,12 +242,7 @@ public class WebRuleSet implements RuleSet {
                 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/trim-directive-whitespaces",
                 "setTrimWhitespace", 0);
-        if (urlPatternsProvidedInDecodedForm) {
-            digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern", "addUrlPatternDecoded",
-                    0);
-        } else {
-            digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern", "addUrlPattern", 0);
-        }
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern", "addUrlPattern", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/default-content-type",
                 "setDefaultContentType", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/buffer", "setBuffer", 0);
@@ -291,15 +258,8 @@ public class WebRuleSet implements RuleSet {
         digester.addCallMethod(fullPrefix + "/login-config/auth-method", "setAuthMethod", 0);
         digester.addCallMethod(fullPrefix + "/login-config/realm-name", "setRealmName", 0);
 
-        if (urlPatternsProvidedInDecodedForm) {
-            digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-error-page",
-                    "setErrorPageDecoded", 0);
-            digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-login-page",
-                    "setLoginPageDecoded", 0);
-        } else {
-            digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-error-page", "setErrorPage", 0);
-            digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-login-page", "setLoginPage", 0);
-        }
+        digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-error-page", "setErrorPage", 0);
+        digester.addCallMethod(fullPrefix + "/login-config/form-login-config/form-login-page", "setLoginPage", 0);
 
         digester.addCallMethod(fullPrefix + "/mime-mapping", "addMimeMapping", 2);
         digester.addCallParam(fullPrefix + "/mime-mapping/extension", 0);
@@ -324,13 +284,8 @@ public class WebRuleSet implements RuleSet {
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method", "addMethod", 0);
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method-omission",
                 "addOmittedMethod", 0);
-        if (urlPatternsProvidedInDecodedForm) {
-            digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/url-pattern",
-                    "addPatternDecoded", 0);
-        } else {
-            digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/url-pattern",
-                    "addPattern", 0);
-        }
+        digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/url-pattern", "addPattern",
+                0);
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/web-resource-name", "setName",
                 0);
 

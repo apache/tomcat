@@ -269,30 +269,19 @@ public class TestContextConfigAnnotation {
     }
 
     @Test
-    public void testUrlPatternsEncoded() throws Exception {
-        doTestUrlPatterns(false, "%");
-    }
-
-    @Test
-    public void testUrlPatternsDecoded() throws Exception {
-        doTestUrlPatterns(true, "%25");
-    }
-
-    @SuppressWarnings("deprecation")
-    private void doTestUrlPatterns(boolean urlPatternsProvidedInDecodedForm, String expectedSuffix) throws Exception {
-        WebXml webXml = new WebXml(urlPatternsProvidedInDecodedForm);
+    public void testUrlPatternsExpectDecoded() throws Exception {
+        WebXml webXml = new WebXml();
         Map<String,JavaClassCacheEntry> javaClassCache = new HashMap<>();
         ContextConfig config = new ContextConfig();
 
         File servletFile = paramClassResource("org/apache/catalina/startup/UrlPatternServlet");
         config.processAnnotationsFile(servletFile, webXml, false, javaClassCache);
-        Assert.assertEquals("urlPatternServlet",
-                webXml.getServletMappings().get("/servlet" + expectedSuffix));
+        Assert.assertEquals("urlPatternServlet", webXml.getServletMappings().get("/servlet%25"));
 
         File filterFile = paramClassResource("org/apache/catalina/startup/UrlPatternFilter");
         config.processAnnotationsFile(filterFile, webXml, false, javaClassCache);
         FilterMap filterMap = webXml.getFilterMappings().iterator().next();
-        Assert.assertArrayEquals(new String[] { "/filter" + expectedSuffix }, filterMap.getURLPatterns());
+        Assert.assertArrayEquals(new String[] { "/filter%25" }, filterMap.getURLPatterns());
     }
 
     @Test

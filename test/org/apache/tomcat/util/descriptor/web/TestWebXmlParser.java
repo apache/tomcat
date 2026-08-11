@@ -27,41 +27,31 @@ public class TestWebXmlParser {
     private static final String WEB_XML = "TestWebXmlParser-web.xml";
 
     @Test
-    public void testUrlPatternsEncoded() throws Exception {
-        doTestUrlPatterns(false, "%");
-    }
-
-    @Test
-    public void testUrlPatternsDecoded() throws Exception {
-        doTestUrlPatterns(true, "%25");
-    }
-
-    @SuppressWarnings("deprecation")
-    private void doTestUrlPatterns(boolean urlPatternsProvidedInDecodedForm, String expectedSuffix) throws Exception {
+    public void testUrlPatterns() throws Exception {
         URL webXmlUrl = TestWebXmlParser.class.getResource(WEB_XML);
         Assert.assertNotNull("Could not locate " + WEB_XML, webXmlUrl);
 
-        WebXml webXml = new WebXml(urlPatternsProvidedInDecodedForm);
-        WebXmlParser parser = new WebXmlParser(false, false, true, urlPatternsProvidedInDecodedForm);
+        WebXml webXml = new WebXml();
+        WebXmlParser parser = new WebXmlParser(false, false, true);
         Assert.assertTrue(parser.parseWebXml(webXmlUrl, webXml, false));
 
-        Assert.assertEquals("servlet", webXml.getServletMappings().get("/servlet" + expectedSuffix));
+        Assert.assertEquals("servlet", webXml.getServletMappings().get("/servlet%25"));
 
         FilterMap filterMap = webXml.getFilterMappings().iterator().next();
-        Assert.assertArrayEquals(new String[] { "/filter" + expectedSuffix }, filterMap.getURLPatterns());
+        Assert.assertArrayEquals(new String[] { "/filter%25" }, filterMap.getURLPatterns());
 
         JspPropertyGroup jspPropertyGroup = webXml.getJspPropertyGroups().iterator().next();
-        Assert.assertEquals(Set.of("/jsp" + expectedSuffix), jspPropertyGroup.getUrlPatterns());
+        Assert.assertEquals(Set.of("/jsp%25"), jspPropertyGroup.getUrlPatterns());
 
         LoginConfig loginConfig = webXml.getLoginConfig();
-        Assert.assertEquals("/login" + expectedSuffix, loginConfig.getLoginPage());
-        Assert.assertEquals("/login-error" + expectedSuffix, loginConfig.getErrorPage());
+        Assert.assertEquals("/login%25", loginConfig.getLoginPage());
+        Assert.assertEquals("/login-error%25", loginConfig.getErrorPage());
 
         ErrorPage errorPage = webXml.getErrorPages().values().iterator().next();
-        Assert.assertEquals("/error" + expectedSuffix, errorPage.getLocation());
+        Assert.assertEquals("/error%25", errorPage.getLocation());
 
         SecurityConstraint securityConstraint = webXml.getSecurityConstraints().iterator().next();
         SecurityCollection securityCollection = securityConstraint.findCollection("resource");
-        Assert.assertArrayEquals(new String[] { "/secure" + expectedSuffix }, securityCollection.findPatterns());
+        Assert.assertArrayEquals(new String[] { "/secure%25" }, securityCollection.findPatterns());
     }
 }
