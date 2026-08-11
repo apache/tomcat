@@ -140,7 +140,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 26 EA26
+        // Based on Java 28 EA10
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -228,6 +228,7 @@ public class ImportHandler {
         javaLangClassNames.add("CloneNotSupportedException");
         javaLangClassNames.add("EnumConstantNotPresentException");
         javaLangClassNames.add("Exception");
+        javaLangClassNames.add("IdentityException");
         javaLangClassNames.add("IllegalAccessException");
         javaLangClassNames.add("IllegalArgumentException");
         javaLangClassNames.add("IllegalCallerException");
