@@ -311,6 +311,11 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, status);
 
         Assert.assertTrue(closeLatch.await(10, TimeUnit.SECONDS));
+        // Account for a timing window
+        int i = 0;
+        while (wsSession.isOpen() && i < 100) {
+            Thread.sleep(50);
+        }
         Assert.assertFalse(wsSession.isOpen());
     }
 
