@@ -55,7 +55,7 @@ public class TestMessageBytesIntegration extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "MixUpServlet", new MixUpServlet());
-        ctx.addServletMappingDecoded("/mixup", "MixUpServlet");
+        ctx.addServletMapping("/mixup", "MixUpServlet");
 
         tomcat.start();
 

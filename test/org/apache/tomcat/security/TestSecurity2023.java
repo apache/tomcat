@@ -83,7 +83,7 @@ public class TestSecurity2023 extends TomcatBaseTest {
         context.addFilterDef(filterDef);
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(filterDef.getFilterName());
-        filterMap.addURLPatternDecoded("*");
+        filterMap.addURLPattern("*");
         context.addFilterMap(filterMap);
 
         tomcat.start();

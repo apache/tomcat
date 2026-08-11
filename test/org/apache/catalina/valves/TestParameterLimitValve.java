@@ -687,7 +687,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         failedRequestFilter.setFilterClass(FailedRequestFilter.class.getName());
         FilterMap failedRequestFilterMap = new FilterMap();
         failedRequestFilterMap.setFilterName("failedRequestFilter");
-        failedRequestFilterMap.addURLPatternDecoded("/*");
+        failedRequestFilterMap.addURLPattern("/*");
         context.addFilterDef(failedRequestFilter);
         context.addFilterMap(failedRequestFilterMap);
     }
