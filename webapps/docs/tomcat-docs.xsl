@@ -231,11 +231,23 @@
 
     <div class="subsection">
       <!-- Subsection heading -->
-      <!-- TODO: When a <subsection> is nested in another <subsection>,
-           the output should be <h5>, not <h4>. Same with <h6>. -->
-      <h4 id="{$name}">
-        <xsl:value-of select="@name"/>
-      </h4>
+      <xsl:choose>
+        <xsl:when test="not(parent::subsection)">
+          <h4 id="{$name}">
+            <xsl:value-of select="@name"/>
+          </h4>
+        </xsl:when>
+        <xsl:when test="parent::subsection and not(parent::subsection/parent::subsection)">
+          <h5 id="{$name}">
+            <xsl:value-of select="@name"/>
+          </h5>
+        </xsl:when>
+        <xsl:otherwise>
+          <h6 id="{$name}">
+            <xsl:value-of select="@name"/>
+          </h6>
+        </xsl:otherwise>
+      </xsl:choose>
       <!-- Subsection body -->
       <div class="text">
         <xsl:apply-templates/>
