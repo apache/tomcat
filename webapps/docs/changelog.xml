@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.23 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.24 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -241,92 +241,6 @@
         interface must implement this method. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Ensure that a <code>login-config</code> conflict when merging web.xml
-        fragments triggers a deployment failure. (markt)
-      </fix>
-      <scode>
-        Remove unnecessary calls to <code>String.intern()</code> in the parsing
-        of configuration files. (markt)
-      </scode>
-      <fix>
-        Extend <code>sessionAttributeValueClassNameFilter</code> to include
-        filtering of dynamic proxy interface classes. (markt)
-      </fix>
-      <fix>
-        Attempt to use rollback when persisting user data to the
-        <code>DataSourceUserDatabase</code> fails and improve error reporting.
-        (remm)
-      </fix>
-      <fix>
-        <bug>70143</bug>: Handle InvalidFileNameException when parsing parts to
-        rethrow it as an <code>IllegalStateException</code> as mandated by the
-        Servlet specification. (remm)
-      </fix>
-      <fix>
-        Add missing reason to the <code>JsonErrorReportValve</code>. (remm)
-      </fix>
-      <fix>
-        Fix evaluation of the <code>N</code> and <code>C</code> flags for
-        rewrite rules. (remm)
-      </fix>
-      <fix>
-        <code>qsd</code> flag should always discard the original query string
-        when rewriting. (remm)
-      </fix>
-      <fix>
-        Add appropriate escaping for context path, current directory name and
-        parent directory name for directory listings produced by the default
-        servlet. Ensure XML escaping is used with XML output. (markt)
-      </fix>
-      <fix>
-        When processing certificate subject names and issuer names within
-        RewriteValve rules, always use the RFC 2253 format name. (markt)
-      </fix>
-      <fix>
-        Fix the incorrect rejection of requests using digest authentication when
-        the client provided nonce count is at the upper boundary of the window
-        (markt).
-      </fix>
-      <update>
-        Separate the <code>Context</code> role mapping from the Servlet
-        specification <code>security-role-ref</code>. (remm)
-      </update>
-      <fix>
-        Handle the case where the <code>JNDIRealm</code> is configured to
-        perform role searches with <code>userRoleAttribute</code> but the
-        attribute is not available or not configured for the current user.
-        (markt)
-      </fix>
-      <fix>
-        Improve handling of session attribute addition concurrent with session
-        expiration. An application will now either see a successful addition
-        followed by expiration or the addition will not succeed. It is no longer
-        possible for the session to expire and the addition to succeed. This is
-        of particular not for attributes that implement
-        <code>HttpSessionBindingListener</code>. (markt)
-      </fix>
-      <fix>
-        Ensure the security constraint with the longest matching path is
-        selected when more than one constraint matches the request path. (markt)
-      </fix>
-      <fix>
-        If the request saved by FORM authentication uses a method other than
-        GET, ensure that the security constraints are re-assessed after the
-        saved request is restored and before it is processed. Custom
-        <code>Authenticator</code> implementations that extend
-        <code>FormAuthenticator</code> and override
-        <code>doAuthenticate()</code> and/or <code>restoreRequest()</code> will
-        require modification. (markt)
-      </fix>
-      <fix>
-        Various improvements to the <code>DataSourceRealm</code>. A failure to
-        connect to the database or an exception during either user or role
-        lookup will now result in an authentication failure rather than a
-        partially populated Principal. For <code>CLIENT-CERT</code> and
-        <code>SPNEGO</code> authentication, the user must exist in the database
-        for authentication to succeed. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -359,36 +273,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Add utility AutoCloseable URLConnection wrapper, and use it to cleanup
-        existing code patterns. (remm/markt)
-      </update>
-      <fix>
-        When processing an HTTP upgrade from HTTP/1.1 to HTTP/2, ensure that all
-        the HTTP/1.1 data has been processed before switching protocols. (markt)
-      </fix>
-      <fix>
-        Require every HTTP/2 request to provide an authority (either an
-        <code>:authority</code> pseudo header or a <code>Host</code> header).
-        (markt)
-      </fix>
-      <fix>
-        Register the use of an HTTP/2 stream identifier earlier so that there is
-        no possibility of a re-used stream identifier being accepted, regardless
-        of how early in the HEADERS frame processing an error is detected.
-        (markt)
-      </fix>
-      <add>
-        Add new attributes (<code>unixDomainSocketParentPermissions</code> and
-        <code>unixDomainSocketParentOwner</code>) to the NIO connector to
-        provide additional control over the security of Unix Domain Sockets.
-        Additional checks (enabled by default) have also been added for the
-        directory where the Unix Domain Socket will be created.(markt)
-      </add>
-      <fix>
-        Fix an allocation leak in the HTTP/2 backlog tracking when a stream is
-        reset. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -427,29 +311,11 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Ensure internal state is reset before re-using ELParser. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Change the default algorithm for the <code>EncryptInterceptor</code> to
-        <code>AES/GCM/NoPadding</code>. (markt)
-      </scode>
-      <add>
-        Expand the documentation for the <code>EncryptInterceptor</code> to be
-        more explicit regarding the security weaknesses of some supported
-        algorithms. Also explicitly state that the replay protection is only
-        effective for non-malleable algorithms. (markt)
-      </add>
-      <add>
-        Expand the Javadoc for the <code>DNSMembershipProvider</code> in
-        particular explaining its behaviour and providing configuration advice
-        if control more over cluster membership is required. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -481,24 +347,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Add a limit (defaults to 8KB) on the size of the HTTP response headers
-        accepted during a WebSocket HTTP upgrade. This is configured via the
-        <code>org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES</code>
-        user property. (markt)
-      </add>
-      <fix>
-        Improve URI template matching for WebSocket end points. Trailing slashes
-        are now significant both for template definitions and URIs considered
-        for potential matches to those URIs. Note that this means if a URI
-        template ends in a variable without a trailing slash, that variable
-        might be expanded to the empty string. (markt)
-      </fix>
-      <fix>
-        Account for session ID changes when tracking WebSocket connections for
-        closure because they were created under an authenticated HTTP session
-        that has since ended. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -507,31 +355,12 @@
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
-      <fix>
-        Manager: Use reflection to load clustering classes in
-        <code>sessionsList.jsp</code> so the sessions list page renders
-        correctly when clustering JARs are not present. (csutherl)
-      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Documentation: Better sample httpd configuration for use with SSLValve
-        and add a note that the exact configuration required will depend on the
-        overall httpd configuration. (markt)
-      </fix>
-      <fix>
-        Documentation: Expand the description of the <code>%S</code> (session ID)
-        access log pattern token. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>70164</bug>: Correct the documentation for the
-        <code>testOnBorrow</code> attribute. Pull request <pr>1033</pr> provided
-        by Kohei Tamura. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -559,26 +388,6 @@
         Update Checkstyle to 13.9.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Examples: Limit the buffering of messages in the WebSocket chat example
-        to prevent a malicious client triggering excessive memory usage that
-        could lead to a DoS. (markt)
-      </fix>
-      <update>
-        Update Objenesis to 3.6. (markt)
-      </update>
-      <update>
-        Update JSign to 7.5. (markt)
-      </update>
-      <update>
-        Update Bouncy Castle to 1.85. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
