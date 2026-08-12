@@ -273,6 +273,10 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix parsing of client certificates that specify more than one OCSP
+        responder for configurations that use OpenSSL-FFM. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
