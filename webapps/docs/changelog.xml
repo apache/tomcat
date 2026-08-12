@@ -108,6 +108,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.26 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix parsing of client certificates that specify more than one OCSP
+        responder for configurations that use OpenSSL-FFM. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.25 (markt)" rtext="release in progress">
   <subsection name="Catalina">
