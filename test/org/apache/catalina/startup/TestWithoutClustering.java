@@ -54,7 +54,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                         "org.apache.catalina.tribes.Channel"));
     }
 
-    /**
+    /*
      * Verify that Tomcat starts up and serves requests when clustering
      * classes are not available.
      */
@@ -105,7 +105,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 tomcat.getEngine().getCluster());
     }
 
-    /**
+    /*
      * Verify that a servlet running inside a web application cannot load
      * clustering classes via the webapp classloader.
      */
@@ -159,7 +159,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 body.contains("RESULT: ALL_HIDDEN"));
     }
 
-    /**
+    /*
      * Verify that sessionsList.jsp compiles and renders when clustering
      * classes are not available. The JSP uses reflection to load DeltaSession
      * so it should gracefully fall back.
@@ -253,7 +253,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 .contains("active Sessions"));
     }
 
-    /**
+    /*
      * Verify that StandardEngineSF loads without error when clustering
      * classes are not available. The clusterValveClass field should be null.
      */
@@ -274,7 +274,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 "clustering classes", f.get(null));
     }
 
-    /**
+    /*
      * Verify that StandardHostSF loads without error when clustering
      * classes are not available. The clusterValveClass field should be null.
      */
@@ -295,7 +295,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 "clustering classes", f.get(null));
     }
 
-    /**
+    /*
      * Verify that StoreRegistry.getInterfaces() returns only the 10
      * core interfaces when clustering classes are not available.
      */
@@ -331,7 +331,7 @@ public class TestWithoutClustering extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Servlet that checks whether clustering classes are visible via the
      * webapp classloader (TCCL). Uses the TCCL rather than Class.forName()
      * because the servlet class itself is loaded by the system classloader
