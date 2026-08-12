@@ -1199,31 +1199,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         BIO_free(certificateChainBIO);
                     }
                 }
-                // Set revocation
-                MemorySegment certificateStore = SSL_CTX_get_cert_store(state.sslCtx);
-                if (sslHostConfig.getCertificateRevocationListFile() != null) {
-                    MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
-                    var certificateRevocationListFileNative = localArena.allocateFrom(
-                            SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
-                    if (X509_LOOKUP_load_file(x509Lookup, certificateRevocationListFileNative,
-                            X509_FILETYPE_PEM()) <= 0) {
-                        throw new IllegalArgumentException(sm.getString(
-                                "openssl.errorLoadingCertificateRevocationListWithError",
-                                sslHostConfig.getCertificateRevocationListFile(), OpenSSLLibrary.getLastError()));
-                    }
-                }
-                if (sslHostConfig.getCertificateRevocationListPath() != null) {
-                    MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
-                    var certificateRevocationListPathNative = localArena.allocateFrom(
-                            SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
-                    if (X509_LOOKUP_add_dir(x509Lookup, certificateRevocationListPathNative,
-                            X509_FILETYPE_PEM()) <= 0) {
-                        throw new IllegalArgumentException(sm.getString(
-                                "openssl.errorLoadingCertificateRevocationListWithError",
-                                sslHostConfig.getCertificateRevocationListPath(), OpenSSLLibrary.getLastError()));
-                    }
-                }
-                X509_STORE_set_flags(certificateStore, X509_V_FLAG_CRL_CHECK() | X509_V_FLAG_CRL_CHECK_ALL());
             } finally {
                 BIO_free(certificateBIO);
             }
@@ -1317,6 +1292,36 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } finally {
                 BIO_free(keyBIO);
             }
+        }
+        // Set revocation
+        boolean crlPresent = false;
+        MemorySegment certificateStore = SSL_CTX_get_cert_store(state.sslCtx);
+        if (sslHostConfig.getCertificateRevocationListFile() != null) {
+            MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
+            var certificateRevocationListFileNative = localArena.allocateFrom(
+                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
+            if (X509_LOOKUP_load_file(x509Lookup, certificateRevocationListFileNative,
+                    X509_FILETYPE_PEM()) <= 0) {
+                throw new IllegalArgumentException(sm.getString(
+                        "openssl.errorLoadingCertificateRevocationListWithError",
+                        sslHostConfig.getCertificateRevocationListFile(), OpenSSLLibrary.getLastError()));
+            }
+            crlPresent = true;
+        }
+        if (sslHostConfig.getCertificateRevocationListPath() != null) {
+            MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
+            var certificateRevocationListPathNative = localArena.allocateFrom(
+                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
+            if (X509_LOOKUP_add_dir(x509Lookup, certificateRevocationListPathNative,
+                    X509_FILETYPE_PEM()) <= 0) {
+                throw new IllegalArgumentException(sm.getString(
+                        "openssl.errorLoadingCertificateRevocationListWithError",
+                        sslHostConfig.getCertificateRevocationListPath(), OpenSSLLibrary.getLastError()));
+            }
+            crlPresent = true;
+        }
+        if (crlPresent) {
+            X509_STORE_set_flags(certificateStore, X509_V_FLAG_CRL_CHECK() | X509_V_FLAG_CRL_CHECK_ALL());
         }
         return true;
     }

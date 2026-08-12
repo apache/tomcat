@@ -251,6 +251,10 @@
         Small per performance optimisation. Don't waste cycles swallowing an AJP
         response body when the connection is going to be closed. (markt)
       </fix>
+      <fix>
+        Fix OpenSSL support for CRLs when using OpenSSL trust with the server
+        key held in a Java key store. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
