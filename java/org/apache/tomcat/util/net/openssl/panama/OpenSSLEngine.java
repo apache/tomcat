@@ -1277,11 +1277,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final byte[] OCSP_OID = { 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x30, 0x01 };
 
     private static void parseOCSPURLs(Asn1Parser parser, ArrayList<String> urls) {
+        // See RFC 5280, section 4.2.2.1 for format
+        // Outer sequence
+        int tag = parser.peekTag();
+        if (tag == ASN1_SEQUENCE) {
+            parser.parseTag(ASN1_SEQUENCE);
+            parser.parseFullLength();
+        }
+        // Iterate over nested sequences
         while (!parser.eof()) {
-            int tag = parser.peekTag();
+            tag = parser.peekTag();
             if (tag == ASN1_SEQUENCE) {
                 parser.parseTag(ASN1_SEQUENCE);
-                parser.parseFullLength();
+                parser.parseLength();
             } else if (tag == ASN1_OID) {
                 parser.parseTag(ASN1_OID);
                 int oidLen = parser.parseLength();

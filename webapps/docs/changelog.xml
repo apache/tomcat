@@ -244,6 +244,10 @@
         Fix an allocation leak in the HTTP/2 backlog tracking when a stream is
         reset. (markt)
       </fix>
+      <fix>
+        Fix parsing of client certificates that specify more than one OCSP
+        responder for configurations that use OpenSSL-FFM. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
