@@ -34,6 +34,7 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.tomcat.util.ExceptionUtils;
 
 public class EncryptionInterceptorBaseTest {
 
@@ -56,9 +57,28 @@ public class EncryptionInterceptorBaseTest {
 
     @AfterClass
     public static void cleanup() {
-        File f = new File(MESSAGE_FILE);
-        if (f.isFile()) {
-            Assert.assertTrue(f.delete());
+        int attempts = 0;
+        int maxAttempts = 2;
+        while (attempts < maxAttempts) {
+            attempts++;
+            try {
+                File f = new File(MESSAGE_FILE);
+                if (f.isFile()) {
+                    Assert.assertTrue(f.delete());
+                }
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                if (attempts < maxAttempts) {
+                    // Brief delay before re-try
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        // Ignore. The delay will just be shorter than expected.
+                    }
+                } else {
+                    throw t;
+                }
+            }
         }
     }
 
