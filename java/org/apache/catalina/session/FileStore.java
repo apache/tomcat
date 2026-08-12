@@ -38,6 +38,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -282,11 +283,35 @@ public final class FileStore extends StoreBase {
                     ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
                 ((StandardSession) session).writeObjectData(oos);
             }
-            try {
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            /*
+             * Failures have been observed with the move when under load in testing. The re-try mechanism is an attempt
+             * to mitigate against those failures.
+             */
+            int attempts = 0;
+            int maxAttempts = 2;
+            while (attempts < maxAttempts) {
+                attempts++;
+                try {
+                    try {
+                        Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    break;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    if (attempts < maxAttempts) {
+                        // Brief delay before re-try
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            // Ignore. The delay will just be shorter than expected.
+                        }
+                    } else {
+                        throw t;
+                    }
+                }
             }
         } finally {
             try {
