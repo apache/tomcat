@@ -134,15 +134,23 @@ public class TestHttp2Section_5_2 extends Http2TestBase {
             parser.readFrame();
         }
 
+        output.clearTrace();
+
         // Connection flow control window is now empty
 
         // Put a stream on the backlog and then immediately cancel it
         sendSimpleGetRequest(17);
         sendRst(17, Http2Error.NO_ERROR.getCode());
-        // Read headers
+        /*
+         * There is a server side race here. The start of the response may or may not be received before the RST is
+         * processed. Handle both cases. Once the RST is received, no further frames will be received for that stream.
+         */
+        // Read headers or RST
         parser.readFrame();
-        // Read reset from server
-        parser.readFrame();
+        if (output.getTrace().startsWith("17-HeadersStart")) {
+            // Read reset from server
+            parser.readFrame();
+        }
 
         // Increase default window size to 8k
         sendSettings(0, false, new SettingValue(4, 8 * 1024));
