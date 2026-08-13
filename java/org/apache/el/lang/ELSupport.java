@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Clock;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
@@ -551,10 +552,24 @@ public class ELSupport {
 
         return switch (obj) {
             case null -> null;
-            case TemporalAccessor t -> Instant.from(t);
+            case TemporalAccessor t -> {
+                try {
+                    yield Instant.from(t);
+                } catch (DateTimeException e) {
+                    throw new ELException(
+                            MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class), e);
+                }
+            }
             case Clock c -> c.instant();
             case Date d -> d.toInstant();
-            case String s -> Instant.parse(s);
+            case String s -> {
+                try {
+                    yield Instant.parse(s);
+                } catch (DateTimeException e) {
+                    throw new ELException(
+                            MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class), e);
+                }
+            }
             default -> {
                 throw new ELException(
                         MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));

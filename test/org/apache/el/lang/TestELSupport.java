@@ -19,6 +19,8 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -236,6 +238,22 @@ public class TestELSupport {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "", TesterType.class);
         Assert.assertNull(result);
+    }
+
+    @Test
+    public void testCoerceToInstant01() {
+        Object result = ELSupport.coerceToType(null, "2024-01-01T00:00:00Z", Instant.class);
+        Assert.assertEquals(Instant.parse("2024-01-01T00:00:00Z"), result);
+    }
+
+    @Test(expected = ELException.class)
+    public void testCoerceToInstant02() {
+        ELSupport.coerceToType(null, "not-a-date", Instant.class);
+    }
+
+    @Test(expected = ELException.class)
+    public void testCoerceToInstant03() {
+        ELSupport.coerceToType(null, LocalDate.of(2024, 1, 1), Instant.class);
     }
 
     @Test
