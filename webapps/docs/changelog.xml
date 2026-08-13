@@ -107,11 +107,13 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.59 (schultz)" rtext="in development">
-  <subsection>
-    <fix>
-      Fix async path building. (markt)
-    </fix>
+<section name="Tomcat 10.1.59 (schultz)" rtext="">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix async path building. (markt)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 10.1.58 (schultz)" rtext="not released">
