@@ -400,8 +400,11 @@ public class ApplicationContext implements ServletContext {
         // Remove path parameters
         String uriToMap = org.apache.catalina.util.RequestUtil.stripPathParams(uri, null);
 
+        boolean pathIsEncoded =
+                getContext().getDispatchersUseEncodedPaths() || AsyncContextImpl.uriEncoded.get().booleanValue();
+
         // Decode only if the uri derived from the provided path is expected to be encoded
-        if (getContext().getDispatchersUseEncodedPaths()) {
+        if (pathIsEncoded) {
             uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8, context.getEncodedSolidusHandlingEnum(),
                     context.getEncodedReverseSolidusHandlingEnum());
         }
@@ -419,7 +422,7 @@ public class ApplicationContext implements ServletContext {
          * getRequestURI() which returns encoded values. getContextPath() returns a decoded value. uri may be encoded or
          * not. Need to prepend the context path to uri and ensure the result is correctly encoded.
          */
-        if (getContext().getDispatchersUseEncodedPaths()) {
+        if (pathIsEncoded) {
             uri = URLEncoder.DEFAULT.encode(getContextPath(), StandardCharsets.UTF_8) + uri;
         } else {
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
