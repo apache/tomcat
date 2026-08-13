@@ -128,6 +128,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
+    /*
+     * ThreadLocal for passing over-ridden URL encoding state when dispatching.
+     */
+    static ThreadLocal<Boolean> uriEncoded = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     /**
      * Constructs an AsyncContextImpl for the given request.
@@ -219,7 +223,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         String path;
         String cpath;
         Request request = this.request;
-        Context context = this.context;
         // Calls check() so local copies are validated
         ServletRequest servletRequest = getRequest();
         if (servletRequest instanceof HttpServletRequest sr) {
@@ -232,10 +235,20 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (cpath.length() > 1) {
             path = path.substring(cpath.length());
         }
-        if (!context.getDispatchersUseEncodedPaths()) {
-            path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
+        /*
+         * This is a dispatch of the original request path. That path will always be URI-decoded. That will cause
+         * problems in ServletContext.getRequestDispatcher() if the decoded URI contains a literal '?' as it will be
+         * treated as a query delimiter. Therefore, ignore context.getDispatchersUseEncodedPaths() here and always
+         * encode. Also need to mark this request as ignoring context.getDispatchersUseEncodedPaths() so it is handled
+         * correctly in ServletContext.getRequestDispatcher().
+         */
+        path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
+        try {
+            uriEncoded.set(Boolean.TRUE);
+            dispatch(path);
+        } finally {
+            uriEncoded.set(Boolean.FALSE);
         }
-        dispatch(path);
     }
 
     @Override
