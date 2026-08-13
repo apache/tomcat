@@ -120,6 +120,8 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
     @Test
     public void testMinimalUserRoleDatabase()
         throws Exception {
+        Assume.assumeTrue(JreCompat.isJre16Available());
+
         // Test functionality with the DataSourceRealm schema
 
         db = new DerbyUserDatabase("minimal");
