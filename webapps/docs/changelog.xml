@@ -218,6 +218,10 @@
         this fix, paths containing literal <code>'?'</code> characters were
         truncated. (markt)
       </fix>
+      <fix>
+        Ensure that capture groups from a <code>RewriteCond</code> always
+        reflect the result of the current request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
