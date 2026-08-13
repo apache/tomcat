@@ -241,6 +241,14 @@
         interface must implement this method. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Improve the handling of <code>AsyncContext.dispatch()</code> when the
+        <code>Context</code> attribute <code>dispatchersUseEncodedPaths</code>
+        is set to <code>false</code> since the application has no control over
+        the path used for the <code>AsyncContext.dispatch()</code>. Prior to
+        this fix, paths containing literal <code>'?'</code> characters were
+        truncated. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
