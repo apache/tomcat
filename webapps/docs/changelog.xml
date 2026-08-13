@@ -210,6 +210,14 @@
         <code>SPNEGO</code> authentication, the user must exist in the database
         for authentication to succeed. (markt)
       </fix>
+      <fix>
+        Improve the handling of <code>AsyncContext.dispatch()</code> when the
+        <code>Context</code> attribute <code>dispatchersUseEncodedPaths</code>
+        is set to <code>false</code> since the application has no control over
+        the path used for the <code>AsyncContext.dispatch()</code>. Prior to
+        this fix, paths containing literal <code>'?'</code> characters were
+        truncated. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
