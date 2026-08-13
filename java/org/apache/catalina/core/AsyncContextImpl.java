@@ -17,7 +17,6 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -48,7 +47,6 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -237,13 +235,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             path = path.substring(cpath.length());
         }
         /*
-         * This is a dispatch of the original request path. That path will always be URI-decoded. That will cause
-         * problems in ServletContext.getRequestDispatcher() if the decoded URI contains a literal '?' as it will be
-         * treated as a query delimiter. Therefore, ignore context.getDispatchersUseEncodedPaths() here and always
-         * encode. Also need to mark this request as ignoring context.getDispatchersUseEncodedPaths() so it is handled
-         * correctly in ServletContext.getRequestDispatcher().
+         * This is a dispatch of the original request path. That path (obtained request.getRequestURI()) will always be
+         * URL-encoded. Therefore, ignore context.getDispatchersUseEncodedPaths() here and mark as always encoded so it
+         * is handled correctly in ServletContext.getRequestDispatcher().
          */
-        path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
         try {
             uriEncoded.set(Boolean.TRUE);
             dispatch(path);
