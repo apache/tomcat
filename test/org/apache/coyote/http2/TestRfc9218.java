@@ -134,7 +134,9 @@ public class TestRfc9218 extends Http2TestBase {
         // Add 1 byte to the connection window. Due to rounding up, each stream should get 1 byte.
         sendWindowUpdate(0, 1);
         parser.readFrame();
+        System.out.println(output.getTrace());
         parser.readFrame();
+        System.out.println(output.getTrace());
         parser.readFrame();
 
         trace = output.getTrace();
