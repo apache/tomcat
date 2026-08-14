@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Map;
@@ -254,6 +255,12 @@ public class TestELSupport {
     @Test(expected = ELException.class)
     public void testCoerceToInstant03() {
         ELSupport.coerceToType(null, LocalDate.of(2024, 1, 1), Instant.class);
+    }
+
+    @Test(expected = ELException.class)
+    public void testCoerceToInstant04() {
+        // java.sql.Date can't convert to Instant
+        ELSupport.coerceToType(null, new Date(0), Instant.class);
     }
 
     @Test

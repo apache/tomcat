@@ -550,31 +550,22 @@ public class ELSupport {
             }
         }
 
-        return switch (obj) {
-            case null -> null;
-            case TemporalAccessor t -> {
-                try {
-                    yield Instant.from(t);
-                } catch (DateTimeException e) {
+        try {
+            return switch (obj) {
+                case null -> null;
+                case TemporalAccessor t -> Instant.from(t);
+                case Clock c -> c.instant();
+                case Date d -> d.toInstant();
+                case String s -> Instant.parse(s);
+                default -> {
                     throw new ELException(
-                            MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class), e);
+                            MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));
                 }
-            }
-            case Clock c -> c.instant();
-            case Date d -> d.toInstant();
-            case String s -> {
-                try {
-                    yield Instant.parse(s);
-                } catch (DateTimeException e) {
-                    throw new ELException(
-                            MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class), e);
-                }
-            }
-            default -> {
-                throw new ELException(
-                        MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));
-            }
-        };
+            };
+        } catch (DateTimeException | UnsupportedOperationException e) {
+            throw new ELException(
+                    MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class), e);
+        }
     }
 
     /**
