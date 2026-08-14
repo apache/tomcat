@@ -17,9 +17,16 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import jakarta.websocket.RemoteEndpoint;
+
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public class TestWsFrame {
 
@@ -57,5 +64,77 @@ public class TestWsFrame {
         Assert.assertEquals(0x7FFFFFFFFFFFFFFFL,
                 WsFrameBase.byteArrayToLong(new byte[] { 20, 127, -1, -1, -1, -1, -1, -1, -1 }, 1, 8));
         Assert.assertEquals(-1, WsFrameBase.byteArrayToLong(new byte[] { 20, -1, -1, -1, -1, -1, -1, -1, -1 }, 1, 8));
+    }
+
+
+    @Test
+    public void testAutomaticPongAfterCloseStarted() throws Exception {
+        WsSession wsSession = EasyMock.createNiceMock(WsSession.class);
+        RemoteEndpoint.Basic basicRemote = EasyMock.createMock(RemoteEndpoint.Basic.class);
+        EasyMock.expect(wsSession.isOpen()).andReturn(Boolean.TRUE);
+        EasyMock.expect(wsSession.getBasicRemote()).andReturn(basicRemote);
+        basicRemote.sendPong(EasyMock.anyObject(ByteBuffer.class));
+        EasyMock.expectLastCall().andThrow(new IllegalStateException());
+        EasyMock.expect(wsSession.isClosing()).andReturn(Boolean.TRUE);
+        EasyMock.replay(wsSession, basicRemote);
+
+        TestFrame frame = new TestFrame(wsSession);
+        frame.processPing();
+
+        EasyMock.verify(wsSession, basicRemote);
+    }
+
+
+    @Test
+    public void testAutomaticPongFailureWhileOpen() throws Exception {
+        WsSession wsSession = EasyMock.createNiceMock(WsSession.class);
+        RemoteEndpoint.Basic basicRemote = EasyMock.createMock(RemoteEndpoint.Basic.class);
+        EasyMock.expect(wsSession.isOpen()).andReturn(Boolean.TRUE);
+        EasyMock.expect(wsSession.getBasicRemote()).andReturn(basicRemote);
+        basicRemote.sendPong(EasyMock.anyObject(ByteBuffer.class));
+        EasyMock.expectLastCall().andThrow(new IllegalStateException());
+        EasyMock.expect(wsSession.isClosing()).andReturn(Boolean.FALSE);
+        EasyMock.replay(wsSession, basicRemote);
+
+        TestFrame frame = new TestFrame(wsSession);
+        try {
+            frame.processPing();
+            Assert.fail();
+        } catch (IllegalStateException expected) {
+            // Expected.
+        }
+
+        EasyMock.verify(wsSession, basicRemote);
+    }
+
+
+    private static class TestFrame extends WsFrameBase {
+
+        TestFrame(WsSession wsSession) {
+            super(wsSession, null);
+        }
+
+        void processPing() throws IOException {
+            inputBuffer.clear();
+            inputBuffer.put((byte) 0x89);
+            inputBuffer.put((byte) 0x00);
+            inputBuffer.flip();
+            processInputBuffer();
+        }
+
+        @Override
+        protected boolean isMasked() {
+            return false;
+        }
+
+        @Override
+        protected Log getLog() {
+            return LogFactory.getLog(TestFrame.class);
+        }
+
+        @Override
+        protected void resumeProcessing() {
+            // NO-OP
+        }
     }
 }
