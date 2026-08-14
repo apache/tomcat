@@ -336,10 +336,6 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
-      <fix>
-        Fix an exception when an automatic Pong response races with the
-        closing of the WebSocket session. (moritzfl)
-      </fix>
       <update>
         Update Tomcat's WebSocket support to version 2.3 of the Jakarta
         WebSocket API. (markt)
@@ -367,6 +363,11 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix an exception when an automatic Pong response races with the
+        closing of the WebSocket session. Pull request <pr>1041</pr> provided by
+        moritzfl. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

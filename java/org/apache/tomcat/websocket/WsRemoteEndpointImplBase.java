@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -548,7 +549,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     void writeMessagePart(MessagePart mp) throws IOException {
         if (closed) {
-            throw new IOException(sm.getString("wsRemoteEndpoint.closed"));
+            throw new EOFException(sm.getString("wsRemoteEndpoint.closed"));
         }
 
         if (Constants.INTERNAL_OPCODE_FLUSH == mp.getOpCode()) {

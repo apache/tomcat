@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -379,10 +380,12 @@ public abstract class WsFrameBase {
             if (wsSession.isOpen()) {
                 try {
                     wsSession.getBasicRemote().sendPong(controlBufferBinary);
-                } catch (IllegalStateException ise) {
-                    // The close process may have started after isOpen() was checked.
+                } catch (IllegalStateException | EOFException e) {
+                    // IllegalStateException - wsSession started to close while pong was being prepared
+                    // EOFException - wsSession closed while pong was being prepared
+                    // Either way, ignore the error
                     if (!wsSession.isClosing()) {
-                        throw ise;
+                        throw e;
                     }
                 }
             }

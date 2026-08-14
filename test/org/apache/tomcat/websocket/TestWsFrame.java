@@ -16,17 +16,18 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import jakarta.websocket.RemoteEndpoint;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.easymock.EasyMock;
 
 public class TestWsFrame {
 
@@ -69,39 +70,61 @@ public class TestWsFrame {
 
     @Test
     public void testAutomaticPongAfterCloseStarted() throws Exception {
-        WsSession wsSession = EasyMock.createNiceMock(WsSession.class);
-        RemoteEndpoint.Basic basicRemote = EasyMock.createMock(RemoteEndpoint.Basic.class);
-        EasyMock.expect(wsSession.isOpen()).andReturn(Boolean.TRUE);
-        EasyMock.expect(wsSession.getBasicRemote()).andReturn(basicRemote);
-        basicRemote.sendPong(EasyMock.anyObject(ByteBuffer.class));
-        EasyMock.expectLastCall().andThrow(new IllegalStateException());
-        EasyMock.expect(wsSession.isClosing()).andReturn(Boolean.TRUE);
-        EasyMock.replay(wsSession, basicRemote);
-
-        TestFrame frame = new TestFrame(wsSession);
-        frame.processPing();
-
-        EasyMock.verify(wsSession, basicRemote);
+        doTestAutomaticPongFailure(new IllegalStateException(), true, true);
     }
 
 
     @Test
-    public void testAutomaticPongFailureWhileOpen() throws Exception {
+    public void testAutomaticPongISEWhileOpen() throws Exception {
+        doTestAutomaticPongFailure(new IllegalStateException(), false, false);
+    }
+
+
+    @Test
+    public void testAutomaticPongAfterCloseCompleted() throws Exception {
+        doTestAutomaticPongFailure(new EOFException(), true, true);
+    }
+
+
+    @Test
+    public void testAutomaticPongEOFWhileOpen() throws Exception {
+        doTestAutomaticPongFailure(new EOFException(), false, false);
+    }
+
+
+    @Test
+    public void testAutomaticPongIOEAfterCloseStarted() throws Exception {
+        doTestAutomaticPongFailure(new IOException(), true, false);
+    }
+
+
+    @Test
+    public void testAutomaticPongIOEWhileOpen() throws Exception {
+        doTestAutomaticPongFailure(new IOException(), false, false);
+    }
+
+
+    private static void doTestAutomaticPongFailure(Exception failure, boolean closing, boolean swallowed)
+            throws Exception {
         WsSession wsSession = EasyMock.createNiceMock(WsSession.class);
         RemoteEndpoint.Basic basicRemote = EasyMock.createMock(RemoteEndpoint.Basic.class);
-        EasyMock.expect(wsSession.isOpen()).andReturn(Boolean.TRUE);
+        EasyMock.expect(Boolean.valueOf(wsSession.isOpen())).andReturn(Boolean.TRUE);
         EasyMock.expect(wsSession.getBasicRemote()).andReturn(basicRemote);
         basicRemote.sendPong(EasyMock.anyObject(ByteBuffer.class));
-        EasyMock.expectLastCall().andThrow(new IllegalStateException());
-        EasyMock.expect(wsSession.isClosing()).andReturn(Boolean.FALSE);
+        EasyMock.expectLastCall().andThrow(failure);
+        EasyMock.expect(Boolean.valueOf(wsSession.isClosing())).andStubReturn(Boolean.valueOf(closing));
         EasyMock.replay(wsSession, basicRemote);
 
         TestFrame frame = new TestFrame(wsSession);
-        try {
+        if (swallowed) {
             frame.processPing();
-            Assert.fail();
-        } catch (IllegalStateException expected) {
-            // Expected.
+        } else {
+            try {
+                frame.processPing();
+                Assert.fail();
+            } catch (Exception actual) {
+                Assert.assertSame(failure, actual);
+            }
         }
 
         EasyMock.verify(wsSession, basicRemote);
