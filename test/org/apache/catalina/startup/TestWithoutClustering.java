@@ -410,6 +410,19 @@ public class TestWithoutClustering extends TomcatBaseTest {
                 try {
                     byte[] bytes = Files.readAllBytes(
                             Paths.get(path));
+                    // Ensure the package is defined so that
+                    // Class.getPackage() does not return null on Java 8.
+                    // (Java 9+ defines it implicitly in defineClass().)
+                    int lastDot = name.lastIndexOf('.');
+                    if (lastDot != -1) {
+                        String pkgName = name.substring(0, lastDot);
+                        try {
+                            definePackage(pkgName, null, null, null,
+                                    null, null, null, null);
+                        } catch (IllegalArgumentException e) {
+                            // Package already defined - ignore
+                        }
+                    }
                     c = defineClass(name, bytes, 0, bytes.length);
                     if (resolve) {
                         resolveClass(c);
