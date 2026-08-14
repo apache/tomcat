@@ -304,7 +304,7 @@ class Http2Parser {
             // The padding does not count towards the size of payload that is read below.
             payloadSize -= padLength;
 
-            // Any RFC 7450 priority data was read into the byte[] optional above. It is ignored.
+            // Any RFC 7540 priority data was read into the byte[] optional above. It is ignored.
         }
 
         readHeaderPayload(streamId, payloadSize, buffer);
@@ -323,7 +323,7 @@ class Http2Parser {
 
 
     protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws IOException {
-        // RFC 7450 priority frames are ignored. Still need to treat as overhead.
+        // RFC 7540 priority frames are ignored. Still need to treat as overhead.
         try {
             swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
         } catch (ConnectionException ignore) {

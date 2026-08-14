@@ -1934,7 +1934,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         } else if (setting == Setting.NO_RFC7540_PRIORITIES) {
             // This should not be changed after the initial setting
             if (value != ConnectionSettingsBase.DEFAULT_NO_RFC7540_PRIORITIES) {
-                throw new ConnectionException(sm.getString("upgradeHandler.enableRfc7450Priorities", connectionId),
+                throw new ConnectionException(sm.getString("upgradeHandler.enableRfc7540Priorities", connectionId),
                         Http2Error.PROTOCOL_ERROR);
             }
         } else {
