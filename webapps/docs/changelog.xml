@@ -132,6 +132,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Fix an exception when an automatic Pong response races with the
+        closing of the WebSocket session. (moritzfl)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.121 (remm)" rtext="release in progress">
   <subsection name="Catalina">
@@ -19043,4 +19051,3 @@
 </section>
 </body>
 </document>
-

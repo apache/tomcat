@@ -553,6 +553,16 @@ public class WsSession implements Session {
 
 
     /**
+     * Checks if the session close process has started.
+     *
+     * @return true if the session is closing or closed
+     */
+    boolean isClosing() {
+        return state.get() != State.OPEN;
+    }
+
+
+    /**
      * Checks if the session is closed.
      *
      * @return true if the session is closed

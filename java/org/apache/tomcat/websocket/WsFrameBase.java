@@ -377,7 +377,14 @@ public abstract class WsFrameBase {
             wsSession.onClose(new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
             if (wsSession.isOpen()) {
-                wsSession.getBasicRemote().sendPong(controlBufferBinary);
+                try {
+                    wsSession.getBasicRemote().sendPong(controlBufferBinary);
+                } catch (IllegalStateException e) {
+                    // wsSession started to close or has fully closed while pong was being prepared
+                    if (!wsSession.isClosing()) {
+                        throw e;
+                    }
+                }
             }
         } else if (opCode == Constants.OPCODE_PONG) {
             MessageHandler.Whole<PongMessage> mhPong = wsSession.getPongMessageHandler();
