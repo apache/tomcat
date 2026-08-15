@@ -527,33 +527,30 @@ RewriteRule ^/(.*)$ ${uc:$1}
       <p>Some hints on the syntax of regular
       expressions:</p>
 
-<!-- TODO: Why is the following pre-formatted non-wrappable text? -->
-<pre>
-<strong>Text:</strong>
-  <strong><code>.</code></strong>           Any single character
-  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class 'chars'
-  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class 'chars'
-  text1<strong><code>|</code></strong>text2 Alternative: text1 or text2
+<source wrapped="true"><strong>Text:</strong>
+  <strong>.</strong>           Any single character
+  <strong>[</strong>chars<strong>]</strong>     Character class: Any character of the class 'chars'
+  <strong>[^</strong>chars<strong>]</strong>    Character class: Not a character of the class 'chars'
+  text1<strong>|</strong>text2 Alternative: text1 or text2
 
 <strong>Quantifiers:</strong>
-  <strong><code>?</code></strong>           0 or 1 occurrences of the preceding text
-  <strong><code>*</code></strong>           0 or N occurrences of the preceding text (N &gt; 0)
-  <strong><code>+</code></strong>           1 or N occurrences of the preceding text (N &gt; 1)
+  <strong>?</strong>           0 or 1 occurrences of the preceding text
+  <strong>*</strong>           0 or N occurrences of the preceding text (N &gt; 0)
+  <strong>+</strong>           1 or N occurrences of the preceding text (N &gt; 1)
 
 <strong>Grouping:</strong>
-  <strong><code>(</code></strong>text<strong><code>)</code></strong>      Grouping of text
+  <strong>(</strong>text<strong>)</strong>      Grouping of text
               (used either to set the borders of an alternative as above, or
               to make backreferences, where the <strong>N</strong>th group can
-              be referred to on the RHS of a RewriteRule as <code>$</code><strong>N</strong>)
+              be referred to on the RHS of a RewriteRule as $<strong>N</strong>)
 
 <strong>Anchors:</strong>
-  <strong><code>^</code></strong>           Start-of-line anchor
-  <strong><code>$</code></strong>           End-of-line anchor
+  <strong>^</strong>           Start-of-line anchor
+  <strong>$</strong>           End-of-line anchor
 
 <strong>Escaping:</strong>
-  <strong><code>\</code></strong>char       escape the given char
-              (for instance, to specify the chars "<code>.[]()</code>" <em>etc.</em>)
-</pre>
+  <strong>\</strong>char       escape the given char
+              (for instance, to specify the chars ".[]()" <em>etc.</em>)</source>
 
       <p>For more information about regular expressions, have a look at the
       perl regular expression manpage ("<a

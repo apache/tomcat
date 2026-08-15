@@ -372,6 +372,10 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <docs>
+        Wrap the <code>RewriteRule</code> regular expression syntax reference
+        on narrow displays. (sainadh777)
+      </docs>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
