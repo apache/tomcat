@@ -18,7 +18,6 @@ package org.apache.catalina.session;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -808,11 +807,17 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             log.debug(sm.getString("persistentManager.tooManyActive", Integer.valueOf(sessions.length)));
         }
 
-        int toswap = sessions.length - limit;
-        Arrays.sort(sessions, Comparator.comparingLong(Session::getLastAccessedTimeInternal));
+        // lastAccessedTimeInternal may change so need to use a snapshot to avoid various concurrency failures.
+        SortableSession[] sortedSessions = new SortableSession[sessions.length];
+        for (int i = 0; i < sessions.length; i++) {
+            sortedSessions[i] = new SortableSession(sessions[i].getLastAccessedTimeInternal(), sessions[i]);
+        }
+        Arrays.sort(sortedSessions);
 
-        for (int i = 0; i < sessions.length && toswap > 0; i++) {
-            StandardSession session = (StandardSession) sessions[i];
+        int toswap = sessions.length - limit;
+
+        for (int i = 0; i < sortedSessions.length && toswap > 0; i++) {
+            StandardSession session = (StandardSession) sortedSessions[i].session();
             synchronized (session) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= minIdleSwap) {
@@ -833,7 +838,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                 }
             }
         }
-
     }
 
 
@@ -877,6 +881,5 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             }
         }
     }
-
 }
 
