@@ -21,7 +21,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,6 +33,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.SessionComparators;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -940,7 +940,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         }
 
         int toswap = sessions.length - limit;
-        Arrays.sort(sessions, Comparator.comparingLong(Session::getLastAccessedTimeInternal));
+        Arrays.sort(sessions, SessionComparators.comparingLongSnapshot(Session::getLastAccessedTimeInternal));
 
         for (int i = 0; i < sessions.length && toswap > 0; i++) {
             StandardSession session = (StandardSession) sessions[i];
@@ -964,7 +964,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                 }
             }
         }
-
     }
 
 
@@ -1008,6 +1007,5 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             }
         }
     }
-
 }
 

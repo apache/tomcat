@@ -47,6 +47,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.SessionComparators;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
@@ -1100,7 +1101,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         } else if ("id".equalsIgnoreCase(sortBy)) {
             return comparingNullable(Session::getId);
         } else if ("LastAccessedTime".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparingLong(Session::getLastAccessedTime);
+            return SessionComparators.comparingLongSnapshot(Session::getLastAccessedTime);
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingInt(Session::getMaxInactiveInterval);
         } else if ("new".equalsIgnoreCase(sortBy)) {
@@ -1110,11 +1111,11 @@ public class HTMLManagerServlet extends ManagerServlet {
         } else if ("user".equalsIgnoreCase(sortBy)) {
             return comparingNullable(JspHelper::guessDisplayUserFromSession);
         } else if ("UsedTime".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparingLong(SessionUtils::getUsedTimeForSession);
+            return SessionComparators.comparingLongSnapshot(SessionUtils::getUsedTimeForSession);
         } else if ("InactiveTime".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparingLong(SessionUtils::getInactiveTimeForSession);
+            return SessionComparators.comparingLongSnapshot(SessionUtils::getInactiveTimeForSession);
         } else if ("TTL".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparingLong(SessionUtils::getTTLForSession);
+            return SessionComparators.comparingLongSnapshot(SessionUtils::getTTLForSession);
         } else {
             return null;
         }

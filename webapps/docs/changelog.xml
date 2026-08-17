@@ -128,6 +128,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Manager: Fix a potential concurrency issue when ordering sessions prior
+        to displaying a list of session. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.58 (schultz)" rtext="not released">
   <subsection name="Catalina">
