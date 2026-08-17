@@ -83,18 +83,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 5. PersistentManagerBase LRU Algorithm (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 5.1 | `PersistentManagerBase.java:804` | Sessions swapped to disk in arbitrary order, not LRU | Sort sessions by `getLastAccessedTime()` before selecting which to swap. Swap the least-recently-used sessions first. | 1 day | Low |
-
-**Summary:** Simple fix. Sort the sessions array by access time before the swap loop.
-
-**Total estimated effort: 1 day, Low difficulty**
-
----
-
 ### 6. DBCP DelegatingStatement Double-Close (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
