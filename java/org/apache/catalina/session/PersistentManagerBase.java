@@ -29,6 +29,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
+import org.apache.catalina.util.SessionComparators;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -807,17 +808,11 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             log.debug(sm.getString("persistentManager.tooManyActive", Integer.valueOf(sessions.length)));
         }
 
-        // lastAccessedTimeInternal may change so need to use a snapshot to avoid various concurrency failures.
-        SortableSession[] sortedSessions = new SortableSession[sessions.length];
-        for (int i = 0; i < sessions.length; i++) {
-            sortedSessions[i] = new SortableSession(sessions[i].getLastAccessedTimeInternal(), sessions[i]);
-        }
-        Arrays.sort(sortedSessions);
-
         int toswap = sessions.length - limit;
+        Arrays.sort(sessions, SessionComparators.comparingLongSnapshot(Session::getLastAccessedTimeInternal));
 
-        for (int i = 0; i < sortedSessions.length && toswap > 0; i++) {
-            StandardSession session = (StandardSession) sortedSessions[i].session();
+        for (int i = 0; i < sessions.length && toswap > 0; i++) {
+            StandardSession session = (StandardSession) sessions[i];
             synchronized (session) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= minIdleSwap) {
