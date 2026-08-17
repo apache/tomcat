@@ -113,6 +113,11 @@
       <fix>
         Fix async path building. (markt)
       </fix>
+      <fix>
+        When a <code>PersistentManager</code> needs to reduce the number of
+        active sessions, swap out the least recently used eligible sessions
+        first. Pull request <pr>1045</pr> provided by sainadh777. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
