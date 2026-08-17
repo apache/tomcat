@@ -18,6 +18,7 @@ package org.apache.catalina.session;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -797,7 +798,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
         Session[] sessions = findSessions();
 
-        // FIXME: Smarter algorithm (LRU)
         int limit = (int) (getMaxActiveSessions() * 0.9);
 
         if (limit >= sessions.length) {
@@ -809,6 +809,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         }
 
         int toswap = sessions.length - limit;
+        Arrays.sort(sessions, Comparator.comparingLong(Session::getLastAccessedTimeInternal));
 
         for (int i = 0; i < sessions.length && toswap > 0; i++) {
             StandardSession session = (StandardSession) sessions[i];
