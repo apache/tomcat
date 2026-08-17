@@ -145,6 +145,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Manager: Fix a potential concurrency issue when ordering sessions prior
+        to displaying a list of session. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.25 (markt)" rtext="release in progress">
   <subsection name="Catalina">
