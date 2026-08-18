@@ -384,10 +384,6 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
-      <docs>
-        Wrap the <code>RewriteRule</code> regular expression syntax reference
-        on narrow displays. (sainadh777)
-      </docs>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
@@ -397,6 +393,10 @@
         Manager: Fix a potential concurrency issue when ordering sessions prior
         to displaying a list of session. (markt)
       </fix>
+      <docs>
+        Wrap the <code>RewriteRule</code> regular expression syntax reference
+        on narrow displays. Pull request <pr>1044</pr> by sainadh777. (markt)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
