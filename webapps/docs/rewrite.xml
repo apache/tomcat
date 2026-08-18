@@ -527,33 +527,38 @@ RewriteRule ^/(.*)$ ${uc:$1}
       <p>Some hints on the syntax of regular
       expressions:</p>
 
-<!-- TODO: Why is the following pre-formatted non-wrappable text? -->
-<pre>
-<strong>Text:</strong>
-  <strong><code>.</code></strong>           Any single character
-  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class 'chars'
-  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class 'chars'
-  text1<strong><code>|</code></strong>text2 Alternative: text1 or text2
-
-<strong>Quantifiers:</strong>
-  <strong><code>?</code></strong>           0 or 1 occurrences of the preceding text
-  <strong><code>*</code></strong>           0 or N occurrences of the preceding text (N &gt; 0)
-  <strong><code>+</code></strong>           1 or N occurrences of the preceding text (N &gt; 1)
-
-<strong>Grouping:</strong>
-  <strong><code>(</code></strong>text<strong><code>)</code></strong>      Grouping of text
-              (used either to set the borders of an alternative as above, or
-              to make backreferences, where the <strong>N</strong>th group can
-              be referred to on the RHS of a RewriteRule as <code>$</code><strong>N</strong>)
-
-<strong>Anchors:</strong>
-  <strong><code>^</code></strong>           Start-of-line anchor
-  <strong><code>$</code></strong>           End-of-line anchor
-
-<strong>Escaping:</strong>
-  <strong><code>\</code></strong>char       escape the given char
-              (for instance, to specify the chars "<code>.[]()</code>" <em>etc.</em>)
-</pre>
+      <table class="defaultTable">
+        <tr><th colspan="2">Text</th></tr>
+        <tr><td><code>.</code></td>
+          <td>Any single character</td></tr>
+        <tr><td><code>[chars]</code></td>
+          <td>Character class: Any character of the class 'chars'</td></tr>
+        <tr><td><code>[^chars]</code></td>
+          <td>Character class: Not a character of the class 'chars'</td></tr>
+        <tr><td><code>text1|text2</code></td>
+          <td>Alternative: text1 or text2</td></tr>
+        <tr><th colspan="2">Quantifiers</th></tr>
+        <tr><td><code>?</code></td>
+          <td>0 or 1 occurrences of the preceding text</td></tr>
+        <tr><td><code>*</code></td>
+          <td>0 or N occurrences of the preceding text (N &gt; 0)</td></tr>
+        <tr><td><code>+</code></td>
+          <td>1 or N occurrences of the preceding text (N &gt; 1)</td></tr>
+        <tr><th colspan="2">Grouping</th></tr>
+        <tr><td><code>(text)</code></td>
+          <td>Grouping of text (used either to set the borders of an
+            alternative as above, or to make backreferences, where the Nth
+            group can be referred to on the RHS of a RewriteRule as $N)</td></tr>
+        <tr><th colspan="2">Anchors</th></tr>
+        <tr><td><code>^</code></td>
+          <td>Start-of-line anchor</td></tr>
+        <tr><td><code>$</code></td>
+          <td>End-of-line anchor</td></tr>
+        <tr><th colspan="2">Escaping</th></tr>
+        <tr><td><code>\char</code></td>
+          <td>Escape the given char (for instance, to specify the chars
+            ".[]()" <em>etc.</em>)</td></tr>
+      </table>
 
       <p>For more information about regular expressions, have a look at the
       perl regular expression manpage ("<a

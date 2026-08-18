@@ -145,6 +145,10 @@
         Manager: Fix a potential concurrency issue when ordering sessions prior
         to displaying a list of session. (markt)
       </fix>
+      <docs>
+        Wrap the <code>RewriteRule</code> regular expression syntax reference
+        on narrow displays. Pull request <pr>1044</pr> by sainadh777. (markt)
+      </docs>
     </changelog>
   </subsection>
 </section>
