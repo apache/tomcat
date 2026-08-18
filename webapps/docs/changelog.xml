@@ -137,6 +137,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Validate that the <code>DeltaManager</code> attribute
+        <code>sendAllSessionsSize</code> is a positive integer. Zero or negative
+        values previously caused an infinite loop or a
+        <code>NegativeArraySizeException</code> during session state transfer.
+        Pull request <pr>1042</pr> provided by lihongyi87. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
