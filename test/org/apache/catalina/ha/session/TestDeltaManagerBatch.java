@@ -18,13 +18,14 @@ package org.apache.catalina.ha.session;
 
 import java.io.IOException;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.tribes.Member;
+import org.easymock.EasyMock;
+
 
 /**
  * Tests for the <code>sendAllSessionsSize</code> validation in

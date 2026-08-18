@@ -339,10 +339,10 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Validate that the <code>DeltaManager</code> attribute
-        <code>sendAllSessionsSize</code> is a positive integer. Zero or
-        negative values previously caused an infinite loop or a
+        <code>sendAllSessionsSize</code> is a positive integer. Zero or negative
+        values previously caused an infinite loop or a
         <code>NegativeArraySizeException</code> during session state transfer.
-        (lihongyi87)
+        Pull request <pr>1042</pr> provided by lihongyi87. (markt)
       </fix>
     </changelog>
   </subsection>
