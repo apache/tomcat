@@ -344,6 +344,13 @@
         <code>NegativeArraySizeException</code> during session state transfer.
         Pull request <pr>1042</pr> provided by lihongyi87. (markt)
       </fix>
+      <fix>
+        Ensure <code>DeltaManager</code> resets the
+        <code>noContextManagerReceived</code> flag when requesting session
+        state. A previously received <code>ALL_SESSION_NOCONTEXTMANAGER</code>
+        event caused all subsequent state transfers to return immediately,
+        skipping sessions sent by the cluster. (lihongyi87)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
