@@ -171,6 +171,12 @@
         Ensure resources are evicted from the static resource cache in the
         correct order. (markt)
       </fix>
+      <fix>
+        When Jakarta Authentication is configured for a web application, cache
+        the <code>ServerAuthConfig</code> in the <code>Authenticator</code>
+        valve. This ensures web application specific settings are cached on a
+        per web application basis. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
