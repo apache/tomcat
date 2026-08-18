@@ -438,9 +438,15 @@ public class DeltaManager extends ClusterManagerBase {
     /**
      * Set the batch size for sending all sessions.
      *
-     * @param sendAllSessionsSize The batch size value
+     * @param sendAllSessionsSize The batch size value. Must be a positive integer.
+     *
+     * @throws IllegalArgumentException if the batch size is not a positive integer
      */
     public void setSendAllSessionsSize(int sendAllSessionsSize) {
+        if (sendAllSessionsSize <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("deltaManager.sendAllSessionsSize.invalid", Integer.valueOf(sendAllSessionsSize)));
+        }
         this.sendAllSessionsSize = sendAllSessionsSize;
     }
 
