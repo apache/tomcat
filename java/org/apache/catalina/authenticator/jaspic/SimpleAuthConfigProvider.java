@@ -34,8 +34,6 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
 
     private final Map<String,Object> properties;
 
-    private volatile ServerAuthConfig serverAuthConfig;
-
     /**
      * Creates a new SimpleAuthConfigProvider.
      *
@@ -62,24 +60,10 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
     }
 
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The returned ServerAuthConfig is created lazily and cached.
-     */
     @Override
     public ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
             throws AuthException {
-        ServerAuthConfig serverAuthConfig = this.serverAuthConfig;
-        if (serverAuthConfig == null) {
-            synchronized (this) {
-                if (this.serverAuthConfig == null) {
-                    this.serverAuthConfig = createServerAuthConfig(layer, appContext, handler, properties);
-                }
-                serverAuthConfig = this.serverAuthConfig;
-            }
-        }
-        return serverAuthConfig;
+        return createServerAuthConfig(layer, appContext, handler, properties);
     }
 
 
@@ -102,13 +86,10 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
     /**
      * {@inheritDoc}
      * <p>
-     * Delegates refresh to the cached ServerAuthConfig if one has been created.
+     * NO-OP for this implementation.
      */
     @Override
     public void refresh() {
-        ServerAuthConfig serverAuthConfig = this.serverAuthConfig;
-        if (serverAuthConfig != null) {
-            serverAuthConfig.refresh();
-        }
+        // NO-OP
     }
 }
