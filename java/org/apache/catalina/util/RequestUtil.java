@@ -17,15 +17,20 @@
 package org.apache.catalina.util;
 
 import java.net.URL;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * General purpose request parsing and encoding utility methods.
  */
 public final class RequestUtil {
+
+    private static final StringManager sm = StringManager.getManager(RequestUtil.class);
+
     /**
      * Default constructor.
      */
@@ -155,5 +160,29 @@ public final class RequestUtil {
         }
 
         return true;
+    }
+
+
+    /**
+     * Obtains an HTTP value, ensuring that there is no more than one instance of the header.
+     *
+     * @param request    The request from which to obtain the HTTP headers
+     * @param headerName The name of the required HTTP header
+     *
+     * @return The value for the HTTP header of there is exactly one instance of the header in the request. {@code null}
+     * if there are zero instances of the header
+     *
+     * @throws IllegalArgumentException if there is more than one instance of the header in the request
+     */
+    public static String getUniqueHeader(HttpServletRequest request, String headerName) {
+        Enumeration<String> headerValues = request.getHeaders(headerName);
+        String value = null;
+        if (headerValues.hasMoreElements()) {
+            value = headerValues.nextElement();
+            if (headerValues.hasMoreElements()) {
+                throw new IllegalArgumentException(sm.getString("requestUtil.multipleHeaders", headerName));
+            }
+        }
+        return value;
     }
 }
