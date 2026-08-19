@@ -131,6 +131,10 @@
         Align web.xml logging output with the new <code>Context</code> attribute
         <code>urlPatternsProvidedInDecodedForm</code>. (markt)
       </fix>
+      <fix>
+        Improve robustness of DIGEST authentication to system clock jumps.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
