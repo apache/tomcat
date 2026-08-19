@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,8 +43,6 @@ import jakarta.servlet.descriptor.TaglibDescriptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.UEncoder;
-import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
@@ -72,8 +69,6 @@ public class WebXml {
     private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final Log log = LogFactory.getLog(WebXml.class); // must not be static
-
-    private final UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
 
 
     /**
@@ -1485,7 +1480,7 @@ public class WebXml {
                     sb.append("    <url-pattern>*</url-pattern>\n");
                 } else {
                     for (String urlPattern : filterMap.getURLPatterns()) {
-                        appendElement(sb, INDENT4, "url-pattern", encodeUrl(urlPattern));
+                        appendElement(sb, INDENT4, "url-pattern", urlPattern);
                     }
                 }
                 // dispatcher was added in Servlet 2.4
@@ -1571,7 +1566,7 @@ public class WebXml {
         for (Map.Entry<String,String> entry : servletMappings.entrySet()) {
             sb.append("  <servlet-mapping>\n");
             appendElement(sb, INDENT4, "servlet-name", entry.getValue());
-            appendElement(sb, INDENT4, "url-pattern", encodeUrl(entry.getKey()));
+            appendElement(sb, INDENT4, "url-pattern", entry.getKey());
             sb.append("  </servlet-mapping>\n");
         }
         if (!servletMappings.isEmpty()) {
@@ -1651,7 +1646,7 @@ public class WebXml {
             } else if (errorPage.getErrorCode() > 0) {
                 appendElement(sb, INDENT4, "error-code", Integer.toString(errorCode));
             }
-            appendElement(sb, INDENT4, "location", errorPage.getLocation(), true);
+            appendElement(sb, INDENT4, "location", errorPage.getLocation());
             sb.append("  </error-page>\n");
         }
         if (!errorPages.isEmpty()) {
@@ -1674,7 +1669,7 @@ public class WebXml {
                 for (JspPropertyGroup jpg : jspPropertyGroups) {
                     sb.append("    <jsp-property-group>\n");
                     for (String urlPattern : jpg.getUrlPatterns()) {
-                        appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                        appendElement(sb, INDENT6, "url-pattern", urlPattern);
                     }
                     appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
                     appendElement(sb, INDENT6, "page-encoding", jpg.getPageEncoding());
@@ -1754,7 +1749,7 @@ public class WebXml {
                 appendElement(sb, INDENT6, "web-resource-name", collection.getName());
                 appendElement(sb, INDENT6, "description", collection.getDescription());
                 for (String urlPattern : collection.findPatterns()) {
-                    appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                    appendElement(sb, INDENT6, "url-pattern", urlPattern);
                 }
                 for (String method : collection.findMethods()) {
                     appendElement(sb, INDENT6, "http-method", method);
@@ -1797,8 +1792,8 @@ public class WebXml {
             appendElement(sb, INDENT4, "realm-name", loginConfig.getRealmName());
             if (loginConfig.getErrorPage() != null || loginConfig.getLoginPage() != null) {
                 sb.append("    <form-login-config>\n");
-                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage(), true);
-                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage(), true);
+                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage());
+                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage());
                 sb.append("    </form-login-config>\n");
             }
             sb.append("  </login-config>\n\n");
@@ -2018,21 +2013,7 @@ public class WebXml {
     }
 
 
-    private synchronized String encodeUrl(String input) {
-        try {
-            return urlEncoder.encodeURL(input, 0, input.length()).toString();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(input, e);
-        }
-    }
-
-
     private void appendElement(StringBuilder sb, String indent, String elementName, String value) {
-        appendElement(sb, indent, elementName, value, false);
-    }
-
-    private void appendElement(StringBuilder sb, String indent, String elementName, String value, boolean encodeValue) {
-
         if (value == null) {
             return;
         }
@@ -2046,11 +2027,7 @@ public class WebXml {
             sb.append('<');
             sb.append(elementName);
             sb.append('>');
-            if (encodeValue) {
-                sb.append(Escape.xml(encodeUrl(value)));
-            } else {
-                sb.append(Escape.xml(value));
-            }
+            sb.append(Escape.xml(value));
             sb.append("</");
             sb.append(elementName);
             sb.append(">\n");
