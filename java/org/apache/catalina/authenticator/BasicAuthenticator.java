@@ -60,10 +60,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Sets the character set used for encoding credentials. Empty charsets will set
-     * ISO-8859-1.
+     * Sets the character set used for encoding credentials. Empty charsets will set ISO-8859-1.
      *
      * @param charsetString the character set name
+     *
      * @throws IllegalArgumentException if the charset is not supported
      */
     public void setCharset(String charsetString) {
@@ -227,8 +227,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * Extract the mandatory username and password tokens separated by a colon. Tolerate surplus
-         * surrounding white space.
+         * Extract the mandatory username and password tokens separated by a colon. Tolerate surplus surrounding white
+         * space.
          */
         private void parseCredentials(byte[] decoded) throws IllegalArgumentException {
 
