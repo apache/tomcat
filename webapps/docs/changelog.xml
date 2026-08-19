@@ -501,6 +501,11 @@
       <fix>
         Reduce CPU usage while sending WebSocket close message. (markt)
       </fix>
+      <fix>
+        Fix overly broad check that prevented request URIs containing literal
+        <code>{</code> and <code>}</code> characters from being mapped to
+        WebSocket end points. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

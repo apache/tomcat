@@ -294,7 +294,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         // No exact match. Need to look for template matches.
         UriTemplate pathUriTemplate;
         try {
-            pathUriTemplate = new UriTemplate(path);
+            pathUriTemplate = new UriTemplate(path, false);
         } catch (DeploymentException e) {
             // Path is not valid so can't be matched to a WebSocketEndpoint
             return null;
