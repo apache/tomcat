@@ -39,7 +39,7 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
      * Creates a new SimpleAuthConfigProvider.
      *
      * @param properties Properties to pass to the ServerAuthConfig
-     * @param factory AuthConfigFactory to register this provider with, or {@code null}
+     * @param factory    AuthConfigFactory to register this provider with, or {@code null}
      */
     public SimpleAuthConfigProvider(Map<String,String> properties, AuthConfigFactory factory) {
         this.properties = properties;
@@ -85,10 +85,11 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
     /**
      * Creates the ServerAuthConfig. Can be overridden by subclasses to provide a custom implementation.
      *
-     * @param layer Message layer
+     * @param layer      Message layer
      * @param appContext Application context
-     * @param handler Callback handler
+     * @param handler    Callback handler
      * @param properties Configuration properties
+     *
      * @return The ServerAuthConfig instance
      */
     protected ServerAuthConfig createServerAuthConfig(String layer, String appContext, CallbackHandler handler,

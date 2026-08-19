@@ -104,16 +104,16 @@ public class Constants {
 
 
     /**
-     * When the <code>cache</code> property of the authenticator is set to <code>false</code>, the Principal is not cached.
-     * In this case, if the current request is part of a session, the password used to authenticate this user will be stored
-     * under this key so the user can be re-authenticated on subsequent requests.
+     * When the <code>cache</code> property of the authenticator is set to <code>false</code>, the Principal is not
+     * cached. In this case, if the current request is part of a session, the password used to authenticate this user
+     * will be stored under this key so the user can be re-authenticated on subsequent requests.
      */
     public static final String SESS_PASSWORD_NOTE = "org.apache.catalina.session.PASSWORD";
 
     /**
-     * When the <code>cache</code> property of the authenticator is set to <code>false</code>, the Principal is not cached.
-     * In this case, if the current request is part of a session, the username used to authenticate this user will be stored
-     * under this key so the user can be re-authenticated on subsequent requests.
+     * When the <code>cache</code> property of the authenticator is set to <code>false</code>, the Principal is not
+     * cached. In this case, if the current request is part of a session, the username used to authenticate this user
+     * will be stored under this key so the user can be re-authenticated on subsequent requests.
      */
     public static final String SESS_USERNAME_NOTE = "org.apache.catalina.session.USERNAME";
 

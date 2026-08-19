@@ -53,9 +53,9 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     /**
      * Creates a new SimpleServerAuthConfig.
      *
-     * @param layer Message layer
+     * @param layer      Message layer
      * @param appContext Application context
-     * @param handler Callback handler
+     * @param handler    Callback handler
      * @param properties Configuration properties
      */
     public SimpleServerAuthConfig(String layer, String appContext, CallbackHandler handler,
@@ -116,8 +116,8 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
      * {@inheritDoc}
      * <p>
      * Loads ServerAuthModule instances from properties keyed with
-     * {@code org.apache.catalina.authenticator.jaspic.ServerAuthModule.N} where N is 1-based index.
-     * The returned context is cached and reused for subsequent calls.
+     * {@code org.apache.catalina.authenticator.jaspic.ServerAuthModule.N} where N is 1-based index. The returned
+     * context is cached and reused for subsequent calls.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" }) // JASPIC API uses raw types
     @Override
@@ -175,6 +175,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
      * Creates the ServerAuthContext. Can be overridden by subclasses to provide a custom implementation.
      *
      * @param modules List of ServerAuthModule instances
+     *
      * @return The ServerAuthContext instance
      */
     protected ServerAuthContext createServerAuthContext(List<ServerAuthModule> modules) {
