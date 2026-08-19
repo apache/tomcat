@@ -1521,7 +1521,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     sb.append("    <url-pattern>*</url-pattern>\n");
                 } else {
                     for (String urlPattern : filterMap.getURLPatterns()) {
-                        appendElement(sb, INDENT4, "url-pattern", encodeUrl(urlPattern));
+                        if (!getUrlPatternsProvidedInDecodedForm()) {
+                            urlPattern = encodeUrl(urlPattern);
+                        }
+                        appendElement(sb, INDENT4, "url-pattern", urlPattern);
                     }
                 }
                 // dispatcher was added in Servlet 2.4
@@ -1607,7 +1610,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         for (Map.Entry<String,String> entry : servletMappings.entrySet()) {
             sb.append("  <servlet-mapping>\n");
             appendElement(sb, INDENT4, "servlet-name", entry.getValue());
-            appendElement(sb, INDENT4, "url-pattern", encodeUrl(entry.getKey()));
+            if (getUrlPatternsProvidedInDecodedForm()) {
+                appendElement(sb, INDENT4, "url-pattern", entry.getKey());
+            } else {
+                appendElement(sb, INDENT4, "url-pattern", encodeUrl(entry.getKey()));
+            }
             sb.append("  </servlet-mapping>\n");
         }
         if (!servletMappings.isEmpty()) {
@@ -1667,7 +1674,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             } else if (errorPage.getErrorCode() > 0) {
                 appendElement(sb, INDENT4, "error-code", Integer.toString(errorCode));
             }
-            appendElement(sb, INDENT4, "location", errorPage.getLocation(), true);
+            appendElement(sb, INDENT4, "location", errorPage.getLocation(), !getUrlPatternsProvidedInDecodedForm());
             sb.append("  </error-page>\n");
         }
         if (!errorPages.isEmpty()) {
@@ -1690,7 +1697,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 for (JspPropertyGroup jpg : jspPropertyGroups) {
                     sb.append("    <jsp-property-group>\n");
                     for (String urlPattern : jpg.getUrlPatterns()) {
-                        appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                        if (!getUrlPatternsProvidedInDecodedForm()) {
+                            urlPattern = encodeUrl(urlPattern);
+                        }
+                        appendElement(sb, INDENT6, "url-pattern", urlPattern);
                     }
                     appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
                     appendElement(sb, INDENT6, "page-encoding", jpg.getPageEncoding());
@@ -1770,7 +1780,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 appendElement(sb, INDENT6, "web-resource-name", collection.getName());
                 appendElement(sb, INDENT6, "description", collection.getDescription());
                 for (String urlPattern : collection.findPatterns()) {
-                    appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                    if (!getUrlPatternsProvidedInDecodedForm()) {
+                        urlPattern = encodeUrl(urlPattern);
+                    }
+                    appendElement(sb, INDENT6, "url-pattern", urlPattern);
                 }
                 for (String method : collection.findMethods()) {
                     appendElement(sb, INDENT6, "http-method", method);
@@ -1813,8 +1826,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             appendElement(sb, INDENT4, "realm-name", loginConfig.getRealmName());
             if (loginConfig.getErrorPage() != null || loginConfig.getLoginPage() != null) {
                 sb.append("    <form-login-config>\n");
-                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage(), true);
-                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage(), true);
+                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage(), !getUrlPatternsProvidedInDecodedForm());
+                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage(), !getUrlPatternsProvidedInDecodedForm());
                 sb.append("    </form-login-config>\n");
             }
             sb.append("  </login-config>\n\n");
