@@ -262,6 +262,10 @@
         Improve robustness of DIGEST authentication to system clock jumps.
         (markt)
       </fix>
+      <add>
+        Reject requests containing multiple protocol header values in the
+        <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

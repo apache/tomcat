@@ -940,7 +940,17 @@ public class RemoteIpFilter extends GenericFilter {
             }
 
             if (protocolHeader != null) {
-                String protocolHeaderValue = request.getHeader(protocolHeader);
+                String protocolHeaderValue;
+                try {
+                    protocolHeaderValue = RequestUtil.getUniqueHeader(request, protocolHeader);
+                } catch (IllegalArgumentException iae) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.multipleHeaders", protocolHeader));
+                    }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
                 if (protocolHeaderValue == null) {
                     // Don't modify the secure, scheme and serverPort attributes
                     // of the request
