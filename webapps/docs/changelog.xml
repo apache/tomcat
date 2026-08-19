@@ -258,6 +258,10 @@
         active sessions, swap out the least recently used eligible sessions
         first. Pull request <pr>1045</pr> provided by sainadh777. (markt)
       </fix>
+      <fix>
+        Improve robustness of DIGEST authentication to system clock jumps.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
