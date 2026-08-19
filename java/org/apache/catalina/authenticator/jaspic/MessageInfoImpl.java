@@ -51,8 +51,9 @@ public class MessageInfoImpl implements MessageInfo {
 
     /**
      * Constructor.
-     * @param request the request
-     * @param response the response
+     *
+     * @param request       the request
+     * @param response      the response
      * @param authMandatory whether auth is mandatory
      */
     public MessageInfoImpl(HttpServletRequest request, HttpServletResponse response, boolean authMandatory) {

@@ -55,6 +55,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Adds a cookie to this saved request.
+     *
      * @param cookie the cookie to add
      */
     public void addCookie(Cookie cookie) {
@@ -63,6 +64,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns an iterator over the cookies saved for this request.
+     *
      * @return iterator over the saved cookies
      */
     public Iterator<Cookie> getCookies() {
@@ -78,7 +80,8 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Adds a header value to this saved request.
-     * @param name the header name
+     *
+     * @param name  the header name
      * @param value the header value
      */
     public void addHeader(String name, String value) {
@@ -87,6 +90,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns an iterator over the names of all headers saved for this request.
+     *
      * @return iterator over the header names
      */
     public Iterator<String> getHeaderNames() {
@@ -95,7 +99,9 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns an iterator over the values for the specified header.
+     *
      * @param name the header name
+     *
      * @return iterator over the header values, or an empty iterator if the header is not present
      */
     public Iterator<String> getHeaderValues(String name) {
@@ -115,6 +121,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Adds a locale to this saved request.
+     *
      * @param locale the locale to add
      */
     public void addLocale(Locale locale) {
@@ -123,6 +130,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns an iterator over the locales saved for this request.
+     *
      * @return iterator over the saved locales
      */
     public Iterator<Locale> getLocales() {
@@ -137,6 +145,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the HTTP method of the saved request.
+     *
      * @return the request method, or {@code null} if not set
      */
     public String getMethod() {
@@ -145,6 +154,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the HTTP method of the saved request.
+     *
      * @param method the request method
      */
     public void setMethod(String method) {
@@ -159,6 +169,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the query string of the saved request.
+     *
      * @return the query string, or {@code null} if not set
      */
     public String getQueryString() {
@@ -167,6 +178,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the query string of the saved request.
+     *
      * @param queryString the query string
      */
     public void setQueryString(String queryString) {
@@ -181,6 +193,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the request URI of the saved request.
+     *
      * @return the request URI, or {@code null} if not set
      */
     public String getRequestURI() {
@@ -189,6 +202,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the request URI of the saved request.
+     *
      * @param requestURI the request URI
      */
     public void setRequestURI(String requestURI) {
@@ -203,6 +217,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the decoded request URI of the saved request, with path parameters excluded.
+     *
      * @return the decoded request URI, or {@code null} if not set
      */
     public String getDecodedRequestURI() {
@@ -211,6 +226,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the decoded request URI of the saved request.
+     *
      * @param decodedRequestURI the decoded request URI
      */
     public void setDecodedRequestURI(String decodedRequestURI) {
@@ -225,6 +241,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the body of the saved request.
+     *
      * @return the request body as a {@link ByteChunk}, or {@code null} if not set
      */
     public ByteChunk getBody() {
@@ -233,6 +250,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the body of the saved request.
+     *
      * @param body the request body as a {@link ByteChunk}
      */
     public void setBody(ByteChunk body) {
@@ -247,6 +265,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the content type of the saved request.
+     *
      * @return the content type, or {@code null} if not set
      */
     public String getContentType() {
@@ -255,6 +274,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the content type of the saved request.
+     *
      * @param contentType the content type
      */
     public void setContentType(String contentType) {
@@ -269,6 +289,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Returns the original max inactive interval for the session.
+     *
      * @return the original max inactive interval, or {@code null} if not set
      */
     public Integer getOriginalMaxInactiveIntervalOptional() {
@@ -290,6 +311,7 @@ public final class SavedRequest implements Serializable {
 
     /**
      * Sets the original max inactive interval for the session.
+     *
      * @param originalMaxInactiveInterval the max inactive interval in seconds
      */
     public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
