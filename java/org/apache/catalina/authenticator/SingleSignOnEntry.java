@@ -57,8 +57,8 @@ public class SingleSignOnEntry implements Serializable {
     private transient Principal principal = null;
 
     /**
-     * Set of session keys associated with this SSO entry. Backed by ConcurrentHashMap to take
-     * advantage of its thread safety features.
+     * Set of session keys associated with this SSO entry. Backed by ConcurrentHashMap to take advantage of its thread
+     * safety features.
      */
     private final Map<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
 
@@ -206,6 +206,7 @@ public class SingleSignOnEntry implements Serializable {
      * Custom serialization to handle the transient principal field.
      *
      * @param out the object output stream
+     *
      * @throws IOException if an I/O error occurs
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -222,7 +223,8 @@ public class SingleSignOnEntry implements Serializable {
      * Custom deserialization to restore the transient principal field.
      *
      * @param in the object input stream
-     * @throws IOException if an I/O error occurs
+     *
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if the principal class cannot be found
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {

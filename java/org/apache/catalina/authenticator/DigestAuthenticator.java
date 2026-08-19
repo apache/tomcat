@@ -617,8 +617,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
         /**
          * Parse the authorization header to extract digest credentials.
          *
-         * @param request         HTTP request
-         * @param authorization   Authorization header value
+         * @param request       HTTP request
+         * @param authorization Authorization header value
+         *
          * @return {@code true} if parsing succeeded
          */
         public boolean parse(Request request, String authorization) {
@@ -665,8 +666,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
         /**
          * Validate the parsed digest credentials against the request and configured algorithms.
          *
-         * @param request     HTTP request
-         * @param algorithms  Configured authentication algorithms
+         * @param request    HTTP request
+         * @param algorithms Configured authentication algorithms
+         *
          * @return {@code true} if validation succeeded
          */
         public boolean validate(Request request, List<AuthDigest> algorithms) {
@@ -793,6 +795,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * Authenticate the user against the given realm using the parsed digest credentials.
          *
          * @param realm Realm to authenticate against
+         *
          * @return Principal if authentication succeeded, {@code null} otherwise
          */
         public Principal authenticate(Realm realm) {
@@ -820,8 +823,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
         /**
          * Create a new NonceInfo instance.
          *
-         * @param currentTime      Current timestamp
-         * @param seenWindowSize   Size of the window for tracking seen nonce counts
+         * @param currentTime    Current timestamp
+         * @param seenWindowSize Size of the window for tracking seen nonce counts
          */
         public NonceInfo(long currentTime, int seenWindowSize) {
             this.timestamp = currentTime;
@@ -833,6 +836,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * Validate the nonce count to detect replay attacks.
          *
          * @param nonceCount Nonce count from the client
+         *
          * @return {@code true} if the nonce count is valid
          */
         public synchronized boolean nonceCountValid(long nonceCount) {

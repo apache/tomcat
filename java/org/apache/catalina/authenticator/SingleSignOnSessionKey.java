@@ -58,7 +58,7 @@ public class SingleSignOnSessionKey implements Serializable {
     /**
      * Creates a session key using the given session context and an explicit session ID.
      *
-     * @param session the session from which to extract context and host information
+     * @param session   the session from which to extract context and host information
      * @param sessionId the session ID to use for this key
      */
     public SingleSignOnSessionKey(Session session, String sessionId) {

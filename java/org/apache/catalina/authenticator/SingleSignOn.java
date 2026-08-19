@@ -515,7 +515,7 @@ public class SingleSignOn extends ValveBase {
      * Populates the request with the authentication data from the SSO entry.
      *
      * @param request the request to populate
-     * @param ssoId the SSO identifier
+     * @param ssoId   the SSO identifier
      */
     protected void populateRequestFromSsoEntry(Request request, String ssoId) {
         SingleSignOnEntry entry = cache.get(ssoId);
@@ -671,8 +671,8 @@ public class SingleSignOn extends ValveBase {
     /**
      * Handles a session ID change by updating the SSO entry to track the new session ID.
      *
-     * @param ssoId the SSO identifier
-     * @param session the session with the new ID
+     * @param ssoId        the SSO identifier
+     * @param session      the session with the new ID
      * @param oldSessionId the previous session ID
      */
     protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {

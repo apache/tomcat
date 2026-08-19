@@ -61,10 +61,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Sets the character set used for encoding credentials. Empty charsets will set
-     * ISO-8859-1.
+     * Sets the character set used for encoding credentials. Empty charsets will set ISO-8859-1.
      *
      * @param charsetString the character set name
+     *
      * @throws IllegalArgumentException if the charset is not supported
      */
     public void setCharset(String charsetString) {
