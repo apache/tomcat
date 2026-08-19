@@ -532,7 +532,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
         nonces = new LinkedHashMap<>() {
 
             private static final long serialVersionUID = 1L;
-            private static final long LOG_SUPPRESS_TIME = TimeUnit.MINUTES.toNanos(5);
+            // 5 minutes in nanoseconds
+            private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000 * 1000 * 1000;
 
             private long lastLog = System.nanoTime() - 1;
 
