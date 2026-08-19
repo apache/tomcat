@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -98,7 +99,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * The last timestamp used to generate a nonce. Each nonce should get a unique timestamp.
      */
-    protected long lastTimestamp = 0;
+    protected long lastTimestamp = System.nanoTime() - 1;
 
     /**
      * Lock object used to ensure unique timestamps for nonce generation.
@@ -127,7 +128,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * How long server nonces are valid for in milliseconds. Defaults to 5 minutes.
      */
-    protected long nonceValidity = 5 * 60 * 1000;
+    protected long nonceValidity = TimeUnit.MINUTES.toMillis(5);
 
 
     /**
@@ -431,23 +432,23 @@ public class DigestAuthenticator extends AuthenticatorBase {
      */
     protected String generateNonce(Request request) {
 
-        long currentTime = System.currentTimeMillis();
+        long nanoTime = System.nanoTime();
 
         synchronized (lastTimestampLock) {
-            if (currentTime > lastTimestamp) {
-                lastTimestamp = currentTime;
+            if (nanoTime > lastTimestamp) {
+                lastTimestamp = nanoTime;
             } else {
-                currentTime = ++lastTimestamp;
+                nanoTime = ++lastTimestamp;
             }
         }
 
-        String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
+        String ipTimeKey = request.getRemoteAddr() + ":" + nanoTime + ":" + getKey();
 
         // Note: The digest used to generate the nonce is independent of the digest used for authentication.
         byte[] buffer = ConcurrentMessageDigest.digest(NONCE_DIGEST, ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
-        String nonce = currentTime + ":" + HexUtils.toHexString(buffer);
+        String nonce = nanoTime + ":" + HexUtils.toHexString(buffer);
 
-        NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
+        NonceInfo info = new NonceInfo(nanoTime, getNonceCountWindowSize());
         synchronized (nonces) {
             nonces.put(nonce, info);
         }
@@ -531,19 +532,20 @@ public class DigestAuthenticator extends AuthenticatorBase {
         nonces = new LinkedHashMap<>() {
 
             private static final long serialVersionUID = 1L;
-            private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;
+            private static final long LOG_SUPPRESS_TIME = TimeUnit.MINUTES.toNanos(5);
 
-            private long lastLog = 0;
+            private long lastLog = System.nanoTime() - 1;
 
             @Override
             protected boolean removeEldestEntry(Map.Entry<String,NonceInfo> eldest) {
                 // This is called from a sync so keep it simple
-                long currentTime = System.currentTimeMillis();
+                long nanoTime = System.nanoTime();
                 if (size() > getNonceCacheSize()) {
-                    if (lastLog < currentTime && currentTime - eldest.getValue().getTimestamp() < getNonceValidity()) {
+                    long nonceValidityNanos = TimeUnit.MILLISECONDS.toNanos(getNonceValidity());
+                    if ((nanoTime - lastLog) > 0 && nanoTime - eldest.getValue().getTimestamp() < nonceValidityNanos) {
                         // Replay attack is possible
                         log.warn(sm.getString("digestAuthenticator.cacheRemove"));
-                        lastLog = currentTime + LOG_SUPPRESS_TIME;
+                        lastLog = nanoTime + LOG_SUPPRESS_TIME;
                     }
                     return true;
                 }
@@ -566,7 +568,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     public static class DigestInfo {
 
         private final String opaque;
-        private final long nonceValidity;
+        private final long nonceValidityNanos;
         private final String key;
         private final Map<String,NonceInfo> nonces;
         private final boolean validateUri;
@@ -598,7 +600,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         public DigestInfo(String opaque, long nonceValidity, String key, Map<String,NonceInfo> nonces,
                 boolean validateUri) {
             this.opaque = opaque;
-            this.nonceValidity = nonceValidity;
+            this.nonceValidityNanos = TimeUnit.MILLISECONDS.toNanos(nonceValidity);
             this.key = key;
             this.nonces = nonces;
             this.validateUri = validateUri;
@@ -728,8 +730,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             }
             String digestclientIpTimeKey = nonce.substring(i + 1);
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - nonceTime) > nonceValidity) {
+            long nanoTime = System.nanoTime();
+            if ((nanoTime - nonceTime) > nonceValidityNanos) {
                 nonceStale = true;
                 synchronized (nonces) {
                     nonces.remove(nonce);
