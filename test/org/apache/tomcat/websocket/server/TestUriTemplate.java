@@ -227,4 +227,72 @@ public class TestUriTemplate {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("//b");
     }
+
+
+    @Test
+    public void testCandidateBraces01() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/{b}/other", false));
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testCandidateBraces02() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/{other}", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("{other}", result.get("c"));
+    }
+
+
+    @Test
+    public void testCandidateBraces03() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/ot{h}er", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("ot{h}er", result.get("c"));
+    }
+
+
+    @Test
+    public void testCandidateBraces04() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/{other", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("{other", result.get("c"));
+    }
+
+
+    @Test
+    public void testCandidateBraces05() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/ot{her", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("ot{her", result.get("c"));
+    }
+
+
+    @Test
+    public void testCandidateBraces06() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/other}", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("other}", result.get("c"));
+    }
+
+
+    @Test
+    public void testCandidateBraces07() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b/{c}");
+        Map<String, String> result = t.match(new UriTemplate("/a/b/oth}er", false));
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("oth}er", result.get("c"));
+    }
 }
