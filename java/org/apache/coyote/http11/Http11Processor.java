@@ -805,14 +805,18 @@ public class Http11Processor extends AbstractProcessor {
         // HTTP 1.x header from a 1.x client unless the specs says otherwise.
         MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
         if (transferEncodingValueMB != null) {
-            List<String> encodingNames = new ArrayList<>();
-            if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
-                for (String encodingName : encodingNames) {
-                    addInputFilter(inputFilters, encodingName);
+            if (http11) {
+                List<String> encodingNames = new ArrayList<>();
+                if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
+                    for (String encodingName : encodingNames) {
+                        addInputFilter(inputFilters, encodingName);
+                    }
+                } else {
+                    // Invalid transfer encoding
+                    badRequest("http11processor.request.invalidTransferEncoding");
                 }
             } else {
-                // Invalid transfer encoding
-                badRequest("http11processor.request.invalidTransferEncoding");
+                badRequest("http11processor.request.transferEncodingWithHttp10");
             }
         }
 
