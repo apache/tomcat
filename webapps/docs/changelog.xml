@@ -136,8 +136,9 @@
         (markt)
       </fix>
       <add>
-        Reject requests containing multiple protocol header values in the
-        <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>. (markt)
+        Support multiple protocol header values (treat as a single merged header
+        value) in the <code>RemoteIpFilter</code> and
+        <code>RemoteIpValve</code>. (markt)
       </add>
     </changelog>
   </subsection>

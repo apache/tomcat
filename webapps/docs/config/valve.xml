@@ -1177,6 +1177,32 @@
 
   </subsection>
 
+  <subsection name="Security">
+
+    <p>The valve changes security sensitive properties of the request based on
+       values provided in HTTP headers. It is essential that Tomcat is able to
+       trust these values for secure operation. Therefore, the first proxy
+       (trusted or internal) must ensure that any of the HTTP headers used by
+       the valve are removed from the untrusted request received.</p>
+    <p>Only the HTTP headers used by the valve need to be removed. The names of
+       those headers will vary depending on configuration. Assuming default
+       header names (adjust as necessary if non-default header names are used),
+       the headers that need to be removed are:</p>
+       <ul>
+         <li><code>x-forwarded-for</code></li>
+         <li><code>x-forwarded-by</code></li>
+         <li><code>x-forwarded-proto</code></li>
+         <li><code>x-forwarded-host</code></li>
+         <li><code>x-forwarded-port</code></li>
+       </ul>
+     <p>Note that HTTP header names are case-insensitive.</p>
+
+     <p>The default value for <code>internalProxies</code> assumes that all
+        local networks are trusted. If this is not the case, adjust the value
+        accordingly.</p>
+
+  </subsection>
+
   <subsection name="Attributes">
 
     <p>The <strong>Remote IP Valve</strong> supports the
@@ -1237,8 +1263,13 @@
 
       <attribute name="protocolHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the protocol
-        used by the client to connect to the proxy. If not specified, the
-        default of <code>X-Forwarded-Proto</code> is used.</p>
+        used by the client to connect to the proxy. Multiple headers with the
+        same name will be merged as per RFC 9110, section 5.2. If multiple
+        values are present they must all match
+        <code>protocolHeaderHttpsValue</code> for the request to be treated as
+        an HTTPS request else it will be treated as HTTP. If not specified, the
+        default of <code>X-Forwarded-Proto</code> is used. To disable this
+        feature set the value to the empty string.</p>
       </attribute>
 
       <attribute name="hostHeader" required="false">
