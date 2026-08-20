@@ -823,9 +823,9 @@ public class Http11Processor extends AbstractProcessor {
         // Parse transfer-encoding header
         // HTTP specs say an HTTP 1.1 server should accept any recognised
         // HTTP 1.x header from a 1.x client unless the specs says otherwise.
-        if (!http09) {
-            MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
-            if (transferEncodingValueMB != null) {
+        MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
+        if (transferEncodingValueMB != null) {
+            if (http11) {
                 List<String> encodingNames = new ArrayList<>();
                 if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
                     for (String encodingName : encodingNames) {
@@ -835,6 +835,8 @@ public class Http11Processor extends AbstractProcessor {
                     // Invalid transfer encoding
                     badRequest("http11processor.request.invalidTransferEncoding");
                 }
+            } else {
+                badRequest("http11processor.request.transferEncodingWithHttp10");
             }
         }
 
