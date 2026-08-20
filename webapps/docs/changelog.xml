@@ -241,6 +241,10 @@
         Fix OpenSSL support for CRLs when using OpenSSL trust with the server
         key held in a Java key store. (markt)
       </fix>
+      <fix>
+        Reject HTTP/1.0 or earlier requests that send a
+        <code>transfer-encoding</code> header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
