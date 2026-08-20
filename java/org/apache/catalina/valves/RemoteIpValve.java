@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
@@ -671,20 +670,6 @@ public class RemoteIpValve extends ValveBase {
         }
 
         if (isInternal || (trustedProxies != null && trustedProxies.matcher(originalRemoteAddr).matches())) {
-            // Validate before request modifications
-            String protocolHeaderValue = null;
-            if (protocolHeader != null) {
-                try {
-                    protocolHeaderValue = RequestUtil.getUniqueHeader(request, protocolHeader);
-                } catch (IllegalArgumentException iae) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("remoteIpValve.multipleHeaders", protocolHeader), iae);
-                    }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            }
-
             String remoteIp = null;
             Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
@@ -759,17 +744,20 @@ public class RemoteIpValve extends ValveBase {
                 }
             }
 
-            if (protocolHeaderValue == null) {
-                // Don't modify the secure, scheme and serverPort attributes
-                // of the request
-            } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
-                request.setSecure(true);
-                request.getCoyoteRequest().scheme().setString("https");
-                setPorts(request, httpsServerPort);
-            } else {
-                request.setSecure(false);
-                request.getCoyoteRequest().scheme().setString("http");
-                setPorts(request, httpServerPort);
+            if (protocolHeader != null && !protocolHeader.isEmpty()) {
+                String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
+                if (protocolHeaderValue == null) {
+                    // Don't modify the secure, scheme and serverPort attributes
+                    // of the request
+                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
+                    request.setSecure(true);
+                    request.getCoyoteRequest().scheme().setString("https");
+                    setPorts(request, httpsServerPort);
+                } else {
+                    request.setSecure(false);
+                    request.getCoyoteRequest().scheme().setString("http");
+                    setPorts(request, httpServerPort);
+                }
             }
 
             if (hostHeader != null) {

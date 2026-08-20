@@ -22,15 +22,11 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.connector.Request;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * General purpose request parsing and encoding utility methods.
  */
 public final class RequestUtil {
-
-    private static final StringManager sm = StringManager.getManager(RequestUtil.class);
-
     /**
      * Default constructor.
      */
@@ -121,7 +117,7 @@ public final class RequestUtil {
      * @param url     The URL to test
      *
      * @return {@code true} if the provided URL is for a resource contained within the same web application as the
-     * request, otherwise {@code false}
+     *             request, otherwise {@code false}
      */
     public static boolean isSameWebApplication(HttpServletRequest request, URL url) {
         // Does this URL match down to (and including) the context path?
@@ -164,25 +160,26 @@ public final class RequestUtil {
 
 
     /**
-     * Obtains an HTTP value, ensuring that there is no more than one instance of the header.
+     * Behaves the same way as {@link HttpServletRequest#getHeader(String)} but with the addition that, if multiple
+     * headers of the specified name are present, the values are concatenated (with commas) before returning a single
+     * combined value.
      *
-     * @param request    The request from which to obtain the HTTP headers
-     * @param headerName The name of the required HTTP header
+     * @param request    The request from which the header value(s) should be retrieved
+     * @param headerName The name of the HTTP header for which the merged value should be obtained
      *
-     * @return The value for the HTTP header of there is exactly one instance of the header in the request. {@code null}
-     * if there are zero instances of the header
-     *
-     * @throws IllegalArgumentException if there is more than one instance of the header in the request
+     * @return The merged value for the given HTTP header.
      */
-    public static String getUniqueHeader(HttpServletRequest request, String headerName) {
-        Enumeration<String> headerValues = request.getHeaders(headerName);
-        String value = null;
-        if (headerValues.hasMoreElements()) {
-            value = headerValues.nextElement();
-            if (headerValues.hasMoreElements()) {
-                throw new IllegalArgumentException(sm.getString("requestUtil.multipleHeaders", headerName));
-            }
+    public static String getMergedHeaderValue(HttpServletRequest request, String headerName) {
+        Enumeration<String> values = request.getHeaders(headerName);
+        if (!values.hasMoreElements()) {
+            return null;
         }
-        return value;
+        StringBuilder result = new StringBuilder();
+        result.append(values.nextElement());
+        while (values.hasMoreElements()) {
+            result.append(',');
+            result.append(values.nextElement());
+        }
+        return result.toString();
     }
 }
