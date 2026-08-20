@@ -108,14 +108,8 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.60 (schultz)" rtext="in development">
-</section>
-
-<section name="Tomcat 10.1.59 (schultz)" rtext="2026-08-20">
   <subsection name="Catalina">
     <changelog>
-      <fix>
-        Fix async path building. (markt)
-      </fix>
       <fix>
         When a <code>PersistentManager</code> needs to reduce the number of
         active sessions, swap out the least recently used eligible sessions
@@ -168,6 +162,17 @@
     </changelog>
   </subsection>
 </section>
+
+<section name="Tomcat 10.1.59 (schultz)" rtext="2026-08-20">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix async path building. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
 <section name="Tomcat 10.1.58 (schultz)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
