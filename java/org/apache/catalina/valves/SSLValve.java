@@ -175,7 +175,8 @@ public class SSLValve extends ValveBase {
      * Retrieves the value of the specified header from the request, handling null and "(null)" values.
      *
      * @param request The request object
-     * @param header The header name to retrieve
+     * @param header  The header name to retrieve
+     *
      * @return The header value, or null if not present or equal to "(null)"
      */
     public String mygetHeader(Request request, String header) {

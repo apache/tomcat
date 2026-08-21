@@ -124,8 +124,8 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     /**
      * Reports the error by redirecting or proxying to the configured error URL.
      *
-     * @param request the servlet request
-     * @param response the servlet response
+     * @param request   the servlet request
+     * @param response  the servlet response
      * @param throwable the exception that caused the error, or {@code null}
      */
     @Override
@@ -176,8 +176,8 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         }
         try {
             stringBuilder.append("requestUri=");
-            stringBuilder.append(
-                URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
+            stringBuilder
+                    .append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
             stringBuilder.append("&statusCode=");
             stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
