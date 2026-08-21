@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -36,7 +37,7 @@ public class HpackDecoder {
     /**
      * The object that receives the headers that are emitted from this decoder
      */
-    private HeaderEmitter headerEmitter;
+    private final AtomicReference<HeaderEmitter> headerEmitter = new AtomicReference<>();
 
     /**
      * The header table
@@ -409,12 +410,12 @@ public class HpackDecoder {
 
 
     HeaderEmitter getHeaderEmitter() {
-        return headerEmitter;
+        return headerEmitter.get();
     }
 
 
     void setHeaderEmitter(HeaderEmitter headerEmitter) {
-        this.headerEmitter = headerEmitter;
+        this.headerEmitter.set(headerEmitter);
         // Reset limit tracking
         headerCount = 0;
         countedCookie = false;
@@ -422,8 +423,14 @@ public class HpackDecoder {
     }
 
 
+    void compareAndSetHeaderEmitter(HeaderEmitter expectedValue, HeaderEmitter newValue) {
+        // Only used in stream replacement so should not reset limits
+        this.headerEmitter.compareAndSet(expectedValue, newValue);
+    }
+
+
     void clearHeaderEmitter() {
-        headerEmitter = null;
+        headerEmitter.set(null);
     }
 
 
@@ -458,7 +465,7 @@ public class HpackDecoder {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.emitHeader", name, value));
             }
-            headerEmitter.emitHeader(name, value);
+            headerEmitter.get().emitHeader(name, value);
         }
     }
 

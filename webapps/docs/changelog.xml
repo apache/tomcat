@@ -420,6 +420,9 @@
         Ensure per request HTTP/2 bad request marker is cleared when the request
         is recycled. (markt)
       </fix>
+      <fix>
+        Additional clean-up after HTTP/2 stream reset to aid GC. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
