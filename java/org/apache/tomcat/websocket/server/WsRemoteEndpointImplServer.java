@@ -139,7 +139,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                             socketWrapper.getLock().unlock();
                         }
                         // Provide opportunity for another thread to obtain the socketWrapper lock
-                        Thread.yield();
+                        Thread.sleep(50);
                     } finally {
                         // Re-obtain the per socket lock(s)
                         for (int i = 0; i < socketWrapperLockCount; i++) {
