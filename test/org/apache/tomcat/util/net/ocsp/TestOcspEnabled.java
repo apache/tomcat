@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
+import java.net.BindException;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,12 +41,35 @@ public class TestOcspEnabled extends OcspBaseTest {
 
     @BeforeClass
     public static void startOcspResponder() {
-        ocspResponder = new TesterOcspResponder();
+        TesterOcspResponder responder = new TesterOcspResponder();
         try {
-            ocspResponder.start();
+            responder.start();
+            ocspResponder = responder;
         } catch (Exception e) {
-            e.printStackTrace();
+            responder.stop();
+            if (isBindException(e)) {
+                // The fixed OCSP responder port (8888, baked into the test
+                // certificates) is in use by another process. This is an
+                // environmental issue, so leave ocspResponder null to skip the
+                // tests rather than reporting spurious failures.
+                ocspResponder = null;
+                e.printStackTrace();
+            } else {
+                // Any other startup failure is a genuine problem.
+                throw new IllegalStateException("Failed to start OCSP responder", e);
+            }
         }
+    }
+
+
+    private static boolean isBindException(Throwable t) {
+        while (t != null) {
+            if (t instanceof BindException) {
+                return true;
+            }
+            t = t.getCause();
+        }
+        return false;
     }
 
 
