@@ -1984,6 +1984,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 log.trace(sm.getString("upgradeHandler.replace.first", getConnectionId(), original.getIdAsString()));
             }
             streams.put(original.getIdentifier(), replacement);
+            getHpackDecoder().compareAndSetHeaderEmitter((Stream) current, HEADER_SINK);
 
             int made;
             original.windowAllocationLock.lock();
