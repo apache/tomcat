@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +49,8 @@ public class TestOrderInterceptor {
 
     @Before
     public void setUp() throws Exception {
+        Assume.assumeTrue("Skipping test - IP multicast is not available in this environment",
+                TesterUtil.isMulticastAvailable());
         System.out.println("Setup");
         channels = new GroupChannel[channelCount];
         orderitcs = new OrderInterceptor[channelCount];
@@ -152,6 +155,10 @@ public class TestOrderInterceptor {
     @After
     public void tearDown() throws Exception {
         System.out.println("tearDown");
+        if (channels == null) {
+            // setUp was skipped (e.g. multicast unavailable)
+            return;
+        }
         for ( int i=0; i<channelCount; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
