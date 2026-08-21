@@ -38,7 +38,6 @@ import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -72,8 +71,6 @@ public final class FileStore extends StoreBase {
      * A File representing the directory in which Sessions are stored.
      */
     private File directoryFile = null;
-
-    private KeyedReentrantReadWriteLock sessionLocksById = new KeyedReentrantReadWriteLock();
 
     /**
      * Name to register for this Store, used for logging.
@@ -211,7 +208,7 @@ public final class FileStore extends StoreBase {
 
         ClassLoader oldThreadContextCL = context.bind(null);
         try {
-            Lock readLock = sessionLocksById.getLock(id).readLock();
+            Lock readLock = getSessionStoreLock(id).readLock();
             readLock.lock();
             try {
                 if (!file.exists()) {
@@ -249,7 +246,7 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
-        Lock writeLock = sessionLocksById.getLock(id).writeLock();
+        Lock writeLock = getSessionStoreLock(id).writeLock();
         writeLock.lock();
         try {
             if (file.exists() && !file.delete()) {
@@ -264,20 +261,24 @@ public final class FileStore extends StoreBase {
     @Override
     public void save(Session session) throws IOException {
         // Open an output stream to the specified pathname, if any
-        File file = file(session.getIdInternal());
+        String sessionId = session.getIdInternal();
+        File file = file(sessionId);
         if (file == null) {
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
+                    .trace(sm.getString(getStoreName() + ".saving", sessionId, file.getAbsolutePath()));
         }
 
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
 
-        Lock writeLock = sessionLocksById.getLock(session.getIdInternal()).writeLock();
+        Lock writeLock = getSessionStoreLock(sessionId).writeLock();
         writeLock.lock();
         try {
+            if (!sessionId.equals(session.getIdInternal())) {
+                throw new IOException(sm.getString("store.inconsistentSessionID", sessionId, session.getIdInternal()));
+            }
             try (FileOutputStream fos = new FileOutputStream(tempFile);
                     ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
                 ((StandardSession) session).writeObjectData(oos);

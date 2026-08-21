@@ -267,6 +267,14 @@
         value) in the <code>RemoteIpFilter</code> and
         <code>RemoteIpValve</code>. (markt)
       </add>
+      <fix>
+        Fix potential concurrency issues when loading/saving sessions from/to a
+        session store. Custom Store implementations that do not extend StoreBase
+        must implement the new <code>getSessionStoreLock()</code> method of the
+        <code>Store</code> interface to ensure concurrency protection. The
+        default method implementation provided only provides the pre-fix
+        functionality. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -19,6 +19,8 @@ package org.apache.catalina;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -136,4 +138,26 @@ public interface Store {
      * @exception IOException if an input/output error occurs
      */
     void save(Session session) throws IOException;
+
+
+    /**
+     * Obtain the session store lock for the session with the given identifier.
+     * <p>
+     * Sub-classes of StoreBase use this lock as necessary. External users of the Store must obtain a write lock before
+     * changing the session identifier. More generally, external users of the store must obtain a write lock before
+     * manipulating the session in any way that changes the mapping from session object to session identifier.
+     * <p>
+     * Implementations of this interface <b>MUST</b> provide an implementation of this method else any change in session
+     * identifier, e.g. on authentication, may result in inconsistent data being held in the store.
+     * <p>
+     * Prior to Tomcat 12, the default implementation always returns a new {@link ReadWriteLock} which will not provide
+     * any concurrency protection. From Tomcat 12, an {@link UnsupportedOperationException} is thrown.
+     *
+     * @param sessionId the session identifier
+     *
+     * @return The lock for the given session identifier
+     */
+    default ReadWriteLock getSessionStoreLock(String sessionId) {
+        return new ReentrantReadWriteLock();
+    }
 }

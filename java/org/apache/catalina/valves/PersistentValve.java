@@ -195,6 +195,11 @@ public class PersistentValve extends ValveBase {
                                 }
                                 session.expire();
                                 store.remove(sessionId);
+                            } else if (!session.getIdInternal().equals(sessionId)) {
+                                if (containerLog.isTraceEnabled()) {
+                                    containerLog.trace("session swapped in has wrong session ID");
+                                }
+                                store.remove(sessionId);
                             } else {
                                 session.setManager(manager);
                                 // session.setId(sessionId); Only if new ???

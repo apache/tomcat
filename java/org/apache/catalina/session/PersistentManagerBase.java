@@ -18,10 +18,9 @@ package org.apache.catalina.session;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -100,11 +99,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     protected int maxIdleSwap = -1;
 
 
-    /**
-     * Sessions currently being swapped in and the associated locks
-     */
-    private final Map<String,Object> sessionSwapInLocks = new HashMap<>();
-
     /*
      * Session that is currently getting swapped in to prevent loading it more than once concurrently
      */
@@ -112,7 +106,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Indicates how many seconds old a session can get, after its last use in a request, before it should be backed up
@@ -541,6 +534,34 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
     // ------------------------------------------------------ Protected Methods
 
+    @Override
+    protected void changeSessionId(Session session, String newId, boolean notifySessionListeners,
+            boolean notifyContainerListeners) {
+
+        Store store = getStore();
+        if (store == null) {
+            super.changeSessionId(session, newId, notifySessionListeners, notifyContainerListeners);
+            return;
+        }
+
+        String oldId = session.getIdInternal();
+
+        Lock oldWriteLock = store.getSessionStoreLock(oldId).writeLock();
+        oldWriteLock.lock();
+        try {
+            Lock newWriteLock = store.getSessionStoreLock(newId).writeLock();
+            newWriteLock.lock();
+            try {
+                super.changeSessionId(session, newId, notifySessionListeners, notifyContainerListeners);
+            } finally {
+                newWriteLock.unlock();
+            }
+        } finally {
+            oldWriteLock.unlock();
+        }
+    }
+
+
     /**
      * Look for a session in the Store and, if found, restore it in the Manager's list of active sessions if
      * appropriate. The session will be removed from the Store after swapping in, but will not be added to the active
@@ -558,21 +579,12 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             return null;
         }
 
-        Object swapInLock;
-
-        /*
-         * The purpose of this sync and these locks is to make sure that a session is only loaded once. It doesn't
-         * matter if the lock is removed and then another thread enters this method and tries to load the same session.
-         * That thread will re-create a swapIn lock for that session, quickly find that the session is already in
-         * sessions, use it and carry on.
-         */
-        synchronized (this) {
-            swapInLock = sessionSwapInLocks.computeIfAbsent(id, k -> new Object());
-        }
-
         Session session;
 
-        synchronized (swapInLock) {
+        Lock writeLock = getStore().getSessionStoreLock(id).writeLock();
+        writeLock.lock();
+        try {
+
             // First check to see if another thread has loaded the session into
             // the manager
             session = sessions.get(id);
@@ -584,11 +596,17 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                         session = loadSessionFromStore(id);
                         sessionToSwapIn.set(session);
 
-                        if (session != null && !session.isValid()) {
-                            log.error(sm.getString("persistentManager.swapInInvalid", id));
-                            session.expire();
-                            removeSession(id);
-                            session = null;
+                        if (session != null) {
+                            if (!session.isValid()) {
+                                log.error(sm.getString("persistentManager.swapInInvalid", id));
+                                session.expire();
+                                removeSession(id);
+                                session = null;
+                            } else if (!session.getIdInternal().equals(id)) {
+                                log.error(sm.getString("persistentManager.swapInInvalid", id));
+                                removeSession(id);
+                                session = null;
+                            }
                         }
 
                         if (session != null) {
@@ -599,11 +617,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                     sessionToSwapIn.remove();
                 }
             }
-        }
-
-        // Make sure the lock is removed
-        synchronized (this) {
-            sessionSwapInLocks.remove(id);
+        } finally {
+            writeLock.unlock();
         }
 
         return session;
