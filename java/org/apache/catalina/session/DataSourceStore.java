@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -129,24 +130,30 @@ public class DataSourceStore extends JDBCStore {
             ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
 
             try (PreparedStatement preparedLoadSql = conn.prepareStatement(loadSql)) {
-                preparedLoadSql.setString(1, id);
-                preparedLoadSql.setString(2, getName());
-                try (ResultSet rst = preparedLoadSql.executeQuery()) {
-                    if (rst.next()) {
-                        try (ObjectInputStream ois = getObjectInputStream(rst.getBinaryStream(2))) {
-                            if (contextLog.isTraceEnabled()) {
-                                contextLog.trace(sm.getString(getStoreName() + ".loading", id, sessionTable));
-                            }
+                Lock readLock = getSessionStoreLock(id).readLock();
+                readLock.lock();
+                try {
+                    preparedLoadSql.setString(1, id);
+                    preparedLoadSql.setString(2, getName());
+                    try (ResultSet rst = preparedLoadSql.executeQuery()) {
+                        if (rst.next()) {
+                            try (ObjectInputStream ois = getObjectInputStream(rst.getBinaryStream(2))) {
+                                if (contextLog.isTraceEnabled()) {
+                                    contextLog.trace(sm.getString(getStoreName() + ".loading", id, sessionTable));
+                                }
 
-                            StandardSession _session = (StandardSession) manager.createEmptySession();
-                            _session.readObjectData(ois);
-                            _session.setManager(manager);
-                            return _session;
+                                StandardSession _session = (StandardSession) manager.createEmptySession();
+                                _session.readObjectData(ois);
+                                _session.setManager(manager);
+                                return _session;
+                            }
+                        } else if (context.getLogger().isDebugEnabled()) {
+                            contextLog.debug(getStoreName() + ": No persisted data object found");
                         }
-                    } else if (context.getLogger().isDebugEnabled()) {
-                        contextLog.debug(getStoreName() + ": No persisted data object found");
+                        return null;
                     }
-                    return null;
+                } finally {
+                    readLock.unlock();
                 }
             } finally {
                 context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
@@ -158,7 +165,13 @@ public class DataSourceStore extends JDBCStore {
     @Override
     public void remove(String id) throws IOException {
         withRetry(conn -> {
-            remove(id, conn);
+            Lock writeLock = getSessionStoreLock(id).writeLock();
+            writeLock.lock();
+            try {
+                remove(id, conn);
+            } finally {
+                writeLock.unlock();
+            }
             return null;
         });
 
@@ -205,7 +218,13 @@ public class DataSourceStore extends JDBCStore {
                 sessionDataCol + ", " + sessionValidCol + ", " + sessionMaxInactiveCol + ", " + sessionLastAccessedCol +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
 
-        synchronized (session) {
+        String sessionId = session.getIdInternal();
+        Lock writeLock = getSessionStoreLock(sessionId).writeLock();
+        writeLock.lock();
+        try {
+            if (!sessionId.equals(session.getIdInternal())) {
+                throw new IOException(sm.getString("store.inconsistentSessionID", sessionId, session.getIdInternal()));
+            }
 
             // First serialize session
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -232,6 +251,8 @@ public class DataSourceStore extends JDBCStore {
                 }
                 return null;
             });
+        } finally {
+            writeLock.unlock();
         }
 
         if (manager.getContext().getLogger().isTraceEnabled()) {
