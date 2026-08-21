@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -31,6 +32,7 @@ import org.apache.catalina.Store;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.ToStringUtil;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -67,6 +69,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      */
     protected Manager manager;
 
+    /*
+     * Locks used to control concurrent access to session for persistence
+     */
+    private KeyedReentrantReadWriteLock sessionLocksById = new KeyedReentrantReadWriteLock();
+
 
     // ------------------------------------------------------------- Properties
 
@@ -94,6 +101,12 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
 
     // --------------------------------------------------------- Public Methods
+
+    @Override
+    public ReadWriteLock getSessionStoreLock(String sessionId) {
+        return sessionLocksById.getLock(sessionId);
+    }
+
 
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {

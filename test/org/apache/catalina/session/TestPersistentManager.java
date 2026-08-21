@@ -17,6 +17,8 @@
 package org.apache.catalina.session;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSessionEvent;
@@ -114,6 +116,12 @@ public class TestPersistentManager {
             @Override
             public Session answer() throws Throwable {
                 return timedOutSession(manager, sessionExpireCounter);
+            }
+        }).anyTimes();
+        EasyMock.expect(mockStore.getSessionStoreLock(EasyMock.anyString())).andAnswer(new IAnswer<ReadWriteLock>() {
+            @Override
+            public ReadWriteLock answer() throws Throwable {
+                return new ReentrantReadWriteLock();
             }
         }).anyTimes();
 
