@@ -48,6 +48,7 @@ public interface Store {
      * Return the number of Sessions present in this Store.
      *
      * @return the number of Sessions
+     *
      * @exception IOException if an input/output error occurs
      */
     int getSize() throws IOException;
@@ -62,10 +63,11 @@ public interface Store {
 
 
     /**
-     * Return an array containing the session identifiers of all Sessions currently saved in this Store. If there are
-     * no such Sessions, a zero-length array is returned.
+     * Return an array containing the session identifiers of all Sessions currently saved in this Store. If there are no
+     * such Sessions, a zero-length array is returned.
      *
      * @return the session identifiers
+     *
      * @exception IOException if an input/output error occurred
      */
     String[] keys() throws IOException;

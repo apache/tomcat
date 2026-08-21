@@ -50,8 +50,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * To avoid conflicts and/or errors when updating the session store, each session must only be accessed by no more than
  * one concurrent request. The {@code filter} field can be used to define requests (e.g. those for static resources)
- * that do not need access to the session and can bypass the session load/save functionality
- * provided by this Valve.
+ * that do not need access to the session and can bypass the session load/save functionality provided by this Valve.
  * <p>
  * The Valve uses a per session {@code Semaphore} to ensure that each session is accessed by no more than one request at
  * a time within a single Tomcat instance. The behaviour if multiple requests try to access the session concurrently can
@@ -147,8 +146,8 @@ public class PersistentValve extends ValveBase {
                  * Acquire the per session semaphore.
                  */
                 if (sessionId != null) {
-                    semaphore = sessionToSemaphoreMap.compute(sessionId,
-                            (k, v) -> v == null ? new UsageCountingSemaphore(semaphoreFairness) : v.incrementUsageCount());
+                    semaphore = sessionToSemaphoreMap.compute(sessionId, (k,
+                            v) -> v == null ? new UsageCountingSemaphore(semaphoreFairness) : v.incrementUsageCount());
                     if (semaphoreBlockOnAcquire) {
                         if (semaphoreAcquireUninterruptibly) {
                             semaphore.acquireUninterruptibly();
@@ -226,8 +225,8 @@ public class PersistentValve extends ValveBase {
                  */
                 if (!asyncOnEntry) {
                     AsyncContext asyncContext = request.getAsyncContext();
-                    asyncContext.addListener(
-                            new StoreSessionAsyncListener(request, context, sessionId, semaphore, mustReleaseSemaphore));
+                    asyncContext.addListener(new StoreSessionAsyncListener(request, context, sessionId, semaphore,
+                            mustReleaseSemaphore));
                 }
             } else {
                 storeSession(request, context, sessionId, semaphore, mustReleaseSemaphore);

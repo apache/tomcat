@@ -319,7 +319,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
              * Creates a new cache with the given format, locale and parent cache.
              *
              * @param format The format string
-             * @param loc The locale
+             * @param loc    The locale
              * @param parent The parent cache
              */
             private Cache(String format, Locale loc, Cache parent) {
@@ -431,8 +431,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         /**
          * Creates a new date format cache.
          *
-         * @param size The cache size
-         * @param loc The default locale
+         * @param size     The cache size
+         * @param loc      The default locale
          * @param parentFC The parent cache
          */
         protected DateFormatCache(int size, Locale loc, DateFormatCache parentFC) {
@@ -452,7 +452,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          * Gets the cache for the given format.
          *
          * @param format The format string
-         * @param loc The locale
+         * @param loc    The locale
          *
          * @return The cache
          */
@@ -491,8 +491,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          * Gets the formatted timestamp in the given format.
          *
          * @param format The format string
-         * @param loc The locale
-         * @param time The time in milliseconds
+         * @param loc    The locale
+         * @param time   The time in milliseconds
          *
          * @return The formatted timestamp
          */
@@ -520,8 +520,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected String condition = null;
 
     /**
-     * Are we doing conditional logging ? default null. It is the value of <code>conditionIf</code> property.
-     * If the ServletRequest.getAttribute(conditionIf) yields a non-null value, the logging will be performed.
+     * Are we doing conditional logging ? default null. It is the value of <code>conditionIf</code> property. If the
+     * ServletRequest.getAttribute(conditionIf) yields a non-null value, the logging will be performed.
      */
     protected String conditionIf = null;
 
@@ -1718,14 +1718,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Appends the query string to the buffer with optional formatting.
      *
-     * @param query                     The query string to append
-     * @param buf                       The buffer to which the query string should be appended
-     * @param appendDelim               Whether to prepend a '?' delimiter
-     * @param escapeQuoteAsDouble       Whether to escape quotes as double quotes
-     * @param writeDashOnNull          Whether to write "-" when query is null
+     * @param query               The query string to append
+     * @param buf                 The buffer to which the query string should be appended
+     * @param appendDelim         Whether to prepend a '?' delimiter
+     * @param escapeQuoteAsDouble Whether to escape quotes as double quotes
+     * @param writeDashOnNull     Whether to write "-" when query is null
      */
-    protected static void appendQueryString(String query, CharArrayWriter buf,
-            boolean appendDelim, boolean escapeQuoteAsDouble, boolean writeDashOnNull) {
+    protected static void appendQueryString(String query, CharArrayWriter buf, boolean appendDelim,
+            boolean escapeQuoteAsDouble, boolean writeDashOnNull) {
         if (query != null) {
             if (appendDelim) {
                 buf.append('?');
@@ -2290,8 +2290,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * - %to trailer response header - %V server name per UseCanonicalName setting
      *
      * The following escaped elements are not escaped in Tomcat because values that would require escaping are rejected
-     * before they reach the AccessLogValve: - %h remote host - %H request protocol - %m request method
-     * - %v canonical server name
+     * before they reach the AccessLogValve: - %h remote host - %H request protocol - %m request method - %v canonical
+     * server name
      *
      * The following escaped elements are supported by Tomcat: - %{}i request header - %{}o response header - %u remote
      * user
@@ -2323,9 +2323,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Escapes and appends the input string to the destination writer.
      *
-     * @param input                The input string
-     * @param dest                 The destination writer
-     * @param escapeQuoteAsDouble  Whether to escape quotes as double quotes
+     * @param input               The input string
+     * @param dest                The destination writer
+     * @param escapeQuoteAsDouble Whether to escape quotes as double quotes
      */
     protected static void escapeAndAppend(String input, CharArrayWriter dest, boolean escapeQuoteAsDouble) {
         if (input == null || input.isEmpty()) {
@@ -2383,16 +2383,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 next = current + 1;
                 switch (c) {
                     // Standard escapes for some control chars
-                    case '\f' -> // dec 12
-                            dest.append("\\f");
-                    case '\n' -> // dec 10
-                            dest.append("\\n");
-                    case '\r' -> // dec 13
-                            dest.append("\\r");
-                    case '\t' -> // dec 09
-                            dest.append("\\t");
-                    // Unicode escape \\uXXXX
+                    case '\f' -> dest.append("\\f"); // dec 12
+                    case '\n' -> dest.append("\\n"); // dec 10
+                    case '\r' -> dest.append("\\r"); // dec 13
+                    case '\t' -> dest.append("\\t"); // dec 09
                     default -> {
+                        // Unicode escape \\uXXXX
                         dest.append("\\u");
                         dest.append(HexUtils.toHexString(c));
                     }

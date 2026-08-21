@@ -89,6 +89,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the regular expression used to identify crawlers based on the User-Agent header.
+     *
      * @see #setCrawlerUserAgents(String)
      *
      * @return The current regular expression being used to match user agents
@@ -115,6 +116,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the regular expression used to identify crawlers based on their IP address.
+     *
      * @see #setCrawlerIps(String)
      *
      * @return The current regular expression being used to match IP addresses
@@ -136,6 +138,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the session timeout for a crawler's session.
+     *
      * @see #setSessionInactiveInterval(int)
      *
      * @return The current timeout in seconds

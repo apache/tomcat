@@ -121,8 +121,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
                     StackTraceElement[] elements = throwable.getStackTrace();
                     int pos = elements.length;
                     for (int i = elements.length - 1; i >= 0; i--) {
-                        if (elements[i].getClassName()
-                                .startsWith("org.apache.catalina.core.ApplicationFilterChain") &&
+                        if (elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain") &&
                                 elements[i].getMethodName().equals("doFilter")) {
                             pos = i;
                             break;
@@ -130,8 +129,8 @@ public class JsonErrorReportValve extends ErrorReportValve {
                     }
                     for (int i = 0; i < pos; i++) {
                         if (!elements[i].getClassName().startsWith("org.apache.catalina.core.")) {
-                            sb.append(',').append('\"').append(' ')
-                                    .append(JSONFilter.escape(elements[i].toString())).append('\"');
+                            sb.append(',').append('\"').append(' ').append(JSONFilter.escape(elements[i].toString()))
+                                    .append('\"');
                         }
                     }
 

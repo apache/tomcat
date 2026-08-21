@@ -124,8 +124,8 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     /**
      * Reports the error by redirecting or proxying to the configured error URL.
      *
-     * @param request the servlet request
-     * @param response the servlet response
+     * @param request   the servlet request
+     * @param response  the servlet response
      * @param throwable the exception that caused the error, or {@code null}
      */
     @Override
