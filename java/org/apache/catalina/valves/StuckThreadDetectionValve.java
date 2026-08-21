@@ -276,8 +276,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     /**
-     * Returns the total number of threads that have been interrupted
-     * due to being stuck.
+     * Returns the total number of threads that have been interrupted due to being stuck.
      *
      * @return the count of interrupted threads
      */
