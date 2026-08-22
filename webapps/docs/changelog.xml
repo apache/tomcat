@@ -265,6 +265,10 @@
         host header and TLS configuration matching via SNI are completely
         separate processes. (markt)
       </add>
+      <fix>
+        Examples: Draw axis-aligned rectangles and ellipses as lines in the
+        WebSocket drawboard. (sainadh777)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
