@@ -245,6 +245,10 @@
         Reject HTTP/1.0 or earlier requests that send a
         <code>transfer-encoding</code> header. (markt)
       </fix>
+      <fix>
+        Ensure per request HTTP/2 bad request marker is cleared when the request
+        is recycled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
