@@ -153,6 +153,8 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                          * statistics updating in StreamProcessor.recycle() needs to happen before the request and
                          * response are added to the pool to avoid concurrency issues corrupting the statistics.
                          */
+                        // Notes are not reset when request is recycled but this is a per request note
+                        request.setNote(Request.NOTE_BAD_REQUEST, null);
                         recycle();
                         stream.recycle();
                     }
@@ -523,8 +525,6 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         // - invalid (incorrectly formatted) :authority header
         // - invalid (incorrectly formatted) host header
         if (request.getNote(Request.NOTE_BAD_REQUEST) != null) {
-            // Notes not reset when request is recycled
-            request.setNote(Request.NOTE_BAD_REQUEST, null);
             return false;
         }
 
