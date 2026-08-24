@@ -26,6 +26,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
@@ -559,6 +561,12 @@ public class TestPersistentValveAsync extends TomcatBaseTest {
         public void save(Session session) {
             sessions.put(session.getId(), session);
             savedIds.add(session.getId());
+        }
+
+        @Override
+        public ReadWriteLock getSessionStoreLock(String sessionId) {
+            // Doesn't provide useful locking but sufficient for tests to pass.
+            return new ReentrantReadWriteLock();
         }
     }
 }
