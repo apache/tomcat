@@ -1077,15 +1077,16 @@ public class AjpProcessor extends AbstractProcessor {
             return;
         }
 
-        // Swallow the unread body packet if present
-        if (waitingForBodyMessage || first && request.getContentLengthLong() > 0) {
-            refillReadBuffer(true);
-        }
-
-        // Add the end message
         if (getErrorState().isError()) {
+            // Write the end and close message
             socketWrapper.write(true, endAndCloseMessageArray, 0, endAndCloseMessageArray.length);
         } else {
+            // Swallow the unread body packet if present
+            if (waitingForBodyMessage || first && request.getContentLengthLong() > 0) {
+                refillReadBuffer(true);
+            }
+
+            // Write the end message
             socketWrapper.write(true, endMessageArray, 0, endMessageArray.length);
         }
         socketWrapper.flush(true);
