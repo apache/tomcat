@@ -266,13 +266,11 @@
         feature is enabled, the time interval specified here should be equal to
         or longer than the value specified for <code>maxIdleBackup</code>. By
         default, this feature is disabled.</p>
-        <p>If this feature is enabled, the <code>sessionActivityCheck</code>
-        attribute is forced to be true to ensure that currently active sessions
-        are not swapped out.</p>
-        <p>If this feature is enabled at runtime, e.g. via JMX, and session
-        activity was not being tracked prior to the feature being enabled, only
-        sessions created after the feature is enabled will be eligible for swap
-        out.</p>
+        <p>If this feature is enabled, the system property
+        <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code>
+        must be set to <code>true</code> either explicitly or via
+        <code>STRICT_SERVLET_COMPLIANCE</code> else the configuration will be
+        rejected.</p>
       </attribute>
 
       <attribute name="minIdleSwap" required="false">
@@ -282,13 +280,11 @@
         swapped out to keep the active session count down. If specified, this
         value should be less than that specified by <code>maxIdleSwap</code>.
         By default, this value is set to <code>-1</code>.</p>
-        <p>If this feature is enabled, the <code>sessionActivityCheck</code>
-        attribute is forced to be true to ensure that currently active sessions
-        are not swapped out.</p>
-        <p>If this feature is enabled at runtime, e.g. via JMX, and session
-        activity was not being tracked prior to the feature being enabled, only
-        sessions created after the feature is enabled will be eligible for swap
-        out.</p>
+        <p>If this feature is enabled, the system property
+        <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code>
+        must be set to <code>true</code> either explicitly or via
+        <code>STRICT_SERVLET_COMPLIANCE</code> else the configuration will be
+        rejected.</p>
       </attribute>
 
       <attribute name="persistAuthentication" required="false">

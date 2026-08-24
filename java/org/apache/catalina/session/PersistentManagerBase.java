@@ -242,7 +242,9 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
      * @param max time in seconds to wait for possible swap out
      */
     public void setMaxIdleSwap(int max) {
-
+        if (max > -1 && !StandardSession.ACTIVITY_CHECK) {
+            throw new IllegalArgumentException(sm.getString("persistentManager.activityCheckRequired", "maxIdleSwap"));
+        }
         if (max == this.maxIdleSwap) {
             return;
         }
@@ -273,7 +275,9 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
      * @param min time in seconds before a possible swap out
      */
     public void setMinIdleSwap(int min) {
-
+        if (min > -1 && !StandardSession.ACTIVITY_CHECK) {
+            throw new IllegalArgumentException(sm.getString("persistentManager.activityCheckRequired", "minIdleSwap"));
+        }
         if (this.minIdleSwap == min) {
             return;
         }
@@ -357,12 +361,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         support.firePropertyChange("saveOnRestart", Boolean.valueOf(oldSaveOnRestart),
                 Boolean.valueOf(this.saveOnRestart));
 
-    }
-
-
-    @Override
-    public boolean getSessionActivityCheck() {
-        return super.getSessionActivityCheck() || minIdleSwap > -1 || maxIdleSwap > -1;
     }
 
 

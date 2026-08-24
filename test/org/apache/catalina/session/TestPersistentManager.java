@@ -25,6 +25,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -41,6 +42,11 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 
 public class TestPersistentManager {
+
+    @Before
+    public void setup() {
+        System.setProperty("org.apache.catalina.session.StandardSession.ACTIVITY_CHECK", "true");
+    }
 
     @Test
     public void testMinIdleSwap() throws Exception {

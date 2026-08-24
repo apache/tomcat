@@ -151,9 +151,13 @@
       <fix>
         Ensure that <code>PersistentManager</code> implementations that extend
         <code>PersistentManagerBase</code> do not swap out sessions that are
-        associated with a request that is currently being processed. This
-        includes not swapping out a session unless the session was created when
-        activity tracking was enabled. (markt)
+        associated with a request that is currently being processed. As a
+        result, it is now a requirement that the system property
+        <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code>
+        is set to <code>true</code> (either explicitly or via
+        <code>STRICT_SERVLET_COMPLIANCE</code>) if either
+        <code>minIdleSwap</code> or <code>maxIdleSwap</code> are configured.
+        (markt)
       </fix>
     </changelog>
   </subsection>
