@@ -286,8 +286,13 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    @Override
+    public boolean getSessionActivityCheck() {
+        return super.getSessionActivityCheck() || minIdleSwap > -1 || maxIdleSwap > -1;
+    }
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Clear all sessions from the Store.
@@ -783,8 +788,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                 }
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
-                    if (session.accessCount != null && session.accessCount.get() > 0) {
-                        // Session is currently being accessed - skip it
+                    if (session.accessCount == null || session.accessCount.get() > 0) {
+                        // Session access is not tracked or session is currently being accessed - skip it
                         continue;
                     }
                     if (log.isTraceEnabled()) {
@@ -831,8 +836,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             synchronized (session) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= minIdleSwap) {
-                    if (session.accessCount != null && session.accessCount.get() > 0) {
-                        // Session is currently being accessed - skip it
+                    if (session.accessCount == null || session.accessCount.get() > 0) {
+                        // Session access is not tracked or session is currently being accessed - skip it
                         continue;
                     }
                     if (log.isTraceEnabled()) {

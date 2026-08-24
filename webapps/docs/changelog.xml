@@ -148,6 +148,13 @@
         default method implementation provided only provides the pre-fix
         functionality. (markt)
       </fix>
+      <fix>
+        Ensure that <code>PersistentManager</code> implementations that extend
+        <code>PersistentManagerBase</code> do not swap out sessions that are
+        associated with a request that is currently being processed. This
+        includes not swapping out a session unless the session was created when
+        activity tracking was enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
