@@ -239,6 +239,10 @@
         Cleaner handling of AJP response headers which overflow the maximum
         message size. (remm)
       </fix>
+      <fix>
+        Small per performance optimisation. Don't waste cycles swallowing an AJP
+        response body when the connection is going to be closed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
