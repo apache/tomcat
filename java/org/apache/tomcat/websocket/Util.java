@@ -127,7 +127,7 @@ public class Util {
     }
 
 
-    static byte[] generateMask() {
+    static byte[] generateRandomBytes(int len) {
         // SecureRandom is not thread-safe so need to make sure only one thread
         // uses it at a time. In theory, the pool could grow to the same size
         // as the number of request processing threads. In reality, it will be
@@ -146,8 +146,8 @@ public class Util {
             }
         }
 
-        // Generate the mask
-        byte[] result = new byte[4];
+        // Generate the random byte array
+        byte[] result = new byte[len];
         sr.nextBytes(result);
 
         // Put the SecureRandom back in the poll

@@ -586,7 +586,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         byte[] mask;
 
         if (isMasked()) {
-            mask = Util.generateMask();
+            mask = Util.generateRandomBytes(4);
         } else {
             mask = null;
         }

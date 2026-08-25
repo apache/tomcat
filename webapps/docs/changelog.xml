@@ -182,6 +182,10 @@
         Fix an exception when an automatic Pong response races with the
         closing of the WebSocket session. (moritzfl)
       </fix>
+      <fix>
+        Harden the WebSocket client and use a <code>SecureRandom</code> when
+        generating the <code>Sec-WebSocket-Key</code> header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

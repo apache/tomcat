@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -85,7 +84,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
     private static final StringManager sm = StringManager.getManager(WsWebSocketContainer.class);
-    private static final Random RANDOM = new Random();
     private static final byte[] CRLF = new byte[] { 13, 10 };
 
     private static final byte[] GET_BYTES = "GET ".getBytes(StandardCharsets.ISO_8859_1);
@@ -777,8 +775,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     private static String generateWsKeyValue() {
-        byte[] keyBytes = new byte[16];
-        RANDOM.nextBytes(keyBytes);
+        byte[] keyBytes = Util.generateRandomBytes(16);
         return Base64.getEncoder().encodeToString(keyBytes);
     }
 
