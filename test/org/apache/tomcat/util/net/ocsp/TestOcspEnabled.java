@@ -130,7 +130,7 @@ public class TestOcspEnabled extends OcspBaseTest {
 
     @Test
     public void test() throws Exception {
-        Assume.assumeNotNull(ocspResponder);
+        Assume.assumeTrue("OCSP responder unavailable (port 8888 in use?)", ocspResponder != null);
         try {
             doTest(clientCertValid, serverCertValid, verifyClientCert, verifyServerCert);
             if (handshakeFailureExpected) {
