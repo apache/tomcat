@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +38,8 @@ public class TestGroupChannelMemberArrival {
 
     @Before
     public void setUp() throws Exception {
+        Assume.assumeTrue("Skipping test - IP multicast is not available in this environment",
+                TesterUtil.isMulticastAvailable());
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
             ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");

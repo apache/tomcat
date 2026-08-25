@@ -21,6 +21,7 @@ import java.util.logging.LogManager;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +44,8 @@ public class TestNonBlockingCoordinator {
 
     @Before
     public void setUp() throws Exception {
+        Assume.assumeTrue("Skipping test - IP multicast is not available in this environment",
+                TesterUtil.isMulticastAvailable());
         LogManager.getLogManager().getLogger(
                 "org.apache.catalina.tribes.group.interceptors.TestNonBlockingCoordinator").setLevel(Level.ALL);
         try {
@@ -177,6 +180,10 @@ public class TestNonBlockingCoordinator {
     @After
     public void tearDown() throws Exception {
         log.info("tearDown");
+        if (channels == null) {
+            // setUp was skipped (e.g. multicast unavailable)
+            return;
+        }
         for ( int i=0; i<CHANNEL_COUNT; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
