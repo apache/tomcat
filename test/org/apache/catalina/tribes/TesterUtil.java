@@ -21,7 +21,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.net.StandardSocketOptions;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
@@ -67,9 +66,8 @@ public class TesterUtil {
         // Bind to an ephemeral port (not the McastService default) so this probe
         // never clashes with a running membership service on the same host.
         try (MulticastSocket socket = new MulticastSocket(0)) {
-            // Loop-back must be enabled for the probe to receive its own packet (the parameter is "disable").
+            // Loop-back must be enabled for the probe to receive its own packet.
             socket.setLoopbackMode(false);
-            socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.TRUE);
             socket.setSoTimeout(1000);
 
             int port = socket.getLocalPort();
