@@ -67,7 +67,8 @@ public class TesterUtil {
         // Bind to an ephemeral port (not the McastService default) so this probe
         // never clashes with a running membership service on the same host.
         try (MulticastSocket socket = new MulticastSocket(0)) {
-            // Loopback must be enabled for the probe to receive its own packet.
+            // Loop-back must be enabled for the probe to receive its own packet (the parameter is "disable").
+            socket.setLoopbackMode(false);
             socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.TRUE);
             socket.setSoTimeout(1000);
 
