@@ -404,6 +404,10 @@
         closing of the WebSocket session. Pull request <pr>1041</pr> provided by
         moritzfl. (markt)
       </fix>
+      <fix>
+        Harden the WebSocket client and use a <code>SecureRandom</code> when
+        generating the <code>Sec-WebSocket-Key</code> header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
