@@ -45,7 +45,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
 
     @Test
     public void testBug54716() throws Exception {
-        TestUtil.generateMask();
+        TestUtil.initSecureRandom();
         // Set up utility classes
         Bug54716 server = new Bug54716();
         SingletonConfigurator.setInstance(server);

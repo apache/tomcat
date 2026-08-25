@@ -31,9 +31,9 @@ import org.junit.Test;
 
 public class TestUtil {
 
-    // Used to init SecureRandom prior to running tests
-    public static void generateMask() {
-        Util.generateMask();
+    // Used to initialise SecureRandom prior to running tests
+    public static void initSecureRandom() {
+        Util.generateRandomBytes(1);
     }
 
     @Test
