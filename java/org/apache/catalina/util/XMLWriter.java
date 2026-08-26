@@ -144,7 +144,7 @@ public class XMLWriter {
                     }
                     if (namespaceInfo != null) {
                         buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
-                                .append(namespace).append("=\"").append(namespaceInfo).append("\">");
+                                .append(namespace).append("=\"").append(Escape.xml(namespaceInfo)).append("\">");
                     } else {
                         buffer.append("<").append(namespace).append(":").append(name).append(">");
                     }
@@ -161,7 +161,7 @@ public class XMLWriter {
                     }
                     if (namespaceInfo != null) {
                         buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
-                                .append(namespace).append("=\"").append(namespaceInfo).append("\"/>\n");
+                                .append(namespace).append("=\"").append(Escape.xml(namespaceInfo)).append("\"/>\n");
                     } else {
                         buffer.append("<").append(namespace).append(":").append(name).append("/>\n");
                     }
@@ -174,7 +174,7 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\">");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(Escape.xml(namespaceInfo)).append("\">");
                     lastWriteWasOpen = true;
                     break;
                 case CLOSING:
@@ -186,7 +186,8 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\"/>\n");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(Escape.xml(namespaceInfo))
+                            .append("\"/>\n");
                     lastWriteWasOpen = false;
                     break;
             }
