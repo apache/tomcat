@@ -77,7 +77,10 @@ public final class SSLContext {
      *
      * @param ctx     Server or Client context to use.
      * @param options See SSL.SSL_OP_* for option flags.
+     *
+     * @deprecated Use {@link #setOptionsLong(long,long)}
      */
+    @Deprecated
     public static native void setOptions(long ctx, int options);
 
     /**
@@ -86,7 +89,10 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      *
      * @return options See SSL.SSL_OP_* for option flags.
+     *
+     * @deprecated Use {@link #getOptionsLong(long)}
      */
+    @Deprecated
     public static native int getOptions(long ctx);
 
     /**
@@ -94,8 +100,36 @@ public final class SSLContext {
      *
      * @param ctx     Server or Client context to use.
      * @param options See SSL.SSL_OP_* for option flags.
+     *
+     * @deprecated Use {@link #clearOptionsLong(long,long)}
      */
+    @Deprecated
     public static native void clearOptions(long ctx, int options);
+
+    /**
+     * Set OpenSSL Option.
+     *
+     * @param ctx     Server or Client context to use.
+     * @param options See SSL.SSL_OP_* for option flags.
+     */
+    public static native void setOptionsLong(long ctx, long options);
+
+    /**
+     * Get OpenSSL Option.
+     *
+     * @param ctx Server or Client context to use.
+     *
+     * @return options See SSL.SSL_OP_* for option flags.
+     */
+    public static native long getOptionsLong(long ctx);
+
+    /**
+     * Clears OpenSSL Options.
+     *
+     * @param ctx     Server or Client context to use.
+     * @param options See SSL.SSL_OP_* for option flags.
+     */
+    public static native void clearOptionsLong(long ctx, long options);
 
     /**
      * Returns all cipher suites that are enabled for negotiation in an SSL handshake.
