@@ -78,7 +78,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         try {
             final long sslCtx = SSLContext.make(aprPool, SSL.SSL_PROTOCOL_ALL, SSL.SSL_MODE_SERVER);
             try {
-                SSLContext.setOptions(sslCtx, SSL.SSL_OP_ALL);
+                SSLContext.setOptionsLong(sslCtx, SSL.SSL_OP_ALL);
                 SSLContext.setCipherSuite(sslCtx, "ALL");
                 final long ssl = SSL.newSSL(sslCtx, true);
                 try {
@@ -816,7 +816,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         List<String> enabled = new ArrayList<>();
         // Seems like there is no way to explicitly disable SSLv2Hello in OpenSSL so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
-        int opts = SSL.getOptions(ssl);
+        long opts = SSL.getOptionsLong(ssl);
         if ((opts & SSL.SSL_OP_NO_TLSv1) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1);
         }
@@ -863,22 +863,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
         // Enable all and then disable what we not want
-        SSL.setOptions(ssl, SSL.SSL_OP_ALL);
-
-        // Always disable SSLv2
-        SSL.setOptions(ssl, SSL.SSL_OP_NO_SSLv2);
-
+        SSL.setOptionsLong(ssl, SSL.SSL_OP_ALL);
         if (!sslv3) {
-            SSL.setOptions(ssl, SSL.SSL_OP_NO_SSLv3);
+            SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_SSLv3);
         }
         if (!tlsv1) {
-            SSL.setOptions(ssl, SSL.SSL_OP_NO_TLSv1);
+            SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_TLSv1);
         }
         if (!tlsv1_1) {
-            SSL.setOptions(ssl, SSL.SSL_OP_NO_TLSv1_1);
+            SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_TLSv1_1);
         }
         if (!tlsv1_2) {
-            SSL.setOptions(ssl, SSL.SSL_OP_NO_TLSv1_2);
+            SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_TLSv1_2);
         }
     }
 
