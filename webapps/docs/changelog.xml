@@ -143,6 +143,9 @@
         includes not swapping out a session unless the session was created when
         activity tracking was enabled. (markt)
       </fix>
+      <fix>
+        Ensure namespace attributes are XML escaped in WebDAV responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
