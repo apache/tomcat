@@ -430,6 +430,16 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <code>DataSourceProxy.getPooledConnection(String,String)</code> now
+        delegates to <code>getConnection(String,String)</code> rather than
+        <code>getConnection()</code>. (markt)
+      </fix>
+      <add>
+        Log a warning if an attempt is made to obtain a connection with
+        credentials when <code>alternateUsernameAllowed</code> is set to
+        <code>false</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
