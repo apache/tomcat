@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
 import jakarta.servlet.DispatcherType;
@@ -87,7 +88,7 @@ final class StandardWrapperValve extends ValveBase {
         boolean unavailable = false;
         Throwable throwable = null;
         // This should be a Request attribute...
-        long t1 = System.currentTimeMillis();
+        long t1 = System.nanoTime();
         requestCount.increment();
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         Servlet servlet = null;
@@ -247,9 +248,9 @@ final class StandardWrapperValve extends ValveBase {
                     exception(request, response, t);
                 }
             }
-            long t2 = System.currentTimeMillis();
+            long t2 = System.nanoTime();
 
-            long time = t2 - t1;
+            long time = TimeUnit.NANOSECONDS.toMillis(t2 - t1);
             processingTime.add(time);
             if (time > maxTime) {
                 maxTime = time;
