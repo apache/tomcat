@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -889,7 +890,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
         Servlet servlet;
         try {
-            long t1 = System.currentTimeMillis();
+            long t1 = System.nanoTime();
             // Complain if no servlet class has been specified
             if (servletClass == null) {
                 unavailable(null);
@@ -932,7 +933,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 ((ContainerServlet) servlet).setWrapper(this);
             }
 
-            classLoadTime = (int) (System.currentTimeMillis() - t1);
+            classLoadTime = (int) TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1);
 
             if (servlet instanceof SingleThreadModel) {
                 if (instancePool == null) {
@@ -945,7 +946,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
             fireContainerEvent("load", this);
 
-            loadTime = System.currentTimeMillis() - t1;
+            loadTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1);
         } finally {
             if (swallowOutput) {
                 String log = SystemLogHandler.stopCapture();

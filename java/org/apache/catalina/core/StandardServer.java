@@ -559,7 +559,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 StringBuilder command = new StringBuilder();
                 try {
                     InputStream stream;
-                    long acceptStartTime = System.currentTimeMillis();
+                    long acceptStartTime = System.nanoTime();
                     try {
                         socket = serverSocket.accept();
                         socket.setSoTimeout(10 * 1000); // Ten seconds
@@ -568,7 +568,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         // This should never happen but bug 56684 suggests that
                         // it does.
                         log.warn(sm.getString("standardServer.accept.timeout",
-                                Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
+                                Long.valueOf(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - acceptStartTime))), ste);
                         continue;
                     } catch (AccessControlException ace) {
                         log.warn(sm.getString("standardServer.accept.security"), ace);
