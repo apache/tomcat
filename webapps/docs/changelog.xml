@@ -201,6 +201,13 @@
         Align cipher order with the results produced by OpenSSL if the cipher
         specification adds, removes and then re-adds ciphers. (markt)
       </fix>
+      <add>
+        Add new attributes (<code>unixDomainSocketParentPermissions</code> and
+        <code>unixDomainSocketParentOwner</code>) to the APR/Native connector to
+        provide additional control over the security of Unix Domain Sockets.
+        Additional checks (enabled by default) have also been added for the
+        directory where the Unix Domain Socket will be created.(markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
