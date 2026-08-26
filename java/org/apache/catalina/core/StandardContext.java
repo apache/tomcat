@@ -44,6 +44,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -4833,8 +4834,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // requests will be mapped) but is still available.
 
         // Give the in progress async requests a chance to complete
-        long limit = System.currentTimeMillis() + unloadDelay;
-        while (inProgressAsyncCount.get() > 0 && System.currentTimeMillis() < limit) {
+        long limit = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(unloadDelay);
+        while (inProgressAsyncCount.get() > 0 && (System.nanoTime() - limit) < 0) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
