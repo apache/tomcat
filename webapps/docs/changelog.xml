@@ -204,6 +204,20 @@
       </docs>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <code>DataSourceProxy.getPooledConnection(String,String)</code> now
+        delegates to <code>getConnection(String,String)</code> rather than
+        <code>getConnection()</code>. (markt)
+      </fix>
+      <add>
+        Log a warning if an attempt is made to obtain a connection with
+        credentials when <code>alternateUsernameAllowed</code> is set to
+        <code>false</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.121 (remm)" rtext="release in progress">
   <subsection name="Catalina">
