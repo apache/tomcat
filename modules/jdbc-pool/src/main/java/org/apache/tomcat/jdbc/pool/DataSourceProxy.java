@@ -23,6 +23,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import javax.sql.XAConnection;
@@ -42,6 +43,8 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 public class DataSourceProxy implements PoolConfiguration {
     private static final Log log = LogFactory.getLog(DataSourceProxy.class);
+
+    private final AtomicBoolean connectionWithoutCredentialsWarningIssued = new AtomicBoolean(false);
 
     /**
      * The underlying connection pool.
@@ -120,6 +123,11 @@ public class DataSourceProxy implements PoolConfiguration {
             }
             return pool.getConnection(username,password);
         } else {
+            if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
+                log.warn(String.format(
+                        "alternateUsernameAllowed is set to false so the provided user name [%s] and associated " +
+                        "password have been ignored", username));
+            }
             return getConnection();
         }
     }
@@ -238,15 +246,15 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Get a database connection.
-     * {@link javax.sql.DataSource#getConnection()}
-     * @param username unused
-     * @param password unused
+     * {@link javax.sql.DataSource#getConnection(String,String)}
+     * @param username The user name
+     * @param password The password
      * @return the connection
      * @throws SQLException Connection error
      */
     public javax.sql.PooledConnection getPooledConnection(String username,
             String password) throws SQLException {
-        return (javax.sql.PooledConnection) getConnection();
+        return (javax.sql.PooledConnection) getConnection(username, password);
     }
 
     /**
