@@ -426,31 +426,52 @@ public final class SSL {
 
     /**
      * Info flag for session ID.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SESSION_ID = 0x0001;
     /**
      * Info flag for cipher name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CIPHER = 0x0002;
     /**
      * Info flag for cipher effective key size.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CIPHER_USEKEYSIZE = 0x0003;
     /**
      * Info flag for cipher algorithm key size.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CIPHER_ALGKEYSIZE = 0x0004;
     /**
      * Info flag for cipher version.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CIPHER_VERSION = 0x0005;
     /**
      * Info flag for cipher description.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CIPHER_DESCRIPTION = 0x0006;
     /**
      * Info flag for protocol version.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_PROTOCOL = 0x0007;
 
     /*
@@ -458,141 +479,240 @@ public final class SSL {
      */
     /**
      * Info flag for client subject distinguished name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_S_DN = 0x0010;
     /**
      * Info flag for client issuer distinguished name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_I_DN = 0x0020;
     /**
      * Info flag for server subject distinguished name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_S_DN = 0x0040;
     /**
      * Info flag for server issuer distinguished name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_I_DN = 0x0080;
 
     /**
      * DN field for country name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_COUNTRYNAME = 0x0001;
     /**
      * DN field for state or province name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_STATEORPROVINCENAME = 0x0002;
     /**
      * DN field for locality name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_LOCALITYNAME = 0x0003;
     /**
      * DN field for organization name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_ORGANIZATIONNAME = 0x0004;
     /**
      * DN field for organizational unit name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_ORGANIZATIONALUNITNAME = 0x0005;
     /**
      * DN field for common name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_COMMONNAME = 0x0006;
     /**
      * DN field for title.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_TITLE = 0x0007;
     /**
      * DN field for initials.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_INITIALS = 0x0008;
     /**
      * DN field for given name.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_GIVENNAME = 0x0009;
     /**
      * DN field for surname.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_SURNAME = 0x000A;
     /**
      * DN field for description.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_DESCRIPTION = 0x000B;
     /**
      * DN field for unique identifier.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_UNIQUEIDENTIFIER = 0x000C;
     /**
      * DN field for email address.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_DN_EMAILADDRESS = 0x000D;
 
     /**
      * Info flag for client certificate version.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_M_VERSION = 0x0101;
     /**
      * Info flag for client certificate serial number.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_M_SERIAL = 0x0102;
     /**
      * Info flag for client certificate validity start.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_V_START = 0x0103;
     /**
      * Info flag for client certificate validity end.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_V_END = 0x0104;
     /**
      * Info flag for client certificate signature algorithm.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_A_SIG = 0x0105;
     /**
      * Info flag for client certificate public key algorithm.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_A_KEY = 0x0106;
     /**
      * Info flag for client certificate data.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_CERT = 0x0107;
     /**
      * Info flag for client certificate validity remaining.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_V_REMAIN = 0x0108;
 
     /**
      * Info flag for server certificate version.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_M_VERSION = 0x0201;
     /**
      * Info flag for server certificate serial number.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_M_SERIAL = 0x0202;
     /**
      * Info flag for server certificate validity start.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_V_START = 0x0203;
     /**
      * Info flag for server certificate validity end.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_V_END = 0x0204;
     /**
      * Info flag for server certificate signature algorithm.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_A_SIG = 0x0205;
     /**
      * Info flag for server certificate public key algorithm.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_A_KEY = 0x0206;
     /**
      * Info flag for server certificate data.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_SERVER_CERT = 0x0207;
     /*
      * Return client certificate chain. Add certificate chain number to that flag (0 ... verify depth)
      */
     /**
      * Info flag for client certificate chain.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_INFO_CLIENT_CERT_CHAIN = 0x0400;
 
     /* Only support OFF and SERVER for now */
