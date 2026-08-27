@@ -101,7 +101,7 @@ public class Substitution {
 
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            String result = rule.group(n);
+            String result = (n <= rule.groupCount()) ? rule.group(n) : null;
             if (result == null) {
                 result = "";
             }
@@ -134,7 +134,8 @@ public class Substitution {
 
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            return (cond.group(n) == null ? "" : cond.group(n));
+            String result = (cond != null && n <= cond.groupCount()) ? cond.group(n) : null;
+            return (result == null) ? "" : result;
         }
     }
 
@@ -497,7 +498,13 @@ public class Substitution {
     private String evaluateSubstitution(SubstitutionElement[] elements, Matcher rule, Matcher cond, Resolver resolver) {
         StringBuilder buf = new StringBuilder();
         for (SubstitutionElement element : elements) {
-            buf.append(element.evaluate(rule, cond, resolver));
+            // Elements may return null, for example when a server variable,
+            // environment variable, SSL variable or map lookup is undefined.
+            // Like mod_rewrite, undefined values expand to an empty string.
+            String value = element.evaluate(rule, cond, resolver);
+            if (value != null) {
+                buf.append(value);
+            }
         }
         return buf.toString();
     }
