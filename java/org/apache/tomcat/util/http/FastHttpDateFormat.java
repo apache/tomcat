@@ -50,8 +50,9 @@ public final class FastHttpDateFormat {
     private static final ConcurrentDateFormat FORMAT_RFC5322;
     private static final ConcurrentDateFormat FORMAT_OBSOLETE_RFC850;
     private static final ConcurrentDateFormat FORMAT_OBSOLETE_ASCTIME;
+    private static final TryParseDateToTimestamp FORMAT_RFC9651;
 
-    private static final ConcurrentDateFormat[] httpParseFormats;
+    private static final TryParseDateToTimestamp[] httpParseFormats;
 
     static {
         // All the formats that use a timezone use GMT
@@ -60,9 +61,19 @@ public final class FastHttpDateFormat {
         FORMAT_RFC5322 = new ConcurrentDateFormat(DATE_RFC5322, Locale.US, tz);
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
+        FORMAT_RFC9651 = dateString -> {
+            if(dateString == null || !dateString.startsWith("@")) {
+                throw new ParseException("Date " + dateString + " not in RFC 9651 format", 0);
+            }
+            try {
+                return Long.parseLong(dateString.substring(1));
+            } catch (NumberFormatException e) {
+                throw new ParseException("Unable to parse number in date string " + dateString, 1);
+            }
+        };
 
         httpParseFormats =
-                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
+                new TryParseDateToTimestamp[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME, FORMAT_RFC9651 };
     }
 
     /**
@@ -147,7 +158,7 @@ public final class FastHttpDateFormat {
         long date = -1;
         for (int i = 0; (date == -1) && (i < httpParseFormats.length); i++) {
             try {
-                date = httpParseFormats[i].parse(value).getTime();
+                date = httpParseFormats[i].tryParseDate(value);
                 updateParseCache(value, Long.valueOf(date));
             } catch (ParseException e) {
                 // Ignore
@@ -185,5 +196,8 @@ public final class FastHttpDateFormat {
         parseCache.put(key, value);
     }
 
-
+    @FunctionalInterface
+    interface TryParseDateToTimestamp {
+        long tryParseDate(String dateString) throws ParseException;
+    }
 }
