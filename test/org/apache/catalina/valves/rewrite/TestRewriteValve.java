@@ -20,11 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -829,6 +832,107 @@ public class TestRewriteValve extends TomcatBaseTest {
     @Test
     public void testEmptyBackReferenceRewrite() throws Exception {
         doTestRewrite("RewriteRule ^/b/(rest)?$ /c/$1", "/b/", "/c/");
+    }
+
+
+    @Test
+    public void testSubstitutionUnknownServerVariable() throws Exception {
+        // Unknown server variables must expand to an empty string
+        doTestRewrite("RewriteRule ^/b$ /c/undef_%{UNKNOWN_VARIABLE}", "/b", "/c/undef_");
+    }
+
+
+    @Test
+    public void testSubstitutionFailedMapLookup() throws Exception {
+        // A failed map lookup without a default value must expand to an empty string
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA\n" +
+                "RewriteRule ^/b$ /c/map_${mapa:missing}", "/b", "/c/map_");
+    }
+
+
+    @Test
+    public void testRuleBackReferenceMissingGroup() throws Exception {
+        // $1 does not exist in the pattern so it must expand to an empty string
+        doTestRewrite("RewriteRule ^/b$ /c/backref_$1", "/b", "/c/backref_");
+    }
+
+
+    @Test
+    public void testCondBackReferenceNoMatchedCond() throws Exception {
+        // There are no RewriteCond directives so %1 must expand to an empty string
+        doTestRewrite("RewriteRule ^/b$ /c/backref_%1", "/b", "/c/backref_");
+    }
+
+
+    @Test
+    public void testCondBackReferenceLexicalCondOnly() throws Exception {
+        // The condition is a lexical comparison and has no capture groups so %1 must
+        // expand to an empty string
+        doTestRewrite("RewriteCond %{REQUEST_URI} =/b\n" +
+                "RewriteRule ^/b$ /c/backref_%1", "/b", "/c/backref_");
+    }
+
+
+    @Test
+    public void testCondMatcherReflectsCurrentRequest() throws Exception {
+        // The matcher returned for a condition must reflect the result of the most
+        // recent evaluation, including that it is cleared when the pattern does not
+        // match.
+        RewriteCond condition = new RewriteCond();
+        condition.setTestString("%{QUERY_STRING}");
+        condition.setCondPattern("!^a=([0-9]+)$");
+        condition.parse(new HashMap<String, RewriteMap>());
+
+        Matcher rule = Pattern.compile(".*").matcher("/b");
+
+        // The pattern matches so the negated condition is not satisfied
+        Assert.assertFalse(condition.evaluate(rule, null, new TestResolver("a=1")));
+        Matcher m = condition.getMatcher();
+        Assert.assertNotNull(m);
+        Assert.assertEquals("1", m.group(1));
+
+        // The pattern does not match so the negated condition is satisfied and the
+        // matcher must be cleared
+        Assert.assertTrue(condition.evaluate(rule, null, new TestResolver("b=2")));
+        Assert.assertNull(condition.getMatcher());
+    }
+
+
+    private static class TestResolver extends Resolver {
+
+        private final String queryString;
+
+        private TestResolver(String queryString) {
+            this.queryString = queryString;
+        }
+
+        @Override
+        public String resolve(String key) {
+            if (key.equals("QUERY_STRING")) {
+                return queryString;
+            }
+            return "";
+        }
+
+        @Override
+        public String resolveSsl(String key) {
+            return null;
+        }
+
+        @Override
+        public String resolveHttp(String key) {
+            return "";
+        }
+
+        @Override
+        public boolean resolveResource(int type, String name) {
+            return false;
+        }
+
+        @Override
+        public Charset getUriCharset() {
+            return StandardCharsets.UTF_8;
+        }
     }
 
 
