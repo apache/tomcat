@@ -66,7 +66,8 @@ public final class FastHttpDateFormat {
                 throw new ParseException("Date " + dateString + " not in RFC 9651 format", 0);
             }
             try {
-                return Long.parseLong(dateString.substring(1));
+                // An RFC 9651 timestamp is in seconds, not milliseconds.
+                return Long.parseLong(dateString.substring(1)) * 1_000;
             } catch (NumberFormatException e) {
                 throw new ParseException("Unable to parse number in date string " + dateString, 1);
             }
@@ -198,6 +199,13 @@ public final class FastHttpDateFormat {
 
     @FunctionalInterface
     interface TryParseDateToTimestamp {
+        /**
+         * Tries to parse the given string as a date and returns it as a timestamp.
+         *
+         * @param dateString the string representation of the date trying to be parsed
+         * @return the number of *milli*seconds since January 1, 1970, 00:00:00 GMT
+         * @throws ParseException if dateString cannot be parsed
+         */
         long tryParseDate(String dateString) throws ParseException;
     }
 }
