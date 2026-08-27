@@ -82,7 +82,9 @@ public final class SSLContext {
      * @param ctx Context to use.
      * @param id  String that uniquely identifies this context.
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setContextId(long ctx, String id);
@@ -105,7 +107,9 @@ public final class SSLContext {
      * @param bio BIO handle to use, created with SSL.newBIO
      * @param dir BIO direction (1 for input 0 for output).
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setBIO(long ctx, long bio, int dir);
@@ -158,7 +162,9 @@ public final class SSLContext {
      * @param ctx  Server or Client context to use.
      * @param mode True to set the quiet shutdown.
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setQuietShutdown(long ctx, boolean mode);
@@ -460,7 +466,9 @@ public final class SSLContext {
      * @param ctx  Server or Client context to use.
      * @param file random file.
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setRandom(long ctx, String file);
@@ -478,7 +486,9 @@ public final class SSLContext {
      * @param ctx  Server or Client context to use.
      * @param type Shutdown type to use.
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setShutdownType(long ctx, int type);
@@ -560,7 +570,9 @@ public final class SSLContext {
      * @param sniCallBack       The component that will map SNI hosts names received via connections initiated using
      *                              <code>defaultSSLContext</code> to the correct OpenSSL SSLContext
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static void registerDefault(Long defaultSSLContext, SNICallBack sniCallBack) {
@@ -574,7 +586,9 @@ public final class SSLContext {
      * @param defaultSSLContext The Java representation of a pointer to the OpenSSL SSLContext that will no longer be
      *                              used
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static void unregisterDefault(Long defaultSSLContext) {
@@ -618,7 +632,9 @@ public final class SSLContext {
      * @param ctx        Server context to use.
      * @param nextProtos comma delimited list of protocols in priority order
      *
-     * @deprecated use {@link #setNpnProtos(long, String[], int)}
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static void setNextProtos(long ctx, String nextProtos) {
@@ -633,7 +649,9 @@ public final class SSLContext {
      * @param selectorFailureBehavior see {@link SSL#SSL_SELECTOR_FAILURE_NO_ADVERTISE} and
      *                                    {@link SSL#SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL}
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setNpnProtos(long ctx, String[] nextProtos, int selectorFailureBehavior);
@@ -657,7 +675,9 @@ public final class SSLContext {
      *
      * @throws Exception An error occurred
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setTmpDH(long ctx, String cert) throws Exception;
@@ -671,7 +691,9 @@ public final class SSLContext {
      *
      * @throws Exception An error occurred
      *
-     * @deprecated Unused. Will be removed in Tomcat 10.1
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
     @Deprecated
     public static native void setTmpECDHByCurveName(long ctx, String curveName) throws Exception;

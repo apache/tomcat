@@ -481,19 +481,39 @@ public final class SSL {
 
     /**
      * Shutdown type unset.
+     *
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_UNSET = 0;
     /**
      * Standard shutdown type.
+     *
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
     /**
      * Unclean shutdown type.
+     *
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN = 2;
     /**
      * Accurate shutdown type.
+     *
+     * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+     *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+     *                 provide OpenSSL integration with the NIO and NIO2 connectors.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
     /**
