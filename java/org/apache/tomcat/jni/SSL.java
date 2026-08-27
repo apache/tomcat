@@ -462,35 +462,6 @@ public final class SSL {
     public static final int SSL_CONF_TYPE_DIR = 0x0003;
 
     /**
-     * Shutdown type unset.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_SHUTDOWN_TYPE_UNSET = 0;
-    /**
-     * Standard shutdown type.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
-    /**
-     * Unclean shutdown type.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_SHUTDOWN_TYPE_UNCLEAN = 2;
-    /**
-     * Accurate shutdown type.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
-
-    /**
      * Info flag for session ID.
      */
     public static final int SSL_INFO_SESSION_ID = 0x0001;
