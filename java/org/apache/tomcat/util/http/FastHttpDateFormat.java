@@ -63,13 +63,13 @@ public final class FastHttpDateFormat {
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
         FORMAT_RFC9651 = dateString -> {
             if(dateString == null || !dateString.startsWith("@")) {
-                throw new ParseException("Date " + dateString + " not in RFC 9651 format", 0);
+                return -1;
             }
             try {
                 // An RFC 9651 timestamp is in seconds, not milliseconds.
                 return Long.parseLong(dateString.substring(1)) * 1_000;
             } catch (NumberFormatException e) {
-                throw new ParseException("Unable to parse number in date string " + dateString, 1);
+                return -1;
             }
         };
 
@@ -158,13 +158,9 @@ public final class FastHttpDateFormat {
 
         long date = -1;
         for (int i = 0; (date == -1) && (i < httpParseFormats.length); i++) {
-            try {
-                date = httpParseFormats[i].tryParseDate(value);
-                updateParseCache(value, Long.valueOf(date));
-            } catch (ParseException e) {
-                // Ignore
-            }
+            date = httpParseFormats[i].tryParseDate(value);
         }
+        updateParseCache(value, Long.valueOf(date));
 
         return date;
     }
@@ -203,9 +199,8 @@ public final class FastHttpDateFormat {
          * Tries to parse the given string as a date and returns it as a timestamp.
          *
          * @param dateString the string representation of the date trying to be parsed
-         * @return the number of *milli*seconds since January 1, 1970, 00:00:00 GMT
-         * @throws ParseException if dateString cannot be parsed
+         * @return the number of *milli*seconds since January 1, 1970, 00:00:00 GMT or -1 if parsing failed
          */
-        long tryParseDate(String dateString) throws ParseException;
+        long tryParseDate(String dateString);
     }
 }

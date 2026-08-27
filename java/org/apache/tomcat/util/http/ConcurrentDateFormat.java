@@ -89,8 +89,12 @@ public class ConcurrentDateFormat implements FastHttpDateFormat.TryParseDateToTi
     }
 
     @Override
-    public long tryParseDate(String dateString) throws ParseException {
-        return parse(dateString).getTime();
+    public long tryParseDate(String dateString) {
+        try {
+            return parse(dateString).getTime();
+        } catch (ParseException e) {
+            return -1;
+        }
     }
 
     private SimpleDateFormat createInstance() {
