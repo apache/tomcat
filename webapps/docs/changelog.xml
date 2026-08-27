@@ -146,6 +146,10 @@
       <fix>
         Ensure namespace attributes are XML escaped in WebDAV responses. (markt)
       </fix>
+      <fix>
+        Resolve null or missing rewrite substitutions as an empty string, to
+        align with the mod_rewrite behavior. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
