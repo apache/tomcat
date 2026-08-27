@@ -112,67 +112,6 @@ public final class SSL {
     public static final int SSL_TMP_KEY_MAX = 8;
 
     /*
-     * Define the SSL options
-     */
-    /**
-     * No SSL options.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_NONE = 0;
-    /**
-     * SSL option for relative settings.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_RELSET = (1 << 0);
-    /**
-     * SSL option for standard environment variables.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_STDENVVARS = (1 << 1);
-    /**
-     * SSL option for exporting certificate data.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_EXPORTCERTDATA = (1 << 3);
-    /**
-     * SSL option for fake basic authentication.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_FAKEBASICAUTH = (1 << 4);
-    /**
-     * SSL option for strict require.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_STRICTREQUIRE = (1 << 5);
-    /**
-     * SSL option for optional renegotiation.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_OPTRENEGOTIATE = (1 << 6);
-    /**
-     * All SSL options combined.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    public static final int SSL_OPT_ALL = (SSL_OPT_STDENVVARS | SSL_OPT_EXPORTCERTDATA | SSL_OPT_FAKEBASICAUTH |
-            SSL_OPT_STRICTREQUIRE | SSL_OPT_OPTRENEGOTIATE);
-
-    /*
      * Define the SSL Protocol options
      */
     /**
