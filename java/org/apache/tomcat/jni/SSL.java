@@ -468,19 +468,31 @@ public final class SSL {
 
     /**
      * Shutdown type unset.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_UNSET = 0;
     /**
      * Standard shutdown type.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
     /**
      * Unclean shutdown type.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN = 2;
     /**
      * Accurate shutdown type.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
     /**
