@@ -171,8 +171,8 @@ public class RequestUtil {
         }
 
 
-        // Both scheme and host are case-insensitive but the CORS spec states
-        // this check should be case-sensitive
+        // Both scheme and host are case-insensitive usually
+        // However, CORS same origin check must be case-sensitive (from the CORS specification)
         return origin.contentEquals(target);
     }
 
