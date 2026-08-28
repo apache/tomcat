@@ -356,7 +356,7 @@ public class DataSourceStore extends StoreBase {
     private String[] keys(boolean expiredOnly) throws IOException {
         String sqlTmp = "SELECT " + sessionIdCol + " FROM " + sessionTable + " WHERE " + sessionAppCol + " = ?";
         if (expiredOnly) {
-            sqlTmp += " AND " + sessionMaxInactiveCol + " >= 0";
+            sqlTmp += " AND " + sessionMaxInactiveCol + " > 0";
             sqlTmp += " AND (" + sessionLastAccessedCol + " + " + sessionMaxInactiveCol + " * 1000 < ?)";
         }
         final String keysSql = sqlTmp;
