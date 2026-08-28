@@ -103,7 +103,7 @@ public class ResolverImpl extends Resolver {
             case "REQUEST_METHOD" -> request.getMethod();
             case "SCRIPT_FILENAME" -> request.getServletContext().getRealPath(request.getServletPath());
             case "REQUEST_PATH" -> request.getRequestPathMB().toString();
-            case "CONTEXT_PATH" -> request.getContextPath();
+            case "CONTEXT_PATH" -> request.getContext().getPath();
             case "SERVLET_PATH" -> emptyStringIfNull(request.getServletPath());
             case "PATH_INFO" -> emptyStringIfNull(request.getPathInfo());
             case "QUERY_STRING" -> emptyStringIfNull(request.getQueryString());

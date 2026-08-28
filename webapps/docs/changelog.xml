@@ -294,6 +294,11 @@
         <code>CrawlerSessionManagerValve</code> against crawlers being
         associated with an authenticated session. (markt)
       </add>
+      <fix>
+        Clarify the meaning of various RewriteValve server variables and
+        explicitly use the canonical context path for the
+        <code>CONTEXT_PATH</code> server variable. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
