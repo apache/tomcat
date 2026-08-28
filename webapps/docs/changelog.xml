@@ -162,6 +162,11 @@
         Resolve null or missing rewrite substitutions as an empty string, to
         align with the mod_rewrite behavior. (remm)
       </fix>
+      <add>
+        Add a best efforts protection in the
+        <code>CrawlerSessionManagerValve</code> against crawlers being
+        associated with an authenticated session. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
