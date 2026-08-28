@@ -130,7 +130,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("REQUEST_PATH")) {
             return request.getRequestPathMB().toString();
         } else if (key.equals("CONTEXT_PATH")) {
-            return request.getContextPath();
+            return request.getServletContext().getContextPath();
         } else if (key.equals("SERVLET_PATH")) {
             return emptyStringIfNull(request.getServletPath());
         } else if (key.equals("PATH_INFO")) {
