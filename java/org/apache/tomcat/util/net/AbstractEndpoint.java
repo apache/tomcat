@@ -639,12 +639,13 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        if (getLogCertificate().isDebugEnabled()) {
+        SSLContext sslContext = certificate.getSslContext();
+        if (getLogCertificate().isDebugEnabled() && sslContext != null) {
             String alias = certificate.getCertificateKeyAlias();
             if (alias == null) {
                 alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
             }
-            X509Certificate[] x509Certificates = certificate.getSslContext().getCertificateChain(alias);
+            X509Certificate[] x509Certificates = sslContext.getCertificateChain(alias);
             if (x509Certificates != null && x509Certificates.length > 0) {
                 getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
             } else {
