@@ -2435,6 +2435,12 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
     should be defined before this valve to ensure that the correct client IP
     address is presented to this valve.</p>
 
+    <p>Care should be taken when configuring this Valve to ensure that crawlers
+    are not associated with the authenticated session of a genuine user. In
+    particular, the <code>crawlerUserAgents</code> must be chosen with care. The
+    Valve will attempt (but does NOT guarantee) to detect this situation and
+    will expire the authenticated session if detected.</p>
+
   </subsection>
 
   <subsection name="Attributes">
