@@ -1110,6 +1110,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         DocumentBuilder documentBuilder = getDocumentBuilder();
         ArrayList<ProppatchOperation> operations = new ArrayList<>();
 
+        // There is no size limit for the PROPPATCH body, since write access is already considered high privilege
         byte[] body;
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
