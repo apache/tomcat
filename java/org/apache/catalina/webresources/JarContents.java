@@ -157,10 +157,11 @@ public final class JarContents {
         if (path.startsWith(webappRoot)) {
             startPos = webappRoot.length();
         }
-
-        if (path.charAt(startPos) == '/') {
-            // ignore leading slash
+        while (startPos < path.length() && path.charAt(startPos) == '/') {
             startPos++;
+        }
+        if (startPos == path.length()) {
+            return true; // archive root: cannot rule out
         }
 
         // calculate the hash lazily and return a boolean value for this path
