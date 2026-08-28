@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -122,9 +123,9 @@ public class TestCrawlerSessionManagerValveIntegration extends TomcatBaseTest {
 
     private static Map<String,List<String>> headers(String userAgent, String authorization) {
         Map<String,List<String>> headers = new HashMap<>();
-        headers.put("user-agent", List.of(userAgent));
+        headers.put("user-agent", Arrays.asList(userAgent));
         if (authorization != null) {
-            headers.put("authorization", List.of(authorization));
+            headers.put("authorization", Arrays.asList(authorization));
         }
         return headers;
     }
