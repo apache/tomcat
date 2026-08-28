@@ -37,9 +37,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
