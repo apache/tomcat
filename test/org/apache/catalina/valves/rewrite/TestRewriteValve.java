@@ -881,7 +881,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         RewriteCond condition = new RewriteCond();
         condition.setTestString("%{QUERY_STRING}");
         condition.setCondPattern("!^a=([0-9]+)$");
-        condition.parse(new HashMap<String, RewriteMap>());
+        condition.parse(new HashMap<>());
 
         Matcher rule = Pattern.compile(".*").matcher("/b");
 
