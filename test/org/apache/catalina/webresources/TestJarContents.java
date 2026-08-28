@@ -73,17 +73,25 @@ public class TestJarContents {
         Assert.assertFalse(testJarContentsObject.mightContainResource(
                 "/d7/d1-f1.txt", jar.getAbsolutePath()));
 
-        Assert.assertFalse(testJarContentsObject.mightContainResource(
+        // A path that only contains slashes (once the webapp root and any
+        // leading slashes have been removed) refers to the root of the
+        // archive. That cannot be ruled out, so the method must return
+        // true.
+        Assert.assertTrue(testJarContentsObject.mightContainResource(
                 "/", jar.getAbsolutePath()));
 
-        Assert.assertFalse(testJarContentsObject.mightContainResource(
+        Assert.assertTrue(testJarContentsObject.mightContainResource(
                 "/////", jar.getAbsolutePath()));
 
+        Assert.assertTrue(testJarContentsObject.mightContainResource(
+                jar.getAbsolutePath(), jar.getAbsolutePath()));
     }
 
-    @Test(expected = StringIndexOutOfBoundsException.class)
-    public void testStringOutOfBoundExceptions() {
-        testJarContentsObject.mightContainResource("", jar.getAbsolutePath());
+    @Test
+    public void testEmptyPath() {
+        // Must not throw and must return true since nothing can be ruled
+        // out.
+        Assert.assertTrue(testJarContentsObject.mightContainResource("", jar.getAbsolutePath()));
     }
 
     @Test(expected = NullPointerException.class)
