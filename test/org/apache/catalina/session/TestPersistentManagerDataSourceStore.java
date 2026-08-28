@@ -38,6 +38,8 @@ import org.apache.catalina.Session;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterServletContext;
 
 public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
@@ -146,6 +148,46 @@ public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
         session.expire();
         Assert.assertTrue(store.getSize() == 0);
         store.clear();
+    }
+
+    @Test
+    public void testExpiredKeysNeverExpiringSessions() throws Exception {
+        StandardManager manager = new StandardManager();
+        TesterContext testerContext = new TesterContext();
+        testerContext.setServletContext(new TesterServletContext());
+        manager.setContext(testerContext);
+
+        DerbyDataSourceStore store = new DerbyDataSourceStore("expiredkeys");
+        store.setSessionTable("tomcatsessions");
+        store.setManager(manager);
+        store.start();
+        try {
+            // A session that must never expire.
+            StandardSession neverExpiring = (StandardSession) manager.createSession("never-expiring");
+            neverExpiring.setManager(manager);
+            neverExpiring.setMaxInactiveInterval(-1);
+            store.save(neverExpiring);
+
+            // A session with a 1 second max inactive interval.
+            StandardSession expiring = (StandardSession) manager.createSession("expiring");
+            expiring.setManager(manager);
+            expiring.setMaxInactiveInterval(1);
+            store.save(expiring);
+
+            // Make both saved sessions idle for 60 seconds so that the
+            // "expiring" session is well past its max inactive interval.
+            String dbUrl = "jdbc:derby:" + getTemporaryDirectory().getAbsolutePath() +
+                    "/store-expiredkeys";
+            try (Connection conn = DriverManager.getConnection(dbUrl);
+                    Statement statement = conn.createStatement()) {
+                statement.execute("update tomcatsessions set lastaccess = lastaccess - 60000");
+            }
+
+            Assert.assertArrayEquals(new String[] { "expiring" }, store.expiredKeys());
+        } finally {
+            store.clear();
+            store.stop();
+        }
     }
 
     private static class DummyServlet extends HttpServlet {

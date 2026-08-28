@@ -160,7 +160,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                     continue;
                 }
                 int timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-                if (timeIdle < session.getMaxInactiveInterval()) {
+                int maxInactive = session.getMaxInactiveInterval();
+                if (maxInactive < 0 || timeIdle < maxInactive) {
                     continue;
                 }
                 if (manager.getContext().getLogger().isTraceEnabled()) {
