@@ -103,6 +103,40 @@ public class TestFileStore {
     }
 
     @Test
+    public void processExpiresNeverExpiringSession() throws Exception {
+        // Use a separate store and directory so this test does not
+        // interfere with the fixtures used by the other tests.
+        FileStore expireStore = new FileStore();
+        expireStore.setManager(manager);
+        expireStore.setDirectory(new File(dir, "expire").getAbsolutePath());
+        expireStore.start();
+        try {
+            // A session that is idle longer than its max inactive interval
+            // but that must never expire.
+            StandardSession neverExpiring = (StandardSession) manager.createSession("never-expiring");
+            neverExpiring.setManager(manager);
+            neverExpiring.setMaxInactiveInterval(-1);
+            neverExpiring.setCreationTime(System.currentTimeMillis() - 60_000L);
+            expireStore.save(neverExpiring);
+
+            // A session that is idle longer than its max inactive interval
+            // and that must be expired.
+            StandardSession expiring = (StandardSession) manager.createSession("expiring");
+            expiring.setManager(manager);
+            expiring.setMaxInactiveInterval(1);
+            expiring.setCreationTime(System.currentTimeMillis() - 60_000L);
+            expireStore.save(expiring);
+
+            expireStore.processExpires();
+
+            Assert.assertArrayEquals(new String[] { "never-expiring" }, expireStore.keys());
+        } finally {
+            expireStore.clear();
+            expireStore.stop();
+        }
+    }
+
+    @Test
     public void pathTraversalSessionId() throws Exception {
         File storageDir = dir.getAbsoluteFile();
         File outsideFile = new File(storageDir.getParentFile(), "conf" + File.separator + "test.session");
