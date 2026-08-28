@@ -180,6 +180,7 @@ class HpackEncoder {
 
                 // We use 11 to make sure we have enough room for the
                 // variable length integers
+                // 12 is the maximum in theory but it cannot happen in practice
                 int required = 11 + headerName.length() + 1 + val.length();
 
                 if (target.remaining() < required) {
