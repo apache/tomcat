@@ -24,7 +24,7 @@
   &project;
 
   <properties>
-    <title>The rewrite Valve</title>
+    <title>The Rewrite Valve</title>
   </properties>
 
 <body>
@@ -41,17 +41,13 @@
   <p>The rewrite valve is configured as a valve using the <code>org.apache.catalina.valves.rewrite.RewriteValve</code>
   class name.</p>
 
-  <p>The rewrite valve can be configured as a valve added in a Host.
-     See <a href="config/host.html">virtual-server</a> documentation for
-     information on how to configure it. It will use a <code>rewrite.config</code> file
-     containing the rewrite directives, it must be placed in the Host configuration
-     folder.
-  </p>
+  <p>The rewrite valve can be configured as a valve added in a Host. See the <a href="config/host.html">Host</a>
+  documentation for information on how to configure it. The <code>rewrite.config</code> file containing the rewrite
+  directives must be placed in the Host configuration folder.</p>
 
-  <p>It can also be in the context.xml of a webapp.
-  The valve will then use a <code>rewrite.config</code> file containing the
-  rewrite directives, it must be placed in the WEB-INF folder of the web application
-  </p>
+  <p>The Valve can also be configured as a Valve added in a Context. The Valve must be added in the context.xml of a
+  webapp. The valve will then use the <code>rewrite.config</code> file containing the rewrite directives found in the
+  WEB-INF folder of the web application.</p>
 
 </section>
 
@@ -106,7 +102,7 @@
           (0 &lt;= N &lt;= 9), which provide access to the grouped
           parts (in parentheses) of the pattern, from the
           <code>RewriteRule</code> which is subject to the current
-          set of <code>RewriteCond</code> conditions..
+          set of <code>RewriteCond</code> conditions.
         </li>
         <li>
           <strong>RewriteCond backreferences</strong>: These are
@@ -197,45 +193,53 @@
           </li>
           </ul>
 
-                <p>These variables all
-                correspond to the similarly named HTTP
-                MIME-headers and Servlet API methods.
-                Most are documented elsewhere in the Manual or in
-                the CGI specification. Those that are special to
-                the rewrite valve include those below.</p>
+                <p>These variables correspond to the similarly named HTTP MIME-headers and Servlet API methods. Most are
+                documented in the Servlet API in the CGI specification. Those that are special to the rewrite valve
+                include those below.</p>
 
                 <dl>
 
                   <dt><code>REQUEST_PATH</code></dt>
 
-                  <dd>Corresponds to the full path that is used for mapping.</dd>
+                  <dd>Corresponds to the decoded, normalized path (excluding the context path) that is used for
+                  mapping.</dd>
 
                   <dt><code>CONTEXT_PATH</code></dt>
 
-                  <dd>Corresponds to the path of the mapped context.</dd>
+                  <dd>Corresponds to the canonical (decoded and normalized) path of the mapped context.</dd>
 
                   <dt><code>SERVLET_PATH</code></dt>
 
-                  <dd>Corresponds to the servlet path.</dd>
+                  <dd>Corresponds to <code>HttpServletRequest.getServletPath()</code>. The value is decoded and
+                  normalized.</dd>
+
+                  <dt><code>PATH_INFO</code></dt>
+
+                  <dd>Corresponds to <code>HttpServletRequest.getPathInfo()</code>. The value is decoded and
+                  normalized.</dd>
 
                   <dt><code>THE_REQUEST</code></dt>
 
-                  <dd>The full HTTP request line sent by the
-                  browser to the server (e.g., "<code>GET
-                  /index.html HTTP/1.1</code>"). This does not
-                  include any additional headers sent by the
-                  browser.</dd>
+                  <dd>The full HTTP request line sent by the browser to the server (e.g., "<code>GET /index.html
+                  HTTP/1.1</code>"). This does not include any additional headers sent by the browser.</dd>
 
                   <dt><code>REQUEST_URI</code></dt>
 
-                  <dd>The resource requested in the HTTP request
-                  line. (In the example above, this would be
-                  "/index.html".)</dd>
+                  <dd>The resource requested in the HTTP request line. (In the example above, this would be
+                  "/index.html".) Corresponds to <code>HttpServletRequest.getRequestURI()</code>. This is the original,
+                  non-decoded, non-normalized value and as such may not be suitable for many rewrite use cases. In most
+                  cases <code>%{CONTEXT_PATH}%{REQUEST_PATH}</code> will be more suitable than
+                  <code>%{REQUEST_URI}</code> </dd>
+
+                  <dt><code>SCRIPT_FILENAME</code></dt>
+
+                  <dd>The full local file system path to the file or script matching the request servlet path. The exact
+                  value returned is <code>ServletContext.getRealPath(HttpServletRequest.getServletPath()).</code></dd>
 
                   <dt><code>REQUEST_FILENAME</code></dt>
 
-                  <dd>The full local file system path to the file or
-                  script matching the request.</dd>
+                  <dd>The full local file system path to the file or script matching the request path info. The exact
+                  value returned is <code>ServletContext.getRealPath(HttpServletRequest.getPathInfo()).</code></dd>
 
                   <dt><code>HTTPS</code></dt>
 
@@ -250,15 +254,6 @@
       <p>Other things you should be aware of:</p>
 
       <ol>
-        <li>The variables SCRIPT_FILENAME and REQUEST_FILENAME
-        contain the same value - the value of the
-        <code>filename</code> field of the internal
-        <code>request_rec</code> structure of the Apache server.
-        The first name is the commonly known CGI variable name
-        while the second is the appropriate counterpart of
-        REQUEST_URI (which contains the value of the
-        <code>uri</code> field of <code>request_rec</code>).</li>
-
         <li>
         <code>%{ENV:variable}</code>, where <em>variable</em> can be
         any Java system property, is also available.</li>
