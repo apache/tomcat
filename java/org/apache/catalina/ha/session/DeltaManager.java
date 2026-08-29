@@ -841,6 +841,7 @@ public class DeltaManager extends ClusterManagerBase {
                 counterSend_EVT_GET_ALL_SESSIONS.incrementAndGet();
             }
             stateTransferred = false;
+            noContextManagerReceived = false;
             // FIXME This send call block the deploy thread, when sender waitForAck is enabled
             try {
                 synchronized (receivedMessageQueue) {
