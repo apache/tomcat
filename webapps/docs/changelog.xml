@@ -372,6 +372,11 @@
         Add support for <code>java.util.Optional</code> to the empty operator.
         (markt)
       </add>
+      <fix>
+        Detect duplicate function names while parsing a tag library descriptor
+        rather than when constructing its <code>TagLibraryInfo</code>.
+        (sainadh777)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
