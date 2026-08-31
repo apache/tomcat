@@ -194,6 +194,10 @@
         Fix incorrect initial window size calculation when upgrading to HTTP/2.
         (remm)
       </fix>
+      <fix>
+        Avoid HTTP/2 exceptions with invalid <code>content-length</code>
+        values. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
