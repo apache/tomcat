@@ -188,7 +188,7 @@ class StreamStateMachine {
                                                        FrameType.RST,
                                                        FrameType.PUSH_PROMISE,
                                                        FrameType.WINDOW_UPDATE),
-        HALF_CLOSED_REMOTE (false, true,  true,  true,
+        HALF_CLOSED_REMOTE (false, true,  true,  false,
                             Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
                                                        FrameType.RST,
                                                        FrameType.WINDOW_UPDATE),
