@@ -434,6 +434,12 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public boolean resolveResource(int type, String name) {
+        if (name == null || !name.startsWith("/")) {
+            return false;
+        }
+        if (org.apache.tomcat.util.http.RequestUtil.normalize(name) == null) {
+            return false;
+        }
         WebResourceRoot resources = request.getContext().getResources();
         WebResource resource = resources.getResource(name);
         if (!resource.exists()) {
