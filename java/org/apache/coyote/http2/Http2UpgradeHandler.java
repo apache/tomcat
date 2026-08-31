@@ -284,6 +284,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Settings are only valid on stream 0
                 FrameType.SETTINGS.check(0, settings.length);
 
+                long oldInitialWindowSize = remoteSettings.getInitialWindowSize();
+
                 for (int i = 0; i < settings.length / 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
@@ -293,6 +295,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 Long.toString(value)));
                     }
                     remoteSettings.set(key, value);
+                }
+
+                // Stream 1 was created before the client settings were
+                // processed and so was given the default initial window
+                // size. Apply any change in the initial window size to
+                // stream 1 (mirrors setting()).
+                long delta = remoteSettings.getInitialWindowSize() - oldInitialWindowSize;
+                if (delta != 0) {
+                    stream.incrementWindowSize((int) delta);
                 }
             } catch (IllegalArgumentException | Http2Exception e) {
                 throw new ProtocolException(sm.getString("upgradeHandler.upgrade.fail", connectionId), e);
