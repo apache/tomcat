@@ -174,7 +174,7 @@ public final class ObjectReflectionPropertyInspector {
 
     static Method findGetter(Class<?> declaringClass, String propertyName) {
         for (String getterName : Arrays.asList("get" + IntrospectionUtils.capitalize(propertyName),
-                "is" + IntrospectionUtils.capitalize(propertyName))) {
+                "is" + propertyName)) {
             try {
                 Method method = declaringClass.getMethod(getterName);
                 if (!Modifier.isPrivate(method.getModifiers())) {
