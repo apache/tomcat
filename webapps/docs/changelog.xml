@@ -186,6 +186,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        xreflection generated code stack overflow issue. (remm)
+      </fix>
+      <fix>
+        Align xreflection better with IntrospectionUtils. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
