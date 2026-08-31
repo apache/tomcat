@@ -110,7 +110,8 @@ public final class ObjectReflectionPropertyInspector {
 
     // types of properties that IntrospectionUtils.setProperty supports
     private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(
-            new LinkedHashSet<>(Arrays.asList(Boolean.TYPE, Integer.TYPE, Long.TYPE, String.class, InetAddress.class)));
+            new LinkedHashSet<>(Arrays.asList(Boolean.TYPE, Boolean.class, Integer.TYPE, Integer.class,
+                    Long.TYPE, Long.class, String.class, InetAddress.class)));
     private static final Map<Class<?>,SetPropertyClass> classes = new LinkedHashMap<>();
 
     /**
@@ -158,7 +159,7 @@ public final class ObjectReflectionPropertyInspector {
 
     static Method findGetter(Class<?> declaringClass, String propertyName) {
         for (String getterName : Arrays.asList("get" + IntrospectionUtils.capitalize(propertyName),
-                "is" + propertyName)) {
+                "is" + IntrospectionUtils.capitalize(propertyName))) {
             try {
                 Method method = declaringClass.getMethod(getterName);
                 if (!Modifier.isPrivate(method.getModifiers())) {
@@ -168,14 +169,6 @@ public final class ObjectReflectionPropertyInspector {
                 // Ignore
             }
         }
-        try {
-            Method method = declaringClass.getMethod("getProperty", String.class, String.class);
-            if (!Modifier.isPrivate(method.getModifiers())) {
-                return method;
-            }
-        } catch (NoSuchMethodException e) {
-            // Ignore
-        }
 
         return null;
     }
@@ -183,14 +176,6 @@ public final class ObjectReflectionPropertyInspector {
     static Method findSetter(Class<?> declaringClass, String propertyName, Class<?> propertyType) {
         try {
             Method method = declaringClass.getMethod("set" + IntrospectionUtils.capitalize(propertyName), propertyType);
-            if (!Modifier.isPrivate(method.getModifiers())) {
-                return method;
-            }
-        } catch (NoSuchMethodException e) {
-            // Ignore
-        }
-        try {
-            Method method = declaringClass.getMethod("setProperty", String.class, String.class);
             if (!Modifier.isPrivate(method.getModifiers())) {
                 return method;
             }
@@ -217,24 +202,16 @@ public final class ObjectReflectionPropertyInspector {
         SetPropertyClass spc = getOrCreateSetPropertyClass(clazz);
         final Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (isAllowedSetMethod(method)) {
-                String propertyName = decapitalize(method.getName().substring(3));
-                Class<?> propertyType = method.getParameterTypes()[0];
-                Method getter = findGetter(clazz, propertyName);
-                Method setter = findSetter(clazz, propertyName, propertyType);
-                ReflectionProperty property =
-                        new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
-                spc.addProperty(property);
-            } else if (isAllowedGetMethod(method)) {
-                boolean startsWithIs = method.getName().startsWith("is");
-                String propertyName = decapitalize(method.getName().substring(startsWithIs ? 2 : 3));
-                Class<?> propertyType = method.getReturnType();
-                Method getter = findGetter(clazz, propertyName);
-                Method setter = findSetter(clazz, propertyName, propertyType);
-                ReflectionProperty property =
-                        new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
-                spc.addProperty(property);
+            addPropertyForMethod(spc, clazz, method);
+        }
+        // Default methods on implemented interfaces are not returned by
+        // getDeclaredMethods() but are visible to IntrospectionUtils, so they
+        // need to be processed as well
+        for (Method method : clazz.getMethods()) {
+            if (!method.getDeclaringClass().isInterface()) {
+                continue;
             }
+            addPropertyForMethod(spc, clazz, method);
         }
 
         final Field[] fields = clazz.getDeclaredFields();
@@ -255,6 +232,28 @@ public final class ObjectReflectionPropertyInspector {
             return processClass(parent.getClazz());
         } else {
             return spc;
+        }
+    }
+
+
+    private static void addPropertyForMethod(SetPropertyClass spc, Class<?> clazz, Method method) {
+        if (isAllowedSetMethod(method)) {
+            String propertyName = decapitalize(method.getName().substring(3));
+            Class<?> propertyType = method.getParameterTypes()[0];
+            Method getter = findGetter(clazz, propertyName);
+            Method setter = findSetter(clazz, propertyName, propertyType);
+            ReflectionProperty property =
+                    new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
+            spc.addProperty(property);
+        } else if (isAllowedGetMethod(method)) {
+            boolean startsWithIs = method.getName().startsWith("is");
+            String propertyName = decapitalize(method.getName().substring(startsWithIs ? 2 : 3));
+            Class<?> propertyType = method.getReturnType();
+            Method getter = findGetter(clazz, propertyName);
+            Method setter = findSetter(clazz, propertyName, propertyType);
+            ReflectionProperty property =
+                    new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
+            spc.addProperty(property);
         }
     }
 }

@@ -86,13 +86,13 @@ final class ReflectionProperty implements Comparable<ReflectionProperty> {
         if (getPropertyType() == String.class) {
             return valueVarName;
         }
-        if (getPropertyType() == Boolean.TYPE) {
+        if (getPropertyType() == Boolean.TYPE || getPropertyType() == Boolean.class) {
             return "Boolean.valueOf(" + valueVarName + ")";
         }
-        if (getPropertyType() == Long.TYPE) {
+        if (getPropertyType() == Long.TYPE || getPropertyType() == Long.class) {
             return "Long.valueOf(" + valueVarName + ")";
         }
-        if (getPropertyType() == Integer.TYPE) {
+        if (getPropertyType() == Integer.TYPE || getPropertyType() == Integer.class) {
             return "Integer.valueOf(" + valueVarName + ")";
         }
         if (getPropertyType() == InetAddress.class) {
