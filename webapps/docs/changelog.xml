@@ -194,6 +194,10 @@
       <fix>
         Align xreflection better with IntrospectionUtils. (remm)
       </fix>
+      <fix>
+        In HTTP/2 after half closed (remote), any unexpected frame should be
+        a stream error. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
