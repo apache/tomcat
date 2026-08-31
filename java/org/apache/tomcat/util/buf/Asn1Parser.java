@@ -100,6 +100,10 @@ public class Asn1Parser {
      * @return the next tag byte value
      */
     public int peekTag() {
+        if (pos >= source.length) {
+            throw new IllegalArgumentException(
+                    sm.getString("asn1Parser.truncatedData", Integer.valueOf(1), Integer.valueOf(0)));
+        }
         return source[pos] & 0xFF;
     }
 
@@ -175,6 +179,11 @@ public class Asn1Parser {
                         Integer.valueOf(source.length - pos)));
             }
         }
+        if (source.length - pos < len) {
+            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+                    Integer.valueOf(source.length - pos)));
+        }
+
         /*
          * If this is the first length parsed after a sequence has been added to the sequence nesting tracking mechanism
          * it must be the length of the sequence so update the entry to record the end position of the sequence. Note
@@ -182,10 +191,6 @@ public class Asn1Parser {
          */
         if (nestedSequenceEndPositions.peekLast() != null && nestedSequenceEndPositions.peekLast().intValue() == -1) {
             nestedSequenceEndPositions.pollLast();
-            if (source.length - pos < len) {
-                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
-                        Integer.valueOf(source.length - pos)));
-            }
             nestedSequenceEndPositions.addLast(Integer.valueOf(pos + len));
         }
         return len;
@@ -283,6 +288,10 @@ public class Asn1Parser {
 
 
     private int next() {
+        if (pos >= source.length) {
+            throw new IllegalArgumentException(
+                    sm.getString("asn1Parser.truncatedData", Integer.valueOf(1), Integer.valueOf(0)));
+        }
         return source[pos++] & 0xFF;
     }
 
