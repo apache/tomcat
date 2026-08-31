@@ -393,7 +393,7 @@ public class MimeHeaders {
                 if (result == null) {
                     result = headers[i].getValue();
                 } else {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(sm.getString("headers.duplicateUniqueHeader", name));
                 }
             }
         }

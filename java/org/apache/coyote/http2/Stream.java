@@ -744,7 +744,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     @Override
     final void receivedData(int dataLength) throws Http2Exception {
         contentLengthReceived += dataLength;
-        long contentLengthHeader = coyoteRequest.getContentLengthLong();
+        long contentLengthHeader = getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new StreamException(
                     sm.getString("stream.header.contentLength", getConnectionId(), getIdAsString(),
@@ -758,16 +758,25 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (isContentLengthInconsistent()) {
             throw new StreamException(
                     sm.getString("stream.header.contentLength", getConnectionId(), getIdAsString(),
-                            Long.valueOf(coyoteRequest.getContentLengthLong()), Long.valueOf(contentLengthReceived)),
+                            Long.valueOf(getContentLengthLong()), Long.valueOf(contentLengthReceived)),
                     Http2Error.PROTOCOL_ERROR, getIdAsInt());
         }
         state.receivedEndOfStream();
         inputBuffer.notifyEof();
     }
 
+    final long getContentLengthLong() throws Http2Exception {
+        try {
+            return coyoteRequest.getContentLengthLong();
+        } catch (Exception e) {
+            throw new StreamException(
+                    sm.getString("stream.header.contentLength.invalid", getConnectionId(), getIdAsString()),
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt(), e);
+        }
+    }
 
-    final boolean isContentLengthInconsistent() {
-        long contentLengthHeader = coyoteRequest.getContentLengthLong();
+    final boolean isContentLengthInconsistent() throws Http2Exception {
+        long contentLengthHeader = getContentLengthLong();
         return contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader;
     }
 
