@@ -190,6 +190,10 @@
         In HTTP/2 after half closed (remote), any unexpected frame should be
         a stream error. (remm)
       </fix>
+      <fix>
+        Fix incorrect initial window size calculation when upgrading to HTTP/2.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
