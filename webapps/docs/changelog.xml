@@ -335,6 +335,12 @@
         Fix parsing of client certificates that specify more than one OCSP
         responder for configurations that use OpenSSL-FFM. (markt)
       </fix>
+      <fix>
+        xreflection generated code stack overflow issue. (remm)
+      </fix>
+      <fix>
+        Align xreflection better with IntrospectionUtils. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

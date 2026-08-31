@@ -261,7 +261,24 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append('}')
                 .append(System.lineSeparator());
 
-        // we have a generic setProperty(String, String) method, invoke it
+        // invoke the parent first so that a specific setter on a superclass
+        // is preferred over the generic setProperty method on this class
+        if (getParent() != null) {
+            String parentInvocation = getParent().generateParentSetPropertyForMethodInvocation();
+            code.append(ReflectionLessCodeGenerator.getIndent(2))
+                .append("if (")
+                .append(parentInvocation, 0, parentInvocation.length() - 1)
+                .append(") {")
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(3))
+                .append("return true;")
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(2))
+                .append('}')
+                     .append(System.lineSeparator());
+        }
+
+        // we have a generic setProperty method, invoke it
         if (getGenericSetPropertyMethod() != null) {
             ReflectionProperty p = new ReflectionProperty(
                     clazz.getName(),
@@ -271,40 +288,36 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                     null
             );
             code.append(ReflectionLessCodeGenerator.getIndent(2))
-               .append("if (")
-               .append(SETP_VAR_NAME)
-               .append(") {")
-               .append(System.lineSeparator())
-               .append(ReflectionLessCodeGenerator.getIndent(3))
-               .append(generateSetPropertyMethod(p))
-               .append(System.lineSeparator())
-               .append(ReflectionLessCodeGenerator.getIndent(3))
-               .append("return true;")
-               .append(System.lineSeparator())
-               .append(ReflectionLessCodeGenerator.getIndent(2))
-               .append('}')
+                .append("if (")
+                .append(SETP_VAR_NAME)
+                .append(") {")
                     .append(System.lineSeparator());
+            if (getGenericSetPropertyMethod().getReturnType() == Boolean.TYPE) {
+                code.append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append("return ")
+                    .append(generateSetPropertyMethod(p))
+                        .append(System.lineSeparator());
+            } else {
+                code.append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append(generateSetPropertyMethod(p))
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append("return true;")
+                        .append(System.lineSeparator());
+            }
+            code.append(ReflectionLessCodeGenerator.getIndent(2))
+                .append('}')
+                     .append(System.lineSeparator());
         }
 
-        // invoke parent or return false
         code.append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("return ")
-            .append(getSetPropertyForExitStatement())
+            .append("return false;")
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(1))
                 .append('}');
 
         return code.toString();
         //@formatter:on
-    }
-
-    private String getSetPropertyForExitStatement() {
-
-        return (getParent() != null) ?
-                // invoke the parent if we have one
-                getParent().generateParentSetPropertyForMethodInvocation() :
-                // if we invoke setProperty, return true, return false otherwise
-                getGenericSetPropertyMethod() != null ? "true;" : "false;";
     }
 
     /**
@@ -455,6 +468,38 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         return "null;";
     }
 
+    /**
+     * Return the names of the properties for which a specific getter method
+     * (a public zero-argument <code>get*</code> or <code>is*</code> method)
+     * is available on this class or one of its superclasses. Only names that
+     * {@code IntrospectionUtils.getProperty} can reconstruct from the getter
+     * name are included.
+     *
+     * @return the property names with a specific getter
+     */
+    private Set<String> getSpecificGetterPropertyNames() {
+        Set<String> names = new TreeSet<>();
+        for (Method method : clazz.getMethods()) {
+            if (method.getParameterTypes().length != 0) {
+                continue;
+            }
+            String methodName = method.getName();
+            String rest;
+            if (methodName.startsWith("get") && methodName.length() > 3) {
+                rest = methodName.substring(3);
+            } else if (methodName.startsWith("is") && methodName.length() > 2) {
+                rest = methodName.substring(2);
+            } else {
+                continue;
+            }
+            String propertyName = ObjectReflectionPropertyInspector.decapitalize(rest);
+            if (IntrospectionUtils.capitalize(propertyName).equals(rest)) {
+                names.add(propertyName);
+            }
+        }
+        return names;
+    }
+
 
     /**
      * Generate a complete getProperty method for this class with switch-case
@@ -516,7 +561,10 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append('}')
                 .append(System.lineSeparator());
 
-        // we have a generic getProperty(String, String) method, invoke it
+        // we have a generic getProperty(String) method, invoke it for property
+        // names that do not have a specific getter on this class or a
+        // superclass (IntrospectionUtils only falls back to the generic
+        // method when no specific getter is found)
         if (getGenericGetPropertyMethod() != null) {
             ReflectionProperty p = new ReflectionProperty(
                     clazz.getName(),
@@ -525,15 +573,52 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                     null,
                     getGenericGetPropertyMethod()
             );
-            code.append(ReflectionLessCodeGenerator.getIndent(2))
-                .append("if (result == null) {")
-                .append(System.lineSeparator())
-                .append(ReflectionLessCodeGenerator.getIndent(3))
-                .append(generateGetPropertyMethod(p))
-                .append(System.lineSeparator())
-                .append(ReflectionLessCodeGenerator.getIndent(2))
-                .append('}')
-                    .append(System.lineSeparator());
+            Set<String> getterNames = getSpecificGetterPropertyNames();
+            if (getterNames.isEmpty()) {
+                code.append(ReflectionLessCodeGenerator.getIndent(2))
+                    .append("if (result == null) {")
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append(generateGetPropertyMethod(p))
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(2))
+                    .append('}')
+                        .append(System.lineSeparator());
+            } else {
+                code.append(ReflectionLessCodeGenerator.getIndent(2))
+                    .append("if (result == null) {")
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append("switch (")
+                    .append(NAME_VAR_NAME)
+                    .append(") {")
+                        .append(System.lineSeparator());
+                for (String name : getterNames) {
+                    code.append(ReflectionLessCodeGenerator.getIndent(4))
+                        .append("case \"")
+                        .append(name)
+                        .append("\":")
+                            .append(System.lineSeparator());
+                }
+                code.append(ReflectionLessCodeGenerator.getIndent(4))
+                    .append("break;")
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(4))
+                    .append("default:")
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(5))
+                    .append(generateGetPropertyMethod(p))
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(4))
+                    .append("break;")
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(3))
+                    .append('}')
+                    .append(System.lineSeparator())
+                    .append(ReflectionLessCodeGenerator.getIndent(2))
+                    .append('}')
+                        .append(System.lineSeparator());
+            }
         }
         code.append(ReflectionLessCodeGenerator.getIndent(2))
             .append("return result;")
