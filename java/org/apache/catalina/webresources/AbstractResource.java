@@ -230,6 +230,13 @@ public abstract class AbstractResource implements WebResource {
     protected abstract Log getLog();
 
 
+    /**
+     * Gets the creation time for the given file
+     *
+     * @param file The file for which the creation time is required
+     *
+     * @return The creation time or, if not available the value of {@link File#lastModified()}
+     */
     protected long getCreation(File file) {
         try {
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
