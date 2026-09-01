@@ -17,6 +17,8 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +59,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     @Test
-    public void halfClosedRemoteInvalidFrame() throws Exception {
+    public void testHalfClosedRemoteInvalidFrame() throws Exception {
         http2Connect();
 
         // This half-closes the stream since it includes the end of stream flag
@@ -70,6 +72,84 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendData(3, new byte[] {});
 
         handleGoAwayResponse(3, Http2Error.STREAM_CLOSED);
+    }
+
+
+    @Test
+    public void testHalfClosedRemoteHeadersFrameMaintainsHpackState() throws Exception {
+        doTestHalfClosedRemoteHeadersMaintainsHpackState(false);
+    }
+
+
+    @Test
+    public void testHalfClosedRemoteContinuationFrameMaintainsHpackState() throws Exception {
+        doTestHalfClosedRemoteHeadersMaintainsHpackState(true);
+    }
+
+
+    private void doTestHalfClosedRemoteHeadersMaintainsHpackState(boolean useContinuation) throws Exception {
+        http2Connect();
+
+        // This test may trigger overhead protection so disable it.
+        http2Protocol.setOverheadResetFactor(0);
+
+        // Prevent the response body from completing so stream 3 remains half-closed (remote).
+        sendSettings(0, false, new SettingValue(4, 0));
+        parser.readFrame();
+        output.clearTrace();
+
+        // Send a request on stream 3
+        sendSimpleGetRequest(3);
+
+        /*
+         * Send another (invalid) request on stream 3 (will cause HEADERS to be received in the "half-closed (remote)"
+         * state). This request create a dynamic table entry for the 'x-hpack-test' header.
+         */
+        String headerName = "x-hpack-test";
+        String headerValue = "value";
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        if (useContinuation) {
+            buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+            writeFrame(frameHeader, headersPayload);
+
+            frameHeader = new byte[9];
+            headersPayload = ByteBuffer.allocate(128);
+            List<Header> continuationHeaders = new ArrayList<>(1);
+            continuationHeaders.add(new Header(headerName, headerValue));
+            buildSimpleGetRequestPart2(frameHeader, headersPayload, continuationHeaders, 3);
+            writeFrame(frameHeader, headersPayload);
+        } else {
+            List<Header> invalidHeaders = new ArrayList<>(1);
+            invalidHeaders.add(new Header(headerName, headerValue));
+            buildGetRequest(frameHeader, headersPayload, null, invalidHeaders, 3);
+            writeFrame(frameHeader, headersPayload);
+        }
+
+        /*
+         * Create a valid request on Stream 5. This request uses the dynamic table entry for the 'x-hpack-test' header
+         * created by the invalid field block above.
+         */
+        frameHeader = new byte[9];
+        headersPayload = ByteBuffer.allocate(128);
+        List<Header> validHeaders = new ArrayList<>(5);
+        validHeaders.add(new Header(":method", Method.GET));
+        validHeaders.add(new Header(":scheme", "http"));
+        validHeaders.add(new Header(":path", "/empty"));
+        validHeaders.add(new Header(":authority", "localhost:" + getPort()));
+        validHeaders.add(new Header(headerName, headerValue));
+        buildGetRequest(frameHeader, headersPayload, null, validHeaders, 5);
+        writeFrame(frameHeader, headersPayload);
+
+        while (!output.getTrace().contains("5-EndOfStream") && !output.getTrace().contains("5-RST-")) {
+            System.out.println(output.getTrace());
+            parser.readFrame();
+        }
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
+        Assert.assertTrue(trace, trace.contains(getEmptyResponseTrace(5)));
     }
 
 

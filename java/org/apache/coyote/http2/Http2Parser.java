@@ -241,8 +241,7 @@ class Http2Parser {
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
         } catch (StreamException se) {
-            swallowPayload(streamId, FrameType.HEADERS.getId(), payloadSize, false, buffer);
-            throw se;
+            hpackDecoder.setHeaderEmitter(new HeaderSink(se));
         }
 
         int padLength = 0;
@@ -294,10 +293,9 @@ class Http2Parser {
 
         swallowPayload(streamId, FrameType.HEADERS.getId(), padLength, true, buffer);
 
-        // Validate the headers so far
-        hpackDecoder.getHeaderEmitter().validateHeaders();
-
         if (Flags.isEndOfHeaders(flags)) {
+            // Validate the headers once complete
+            hpackDecoder.getHeaderEmitter().validateHeaders();
             onHeadersComplete(streamId);
         } else {
             headersCurrentStream = streamId;
@@ -463,11 +461,12 @@ class Http2Parser {
 
         readHeaderPayload(streamId, payloadSize, buffer);
 
-        // Validate the headers so far
-        hpackDecoder.getHeaderEmitter().validateHeaders();
-
         if (endOfHeaders) {
             headersCurrentStream = -1;
+
+            // Validate the headers once complete
+            hpackDecoder.getHeaderEmitter().validateHeaders();
+
             onHeadersComplete(streamId);
         }
     }
