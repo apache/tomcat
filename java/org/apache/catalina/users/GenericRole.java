@@ -77,8 +77,8 @@ public class GenericRole<UD extends UserDatabase> extends AbstractRole {
 
     @Override
     public void setRolename(String rolename) {
-        database.modifiedRole(this);
-        super.setRolename(rolename);
+        // Note: changing the rolename (which is the key) in a database will not work
+        // and the role should be removed and added instead
     }
 
 
