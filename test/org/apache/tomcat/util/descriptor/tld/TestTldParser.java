@@ -164,6 +164,14 @@ public class TestTldParser {
         Assert.assertEquals("org.apache.catalina.core.TesterTldListener", listeners.get(0));
     }
 
+    @Test
+    public void testDuplicateFunctionName() {
+        parser = new TldParser(true, false, new TldRuleSet(), true);
+        SAXException exception =
+                Assert.assertThrows(SAXException.class, () -> parse("test/tld/duplicate-function.tld"));
+        Assert.assertTrue(exception.getMessage(), exception.getMessage().contains("Duplicate function name [trim]"));
+    }
+
     private TaglibXml parse(String pathname) throws IOException, SAXException {
         File file = new File(pathname);
         TldResourcePath path = new TldResourcePath(file.toURI().toURL(), null);
