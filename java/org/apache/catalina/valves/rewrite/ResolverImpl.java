@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -35,6 +36,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
@@ -395,7 +397,7 @@ public class ResolverImpl extends Resolver {
         if (name == null || !name.startsWith("/")) {
             return false;
         }
-        if (org.apache.tomcat.util.http.RequestUtil.normalize(name) == null) {
+        if (RequestUtil.normalize(name, File.separatorChar == '\\') == null) {
             return false;
         }
         WebResourceRoot resources = request.getContext().getResources();
