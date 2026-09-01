@@ -16,6 +16,8 @@
  */
 package org.apache.el.lang;
 
+import org.apache.el.parser.Node;
+
 /**
  * Stores the state required for correct evaluation of lambda expressions. Lambda expressions may be nested. Correct
  * evaluation requires knowledge not just of the current lambda expression, but also of any nested and nesting
@@ -27,13 +29,34 @@ package org.apache.el.lang;
  */
 public final class LambdaExpressionNestedState {
 
+    private final Node root;
+
     private int nestingCount = 0;
     private boolean hasFormalParameters = false;
 
     /**
-     * Default constructor.
+     * Constructor.
+     *
+     * @param root The lambda expression node that created this state
      */
-    public LambdaExpressionNestedState() {
+    public LambdaExpressionNestedState(Node root) {
+        this.root = root;
+    }
+
+    /**
+     * Returns whether the given node is the node that created this state or a descendant of that node.
+     *
+     * @param node The node to check
+     *
+     * @return {@code true} if the given node is the node that created this state or a descendant of that node
+     */
+    public boolean contains(Node node) {
+        for (Node n = node; n != null; n = n.jjtGetParent()) {
+            if (n == root) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
