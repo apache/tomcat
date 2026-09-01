@@ -19,10 +19,24 @@ package org.apache.coyote.http2;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 
 /**
- * Purpose of this class is to silently swallow any headers. It is used once the connection close process has started if
- * headers for new streams are received.
+ * The purpose of this class is to swallow headers.
+ * <p>
+ * Reporting of stream level errors needs to be delayed until after the headers have been fully read so that the
+ * server's HPACK decoder remains synchronized with the client's encoder. This class can be used to ignore such errors
+ * completely (e.g. when new HEADERS are received after the connection close process has started) or it can be used to
+ * report an error once processing completes (e.g. when HEADERS are received in the half-closed (remote) state).
  */
 class HeaderSink implements HeaderEmitter {
+
+    private final StreamException se;
+
+    HeaderSink() {
+        this(null);
+    }
+
+    HeaderSink(StreamException se) {
+        this.se = se;
+    }
 
     @Override
     public void emitHeader(String name, String value) {
@@ -31,7 +45,9 @@ class HeaderSink implements HeaderEmitter {
 
     @Override
     public void validateHeaders() throws StreamException {
-        // NO-OP
+        if (se != null) {
+            throw new StreamException(se.getMessage(), se.getError(), se.getStreamId(), se);
+        }
     }
 
     @Override
