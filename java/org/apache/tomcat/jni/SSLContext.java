@@ -667,13 +667,12 @@ public final class SSLContext {
     public static native void setAlpnProtos(long ctx, String[] alpnProtos, int selectorFailureBehavior);
 
     /**
-     * Set DH parameters
+     * This is a NO-OP.
      *
-     * @param ctx  Server context to use.
-     * @param cert DH param file (can be generated from e.g. {@code openssl dhparam -rand - 2048 > dhparam.pem} - see
-     *                 the <a href="https://www.openssl.org/docs/apps/dhparam.html">OpenSSL documentation</a>).
+     * @param ctx  Unused.
+     * @param cert Unused.
      *
-     * @throws Exception An error occurred
+     * @throws Exception Never thrown.
      *
      * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
      *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
@@ -683,13 +682,12 @@ public final class SSLContext {
     public static native void setTmpDH(long ctx, String cert) throws Exception;
 
     /**
-     * Set ECDH elliptic curve by name
+     * This is a NO-OP.
      *
-     * @param ctx       Server context to use.
-     * @param curveName the name of the elliptic curve to use (available names can be obtained from
-     *                      {@code openssl ecparam -list_curves}).
+     * @param ctx       Unused.
+     * @param curveName Unused.
      *
-     * @throws Exception An error occurred
+     * @throws Exception Never thrown.
      *
      * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
      *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
