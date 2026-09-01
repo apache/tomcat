@@ -1538,6 +1538,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             this.authenticated = authenticated;
         }
 
+        /**
+         * Was the authentication successful?
+         *
+         * @return {@code true} if successful, otherwise {@code false}
+         */
         public boolean getAuthenticated() {
             return authenticated;
         }

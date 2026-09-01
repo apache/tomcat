@@ -22,12 +22,21 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionBindingEvent;
 import jakarta.servlet.http.HttpSessionBindingListener;
 
+/**
+ * Listener used to track when an HTTP session expires and notifies the WebSocket container so any associated WebSocket
+ * session can be closed.
+ */
 public class WsHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final String key;
 
+    /**
+     * Create a new listener.
+     *
+     * @param key The key that identifies the HTTP session
+     */
     public WsHttpSessionBindingListener(String key) {
         this.key = key;
     }
