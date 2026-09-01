@@ -210,7 +210,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     /**
      * Fetch current cluster members from the cloud orchestration.
      *
-     * @return the member array, or {@null} if an error occurred
+     * @return the member array, or {@code null} if an error occurred
      */
     protected abstract Member[] fetchMembers();
 

@@ -350,6 +350,13 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
+    /**
+     * Register the link between the HTTP session and WebSocket session if the HTTP session is authenticated.
+     *
+     * @param key         The key to use to identify the HTTP session (session IDs can change)
+     * @param wsSession   The WebSocket session
+     * @param httpSession The HTTP session
+     */
     protected void registerSession(Object key, WsSession wsSession, Object httpSession) {
         super.registerSession(key, wsSession);
         if (wsSession.isOpen() && wsSession.getUserPrincipal() != null && httpSession != null) {
