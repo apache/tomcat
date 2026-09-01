@@ -559,7 +559,7 @@ public class MemoryUserDatabase implements UserDatabase {
                     writer.print("  <user username=\"");
                     writer.print(Escape.xml(user.getUsername()));
                     writer.print("\" password=\"");
-                    writer.print(Escape.xml(user.getPassword()));
+                    writer.print(Escape.xml("", user.getPassword()));
                     writer.print("\"");
                     if (null != user.getFullName()) {
                         writer.print(" fullName=\"");
