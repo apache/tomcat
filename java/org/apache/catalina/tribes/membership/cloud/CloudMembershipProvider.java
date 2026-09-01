@@ -193,6 +193,9 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     @Override
     public void heartbeat() {
         Member[] announcedMembers = fetchMembers();
+        if (announcedMembers == null) {
+            return;
+        }
         // Add new members or refresh the members in the membership
         for (Member member : announcedMembers) {
             updateMember(member, true);
@@ -207,7 +210,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     /**
      * Fetch current cluster members from the cloud orchestration.
      *
-     * @return the member array
+     * @return the member array, or {@null} if an error occurred
      */
     protected abstract Member[] fetchMembers();
 

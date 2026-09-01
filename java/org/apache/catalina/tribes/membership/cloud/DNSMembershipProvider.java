@@ -157,40 +157,39 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
     @Override
     protected Member[] fetchMembers() {
-        List<MemberImpl> members = new ArrayList<>();
 
         InetAddress[] inetAddresses = null;
         try {
             inetAddresses = InetAddress.getAllByName(dnsServiceName);
         } catch (UnknownHostException exception) {
             log.warn(sm.getString("dnsMembershipProvider.dnsError", dnsServiceName), exception);
+            return null;
         }
 
-        if (inetAddresses != null) {
-            for (InetAddress inetAddress : inetAddresses) {
-                String ip = inetAddress.getHostAddress();
-                byte[] id = digest(ip.getBytes(StandardCharsets.US_ASCII));
-                // We found ourselves, ignore
-                if (ip.equals(localIp)) {
-                    // Update the UID on initial lookup
-                    Member localMember = service.getLocalMember(false);
-                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
-                            localMember instanceof MemberImpl) {
-                        ((MemberImpl) localMember).setUniqueId(id);
-                    }
-                    continue;
+        List<MemberImpl> members = new ArrayList<>();
+        for (InetAddress inetAddress : inetAddresses) {
+            String ip = inetAddress.getHostAddress();
+            byte[] id = digest(ip.getBytes(StandardCharsets.US_ASCII));
+            // We found ourselves, ignore
+            if (ip.equals(localIp)) {
+                // Update the UID on initial lookup
+                Member localMember = service.getLocalMember(false);
+                if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
+                        localMember instanceof MemberImpl) {
+                    ((MemberImpl) localMember).setUniqueId(id);
                 }
-                long aliveTime = -1;
-                MemberImpl member;
-                try {
-                    member = new MemberImpl(ip, port, aliveTime);
-                } catch (IOException ioe) {
-                    log.error(sm.getString("dnsMembershipProvider.memberError"), ioe);
-                    continue;
-                }
-                member.setUniqueId(id);
-                members.add(member);
+                continue;
             }
+            long aliveTime = -1;
+            MemberImpl member;
+            try {
+                member = new MemberImpl(ip, port, aliveTime);
+            } catch (IOException ioe) {
+                log.error(sm.getString("dnsMembershipProvider.memberError"), ioe);
+                continue;
+            }
+            member.setUniqueId(id);
+            members.add(member);
         }
 
         return members.toArray(new Member[0]);
