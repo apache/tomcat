@@ -558,9 +558,15 @@ public class MemoryUserDatabase implements UserDatabase {
                     User user = (User) values.next();
                     writer.print("  <user username=\"");
                     writer.print(Escape.xml(user.getUsername()));
-                    writer.print("\" password=\"");
-                    writer.print(Escape.xml("", user.getPassword()));
                     writer.print("\"");
+                    // Local copy to avoid TOCTOU inconsistency
+                    // No password is not the same as a password of ""
+                    String pwd = user.getPassword();
+                    if (pwd != null) {
+                        writer.print(" password=\"");
+                        writer.print(Escape.xml(pwd));
+                        writer.print("\"");
+                    }
                     if (null != user.getFullName()) {
                         writer.print(" fullName=\"");
                         writer.print(Escape.xml(user.getFullName()));
