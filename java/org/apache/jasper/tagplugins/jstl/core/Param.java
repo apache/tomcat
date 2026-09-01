@@ -54,7 +54,7 @@ public class Param implements TagPlugin {
 
         // get the url string before adding this param
         ctxt.generateJavaSource(
-                "String " + urlName + " = " + "(String)pageContext.getAttribute(\"url_without_param\");");
+                "String " + urlName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
 
         // get the value of "name"
         ctxt.generateJavaSource("String " + nameName + " = ");
@@ -69,7 +69,8 @@ public class Param implements TagPlugin {
         ctxt.generateAttribute("value");
         ctxt.generateJavaSource(";");
         ctxt.generateJavaSource("    if(" + valueName + " == null) " + valueName + " = \"\";");
-        ctxt.generateJavaSource("    String " + encName + " = pageContext.getResponse().getCharacterEncoding();");
+        ctxt.generateJavaSource(
+                "    String " + encName + " = _jspx_page_context.getResponse().getCharacterEncoding();");
         ctxt.generateJavaSource(
                 "    " + nameName + " = java.net.URLEncoder.encode(" + nameName + ", " + encName + ");");
         ctxt.generateJavaSource(
@@ -85,7 +86,7 @@ public class Param implements TagPlugin {
         ctxt.generateJavaSource(
                 "        " + urlName + " = " + urlName + " + \"&\" + " + nameName + " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("    pageContext.setAttribute(\"url_without_param\"," + urlName + ");");
+        ctxt.generateJavaSource("    _jspx_page_context.setAttribute(\"url_without_param\"," + urlName + ");");
         ctxt.generateJavaSource("}");
     }
 }
