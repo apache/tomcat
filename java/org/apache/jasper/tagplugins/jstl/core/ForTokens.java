@@ -119,7 +119,7 @@ public class ForTokens implements TagPlugin {
         // if var specified, put the current token into the attribute "var" defines.
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
-            ctxt.generateJavaSource("        pageContext.setAttribute(\"" + strVar + "\", " + temp + ");");
+            ctxt.generateJavaSource("        _jspx_page_context.setAttribute(\"" + strVar + "\", " + temp + ");");
         }
         ctxt.generateBody();
         ctxt.generateJavaSource("    }");

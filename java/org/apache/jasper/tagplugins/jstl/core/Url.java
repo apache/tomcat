@@ -71,20 +71,20 @@ public class Url implements TagPlugin {
 
         // get the raw url
         ctxt.generateJavaSource("String " + baseUrlName + " = " + "org.apache.jasper.tagplugins.jstl.Util.resolveUrl(" +
-                valueName + ", " + contextName + ", pageContext);");
-        ctxt.generateJavaSource("pageContext.setAttribute" + "(\"url_without_param\", " + baseUrlName + ");");
+                valueName + ", " + contextName + ", _jspx_page_context);");
+        ctxt.generateJavaSource("_jspx_page_context.setAttribute" + "(\"url_without_param\", " + baseUrlName + ");");
 
         // add params
         ctxt.generateBody();
 
         ctxt.generateJavaSource(
-                "String " + resultName + " = " + "(String)pageContext.getAttribute(\"url_without_param\");");
-        ctxt.generateJavaSource("pageContext.removeAttribute(\"url_without_param\");");
+                "String " + resultName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
+        ctxt.generateJavaSource("_jspx_page_context.removeAttribute(\"url_without_param\");");
 
         // if the url is relative, encode it
         ctxt.generateJavaSource("if(!org.apache.jasper.tagplugins.jstl.Util.isAbsoluteUrl(" + resultName + ")){");
         ctxt.generateJavaSource("    HttpServletResponse " + responseName + " = " +
-                "((HttpServletResponse) pageContext.getResponse());");
+                "((HttpServletResponse) _jspx_page_context.getResponse());");
         ctxt.generateJavaSource("    " + resultName + " = " + responseName + ".encodeURL(" + resultName + ");");
         ctxt.generateJavaSource("}");
 
@@ -92,12 +92,12 @@ public class Url implements TagPlugin {
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource(
-                    "pageContext.setAttribute" + "(\"" + strVar + "\", " + resultName + ", " + iScope + ");");
+                    "_jspx_page_context.setAttribute" + "(\"" + strVar + "\", " + resultName + ", " + iScope + ");");
 
             // if var is not specified, just print out the url string
         } else {
             ctxt.generateJavaSource("try{");
-            ctxt.generateJavaSource("    pageContext.getOut().print(" + resultName + ");");
+            ctxt.generateJavaSource("    _jspx_page_context.getOut().print(" + resultName + ");");
             ctxt.generateJavaSource("}catch(java.io.IOException ex){");
             ctxt.generateJavaSource("    throw new JspTagException(ex.toString(), ex);");
             ctxt.generateJavaSource("}");
