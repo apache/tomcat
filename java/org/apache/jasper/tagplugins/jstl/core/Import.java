@@ -119,7 +119,7 @@ public class Import implements TagPlugin {
         ctxt.generateJavaSource("if(!" + iauName + "){");
         ctxt.generateJavaSource("    if(!" + urlName + ".startsWith(\"/\")){");
         ctxt.generateJavaSource("        String " + servletPathName + " = " +
-                "((HttpServletRequest)pageContext.getRequest()).getServletPath();");
+                "((HttpServletRequest)_jspx_page_context.getRequest()).getServletPath();");
         ctxt.generateJavaSource("        " + urlName + " = " + servletPathName + ".substring(0," + servletPathName +
                 ".lastIndexOf('/')) + '/' + " + urlName + ";");
         ctxt.generateJavaSource("    }");
@@ -182,14 +182,15 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    }");
 
             // set attribute in the page context scope
-            ctxt.generateJavaSource("    pageContext.setAttribute(" + varReaderName + ", " + tempReaderName + ");");
+            ctxt.generateJavaSource("    _jspx_page_context.setAttribute(" + varReaderName + ", " +
+                    tempReaderName + ");");
 
             // if the url is relative
             ctxt.generateJavaSource("}else{");
 
             // if the url is relative, http request is needed
-            ctxt.generateJavaSource("    if (!(pageContext.getRequest() instanceof HttpServletRequest  " +
-                    "&& pageContext.getResponse() instanceof HttpServletResponse)){");
+            ctxt.generateJavaSource("    if (!(_jspx_page_context.getRequest() instanceof HttpServletRequest  " +
+                    "&& _jspx_page_context.getResponse() instanceof HttpServletResponse)){");
             ctxt.generateJavaSource(
                     "        throw new JspTagException(\"Relative &lt;import&gt; from non-HTTP request not allowed\");");
             ctxt.generateJavaSource("    }");
@@ -199,12 +200,12 @@ public class Import implements TagPlugin {
             if (hasContext) {
                 ctxt.generateJavaSource("    if(null != " + contextName + "){");
                 ctxt.generateJavaSource("        " + servletContextName +
-                        " = pageContext.getServletContext().getContext(" + contextName + ");");
+                        " = _jspx_page_context.getServletContext().getContext(" + contextName + ");");
                 ctxt.generateJavaSource("    }else{");
-                ctxt.generateJavaSource("        " + servletContextName + " = pageContext.getServletContext();");
+                ctxt.generateJavaSource("        " + servletContextName + " = _jspx_page_context.getServletContext();");
                 ctxt.generateJavaSource("    }");
             } else {
-                ctxt.generateJavaSource("    " + servletContextName + " = pageContext.getServletContext();");
+                ctxt.generateJavaSource("    " + servletContextName + " = _jspx_page_context.getServletContext();");
             }
 
             //
@@ -230,7 +231,7 @@ public class Import implements TagPlugin {
 
             // initialize a ImportResponseWrapper to include the resource
             ctxt.generateJavaSource("    org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper " + irwName +
-                    " = new org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper((HttpServletResponse) pageContext.getResponse());");
+                    " = new org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper((HttpServletResponse) _jspx_page_context.getResponse());");
             ctxt.generateJavaSource("    if(" + charSetName + " == null){");
             ctxt.generateJavaSource(
                     "        " + charSetName + " = org.apache.jasper.tagplugins.jstl.Util.DEFAULT_ENCODING;");
@@ -238,7 +239,7 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    " + irwName + ".setCharEncoding(" + charSetName + ");");
             ctxt.generateJavaSource("    try{");
             ctxt.generateJavaSource(
-                    "        " + requestDispatcherName + ".include(pageContext.getRequest(), " + irwName + ");");
+                    "        " + requestDispatcherName + ".include(_jspx_page_context.getRequest(), " + irwName + ");");
             ctxt.generateJavaSource("    }catch(java.io.IOException ex){");
             ctxt.generateJavaSource("        throw new JspException(ex);");
             ctxt.generateJavaSource("    }catch(RuntimeException ex){");
@@ -260,7 +261,8 @@ public class Import implements TagPlugin {
             // push in the page context
             ctxt.generateJavaSource("    java.io.Reader " + tempReaderName + " = new java.io.StringReader(" + irwName +
                     ".getString());");
-            ctxt.generateJavaSource("    pageContext.setAttribute(" + varReaderName + ", " + tempReaderName + ");");
+            ctxt.generateJavaSource("    _jspx_page_context.setAttribute(" + varReaderName + ", " +
+                    tempReaderName + ");");
 
             ctxt.generateJavaSource("}");
 
@@ -269,18 +271,18 @@ public class Import implements TagPlugin {
 
             // close the reader
             ctxt.generateJavaSource("java.io.Reader " + tempReaderName2 +
-                    " = (java.io.Reader)pageContext.getAttribute(" + varReaderName + ");");
+                    " = (java.io.Reader)_jspx_page_context.getAttribute(" + varReaderName + ");");
             ctxt.generateJavaSource("if(" + tempReaderName2 + " != null) " + tempReaderName2 + ".close();");
-            ctxt.generateJavaSource("pageContext.removeAttribute(" + varReaderName + ",1);");
+            ctxt.generateJavaSource("_jspx_page_context.removeAttribute(" + varReaderName + ",1);");
         }
 
         // if the varReader is not specified
         else {
 
-            ctxt.generateJavaSource("pageContext.setAttribute(\"url_without_param\"," + urlName + ");");
+            ctxt.generateJavaSource("_jspx_page_context.setAttribute(\"url_without_param\"," + urlName + ");");
             ctxt.generateBody();
-            ctxt.generateJavaSource(urlName + " = (String)pageContext.getAttribute(\"url_without_param\");");
-            ctxt.generateJavaSource("pageContext.removeAttribute(\"url_without_param\");");
+            ctxt.generateJavaSource(urlName + " = (String)_jspx_page_context.getAttribute(\"url_without_param\");");
+            ctxt.generateJavaSource("_jspx_page_context.removeAttribute(\"url_without_param\");");
             String strScope = "page";
             if (hasScope) {
                 strScope = ctxt.getConstantAttribute("scope");
@@ -341,8 +343,8 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("}else{");
 
             // if the url is relative, http request is needed.
-            ctxt.generateJavaSource("    if (!(pageContext.getRequest() instanceof HttpServletRequest  " +
-                    "&& pageContext.getResponse() instanceof HttpServletResponse)){");
+            ctxt.generateJavaSource("    if (!(_jspx_page_context.getRequest() instanceof HttpServletRequest  " +
+                    "&& _jspx_page_context.getResponse() instanceof HttpServletResponse)){");
             ctxt.generateJavaSource(
                     "        throw new JspTagException(\"Relative &lt;import&gt; from non-HTTP request not allowed\");");
             ctxt.generateJavaSource("    }");
@@ -352,12 +354,12 @@ public class Import implements TagPlugin {
             if (hasContext) {
                 ctxt.generateJavaSource("    if(null != " + contextName + "){");
                 ctxt.generateJavaSource("        " + servletContextName +
-                        " = pageContext.getServletContext().getContext(" + contextName + ");");
+                        " = _jspx_page_context.getServletContext().getContext(" + contextName + ");");
                 ctxt.generateJavaSource("    }else{");
-                ctxt.generateJavaSource("        " + servletContextName + " = pageContext.getServletContext();");
+                ctxt.generateJavaSource("        " + servletContextName + " = _jspx_page_context.getServletContext();");
                 ctxt.generateJavaSource("    }");
             } else {
-                ctxt.generateJavaSource("    " + servletContextName + " = pageContext.getServletContext();");
+                ctxt.generateJavaSource("    " + servletContextName + " = _jspx_page_context.getServletContext();");
             }
 
             //
@@ -383,7 +385,7 @@ public class Import implements TagPlugin {
 
             // initialize a ImportResponseWrapper to include the resource
             ctxt.generateJavaSource("    org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper " + irwName +
-                    " = new org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper((HttpServletResponse) pageContext.getResponse());");
+                    " = new org.apache.jasper.tagplugins.jstl.Util.ImportResponseWrapper((HttpServletResponse) _jspx_page_context.getResponse());");
             ctxt.generateJavaSource("    if(" + charSetName + " == null){");
             ctxt.generateJavaSource(
                     "        " + charSetName + " = org.apache.jasper.tagplugins.jstl.Util.DEFAULT_ENCODING;");
@@ -391,7 +393,7 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    " + irwName + ".setCharEncoding(" + charSetName + ");");
             ctxt.generateJavaSource("    try{");
             ctxt.generateJavaSource(
-                    "        " + requestDispatcherName + ".include(pageContext.getRequest(), " + irwName + ");");
+                    "        " + requestDispatcherName + ".include(_jspx_page_context.getRequest(), " + irwName + ");");
             ctxt.generateJavaSource("    }catch(java.io.IOException ex){");
             ctxt.generateJavaSource("        throw new JspException(ex);");
             ctxt.generateJavaSource("    }catch(RuntimeException ex){");
@@ -417,9 +419,9 @@ public class Import implements TagPlugin {
             if (hasVar) {
                 String strVar = ctxt.getConstantAttribute("var");
                 ctxt.generateJavaSource(
-                        "pageContext.setAttribute(\"" + strVar + "\"," + tempStringName + "," + iScope + ");");
+                        "_jspx_page_context.setAttribute(\"" + strVar + "\"," + tempStringName + "," + iScope + ");");
             } else {
-                ctxt.generateJavaSource("pageContext.getOut().print(" + tempStringName + ");");
+                ctxt.generateJavaSource("_jspx_page_context.getOut().print(" + tempStringName + ");");
             }
         }
     }
