@@ -27,8 +27,6 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.ImportHandler;
 import jakarta.el.VariableMapper;
 
-import org.apache.el.util.MessageFactory;
-
 /**
  * Extended EL context that wraps an existing ELContext and provides additional
  * functionality for lambda expression evaluation.
@@ -199,18 +197,13 @@ public final class EvaluationContext extends ELContext {
 
 
     /**
-     * Sets the lambda expression nested state for this context.
+     * Sets the lambda expression nested state for this context. Any existing state is replaced. This happens when a
+     * sibling lambda expression (one that is not nested inside the lambda expression that created the existing state)
+     * is evaluated during the same evaluation.
      *
      * @param lambdaExpressionNestedState The lambda expression nested state
-     *
-     * @throws IllegalStateException if a nested state has already been set
      */
     public void setLambdaExpressionNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
-        if (this.lambdaExpressionNestedState != null) {
-            // Should never happen
-            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
-        }
-
         this.lambdaExpressionNestedState = lambdaExpressionNestedState;
     }
 }
