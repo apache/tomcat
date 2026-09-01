@@ -224,6 +224,10 @@
         <code>NegativeArraySizeException</code> during session state transfer.
         Pull request <pr>1042</pr> provided by lihongyi87. (markt)
       </fix>
+      <fix>
+        Improve robustness of cloud membership providers if an error occurs
+        fetching members. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

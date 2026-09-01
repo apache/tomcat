@@ -164,6 +164,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             inetAddresses = InetAddress.getAllByName(dnsServiceName);
         } catch (UnknownHostException exception) {
             log.warn(sm.getString("dnsMembershipProvider.dnsError", dnsServiceName), exception);
+            return null;
         }
 
         if (inetAddresses != null) {

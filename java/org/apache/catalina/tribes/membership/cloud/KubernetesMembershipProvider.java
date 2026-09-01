@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -155,7 +156,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
     @Override
     protected Member[] fetchMembers() {
         if (streamProvider == null) {
-            return new Member[0];
+            return null;
         }
 
         reloadSaTokenIfChanged();
@@ -164,9 +165,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
                 InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
-            parsePods(reader, members);
+            if (!parsePods(reader, members)) {
+                return null;
+            }
         } catch (IOException ioe) {
             log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+            return null;
         }
 
         return members.toArray(new Member[0]);
@@ -202,16 +206,17 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
      *
      * @param reader The reader with pod data
      * @param members The list to populate with members
+     * @return {@code true} if no error occurred
      */
     @SuppressWarnings("unchecked")
-    protected void parsePods(Reader reader, List<MemberImpl> members) {
+    protected boolean parsePods(Reader reader, List<MemberImpl> members) {
         JSONParser parser = new JSONParser(reader);
         try {
             LinkedHashMap<String,Object> json = parser.object();
             Object itemsObject = json.get("items");
             if (!(itemsObject instanceof List<?>)) {
                 log.error(sm.getString("kubernetesMembershipProvider.invalidPodsList", "no items"));
-                return;
+                return false;
             }
             List<Object> items = (List<Object>) itemsObject;
             for (Object podObject : items) {
@@ -273,8 +278,13 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
 
-                long aliveTime =
-                        Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
+                long aliveTime;
+                try {
+                    aliveTime = Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
+                } catch (DateTimeParseException e) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "creationTimestamp"), e);
+                    continue;
+                }
 
                 MemberImpl member;
                 try {
@@ -291,6 +301,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             }
         } catch (Exception e) {
             log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
+            return false;
         }
+        return true;
     }
 }
