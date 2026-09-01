@@ -138,7 +138,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final String INVALID_CIPHER = "SSL_NULL_WITH_NULL_NULL";
 
-    private static final long EMPTY_ADDR = Buffer.address(ByteBuffer.allocate(0));
+    private static final long EMPTY_ADDR = Buffer.address(ByteBuffer.allocateDirect(0));
 
     private final OpenSSLState state;
     private final Cleanable cleanable;
