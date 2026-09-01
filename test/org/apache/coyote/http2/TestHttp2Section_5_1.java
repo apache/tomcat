@@ -143,12 +143,13 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         while (!output.getTrace().contains("5-EndOfStream") && !output.getTrace().contains("5-RST-")) {
-            System.out.println(output.getTrace());
             parser.readFrame();
         }
 
         String trace = output.getTrace();
         Assert.assertTrue(trace, trace.contains("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
+        // Remove trace entries for stream 3 as they may be interleaved with those for stream 5
+        trace = trace.replaceAll("(?m)^3-.*(\\r?\\n)?", "");
         Assert.assertTrue(trace, trace.contains(getEmptyResponseTrace(5)));
     }
 
