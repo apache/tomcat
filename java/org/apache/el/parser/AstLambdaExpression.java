@@ -40,10 +40,11 @@ public class AstLambdaExpression extends SimpleNode {
         // Correct evaluation requires knowledge of the whole set of nested
         // expressions, not just the current expression
         LambdaExpressionNestedState state = ctx.getLambdaExpressionNestedState();
-        if (state == null) {
-            // This must be an outer lambda expression. Create and populate the
-            // state.
-            state = new LambdaExpressionNestedState();
+        if (state == null || !state.contains(this)) {
+            // This is an outer lambda expression or a sibling of the lambda
+            // expression that created the stored state. Create and populate
+            // the state.
+            state = new LambdaExpressionNestedState(this);
             populateNestedState(state);
             ctx.setLambdaExpressionNestedState(state);
         }
