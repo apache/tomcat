@@ -35,26 +35,29 @@ public final class Library {
     private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
-        File binLib = new File(System.getProperty(CATALINA_HOME_PROP), "bin");
-        for (int i = 0; i < NAMES.length; i++) {
-            File library = new File(binLib, System.mapLibraryName(NAMES[i]));
-            try {
-                System.load(library.getAbsolutePath());
-                loaded = true;
-            } catch (VirtualMachineError t) {
-                throw t;
-            } catch (Throwable t) {
-                if (library.exists()) {
-                    // File exists but failed to load
+        String catalinaHome = System.getProperty(CATALINA_HOME_PROP);
+        if (catalinaHome != null) {
+            File binLib = new File(catalinaHome, "bin");
+            for (int i = 0; i < NAMES.length; i++) {
+                File library = new File(binLib, System.mapLibraryName(NAMES[i]));
+                try {
+                    System.load(library.getAbsolutePath());
+                    loaded = true;
+                } catch (VirtualMachineError t) {
                     throw t;
+                } catch (Throwable t) {
+                    if (library.exists()) {
+                        // File exists but failed to load
+                        throw t;
+                    }
+                    if (i > 0) {
+                        err.append(", ");
+                    }
+                    err.append(t.getMessage());
                 }
-                if (i > 0) {
-                    err.append(", ");
+                if (loaded) {
+                    break;
                 }
-                err.append(t.getMessage());
-            }
-            if (loaded) {
-                break;
             }
         }
         if (!loaded) {
