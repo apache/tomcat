@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -860,7 +861,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         byte[][] certificateChain = new byte[len][];
         try (var localArena = Arena.ofConfined()) {
-            OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain);
+            if (!OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain)) {
+                return null;
+            }
             return certificateChain;
         }
     }
@@ -882,7 +885,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (log.isTraceEnabled()) {
                 log.trace("Protocol negotiated [" + new String(name) + "]");
             }
-            return new String(name);
+            return new String(name, StandardCharsets.UTF_8);
         }
     }
 
