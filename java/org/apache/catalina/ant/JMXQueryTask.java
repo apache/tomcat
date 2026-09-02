@@ -92,6 +92,6 @@ public class JMXQueryTask extends AbstractCatalinaTask {
             }
         }
         log("Query string is " + queryString);
-        execute("/jmxproxy/" + queryString);
+        execute("/../jmxproxy/" + queryString);
     }
 }
