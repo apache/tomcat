@@ -136,7 +136,12 @@ public class UpgradeUtil {
         List<Extension> extensionsRequested = new ArrayList<>();
         Enumeration<String> extHeaders = req.getHeaders(Constants.WS_EXTENSIONS_HEADER_NAME);
         while (extHeaders.hasMoreElements()) {
-            Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
+            try {
+                Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
+            } catch (IllegalArgumentException iae) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
         }
         // Negotiation phase 1. By default, this simply filters out the
         // extensions that the server does not support but applications could
