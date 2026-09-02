@@ -1274,41 +1274,39 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         return ocspResponse;
     }
 
-    private static final int ASN1_SEQUENCE = 0x30;
     private static final int ASN1_OID = 0x06;
     private static final int ASN1_STRING = 0x86;
     private static final byte[] OCSP_OID = { 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x30, 0x01 };
 
     private static void parseOCSPURLs(Asn1Parser parser, ArrayList<String> urls) {
+        ArrayList<String> result = new ArrayList<>();
         // See RFC 5280, section 4.2.2.1 for format
         // Outer sequence
-        int tag = parser.peekTag();
-        if (tag == ASN1_SEQUENCE) {
-            parser.parseTag(ASN1_SEQUENCE);
-            parser.parseFullLength();
-        }
+        parser.parseTagSequence();
+        parser.parseFullLength();
         // Iterate over nested sequences
         while (!parser.eof()) {
-            tag = parser.peekTag();
-            if (tag == ASN1_SEQUENCE) {
-                parser.parseTag(ASN1_SEQUENCE);
-                parser.parseLength();
-            } else if (tag == ASN1_OID) {
-                parser.parseTag(ASN1_OID);
-                int oidLen = parser.parseLength();
-                byte[] oid = new byte[oidLen];
-                parser.parseBytes(oid);
-                if (Arrays.compareUnsigned(oid, 0, oidLen, OCSP_OID, 0, OCSP_OID.length) == 0) {
-                    parser.parseTag(ASN1_STRING);
-                    int urlLen = parser.parseLength();
-                    byte[] url = new byte[urlLen];
-                    parser.parseBytes(url);
-                    urls.add(new String(url));
-                }
-            } else {
+            parser.parseTagSequence();
+            if (parser.getNestedSequenceLevel() != 2) {
                 return;
             }
+            parser.parseLength();
+            parser.parseTag(ASN1_OID);
+            int oidLen = parser.parseLength();
+            byte[] oid = new byte[oidLen];
+            parser.parseBytes(oid);
+            parser.parseTag(ASN1_STRING);
+            int urlLen = parser.parseLength();
+            byte[] url = new byte[urlLen];
+            parser.parseBytes(url);
+            if (!parser.isAtEndOfSequence()) {
+                return;
+            }
+            if (Arrays.compareUnsigned(oid, 0, oidLen, OCSP_OID, 0, OCSP_OID.length) == 0) {
+                result.add(new String(url));
+            }
         }
+        urls.addAll(result);
     }
 
     private static int processOCSPRequest(EngineState state, URL url, MemorySegment issuer, MemorySegment x509,

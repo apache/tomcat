@@ -131,6 +131,19 @@ public class Asn1Parser {
 
 
     /**
+     * Is the parser at the expected end of a sequence (based on the stated length of the sequence).
+     *
+     * @return {@code true} if the parser is at the expected end of the sequence, otherwise {@code false}
+     */
+    public boolean isAtEndOfSequence() {
+        if (!nestedSequenceEndPositions.isEmpty() && nestedSequenceEndPositions.peekLast().intValue() == pos) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * Parses and validates an expected tag.
      *
      * @param tag the expected tag value
