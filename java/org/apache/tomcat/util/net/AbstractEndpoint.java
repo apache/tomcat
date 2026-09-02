@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -1745,6 +1746,9 @@ public abstract class AbstractEndpoint<S, U> {
      * @param negotiableProtocol The protocol to add
      */
     public void addNegotiatedProtocol(String negotiableProtocol) {
+        if (negotiableProtocol.getBytes(StandardCharsets.UTF_8).length > 255) {
+            throw new IllegalArgumentException(sm.getString("abstractEndpoint.alpn.tooLong", negotiableProtocol));
+        }
         negotiableProtocols.add(negotiableProtocol);
     }
 

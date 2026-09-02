@@ -517,19 +517,25 @@ public class OpenSSLLibrary {
         return sslError;
     }
 
-    static void populateCertificateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
+    static boolean populateCertificateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
             byte[][] certificateChain) {
         for (int i = 0; i < certificateChain.length; i++) {
             MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
-            if (length <= 0) {
-                certificateChain[i] = new byte[0];
-                continue;
-            }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-            OPENSSL_free(buf);
+            if (length <= 0) {
+                if (!MemorySegment.NULL.equals(buf)) {
+                    OPENSSL_free(buf);
+                }
+                return false;
+            }
+            try {
+                certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
+            } finally {
+                OPENSSL_free(buf);
+            }
         }
+        return true;
     }
 }
