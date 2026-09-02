@@ -72,13 +72,13 @@ public class AprLifecycleListener implements LifecycleListener {
     /** Required minor version of Tomcat Native. */
     protected static final int TCN_REQUIRED_MINOR = 0;
     /** Required patch version of Tomcat Native. */
-    protected static final int TCN_REQUIRED_PATCH = 15;
+    protected static final int TCN_REQUIRED_PATCH = 16;
     /** Recommended major version of Tomcat Native. */
     protected static final int TCN_RECOMMENDED_MAJOR = 2;
     /** Recommended minor version of Tomcat Native. */
     protected static final int TCN_RECOMMENDED_MINOR = 0;
     /** Recommended patch version of Tomcat Native. */
-    protected static final int TCN_RECOMMENDED_PV = 15;
+    protected static final int TCN_RECOMMENDED_PV = 16;
 
 
     // ---------------------------------------------- Properties
