@@ -221,6 +221,9 @@
       <fix>
         Make the processing of OCSP responses more robust. (markt)
       </fix>
+      <fix>
+        Stricter OCSP handling when soft-fail is disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
