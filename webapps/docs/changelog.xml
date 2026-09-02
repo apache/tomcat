@@ -270,6 +270,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Easymock to 5.7.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.25 (markt)" rtext="2026-08-18">
   <subsection name="Catalina">
