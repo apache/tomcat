@@ -1298,7 +1298,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 int oidLen = parser.parseLength();
                 byte[] oid = new byte[oidLen];
                 parser.parseBytes(oid);
-                if (Arrays.compareUnsigned(oid, 0, OCSP_OID.length, OCSP_OID, 0, OCSP_OID.length) == 0) {
+                if (Arrays.compareUnsigned(oid, 0, oidLen, OCSP_OID, 0, OCSP_OID.length) == 0) {
                     parser.parseTag(ASN1_STRING);
                     int urlLen = parser.parseLength();
                     byte[] url = new byte[urlLen];
