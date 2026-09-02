@@ -52,6 +52,7 @@ import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.net.Constants;
@@ -290,7 +291,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 alpn = true;
                 negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
                 for (String negotiableProtocol : negotiableProtocols) {
-                    negotiableProtocolsBytes.add(negotiableProtocol.getBytes(StandardCharsets.ISO_8859_1));
+                    byte[] negotiableProtocolBytes = negotiableProtocol.getBytes(StandardCharsets.UTF_8);
+                    if (negotiableProtocolBytes.length > 255) {
+                        throw new IllegalArgumentException(sm.getString("openssl.alpn.tooLong", negotiableProtocol));
+                    }
+                    negotiableProtocolsBytes.add(negotiableProtocolBytes);
                 }
                 negotiableProtocolsBytes.add(HTTP_11_PROTOCOL);
             } else {
@@ -803,24 +808,28 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (MemorySegment.NULL.equals(param)) {
                 return 0;
             }
-            MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-            MemorySegment /* STACK_OF(X509) */ sk = X509_STORE_CTX_get0_untrusted(x509_ctx);
-            int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
-            byte[][] certificateChain = new byte[len][];
             try (var localArena = Arena.ofConfined()) {
-                OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain);
+                MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+                MemorySegment /* STACK_OF(X509) */ sk = X509_STORE_CTX_get0_untrusted(x509_ctx);
+                if (MemorySegment.NULL.equals(sk)) {
+                    return 0;
+                }
+                int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
+                byte[][] certificateChain = new byte[len][];
+                if (!OpenSSLLibrary.populateCertificateChain(localArena, sk, certificateChain)) {
+                    return 0;
+                }
                 MemorySegment cipher = SSL_get_current_cipher(ssl);
                 String authMethod = (MemorySegment.NULL.equals(cipher)) ? "UNKNOWN" :
                         getCipherAuthenticationMethod(SSL_CIPHER_get_auth_nid(cipher), SSL_CIPHER_get_kx_nid(cipher));
                 X509Certificate[] peerCerts = certificates(certificateChain);
-                try {
-                    x509TrustManager.checkClientTrusted(peerCerts, authMethod);
-                    OpenSSLEngine.markPostHandshakeAuthComplete(ssl);
-                    return 1;
-                } catch (Exception e) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
-                    }
+                x509TrustManager.checkClientTrusted(peerCerts, authMethod);
+                OpenSSLEngine.markPostHandshakeAuthComplete(ssl);
+                return 1;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("openssl.certificateVerificationFailed"), t);
                 }
             }
             return 0;

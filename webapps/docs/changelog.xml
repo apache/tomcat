@@ -216,6 +216,12 @@
       <fix>
         Implement stricter ALPN matching for Connectors using FFM. (markt)
       </fix>
+      <add>
+        Add length validation for ALPN protocol names. (markt)
+      </add>
+      <fix>
+        Make FFM certificate verification more robust. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
