@@ -164,6 +164,9 @@
         Fix storeconfig not saving the path when a context is saved in
         server.xml. (remm)
       </fix>
+      <fix>
+        WAR URLConnection should propagate use of caching. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
