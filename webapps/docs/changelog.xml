@@ -373,6 +373,9 @@
         Align FFM OCSP URL parsing with Tomcat Native and treat a parsing
         failure as if no usable OCSP URLs were present. (markt)
       </fix>
+      <fix>
+        Make the processing of OCSP responses more robust. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
