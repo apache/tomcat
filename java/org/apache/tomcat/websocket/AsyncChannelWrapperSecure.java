@@ -265,10 +265,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                     if (forceRead) {
                         forceRead = false;
                         Future<Integer> f = socketChannel.read(socketReadBuffer);
-                        Integer socketRead = f.get();
-                        if (socketRead.intValue() == -1) {
-                            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
-                        }
+                        checkFutureRead(f);
                     }
 
                     socketReadBuffer.flip();
@@ -339,6 +336,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     }
 
 
+    private static void checkFutureRead(Future<Integer> future) throws EOFException, ExecutionException,
+            InterruptedException {
+        Integer bytesRead = future.get();
+        if (bytesRead.intValue() < 0) {
+            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
+        }
+    }
+
     private class WebSocketSslHandshakeThread extends Thread {
 
         private final WrapperFuture<Void,Void> hFuture;
@@ -371,9 +376,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             socketWriteBuffer.flip();
                             while (socketWriteBuffer.hasRemaining()) {
                                 Future<Integer> fWrite = socketChannel.write(socketWriteBuffer);
-                                if (fWrite.get() < 0) {
-                                    throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
-                                }
+                                fWrite.get();
                             }
                             break;
                         }
@@ -381,9 +384,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             socketReadBuffer.compact();
                             if (socketReadBuffer.position() == 0 || resultStatus == Status.BUFFER_UNDERFLOW) {
                                 Future<Integer> fRead = socketChannel.read(socketReadBuffer);
-                                if (fRead.get() < 0) {
-                                    throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
-                                }
+                                checkFutureRead(fRead);
                             }
                             socketReadBuffer.flip();
                             SSLEngineResult r = sslEngine.unwrap(socketReadBuffer, DUMMY);
