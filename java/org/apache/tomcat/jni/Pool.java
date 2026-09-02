@@ -39,7 +39,7 @@ public class Pool {
 
     /**
      * Destroy the pool. This takes similar action as apr_pool_clear() and then frees all the memory. This will actually
-     * free the memory.
+     * free the memory. Calling this more than once for a pool will trigger a JVM crash.
      *
      * @param pool The pool to destroy
      */
