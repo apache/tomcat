@@ -441,7 +441,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             List<String> extHeaders = handshakeResponse.getHeaders().get(Constants.WS_EXTENSIONS_HEADER_NAME);
             if (extHeaders != null) {
                 for (String extHeader : extHeaders) {
-                    Util.parseExtensionHeader(extensionsAgreed, extHeader);
+                    try {
+                        Util.parseExtensionHeader(extensionsAgreed, extHeader);
+                    } catch (IllegalArgumentException iae) {
+                        throw new DeploymentException(
+                                sm.getString("wsWebSocketContainer.invalidExtensionsHeader"), iae);
+                    }
                 }
             }
 
