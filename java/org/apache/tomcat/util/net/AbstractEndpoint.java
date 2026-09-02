@@ -2317,6 +2317,7 @@ public abstract class AbstractEndpoint<S, U> {
      */
     public void resume() {
         if (running) {
+            initializeConnectionLatch();
             paused = false;
         }
     }
