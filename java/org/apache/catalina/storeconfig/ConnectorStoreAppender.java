@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +67,12 @@ public class ConnectorStoreAppender extends StoreAppender {
     public ConnectorStoreAppender() {
         super();
     }
+
+    /**
+     * Map of attribute names stored in the socket properties but present as properties on the endpoint.
+     */
+    protected static final Set<String> derivedEndpointAttributes =
+            new HashSet<>(Arrays.asList("connectionTimeout", "connectionLinger"));
 
     /**
      * Map of attribute name replacements for connector properties.
@@ -184,6 +191,10 @@ public class ConnectorStoreAppender extends StoreAppender {
                     internalExecutorAttributes.contains(key)) {
                 continue;
             }
+            // Avoid duplicating properties, so properties saved to the socket will be saved there
+            if (derivedEndpointAttributes.contains(key)) {
+                continue;
+            }
             if (replacements.get(key) != null) {
                 key = replacements.get(key);
             }
@@ -278,7 +289,16 @@ public class ConnectorStoreAppender extends StoreAppender {
                 File catalinaBase = getCatalinaBase();
                 File jkHomeBase = getJkHomeBase((String) connector.getProperty("jkHome"), catalinaBase);
                 isPrint = !catalinaBase.equals(jkHomeBase);
-
+            } else if ("keepAliveTimeout".equals(attrName)) {
+                /*
+                 * When keepAliveTimeout has not been explicitly configured, the endpoint reports the value of
+                 * connectionTimeout. Storing that derived value would duplicate the connectionTimeout configuration, so
+                 * suppress it unless it differs from connectionTimeout.
+                 */
+                Object keepAliveTimeout = IntrospectionUtils.getProperty(bean, "keepAliveTimeout");
+                Object connectionTimeout = IntrospectionUtils.getProperty(bean, "connectionTimeout");
+                isPrint = (keepAliveTimeout == null) || (connectionTimeout == null) ||
+                        !keepAliveTimeout.equals(connectionTimeout);
             }
         }
         return isPrint;
