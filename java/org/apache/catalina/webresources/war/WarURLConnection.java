@@ -93,4 +93,27 @@ public class WarURLConnection extends URLConnection {
         return wrappedJarUrlConnection.getContentLengthLong();
     }
 
+
+    @Override
+    public void setUseCaches(boolean usecaches) {
+        wrappedJarUrlConnection.setUseCaches(usecaches);
+    }
+
+
+    @Override
+    public boolean getUseCaches() {
+        return wrappedJarUrlConnection.getUseCaches();
+    }
+
+
+    @Override
+    public void setDefaultUseCaches(boolean defaultusecaches) {
+        wrappedJarUrlConnection.setDefaultUseCaches(defaultusecaches);
+    }
+
+
+    @Override
+    public boolean getDefaultUseCaches() {
+        return wrappedJarUrlConnection.getDefaultUseCaches();
+    }
 }
