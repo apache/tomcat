@@ -206,6 +206,10 @@
         Avoid HTTP/2 exceptions with invalid <code>content-length</code>
         values. (remm)
       </fix>
+      <fix>
+        Only try and load the native library from the <code>CATALINA_HOME</code>
+        system property when the property is set. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
