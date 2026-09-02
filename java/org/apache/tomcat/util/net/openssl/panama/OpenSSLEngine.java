@@ -1387,6 +1387,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             } else {
                 if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
                     basicResponse = OCSP_response_get1_basic(ocspResponse);
+                    if (MemorySegment.NULL.equals(basicResponse)) {
+                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_RESP_INVALID());
+                        return V_OCSP_CERTSTATUS_UNKNOWN();
+                    }
                     if (OCSP_check_nonce(ocspRequest, basicResponse) == 0) {
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_RESP_INVALID());
                         return V_OCSP_CERTSTATUS_UNKNOWN();
