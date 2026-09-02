@@ -762,25 +762,24 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 MemorySegment inSeg = in.reinterpret(inlen, localArena, null);
                 byte[] advertisedBytes = inSeg.toArray(ValueLayout.JAVA_BYTE);
                 for (byte[] negotiableProtocolBytes : negotiableProtocols) {
-                    for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
-                        if (advertisedBytes[i] == negotiableProtocolBytes[0]) {
-                            for (int j = 0; j < negotiableProtocolBytes.length; j++) {
-                                if (advertisedBytes[i + j] == negotiableProtocolBytes[j]) {
-                                    if (j == negotiableProtocolBytes.length - 1) {
-                                        // Match
-                                        MemorySegment outSeg =
-                                                out.reinterpret(ValueLayout.ADDRESS.byteSize(), localArena, null);
-                                        outSeg.set(ValueLayout.ADDRESS, 0, inSeg.asSlice(i));
-                                        MemorySegment outlenSeg =
-                                                outlen.reinterpret(ValueLayout.JAVA_BYTE.byteSize(), localArena, null);
-                                        outlenSeg.set(ValueLayout.JAVA_BYTE, 0, (byte) negotiableProtocolBytes.length);
-                                        return SSL_TLSEXT_ERR_OK();
-                                    }
-                                } else {
-                                    break;
-                                }
-                            }
+                    int protocolStart = 0;
+                    while (protocolStart < advertisedBytes.length) {
+                        int protocolLength = advertisedBytes[protocolStart] & 0xFF;
+                        protocolStart++;
+                        if (protocolLength == 0 || protocolLength > advertisedBytes.length - protocolStart) {
+                            return SSL_TLSEXT_ERR_NOACK();
                         }
+                        if (Arrays.equals(advertisedBytes, protocolStart, protocolStart + protocolLength,
+                                negotiableProtocolBytes, 0, negotiableProtocolBytes.length)) {
+                            MemorySegment outSeg =
+                                    out.reinterpret(ValueLayout.ADDRESS.byteSize(), localArena, null);
+                            outSeg.set(ValueLayout.ADDRESS, 0, inSeg.asSlice(protocolStart));
+                            MemorySegment outlenSeg =
+                                    outlen.reinterpret(ValueLayout.JAVA_BYTE.byteSize(), localArena, null);
+                            outlenSeg.set(ValueLayout.JAVA_BYTE, 0, (byte) negotiableProtocolBytes.length);
+                            return SSL_TLSEXT_ERR_OK();
+                        }
+                        protocolStart += protocolLength;
                     }
                 }
             }
