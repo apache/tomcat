@@ -36,13 +36,15 @@ jobs:
       matrix:
         isMain:
           - ${{ contains(github.ref, 'main') }}
-        java: [ 21, 25, 26-ea ]
+        java: [ 21, 25, 26, 27-ea, 28-ea ]
         os: [ ubuntu-latest, windows-latest ]
         exclude:
           - os: windows-latest
             java: 21
           - os: windows-latest
             java: 25
+          - os: windows-latest
+            java: 26
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
