@@ -369,15 +369,21 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             SSLEngineResult r = sslEngine.wrap(DUMMY, socketWriteBuffer);
                             checkResult(r, true);
                             socketWriteBuffer.flip();
-                            Future<Integer> fWrite = socketChannel.write(socketWriteBuffer);
-                            fWrite.get();
+                            while (socketWriteBuffer.hasRemaining()) {
+                                Future<Integer> fWrite = socketChannel.write(socketWriteBuffer);
+                                if (fWrite.get() < 0) {
+                                    throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
+                                }
+                            }
                             break;
                         }
                         case NEED_UNWRAP: {
                             socketReadBuffer.compact();
                             if (socketReadBuffer.position() == 0 || resultStatus == Status.BUFFER_UNDERFLOW) {
                                 Future<Integer> fRead = socketChannel.read(socketReadBuffer);
-                                fRead.get();
+                                if (fRead.get() < 0) {
+                                    throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
+                                }
                             }
                             socketReadBuffer.flip();
                             SSLEngineResult r = sslEngine.unwrap(socketReadBuffer, DUMMY);
