@@ -220,6 +220,9 @@
         Harden the WebSocket client and use a <code>SecureRandom</code> when
         generating the <code>Sec-WebSocket-Key</code> header. (markt)
       </fix>
+      <fix>
+        Improve robustness of client handshakes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
