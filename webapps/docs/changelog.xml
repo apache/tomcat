@@ -189,6 +189,9 @@
       <fix>
         Fix max connections enforcement after an enpoint resume. (remm)
       </fix>
+      <fix>
+        Implement stricter ALPN matching for Connectors using FFM. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
