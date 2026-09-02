@@ -363,6 +363,7 @@ public final class UserConfig implements LifecycleListener {
         try {
             Class<?> clazz = Class.forName(contextClass);
             Context context = (Context) clazz.getConstructor().newInstance();
+            // StandardContext or any compatible Context impl should also set the name derived from the path
             context.setPath(contextPath);
             context.setDocBase(app.toString());
             clazz = Class.forName(configClass);

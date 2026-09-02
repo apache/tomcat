@@ -1328,7 +1328,13 @@ public class HostConfig implements LifecycleListener {
                         // The only resource that should be deleted is the
                         // expanded WAR (if any)
                         Context context = (Context) host.findChild(app.name);
-                        String docBase = context.getDocBase();
+                        String docBase = context == null ? null : context.getDocBase();
+                        if (context == null || docBase == null) {
+                            // Context missing or broken - redeploy instead of reload
+                            undeploy(app);
+                            deleteRedeployResources(app, resources, i, false);
+                            return;
+                        }
                         if (!docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                             // This is an expanded directory
                             File docBaseFile = new File(docBase);
