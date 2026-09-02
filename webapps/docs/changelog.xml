@@ -184,6 +184,10 @@
         explicitly use the canonical context path for the
         <code>CONTEXT_PATH</code> server variable. (markt)
       </fix>
+      <fix>
+        Fix storeconfig not saving the path when a context is saved in
+        server.xml. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

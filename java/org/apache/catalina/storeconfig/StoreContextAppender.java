@@ -75,7 +75,7 @@ public class StoreContextAppender extends StoreAppender {
                     isPrint = !defaultWorkDir.equals(context.getWorkDir());
                 }
             } else if ("path".equals(attrName)) {
-                isPrint = desc.isStoreSeparate() && desc.isExternalAllowed() && context.getConfigFile() == null;
+                isPrint = !desc.isStoreSeparate() || !desc.isExternalAllowed() || context.getConfigFile() == null;
             } else if ("docBase".equals(attrName)) {
                 Container host = context.getParent();
                 if (host instanceof StandardHost) {
