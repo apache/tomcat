@@ -1413,6 +1413,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     MemorySegment nextUpdatePointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                     int status = OCSP_single_get0_status(singleResponse, MemorySegment.NULL, MemorySegment.NULL,
                             thisUpdatePointer, nextUpdatePointer);
+                    if (status == -1) {
+                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_RESP_INVALID());
+                        return V_OCSP_CERTSTATUS_UNKNOWN();
+                    }
                     if (OCSP_check_validity(thisUpdatePointer.get(ValueLayout.ADDRESS, 0),
                             nextUpdatePointer.get(ValueLayout.ADDRESS, 0), OCSP_MAX_SKEW, -1) <= 0) {
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_NOT_YET_VALID());
