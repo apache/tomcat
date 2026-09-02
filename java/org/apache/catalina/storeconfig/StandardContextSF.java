@@ -86,6 +86,12 @@ public class StandardContextSF extends StoreFactoryBase {
                             storeContextSeparate(aWriter, indent, (StandardContext) aContext);
                         }
                         return;
+                    } else if (aWriter == null) {
+                        if (log.isInfoEnabled()) {
+                            log.info(sm.getString("standardContextSF.storeContextSkipped",
+                                    ((StandardContext) aContext).getPath()));
+                        }
+                        return;
                     }
                 } else if (desc.isExternalOnly()) {
                     // Set a configFile so that the configuration is actually saved
