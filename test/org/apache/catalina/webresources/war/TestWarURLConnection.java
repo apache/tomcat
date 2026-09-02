@@ -67,7 +67,9 @@ public class TestWarURLConnection {
         Assert.assertFalse(urlConn.getUseCaches());
 
         try (InputStream is = urlConn.getInputStream()) {
-            is.readAllBytes();
+            byte[] buf = new byte[1024];
+            while (is.read(buf) > 0) {
+            }
         }
 
         try {
