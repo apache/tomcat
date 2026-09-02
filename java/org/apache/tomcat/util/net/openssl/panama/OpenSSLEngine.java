@@ -1226,6 +1226,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         if (!MemorySegment.NULL.equals(issuer)) {
                             // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
                             int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
+                            boolean requestAttempted = false;
                             if (nid >= 0) {
                                 MemorySegment ext = X509_get_ext(x509, nid);
                                 MemorySegment os = X509_EXTENSION_get_data(ext);
@@ -1247,6 +1248,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                     for (String urlString : urls) {
                                         try {
                                             URL url = (new URI(urlString)).toURL();
+                                            requestAttempted = true;
                                             ocspResponse =
                                                     processOCSPRequest(state, url, issuer, x509, x509ctx, localArena);
                                             if (log.isDebugEnabled()) {
@@ -1261,6 +1263,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                         }
                                     }
                                 }
+                            }
+                            if (!requestAttempted) {
+                                // The AIA extension is not present, no URLs were found, or none of the URLs found
+                                // could be used to make an OCSP request.
+                                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                             }
                         }
                     } finally {
