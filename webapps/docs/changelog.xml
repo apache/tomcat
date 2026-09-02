@@ -210,6 +210,9 @@
         Only try and load the native library from the <code>CATALINA_HOME</code>
         system property when the property is set. (markt)
       </fix>
+      <fix>
+        Fix max connections enforcement after an enpoint resume. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
