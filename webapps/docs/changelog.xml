@@ -191,6 +191,10 @@
       <fix>
         WAR URLConnection should propagate use of caching. (remm)
       </fix>
+      <fix>
+        Ensure resources are evicted from the static resource cache in the
+        correct order. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
