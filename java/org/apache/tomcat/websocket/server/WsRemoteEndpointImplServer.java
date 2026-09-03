@@ -53,6 +53,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private final UpgradeInfo upgradeInfo;
     private final WebConnection connection;
     private final WsWriteTimeout wsWriteTimeout;
+    private final ReentrantLock writeCompletionLock = new ReentrantLock();
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
 
@@ -169,12 +170,17 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     return;
                 }
             } else {
-                this.handler = handler;
-                timeout = getSendTimeout();
-                if (timeout > 0) {
-                    // Register with timeout thread
-                    timeoutExpiry = timeout + System.currentTimeMillis();
-                    wsWriteTimeout.register(this);
+                writeCompletionLock.lock();
+                try {
+                    this.handler = handler;
+                    timeout = getSendTimeout();
+                    if (timeout > 0) {
+                        // Register with timeout thread
+                        timeoutExpiry = timeout + System.currentTimeMillis();
+                        wsWriteTimeout.register(this);
+                    }
+                } finally {
+                    writeCompletionLock.unlock();
                 }
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout, TimeUnit.MILLISECONDS,
@@ -189,7 +195,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                                     handler.onResult(SENDRESULT_OK);
                                 }
                             } else {
-                                wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
                                 clearHandler(null, true);
                             }
                         }
@@ -200,7 +205,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                                 SendResult sr = new SendResult(exc);
                                 handler.onResult(sr);
                             } else {
-                                wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
                                 clearHandler(exc, true);
                                 close();
                             }
@@ -208,8 +212,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     }, buffers);
         } else {
             if (blockingWriteTimeoutExpiry == -1) {
-                this.handler = handler;
-                this.buffers = buffers;
+                writeCompletionLock.lock();
+                try {
+                    this.handler = handler;
+                    this.buffers = buffers;
+                } finally {
+                    writeCompletionLock.unlock();
+                }
                 // This is definitely the same thread that triggered the write so a
                 // dispatch will be required.
                 onWritePossible(true);
@@ -280,25 +289,29 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     socketWrapper.flush(false);
                     complete = socketWrapper.isReadyForWrite();
                     if (complete) {
-                        wsWriteTimeout.unregister(this);
                         clearHandler(null, useDispatch);
                     }
                     break;
                 }
             }
         } catch (IOException | IllegalStateException e) {
-            wsWriteTimeout.unregister(this);
             clearHandler(e, useDispatch);
             close();
         }
 
         if (!complete) {
-            // Async write is in progress
-            long timeout = getSendTimeout();
-            if (timeout > 0) {
-                // Register with timeout thread
-                timeoutExpiry = timeout + System.currentTimeMillis();
-                wsWriteTimeout.register(this);
+            writeCompletionLock.lock();
+            try {
+                // The write may have completed or timed out while obtaining the lock
+                if (handler != null) {
+                    long timeout = getSendTimeout();
+                    if (timeout > 0) {
+                        timeoutExpiry = timeout + System.currentTimeMillis();
+                        wsWriteTimeout.register(this);
+                    }
+                }
+            } finally {
+                writeCompletionLock.unlock();
             }
         }
     }
@@ -340,13 +353,22 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      */
     /**
      * Handles a write timeout event.
-     * @param useDispatch whether to use a dispatch for callback
+     *
+     * @param useDispatch Whether to use a dispatch for callback
+     * @param now         The time to which the timeout should be compared
      */
-    protected void onTimeout(boolean useDispatch) {
-        if (handler != null) {
-            clearHandler(new SocketTimeoutException(), useDispatch);
+    protected void onTimeout(boolean useDispatch, long now) {
+        writeCompletionLock.lock();
+        try {
+            // Re-check timeout in case of concurrent completion and new write
+            if (handler != null && getTimeoutExpiry() < now) {
+                wsWriteTimeout.unregister(this);
+                clearHandlerInternal(new SocketTimeoutException(), useDispatch);
+                close();
+            }
+        } finally {
+            writeCompletionLock.unlock();
         }
-        close();
     }
 
 
@@ -363,6 +385,23 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      *                        the requirements of {@link jakarta.websocket.RemoteEndpoint.Async}
      */
     void clearHandler(Throwable t, boolean useDispatch) {
+        writeCompletionLock.lock();
+        try {
+            if (handler != null) {
+                /*
+                 * Unregister before invoking the callback since the callback may synchronously start and register the
+                 * next write.
+                 */
+                wsWriteTimeout.unregister(this);
+                clearHandlerInternal(t, useDispatch);
+            }
+        } finally {
+            writeCompletionLock.unlock();
+        }
+    }
+
+
+    private void clearHandlerInternal(Throwable t, boolean useDispatch) {
         // Setting the result marks this (partial) message as
         // complete which means the next one may be sent which
         // could update the value of the handler. Therefore, keep a
@@ -371,27 +410,25 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         SendHandler sh = handler;
         handler = null;
         buffers = null;
-        if (sh != null) {
-            if (useDispatch) {
-                OnResultRunnable r = new OnResultRunnable(sh, t);
-                try {
-                    socketWrapper.execute(r);
-                } catch (RejectedExecutionException ree) {
-                    // Can't use the executor so call the runnable directly.
-                    // This may not be strictly specification compliant in all
-                    // cases but during shutdown only close messages are going
-                    // to be sent so there should not be the issue of nested
-                    // calls leading to stack overflow as described in bug
-                    // 55715. The issues with nested calls was the reason for
-                    // the separate thread requirement in the specification.
-                    r.run();
-                }
+        if (useDispatch) {
+            OnResultRunnable r = new OnResultRunnable(sh, t);
+            try {
+                socketWrapper.execute(r);
+            } catch (RejectedExecutionException ree) {
+                // Can't use the executor so call the runnable directly.
+                // This may not be strictly specification compliant in all
+                // cases but during shutdown only close messages are going
+                // to be sent so there should not be the issue of nested
+                // calls leading to stack overflow as described in bug
+                // 55715. The issues with nested calls was the reason for
+                // the separate thread requirement in the specification.
+                r.run();
+            }
+        } else {
+            if (t == null) {
+                sh.onResult(new SendResult());
             } else {
-                if (t == null) {
-                    sh.onResult(new SendResult());
-                } else {
-                    sh.onResult(new SendResult(t));
-                }
+                sh.onResult(new SendResult(t));
             }
         }
     }
