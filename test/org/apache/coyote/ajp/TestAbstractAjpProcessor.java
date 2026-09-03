@@ -941,6 +941,62 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
+    /*
+     * AJP does not support splitting a response header across multiple
+     * packets so a response header that does not fit in a single packet
+     * must fail the response rather than corrupt the AJP message.
+     */
+    @Test
+    public void testResponseHeaderLargerThanPacket() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "largeHeader", new LargeHeaderServlet());
+        ctx.addServletMapping("/", "largeHeader");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        // The response header is larger than an AJP packet so the response
+        // is failed and the connection is closed without a response.
+        try {
+            ajpClient.sendMessage(forwardMessage);
+            Assert.fail("Expected the connection to be closed");
+        } catch (IOException ioe) {
+            // Expected
+        }
+
+        ajpClient.disconnect();
+    }
+
+
+    private static class LargeHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            StringBuilder value = new StringBuilder(Constants.MAX_PACKET_SIZE * 2);
+            for (int i = 0; i < value.capacity(); i++) {
+                value.append('A');
+            }
+            resp.setHeader("X-Large-Header", value.toString());
+            resp.getWriter().print("Body");
+        }
+    }
+
+
     /**
      * Process response header packet and checks the status. Any other data is ignored.
      */
