@@ -313,13 +313,11 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     @Override
     protected void doClose() {
-        if (handler != null) {
-            // close() can be triggered by a wide range of scenarios. It is far
-            // simpler just to always use a dispatch than it is to try and track
-            // whether or not this method was called by the same thread that
-            // triggered the write
-            clearHandler(new EOFException(), true);
-        }
+        /*
+         * close() can be triggered by a wide range of scenarios. It is far simpler just to always use a dispatch than
+         * it is to try and track whether or not this method was called by the same thread that triggered the write
+         */
+        clearHandler(new EOFException(), true);
         try {
             socketWrapper.close();
         } catch (Exception e) {
