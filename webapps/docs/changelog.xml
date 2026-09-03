@@ -491,8 +491,8 @@
         Improve robustness of client handshakes. (remm)
       </fix>
       <fix>
-        Ensure that WebSocket non-blocking write timeouts are not lost if two
-        writes have the same timeout. (markt)
+        Ensure that WebSocket write timeouts apply to the complete message and
+        are not lost if two writes have the same timeout. (markt)
       </fix>
     </changelog>
   </subsection>
