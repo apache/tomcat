@@ -36,8 +36,10 @@ public class MessagePart {
     private final SendHandler intermediateHandler;
     /** End send handler. */
     private volatile SendHandler endHandler;
-    /** Blocking write timeout expiry. */
-    private final long blockingWriteTimeoutExpiry;
+    /** Whether the write is blocking. */
+    private final boolean blocking;
+    /** Write timeout expiry. */
+    private final long writeTimeoutExpiry;
 
     /**
      * Constructor.
@@ -47,17 +49,19 @@ public class MessagePart {
      * @param payload payload data
      * @param intermediateHandler intermediate send handler
      * @param endHandler end send handler
-     * @param blockingWriteTimeoutExpiry blocking write timeout expiry
+     * @param blocking whether the write is blocking
+     * @param writeTimeoutExpiry write timeout expiry
      */
     MessagePart(boolean fin, int rsv, byte opCode, ByteBuffer payload, SendHandler intermediateHandler,
-            SendHandler endHandler, long blockingWriteTimeoutExpiry) {
+            SendHandler endHandler, boolean blocking, long writeTimeoutExpiry) {
         this.fin = fin;
         this.rsv = rsv;
         this.opCode = opCode;
         this.payload = payload;
         this.intermediateHandler = intermediateHandler;
         this.endHandler = endHandler;
-        this.blockingWriteTimeoutExpiry = blockingWriteTimeoutExpiry;
+        this.blocking = blocking;
+        this.writeTimeoutExpiry = writeTimeoutExpiry;
     }
 
     /**
@@ -117,11 +121,18 @@ public class MessagePart {
     }
 
     /**
-     * Get the blocking write timeout expiry.
-     * @return the blocking write timeout expiry
+     * Determine if the write is blocking.
+     * @return {@code true} if the write is blocking, otherwise {@code false}
      */
-    public long getBlockingWriteTimeoutExpiry() {
-        return blockingWriteTimeoutExpiry;
+    public boolean isBlocking() {
+        return blocking;
+    }
+
+    /**
+     * Get the write timeout expiry.
+     * @return the write timeout expiry
+     */
+    public long getWriteTimeoutExpiry() {
+        return writeTimeoutExpiry;
     }
 }
-
