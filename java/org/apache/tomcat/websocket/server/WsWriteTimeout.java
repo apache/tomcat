@@ -16,10 +16,9 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.tomcat.websocket.BackgroundProcess;
 import org.apache.tomcat.websocket.BackgroundProcessManager;
@@ -37,13 +36,11 @@ public class WsWriteTimeout implements BackgroundProcess {
     public WsWriteTimeout() {
     }
 
-    /**
-     * Note: The comparator imposes orderings that are inconsistent with equals
-     */
-    private final Set<WsRemoteEndpointImplServer> endpoints =
-            new ConcurrentSkipListSet<>(Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
-    private final AtomicInteger count = new AtomicInteger(0);
-    private int backgroundProcessCount = 0;
+    private final Set<WsRemoteEndpointImplServer> endpoints = new HashSet<>();
+    private final ReentrantLock backgroundProcessLock = new ReentrantLock();
+    private int count = 0;
+
+    private volatile int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;
 
     @Override
@@ -54,17 +51,24 @@ public class WsWriteTimeout implements BackgroundProcess {
         if (backgroundProcessCount >= processPeriod) {
             backgroundProcessCount = 0;
 
+            Set<WsRemoteEndpointImplServer> endpointsForTimeoutCheck = new HashSet<>();
+            backgroundProcessLock.lock();
+            try {
+                endpointsForTimeoutCheck.addAll(endpoints);
+            } finally {
+                backgroundProcessLock.unlock();
+            }
+
+            /*
+             * The timeout expiry is not fixed. A completed write or a new write can change the expiry at any point.
+             * Since it is not possible to order the endpoints by expiry time and process the endpoints in expiry time
+             * order, every endpoint is checked.
+             */
             long now = System.currentTimeMillis();
-            for (WsRemoteEndpointImplServer endpoint : endpoints) {
+            for (WsRemoteEndpointImplServer endpoint : endpointsForTimeoutCheck) {
                 if (endpoint.getTimeoutExpiry() < now) {
-                    // Background thread, not the thread that triggered the
-                    // write so no need to use a dispatch
-                    endpoint.onTimeout(false);
-                } else {
-                    // Endpoints are ordered by timeout expiry so if this point
-                    // is reached there is no need to check the remaining
-                    // endpoints
-                    break;
+                    // Background thread, not the thread that triggered the write, so no need to use a dispatch
+                    endpoint.onTimeout(false, now);
                 }
             }
         }
@@ -94,12 +98,17 @@ public class WsWriteTimeout implements BackgroundProcess {
      * @param endpoint the endpoint to register
      */
     public void register(WsRemoteEndpointImplServer endpoint) {
-        boolean result = endpoints.add(endpoint);
-        if (result) {
-            int newCount = count.incrementAndGet();
-            if (newCount == 1) {
-                BackgroundProcessManager.getInstance().register(this);
+        backgroundProcessLock.lock();
+        try {
+            boolean result = endpoints.add(endpoint);
+            if (result) {
+                if (count == 0) {
+                    BackgroundProcessManager.getInstance().register(this);
+                }
+                count++;
             }
+        } finally {
+            backgroundProcessLock.unlock();
         }
     }
 
@@ -110,12 +119,17 @@ public class WsWriteTimeout implements BackgroundProcess {
      * @param endpoint the endpoint to unregister
      */
     public void unregister(WsRemoteEndpointImplServer endpoint) {
-        boolean result = endpoints.remove(endpoint);
-        if (result) {
-            int newCount = count.decrementAndGet();
-            if (newCount == 0) {
-                BackgroundProcessManager.getInstance().unregister(this);
+        backgroundProcessLock.lock();
+        try {
+            boolean result = endpoints.remove(endpoint);
+            if (result) {
+                count--;
+                if (count == 0) {
+                    BackgroundProcessManager.getInstance().unregister(this);
+                }
             }
+        } finally {
+            backgroundProcessLock.unlock();
         }
     }
 }
