@@ -608,13 +608,13 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 }
                 authenticated = authenticationResult.getAuthenticated();
             } else {
-                if (jaspicContextState.serverAuthConfig() == null) {
+                if (jaspicContextState.serverAuthConfig == null) {
                     // JASPIC is configured but didn't initialise correctly
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
                 jaspicRequestState = getJaspicRequestState(
-                        jaspicContextState.serverAuthConfig(), request, response, hasAuthConstraint);
+                        jaspicContextState.serverAuthConfig, request, response, hasAuthConstraint);
                 if (jaspicRequestState == null) {
                     // getJaspicRequestState() sets the HTTP status code
                     return;
@@ -770,13 +770,13 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             return doAuthenticateExtended(request, httpResponse).getAuthenticated();
         } else {
             Response response = request.getResponse();
-            if (jaspicContextState.serverAuthConfig() == null) {
+            if (jaspicContextState.serverAuthConfig == null) {
                 // JASPIC is configured but didn't initialise correctly
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return false;
             }
             JaspicRequestState jaspicRequestState =
-                    getJaspicRequestState(jaspicContextState.serverAuthConfig(), request, response, true);
+                    getJaspicRequestState(jaspicContextState.serverAuthConfig, request, response, true);
             if (jaspicRequestState == null) {
                 // getJaspicRequestState() sets the HTTP status code
                 return false;
@@ -1320,7 +1320,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             MessageInfo messageInfo = new MessageInfoImpl(request, request.getResponse(), true);
             Subject client = (Subject) request.getNote(Constants.REQ_JASPIC_SUBJECT_NOTE);
             if (client != null) {
-                ServerAuthConfig serverAuthConfig = jaspicContextState.serverAuthConfig();
+                ServerAuthConfig serverAuthConfig = jaspicContextState.serverAuthConfig;
                 if (serverAuthConfig == null) {
                     log.debug(sm.getString("authenticator.jaspicCleanSubjectFail"));
                 } else {
@@ -1458,7 +1458,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 }
                 if (result.serverAuthConfig == null) {
                     jaspicContextState = Optional.of(new JaspicContextState(
-                            result.authConfigProvider(), createServerAuthConfig(result.authConfigProvider())));
+                            result.authConfigProvider, createServerAuthConfig(result.authConfigProvider)));
                 }
             }
             return jaspicContextState.orElse(null);
@@ -1508,11 +1508,25 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    private record JaspicContextState(AuthConfigProvider authConfigProvider, ServerAuthConfig serverAuthConfig) {
+    private class JaspicContextState {
+        private final AuthConfigProvider authConfigProvider;
+        private final ServerAuthConfig serverAuthConfig;
+
+        JaspicContextState(AuthConfigProvider authConfigProvider, ServerAuthConfig serverAuthConfig) {
+            this.authConfigProvider = authConfigProvider;
+            this.serverAuthConfig = serverAuthConfig;
+        }
     }
 
 
-    private record JaspicRequestState(MessageInfo messageInfo, ServerAuthContext serverAuthContext) {
+    private class JaspicRequestState {
+        private final MessageInfo messageInfo;
+        private final ServerAuthContext serverAuthContext;
+
+        JaspicRequestState(MessageInfo messageInfo, ServerAuthContext serverAuthContext) {
+            this.messageInfo = messageInfo;
+            this.serverAuthContext = serverAuthContext;
+        }
     }
 
 
