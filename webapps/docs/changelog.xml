@@ -390,6 +390,10 @@
       <fix>
         Stricter OCSP handling when soft-fail is disabled. (markt)
       </fix>
+      <fix>
+        Cleaner handling of AJP response headers which overflow the maximum
+        message size. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
