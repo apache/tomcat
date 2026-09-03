@@ -215,5 +215,8 @@ public class ChunkedOutputFilter implements OutputFilter {
     @Override
     public void recycle() {
         response = null;
+        lastChunk.position(0).limit(lastChunk.capacity());
+        crlfChunk.position(0).limit(crlfChunk.capacity());
+        endChunk.position(0).limit(endChunk.capacity());
     }
 }
