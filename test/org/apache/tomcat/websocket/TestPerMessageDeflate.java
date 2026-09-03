@@ -47,14 +47,16 @@ public class TestPerMessageDeflate {
         perMessageDeflate.setNext(new TesterTransformation());
 
         ByteBuffer bb1 = ByteBuffer.wrap("A".getBytes(StandardCharsets.UTF_8));
-        MessagePart mp1 = new MessagePart(true, 0, Constants.OPCODE_TEXT, bb1, null, null, -1);
+        MessagePart mp1 =
+                new MessagePart(true, 0, Constants.OPCODE_TEXT, bb1, null, null, false, Long.MAX_VALUE);
 
         List<MessagePart> uncompressedParts1 = new ArrayList<>();
         uncompressedParts1.add(mp1);
         perMessageDeflate.sendMessagePart(uncompressedParts1);
 
         ByteBuffer bb2 = ByteBuffer.wrap("".getBytes(StandardCharsets.UTF_8));
-        MessagePart mp2 = new MessagePart(true, 0, Constants.OPCODE_TEXT, bb2, null, null, -1);
+        MessagePart mp2 =
+                new MessagePart(true, 0, Constants.OPCODE_TEXT, bb2, null, null, false, Long.MAX_VALUE);
 
         List<MessagePart> uncompressedParts2 = new ArrayList<>();
         uncompressedParts2.add(mp2);
@@ -80,13 +82,17 @@ public class TestPerMessageDeflate {
         byte[] data = new byte[8192];
 
         ByteBuffer bb = ByteBuffer.wrap(data);
-        MessagePart mp = new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, -1);
+        long writeTimeoutExpiry = System.currentTimeMillis() + 10000;
+        MessagePart mp =
+                new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, true, writeTimeoutExpiry);
 
         List<MessagePart> uncompressedParts = new ArrayList<>();
         uncompressedParts.add(mp);
         List<MessagePart> compressedParts = perMessageDeflateTx.sendMessagePart(uncompressedParts);
 
         MessagePart compressedPart = compressedParts.get(0);
+        Assert.assertTrue(compressedPart.isBlocking());
+        Assert.assertEquals(writeTimeoutExpiry, compressedPart.getWriteTimeoutExpiry());
 
         // Set up the decompression and process the received message
         PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, true);
@@ -120,7 +126,7 @@ public class TestPerMessageDeflate {
             Arrays.fill(data, (byte) 0x80);
             List<MessagePart> uncompressedParts = new ArrayList<>();
             uncompressedParts.add(new MessagePart(true, 0, Constants.OPCODE_BINARY,
-                    ByteBuffer.wrap(data), null, null, -1));
+                    ByteBuffer.wrap(data), null, null, false, Long.MAX_VALUE));
             MessagePart compressedPart = perMessageDeflateTx.sendMessagePart(uncompressedParts).get(0);
 
             // Decompress the way WsFrameBase.processDataBinary does: fill an 8192
@@ -166,11 +172,13 @@ public class TestPerMessageDeflate {
         // First message part
         byte[] data = new byte[1024];
         ByteBuffer bb = ByteBuffer.wrap(data);
-        MessagePart mp1 = new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, -1);
+        MessagePart mp1 =
+                new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, false, Long.MAX_VALUE);
         uncompressedParts.add(mp1);
 
         // Flush message (replicates result of calling flushBatch()
-        MessagePart mp2 = new MessagePart(true, 0, Constants.INTERNAL_OPCODE_FLUSH, null, null, null, -1);
+        MessagePart mp2 = new MessagePart(true, 0, Constants.INTERNAL_OPCODE_FLUSH, null, null, null, false,
+                Long.MAX_VALUE);
         uncompressedParts.add(mp2);
 
         List<MessagePart> compressedParts = perMessageDeflateTx.sendMessagePart(uncompressedParts);

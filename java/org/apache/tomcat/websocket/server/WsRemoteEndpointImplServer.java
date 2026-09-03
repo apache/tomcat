@@ -56,6 +56,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private final ReentrantLock writeCompletionLock = new ReentrantLock();
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
+    private boolean blockingWriteInProgress = false;
+    private boolean blockingWriteTimedOut = false;
 
     private volatile long timeoutExpiry = -1;
 
@@ -158,25 +160,21 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     @Override
-    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... buffers) {
+    protected void doWrite(SendHandler handler, boolean block, long writeTimeoutExpiry, ByteBuffer... buffers) {
         if (socketWrapper.hasAsyncIO()) {
-            final boolean block = (blockingWriteTimeoutExpiry != -1);
-            long timeout;
-            if (block) {
-                timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                if (timeout <= 0) {
-                    SendResult sr = new SendResult(new SocketTimeoutException());
-                    handler.onResult(sr);
-                    return;
-                }
-            } else {
+            long timeout = getTimeout(writeTimeoutExpiry);
+            if (timeout == 0) {
+                SendResult sr = new SendResult(new SocketTimeoutException());
+                handler.onResult(sr);
+                return;
+            }
+            if (!block) {
                 writeCompletionLock.lock();
                 try {
                     this.handler = handler;
-                    timeout = getSendTimeout();
-                    if (timeout > 0) {
+                    timeoutExpiry = writeTimeoutExpiry;
+                    if (writeTimeoutExpiry != Long.MAX_VALUE) {
                         // Register with timeout thread
-                        timeoutExpiry = timeout + System.currentTimeMillis();
                         wsWriteTimeout.register(this);
                     }
                 } finally {
@@ -188,8 +186,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                         @Override
                         public void completed(Long result, Void attachment) {
                             if (block) {
-                                long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                                if (timeout <= 0) {
+                                long timeout = getTimeout(writeTimeoutExpiry);
+                                if (timeout == 0) {
                                     failed(new SocketTimeoutException(), null);
                                 } else {
                                     handler.onResult(SENDRESULT_OK);
@@ -211,11 +209,15 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                         }
                     }, buffers);
         } else {
-            if (blockingWriteTimeoutExpiry == -1) {
+            if (!block) {
                 writeCompletionLock.lock();
                 try {
                     this.handler = handler;
                     this.buffers = buffers;
+                    timeoutExpiry = writeTimeoutExpiry;
+                    if (writeTimeoutExpiry != Long.MAX_VALUE) {
+                        wsWriteTimeout.register(this);
+                    }
                 } finally {
                     writeCompletionLock.unlock();
                 }
@@ -224,32 +226,69 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 onWritePossible(true);
             } else {
                 // Blocking
+                writeCompletionLock.lock();
                 try {
+                    blockingWriteInProgress = true;
+                    blockingWriteTimedOut = false;
+                    timeoutExpiry = writeTimeoutExpiry;
+                    if (writeTimeoutExpiry != Long.MAX_VALUE) {
+                        wsWriteTimeout.register(this);
+                    }
+                } finally {
+                    writeCompletionLock.unlock();
+                }
+                SendResult sendResult;
+                try {
+                    boolean timedOut = false;
                     for (ByteBuffer buffer : buffers) {
-                        long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                        if (timeout <= 0) {
-                            SendResult sr = new SendResult(new SocketTimeoutException());
-                            handler.onResult(sr);
-                            return;
+                        long timeout = getTimeout(writeTimeoutExpiry);
+                        if (timeout == 0) {
+                            timedOut = true;
+                            break;
                         }
                         socketWrapper.setWriteTimeout(timeout);
                         socketWrapper.write(true, buffer);
                     }
-                    long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                    if (timeout <= 0) {
-                        SendResult sr = new SendResult(new SocketTimeoutException());
-                        handler.onResult(sr);
-                        return;
+                    if (!timedOut) {
+                        long timeout = getTimeout(writeTimeoutExpiry);
+                        if (timeout == 0) {
+                            timedOut = true;
+                        } else {
+                            socketWrapper.setWriteTimeout(timeout);
+                            socketWrapper.flush(true);
+                        }
                     }
-                    socketWrapper.setWriteTimeout(timeout);
-                    socketWrapper.flush(true);
-                    handler.onResult(SENDRESULT_OK);
+                    if (timedOut) {
+                        sendResult = new SendResult(new SocketTimeoutException());
+                    } else {
+                        sendResult = new SendResult();
+                    }
                 } catch (IOException ioe) {
-                    SendResult sr = new SendResult(ioe);
-                    handler.onResult(sr);
+                    sendResult = new SendResult(ioe);
+                } finally {
+                    writeCompletionLock.lock();
+                    try {
+                        if (blockingWriteTimedOut) {
+                            sendResult = new SendResult(new SocketTimeoutException());
+                        }
+                        blockingWriteInProgress = false;
+                        blockingWriteTimedOut = false;
+                        wsWriteTimeout.unregister(this);
+                    } finally {
+                        writeCompletionLock.unlock();
+                    }
                 }
+                handler.onResult(sendResult);
             }
         }
+    }
+
+
+    private static long getTimeout(long writeTimeoutExpiry) {
+        if (writeTimeoutExpiry == Long.MAX_VALUE) {
+            return -1;
+        }
+        return Math.max(0, writeTimeoutExpiry - System.currentTimeMillis());
     }
 
 
@@ -299,21 +338,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             close();
         }
 
-        if (!complete) {
-            writeCompletionLock.lock();
-            try {
-                // The write may have completed or timed out while obtaining the lock
-                if (handler != null) {
-                    long timeout = getSendTimeout();
-                    if (timeout > 0) {
-                        timeoutExpiry = timeout + System.currentTimeMillis();
-                        wsWriteTimeout.register(this);
-                    }
-                }
-            } finally {
-                writeCompletionLock.unlock();
-            }
-        }
     }
 
 
@@ -359,7 +383,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         writeCompletionLock.lock();
         try {
             // Re-check timeout in case of concurrent completion and new write
-            if (handler != null && getTimeoutExpiry() < now) {
+            if (blockingWriteInProgress && getTimeoutExpiry() < now) {
+                blockingWriteInProgress = false;
+                blockingWriteTimedOut = true;
+                wsWriteTimeout.unregister(this);
+                close();
+            } else if (handler != null && getTimeoutExpiry() < now) {
                 wsWriteTimeout.unregister(this);
                 clearHandlerInternal(new SocketTimeoutException(), useDispatch);
                 close();
