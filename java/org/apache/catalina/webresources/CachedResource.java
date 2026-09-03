@@ -33,6 +33,7 @@ import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -56,6 +57,10 @@ public class CachedResource implements WebResource {
     // Estimate (on high side to be safe) of average size excluding content
     // based on profiler data.
     private static final long CACHE_ENTRY_SIZE = 500;
+
+    // The ordering process in cache eviction requires a unique ID for each cached resource
+    private static final AtomicLong uniqueIdSource = new AtomicLong(0);
+    private final long uniqueId = uniqueIdSource.getAndIncrement();
 
     private final Cache cache;
     private final StandardRoot root;
@@ -82,11 +87,11 @@ public class CachedResource implements WebResource {
     /**
      * Construct a cached resource.
      *
-     * @param cache The cache
-     * @param root The standard root
-     * @param path The web application path
-     * @param ttl The time to live in milliseconds
-     * @param objectMaxSizeBytes The maximum size of objects to cache
+     * @param cache                    The cache
+     * @param root                     The standard root
+     * @param path                     The web application path
+     * @param ttl                      The time to live in milliseconds
+     * @param objectMaxSizeBytes       The maximum size of objects to cache
      * @param usesClassLoaderResources Whether class loader resources are used
      */
     public CachedResource(Cache cache, StandardRoot root, String path, long ttl, int objectMaxSizeBytes,
@@ -457,6 +462,11 @@ public class CachedResource implements WebResource {
             result += getContentLength();
         }
         return result;
+    }
+
+
+    long getUniqueId() {
+        return uniqueId;
     }
 
 
