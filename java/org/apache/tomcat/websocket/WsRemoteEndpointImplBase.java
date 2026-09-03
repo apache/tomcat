@@ -471,7 +471,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // that no message parts will be returned. If this is the case the
         // trigger the supplied SendHandler
         if (messageParts.isEmpty()) {
-            handler.onResult(new SendResult(getSession()));
+            if (handler != null) {
+                handler.onResult(new SendResult(getSession()));
+            }
             return;
         }
 
