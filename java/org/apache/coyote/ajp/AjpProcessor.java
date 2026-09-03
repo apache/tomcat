@@ -970,15 +970,45 @@ public class AjpProcessor extends AbstractProcessor {
 
             for (int i = 0; i < numHeaders; i++) {
                 try {
-                    // Write headers
                     MessageBytes hN = headers.getName(i);
                     int hC = Constants.getResponseAjpIndex(hN.toString());
+                    // Calculate the number of bytes the header name and value
+                    // will occupy in the AJP message
+                    int headerSize;
+                    if (hC > 0) {
+                        // The header name is encoded as a 2 byte integer
+                        headerSize = 2;
+                    } else {
+                        hN.toBytes();
+                        // 2 byte length, data, terminating \0
+                        headerSize = hN.getByteChunk().getLength() + 3;
+                    }
+                    MessageBytes hV = headers.getValue(i);
+                    if (hV == null) {
+                        // A null value is encoded as a 0 length string
+                        headerSize += 3;
+                    } else {
+                        hV.toBytes();
+                        // 2 byte length, data, terminating \0
+                        headerSize += hV.getByteChunk().getLength() + 3;
+                    }
+
+                    if (!responseMessage.hasRoom(headerSize)) {
+                        // AJP does not support splitting a header across
+                        // multiple packets so fail the response.
+                        log.error(sm.getString("ajpprocessor.response.headerTooLarge", hN.toString(),
+                                Integer.toString(hV == null ? 0 : hV.getByteChunk().getLength()),
+                                Integer.toString(responseMessage.getBuffer().length)));
+                        setErrorState(ErrorState.CLOSE_NOW, null);
+                        return;
+                    }
+
+                    // Write headers
                     if (hC > 0) {
                         responseMessage.appendInt(hC);
                     } else {
                         responseMessage.appendBytes(hN);
                     }
-                    MessageBytes hV = headers.getValue(i);
                     responseMessage.appendBytes(hV);
                 } catch (IllegalArgumentException iae) {
                     // Log the problematic header
@@ -1005,7 +1035,7 @@ public class AjpProcessor extends AbstractProcessor {
     protected final void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
-        if (!responseFinished) {
+        if (!responseFinished && getErrorState().isIoAllowed()) {
             if (protocol.getAjpFlush()) {
                 // Send the flush message
                 socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
@@ -1022,6 +1052,12 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         responseFinished = true;
+
+        if (!getErrorState().isIoAllowed()) {
+            // The response was failed before it was sent so there is nothing
+            // to finish and the connection will be closed.
+            return;
+        }
 
         // Swallow the unread body packet if present
         if (waitingForBodyMessage || first && request.getContentLengthLong() > 0) {
@@ -1325,7 +1361,7 @@ public class AjpProcessor extends AbstractProcessor {
             }
 
             int len = 0;
-            if (!swallowResponse) {
+            if (!swallowResponse && getErrorState().isIoAllowed()) {
                 try {
                     len = chunk.remaining();
                     writeData(chunk);
