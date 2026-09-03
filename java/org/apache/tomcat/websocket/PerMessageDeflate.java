@@ -467,28 +467,29 @@ public class PerMessageDeflate implements Transformation {
                     boolean fin = uncompressedPart.isFin();
                     boolean full = compressedPayload.limit() == compressedPayload.capacity();
                     boolean needsInput = deflater.needsInput();
-                    long blockingWriteTimeoutExpiry = uncompressedPart.getBlockingWriteTimeoutExpiry();
+                    boolean blocking = uncompressedPart.isBlocking();
+                    long writeTimeoutExpiry = uncompressedPart.getWriteTimeoutExpiry();
 
                     if (fin && !full && needsInput) {
                         // End of compressed message. Drop EOM bytes and output.
                         compressedPayload.limit(compressedPayload.limit() - EOM_BYTES.length);
                         compressedPart = new MessagePart(true, getRsv(uncompressedPart), opCode, compressedPayload,
-                                uncompressedIntermediateHandler, uncompressedIntermediateHandler,
-                                blockingWriteTimeoutExpiry);
+                                uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
+                                writeTimeoutExpiry);
                         deflateRequired = false;
                         startNewMessage();
                     } else if (full && !needsInput) {
                         // Write buffer full and input message not fully read.
                         // Output and start new compressed part.
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
-                                uncompressedIntermediateHandler, uncompressedIntermediateHandler,
-                                blockingWriteTimeoutExpiry);
+                                uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
+                                writeTimeoutExpiry);
                     } else if (!fin && full/* note: needsInput is true here */) {
                         // Write buffer full and input message not fully read.
                         // Output and get more data.
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
-                                uncompressedIntermediateHandler, uncompressedIntermediateHandler,
-                                blockingWriteTimeoutExpiry);
+                                uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
+                                writeTimeoutExpiry);
                         deflateRequired = false;
                     } else if (fin && full/* note: needsInput is true here */) {
                         // Write buffer full. Input fully read. Deflater may be
@@ -508,8 +509,8 @@ public class PerMessageDeflate implements Transformation {
                             // EOM has just been completed
                             compressedPayload.limit(compressedPayload.limit() - EOM_BYTES.length + eomBufferWritten);
                             compressedPart = new MessagePart(true, getRsv(uncompressedPart), opCode, compressedPayload,
-                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler,
-                                    blockingWriteTimeoutExpiry);
+                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
+                                    writeTimeoutExpiry);
                             deflateRequired = false;
                             startNewMessage();
                         } else {
@@ -517,8 +518,8 @@ public class PerMessageDeflate implements Transformation {
                             // Copy bytes to new write buffer
                             writeBuffer.put(EOM_BUFFER, 0, eomBufferWritten);
                             compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
-                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler,
-                                    blockingWriteTimeoutExpiry);
+                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
+                                    writeTimeoutExpiry);
                         }
                     } else {
                         throw new IllegalStateException(sm.getString("perMessageDeflate.invalidState"));
