@@ -188,6 +188,18 @@ public class AjpMessage {
 
 
     /**
+     * Check if the given number of bytes can be appended to the message without overflowing the message buffer.
+     *
+     * @param numBytes The number of bytes to append
+     *
+     * @return {@code true} if the bytes can be appended without overflowing the buffer
+     */
+    public boolean hasRoom(int numBytes) {
+        return pos + numBytes <= buf.length;
+    }
+
+
+    /**
      * Copy a chunk of bytes into the packet, starting at the current write position. The chunk of bytes is encoded with
      * the length in two bytes first, then the data itself, and finally a terminating \0 (which is <B>not</B> included
      * in the encoded length).
