@@ -19,12 +19,15 @@ package org.apache.catalina.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.ExceptionUtils;
 
 
@@ -71,15 +74,44 @@ public class ServerInfo {
         String number = null;
 
         Properties props = new Properties();
-        try (InputStream is = ServerInfo.class.getResourceAsStream("/org/apache/catalina/util/ServerInfo.properties")) {
-            props.load(is);
-            info = props.getProperty("server.info");
-            built = props.getProperty("server.built");
-            builtIso = props.getProperty("server.built.iso");
-            number = props.getProperty("server.number");
+
+        try {
+            if (Globals.LOAD_SERVER_INFO_OVERRIDE) {
+                // Merge every ServerInfo.properties on the class path in reverse
+                // order, so the bundled catalina.jar copy provides the defaults
+                // and an override file (e.g. in $CATALINA_BASE/lib) replaces
+                // only the properties it sets.
+                List<URL> urls = Collections.list(ServerInfo.class.getClassLoader()
+                        .getResources("org/apache/catalina/util/ServerInfo.properties"));
+                Collections.reverse(urls);
+                for (URL url : urls) {
+                    try (InputStream is = url.openStream()) {
+                        props.load(is);
+                    } catch (Throwable t) {
+                        // Catch Throwable so one unreadable or malformed resource
+                        // does not stop the others loading; narrowing to
+                        // IOException was rejected on apache/tomcat PR #366.
+                        ExceptionUtils.handleThrowable(t);
+                    }
+                }
+            } else {
+                // Original behavior: load only the first resource found
+                try (InputStream is = ServerInfo.class.getResourceAsStream(
+                        "/org/apache/catalina/util/ServerInfo.properties")) {
+                    if (is != null) {
+                        props.load(is);
+                    }
+                }
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
+
+        info = props.getProperty("server.info");
+        built = props.getProperty("server.built");
+        builtIso = props.getProperty("server.built.iso");
+        number = props.getProperty("server.number");
+
         if (info == null || info.equals("Apache Tomcat/@VERSION@")) {
             info = "Apache Tomcat/12.0.x-dev";
         }

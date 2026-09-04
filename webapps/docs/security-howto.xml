@@ -448,6 +448,11 @@
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
       script will still report the correct version number.</p>
+      <p>By default only the first <code>ServerInfo.properties</code> on the class
+      path is used, so any property it omits falls back to a generic default. To
+      override only specific properties and keep the real values for the rest, set
+      <code>org.apache.catalina.util.LOAD_SERVER_INFO_OVERRIDE</code> to
+      <code>true</code> so the bundled values are loaded first as defaults.</p>
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
@@ -555,6 +560,11 @@
     determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
     script will still report the correct version number.
     </p>
+    <p>By default only the first <code>ServerInfo.properties</code> on the class
+    path is used, so any property it omits falls back to a generic default. To
+    override only specific properties and keep the real values for the rest, set
+    <code>org.apache.catalina.util.LOAD_SERVER_INFO_OVERRIDE</code> to
+    <code>true</code> so the bundled values are loaded first as defaults.</p>
 
     <p>The CGI Servlet is disabled by default. If enabled, the debug
     initialisation parameter should not be set to <code>10</code> or higher on a
