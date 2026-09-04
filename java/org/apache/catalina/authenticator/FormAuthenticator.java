@@ -217,6 +217,10 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Is this the action request from the login page?
         boolean loginAction = requestURI.startsWith(contextPath) && requestURI.endsWith(Constants.FORM_ACTION);
+        if (loginAction && !Method.POST.equals(request.getMethod())) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return AuthenticationResult.FAILED;
+        }
 
         LoginConfig config = context.getLoginConfig();
 
