@@ -21,11 +21,13 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -67,12 +69,10 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private static final String DEFAULT_REGISTRATION_ID = getRegistrationID(null, null);
 
-    private final Map<String,RegistrationContextImpl> layerAppContextRegistrations = new ConcurrentHashMap<>();
-    private final Map<String,RegistrationContextImpl> appContextRegistrations = new ConcurrentHashMap<>();
-    private final Map<String,RegistrationContextImpl> layerRegistrations = new ConcurrentHashMap<>();
-    // Note: Although there will only ever be a maximum of one entry in this
-    // Map, use a ConcurrentHashMap for consistency
-    private final Map<String,RegistrationContextImpl> defaultRegistration = new ConcurrentHashMap<>(1);
+    private final ReentrantLock registrationLock = new ReentrantLock();
+    private final Map<String,RegistrationContextImpl> registrationToRegistrationContextMap = new HashMap<>();
+    private final Map<String,Set<RegistrationListenerWrapper>> registrationToWrappersMap = new HashMap<>();
+    private final Map<RegistrationListenerWrapper,Set<String>> wrapperToRegistrationsMap = new HashMap<>();
 
 
     /**
@@ -85,29 +85,79 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     @Override
     public AuthConfigProvider getConfigProvider(String layer, String appContext, RegistrationListener listener) {
-        RegistrationContextImpl registrationContext = findRegistrationContextImpl(layer, appContext);
-        if (registrationContext != null) {
-            if (listener != null) {
-                RegistrationListenerWrapper wrapper = new RegistrationListenerWrapper(layer, appContext, listener);
-                registrationContext.addListener(wrapper);
+        RegistrationListenerWrapper wrapper;
+        if (listener == null) {
+            wrapper = null;
+        } else {
+            wrapper = new RegistrationListenerWrapper(layer, appContext, listener);
+        }
+        RegistrationContextImpl registrationContext;
+
+        registrationLock.lock();
+        try {
+            // First check for a layer and appContext match
+            String fullID = getRegistrationID(layer, appContext);
+            registerWrapper(wrapper, fullID);
+            registrationContext = registrationToRegistrationContextMap.get(fullID);
+
+            if (registrationContext == null) {
+                String appContextID = getRegistrationID(null, appContext);
+                registerWrapper(wrapper, appContextID);
+                registrationContext = registrationToRegistrationContextMap.get(appContextID);
             }
+            if (registrationContext == null) {
+                String layerID = getRegistrationID(layer, null);
+                registerWrapper(wrapper, layerID);
+                registrationContext = registrationToRegistrationContextMap.get(layerID);
+            }
+            if (registrationContext == null) {
+                registerWrapper(wrapper, DEFAULT_REGISTRATION_ID);
+                registrationContext = registrationToRegistrationContextMap.get(DEFAULT_REGISTRATION_ID);
+            }
+        } finally {
+            registrationLock.unlock();
+        }
+
+        if (registrationContext != null) {
             return registrationContext.getProvider();
         }
         return null;
     }
 
 
+    private void registerWrapper(RegistrationListenerWrapper wrapper, String registrationID) {
+        if (wrapper != null) {
+            Set<RegistrationListenerWrapper> wrappersForRegistrationID =
+                    registrationToWrappersMap.computeIfAbsent(registrationID, s -> new HashSet<>());
+            wrappersForRegistrationID.add(wrapper);
+
+            Set<String> registrationIDsForWrapper =
+                    wrapperToRegistrationsMap.computeIfAbsent(wrapper, w -> new HashSet<>());
+            registrationIDsForWrapper.add(registrationID);
+        }
+    }
+
+
     @Override
     public String registerConfigProvider(String className, Map<String,String> properties, String layer,
             String appContext, String description) {
-        String registrationID = doRegisterConfigProvider(className, properties, layer, appContext, description);
-        savePersistentRegistrations();
+        String registrationID;
+        Set<RegistrationListenerWrapper> wrappersToNotify = new HashSet<>();
+        registrationLock.lock();
+        try {
+            registrationID =
+                    doRegisterConfigProvider(className, properties, layer, appContext, description, wrappersToNotify);
+            savePersistentRegistrations();
+        } finally {
+            registrationLock.unlock();
+            notifyWrappers(wrappersToNotify);
+        }
         return registrationID;
     }
 
 
     private String doRegisterConfigProvider(String className, Map<String,String> properties, String layer,
-            String appContext, String description) {
+            String appContext, String description, Set<RegistrationListenerWrapper> wrappersToNotify) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("authConfigFactoryImpl.registerClass", className, layer, appContext));
         }
@@ -120,7 +170,8 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContextImpl =
                 new RegistrationContextImpl(layer, appContext, description, true, provider, properties);
-        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
+        addRegistrationContextImpl(registrationID, registrationContextImpl, wrappersToNotify);
+
         return registrationID;
     }
 
@@ -157,164 +208,164 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContextImpl =
                 new RegistrationContextImpl(layer, appContext, description, false, provider, null);
-        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
+
+        Set<RegistrationListenerWrapper> wrappersToNotify = new HashSet<>();
+        addRegistrationContextImpl(registrationID, registrationContextImpl, wrappersToNotify);
+        notifyWrappers(wrappersToNotify);
+
         return registrationID;
     }
 
 
-    private void addRegistrationContextImpl(String layer, String appContext, String registrationID,
-            RegistrationContextImpl registrationContextImpl) {
-        RegistrationContextImpl previous;
+    /*
+     * Always notify outside of any locks to avoid potential deadlocks if the notification is processed/actioned on a
+     * different thread.
+     */
+    private void notifyWrappers(Set<RegistrationListenerWrapper> wrappersToNotify) {
+        for (RegistrationListenerWrapper wrapper : wrappersToNotify) {
+            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext());
+        }
+    }
 
-        // Add the registration, noting any registration it replaces
-        if (layer != null && appContext != null) {
-            previous = layerAppContextRegistrations.put(registrationID, registrationContextImpl);
-        } else if (layer == null && appContext != null) {
-            previous = appContextRegistrations.put(registrationID, registrationContextImpl);
-        } else if (layer != null) {
-            previous = layerRegistrations.put(registrationID, registrationContextImpl);
-        } else {
-            previous = defaultRegistration.put(registrationID, registrationContextImpl);
+    private void addRegistrationContextImpl(String registrationID, RegistrationContextImpl registrationContextImpl,
+            Set<RegistrationListenerWrapper> wrappersToNotify) {
+
+        registrationLock.lock();
+        try {
+            // Add the new registration
+            registrationToRegistrationContextMap.put(registrationID, registrationContextImpl);
+
+            wrappersToNotify.addAll(detachListenersForRegistrationID(registrationID));
+        } finally {
+            registrationLock.unlock();
+        }
+    }
+
+
+    private Set<RegistrationListenerWrapper> detachListenersForRegistrationID(String registrationID) {
+
+        Set<RegistrationListenerWrapper> wrappersToNotify = new HashSet<>();
+
+        // Check for listeners for this registration ID
+        Set<RegistrationListenerWrapper> wrappersForRegistrationID = registrationToWrappersMap.get(registrationID);
+        if (wrappersForRegistrationID != null) {
+            wrappersToNotify.addAll(wrappersForRegistrationID);
+
+            // Detach each listener that was attached to this registration ID
+            for (RegistrationListenerWrapper wrapper : wrappersToNotify) {
+                // Find all the registrationIDs the listener was attached to
+                Set<String> listenerRegistrationIDs = wrapperToRegistrationsMap.remove(wrapper);
+                // Remove the listener from each of the registrationIDs to which it was attached
+                for (String listenerRegistrationID : listenerRegistrationIDs) {
+                    registrationToWrappersMap.get(listenerRegistrationID).remove(wrapper);
+                    if (registrationToWrappersMap.get(listenerRegistrationID).isEmpty()) {
+                        registrationToWrappersMap.remove(listenerRegistrationID);
+                    }
+                }
+            }
         }
 
-        if (previous == null) {
-            // No match with previous registration so need to check listeners
-            // for all less specific registrations to see if they need to be
-            // notified of this new registration. That there is no exact match
-            // with a previous registration allows a few short-cuts to be taken
-            if (layer != null && appContext != null) {
-                // Need to check existing appContext registrations
-                // (and layer and default)
-                // appContext must match
-                RegistrationContextImpl registration = appContextRegistrations.get(getRegistrationID(null, appContext));
-                if (registration != null) {
-                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (layer.equals(wrapper.messageLayer()) && appContext.equals(wrapper.appContext())) {
-                            registration.listeners.remove(wrapper);
-                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
-                        }
-                    }
-                }
-            }
-            if (appContext != null) {
-                // Need to check existing layer registrations
-                // (and default)
-                // Need to check registrations for all layers
-                for (RegistrationContextImpl registration : layerRegistrations.values()) {
-                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (appContext.equals(wrapper.appContext())) {
-                            registration.listeners.remove(wrapper);
-                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
-                        }
-                    }
-                }
-            }
-            if (layer != null || appContext != null) {
-                // Need to check default
-                for (RegistrationContextImpl registration : defaultRegistration.values()) {
-                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (appContext != null && appContext.equals(wrapper.appContext()) ||
-                                layer != null && layer.equals(wrapper.messageLayer())) {
-                            registration.listeners.remove(wrapper);
-                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
-                        }
-                    }
-                }
-            }
-        } else {
-            // Replaced an existing registration so need to notify those listeners
-            for (RegistrationListenerWrapper wrapper : previous.listeners) {
-                previous.listeners.remove(wrapper);
-                wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
-            }
-        }
+        return wrappersToNotify;
     }
 
 
     @Override
     public boolean removeRegistration(String registrationID) {
-        RegistrationContextImpl registration = null;
-        if (DEFAULT_REGISTRATION_ID.equals(registrationID)) {
-            registration = defaultRegistration.remove(registrationID);
-        }
-        if (registration == null) {
-            registration = layerAppContextRegistrations.remove(registrationID);
-        }
-        if (registration == null) {
-            registration = appContextRegistrations.remove(registrationID);
-        }
-        if (registration == null) {
-            registration = layerRegistrations.remove(registrationID);
-        }
 
-        if (registration == null) {
-            return false;
-        } else {
-            for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                wrapper.listener().notify(wrapper.messageLayer(), wrapper.appContext());
+        RegistrationContextImpl registration;
+        Set<RegistrationListenerWrapper> wrappersToNotify = new HashSet<>();
+
+        registrationLock.lock();
+        try {
+            registration = registrationToRegistrationContextMap.remove(registrationID);
+            if (registration != null) {
+                wrappersToNotify.addAll(detachListenersForRegistrationID(registrationID));
             }
-            if (registration.isPersistent()) {
+            if (registration != null && registration.isPersistent()) {
                 savePersistentRegistrations();
             }
-            return true;
+        } finally {
+            registrationLock.unlock();
+            notifyWrappers(wrappersToNotify);
         }
+
+        return registration != null;
     }
 
 
     @Override
     public String[] detachListener(RegistrationListener listener, String layer, String appContext) {
-        String registrationID = getRegistrationID(layer, appContext);
-        RegistrationContextImpl registrationContext = findRegistrationContextImpl(layer, appContext);
-        if (registrationContext != null && registrationContext.removeListener(listener)) {
-            return new String[] { registrationID };
+        List<String> results = new ArrayList<>();
+
+        // Validate the inputs
+        getRegistrationID(layer, appContext);
+        if (listener == null) {
+            return results.toArray(EMPTY_STRING_ARRAY);
         }
-        return EMPTY_STRING_ARRAY;
+
+        registrationLock.lock();
+        try {
+            /*
+             * The listener may have been attached multiple times under different combinations of layer and appContext.
+             * Each combination of listener, layer and appContext is represented by a Wrapper. The detach call may match
+             * more than one wrapper if the values passed in for layer and/or appContext are left as null.
+             *
+             * Iterate over all the wrappers to check for matches.
+             */
+            Iterator<Map.Entry<RegistrationListenerWrapper,Set<String>>> iter =
+                    wrapperToRegistrationsMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<RegistrationListenerWrapper,Set<String>> entry = iter.next();
+                RegistrationListenerWrapper wrapper = entry.getKey();
+                if (listener.equals(wrapper.listener) && (layer == null || layer.equals(wrapper.messageLayer)) &&
+                        (appContext == null || appContext.equals(wrapper.appContext))) {
+                    // The wrapper matches. Add the original registration ID to the results.
+                    results.add(getRegistrationID(wrapper.messageLayer, wrapper.appContext));
+                    // The wrapper may have been attached to multiple registration IDs. Remove them all.
+                    for (String listenerRegistrationID : entry.getValue()) {
+                        registrationToWrappersMap.get(listenerRegistrationID).remove(wrapper);
+                        if (registrationToWrappersMap.get(listenerRegistrationID).isEmpty()) {
+                            registrationToWrappersMap.remove(listenerRegistrationID);
+                        }
+                    }
+                    iter.remove();
+                }
+            }
+        } finally {
+            registrationLock.unlock();
+        }
+
+        return results.toArray(EMPTY_STRING_ARRAY);
     }
 
 
     @Override
     public String[] getRegistrationIDs(AuthConfigProvider provider) {
         List<String> result = new ArrayList<>();
-        if (provider == null) {
-            result.addAll(layerAppContextRegistrations.keySet());
-            result.addAll(appContextRegistrations.keySet());
-            result.addAll(layerRegistrations.keySet());
-            if (!defaultRegistration.isEmpty()) {
-                result.add(DEFAULT_REGISTRATION_ID);
+
+        registrationLock.lock();
+        try {
+            for (Entry<String,RegistrationContextImpl> entry : registrationToRegistrationContextMap.entrySet()) {
+                if (provider == null || provider.equals(entry.getValue().getProvider())) {
+                    result.add(entry.getKey());
+                }
             }
-        } else {
-            findProvider(provider, layerAppContextRegistrations, result);
-            findProvider(provider, appContextRegistrations, result);
-            findProvider(provider, layerRegistrations, result);
-            findProvider(provider, defaultRegistration, result);
+        } finally {
+            registrationLock.unlock();
         }
+
         return result.toArray(EMPTY_STRING_ARRAY);
-    }
-
-
-    private void findProvider(AuthConfigProvider provider, Map<String,RegistrationContextImpl> registrations,
-            List<String> result) {
-        for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
-            if (provider.equals(entry.getValue().getProvider())) {
-                result.add(entry.getKey());
-            }
-        }
     }
 
 
     @Override
     public RegistrationContext getRegistrationContext(String registrationID) {
-        RegistrationContext result = defaultRegistration.get(registrationID);
-        if (result == null) {
-            result = layerAppContextRegistrations.get(registrationID);
+        registrationLock.lock();
+        try {
+            return registrationToRegistrationContextMap.get(registrationID);
+        } finally {
+            registrationLock.unlock();
         }
-        if (result == null) {
-            result = appContextRegistrations.get(registrationID);
-        }
-        if (result == null) {
-            result = layerRegistrations.get(registrationID);
-        }
-        return result;
     }
 
 
@@ -376,71 +427,57 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
 
     private void loadPersistentRegistrations() {
-        synchronized (CONFIG_FILE_LOCK) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("authConfigFactoryImpl.load", CONFIG_FILE.getAbsolutePath()));
+        // To avoid deadlock, always obtain registrationLock then CONFIG_FILE_LOCK
+        Set<RegistrationListenerWrapper> wrappersToNotify = new HashSet<>();
+        registrationLock.lock();
+        try {
+            synchronized (CONFIG_FILE_LOCK) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("authConfigFactoryImpl.load", CONFIG_FILE.getAbsolutePath()));
+                }
+                if (!CONFIG_FILE.isFile()) {
+                    return;
+                }
+                Providers providers = PersistentProviderRegistrations.loadProviders(CONFIG_FILE);
+                for (Provider provider : providers.getProviders()) {
+                    doRegisterConfigProvider(provider.getClassName(), provider.getProperties(), provider.getLayer(),
+                            provider.getAppContext(), provider.getDescription(), wrappersToNotify);
+                }
             }
-            if (!CONFIG_FILE.isFile()) {
-                return;
-            }
-            Providers providers = PersistentProviderRegistrations.loadProviders(CONFIG_FILE);
-            for (Provider provider : providers.getProviders()) {
-                doRegisterConfigProvider(provider.getClassName(), provider.getProperties(), provider.getLayer(),
-                        provider.getAppContext(), provider.getDescription());
-            }
+        } finally {
+            registrationLock.unlock();
+            notifyWrappers(wrappersToNotify);
         }
     }
 
 
     private void savePersistentRegistrations() {
-        synchronized (CONFIG_FILE_LOCK) {
-            Providers providers = new Providers();
-            savePersistentProviders(providers, layerAppContextRegistrations);
-            savePersistentProviders(providers, appContextRegistrations);
-            savePersistentProviders(providers, layerRegistrations);
-            savePersistentProviders(providers, defaultRegistration);
-            PersistentProviderRegistrations.writeProviders(providers, CONFIG_FILE);
-        }
-    }
-
-
-    private void savePersistentProviders(Providers providers, Map<String,RegistrationContextImpl> registrations) {
-        for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
-            savePersistentProvider(providers, entry.getValue());
-        }
-    }
-
-
-    private void savePersistentProvider(Providers providers, RegistrationContextImpl registrationContextImpl) {
-        if (registrationContextImpl != null && registrationContextImpl.isPersistent()) {
-            Provider provider = new Provider();
-            provider.setAppContext(registrationContextImpl.getAppContext());
-            if (registrationContextImpl.getProvider() != null) {
-                provider.setClassName(registrationContextImpl.getProvider().getClass().getName());
+        // To avoid deadlock, always obtain registrationLock then CONFIG_FILE_LOCK
+        registrationLock.lock();
+        try {
+            synchronized (CONFIG_FILE_LOCK) {
+                Providers providers = new Providers();
+                for (Entry<String,RegistrationContextImpl> entry : registrationToRegistrationContextMap.entrySet()) {
+                    RegistrationContextImpl registrationContextImpl = entry.getValue();
+                    if (registrationContextImpl != null && registrationContextImpl.isPersistent()) {
+                        Provider provider = new Provider();
+                        provider.setAppContext(registrationContextImpl.getAppContext());
+                        if (registrationContextImpl.getProvider() != null) {
+                            provider.setClassName(registrationContextImpl.getProvider().getClass().getName());
+                        }
+                        provider.setDescription(registrationContextImpl.getDescription());
+                        provider.setLayer(registrationContextImpl.getMessageLayer());
+                        for (Entry<String,String> property : registrationContextImpl.getProperties().entrySet()) {
+                            provider.addProperty(property.getKey(), property.getValue());
+                        }
+                        providers.addProvider(provider);
+                    }
+                }
+                PersistentProviderRegistrations.writeProviders(providers, CONFIG_FILE);
             }
-            provider.setDescription(registrationContextImpl.getDescription());
-            provider.setLayer(registrationContextImpl.getMessageLayer());
-            for (Entry<String,String> property : registrationContextImpl.getProperties().entrySet()) {
-                provider.addProperty(property.getKey(), property.getValue());
-            }
-            providers.addProvider(provider);
+        } finally {
+            registrationLock.unlock();
         }
-    }
-
-
-    private RegistrationContextImpl findRegistrationContextImpl(String layer, String appContext) {
-        RegistrationContextImpl result;
-        result = layerAppContextRegistrations.get(getRegistrationID(layer, appContext));
-        if (result == null) {
-            result = appContextRegistrations.get(getRegistrationID(null, appContext));
-        }
-        if (result == null) {
-            result = layerRegistrations.get(getRegistrationID(layer, null));
-        }
-        if (result == null) {
-            result = defaultRegistration.get(DEFAULT_REGISTRATION_ID);
-        }
-        return result;
     }
 
 
@@ -466,7 +503,6 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private final boolean persistent;
         private final AuthConfigProvider provider;
         private final Map<String,String> properties;
-        private final List<RegistrationListenerWrapper> listeners = new CopyOnWriteArrayList<>();
 
         @Override
         public String getMessageLayer() {
@@ -496,27 +532,8 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         }
 
 
-        private void addListener(RegistrationListenerWrapper listener) {
-            if (listener != null) {
-                listeners.add(listener);
-            }
-        }
-
-
         private Map<String,String> getProperties() {
             return properties;
-        }
-
-
-        private boolean removeListener(RegistrationListener listener) {
-            boolean result = false;
-            for (RegistrationListenerWrapper wrapper : listeners) {
-                if (wrapper.listener().equals(listener)) {
-                    listeners.remove(wrapper);
-                    result = true;
-                }
-            }
-            return result;
         }
     }
 
