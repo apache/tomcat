@@ -524,6 +524,10 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <fix>
+        Examples: Draw axis-aligned rectangles and ellipses as lines in the
+        WebSocket drawboard. (sainadh777)
+      </fix>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
