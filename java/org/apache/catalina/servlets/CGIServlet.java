@@ -1473,11 +1473,13 @@ public final class CGIServlet extends HttpServlet {
                         cgiOutput = proc.getInputStream();
 
                         try {
-                            while (!skipBody && (bufRead = cgiOutput.read(bBuf)) != -1) {
-                                if (log.isTraceEnabled()) {
-                                    log.trace("output " + bufRead + " bytes of data");
+                            while ((bufRead = cgiOutput.read(bBuf)) != -1) {
+                                if (!skipBody) {
+                                    if (log.isTraceEnabled()) {
+                                        log.trace("output " + bufRead + " bytes of data");
+                                    }
+                                    out.write(bBuf, 0, bufRead);
                                 }
-                                out.write(bBuf, 0, bufRead);
                             }
                         } finally {
                             // Attempt to consume any leftover byte if something bad happens,
