@@ -123,6 +123,105 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
+    @Test
+    public void testListenerForNoMatchExactRegistration() {
+        doTestListenerForNoMatch("L_1", "AC_1");
+    }
+
+
+    @Test
+    public void testListenerForNoMatchAppContextRegistration() {
+        doTestListenerForNoMatch(null, "AC_1");
+    }
+
+
+    @Test
+    public void testListenerForNoMatchLayerRegistration() {
+        doTestListenerForNoMatch("L_1", null);
+    }
+
+
+    @Test
+    public void testListenerForNoMatchDefaultRegistration() {
+        doTestListenerForNoMatch(null, null);
+    }
+
+
+    private void doTestListenerForNoMatch(String registrationLayer, String registrationAppContext) {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        SimpleRegistrationListener listener = new SimpleRegistrationListener("L_1", "AC_1");
+
+        Assert.assertNull(factory.getConfigProvider("L_1", "AC_1", listener));
+
+        AuthConfigProvider unrelatedProvider = new SimpleAuthConfigProvider(null, null);
+        factory.registerConfigProvider(unrelatedProvider, "L_2", "AC_2", null);
+        Assert.assertFalse(listener.wasCalled());
+
+        AuthConfigProvider provider = new SimpleAuthConfigProvider(null, null);
+        factory.registerConfigProvider(provider, registrationLayer, registrationAppContext, null);
+        Assert.assertTrue(listener.wasCorrectlyCalled());
+    }
+
+
+    /*
+     * Bug 70203: a caller (e.g. AuthenticatorBase) that holds a provider obtained with a
+     * listener will, on notification that the provider is no longer valid, immediately call
+     * getConfigProvider() again with the same listener to find out what replaced it. At that
+     * point there may be no matching registration (e.g. the application that owned it is
+     * between stop and start). The listener must still be attached so that it is notified when
+     * a new matching registration is added, otherwise the caller's cache is never refreshed.
+     */
+    @Test
+    public void testListenerReattachedAfterRemovalExactRegistration() {
+        doTestListenerReattachedAfterRemoval("L_1", "AC_1");
+    }
+
+
+    @Test
+    public void testListenerReattachedAfterRemovalAppContextRegistration() {
+        doTestListenerReattachedAfterRemoval(null, "AC_1");
+    }
+
+
+    @Test
+    public void testListenerReattachedAfterRemovalLayerRegistration() {
+        doTestListenerReattachedAfterRemoval("L_1", null);
+    }
+
+
+    @Test
+    public void testListenerReattachedAfterRemovalDefaultRegistration() {
+        doTestListenerReattachedAfterRemoval(null, null);
+    }
+
+
+    private void doTestListenerReattachedAfterRemoval(String layer, String appContext) {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+
+        AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
+        String registrationId = factory.registerConfigProvider(acp1, layer, appContext, null);
+
+        SimpleRegistrationListener listener = new SimpleRegistrationListener(layer, appContext);
+        Assert.assertSame(acp1, factory.getConfigProvider(layer, appContext, listener));
+
+        // Removing the registration must notify the listener that the correspondence is gone.
+        Assert.assertTrue(factory.removeRegistration(registrationId));
+        Assert.assertTrue(listener.wasCorrectlyCalled());
+        listener.reset();
+
+        // The caller reacts to the notification by looking up the provider again. There is
+        // currently no match, but per the AuthConfigFactory#getConfigProvider() contract the
+        // listener must be attached even though null is returned.
+        Assert.assertNull(factory.getConfigProvider(layer, appContext, listener));
+        Assert.assertFalse(listener.wasCalled());
+
+        // A new matching registration must notify the listener that was re-attached above.
+        AuthConfigProvider acp2 = new SimpleAuthConfigProvider(null, null);
+        factory.registerConfigProvider(acp2, layer, appContext, null);
+        Assert.assertTrue(listener.wasCorrectlyCalled());
+    }
+
+
     private void doTestSearchOrder(String layer, String appContext, int expected) {
         AuthConfigFactory factory = new AuthConfigFactoryImpl();
         AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
