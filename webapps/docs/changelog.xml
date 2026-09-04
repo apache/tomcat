@@ -320,6 +320,10 @@
         <bug>70203</bug>: Fix <code>RegistrationListener</code> notifications in
         Jakarta Authentication implementation. (markt)
       </fix>
+      <fix>
+        Handle CGI scripts that write excessively to stdout after setting an
+        HTTP error status code. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
