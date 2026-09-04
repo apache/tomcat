@@ -128,7 +128,7 @@ Tomcat cluster. These include:</p>
 </ul>
 
 <p>When correctly configured, the <a
-href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
+href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
 provides confidentiality and integrity protection but it does not protect
 against all risks associated with running a Tomcat cluster on an untrusted
 network, particularly DoS attacks.</p>
