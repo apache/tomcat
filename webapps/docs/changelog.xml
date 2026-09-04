@@ -177,6 +177,10 @@
         valve. This ensures web application specific settings are cached on a
         per web application basis. (markt)
       </fix>
+      <fix>
+        <bug>70203</bug>: Fix <code>RegistrationListener</code> notifications in
+        Jakarta Authentication implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
