@@ -324,6 +324,10 @@
         Handle CGI scripts that write excessively to stdout after setting an
         HTTP error status code. (schultz)
       </fix>
+      <fix>
+        Require the request to the login action during FORM authentication to be
+        made using HTTP POST. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
