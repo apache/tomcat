@@ -25,6 +25,7 @@ import java.util.List;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,6 +35,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 
 @RunWith(Parameterized.class)
 public class TestCrlSupport extends TomcatBaseTest {
@@ -97,6 +99,7 @@ public class TestCrlSupport extends TomcatBaseTest {
 
     @Test
     public void testCrlClient() throws Exception {
+        Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL || openssl_h_Compatibility.isLibreSSLPre35());
         if (clientCertificateIsRevoked) {
             TesterSupport.configureClientSsl(false, TesterSupport.CLIENT_CRL_JKS);
         } else {
