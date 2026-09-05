@@ -31,11 +31,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
+import org.apache.tomcat.util.compat.JrePlatform;
 
 @RunWith(Parameterized.class)
 public class TestCrlSupport extends TomcatBaseTest {
@@ -99,7 +99,14 @@ public class TestCrlSupport extends TomcatBaseTest {
 
     @Test
     public void testCrlClient() throws Exception {
-        Assume.assumeFalse(openssl_h_Compatibility.BORINGSSL || openssl_h_Compatibility.isLibreSSLPre35());
+        /*
+         * On MacOS, these tests will only pass with FFM if OpenSSL is used. The version of LibreSSL provided does not
+         * support CRLs.
+         */
+        if (JrePlatform.IS_MAC_OS && "OpenSSL-FFM".equals(connectorName)) {
+            Assume.assumeFalse(OpenSSLLifecycleListener.getInstalledOpenSslVersion().contains("LibreSSL"));
+        }
+        System.out.println(OpenSSLLifecycleListener.getInstalledOpenSslVersion());
         if (clientCertificateIsRevoked) {
             TesterSupport.configureClientSsl(false, TesterSupport.CLIENT_CRL_JKS);
         } else {
