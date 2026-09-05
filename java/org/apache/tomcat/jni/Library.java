@@ -309,42 +309,49 @@ public final class Library {
             APR_PATCH_VERSION = version(0x13);
             APR_IS_DEV_VERSION = version(0x14);
 
-            APR_SIZEOF_VOIDP = size(1);
-            APR_PATH_MAX = size(2);
-            APRMAXHOSTLEN = size(3);
-            APR_MAX_IOVEC_SIZE = size(4);
-            APR_MAX_SECS_TO_LINGER = size(5);
-            APR_MMAP_THRESHOLD = size(6);
-            APR_MMAP_LIMIT = size(7);
+            /*
+             * Only try and initialise these with Tomcat Native 1.x. The necessary methods don't exist with Native 2.x
+             * and neither does the support for the related JNI calls.
+             */
+            if (TCN_MAJOR_VERSION == 1) {
+                APR_SIZEOF_VOIDP = size(1);
+                APR_PATH_MAX = size(2);
+                APRMAXHOSTLEN = size(3);
+                APR_MAX_IOVEC_SIZE = size(4);
+                APR_MAX_SECS_TO_LINGER = size(5);
+                APR_MMAP_THRESHOLD = size(6);
+                APR_MMAP_LIMIT = size(7);
 
-            APR_HAVE_IPV6 = has(0);
-            APR_HAS_SHARED_MEMORY = has(1);
-            APR_HAS_THREADS = has(2);
-            APR_HAS_SENDFILE = has(3);
-            APR_HAS_MMAP = has(4);
-            APR_HAS_FORK = has(5);
-            APR_HAS_RANDOM = has(6);
-            APR_HAS_OTHER_CHILD = has(7);
-            APR_HAS_DSO = has(8);
-            APR_HAS_SO_ACCEPTFILTER = has(9);
-            APR_HAS_UNICODE_FS = has(10);
-            APR_HAS_PROC_INVOKED = has(11);
-            APR_HAS_USER = has(12);
-            APR_HAS_LARGE_FILES = has(13);
-            APR_HAS_XTHREAD_FILES = has(14);
-            APR_HAS_OS_UUID = has(15);
-            APR_IS_BIGENDIAN = has(16);
-            APR_FILES_AS_SOCKETS = has(17);
-            APR_CHARSET_EBCDIC = has(18);
-            APR_TCP_NODELAY_INHERITED = has(19);
-            APR_O_NONBLOCK_INHERITED = has(20);
-            APR_POLLSET_WAKEABLE = has(21);
-            APR_HAVE_UNIX = has(22);
-            if (APR_MAJOR_VERSION < 1) {
-                throw new UnsatisfiedLinkError("Unsupported APR Version (" + aprVersionString() + ")");
-            }
-            if (!APR_HAS_THREADS) {
-                throw new UnsatisfiedLinkError("Missing threading support from APR");
+                APR_HAVE_IPV6 = has(0);
+                APR_HAS_SHARED_MEMORY = has(1);
+                APR_HAS_THREADS = has(2);
+                APR_HAS_SENDFILE = has(3);
+                APR_HAS_MMAP = has(4);
+                APR_HAS_FORK = has(5);
+                APR_HAS_RANDOM = has(6);
+                APR_HAS_OTHER_CHILD = has(7);
+                APR_HAS_DSO = has(8);
+                APR_HAS_SO_ACCEPTFILTER = has(9);
+                APR_HAS_UNICODE_FS = has(10);
+                APR_HAS_PROC_INVOKED = has(11);
+                APR_HAS_USER = has(12);
+                APR_HAS_LARGE_FILES = has(13);
+                APR_HAS_XTHREAD_FILES = has(14);
+                APR_HAS_OS_UUID = has(15);
+                APR_IS_BIGENDIAN = has(16);
+                APR_FILES_AS_SOCKETS = has(17);
+                APR_CHARSET_EBCDIC = has(18);
+                APR_TCP_NODELAY_INHERITED = has(19);
+                APR_O_NONBLOCK_INHERITED = has(20);
+                APR_POLLSET_WAKEABLE = has(21);
+                APR_HAVE_UNIX = has(22);
+
+                if (APR_MAJOR_VERSION < 1) {
+                    throw new UnsatisfiedLinkError("Unsupported APR Version (" + aprVersionString() + ")");
+                }
+                if (!APR_HAS_THREADS) {
+                    throw new UnsatisfiedLinkError("Missing threading support from APR");
+                }
             }
         }
         return initialize();
