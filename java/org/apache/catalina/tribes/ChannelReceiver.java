@@ -16,88 +16,100 @@
  */
 package org.apache.catalina.tribes;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
- * The <code>ChannelReceiver</code> interface is the data receiver component at the bottom layer, the IO layer (for
- * layers see the {@link Channel} interface). An implementation of this interface may optionally implement a thread
- * pool for parallel processing of incoming messages.
+ * Channel receiver interface. Receives messages from other nodes in the cluster.
  */
 public interface ChannelReceiver extends Heartbeat {
-    /**
-     * Maximum UDP packet size.
-     */
-    int MAX_UDP_SIZE = 65535;
 
     /**
-     * Start listening for incoming messages on the host/port
+     * Default timeout in milliseconds for waitForReady().
+     */
+    long DEFAULT_READY_TIMEOUT_MS = 5000;
+
+    /**
+     * Start the channel receiver.
      *
-     * @throws IOException Listen failed
+     * @throws java.io.IOException if an IO error occurs
      */
-    void start() throws IOException;
+    void start() throws java.io.IOException;
 
     /**
-     * Stop listening for messages
+     * Stop the channel receiver.
      */
     void stop();
 
     /**
-     * String representation of the IPv4 or IPv6 address that this host is listening to.
+     * Wait until the receiver is ready to accept connections, or the timeout expires.
+     * <p>
+     * The default implementation returns immediately, preserving backward compatibility
+     * for receivers that do not implement readiness signaling. Implementations that
+     * start background listener threads should override this method to block until
+     * the listener thread has entered its accept/select loop.
      *
-     * @return the host that this receiver is listening to
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return {@code true} if the receiver is ready; {@code false} if the timeout elapsed
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     */
+    default boolean waitForReady(long timeout, TimeUnit unit) throws InterruptedException {
+        return true;
+    }
+
+    /**
+     * Return the host that the receiver listens on.
+     *
+     * @return the host name
      */
     String getHost();
 
-
     /**
-     * Returns the listening port
+     * Return the port that the receiver listens on.
      *
-     * @return port
+     * @return the port number
      */
     int getPort();
 
     /**
-     * Returns the secure listening port
+     * Return the secure port that the receiver listens on.
      *
-     * @return port, -1 if a secure port is not activated
+     * @return the secure port number
      */
     int getSecurePort();
 
     /**
-     * Returns the UDP port
+     * Return the UDP port that the receiver listens on.
      *
-     * @return port, -1 if the UDP port is not activated.
+     * @return the UDP port number
      */
     int getUdpPort();
 
     /**
-     * Sets the message listener to receive notification of incoming messages.
+     * Set the message listener.
      *
-     * @param listener MessageListener
+     * @param listener the message listener
      */
     void setMessageListener(MessageListener listener);
 
     /**
-     * Returns the message listener that is associated with this receiver
+     * Return the message listener.
      *
-     * @return MessageListener
-     *
-     * @see MessageListener
+     * @return the message listener
      */
     MessageListener getMessageListener();
 
     /**
-     * Return the channel that is related to this ChannelReceiver
+     * Return the associated channel.
      *
-     * @return Channel
+     * @return the channel
      */
     Channel getChannel();
 
     /**
-     * Set the channel that is related to this ChannelReceiver
+     * Set the associated channel.
      *
-     * @param channel The channel
+     * @param channel the channel
      */
     void setChannel(Channel channel);
-
 }
