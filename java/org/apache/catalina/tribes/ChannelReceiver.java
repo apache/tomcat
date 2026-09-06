@@ -21,10 +21,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The <code>ChannelReceiver</code> interface is the data receiver component at the bottom layer, the IO layer (for
- * layers see the {@link Channel} interface). This class may optionally implement a thread pool for parallel processing
- * of incoming messages.
+ * layers see the {@link Channel} interface). An implementation of this interface may optionally implement a thread
+ * pool for parallel processing of incoming messages.
  */
 public interface ChannelReceiver extends Heartbeat {
+    /**
+     * Maximum UDP packet size.
+     */
     int MAX_UDP_SIZE = 65535;
 
     /**
@@ -74,11 +77,9 @@ public interface ChannelReceiver extends Heartbeat {
     int getUdpPort();
 
     /**
-     * Sets the message listener to receive notification of incoming
+     * Sets the message listener to receive notification of incoming messages.
      *
      * @param listener MessageListener
-     *
-     * @see MessageListener
      */
     void setMessageListener(MessageListener listener);
 
