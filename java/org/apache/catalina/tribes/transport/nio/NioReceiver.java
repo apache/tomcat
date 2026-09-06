@@ -30,6 +30,8 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.io.ObjectReader;
@@ -55,6 +57,15 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
+
+    /**
+     * Latch that is counted down when the receiver thread has entered the listen loop and
+     * is fully ready to accept connections. A new latch is created in {@link #start()}
+     * before the listener thread is launched, and counted down in {@link #listen()} once
+     * {@code setListen(true)} has been called. This eliminates the race window between
+     * {@link #start()} returning and the listener thread actually being ready.
+     */
+    private volatile CountDownLatch readyLatch = new CountDownLatch(0);
 
     protected final Deque<Runnable> events = new ConcurrentLinkedDeque<>();
 
@@ -83,6 +94,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         try {
             getBind();
             bind();
+            // Create a fresh latch before starting the listener thread. The thread will
+            // count it down once it has entered the listen loop. Callers can use
+            // waitForReady() to block until that happens.
+            readyLatch = new CountDownLatch(1);
             String channelName = "";
             if (getChannel().getName() != null) {
                 channelName = "[" + getChannel().getName() + "]";
@@ -91,6 +106,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             t.setDaemon(true);
             t.start();
         } catch (Exception e) {
+            // If we failed after creating the latch but before the thread started,
+            // count it down so waitForReady() doesn't block forever.
+            readyLatch.countDown();
             log.fatal(sm.getString("nioReceiver.start.fail"), e);
             if (e instanceof IOException) {
                 throw (IOException) e;
@@ -98,6 +116,28 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 throw new IOException(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Wait for the receiver thread to enter the listen loop and become fully ready.
+     * <p>
+     * This method should be called after {@link #start()} to ensure that the receiver's
+     * background thread has entered its select loop and is ready to accept connections
+     * before dependent operations (such as resolving the local member's host/port) are
+     * performed.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit    the time unit of the timeout argument
+     *
+     * @return {@code true} if the receiver became ready within the timeout; {@code false}
+     *         if the waiting time elapsed before the receiver was ready
+     *
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     */
+    @Override
+    public boolean waitForReady(long timeout, TimeUnit unit) throws InterruptedException {
+        CountDownLatch latch = this.readyLatch;
+        return latch.await(timeout, unit);
     }
 
     @Override
@@ -267,10 +307,17 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     protected void listen() throws Exception {
         if (doListen()) {
             log.warn(sm.getString("nioReceiver.alreadyStarted"));
+            // Signal ready even if already listening so waitForReady() doesn't block.
+            readyLatch.countDown();
             return;
         }
 
         setListen(true);
+
+        // Signal that the receiver has entered the listen loop and is fully ready.
+        // This eliminates the race window between start() returning and the listener
+        // thread actually being prepared to accept connections.
+        readyLatch.countDown();
 
         // Avoid NPEs if selector is set to null on stop.
         Selector selector = this.selector.get();
@@ -362,6 +409,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     protected void stopListening() {
         setListen(false);
+        // Reset the latch so a subsequent start() can create a fresh one and
+        // waitForReady() on a stopped receiver returns immediately.
+        readyLatch = new CountDownLatch(0);
         Selector selector = this.selector.get();
         if (selector != null) {
             try {
