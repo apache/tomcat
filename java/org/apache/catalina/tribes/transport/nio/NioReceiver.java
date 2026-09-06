@@ -43,6 +43,9 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * NIO-based receiver for cluster communication.
+ */
 public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMBean {
 
     private static final Log log = LogFactory.getLog(NioReceiver.class);
@@ -67,8 +70,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     private volatile CountDownLatch readyLatch = new CountDownLatch(0);
 
+    /**
+     * Queue of events to be processed by the selector thread.
+     */
     protected final Deque<Runnable> events = new ConcurrentLinkedDeque<>();
 
+    /**
+     * Default constructor.
+     */
     public NioReceiver() {
     }
 
@@ -150,6 +159,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     }
 
 
+    /**
+     * Binds the server socket and datagram channels to their respective ports.
+     *
+     * @throws IOException If binding fails
+     */
     protected void bind() throws IOException {
         // allocate an unbound server socket channel
         serverChannel = ServerSocketChannel.open();
@@ -183,6 +197,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         datagramChannel.socket().setTrafficClass(getSoTrafficClass());
     }
 
+    /**
+     * Adds a runnable event to the selector's event queue.
+     *
+     * @param event The event to add
+     */
     public void addEvent(Runnable event) {
         Selector selector = this.selector.get();
         if (selector != null) {
@@ -191,11 +210,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 log.trace("Adding event to selector:" + event);
             }
             if (isListening()) {
-                selector.wakeup();
+                try {
+                    selector.wakeup();
+                } catch (ClosedSelectorException ignore) {
+                    // Selector already closed during shutdown
+                }
             }
         }
     }
 
+    /**
+     * Processes all pending events in the event queue.
+     */
     public void events() {
         if (events.isEmpty()) {
             return;
@@ -213,6 +239,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
     }
 
+    /**
+     * Handles a cancelled selection key by closing associated channels and cleaning up resources.
+     *
+     * @param key The cancelled selection key
+     */
     public static void cancelledKey(SelectionKey key) {
         ObjectReader reader = (ObjectReader) key.attachment();
         if (reader != null) {
@@ -249,8 +280,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     }
 
+    /**
+     * Timestamp of the last socket timeout check.
+     */
     protected long lastCheck = System.currentTimeMillis();
 
+    /**
+     * Checks for socket timeouts and handles expired connections.
+     */
     protected void socketTimeouts() {
         long now = System.currentTimeMillis();
         if ((now - lastCheck) < getSelectorTimeout()) {
@@ -305,7 +342,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException IO error
      */
     protected void listen() throws Exception {
-        if (doListen()) {
+        if (isListening()) {
             log.warn(sm.getString("nioReceiver.alreadyStarted"));
             // Signal ready even if already listening so waitForReady() doesn't block.
             readyLatch.countDown();
@@ -327,7 +364,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
         }
 
-        while (doListen() && selector != null) {
+        while (isListening() && selector != null) {
             // this may block for a long time, upon return the
             // selected set contains keys of the ready channels
             try {
