@@ -1495,13 +1495,15 @@
     </attribute>
 
     <attribute name="ocspSoftFail" required="false">
-      <p>If an OCSP responder returns an error, the TLS handshake will always
-      fail and a TLS connection will not be established. If the OCSP responder
-      is unreachable or otherwise unavailable, this setting determines whether
-      the handshake completes or fails. If <code>true</code>, the handskahe will
-      complete and a TLS connection will be established when the OCSP responder
-      is unavailable. If <code>false</code>, the handshake will fail and no TLS
-      connection will be established.</p>
+      <p>If an OCSP responder reports that the certificate is invalid, the TLS
+      handshake will always fail and a TLS connection will not be established.
+      If Tomcat is unable to create the OCSP request, the OCSP responder is
+      unreachable (network timeout or non HTTP 200 response), the OCSP
+      responder is unavailable (try later response) or the OCSP responder
+      reports an internal error this setting determines whether the handshake
+      completes or fails. If <code>true</code>, the handshake will complete and
+      a TLS connection will be established. If <code>false</code>, the handshake
+      will fail and no TLS connection will be established.</p>
       <p>If not specified, the default value of <code>true</code> will be
       used.</p>
     </attribute>
