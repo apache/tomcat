@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
@@ -132,7 +134,22 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
-                // synchronize, big time FIXME
+                // Wait for the receiver's background thread to enter the listen loop
+                // before reading the local member. Without this synchronization, there
+                // is a race window where start() has returned but the listener thread
+                // has not yet initialized, potentially causing getLocalMember() to
+                // observe an incomplete or null member state.
+                try {
+                    boolean ready = clusterReceiver.waitForReady(
+                            ChannelReceiver.DEFAULT_READY_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                    if (!ready) {
+                        throw new ChannelException(sm.getString("channelCoordinator.receiverNotReady",
+                                Long.toString(ChannelReceiver.DEFAULT_READY_TIMEOUT_MS)));
+                    }
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new ChannelException(sm.getString("channelCoordinator.receiverWaitInterrupted"), ie);
+                }
                 Member localMember = getChannel().getLocalMember(false);
                 if (localMember instanceof StaticMember staticMember) {
                     // static member
@@ -190,7 +207,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      *                SND_TX_SEQ - starts the replication transmitter<BR>
      *                SND_RX_SEQ - starts the replication receiver<BR>
      *
-     * @throws ChannelException if a startup error occurs or the service is already started.
+     * @throws ChannelException if a startup error occurs or the service is already stopped.
      */
     protected synchronized void internalStop(int svc) throws ChannelException {
         try {
