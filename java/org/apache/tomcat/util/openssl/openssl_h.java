@@ -896,6 +896,56 @@ public class openssl_h {
         return OCSP_RESPONSE_STATUS_SUCCESSFUL;
     }
 
+    private static final int OCSP_RESPONSE_STATUS_MALFORMEDREQUEST = (int) 1L;
+
+    /**
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_MALFORMEDREQUEST 1
+     * }
+     */
+    public static int OCSP_RESPONSE_STATUS_MALFORMEDREQUEST() {
+        return OCSP_RESPONSE_STATUS_MALFORMEDREQUEST;
+    }
+
+    private static final int OCSP_RESPONSE_STATUS_INTERNALERROR = (int) 2L;
+
+    /**
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_INTERNALERROR 2
+     * }
+     */
+    public static int OCSP_RESPONSE_STATUS_INTERNALERROR() {
+        return OCSP_RESPONSE_STATUS_INTERNALERROR;
+    }
+
+    private static final int OCSP_RESPONSE_STATUS_TRYLATER = (int) 3L;
+
+    /**
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_TRYLATER 3
+     * }
+     */
+    public static int OCSP_RESPONSE_STATUS_TRYLATER() {
+        return OCSP_RESPONSE_STATUS_TRYLATER;
+    }
+
+    private static final int OCSP_RESPONSE_STATUS_SIGREQUIRED = (int) 5L;
+
+    /**
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_SIGREQUIRED 5
+     * }
+     */
+    public static int OCSP_RESPONSE_STATUS_SIGREQUIRED() {
+        return OCSP_RESPONSE_STATUS_SIGREQUIRED;
+    }
+
+    private static final int OCSP_RESPONSE_STATUS_UNAUTHORIZED = (int) 6L;
+
+    /**
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_UNAUTHORIZED 6
+     * }
+     */
+    public static int OCSP_RESPONSE_STATUS_UNAUTHORIZED() {
+        return OCSP_RESPONSE_STATUS_UNAUTHORIZED;
+    }
+
     private static final int V_OCSP_CERTSTATUS_GOOD = (int) 0L;
 
     /**

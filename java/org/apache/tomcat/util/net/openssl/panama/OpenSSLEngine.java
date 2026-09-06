@@ -1201,7 +1201,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static int processOCSP(EngineState state, MemorySegment /* X509_STORE_CTX */ x509ctx) {
         int ocspResponse = V_OCSP_CERTSTATUS_UNKNOWN();
         MemorySegment x509 = X509_STORE_CTX_get_current_cert(x509ctx);
-        if (!MemorySegment.NULL.equals(x509)) {
+        if (MemorySegment.NULL.equals(x509)) {
+            X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
+        } else {
             // No need to check cert->valid, because ssl_verify_OCSP() only
             // is called if OpenSSL already successfully verified the certificate
             // (parameter "ok" in SSL_callback_SSL_verify() must be true).
@@ -1223,7 +1225,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                 issuer = x509IssuerPointer.get(ValueLayout.ADDRESS, 0);
                             }
                         }
-                        if (!MemorySegment.NULL.equals(issuer)) {
+                        if (MemorySegment.NULL.equals(issuer)) {
+                            X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
+                        } else {
                             // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
                             int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
                             boolean requestAttempted = false;
@@ -1245,6 +1249,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                 }
                                 if (!urls.isEmpty()) {
                                     // Use OpenSSL to build OCSP request
+                                    int errorStatusForUnknownResponse = X509_V_ERR_UNABLE_TO_GET_CRL();
                                     for (String urlString : urls) {
                                         try {
                                             URL url = (new URI(urlString)).toURL();
@@ -1257,9 +1262,30 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                             }
                                         } catch (MalformedURLException | URISyntaxException e) {
                                             log.warn(sm.getString("engine.invalidOCSPURL", urlString));
+                                            // No response to process so skip to next URL
+                                            continue;
                                         }
-                                        if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
+                                        if (ocspResponse == V_OCSP_CERTSTATUS_GOOD()) {
+                                            // Clear any error associated with an unknown response from a previous URL
+                                            X509_STORE_CTX_set_error(x509ctx, X509_V_OK());
                                             break;
+                                        } else if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
+                                            // Error will reflect this failure
+                                            break;
+                                        } else {
+                                            /*
+                                             * Unknown.
+                                             *
+                                             * Should only soft-fail if all the errors from unknown responses are
+                                             * soft-failable. If there is more than one non-soft-failable error, the
+                                             * first one is reported.
+                                             */
+                                            if (errorStatusForUnknownResponse != X509_V_ERR_UNABLE_TO_GET_CRL()) {
+                                                // Prior non-soft-failable error. Reset error status
+                                                X509_STORE_CTX_set_error(x509ctx, errorStatusForUnknownResponse);
+                                            } else {
+                                                errorStatusForUnknownResponse = X509_STORE_CTX_get_error(x509ctx);
+                                            }
                                         }
                                     }
                                 }
@@ -1323,6 +1349,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return V_OCSP_CERTSTATUS_UNKNOWN();
         }
         MemorySegment ocspRequest = MemorySegment.NULL;
+        MemorySegment ocspRequestDer = MemorySegment.NULL;
         MemorySegment ocspResponse = MemorySegment.NULL;
         MemorySegment id;
         MemorySegment ocspOneReq;
@@ -1346,19 +1373,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             OCSP_request_add1_nonce(ocspRequest, (char) 0, -1);
-            MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
-            int requestLength = i2d_OCSP_REQUEST(ocspRequest, bufPointer);
+            MemorySegment ocspRequestDerPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+            int requestLength = i2d_OCSP_REQUEST(ocspRequest, ocspRequestDerPointer);
             if (requestLength <= 0) {
                 X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
-            MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
+            ocspRequestDer = ocspRequestDerPointer.get(ValueLayout.ADDRESS, 0);
             // HTTP request with the following header:
             // POST urlPath HTTP/1.1
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
-            byte[] ocspRequestData = buf.reinterpret(requestLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] ocspRequestDerData = ocspRequestDer.reinterpret(requestLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(state.ocspTimeout);
             connection.setReadTimeout(state.ocspTimeout);
@@ -1368,7 +1395,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             connection.setFixedLengthStreamingMode(requestLength);
             connection.setRequestProperty("Content-Type", "application/ocsp-request");
             connection.connect();
-            connection.getOutputStream().write(ocspRequestData);
+            connection.getOutputStream().write(ocspRequestDerData);
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
@@ -1378,8 +1405,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             int read;
             byte[] responseBuf = new byte[1024];
             while ((read = is.read(responseBuf)) > 0) {
-                if (baos.size() > OCSP_MAX_RESPONSE_SIZE) {
-                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
+                if (read > OCSP_MAX_RESPONSE_SIZE - baos.size()) {
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_RESP_INVALID());
                     return V_OCSP_CERTSTATUS_UNKNOWN();
                 }
                 baos.write(responseBuf, 0, read);
@@ -1392,7 +1419,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 // Failed to get a valid response
                 X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
             } else {
-                if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
+                int ocspResponseStatus = OCSP_response_status(ocspResponse);
+                if (ocspResponseStatus == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
                     basicResponse = OCSP_response_get1_basic(ocspResponse);
                     if (MemorySegment.NULL.equals(basicResponse)) {
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_RESP_INVALID());
@@ -1434,9 +1462,17 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_OCSP_HAS_EXPIRED());
                         return V_OCSP_CERTSTATUS_UNKNOWN();
                     }
+                    if (status == V_OCSP_CERTSTATUS_UNKNOWN()) {
+                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+                    }
                     return status;
-                } else {
+                } else if (ocspResponseStatus == OCSP_RESPONSE_STATUS_TRYLATER() ||
+                        ocspResponseStatus == OCSP_RESPONSE_STATUS_INTERNALERROR()) {
+                    // Soft-failable: consistent with JSSE
                     X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_UNABLE_TO_GET_CRL());
+                } else {
+                    // Not soft-failable: consistent with JSSE
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
                 }
             }
         } catch (IOException ioe) {
@@ -1451,6 +1487,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             OCSP_BASICRESP_free(basicResponse);
             OCSP_RESPONSE_free(ocspResponse);
             OCSP_REQUEST_free(ocspRequest);
+            OPENSSL_free(ocspRequestDer);
             if (connection != null) {
                 connection.disconnect();
             }
