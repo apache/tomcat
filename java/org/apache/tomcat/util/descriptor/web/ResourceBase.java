@@ -42,26 +42,55 @@ public class ResourceBase implements Serializable, Injectable {
     // ------------------------------------------------------------- Properties
 
     /**
-     * The description of this resource.
+     * The descriptions of this resource. Multiple descriptions, each with an optional language, are supported as per
+     * the deployment descriptor specification.
      */
-    private String description = null;
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
     /**
-     * Return the description of this resource.
+     * Returns the descriptions of this resource.
+     *
+     * @return The descriptions of this resource
+     */
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
+    }
+
+    /**
+     * Adds a description to this resource.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+    /**
+     * Return the description of this resource. The default description (the one without a language) is returned if
+     * present, otherwise the first description is returned.
      *
      * @return The description of this resource
      */
     public String getDescription() {
-        return this.description;
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
     }
 
     /**
-     * Set the description of this resource.
+     * Set the description of this resource. Any existing descriptions, including language specific ones, are replaced
+     * by a single default description.
      *
      * @param description The description of this resource
      */
     public void setDescription(String description) {
-        this.description = description;
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
     }
 
 
@@ -201,7 +230,7 @@ public class ResourceBase implements Serializable, Injectable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + descriptions.hashCode();
         result = prime * result + injectionTargets.hashCode();
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + properties.hashCode();
@@ -223,11 +252,7 @@ public class ResourceBase implements Serializable, Injectable {
             return false;
         }
         ResourceBase other = (ResourceBase) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
+        if (!descriptions.equals(other.descriptions)) {
             return false;
         }
         if (!injectionTargets.equals(other.injectionTargets)) {
