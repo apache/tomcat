@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The <code>ChannelReceiver</code> interface is the data receiver component at the bottom layer, the IO layer (for
@@ -25,6 +26,11 @@ import java.io.IOException;
  */
 public interface ChannelReceiver extends Heartbeat {
     int MAX_UDP_SIZE = 65535;
+
+    /**
+     * Default timeout (in milliseconds) for {@link #waitForReady(long, TimeUnit)}.
+     */
+    long DEFAULT_READY_TIMEOUT_MS = 5000;
 
     /**
      * Start listening for incoming messages on the host/port
@@ -98,5 +104,31 @@ public interface ChannelReceiver extends Heartbeat {
      * @param channel The channel
      */
     void setChannel(Channel channel);
+
+    /**
+     * Wait for the receiver to become fully ready (i.e. the listener thread has entered
+     * the accept/select loop and is prepared to receive connections).
+     * <p>
+     * This method addresses a race condition that exists between {@link #start()} returning
+     * and the receiver's background thread actually entering its listen loop. During this
+     * window, calls that depend on the receiver being fully initialized (such as obtaining
+     * the local member with resolved host/port properties) may observe inconsistent state.
+     * <p>
+     * The default implementation returns {@code true} immediately, preserving backward
+     * compatibility for implementations that perform all initialization synchronously inside
+     * {@link #start()}. Implementations that start an asynchronous listener thread should
+     * override this method to block until the thread has signalled readiness.
+     *
+     * @param timeout the maximum time to wait for the receiver to become ready
+     * @param unit    the time unit of the timeout argument
+     *
+     * @return {@code true} if the receiver became ready within the timeout; {@code false}
+     *         if the waiting time elapsed before the receiver was ready
+     *
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     */
+    default boolean waitForReady(long timeout, TimeUnit unit) throws InterruptedException {
+        return true;
+    }
 
 }
