@@ -350,6 +350,9 @@
       <update>
         Update bnd to 7.4.0. (markt)
       </update>
+      <update>
+        Update Tomcat Native to 2.0.16. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
