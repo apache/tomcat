@@ -16,27 +16,34 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Channel receiver interface. Receives messages from other nodes in the cluster.
+ * The <code>ChannelReceiver</code> interface is the data receiver component at the bottom layer, the IO layer (for
+ * layers see the {@link Channel} interface). An implementation of this interface may optionally implement a thread
+ * pool for parallel processing of incoming messages.
  */
 public interface ChannelReceiver extends Heartbeat {
+    /**
+     * Maximum UDP packet size.
+     */
+    int MAX_UDP_SIZE = 65535;
 
     /**
-     * Default timeout in milliseconds for waitForReady().
+     * Default timeout in milliseconds for {@link #waitForReady(long, TimeUnit)}.
      */
     long DEFAULT_READY_TIMEOUT_MS = 5000;
 
     /**
-     * Start the channel receiver.
+     * Start listening for incoming messages on the host/port
      *
-     * @throws java.io.IOException if an IO error occurs
+     * @throws IOException Listen failed
      */
-    void start() throws java.io.IOException;
+    void start() throws IOException;
 
     /**
-     * Stop the channel receiver.
+     * Stop listening for messages
      */
     void stop();
 
@@ -58,58 +65,62 @@ public interface ChannelReceiver extends Heartbeat {
     }
 
     /**
-     * Return the host that the receiver listens on.
+     * String representation of the IPv4 or IPv6 address that this host is listening to.
      *
-     * @return the host name
+     * @return the host that this receiver is listening to
      */
     String getHost();
 
+
     /**
-     * Return the port that the receiver listens on.
+     * Returns the listening port
      *
-     * @return the port number
+     * @return port
      */
     int getPort();
 
     /**
-     * Return the secure port that the receiver listens on.
+     * Returns the secure listening port
      *
-     * @return the secure port number
+     * @return port, -1 if a secure port is not activated
      */
     int getSecurePort();
 
     /**
-     * Return the UDP port that the receiver listens on.
+     * Returns the UDP port
      *
-     * @return the UDP port number
+     * @return port, -1 if the UDP port is not activated.
      */
     int getUdpPort();
 
     /**
-     * Set the message listener.
+     * Sets the message listener to receive notification of incoming messages.
      *
-     * @param listener the message listener
+     * @param listener MessageListener
      */
     void setMessageListener(MessageListener listener);
 
     /**
-     * Return the message listener.
+     * Returns the message listener that is associated with this receiver
      *
-     * @return the message listener
+     * @return MessageListener
+     *
+     * @see MessageListener
      */
     MessageListener getMessageListener();
 
     /**
-     * Return the associated channel.
+     * Return the channel that is related to this ChannelReceiver
      *
-     * @return the channel
+     * @return Channel
      */
     Channel getChannel();
 
     /**
-     * Set the associated channel.
+     * Set the channel that is related to this ChannelReceiver
      *
-     * @param channel the channel
+     * @param channel The channel
      */
     void setChannel(Channel channel);
+
 }
