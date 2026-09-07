@@ -260,6 +260,11 @@
       <fix>
         Additional clean-up after HTTP/2 stream reset to aid GC. (markt)
       </fix>
+      <fix>
+        Revert earlier refactoring of HTTP/2 header field validation that moved
+        it earlier since the refactoring made correct handling of invalid
+        headers more difficult. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
