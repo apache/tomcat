@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -116,7 +115,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -130,7 +129,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -143,7 +142,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -205,11 +204,11 @@ public class HpackDecoder {
         } else if (index != 0) {
             return handleIndexedHeaderName(index);
         } else {
-            return readHpackString(buffer, true);
+            return readHpackString(buffer);
         }
     }
 
-    private String readHpackString(ByteBuffer buffer, boolean isFieldName) throws HpackException {
+    private String readHpackString(ByteBuffer buffer) throws HpackException {
         if (!buffer.hasRemaining()) {
             return null;
         }
@@ -221,34 +220,18 @@ public class HpackDecoder {
         }
         boolean huffman = (data & 0b10000000) != 0;
         if (huffman) {
-            return readHuffmanString(length, buffer, isFieldName);
+            return readHuffmanString(length, buffer);
         }
         StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
-            char c = (char) (buffer.get() & 0xFF);
-            if (isFieldName) {
-                if (HttpParser.isToken(c) && !Character.isUpperCase(c)) {
-                    stringBuilder.append(c);
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("hpackdecoder.illegalCharacterName", Character.toString(c)));
-                }
-            } else {
-                if ((i == 0 || i == length - 1) && HttpParser.isFieldVChar(c) ||
-                        i > 0 && i < length - 1 && HttpParser.isFieldContent(c)) {
-                    stringBuilder.append(c);
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("hpackdecoder.illegalCharacterValue", Character.toString(c)));
-                }
-            }
+            stringBuilder.append((char) (buffer.get() & 0xFF));
         }
         return stringBuilder.toString();
     }
 
-    private String readHuffmanString(int length, ByteBuffer buffer, boolean isFieldName) throws HpackException {
+    private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
         StringBuilder stringBuilder = new StringBuilder(length);
-        HPackHuffman.decode(buffer, length, stringBuilder, isFieldName);
+        HPackHuffman.decode(buffer, length, stringBuilder);
         return stringBuilder.toString();
     }
 
