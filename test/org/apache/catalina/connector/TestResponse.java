@@ -349,7 +349,11 @@ public class TestResponse extends TomcatBaseTest {
 
 
     private void doTestEncodeURL(String location, String expected) {
-        Request req = new TesterRequest(true);
+        doTestEncodeURL("", location, expected);
+    }
+
+    private void doTestEncodeURL(String currentContextPath, String location, String expected) {
+        Request req = new TesterRequest(true,"/level1/level2/foo.html", currentContextPath);
         req.setRequestedSessionId("1234");
         req.setRequestedSessionURL(true);
         Response resp = new Response(null);
@@ -358,7 +362,6 @@ public class TestResponse extends TomcatBaseTest {
         String result = resp.encodeURL(location);
         Assert.assertEquals(expected, result);
     }
-
 
     @Test
     public void testEncodeURL01() throws Exception {
@@ -454,7 +457,27 @@ public class TestResponse extends TomcatBaseTest {
         doTestEncodeURL("./..#/../..", "./..;jsessionid=1234#/../..");
     }
 
+    @Test
+    public void testEncodeURLBug70208a() throws Exception {
+        doTestEncodeURL("/admin", "/admin/index", "/admin/index;jsessionid=1234");
+    }
 
+    @Test
+    public void testEncodeURLBug70208b() throws Exception {
+        doTestEncodeURL("/admin", "/admin/../public/index", "/admin/../public/index");
+    }
+
+    @Test
+    public void testEncodeURLBug70208c() throws Exception {
+        doTestEncodeURL("/admin", "/public/..;/admin/index;jsessionid=zzz",
+                "/public/..;/admin/index;jsessionid=zzz;jsessionid=1234");
+    }
+
+    @Test
+    public void testEncodeURLBug70208d() throws Exception {
+        doTestEncodeURL("/admin", "/administrator/index",
+                "/administrator/index");
+    }
     private void doTestEncodeRedirectURL(String location, String expected) {
         Request req = new TesterRequest(true);
         req.setRequestedSessionId("1234");

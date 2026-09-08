@@ -111,6 +111,40 @@ public final class RequestUtil {
 
 
     /**
+     * Strip parameters for given path.
+     *
+     * @param input   the input path
+     * @param request the request to add the parameters to
+     *
+     * @return the cleaned path
+     */
+    public static String stripPathParams(String input) {
+        // Shortcut
+        if (input.indexOf(';') < 0) {
+            return input;
+        }
+
+        StringBuilder sb = new StringBuilder(input.length());
+        int pos = 0;
+        int limit = input.length();
+        while (pos < limit) {
+            int nextSemiColon = input.indexOf(';', pos);
+            if (nextSemiColon < 0) {
+                nextSemiColon = limit;
+            }
+            sb.append(input, pos, nextSemiColon);
+            int followingSlash = input.indexOf('/', nextSemiColon);
+            if (followingSlash < 0) {
+                pos = limit;
+            } else {
+                pos = followingSlash;
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Tests whether the provided URL is for a resource contained within the same web application as the request.
      *
      * @param request The request to test
@@ -148,14 +182,26 @@ public final class RequestUtil {
         }
 
         /*
-         * This isn't perfect but is the best that can be done without running the full mapping logic on the url to
-         * determine which web application that url will map to.
+         * May not perfect, but try best to determine whether the url belongs to current request or not.
          */
-        if (!url.getPath().startsWith(request.getServletContext().getContextPath())) {
+        String urlPath = url.getPath();
+        urlPath = stripPathParams(urlPath);
+        urlPath = org.apache.tomcat.util.http.RequestUtil.normalize(urlPath);
+        String requestContextPath = request.getServletContext().getContextPath();
+        
+        if(urlPath==null) {
             return false;
         }
-
-        return true;
+        
+        if(urlPath.equals(requestContextPath)) {
+            return true;
+        } else if(requestContextPath.endsWith("/") && urlPath.startsWith(requestContextPath)) {
+            return true;
+        } else if(urlPath.startsWith(requestContextPath+"/")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

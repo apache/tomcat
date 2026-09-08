@@ -43,6 +43,15 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterServletContext implements ServletContext {
 
+    private String contextPath = "";
+    
+    public TesterServletContext() {
+        this("");
+    }
+    
+    public TesterServletContext(String contextPath) {
+        this.contextPath=contextPath;
+    }
     /**
      * {@inheritDoc}
      * <p>
@@ -50,7 +59,7 @@ public class TesterServletContext implements ServletContext {
      */
     @Override
     public String getContextPath() {
-        return "";
+        return contextPath;
     }
 
     /**

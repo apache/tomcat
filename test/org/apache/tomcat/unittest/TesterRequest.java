@@ -56,9 +56,13 @@ public class TesterRequest extends Request {
 
 
     public TesterRequest(boolean withSession, String requestUri) {
+        this(withSession, requestUri, "");
+    }
+
+    public TesterRequest(boolean withSession, String requestUri, String reqContextPath) {
         super(null, null);
         context = new TesterContext();
-        servletContext = new TesterServletContext();
+        servletContext = new TesterServletContext(reqContextPath);
         context.setServletContext(servletContext);
         if (withSession) {
             Set<SessionTrackingMode> modes = new HashSet<>();
@@ -71,8 +75,7 @@ public class TesterRequest extends Request {
         }
         this.requestUri = requestUri;
     }
-
-
+    
     @Override
     public String getScheme() {
         return "http";
