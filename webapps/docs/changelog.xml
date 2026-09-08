@@ -378,6 +378,9 @@
         Update Tomcat Native to 1.3.9. (markt)
       </update>
       <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
         Improvements to Japanese translations provided by tak7iji and
         Ktamura.biz.80. (markt)
       </add>
