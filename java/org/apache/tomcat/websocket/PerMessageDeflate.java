@@ -74,7 +74,7 @@ public class PerMessageDeflate implements Transformation {
 
     /*
      * Whether the LZ77 window used to decompress incoming messages persists across message boundaries. This side's
-     * inflater decompresses whatever // the *peer* compressed, so it is governed by the peer's context takeover
+     * inflater decompresses whatever the *peer* compressed, so it is governed by the peer's context takeover
      * setting: a server's inflater follows clientContextTakeover and a client's inflater follows serverContextTakeover.
      */
     private final boolean inflaterContextTakeover;
@@ -400,10 +400,12 @@ public class PerMessageDeflate implements Transformation {
 
 
     /*
-     * Keeps inflaterWindow holding a rolling copy of the last up to inflaterWindow.length bytes of decompressed output,
-     * across however many inflate() calls and messages that takes, for as long as context takeover keeps this
-     * Inflater's own window alive. Called for every successful inflate() (including the single-byte EOM overflow case),
-     * so it is the one place that needs to know about that.
+     * Keeps inflaterWindow holding a rolling copy of the last up to inflaterWindow.length bytes of decompressed
+     * output, across however many inflate() calls and messages that takes - tracked unconditionally, regardless of
+     * inflaterContextTakeover (see the constructor and endFrame(), which is where that setting actually takes
+     * effect, by clearing inflaterWindowLength at the end of a message when it is false). Called for every
+     * successful inflate() (including the single-byte EOM overflow case), so it is the one place that needs to know
+     * about that.
      */
     private void updateInflaterWindow(byte[] src, int off, int len) {
         if (len >= inflaterWindow.length) {
