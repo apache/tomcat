@@ -373,7 +373,7 @@ public class TestPerMessageDeflate {
     private void testContextTakeoverSurvivesEarlyBfinalBlock(boolean isServer) throws IOException {
         // part2 deliberately repeats a large chunk of part1 verbatim, so a compressor with a live window naturally
         // emits LZ77 back-references into part1's content when compressing part2.
-        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        String repeatedChunk = repeat("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ", 50);
         byte[] part1 = (repeatedChunk + "part1 unique tail.").getBytes(StandardCharsets.UTF_8);
         byte[] part2 = (repeatedChunk + "part2 unique tail, referencing the same repeated chunk as part1.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -440,7 +440,7 @@ public class TestPerMessageDeflate {
 
 
     private void testNoContextTakeoverStillSurvivesEarlyBfinalBlock(boolean isServer) throws IOException {
-        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        String repeatedChunk = repeat("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ", 50);
         byte[] part1 = (repeatedChunk + "part1 unique tail.").getBytes(StandardCharsets.UTF_8);
         byte[] part2 = (repeatedChunk + "part2 unique tail, referencing the same repeated chunk as part1.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -516,13 +516,13 @@ public class TestPerMessageDeflate {
 
     private void testNoContextTakeoverClearsWindowBetweenMessages(boolean isServer) throws IOException {
         // message1: ordinary, single-block message, unrelated to message2 - its content must not leak forward.
-        byte[] message1 = "Unrelated first message that must not leak into the next message's window. ".repeat(20)
+        byte[] message1 = repeat("Unrelated first message that must not leak into the next message's window. ", 20)
                 .getBytes(StandardCharsets.UTF_8);
         byte[] compressed1 = rawDeflateFinished(message1);
 
         // message2: two blocks, exactly as a compliant sender honouring no_context_takeover would produce - part2b
         // legitimately references only part2a, both from the *same* message.
-        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        String repeatedChunk = repeat("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ", 50);
         byte[] part2a = (repeatedChunk + "message2 part A.").getBytes(StandardCharsets.UTF_8);
         byte[] part2b = (repeatedChunk + "message2 part B, referencing part A's repeated chunk.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -593,7 +593,7 @@ public class TestPerMessageDeflate {
 
 
     private void testContextTakeoverSurvivesCleanBfinalMessageEnd(boolean isServer) throws IOException {
-        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        String repeatedChunk = repeat("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ", 50);
         byte[] message1 = (repeatedChunk + "message1 unique tail.").getBytes(StandardCharsets.UTF_8);
         byte[] message2 = (repeatedChunk + "message2 unique tail, referencing the same repeated chunk as message1.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -667,7 +667,7 @@ public class TestPerMessageDeflate {
 
 
     private void testSendContextTakeover(boolean isServer) throws IOException {
-        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        String repeatedChunk = repeat("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ", 50);
         byte[] message1 = (repeatedChunk + "message1 unique tail.").getBytes(StandardCharsets.UTF_8);
         byte[] message2 = (repeatedChunk + "message2 unique tail, referencing the same repeated chunk as message1.")
                 .getBytes(StandardCharsets.UTF_8);
@@ -788,6 +788,15 @@ public class TestPerMessageDeflate {
         preferences.add(parameters);
 
         Assert.assertNull(PerMessageDeflate.build(preferences, true));
+    }
+
+
+    private static String repeat(String text, int count) {
+        StringBuilder sb = new StringBuilder(text.length() * count);
+        for (int i = 0; i< count; i++) {
+            sb.append(text);
+        }
+        return sb.toString();
     }
 
     /*
