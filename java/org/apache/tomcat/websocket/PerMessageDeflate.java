@@ -72,6 +72,23 @@ public class PerMessageDeflate implements Transformation {
     private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
     private final byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
+    /*
+     * Whether the LZ77 window used to decompress incoming messages persists across message boundaries. This side's
+     * inflater decompresses whatever the *peer* compressed, so it is governed by the peer's context takeover
+     * setting: a server's inflater follows clientContextTakeover and a client's inflater follows serverContextTakeover.
+     */
+    private final boolean inflaterContextTakeover;
+    /*
+     * Rolling copy of the last up to inflaterWindow.length bytes of output produced by inflater, maintained for every
+     * message regardless of inflaterContextTakeover (see the constructor). Needed because resetting the Inflater -
+     * either mid-message to recover from an early BFINAL block, or in endFrame() to clear a
+     * finished-but-not-really-done state - discards its LZ77 window; feeding this back via setDictionary() immediately
+     * after such a reset lets back-references into content compressed before the reset keep resolving correctly.
+     * endFrame() clears inflaterWindowLength at the end of a message when inflaterContextTakeover is false, so the
+     * window never actually survives *across* messages in that case - only within one.
+     */
+    private final byte[] inflaterWindow;
+
     private volatile Transformation next;
     private volatile boolean skipDecompression = false;
     private volatile boolean eomBytesInserted = false;
@@ -86,6 +103,8 @@ public class PerMessageDeflate implements Transformation {
      */
     private volatile int lastInputOffset;
     private volatile int lastInputLength;
+    // Number of valid bytes currently held in inflaterWindow.
+    private volatile int inflaterWindowLength;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private volatile boolean firstCompressedFrameWritten = false;
     // Flag to track if a message is completely empty
@@ -203,6 +222,19 @@ public class PerMessageDeflate implements Transformation {
         this.clientContextTakeover = clientContextTakeover;
         this.clientMaxWindowBits = clientMaxWindowBits;
         this.isServer = isServer;
+        this.inflaterContextTakeover = isServer ? clientContextTakeover : serverContextTakeover;
+        /*
+         * 32768 (2^15) is the maximum DEFLATE window size and the one java.util.zip.Inflater/Deflater always
+         * effectively use; there is no way, via the public Java SE API, to honour a smaller negotiated max_window_bits
+         * value here.
+         *
+         * Always allocated, even when inflaterContextTakeover is false: that setting only governs whether the window
+         * survives *between* messages (see endFrame()). RFC 7692 section 7.2.1 permits a single message to be
+         * compressed as multiple DEFLATE blocks, and decompressing that correctly requires window continuity *within*
+         * the message (see the mid-message recovery in getMoreData()) regardless of the cross-message context takeover
+         * setting.
+         */
+        this.inflaterWindow = new byte[32768];
     }
 
 
@@ -300,7 +332,16 @@ public class PerMessageDeflate implements Transformation {
                     int newOffset = lastInputOffset + lastInputLength - remaining;
                     try {
                         inflater.reset();
-                    } catch (NullPointerException e) {
+                        // reset() discards the LZ77 window along with the
+                        // finished state. If context takeover means that
+                        // window should have survived, restore it so
+                        // back-references into content decompressed before
+                        // this reset keep resolving correctly.
+                        if (inflaterWindowLength > 0) {
+                            inflater.setDictionary(inflaterWindow, 0, inflaterWindowLength);
+                        }
+                    } catch (IllegalStateException | NullPointerException e) {
+                        // As of Java 25, the JRE throws an ISE rather than an NPE
                         throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
                     }
                     inflater.setInput(readBuffer.array(), newOffset, remaining);
@@ -342,39 +383,76 @@ public class PerMessageDeflate implements Transformation {
 
 
     private int inflate(byte[] dest, int start, int len) throws IOException {
+        int written;
         try {
-            return inflater.inflate(dest, start, len);
+            written = inflater.inflate(dest, start, len);
         } catch (DataFormatException e) {
             throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
         } catch (IllegalStateException | NullPointerException e) {
             // As of Java 25, the JRE throws an ISE rather than an NPE
             throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
         }
+        if (written > 0) {
+            updateInflaterWindow(dest, start, written);
+        }
+        return written;
     }
+
+
+    /*
+     * Keeps inflaterWindow holding a rolling copy of the last up to inflaterWindow.length bytes of decompressed
+     * output, across however many inflate() calls and messages that takes - tracked unconditionally, regardless of
+     * inflaterContextTakeover (see the constructor and endFrame(), which is where that setting actually takes
+     * effect, by clearing inflaterWindowLength at the end of a message when it is false). Called for every
+     * successful inflate() (including the single-byte EOM overflow case), so it is the one place that needs to know
+     * about that.
+     */
+    private void updateInflaterWindow(byte[] src, int off, int len) {
+        if (len >= inflaterWindow.length) {
+            System.arraycopy(src, off + len - inflaterWindow.length, inflaterWindow, 0, inflaterWindow.length);
+            inflaterWindowLength = inflaterWindow.length;
+        } else {
+            int keep = Math.min(inflaterWindowLength, inflaterWindow.length - len);
+            System.arraycopy(inflaterWindow, inflaterWindowLength - keep, inflaterWindow, 0, keep);
+            System.arraycopy(src, off, inflaterWindow, keep, len);
+            inflaterWindowLength = keep + len;
+        }
+    }
+
 
     private TransformationResult endFrame(boolean fin) throws IOException {
         eomBytesInserted = false;
         eomOverflowWritten = false;
         if (fin) {
-            boolean contextTakeover = isServer ? clientContextTakeover : serverContextTakeover;
             /*
-             * If the message's final block was itself an independently BFINAL=1 terminated block (see the recovery
-             * in getMoreData()), the EOM_BYTES appended to complete the message per RFC 7692 section 7.2.2 were fed
-             * to an already-finished Inflater and were never consumed: inflater.finished() stays true with those 4
-             * bytes still reported by getRemaining(). Left in that state, the next message would compute its first
-             * recovery offset from this stale, unrelated leftover count, which can go negative. There is no way to
-             * continue decompressing past a finished Inflater in place, so it has to be reset here too - even though
-             * context takeover is enabled - at the cost of losing the window for the *next* message in this,
-             * otherwise rare, case.
+             * If the message's final block was itself an independently BFINAL=1 terminated block (see the recovery in
+             * getMoreData()), the EOM_BYTES appended to complete the message per RFC 7692 section 7.2.2 were fed to an
+             * already-finished Inflater and were never consumed: inflater.finished() stays true with those 4 bytes
+             * still reported by getRemaining(). Left in that state, the next message would compute its first recovery
+             * offset from this stale, unrelated leftover count, which can go negative. There is no way to continue
+             * decompressing past a finished Inflater in place, so it has to be reset here too - even though context
+             * takeover may be enabled. Unlike the no-context-takeover case, the window built up so far is still wanted
+             * for the next message, so restore it via setDictionary() rather than losing it.
              */
-            if (!contextTakeover || inflater.finished()) {
+            if (!inflaterContextTakeover || inflater.finished()) {
                 try {
                     inflater.reset();
-                } catch (NullPointerException e) {
+                    if (inflaterContextTakeover && inflaterWindowLength > 0) {
+                        inflater.setDictionary(inflaterWindow, 0, inflaterWindowLength);
+                    }
+                } catch (IllegalStateException | NullPointerException e) {
+                    // As of Java 25, the JRE throws an ISE rather than an NPE
                     throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
                 }
                 lastInputOffset = 0;
                 lastInputLength = 0;
+                if (!inflaterContextTakeover) {
+                    /*
+                     * The window was still legitimately maintained *within* this message (see inflate()), but must not
+                     * survive into the next one when context takeover is disabled.
+                     */
+                    inflaterWindowLength = 0;
+                }
             }
         }
         return TransformationResult.END_OF_FRAME;

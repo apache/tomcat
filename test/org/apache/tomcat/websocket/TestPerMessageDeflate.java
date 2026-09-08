@@ -294,12 +294,12 @@ public class TestPerMessageDeflate {
 
 
     /*
-     * A message whose real content is a single, exactly-fitting, independently BFINAL=1 terminated block (nothing
-     * else) finishes cleanly via the normal needsInput()==true path and, as part of that, has the RFC 7692 section
-     * 7.2.2 EOM_BYTES fed to an already-finished Inflater - which silently ignores them, leaving finished()==true
-     * with those 4 bytes stuck in getRemaining(). With context takeover enabled, endFrame() must not leave the
-     * Inflater in that state: otherwise the next message's recovery logic computes its first offset from this
-     * stale, unrelated leftover count.
+     * A message whose real content is a single, exactly-fitting, independently BFINAL=1 terminated block (nothing else)
+     * finishes cleanly via the normal needsInput()==true path and, as part of that, has the RFC 7692 section 7.2.2
+     * EOM_BYTES fed to an already-finished Inflater - which silently ignores them, leaving finished()==true with those
+     * 4 bytes stuck in getRemaining(). With context takeover enabled, endFrame() must not leave the Inflater in that
+     * state: otherwise the next message's recovery logic computes its first offset from this stale, unrelated leftover
+     * count.
      */
     @Test
     public void testMessageEndingInCleanBfinalBlockDoesNotPoisonNextMessage() throws IOException {
@@ -311,12 +311,12 @@ public class TestPerMessageDeflate {
         preferences.add(parameters);
 
         /*
-         *  Context takeover is enabled by default (no *_no_context_takeover parameter) - the same PerMessageDeflate
-        * instance, and therefore the same Inflater, must be reused across messages, exactly as it would be for a
-        * real connection. setNext() on PerMessageDeflate delegates to the existing next's setNext() once next is
-        * already set, so a single mutable source (rather than two separate TesterTransformation instances) is used
-        * to supply both messages' bytes in turn.
-        */
+         * Context takeover is enabled by default (no *_no_context_takeover parameter) - the same PerMessageDeflate
+         * instance, and therefore the same Inflater, must be reused across messages, exactly as it would be for a real
+         * connection. setNext() on PerMessageDeflate delegates to the existing next's setNext() once next is already
+         * set, so a single mutable source (rather than two separate TesterTransformation instances) is used to supply
+         * both messages' bytes in turn.
+         */
         PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, true);
         MutableTesterTransformation source = new MutableTesterTransformation(ByteBuffer.wrap(compressed1));
         perMessageDeflateRx.setNext(source);
@@ -346,15 +346,403 @@ public class TestPerMessageDeflate {
             received2.write(buf.array(), 0, buf.position());
         } while (tr == TransformationResult.OVERFLOW);
         Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
-        Assert.assertArrayEquals("Second message must decompress correctly; the first message's clean BFINAL "
-                + "ending must not poison the shared Inflater's state", message2, received2.toByteArray());
+        Assert.assertArrayEquals("Second message must decompress correctly; the first message's clean BFINAL " +
+                "ending must not poison the shared Inflater's state", message2, received2.toByteArray());
+    }
+
+
+    /*
+     * The mid-message reset used by testMultipleFinalDeflateBlocksInOneMessage to recover from an early BFINAL block
+     * discards the Inflater's LZ77 window. When context takeover is negotiated (the default - no *_no_context_takeover
+     * parameter), that window must survive: a later block may rely on back-references into content compressed before
+     * the reset. Verified for both directions: a server's inflater decompresses whatever the client compressed, so it
+     * is governed by clientContextTakeover; a client's inflater is governed by serverContextTakeover.
+     */
+    @Test
+    public void testContextTakeoverSurvivesEarlyBfinalBlockServer() throws IOException {
+        testContextTakeoverSurvivesEarlyBfinalBlock(true);
+    }
+
+
+    @Test
+    public void testContextTakeoverSurvivesEarlyBfinalBlockClient() throws IOException {
+        testContextTakeoverSurvivesEarlyBfinalBlock(false);
+    }
+
+
+    private void testContextTakeoverSurvivesEarlyBfinalBlock(boolean isServer) throws IOException {
+        // part2 deliberately repeats a large chunk of part1 verbatim, so a compressor with a live window naturally
+        // emits LZ77 back-references into part1's content when compressing part2.
+        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        byte[] part1 = (repeatedChunk + "part1 unique tail.").getBytes(StandardCharsets.UTF_8);
+        byte[] part2 = (repeatedChunk + "part2 unique tail, referencing the same repeated chunk as part1.")
+                .getBytes(StandardCharsets.UTF_8);
+
+        byte[] compressed1 = rawDeflateFinished(part1);
+        byte[] dictionary =
+                part1.length > 32768 ? Arrays.copyOfRange(part1, part1.length - 32768, part1.length) : part1;
+        byte[] compressed2 = rawDeflateFinished(part2, dictionary);
+
+        // Confirm the setup actually exercises cross-block back-references, rather than merely asserting on a
+        // payload that would pass even without a shared window.
+        Assert.assertTrue("Test setup problem: part2 should compress smaller when it can reference part1's window",
+                compressed2.length < rawDeflateFinished(part2, null).length);
+
+        // Two independently BFINAL=1-terminated blocks concatenated, exactly as in
+        // testMultipleFinalDeflateBlocksInOneMessage - this is what forces getMoreData() to reset() mid-message.
+        byte[] compressedPayload = concat(compressed1, compressed2);
+
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, isServer);
+        perMessageDeflateRx.setNext(new TesterTransformation(ByteBuffer.wrap(compressedPayload)));
+
+        int rsv = 0b100;
+
+        ByteArrayOutputStream received = new ByteArrayOutputStream();
+        ByteBuffer buf = ByteBuffer.allocate(8192);
+        TransformationResult tr;
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+
+        byte[] expected = concat(part1, part2);
+        Assert.assertArrayEquals(
+                "Expected the concatenation of both blocks' decompressed content - part2's back-references into " +
+                        "part1 must still resolve after the mid-message reset",
+                expected, received.toByteArray());
+    }
+
+
+    /*
+     * As testContextTakeoverSurvivesEarlyBfinalBlock, but with context takeover *disabled* for the direction under
+     * test. RFC 7692's context takeover setting only governs whether the LZ77 window is reset *between* messages;
+     * within a single message, multiple DEFLATE blocks must still be decompressible as one continuous stream regardless
+     * of that setting. A later block's back-references into an earlier block of the *same* message must therefore still
+     * resolve after the mid-message reset even when context takeover is off.
+     */
+    @Test
+    public void testNoContextTakeoverStillSurvivesEarlyBfinalBlockServer() throws IOException {
+        testNoContextTakeoverStillSurvivesEarlyBfinalBlock(true);
+    }
+
+
+    @Test
+    public void testNoContextTakeoverStillSurvivesEarlyBfinalBlockClient() throws IOException {
+        testNoContextTakeoverStillSurvivesEarlyBfinalBlock(false);
+    }
+
+
+    private void testNoContextTakeoverStillSurvivesEarlyBfinalBlock(boolean isServer) throws IOException {
+        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        byte[] part1 = (repeatedChunk + "part1 unique tail.").getBytes(StandardCharsets.UTF_8);
+        byte[] part2 = (repeatedChunk + "part2 unique tail, referencing the same repeated chunk as part1.")
+                .getBytes(StandardCharsets.UTF_8);
+
+        byte[] compressed1 = rawDeflateFinished(part1);
+        byte[] dictionary =
+                part1.length > 32768 ? Arrays.copyOfRange(part1, part1.length - 32768, part1.length) : part1;
+        byte[] compressed2 = rawDeflateFinished(part2, dictionary);
+
+        Assert.assertTrue("Test setup problem: part2 should compress smaller when it can reference part1's window",
+                compressed2.length < rawDeflateFinished(part2, null).length);
+
+        byte[] compressedPayload = concat(compressed1, compressed2);
+
+        // Disable context takeover for whichever direction governs this instance's *receiving* window: a server's
+        // inflater is governed by the client's setting, and vice versa.
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(
+                new WsExtensionParameter(isServer ? "client_no_context_takeover" : "server_no_context_takeover", null));
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, isServer);
+        perMessageDeflateRx.setNext(new TesterTransformation(ByteBuffer.wrap(compressedPayload)));
+
+        int rsv = 0b100;
+
+        ByteArrayOutputStream received = new ByteArrayOutputStream();
+        ByteBuffer buf = ByteBuffer.allocate(8192);
+        TransformationResult tr;
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+
+        byte[] expected = concat(part1, part2);
+        Assert.assertArrayEquals(
+                "Expected the concatenation of both blocks' decompressed content - part2's back-references into " +
+                        "part1 (same message) must resolve regardless of context takeover being disabled",
+                expected, received.toByteArray());
+    }
+
+
+    /*
+     * Covers a sequence of two messages - an ordinary one followed by a multi-block one - on the same connection with
+     * context takeover disabled: an unrelated first message must not prevent a later message's own, legitimate
+     * mid-message recovery (see testNoContextTakeoverStillSurvivesEarlyBfinalBlock) from working.
+     *
+     * Note: endFrame() clears inflaterWindowLength at the end of a message when context takeover is disabled, so that
+     * no state is retained across messages, matching RFC 7692's intent for that setting. That clearing could not be
+     * shown to be load-bearing for this specific test: LZ77 back-reference distances resolve from the *end* of whatever
+     * dictionary is supplied, and this class's rolling window always keeps the most recently produced bytes at that
+     * end, evicting older bytes first - so an earlier message's leaked bytes, being strictly older than anything in a
+     * later message, can only be evicted ahead of it or sit as unused padding; they cannot shift or corrupt resolution
+     * of the later message's own back-references. The clearing is still correct and kept for specification fidelity (a
+     * "no context takeover" Inflater should not retain any state across the message boundary), just not something this
+     * test can fail without.
+     */
+    @Test
+    public void testNoContextTakeoverClearsWindowBetweenMessagesServer() throws IOException {
+        testNoContextTakeoverClearsWindowBetweenMessages(true);
+    }
+
+
+    @Test
+    public void testNoContextTakeoverClearsWindowBetweenMessagesClient() throws IOException {
+        testNoContextTakeoverClearsWindowBetweenMessages(false);
+    }
+
+
+    private void testNoContextTakeoverClearsWindowBetweenMessages(boolean isServer) throws IOException {
+        // message1: ordinary, single-block message, unrelated to message2 - its content must not leak forward.
+        byte[] message1 = "Unrelated first message that must not leak into the next message's window. ".repeat(20)
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] compressed1 = rawDeflateFinished(message1);
+
+        // message2: two blocks, exactly as a compliant sender honouring no_context_takeover would produce - part2b
+        // legitimately references only part2a, both from the *same* message.
+        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        byte[] part2a = (repeatedChunk + "message2 part A.").getBytes(StandardCharsets.UTF_8);
+        byte[] part2b = (repeatedChunk + "message2 part B, referencing part A's repeated chunk.")
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] block2a = rawDeflateFinished(part2a);
+        byte[] dictionary =
+                part2a.length > 32768 ? Arrays.copyOfRange(part2a, part2a.length - 32768, part2a.length) : part2a;
+        byte[] block2b = rawDeflateFinished(part2b, dictionary);
+        Assert.assertTrue("Test setup problem: part2b should compress smaller when it can reference part2a's window",
+                block2b.length < rawDeflateFinished(part2b, null).length);
+        byte[] compressed2 = concat(block2a, block2b);
+
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(
+                new WsExtensionParameter(isServer ? "client_no_context_takeover" : "server_no_context_takeover", null));
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, isServer);
+        MutableTesterTransformation source = new MutableTesterTransformation(ByteBuffer.wrap(compressed1));
+        perMessageDeflateRx.setNext(source);
+        int rsv = 0b100;
+
+        ByteArrayOutputStream received1 = new ByteArrayOutputStream();
+        ByteBuffer buf = ByteBuffer.allocate(8192);
+        TransformationResult tr;
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received1.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+        Assert.assertArrayEquals(message1, received1.toByteArray());
+
+        source.data = ByteBuffer.wrap(compressed2);
+        source.delivered = false;
+
+        ByteArrayOutputStream received2 = new ByteArrayOutputStream();
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received2.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+
+        byte[] expected2 = concat(part2a, part2b);
+        Assert.assertArrayEquals("message2's own mid-message recovery must use a dictionary built only from " +
+                "message2's own content, not contaminated by message1's, which must have been cleared at the " +
+                "message1/message2 boundary", expected2, received2.toByteArray());
+    }
+
+
+    /*
+     * As testContextTakeoverSurvivesEarlyBfinalBlock, but exercising the *other* reset point: endFrame()'s recovery
+     * from a message whose final block was an independently BFINAL=1 terminated block (see
+     * testMessageEndingInCleanBfinalBlockDoesNotPoisonNextMessage). That reset must also preserve the context takeover
+     * window across the message boundary, not just avoid crashing.
+     */
+    @Test
+    public void testContextTakeoverSurvivesCleanBfinalMessageEndServer() throws IOException {
+        testContextTakeoverSurvivesCleanBfinalMessageEnd(true);
+    }
+
+
+    @Test
+    public void testContextTakeoverSurvivesCleanBfinalMessageEndClient() throws IOException {
+        testContextTakeoverSurvivesCleanBfinalMessageEnd(false);
+    }
+
+
+    private void testContextTakeoverSurvivesCleanBfinalMessageEnd(boolean isServer) throws IOException {
+        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        byte[] message1 = (repeatedChunk + "message1 unique tail.").getBytes(StandardCharsets.UTF_8);
+        byte[] message2 = (repeatedChunk + "message2 unique tail, referencing the same repeated chunk as message1.")
+                .getBytes(StandardCharsets.UTF_8);
+
+        /*
+         * message1 is a single, exactly-fitting BFINAL=1 block - the shape that leaves the Inflater finished() with the
+         * EOM bytes stuck in getRemaining() once endFrame() runs (see
+         * testMessageEndingInCleanBfinalBlockDoesNotPoisonNextMessage).
+         */
+        byte[] compressed1 = rawDeflateFinished(message1);
+        byte[] dictionary =
+                message1.length > 32768 ? Arrays.copyOfRange(message1, message1.length - 32768, message1.length) :
+                        message1;
+        byte[] compressed2 = rawDeflateFinished(message2, dictionary);
+
+        Assert.assertTrue(
+                "Test setup problem: message2 should compress smaller when it can reference message1's " + "window",
+                compressed2.length < rawDeflateFinished(message2, null).length);
+
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, isServer);
+        MutableTesterTransformation source = new MutableTesterTransformation(ByteBuffer.wrap(compressed1));
+        perMessageDeflateRx.setNext(source);
+        int rsv = 0b100;
+
+        ByteArrayOutputStream received1 = new ByteArrayOutputStream();
+        ByteBuffer buf = ByteBuffer.allocate(8192);
+        TransformationResult tr;
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received1.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+        Assert.assertArrayEquals(message1, received1.toByteArray());
+
+        source.data = ByteBuffer.wrap(compressed2);
+        source.delivered = false;
+
+        ByteArrayOutputStream received2 = new ByteArrayOutputStream();
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(Constants.OPCODE_BINARY, true, rsv, buf);
+            received2.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+        Assert.assertArrayEquals("message2's back-references into message1 must still resolve after endFrame()'s " +
+                "reset of the finished Inflater", message2, received2.toByteArray());
+    }
+
+
+    /*
+     * Covers the *sending* side of context takeover, complementing the receiving-side tests above: when reusing a
+     * single PerMessageDeflate instance to compress two messages, the Deflater's own window must persist across the
+     * message boundary in both directions - a server's own sending is governed by serverContextTakeover; a client's own
+     * sending is governed by clientContextTakeover.
+     */
+    @Test
+    public void testSendContextTakeoverServer() throws IOException {
+        testSendContextTakeover(true);
+    }
+
+
+    @Test
+    public void testSendContextTakeoverClient() throws IOException {
+        testSendContextTakeover(false);
+    }
+
+
+    private void testSendContextTakeover(boolean isServer) throws IOException {
+        String repeatedChunk = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. ".repeat(50);
+        byte[] message1 = (repeatedChunk + "message1 unique tail.").getBytes(StandardCharsets.UTF_8);
+        byte[] message2 = (repeatedChunk + "message2 unique tail, referencing the same repeated chunk as message1.")
+                .getBytes(StandardCharsets.UTF_8);
+
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.build(preferences, isServer);
+        perMessageDeflateTx.setNext(new TesterTransformation());
+
+        List<MessagePart> uncompressedParts1 = new ArrayList<>();
+        uncompressedParts1.add(new MessagePart(true, 0, Constants.OPCODE_BINARY, ByteBuffer.wrap(message1), null, null,
+                false, Long.MAX_VALUE));
+        MessagePart compressedPart1 = perMessageDeflateTx.sendMessagePart(uncompressedParts1).get(0);
+
+        List<MessagePart> uncompressedParts2 = new ArrayList<>();
+        uncompressedParts2.add(new MessagePart(true, 0, Constants.OPCODE_BINARY, ByteBuffer.wrap(message2), null, null,
+                false, Long.MAX_VALUE));
+        MessagePart compressedPart2 = perMessageDeflateTx.sendMessagePart(uncompressedParts2).get(0);
+
+        // Proof that context takeover actually carried the window into the second message's compression: it must
+        // be smaller than compressing the same content with no shared window at all.
+        byte[] compressed2Standalone = rawDeflateFinished(message2, null);
+        Assert.assertTrue(
+                "message2 should compress smaller when the sending side's context takeover window survives from " +
+                        "message1: got " + compressedPart2.getPayload().remaining() + " bytes, independently " +
+                        "compressed would be at least " + compressed2Standalone.length + " bytes",
+                compressedPart2.getPayload().remaining() < compressed2Standalone.length);
+
+        // Round trip both messages through a matching receiving-side instance, reusing it across both messages, to
+        // confirm the compressed output remains correctly decompressible.
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.build(preferences, isServer);
+        MutableTesterTransformation source = new MutableTesterTransformation(compressedPart1.getPayload());
+        perMessageDeflateRx.setNext(source);
+
+        ByteArrayOutputStream received1 = new ByteArrayOutputStream();
+        ByteBuffer buf = ByteBuffer.allocate(8192);
+        TransformationResult tr;
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(compressedPart1.getOpCode(), compressedPart1.isFin(),
+                    compressedPart1.getRsv(), buf);
+            received1.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+        Assert.assertArrayEquals(message1, received1.toByteArray());
+
+        source.data = compressedPart2.getPayload();
+        source.delivered = false;
+
+        ByteArrayOutputStream received2 = new ByteArrayOutputStream();
+        do {
+            buf.clear();
+            tr = perMessageDeflateRx.getMoreData(compressedPart2.getOpCode(), compressedPart2.isFin(),
+                    compressedPart2.getRsv(), buf);
+            received2.write(buf.array(), 0, buf.position());
+        } while (tr == TransformationResult.OVERFLOW);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+        Assert.assertArrayEquals(message2, received2.toByteArray());
     }
 
 
     private static byte[] rawDeflateFinished(byte[] data) {
+        return rawDeflateFinished(data, null);
+    }
+
+
+    private static byte[] rawDeflateFinished(byte[] data, byte[] dictionary) {
         @SuppressWarnings("resource") // False positive
         Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
         try {
+            if (dictionary != null) {
+                deflater.setDictionary(dictionary);
+            }
             deflater.setInput(data);
             deflater.finish();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -457,9 +845,9 @@ public class TestPerMessageDeflate {
 
 
     /*
-     * Like TesterTransformation, but the source ByteBuffer can be swapped out between messages, to exercise reuse of
-     * a single PerMessageDeflate instance (and therefore its Inflater) across multiple messages, as happens on a
-     * real connection with context takeover enabled.
+     * Like TesterTransformation, but the source ByteBuffer can be swapped out between messages, to exercise reuse of a
+     * single PerMessageDeflate instance (and therefore its Inflater) across multiple messages, as happens on a real
+     * connection with context takeover enabled.
      */
     private static class MutableTesterTransformation implements Transformation {
 
