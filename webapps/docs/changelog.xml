@@ -548,6 +548,11 @@
         <code>{</code> and <code>}</code> characters from being mapped to
         WebSocket end points. (markt)
       </fix>
+      <fix>
+        Fix handling of WebSocket messages with compressed payloads using
+        per-message-deflate that have one or more non-final blocks where the
+        <code>BFINAL</code> bit is set. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
