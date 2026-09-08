@@ -335,6 +335,10 @@
         per-message-deflate that have one or more non-final blocks where the
         <code>BFINAL</code> bit is set. (markt)
       </fix>
+      <fix>
+        Fix handling of per-message-deflate context takeover when receiving
+        compressed WebSocket messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
