@@ -76,6 +76,16 @@ public class PerMessageDeflate implements Transformation {
     private volatile boolean skipDecompression = false;
     private volatile boolean eomBytesInserted = false;
     private volatile boolean eomOverflowWritten = false;
+    /*
+     * Offset and length, within readBuffer's backing array, of the compressed bytes most recently passed to
+     * inflater.setInput(). Used to work out where the unconsumed tail starts if inflater.finished() becomes true before
+     * all of those bytes have been consumed (see getMoreData()). Both fields must be kept in sync with whatever the
+     * most recent setInput() call actually used - lastInputOffset is not always readBuffer.arrayOffset(): after the
+     * first such recovery, the next input segment starts wherever the previous one left off, not at the start of
+     * readBuffer's backing array.
+     */
+    private volatile int lastInputOffset;
+    private volatile int lastInputLength;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private volatile boolean firstCompressedFrameWritten = false;
     // Flag to track if a message is completely empty
@@ -238,6 +248,8 @@ public class PerMessageDeflate implements Transformation {
             if (inflater.needsInput() && !eomBytesInserted) {
                 readBuffer.clear();
                 TransformationResult nextResult = next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
+                lastInputOffset = readBuffer.arrayOffset();
+                lastInputLength = readBuffer.position();
                 inflater.setInput(readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                 if (dest.hasRemaining()) {
                     if (TransformationResult.UNDERFLOW.equals(nextResult)) {
@@ -267,7 +279,37 @@ public class PerMessageDeflate implements Transformation {
                             sm.getString("perMessageDeflate.next.ise", next.getClass().getName()));
                 }
             } else if (written == 0) {
-                return endFrame(fin);
+                if (!eomBytesInserted && inflater.finished() && inflater.getRemaining() > 0) {
+                    /*
+                     * RFC 7692 section 7.2.1 permits an endpoint to compress a single message using multiple DEFLATE
+                     * blocks with any mix of BFINAL values, including a block with BFINAL=1 that is not the last block
+                     * of the message.
+                     *
+                     * If inflater is finished without EOM bytes being inserted and with data still to process this
+                     * indicates there is at least one more block to process. Inflater has no API to continue once it
+                     * has finished. From this point on, it silently ignores any further input. The only way to process
+                     * the remaining, still-unconsumed bytes belonging to this same message is to reset() the Inflater
+                     * (clearing the finished state) and feed it just the unconsumed tail.
+                     */
+                    int remaining = inflater.getRemaining();
+                    /*
+                     * The unconsumed tail starts wherever the *current* input segment started, not necessarily at
+                     * readBuffer.arrayOffset(): if this is the second (or later) recovery for the same message, the
+                     * current segment already starts partway into readBuffer.
+                     */
+                    int newOffset = lastInputOffset + lastInputLength - remaining;
+                    try {
+                        inflater.reset();
+                    } catch (NullPointerException e) {
+                        throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+                    }
+                    inflater.setInput(readBuffer.array(), newOffset, remaining);
+                    lastInputOffset = newOffset;
+                    lastInputLength = remaining;
+                    // Continue decompression loop
+                } else {
+                    return endFrame(fin);
+                }
             }
         }
 
@@ -313,11 +355,26 @@ public class PerMessageDeflate implements Transformation {
     private TransformationResult endFrame(boolean fin) throws IOException {
         eomBytesInserted = false;
         eomOverflowWritten = false;
-        if (fin && (isServer && !clientContextTakeover || !isServer && !serverContextTakeover)) {
-            try {
-                inflater.reset();
-            } catch (NullPointerException e) {
-                throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+        if (fin) {
+            boolean contextTakeover = isServer ? clientContextTakeover : serverContextTakeover;
+            /*
+             * If the message's final block was itself an independently BFINAL=1 terminated block (see the recovery
+             * in getMoreData()), the EOM_BYTES appended to complete the message per RFC 7692 section 7.2.2 were fed
+             * to an already-finished Inflater and were never consumed: inflater.finished() stays true with those 4
+             * bytes still reported by getRemaining(). Left in that state, the next message would compute its first
+             * recovery offset from this stale, unrelated leftover count, which can go negative. There is no way to
+             * continue decompressing past a finished Inflater in place, so it has to be reset here too - even though
+             * context takeover is enabled - at the cost of losing the window for the *next* message in this,
+             * otherwise rare, case.
+             */
+            if (!contextTakeover || inflater.finished()) {
+                try {
+                    inflater.reset();
+                } catch (NullPointerException e) {
+                    throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
+                }
+                lastInputOffset = 0;
+                lastInputLength = 0;
             }
         }
         return TransformationResult.END_OF_FRAME;
