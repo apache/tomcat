@@ -377,6 +377,10 @@
         credentials when <code>alternateUsernameAllowed</code> is set to
         <code>false</code>. (markt)
       </add>
+      <fix>
+        Ensure StatementCache interceptor resets properties of cached statements
+        between uses. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

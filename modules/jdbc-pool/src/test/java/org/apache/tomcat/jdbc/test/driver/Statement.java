@@ -43,7 +43,7 @@ import java.util.Map;
 public class Statement implements CallableStatement {
 
     private boolean throwExceptionOnExecute = false;
-    private int timeout=-1;
+    private int timeout = 0;
 
     public Statement() {
         this(false);
