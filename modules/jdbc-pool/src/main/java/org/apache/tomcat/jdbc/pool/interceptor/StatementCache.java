@@ -364,21 +364,39 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 CachedStatement proxy = new CachedStatement(getDelegate(),getSql());
                 proxy.setCacheKey(getCacheKey());
                 try {
-                    // clear Resultset
-                    ResultSet result = getDelegate().getResultSet();
-                    if (result != null && !result.isClosed()) {
-                        result.close();
-                    }
-                    // clear parameter
-                    getDelegate().clearParameters();
-
-                    //create a new facade
-                    Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
-                    proxy.setActualProxy(actualProxy);
-                    proxy.setConnection(getConnection());
-                    proxy.setConstructor(getConstructor());
-                    if (cacheStatement(proxy)) {
-                        shouldClose = false;
+                    // Only cache if statement has been marked as poolable and not close on completion
+                    if (getDelegate().isPoolable() && !getDelegate().isCloseOnCompletion()) {
+                        // clear Resultset
+                        ResultSet result = getDelegate().getResultSet();
+                        if (result != null && !result.isClosed()) {
+                            result.close();
+                        }
+                        // clear parameter
+                        getDelegate().clearParameters();
+                        // clear batch
+                        getDelegate().clearBatch();
+                        // clear warnings
+                        getDelegate().clearWarnings();
+                        // reset the timeout
+                        getDelegate().setQueryTimeout(0);
+                        // reset fetch direction
+                        getDelegate().setFetchDirection(ResultSet.FETCH_FORWARD);
+                        // reset max field size
+                        getDelegate().setMaxFieldSize(0);
+                        // reset max rows
+                        getDelegate().setMaxRows(0);
+                        // reset fetchsize
+                        getDelegate().setFetchSize(0);
+                        // reset the escape processing
+                        getDelegate().setEscapeProcessing(true);
+                        //create a new facade
+                        Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
+                        proxy.setActualProxy(actualProxy);
+                        proxy.setConnection(getConnection());
+                        proxy.setConstructor(getConstructor());
+                        if (cacheStatement(proxy)) {
+                            shouldClose = false;
+                        }
                     }
                 } catch (RuntimeException | ReflectiveOperationException | SQLException x) {
                     removeStatement(proxy);
@@ -389,7 +407,6 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             }
             closed = true;
             delegate = null;
-
         }
 
         /**
