@@ -213,6 +213,10 @@
         Require the request to the login action during FORM authentication to be
         made using HTTP POST. (markt)
       </fix>
+      <fix>
+        <bug>70208</bug>: Make URL encoding more robust. Based on pull request
+        <pr>1065</pr> by Chenjp. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

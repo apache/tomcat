@@ -17,11 +17,13 @@
 package org.apache.catalina.util;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.util.buf.UDecoder;
 
 /**
  * General purpose request parsing and encoding utility methods.
@@ -148,14 +150,29 @@ public final class RequestUtil {
         }
 
         /*
-         * This isn't perfect but is the best that can be done without running the full mapping logic on the url to
-         * determine which web application that url will map to.
+         * May not be perfect, but make a best efforts attempt to determine whether the URL belongs to current request
+         * or not.
+         *
+         * Stripping of path parameters, decoding and normalization should all be unnecessary but are included here as
+         * hardening against the application using untrusted data when constructing the URL.
          */
-        if (!url.getPath().startsWith(request.getServletContext().getContextPath())) {
+        String urlPath = url.getPath();
+        urlPath = stripPathParams(urlPath, null);
+        urlPath = UDecoder.URLDecode(urlPath, StandardCharsets.UTF_8);
+        urlPath = org.apache.tomcat.util.http.RequestUtil.normalize(urlPath);
+        if (urlPath == null) {
+            // Normalization failed. Path tried to escape the root.
             return false;
         }
 
-        return true;
+        // Context path will not end with "/"
+        String requestContextPath = request.getServletContext().getContextPath();
+
+        if (urlPath.equals(requestContextPath) || urlPath.startsWith(requestContextPath + "/")) {
+            return true;
+        }
+
+        return false;
     }
 
 

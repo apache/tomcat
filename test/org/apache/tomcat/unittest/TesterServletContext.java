@@ -43,14 +43,19 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterServletContext implements ServletContext {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This test implementation is hard coded to return an empty String.
-     */
+    private String contextPath = "";
+
+    public TesterServletContext() {
+        this("");
+    }
+
+    public TesterServletContext(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
     @Override
     public String getContextPath() {
-        return "";
+        return contextPath;
     }
 
     /**
@@ -66,8 +71,7 @@ public class TesterServletContext implements ServletContext {
     /**
      * {@inheritDoc}
      * <p>
-     * This test implementation is hard coded to return the class loader that
-     * loaded this class.
+     * This test implementation is hard coded to return the class loader that loaded this class.
      */
     @Override
     public ClassLoader getClassLoader() {
@@ -221,8 +225,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public Dynamic addServlet(String servletName,
-            Class<? extends Servlet> servletClass) {
+    public Dynamic addServlet(String servletName, Class<? extends Servlet> servletClass) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -232,8 +235,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public <T extends Servlet> T createServlet(Class<T> c)
-            throws ServletException {
+    public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -243,7 +245,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -263,8 +265,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public <T extends Filter> T createFilter(Class<T> c)
-            throws ServletException {
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -274,20 +275,21 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
         throw new RuntimeException("Not implemented");
     }
 
     private SessionCookieConfig sessionCookieConfig = new TesterSessionCookieConfig();
+
     @Override
     public SessionCookieConfig getSessionCookieConfig() {
         return sessionCookieConfig;
     }
 
     private final Set<SessionTrackingMode> sessionTrackingModes = new HashSet<>();
+
     @Override
-    public void setSessionTrackingModes(
-            Set<SessionTrackingMode> sessionTrackingModes) {
+    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
         this.sessionTrackingModes.clear();
         this.sessionTrackingModes.addAll(sessionTrackingModes);
     }
@@ -318,8 +320,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public <T extends EventListener> T createListener(Class<T> c)
-            throws ServletException {
+    public <T extends EventListener> T createListener(Class<T> c) throws ServletException {
         throw new RuntimeException("Not implemented");
     }
 
