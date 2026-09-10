@@ -161,14 +161,6 @@
         <code>minIdleSwap</code> or <code>maxIdleSwap</code> are configured.
         (markt)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Fix parsing of client certificates that specify more than one OCSP
-        responder for configurations that use OpenSSL-FFM. (markt)
-      </fix>
       <fix>
         Ensure namespace attributes are XML escaped in WebDAV responses. (markt)
       </fix>
@@ -223,6 +215,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Fix parsing of client certificates that specify more than one OCSP
+        responder for configurations that use OpenSSL-FFM. (markt)
+      </fix>
       <fix>
         xreflection generated code stack overflow issue. (remm)
       </fix>
