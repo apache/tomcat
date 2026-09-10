@@ -142,7 +142,7 @@ public class ServiceRef extends AbstractRef {
      *
      * @return the handler
      *
-     * @throws NoSuchElementException if there are no handlers
+     * @throws java.util.NoSuchElementException if there are no handlers
      */
     public HandlerRef getHandler() {
         return handlers.remove(0);
