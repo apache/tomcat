@@ -440,6 +440,12 @@
         it earlier since the refactoring made correct handling of invalid
         headers more difficult. (markt)
       </fix>
+      <fix>
+        Fix malformed HTTP/1.1 chunked responses when
+        <code>ChunkedOutputFilter</code> is reused after an I/O error during
+        the final chunk write. Reset all reusable chunk buffers when recycling
+        the filter. (junwoo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
