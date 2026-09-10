@@ -968,6 +968,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("stream.recycle.first", getConnectionId(), getIdAsString()));
         }
+        // Notes are not reset when request is recycled but this is a per request note
+        coyoteRequest.setNote(Request.NOTE_BAD_REQUEST, null);
         coyoteRequest.recycle();
         coyoteResponse.recycle();
         handler.getProtocol().pushRequestAndResponse(coyoteRequest);
