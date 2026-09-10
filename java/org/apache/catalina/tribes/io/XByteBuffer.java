@@ -77,8 +77,9 @@ public class XByteBuffer implements Serializable {
     protected int bufSize = 0;
 
     /**
-     * Flag for discarding invalid packages If this flag is set to true, and append(byte[],...) is called, the data
-     * added will be inspected, and if it doesn't start with <code>START_DATA</code> it will be thrown away.
+     * Flag for discarding invalid packages. If this flag is set to true, and append(byte[],...) is called, the
+     * buffer will be inspected, and if it is longer than <code>START_DATA</code> and does not contain
+     * <code>START_DATA</code> it will be reset to length 0.
      */
     protected boolean discard;
 
@@ -368,8 +369,7 @@ public class XByteBuffer implements Serializable {
             if (index != start || ((bufSize - start) < 14)) {
                 break;
             }
-            // next 4 bytes are compress flag not needed for count packages
-            // then get the size 4 bytes
+            // next 4 bytes are the size of the package
             int size = toInt(buf, pos);
             // now the total buffer has to be long enough to hold
             // START_DATA.length+4+size+END_DATA.length

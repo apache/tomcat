@@ -204,9 +204,9 @@ senderAddress=${cluster.server.address},senderPort=${cluster.server.port}"
 senderObjectNames: ${senderObjectNames.0}
 IDataSender.backup.connected: ${IDataSender.backup.connected}
 session: ${sessions.0}
-manager.length: ${manager.length}
-manager.0.name: ${manager.0.name}
-manager.1.name: ${manager.1.name}
+manager.Length: ${manager.Length}
+manager.0.Name: ${manager.0.Name}
+manager.1.Name: ${manager.1.Name}
 hello: ${Hello}
 manager.ClusterTest.0.name: ${manager.ClusterTest.0.name}
 manager.ClusterTest.0.activeSessions: ${manager.ClusterTest.0.activeSessions}
@@ -407,7 +407,7 @@ List of Attributes
   <tr>
     <td>separatearrayresults</td>
     <td>When return value is an array, save result as property list
-    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.length</em>)
+    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.Length</em>)
     </td>
     <td><code class="noHighlight">true</code></td>
   </tr>
@@ -592,7 +592,7 @@ List of Attributes
   <tr>
     <td>separatearrayresults</td>
     <td>When return value is an array, save result as property list
-    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.length</em>)
+    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.Length</em>)
     </td>
     <td><code class="noHighlight">true</code></td>
   </tr>
@@ -688,7 +688,7 @@ List of Attributes
 
   <tr>
     <td>resultproperty</td>
-    <td>Prefix project property name to all founded MBeans (<em>mbeans.[0..N].objectname</em>)
+    <td>Prefix project property name to all founded MBeans (<em>mbeans.[0..N].Name</em>)
     </td>
     <td></td>
   </tr>
@@ -711,7 +711,7 @@ List of Attributes
   <tr>
     <td>separatearrayresults</td>
     <td>When return value is an array, save result as property list
-    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.length</em>)
+    (<em>$resultproperty.[0..N]</em> and <em>$resultproperty.Length</em>)
     </td>
     <td><code class="noHighlight">true</code></td>
   </tr>
@@ -725,8 +725,8 @@ Get all Manager ObjectNames from all services and Hosts
     name="Catalina:type=Manager,*
     resultproperty="manager" />]]></source>
 <p>
-Now you can find the Session Manager at <em>${manager.[0..N].name}</em>
-properties and access the result object counter with ${manager.length} property.
+Now you can find the Session Manager at <em>${manager.[0..N].Name}</em>
+properties and access the result object counter with ${manager.Length} property.
 </p>
 <p>
 Example to get the Manager from <em>servlet-examples</em> application an bind all MBean properties
@@ -738,7 +738,7 @@ Example to get the Manager from <em>servlet-examples</em> application an bind al
 <p>
 Now you can find the manager at <em>${manager.servletExamples.0.name}</em> property
 and can access all properties from this manager with <em>${manager.servletExamples.0.[manager attribute names]</em>}.
-The result object counter from MBeans is stored ad ${manager.length} property.
+The result object counter from MBeans is stored ad ${manager.Length} property.
 </p>
 
 <p>
@@ -774,7 +774,7 @@ Example to get all MBeans from a server and store inside an external XML propert
 
   <!-- Print results -->
   <echo message=
-    "Number of MBeans in server ${jmx.host}:${jmx.port} is ${mbeans.length}"/>
+    "Number of MBeans in server ${jmx.host}:${jmx.port} is ${mbeans.Length}"/>
 </target>
 </project>]]></source>
 <p>

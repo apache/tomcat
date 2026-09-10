@@ -214,7 +214,8 @@ public class NioSender extends AbstractSender {
     /**
      * Reads acknowledgment data from the channel.
      *
-     * @return {@code true} if there is more data to read
+     * @return {@code true} if the read phase is complete (acknowledgment received, or there was nothing to read),
+     *             {@code false} if more data is still needed
      *
      * @throws IOException If an I/O error occurs
      */

@@ -27,6 +27,11 @@ import org.apache.tomcat.util.digester.RuleSet;
 public class CredentialHandlerRuleSet implements RuleSet {
 
 
+    /**
+     * The maximum number of nested <code>CredentialHandler</code> levels to support. The default value of 3 can be
+     * overridden using the <code>org.apache.catalina.startup.CredentialHandlerRuleSet.MAX_NESTED_LEVELS</code> system
+     * property.
+     */
     private static final int MAX_NESTED_LEVELS =
             Integer.getInteger("org.apache.catalina.startup.CredentialHandlerRuleSet.MAX_NESTED_LEVELS", 3).intValue();
 

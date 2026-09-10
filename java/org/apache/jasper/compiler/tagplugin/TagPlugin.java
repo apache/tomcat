@@ -20,7 +20,8 @@ package org.apache.jasper.compiler.tagplugin;
  * This interface is to be implemented by the plugin author, to supply an alternate implementation of the tag handlers.
  * It can be used to specify the Java codes to be generated when a tag is invoked.
  * <p>
- * An implementation of this interface must be registered in a file named "tagPlugins.xml" under WEB-INF.
+ * An implementation of this interface must be registered in a file named "tagPlugins.xml" under WEB-INF, or in a file
+ * named "META-INF/org.apache.jasper/tagPlugins.xml" in a JAR on the web application class loader.
  */
 
 public interface TagPlugin {

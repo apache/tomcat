@@ -74,6 +74,7 @@ public class TestJsonFormatter {
         }
     }
 
+    @Test
     public void testEscapeLatterHalf() {
         String input = "0123456789";
 

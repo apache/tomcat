@@ -61,7 +61,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     /**
      * The timeout in milliseconds for the selector select operation.
      */
-    protected final long selectTimeout = 5000; // default 5 seconds, same as send timeout
+    protected final long selectTimeout = 5000; // default 5 seconds
 
     /**
      * Construct a new {@code ParallelNioSender}.

@@ -299,7 +299,7 @@ public interface Options {
     /**
      * Returns whether tag pooling is allowed on JSP pages that use the extends directive.
      *
-     * @return {@code true} if tag pooling is disabled with page that uses extends.
+     * @return {@code true} if tag pooling is allowed on pages that use extends.
      */
     default boolean getPoolTagsWithExtends() {
         return false;

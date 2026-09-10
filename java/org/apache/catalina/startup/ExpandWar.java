@@ -65,7 +65,8 @@ public class ExpandWar {
      * @param war      URL of the web application archive to be expanded (must start with "jar:")
      * @param pathname Context path name for web application
      *
-     * @exception IllegalArgumentException if this is not a "jar:" URL or if the WAR file is invalid
+     * @exception ClassCastException       if the WAR URL is not a "jar:" URL
+     * @exception IllegalArgumentException if a WAR entry path resolves outside the target directory
      * @exception IOException              if an input/output error was encountered during expansion
      *
      * @return The absolute path to the expanded directory for the given WAR
@@ -92,7 +93,7 @@ public class ExpandWar {
             warLastModified = jfuc.getLastModified();
         }
 
-        // Check to see of the WAR has been expanded previously
+        // Check to see if the WAR has been expanded previously
         if (docBase.exists()) {
             // A WAR was expanded. Tomcat will have set the last modified
             // time of warTracker file to the last modified time of the WAR so
@@ -194,7 +195,8 @@ public class ExpandWar {
      * @param war      URL of the web application archive to be validated (must start with "jar:")
      * @param pathname Context path name for web application
      *
-     * @exception IllegalArgumentException if this is not a "jar:" URL or if the WAR file is invalid
+     * @exception ClassCastException       if the WAR URL is not a "jar:" URL
+     * @exception IllegalArgumentException if a WAR entry path resolves outside the target directory
      * @exception IOException              if an input/output error was encountered during validation
      */
     public static void validate(Host host, URL war, String pathname) throws IOException {

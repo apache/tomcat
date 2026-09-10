@@ -55,9 +55,9 @@ import org.apache.tomcat.util.res.StringManager;
  * should be aligned with that of the associated {@link Context}.
  * </p>
  * <p>
- * This implementation assumes that the base attribute supplied to
+ * The base attribute supplied to
  * {@link StandardRoot#createWebResourceSet( org.apache.catalina.WebResourceRoot.ResourceSetType, String, String, String, String)}
- * represents the absolute path to a file.
+ * must represent the absolute path to a file or a directory.
  * </p>
  */
 public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot {
@@ -218,7 +218,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * @param path The path of the resource to retrieve
      * @param validate Whether to validate and normalize the path
      * @param useClassLoaderResources Whether to search class loader resources
-     * @return The web resource, or a non-existent resource if not found
+     * @return The web resource, or a non-existent resource if not found. May return {@code null} if the resource sets
+     *             are being removed concurrently while this method is executing (during shutdown)
      */
     protected WebResource getResource(String path, boolean validate, boolean useClassLoaderResources) {
         if (validate) {
@@ -413,8 +414,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             default -> throw new IllegalArgumentException(sm.getString("standardRoot.createUnknownType", type));
         };
 
-        // This implementation assumes that the base for all resources will be a
-        // file.
+        // The base for a resource set can be either a file or a directory.
         File file = new File(base);
 
         if (file.isFile()) {

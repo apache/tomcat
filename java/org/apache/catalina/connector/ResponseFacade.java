@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote response object. All methods are delegated to the wrapped response.
+ * Facade class that wraps a {@link Response} object. All methods are delegated to the wrapped response.
  */
 public class ResponseFacade implements HttpServletResponse {
 

@@ -105,7 +105,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the requesting client</td>
  * <td>RemoteIPHeader</td>
  * <td>Compliant http header name</td>
- * <td>x-forwarded-for</td>
+ * <td>X-Forwarded-For</td>
  * </tr>
  * <tr>
  * <td>internalProxies</td>
@@ -122,7 +122,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the incoming <code>remoteIpHeader</code></td>
  * <td>RemoteIPProxiesHeader</td>
  * <td>Compliant http header name</td>
- * <td>x-forwarded-by</td>
+ * <td>X-Forwarded-By</td>
  * </tr>
  * <tr>
  * <td>trustedProxies</td>
@@ -135,7 +135,8 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * <tr>
  * <td>protocolHeader</td>
- * <td>Name of the http header read by this servlet filter that holds the flag that this request</td>
+ * <td>Name of the http header read by this servlet filter that holds the protocol the client used to connect to the
+ * proxy</td>
  * <td>N/A</td>
  * <td>Compliant http header name like <code>X-Forwarded-Proto</code>, <code>X-Forwarded-Ssl</code> or
  * <code>Front-End-Https</code></td>
@@ -193,7 +194,7 @@ import org.apache.tomcat.util.res.StringManager;
  *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-name&gt;proxiesHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
@@ -251,8 +252,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>443</td>
  * </tr>
  * </table>
- * Note : <code>x-forwarded-by</code> header is null because only internal proxies as been traversed by the request.
- * <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
+ * Note : <code>x-forwarded-by</code> header is null because only internal proxies have been traversed by the request.
  * <hr>
  * <p>
  * <strong>Sample with trusted proxies</strong>
@@ -274,7 +274,7 @@ import org.apache.tomcat.util.res.StringManager;
  *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-name&gt;proxiesHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
@@ -314,8 +314,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </table>
  * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code>
- * header, they both are migrated in <code>x-forwarded-by</code> header. <code>x-forwarded-by</code> is null because all
- * the proxies are trusted or internal.
+ * header, they both are migrated in <code>x-forwarded-by</code> header.
  * </p>
  * <hr>
  * <p>
@@ -338,7 +337,7 @@ import org.apache.tomcat.util.res.StringManager;
  *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-name&gt;proxiesHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
@@ -379,8 +378,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code>
  * header, they both are migrated in <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal
- * proxy, it does not appear in <code>x-forwarded-by</code>. <code>x-forwarded-by</code> is null because all the proxies
- * are trusted or internal.
+ * proxy, it does not appear in <code>x-forwarded-by</code>.
  * </p>
  * <hr>
  * <p>
@@ -403,7 +401,7 @@ import org.apache.tomcat.util.res.StringManager;
  *       &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
- *       &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
+ *       &lt;param-name&gt;proxiesHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
@@ -442,7 +440,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * </table>
  * <p>
- * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-by</code> holds
+ * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-for</code> holds
  * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
  * <code>untrusted-proxy</code> is the actual remote ip. <code>request.remoteAddr</code> is <code>untrusted-proxy</code>
  * that is an IP verified by <code>proxy1</code>.

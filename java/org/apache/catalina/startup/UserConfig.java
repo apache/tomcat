@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Startup event listener for a <b>Host</b> that configures Contexts (web applications) for all defined "users" who have
  * a web application in a directory with the specified name in their home directories. The context path of each deployed
- * application will be set to <code>~xxxxx</code>, where xxxxx is the username of the owning user for that web
+ * application will be set to <code>/~xxxxx</code>, where xxxxx is the username of the owning user for that web
  * application
  */
 public final class UserConfig implements LifecycleListener {

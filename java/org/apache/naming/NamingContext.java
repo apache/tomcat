@@ -657,7 +657,7 @@ public class NamingContext implements Context {
 
 
     /**
-     * Throws a naming exception is Context is not writable.
+     * Throws a naming exception if Context is not writable.
      *
      * @return <code>true</code> if the Context is writable
      *

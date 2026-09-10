@@ -66,11 +66,11 @@ public class NetMaskSet {
     /**
      * Tests if the provided IP address matches any of the {@link NetMask}s in the set.
      *
-     * @param ipAddress an IP address to check
+     * @param ipAddress an IP address or hostname to check
      *
      * @return {@code true} if the passed IP address is matched by any of the {@link NetMask}s in the set
      *
-     * @throws UnknownHostException if the passed input is not a valid IP address
+     * @throws UnknownHostException if the passed input cannot be resolved to an IP address
      */
     public boolean contains(String ipAddress) throws UnknownHostException {
 

@@ -36,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The factory can be used as a reader or writer but not both at the same time. When done reading or writing the factory
  * will close the input or output streams and mark the factory as closed. It is not possible to use it after that. <BR>
  * To force a cleanup, call cleanup() from the calling object. <BR>
- * This class is not thread safe.
+ * The read path is not thread safe. The write path is synchronized.
  */
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/

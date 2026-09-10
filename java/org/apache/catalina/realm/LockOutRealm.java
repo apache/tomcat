@@ -215,8 +215,8 @@ public class LockOutRealm extends CombinedRealm {
 
 
     /**
-     * Check if the current user is locked. If this is associated with a login attempt, then the last access
-     * time will be recorded and any attempt to authenticate a locked user will log a warning.
+     * Check if the specified user is locked, that is, the user has at least the configured number of recent
+     * authentication failures and the lock out period has not yet expired.
      *
      * @param username The username to check
      * @return true if the user is locked, false otherwise

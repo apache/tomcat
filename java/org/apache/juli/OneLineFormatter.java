@@ -111,7 +111,7 @@ public class OneLineFormatter extends Formatter {
     /**
      * Obtain the format currently being used for time stamps in log messages.
      *
-     * @return The current format in {@link java.text.SimpleDateFormat} syntax
+     * @return The current format, with each unquoted 'S' (millisecond) character replaced by the '#' placeholder
      */
     public String getTimeFormat() {
         return localDateCache.get().getTimeFormat();

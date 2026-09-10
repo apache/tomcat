@@ -902,7 +902,7 @@ public class JspUtil {
      *
      * @param key The name
      *
-     * @return <code>true</code> if the name is a java identifier
+     * @return <code>true</code> if the name is a java keyword
      */
     public static boolean isJavaKeyword(String key) {
         int i = 0;

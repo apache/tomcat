@@ -57,7 +57,7 @@ public class AstConcatenation extends SimpleNode {
             }
         }
 
-        // Coerce the two child nodes to string and then concatenate
+        // Coerce the two values to string and then concatenate
         String s1 = ELSupport.coerceToString(ctx, obj0);
         String s2 = ELSupport.coerceToString(ctx, obj1);
         return s1 + s2;

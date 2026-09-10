@@ -70,14 +70,14 @@ public class LoadBalancerDrainingValve extends ValveBase {
     private int _redirectStatusCode = HttpServletResponse.SC_TEMPORARY_REDIRECT;
 
     /**
-     * The name of the cookie which can be set to ignore the "draining" action of this Filter. This will allow a client
+     * The name of the cookie which can be set to ignore the "draining" action of this Valve. This will allow a client
      * to contact the server without being re-balanced to another server. The expected cookie value can be set in the
      * {@link #_ignoreCookieValue}. The cookie name and value must match to avoid being re-balanced.
      */
     private String _ignoreCookieName;
 
     /**
-     * The value of the cookie which can be set to ignore the "draining" action of this Filter. This will allow a client
+     * The value of the cookie which can be set to ignore the "draining" action of this Valve. This will allow a client
      * to contact the server without being re-balanced to another server. The expected cookie name can be set in the
      * {@link #_ignoreCookieName}. The cookie name and value must match to avoid being re-balanced.
      */

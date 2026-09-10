@@ -1513,7 +1513,7 @@ public class ContextConfig implements LifecycleListener {
             context.getNamingResources().addMessageDestinationRef(mdr);
         }
 
-        // messageDestinations were ignored in Tomcat 6, so ignore here
+        // message-destination declarations are not supported and are ignored
 
         context.setMetadataComplete(webxml.isMetadataComplete());
         for (Entry<String,String> entry : webxml.getMimeMappings().entrySet()) {

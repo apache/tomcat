@@ -59,6 +59,13 @@ public class AccessLogAdapter implements AccessLog {
         }
     }
 
+    /**
+     * This method is a NO-OP. Each wrapped AccessLog instance maintains its own
+     * <code>requestAttributesEnabled</code> setting, so a single value cannot be applied to all of the wrapped
+     * instances.
+     *
+     * @param requestAttributesEnabled Ignored
+     */
     @Override
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
         // NOOP

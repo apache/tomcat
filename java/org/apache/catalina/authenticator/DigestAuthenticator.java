@@ -139,7 +139,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Should the URI be validated as required by RFC2617? Can be disabled in reverse proxies where the proxy has
+     * Should the URI be validated as required by RFC 7616? Can be disabled in reverse proxies where the proxy has
      * modified the URI.
      */
     protected boolean validateUri = true;
@@ -388,8 +388,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 (
-     * NONCE_DIGEST ( client-IP ":" time-stamp ":" private-key ) ).
+     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = time-stamp ":"
+     * Hex ( NONCE_DIGEST ( client-IP ":" time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
      *
@@ -698,7 +698,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            // Note: The digest used to generate the nonce is independent of the digest used for authentication/
+            // Note: The digest used to generate the nonce is independent of the digest used for authentication.
             byte[] buffer =
                     ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String digestServerIpTimeKey = HexUtils.toHexString(buffer);
@@ -819,7 +819,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         /**
          * Get the timestamp when this nonce was created.
          *
-         * @return Timestamp in milliseconds
+         * @return Timestamp in nanoseconds (from {@link System#nanoTime()})
          */
         public long getTimestamp() {
             return timestamp;

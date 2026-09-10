@@ -38,8 +38,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Takes the ServletInputStream, processes the WebSocket frames it contains and extracts the messages. WebSocket Pings
- * received will be responded to automatically without any action required by the application.
+ * Processes the WebSocket frames read from the connection and extracts the messages. WebSocket Pings received will be
+ * responded to automatically without any action required by the application.
  */
 public abstract class WsFrameBase {
 
@@ -222,7 +222,7 @@ public abstract class WsFrameBase {
             // Client data must be masked
             throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.notMasked")));
         } else if ((b & 0x80) != 0 && !isMasked()) {
-            // Server data must not masked
+            // Server data must not be masked
             throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.masked")));
         }
         payloadLength = b & 0x7F;

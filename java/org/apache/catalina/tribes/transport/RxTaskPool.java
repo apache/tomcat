@@ -46,7 +46,6 @@ public class RxTaskPool {
      * @throws Exception if initialization fails
      */
     public RxTaskPool(int maxTasks, int minTasks, TaskCreator creator) throws Exception {
-        // fill up the pool with worker threads
         this.maxTasks = maxTasks;
         this.minTasks = minTasks;
         this.creator = creator;
@@ -64,9 +63,9 @@ public class RxTaskPool {
     }
 
     /**
-     * Find an idle worker thread, if any. Could return null.
+     * Find an idle worker thread, creating a new one if needed. Blocks until a worker is available.
      *
-     * @return a worker
+     * @return a worker, or null if the pool has been stopped
      */
     public AbstractRxTask getRxTask() {
         AbstractRxTask worker = null;

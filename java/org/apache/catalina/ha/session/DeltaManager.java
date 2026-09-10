@@ -45,8 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The DeltaManager manages replicated sessions by only replicating the deltas in data. For applications written to
  * handle this, the DeltaManager is the optimal way of replicating data.
  * <p>
- * This code is almost identical to StandardManager with a difference in how it persists sessions and some modifications
- * to it.
+ * This manager extends {@link ClusterManagerBase} and does not persist sessions.
  * <p>
  * <b>IMPLEMENTATION NOTE </b>: Correct behavior of session storing and reloading depends upon external calls to the
  * <code>start()</code> and <code>stop()</code> methods of this class at the correct times.

@@ -420,7 +420,7 @@ public class Http11Processor extends AbstractProcessor {
                         response.reset();
                         response.setStatus(500);
                         setErrorState(ErrorState.CLOSE_CLEAN, e);
-                        response.setHeader("Connection", "close"); // TODO: Remove
+                        response.setHeader("Connection", "close");
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);

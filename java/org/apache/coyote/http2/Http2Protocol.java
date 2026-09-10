@@ -206,7 +206,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Configure whether HTTP/2 streams atr allowed to provide a scheme that is inconsistent with the transport over
+     * Configure whether HTTP/2 streams are allowed to provide a scheme that is inconsistent with the transport over
      * which the stream was received
      *
      * @param allowSchemeMismatch {@code true} if a mismatched scheme is permitted, otherwise {@code false}

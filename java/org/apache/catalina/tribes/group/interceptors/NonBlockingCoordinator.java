@@ -51,7 +51,9 @@ import org.apache.juli.logging.LogFactory;
  * groups automatically when members are discovered that weren't part of the
  * </p>
  * <p>
- * This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on
+ * This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on. Note
+ * that {@link #startElection(boolean)} itself blocks its caller for up to 15 seconds while waiting for an election
+ * request from a higher priority member.
  * </p>
  * <p>
  * This implementation is based on a home brewed algorithm that uses the AbsoluteOrder of a membership to pass a token
@@ -727,7 +729,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_DEL, this,
                     "Member remove(" + member.getName() + ")"));
             if (started && (isCoordinator() || isHighest())) {
-                startElection(true); // to do, if a member disappears, only the coordinator can start
+                startElection(true);
             }
         } catch (ChannelException x) {
             log.error(sm.getString("nonBlockingCoordinator.memberDisappeared.failed"), x);

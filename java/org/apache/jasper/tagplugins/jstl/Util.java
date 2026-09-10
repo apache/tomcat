@@ -43,7 +43,7 @@ import org.apache.jasper.compiler.Localizer;
 public class Util {
 
     /**
-     * Constructs a new Util instance.
+     * Constructs a new Util instance. This class consists only of static methods and instances hold no state.
      */
     public Util() {
     }
@@ -174,7 +174,7 @@ public class Util {
     public static String stripSession(String url) {
         StringBuilder u = new StringBuilder(url);
         int sessionStart;
-        while ((sessionStart = u.toString().indexOf(";" + "jsessionid" /* FIXME */ + "=")) != -1) {
+        while ((sessionStart = u.toString().indexOf(";" + "jsessionid" + "=")) != -1) {
             int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
             if (sessionEnd == -1) {
                 sessionEnd = u.toString().indexOf('?', sessionStart + 1);
@@ -190,7 +190,7 @@ public class Util {
     /**
      * Performs the following substring replacements (to facilitate output to XML/HTML pages):
      * <ul>
-     * <li>{@code &} -&gt; {@code &amp}</li>
+     * <li>{@code &} -&gt; {@code &amp;}</li>
      * <li>{@code <} -&gt; {@code &lt;}</li>
      * <li>{@code >} -&gt; {@code &gt;}</li>
      * <li>{@code "} -&gt; {@code &#034;}</li>
@@ -215,7 +215,7 @@ public class Util {
      *
      * @return The escaped string, or {@code null} if no escaping was necessary
      */
-    @SuppressWarnings("null") // escapedBuffer cannot be null
+    @SuppressWarnings("null") // escapedBuffer is non-null once a special character has been found
     public static String escapeXml(char[] arrayBuffer, int length) {
         int start = 0;
         StringBuilder escapedBuffer = null;
@@ -259,7 +259,8 @@ public class Util {
      *
      * @return the absolute URL
      *
-     * @throws JspException If the URL doesn't start with '/'
+     * @throws JspException If the context is non-{@code null} and either the context or the URL doesn't start with
+     *             '/'
      */
     public static String resolveUrl(String url, String context, PageContext pageContext) throws JspException {
         // don't touch absolute URLs

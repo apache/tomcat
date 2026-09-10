@@ -64,7 +64,7 @@ public class AcceptLanguage {
      * Parses an Accept-Language header value.
      *
      * @param input The StringReader containing the header value
-     * @return A list of AcceptLanguage entries sorted by quality
+     * @return A list of AcceptLanguage entries in the order they appear in the header
      * @throws IOException If an I/O error occurs while reading the input
      */
     public static List<AcceptLanguage> parse(StringReader input) throws IOException {

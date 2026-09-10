@@ -33,7 +33,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Two-phase commit interceptor that ensures reliable message delivery.
+ * Two-phase commit interceptor. The sender transmits a confirmation message after each message. The receiver stores
+ * each message and only passes it on when the matching confirmation message is received. There is no retransmission,
+ * so a message whose confirmation is lost, or that arrives out of order, is dropped after the expiration time.
  */
 public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
 
@@ -64,7 +66,8 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     protected long expire = 1000 * 60; // one minute expiration
 
     /**
-     * Whether to deep clone messages before storage.
+     * Whether the confirmation message is deep cloned (true) or shallow cloned (false) before it is sent. Messages
+     * that are stored for later delivery are always deep cloned.
      */
     protected boolean deepclone = true;
 

@@ -88,7 +88,7 @@ public class Url implements TagPlugin {
         ctxt.generateJavaSource("    " + resultName + " = " + responseName + ".encodeURL(" + resultName + ");");
         ctxt.generateJavaSource("}");
 
-        // if "var" is specified, the url string store in the attribute var defines
+        // if "var" is specified, the url string is stored in the attribute var
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource(

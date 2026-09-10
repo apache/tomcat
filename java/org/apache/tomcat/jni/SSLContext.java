@@ -141,7 +141,7 @@ public final class SSLContext {
     public static native String[] getCiphers(long ctx);
 
     /**
-     * Set the TLSv1.2 and below ciphers available for negotiation the in TLS handshake.
+     * Set the TLSv1.2 and below ciphers available for negotiation in the TLS handshake.
      * <p>
      * This complex directive uses a colon-separated cipher-spec string consisting of OpenSSL cipher specifications to
      * configure the ciphers the client is permitted to negotiate in the TLS handshake phase.
@@ -156,7 +156,7 @@ public final class SSLContext {
     public static native boolean setCipherSuite(long ctx, String cipherList) throws Exception;
 
     /**
-     * Set the TLSv1.3 cipher suites available for negotiation the in TLS handshake.
+     * Set the TLSv1.3 cipher suites available for negotiation in the TLS handshake.
      * <p>
      * This uses a colon-separated list of TLSv1.3 cipher suite names in preference order.
      *
@@ -220,7 +220,7 @@ public final class SSLContext {
      * @param ctx      Server or Client context to use.
      * @param cert     Certificate file.
      * @param key      Private Key file to use if not in cert.
-     * @param password Certificate password. If null and certificate is encrypted, password prompt will be displayed.
+     * @param password Certificate password. If null and the certificate is encrypted, loading the certificate will fail.
      * @param idx      Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
      *
      * @return <code>true</code> if the operation was successful
@@ -276,7 +276,7 @@ public final class SSLContext {
      * @param ctx  Server or Client context to use.
      * @param mode The mode to set
      *
-     * @return the value set
+     * @return the previous mode
      */
     public static native long setSessionCacheMode(long ctx, long mode);
 
@@ -285,7 +285,7 @@ public final class SSLContext {
      *
      * @param ctx Server or Client context to use.
      *
-     * @return the value set
+     * @return the current mode
      */
     public static native long getSessionCacheMode(long ctx);
 
@@ -482,7 +482,7 @@ public final class SSLContext {
     public static native void setAlpnProtos(long ctx, String[] alpnProtos, int selectorFailureBehavior);
 
     /**
-     * Set the context within which session be reused (server side only)
+     * Set the context within which sessions can be reused (server side only)
      * http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html
      *
      * @param ctx    Server context to use.
@@ -495,7 +495,7 @@ public final class SSLContext {
 
     /**
      * Set CertificateRaw <br>
-     * Use keystore a certificate and key to fill the BIOP
+     * Use a keystore certificate and key to fill the BIO
      *
      * @param ctx        Server or Client context to use.
      * @param cert       Byte array with the certificate in DER encoding.
@@ -509,7 +509,7 @@ public final class SSLContext {
     /**
      * Add a certificate to the certificate chain. Certs should be added in order starting with the issuer of the host
      * certs and working up the certificate chain to the CA. <br>
-     * Use keystore a certificate chain to fill the BIOP
+     * Use a keystore certificate chain to fill the BIO
      *
      * @param ctx  Server or Client context to use.
      * @param cert Byte array with the certificate in DER encoding.

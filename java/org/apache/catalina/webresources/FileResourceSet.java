@@ -43,8 +43,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
      * @param root         The {@link WebResourceRoot} this new {@link org.apache.catalina.WebResourceSet} will be added
      *                         to.
      * @param webAppMount  The path within the web application at which this {@link org.apache.catalina.WebResourceSet}
-     *                         will be mounted. For example, to add a directory of JARs to a web application, the
-     *                         directory would be mounted at "WEB-INF/lib/"
+     *                         will be mounted. For example, to serve a single file from a web application, the file
+     *                         would be mounted at "/sample.txt"
      * @param base         The absolute path to the file on the file system from which the resource will be served.
      * @param internalPath The path within this new {@link org.apache.catalina.WebResourceSet} where resources will be
      *                         served from.

@@ -3,8 +3,8 @@
 package org.apache.el.parser;
 
 /**
- * An implementation of interface CharStream, where the stream is assumed to contain only ASCII characters (without
- * unicode processing).
+ * A simple character stream implementation used by the EL parser. The stream is char[]-based and fully supports
+ * 16-bit characters.
  */
 
 @SuppressWarnings("all") // Ignore warnings in generated code

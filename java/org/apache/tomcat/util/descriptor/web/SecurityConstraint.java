@@ -311,8 +311,9 @@ public class SecurityConstraint implements Serializable {
 
     /**
      * Return the set of roles that are permitted access to the resources protected by this security constraint. If none
-     * have been defined, a zero-length array is returned (which implies that all authenticated users are permitted
-     * access).
+     * have been defined, a zero-length array is returned. A zero-length array implies that all authenticated users are
+     * permitted access only if {@link #getAuthConstraint()} returns {@code false}; if it returns {@code true}, a
+     * zero-length array means that no user is permitted access.
      *
      * @return the roles array
      */

@@ -40,10 +40,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A <b>membership</b> implementation using simple multicast. This is the representation of a multicast membership
- * service. This class is responsible for maintaining a list of active cluster nodes in the cluster. If a node fails to
- * send out a heartbeat, the node will be dismissed. This is the low level implementation that handles the multicasting
- * sockets.
+ * A <b>membership</b> implementation using simple multicast. This class is responsible for maintaining a list of
+ * active cluster nodes in the cluster. If a node fails to send out a heartbeat, the node will be dismissed. This is the
+ * low level implementation that handles the multicasting sockets.
  */
 public class McastServiceImpl extends MembershipProviderBase {
 

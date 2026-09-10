@@ -44,7 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Registry for modeler MBeans. This is the main entry point into modeler. It provides methods to create and manipulate
- * model mbeans and simplify their use. This class is itself a mbean.
+ * model mbeans and simplify their use.
  */
 public class Registry implements RegistryMBean, MBeanRegistration {
 
@@ -109,7 +109,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param key   Unused
      * @param guard Prevent access to the registry by untrusted components
      *
-     * @return the registry
+     * @return the registry, or {@code null} if the guard object does not allow access to the registry
      *
      * @since 1.1
      */
@@ -162,7 +162,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // -------------------- Generic methods --------------------
 
     /**
-     * Lifecycle method - clean up the registry metadata. Called from resetMetadata().
+     * Lifecycle method - clean up the registry metadata.
      *
      * @since 1.1
      */
@@ -176,7 +176,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
     /**
      * Register a bean by creating a modeler mbean and adding it to the MBeanServer. If metadata is not loaded, we'll
-     * look up and read a file named "mbeans-descriptors.ser" or "mbeans-descriptors.xml" in the same package or parent.
+     * look up and read a file named "mbeans-descriptors.xml" in the same package or parent.
      * If the bean is an instance of DynamicMBean. its metadata will be converted to a model mbean, and we'll wrap it so
      * modeler services are supported. If the metadata is still not found, introspection will be used to extract it
      * automatically. If a mbean is already registered under this name, it'll be first unregistered. If the component
@@ -659,7 +659,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Lookup the component descriptor in the package and in the parent packages.
+     * Lookup the component descriptor in the given package.
      *
      * @param packageName The package name
      * @param classLoader The class loader

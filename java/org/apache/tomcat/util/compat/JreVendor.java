@@ -24,7 +24,8 @@ import java.util.Locale;
 public class JreVendor {
 
     /**
-     * Constructs a new JreVendor instance. This class cannot be instantiated.
+     * Constructs a new JreVendor instance. The vendor flags are static;
+     * instances carry no state.
      */
     public JreVendor() {
     }

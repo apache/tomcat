@@ -254,7 +254,8 @@ public class ELParser {
 
 
     /**
-     * Escape '\\', '\'' and '\"', inverting the unescaping performed in {@link #skipUntilEL()}.
+     * Escape '\\' in the input, and also the quote character when the input is a quoted string literal, inverting the
+     * unescaping performed in {@link #skipUntilEL()}.
      *
      * @param input Non-EL input to be escaped
      *

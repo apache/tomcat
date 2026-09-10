@@ -76,7 +76,7 @@ public interface CatalinaCluster extends Cluster {
     Member getLocalMember();
 
     /**
-     * Add cluster valve. Cluster Valves are only add to container when cluster is started.
+     * Add a cluster valve. Cluster valves are only added to the container when the cluster is started.
      *
      * @param valve The new cluster Valve.
      */

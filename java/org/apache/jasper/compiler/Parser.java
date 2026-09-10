@@ -179,7 +179,7 @@ class Parser implements TagConstants {
      * Attribute ::= Name S? Eq S? ( '"<%=' RTAttributeValueDouble | '"' * AttributeValueDouble | "'<%="
      * RTAttributeValueSingle | "'" AttributeValueSingle }
      * <p>
-     * Note: JSP and XML spec does not allow while spaces around Eq. It is added to be backward compatible with Tomcat,
+     * Note: JSP and XML spec does not allow white spaces around Eq. It is added to be backward compatible with Tomcat,
      * and with other xml parsers.
      */
     private boolean parseAttribute(AttributesImpl attrs) throws JasperException {

@@ -34,7 +34,7 @@ public abstract class ModelerSource {
     }
 
     /**
-     * The string manager for this class.
+     * The string manager for the package that contains {@link Registry}.
      */
     protected static final StringManager sm = StringManager.getManager(Registry.class);
     /**
