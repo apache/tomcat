@@ -51,9 +51,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Returns the character set used for encoding credentials, as set by the user.
+     * Returns the character set name used for encoding credentials, as set by the user.
      *
-     * @return the character set name, the default value is "UTF-8"
+     * @return the character set name, the default value is "UTF-8". May be <code>null</code> or empty, in which case
+     *             the credentials are encoded using ISO-8859-1.
      */
     public String getCharset() {
         return charsetString;
@@ -167,7 +168,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Parser for an HTTP Authorization header for BASIC authentication as per RFC 2617 section 2, and the Base64
+     * Parser for an HTTP Authorization header for BASIC authentication as per RFC 7617, and the Base64
      * encoded credentials as per RFC 2045 section 6.8.
      */
     public static class BasicCredentials {
@@ -256,9 +257,9 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * Decode the base64-user-pass token, which RFC 2617 states can be longer than the 76 characters per line limit
-         * defined in RFC 2045. The base64 decoder will ignore embedded line break characters as well as surplus
-         * surrounding white space.
+         * Decode the base64-user-pass token, which RFC 7617 states can be longer than the 76 characters per line limit
+         * defined in RFC 2045. The base64 decoder is a strict decoder that rejects any embedded line break characters
+         * as well as surplus surrounding white space.
          */
         private byte[] parseBase64() throws IllegalArgumentException {
             byte[] encoded = new byte[base64blobLength];

@@ -120,7 +120,6 @@ public class CatalinaProperties {
         }
 
         if ((is == null)) {
-            // Do something
             log.warn("Failed to load catalina properties file");
             // That's fine - we have reasonable defaults.
             properties = new Properties();

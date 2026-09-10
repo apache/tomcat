@@ -60,7 +60,7 @@ public class Cookie {
     private static final byte COMMA_BYTE = (byte) 0x2C;
     private static final byte SEMICOLON_BYTE = (byte) 0x3B;
     private static final byte EQUALS_BYTE = (byte) 0x3D;
-    private static final byte SLASH_BYTE = (byte) 0x5C;
+    private static final byte BACKSLASH_BYTE = (byte) 0x5C;
     private static final byte DEL_BYTE = (byte) 0x7F;
 
 
@@ -69,7 +69,7 @@ public class Cookie {
         // %x80 to %xFF (UTF-8)
         for (int i = 0; i < 256; i++) {
             isCookieOctet[i] = !(i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE || i == SEMICOLON_BYTE ||
-                    i == SLASH_BYTE || i == DEL_BYTE);
+                    i == BACKSLASH_BYTE || i == DEL_BYTE);
         }
         for (int i = 0; i < 256; i++) {
             isText[i] = !(i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE);

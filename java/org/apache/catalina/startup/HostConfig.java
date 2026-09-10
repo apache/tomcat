@@ -1845,9 +1845,6 @@ public class HostConfig implements LifecycleListener {
         host.removeChild(host.findChild(contextName));
     }
 
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
      * This class represents the state of a deployed application, as well as the monitored resources.
      */

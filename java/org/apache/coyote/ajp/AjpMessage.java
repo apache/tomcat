@@ -292,7 +292,8 @@ public class AjpMessage {
 
 
     /**
-     * Read a null-terminated string of bytes from the packet.
+     * Read a null-terminated string of bytes from the packet. A length of {@code 0xFFFF} indicates that there is no
+     * value: the {@code MessageBytes} is recycled and the read position is not advanced.
      *
      * @param mb The MessageBytes to populate with the read bytes
      */

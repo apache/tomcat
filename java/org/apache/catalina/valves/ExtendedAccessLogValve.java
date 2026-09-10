@@ -59,7 +59,9 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>sc(xxx)</code>: The value of header xxx from server to client</li>
  * <li><code>sc-status</code>: The status code</li>
  * <li><code>time</code>: Time the request was served</li>
- * <li><code>time-taken</code>: Time (in seconds) taken to serve the request</li>
+ * <li><code>time-taken</code>: Time taken to serve the request. In seconds by default; one of the suffixes
+ * <code>-ms</code>, <code>-us</code>, <code>-ns</code> or <code>-fracsec</code> may be appended to select the unit
+ * (unknown suffixes default to seconds)</li>
  * <li><code>x-threadname</code>: Current request thread name (can compare later with stacktraces)</li>
  * <li><code>x-A(xxx)</code>: Pull xxx attribute from the servlet context</li>
  * <li><code>x-C(xxx)</code>: Pull the cookie(s) of the name xxx</li>

@@ -92,7 +92,6 @@ public class Catalina {
      */
     protected String configFile = SERVER_XML;
 
-    // XXX Should be moved to embedded
     /**
      * The shared extensions class loader for this server.
      */
@@ -946,8 +945,7 @@ public class Catalina {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            // This will fail on JDK 1.2. Ignoring, as Tomcat can run
-            // fine without the shutdown hook.
+            // Failure to remove the shutdown hook is non-fatal
         }
 
         // Shut down the server

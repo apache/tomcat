@@ -617,7 +617,7 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * Change the behavior of Servlet startup errors on web application starts.
      *
-     * @param failCtxIfServletStartFails <code>false</code> to ignore errors on Servlets which are stated when the web
+     * @param failCtxIfServletStartFails <code>false</code> to ignore errors on Servlets which are started when the web
      *                                       application starts
      */
     public void setFailCtxIfServletStartFails(boolean failCtxIfServletStartFails) {

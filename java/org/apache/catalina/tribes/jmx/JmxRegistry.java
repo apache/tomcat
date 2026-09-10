@@ -54,7 +54,8 @@ public class JmxRegistry {
      * Get the JMX registry for the given channel.
      *
      * @param channel the channel
-     * @return the JMX registry, or {@code null} if JMX is not enabled
+     * @return the JMX registry, or {@code null} if the channel or its name is null, the channel is not a
+     *             {@link JmxChannel}, JMX is not enabled for the channel, or the base ObjectName cannot be created
      */
     public static JmxRegistry getRegistry(Channel channel) {
         if (channel == null || channel.getName() == null) {

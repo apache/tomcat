@@ -138,10 +138,9 @@ public class Util {
 
 
     static byte[] generateRandomBytes(int len) {
-        // SecureRandom is not thread-safe so need to make sure only one thread
-        // uses it at a time. In theory, the pool could grow to the same size
-        // as the number of request processing threads. In reality, it will be
-        // a lot smaller.
+        // SecureRandom is thread-safe, but creating instances is expensive, so instances are pooled and one is
+        // handed out to each concurrent user. In theory, the pool could grow to the same size as the number of
+        // request processing threads. In reality, it will be a lot smaller.
 
         // Get a SecureRandom from the pool
         SecureRandom sr = randoms.poll();
@@ -160,7 +159,7 @@ public class Util {
         byte[] result = new byte[len];
         sr.nextBytes(result);
 
-        // Put the SecureRandom back in the poll
+        // Put the SecureRandom back in the pool
         randoms.add(sr);
 
         return result;
@@ -306,7 +305,10 @@ public class Util {
      *
      * @return The coerced value
      *
-     * @throws IllegalArgumentException If the type is not supported
+     * @throws IllegalArgumentException            If the type is not supported
+     * @throws NumberFormatException               If the value cannot be parsed as the target numeric type
+     * @throws StringIndexOutOfBoundsException    If the target type is <code>char</code> or <code>Character</code>
+     *                                               and the value is empty
      */
     public static Object coerceToType(Class<?> type, String value) {
         if (type.equals(String.class)) {

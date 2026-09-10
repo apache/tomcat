@@ -43,7 +43,9 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This servlet will display a complete status of the HTTP/1.1 connector.
+ * This servlet will display the status of the server, including JVM memory pools, connector thread pools and, for the
+ * <code>/all</code> path, the status of each deployed web application. The status is rendered in HTML, XML (when the
+ * <code>XML</code> request parameter is set) or JSON (when the <code>JSON</code> request parameter is set).
  */
 public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 

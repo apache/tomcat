@@ -61,7 +61,7 @@ import org.apache.tomcat.util.security.Escape;
  * interface which makes it easier to administrate.
  * <p>
  * However if you use a software that parses the output of <code>ManagerServlet</code> you won't be able to upgrade to
- * this Servlet since the output are not in the same format ar from <code>ManagerServlet</code>
+ * this Servlet since the output is not in the same format as <code>ManagerServlet</code>
  *
  * @see ManagerServlet
  */

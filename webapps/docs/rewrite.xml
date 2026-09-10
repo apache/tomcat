@@ -667,7 +667,7 @@ cannot use <code>$N</code> in the substitution string!
         is specified by <em>NAME</em> and the value is
         <em>VAL</em>. The <em>domain</em> field is the domain of the
         cookie, such as '.apache.org', the optional <em>lifetime</em>
-        is the lifetime of the cookie in minutes, and the optional
+        is the lifetime of the cookie in seconds, and the optional
         <em>path</em> is the path of the cookie</li>
 
         <li>

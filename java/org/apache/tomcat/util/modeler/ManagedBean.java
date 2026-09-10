@@ -131,7 +131,7 @@ public class ManagedBean implements java.io.Serializable {
 
     /**
      * The fully qualified name of the Java class of the MBean described by this descriptor. If not specified, the
-     * standard JMX class (<code>javax.management.modelmbean.RequiredModeLMBean</code>) will be utilized.
+     * default class (<code>org.apache.tomcat.util.modeler.BaseModelMBean</code>) will be utilized.
      *
      * @return the class name
      */

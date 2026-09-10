@@ -33,12 +33,15 @@ import org.apache.tomcat.util.security.ConstantTime;
  * This credential handler supports the following forms of stored passwords:
  * <ul>
  * <li><b>encodedCredential</b> - a hex encoded digest of the password digested using the configured digest</li>
- * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the password</li>
- * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the password</li>
- * <li><b>{SSHA}encodedCredential</b> - 20 byte Base64 encoded SHA1 digest followed by variable length salt.
+ * <li><b>{MD5}encodedCredential</b> - a Base64 encoded digest of the password. The prefix only indicates the storage
+ * encoding used by some directories and databases; the digest is generated with the configured digest algorithm.</li>
+ * <li><b>{SHA}encodedCredential</b> - a Base64 encoded digest of the password. The prefix only indicates the storage
+ * encoding used by some directories and databases; the digest is generated with the configured digest algorithm.</li>
+ * <li><b>{SSHA}encodedCredential</b> - the Base64 encoding of a 20 byte digest of the password (generated with the
+ * configured digest algorithm) concatenated with a variable length salt.
  *
  * <pre>
- * {SSHA}&lt;sha-1 digest:20&gt;&lt;salt:n&gt;
+ * {SSHA}&lt;base64(&lt;digest:20&gt;&lt;salt:n&gt;)&gt;
  * </pre>
  *
  * </li>

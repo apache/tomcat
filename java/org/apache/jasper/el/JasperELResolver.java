@@ -47,7 +47,8 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
  */
 public class JasperELResolver extends CompositeELResolver {
 
-    // Keep aligned with class under test
+    // The number of resolvers to pre-allocate in the resolvers array
+    // Note: Keep aligned with test class
     private static final int STANDARD_RESOLVERS_COUNT = 11;
 
     private final AtomicInteger resolversSize = new AtomicInteger(0);
@@ -120,7 +121,7 @@ public class JasperELResolver extends CompositeELResolver {
                 }
             }
             // skip stream, static and collection-based resolvers (map,
-            // resource, list, array) and bean
+            // resource, list, array) and record
             start = index + 7;
             if (JspRuntimeLibrary.GRAAL) {
                 start++;
@@ -164,7 +165,7 @@ public class JasperELResolver extends CompositeELResolver {
 
         // skip collection (map, resource, list, and array) resolvers
         index += 4;
-        // call bean and the rest of resolvers
+        // call record and the rest of resolvers
         int size = resolversSize.get();
         for (int i = index; i < size; i++) {
             result = resolvers[i].invoke(context, base, targetMethod, paramTypes, params);

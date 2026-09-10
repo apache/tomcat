@@ -48,20 +48,20 @@ public interface ThroughputInterceptorMBean {
     double getLastCnt();
 
     /**
-     * Returns the application-layer transmit rate in MB/s.
-     * @return the MB/s rate
+     * Returns the cumulative amount of data transmitted at the application layer, in MB.
+     * @return the amount in MB
      */
     double getMbAppTx();
 
     /**
-     * Returns the receive rate in MB/s.
-     * @return the MB/s rate
+     * Returns the cumulative amount of data received, in MB.
+     * @return the amount in MB
      */
     double getMbRx();
 
     /**
-     * Returns the transmit rate in MB/s.
-     * @return the MB/s rate
+     * Returns the cumulative amount of data transmitted, in MB.
+     * @return the amount in MB
      */
     double getMbTx();
 
@@ -90,8 +90,8 @@ public interface ThroughputInterceptorMBean {
     long getRxStart();
 
     /**
-     * Returns the last transmit time.
-     * @return the time
+     * Returns the accumulated total transmit time in seconds.
+     * @return the time in seconds
      */
     double getTimeTx();
 

@@ -49,7 +49,7 @@ public enum ActionCode {
 
     /**
      * A flush() operation originated by the client ( i.e. a flush() on the servlet output stream or writer, called by a
-     * servlet ). Argument is the Response.
+     * servlet ). The parameter is ignored.
      */
     CLIENT_FLUSH,
 
@@ -171,7 +171,7 @@ public enum ActionCode {
     ASYNC_IS_ASYNC,
 
     /**
-     * Callback to determine if async dispatch is in progress.
+     * Callback to determine if async processing has been started.
      */
     ASYNC_IS_STARTED,
 

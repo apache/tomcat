@@ -36,12 +36,8 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  *             default="true"
  *             tagClass="org.apache.catalina.core.StandardServer"
  *             storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
- *           <TransientAttributes>
- *             <Attribute></Attribute>
- *           </TransientAttributes>
- *           <TransientChildren>
- *             <Child></Child>
- *           </TransientChildren>
+ *           <TransientAttribute>domain</TransientAttribute>
+ *           <TransientChild>org.apache.catalina.core.StandardContext</TransientChild>
  *         </Description>
  *   ...
  *       </Registry>
@@ -53,7 +49,7 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  * <li>Factories at subpackage <i>org.apache.catalina.storeconfig.xxxSF</i>.</li>
  * <li>Element name are the unique Class name</li>
  * <li>SF for StoreFactory</li>
- * <li>standard implementation is false</li>
+ * <li>standard implementation is true</li>
  * </ul>
  */
 public class StoreLoader {

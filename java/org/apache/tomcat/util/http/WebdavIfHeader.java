@@ -145,7 +145,7 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Return the String representation of the If header present on the given request or <code>null</code>.
+     * Return the String representation of the If header value or <code>null</code> if no If header is present.
      *
      * @return If header value as String or <code>null</code>.
      */
@@ -154,9 +154,9 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Returns true if an If header was present in the given request. False otherwise.
+     * Returns true if an If header is present. False otherwise.
      *
-     * @return true if an If header was present.
+     * @return true if an If header is present.
      */
     public boolean hasValue() {
         return ifHeader != null;
@@ -339,7 +339,7 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Parses an <em>IfList</em> in the <em>If</em> header. This method implements the <em>Tagged</em> production given
+     * Parses an <em>IfList</em> in the <em>If</em> header. This method implements the <em>IfList</em> production given
      * in the class comment :
      *
      * <pre>
@@ -847,15 +847,15 @@ public class WebdavIfHeader {
         private static final long serialVersionUID = 1L;
 
         /**
-         * Matches the token and etag for the given resource. If the resource is not mentioned in the header, a match is
-         * assumed and <code>true</code> is returned in this case.
+         * Matches the token and etag for the given resource. If the resource is not mentioned in the header, a mismatch
+         * is assumed and <code>false</code> is returned in this case.
          *
          * @param resource The absolute URI of the resource for which to find a match.
          * @param tokens   The tokens to compare.
          * @param etag     The etag to compare.
          *
-         * @return <code>true</code> if either no entry exists for the resource or if the entry for the resource matches
-         *             the token and etag.
+         * @return <code>true</code> if the entry for the resource matches the token and etag, <code>false</code>
+         *             otherwise (including when no entry exists for the resource).
          */
         @Override
         public boolean matches(String resource, List<String> tokens, String etag) {

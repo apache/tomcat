@@ -50,8 +50,10 @@ import org.apache.tomcat.util.http.CookieProcessor;
 /**
  * Store server.xml Context element with all children
  * <ul>
- * <li>Store all context at server.xml</li>
- * <li>Store existing app.xml context a conf/enginename/hostname/app.xml</li>
+ * <li>Store a context that has an external configuration file to that file</li>
+ * <li>Store a context without an external configuration file to
+ * conf/enginename/hostname/context.xml, unless the registry allows inline
+ * storage in server.xml</li>
  * <li>Store with backup</li>
  * </ul>
  */

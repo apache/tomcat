@@ -50,7 +50,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * Name to register for this Store, used for logging.
+     * The default store name, used for logging by the default {@link #getStoreName()} implementation. Concrete store
+     * implementations typically shadow this with their own name and override {@link #getStoreName()}.
      */
     protected static final String storeName = "StoreBase";
 
@@ -119,9 +120,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
     /**
-     * Get only those keys of sessions, that are saved in the Store and are to be expired.
+     * Get the keys of sessions that are to be expired. The default implementation returns all keys that are saved in
+     * the Store. Subclasses may override this to return only the keys of sessions that are actually to be expired.
      *
-     * @return array of session keys, that are to be expired
+     * @return array of session keys
      *
      * @throws IOException if an input-/output error occurred
      */

@@ -46,7 +46,7 @@ public class OpenEjbFactory implements ObjectFactory {
     /**
      * Create a new EJB instance using OpenEJB.
      *
-     * @param obj         The reference object describing the DataSource
+     * @param obj         The reference object describing the EJB
      * @param name        the bound name
      * @param nameCtx     unused
      * @param environment unused

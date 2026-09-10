@@ -1299,8 +1299,8 @@ public final class SSL {
      * <br>
      * The depth actually is the maximum number of intermediate certificate issuers, i.e. the number of CA certificates
      * which are max allowed to be followed while verifying the client certificate. A depth of 0 means that self-signed
-     * client certificates are accepted only, the default depth of 1 means the client certificate can be self-signed or
-     * has to be signed by a CA which is directly known to the server (i.e. the CA's certificate is under
+     * client certificates are accepted only. A depth of 1 means the client certificate can be self-signed or has to be
+     * signed by a CA which is directly known to the server (i.e. the CA's certificate is under
      * {@code setCACertificatePath}, etc).
      *
      * @param ssl   the SSL instance (SSL *)
@@ -1359,7 +1359,7 @@ public final class SSL {
     public static native String[] getCiphers(long ssl);
 
     /**
-     * Set the TLSv1.2 and below ciphers available for negotiation the in TLS handshake.
+     * Set the TLSv1.2 and below ciphers available for negotiation in the TLS handshake.
      * <p>
      * This complex directive uses a colon-separated cipher-spec string consisting of OpenSSL cipher specifications to
      * configure the ciphers the client is permitted to negotiate in the TLS handshake phase.
@@ -1374,7 +1374,7 @@ public final class SSL {
     public static native boolean setCipherSuites(long ssl, String cipherList) throws Exception;
 
     /**
-     * Set the TLSv1.3 cipher suites available for negotiation the in TLS handshake.
+     * Set the TLSv1.3 cipher suites available for negotiation in the TLS handshake.
      * <p>
      * This uses a colon-separated list of TLSv1.3 cipher suite names in preference order.
      *

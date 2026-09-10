@@ -88,7 +88,7 @@ public final class ByteChunk extends AbstractChunk {
          * @param off offset in the bytes array
          * @param len length that will be written
          *
-         * @throws IOException If an I/O occurs while writing the bytes
+         * @throws IOException If an I/O error occurs while writing the bytes
          */
         void realWriteBytes(byte[] buf, int off, int len) throws IOException;
 
@@ -98,7 +98,7 @@ public final class ByteChunk extends AbstractChunk {
          *
          * @param from bytes that will be written
          *
-         * @throws IOException If an I/O occurs while writing the bytes
+         * @throws IOException If an I/O error occurs while writing the bytes
          */
         void realWriteBytes(ByteBuffer from) throws IOException;
     }
@@ -989,14 +989,14 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns the first instance of the given bytes in the byte array between the specified start and end.
+     * Returns the first position of any of the given bytes in the byte array between the specified start and end.
      *
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
      * @param end   The point to stop searching in the byte array
      * @param b     The array of bytes to search for
      *
-     * @return The position of the first instance of the byte or -1 if the byte is not found.
+     * @return The position of the first instance of any of the given bytes or -1 if none of them are found.
      */
     public static int findBytes(byte[] bytes, int start, int end, byte[] b) {
         int offset = start;

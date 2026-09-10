@@ -103,13 +103,14 @@ public class SocketProperties {
      * <p>
      * -1 means unlimited<br>
      * 0 means no cache<br>
-     * Default value is based on the max memory reported by the JVM, if less than 1GB, then 0, else the value divided by
-     * 32. This value will then be used to compute bufferPool if its value is -2
+     * Default value is based on the max memory reported by the JVM, if greater than
+     * <code>Integer.MAX_VALUE</code> (about 2 GB), then the value divided by 32, else 0. This value will then be used
+     * to compute bufferPool if its value is -2
      */
     protected int bufferPoolSize = -2;
 
     /**
-     * TCP_NO_DELAY option. JVM default used if not set.
+     * TCP_NO_DELAY option. Default is <code>true</code>.
      */
     protected Boolean tcpNoDelay = Boolean.TRUE;
 
@@ -455,8 +456,8 @@ public class SocketProperties {
     }
 
     /**
-     * Returns the direct buffer pool size.
-     * @return the direct buffer pool size
+     * Returns the buffer pool size.
+     * @return the buffer pool size
      */
     public int getDirectBufferPool() {
         return bufferPool;

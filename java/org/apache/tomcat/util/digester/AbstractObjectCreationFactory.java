@@ -38,7 +38,8 @@ public abstract class AbstractObjectCreationFactory implements ObjectCreationFac
 
 
     /**
-     * The associated <code>Digester</code> instance that was set up by {@link FactoryCreateRule} upon initialization.
+     * The associated <code>Digester</code> instance that was set by {@link Digester#addFactoryCreate} upon
+     * initialization.
      */
     private Digester digester = null;
 
@@ -60,7 +61,7 @@ public abstract class AbstractObjectCreationFactory implements ObjectCreationFac
 
     /**
      * <p>
-     * Returns the {@link Digester} that was set by the {@link FactoryCreateRule} upon initialization.
+     * Returns the {@link Digester} that was set by {@link Digester#addFactoryCreate} upon initialization.
      */
     @Override
     public Digester getDigester() {

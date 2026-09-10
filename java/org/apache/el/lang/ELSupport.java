@@ -88,8 +88,9 @@ public class ELSupport {
      *
      * @return -1, 0, or 1 if this object is less than, equal to, or greater than val.
      *
-     * @throws ELException        if neither object is Comparable
-     * @throws ClassCastException if the objects are not mutually comparable
+     * @throws ELException          if neither object is Comparable
+     * @throws ClassCastException   if the objects are not mutually comparable
+     * @throws NullPointerException if either object is null
      */
     public static int compare(final ELContext ctx, final Object obj0, final Object obj1) throws ELException {
         if (obj0 == obj1 || equals(ctx, obj0, obj1)) {
@@ -138,9 +139,12 @@ public class ELSupport {
      * <p>
      * If either object is null, return false.
      * <p>
+     * If either object is a BigDecimal, Double(Float), BigInteger or Long(Integer, Short, Byte, Character), coerce
+     * both to the corresponding numeric type and check equality.
+     * <p>
      * If either object is Boolean, coerce both to Boolean and check equality.
      * <p>
-     * Similarly for Enum, String, BigDecimal, Double(Float), Long(Integer, Short, Byte, Character)
+     * Similarly for Enum, String and date types (TemporalAccessor, Clock, java.util.Date or java.sql.Timestamp)
      * <p>
      * Otherwise default to using Object.equals().
      *

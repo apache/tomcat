@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 public final class UDecoder {
 
     /**
-     * Constructs a new UDecoder. This utility class should not be instantiated.
+     * Constructs a new UDecoder.
      */
     public UDecoder() {
     }

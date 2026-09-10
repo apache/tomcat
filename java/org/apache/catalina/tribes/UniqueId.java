@@ -41,7 +41,7 @@ public final class UniqueId implements Serializable {
     /**
      * Constructs a new UniqueId from the given byte array.
      *
-     * @param id the byte array containing the identifier
+     * @param id the byte array containing the identifier. The array is retained by reference and must not be modified.
      */
     public UniqueId(byte[] id) {
         this.id = id;

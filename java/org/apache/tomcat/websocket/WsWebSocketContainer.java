@@ -1078,7 +1078,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     /**
-     * {@inheritDoc} Currently, this implementation does not support any extensions.
+     * {@inheritDoc} Currently, this implementation supports the permessage-deflate extension.
      */
     @Override
     public Set<Extension> getInstalledExtensions() {

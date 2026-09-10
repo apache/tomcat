@@ -29,9 +29,9 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This the base implementation for the AJP protocol handlers. Implementations typically extend this base class rather
- * than implement {@link org.apache.coyote.ProtocolHandler}. All of the implementations that ship with Tomcat are
- * implemented this way.
+ * This is the base implementation for the AJP protocol handlers. Implementations typically extend this base class
+ * rather than implement {@link org.apache.coyote.ProtocolHandler}. All of the implementations that ship with Tomcat
+ * are implemented this way.
  *
  * @param <S> The type of socket used by the implementation
  */

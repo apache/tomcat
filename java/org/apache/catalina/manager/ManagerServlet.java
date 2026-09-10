@@ -95,6 +95,9 @@ import org.apache.tomcat.util.security.Escape;
  * attribute with the contents of the web application archive found at <code>{war-url}</code>.</li>
  * <li><b>/deploy?path=/xxx&amp;war={war-url}</b> - Install and start a new web application attached to context path
  * <code>/xxx</code>, based on the contents of the web application archive found at the specified URL.</li>
+ * <li><b>/deploy?path=/xxx&amp;tag={tag}</b> - Install and start a new web application attached to context path
+ * <code>/xxx</code>, based on the web application archive named <code>{baseName}.war</code> in the <code>{tag}</code>
+ * sub-directory of the temporary directory of this web application.</li>
  * <li><b>/list</b> - List the context paths of all currently installed web applications for this virtual host. Each
  * context will be listed with the following format <code>path:status:sessions</code>. Where path is the context path.
  * Status is either running or stopped. Sessions is the number of active Sessions.</li>
@@ -102,13 +105,21 @@ import org.apache.tomcat.util.security.Escape;
  * <li><b>/resources?type=xxxx</b> - Enumerate the available global JNDI resources, optionally limited to those of the
  * specified type (fully qualified Java class name), if available.</li>
  * <li><b>/serverinfo</b> - Display system OS and JVM properties.
- * <li><b>/sessions</b> - Deprecated. Use expire.
+ * <li><b>/sessions?path=/xxx</b> - Deprecated alias for <b>/expire?path=/xxx</b>.
  * <li><b>/expire?path=/xxx</b> - List session idle time information about the web application attached to context path
  * <code>/xxx</code> for this virtual host.</li>
  * <li><b>/expire?path=/xxx&amp;idle=mm</b> - Expire sessions for the context path <code>/xxx</code> which were idle for
  * at least mm minutes.</li>
+ * <li><b>/findleaks</b> - List the context paths of the web applications of this virtual host for which memory leaks
+ * have been detected.</li>
  * <li><b>/sslConnectorCiphers</b> - Display diagnostic info on SSL/TLS ciphers that are currently configured for each
- * connector.
+ * connector.</li>
+ * <li><b>/sslConnectorCerts</b> - Display diagnostic info on the SSL/TLS server certificates that are currently
+ * configured for each connector.</li>
+ * <li><b>/sslConnectorTrustedCerts</b> - Display diagnostic info on the SSL/TLS trusted certificates that are currently
+ * configured for each connector.</li>
+ * <li><b>/sslReload</b> - Reload the SSL/TLS configuration of all SSL connectors, or of the single connector with the
+ * specified <code>tlsHostName</code> if that parameter is provided.</li>
  * <li><b>/start?path=/xxx</b> - Start the web application attached to context path <code>/xxx</code> for this virtual
  * host.</li>
  * <li><b>/stop?path=/xxx</b> - Stop the web application attached to context path <code>/xxx</code> for this virtual
@@ -125,6 +136,10 @@ import org.apache.tomcat.util.security.Escape;
  * Host.</li>
  * </ul>
  * <p>
+ * A <code>PUT</code> request to <b>/deploy?path=/xxx</b> deploys a web application attached to context path
+ * <code>/xxx</code> using the web application archive provided in the request body.
+ * </p>
+ * <p>
  * Use <code>path=/</code> for the ROOT context.
  * </p>
  * <p>
@@ -135,6 +150,8 @@ import org.apache.tomcat.util.security.Escape;
  * <li><b>file:/absolute/path/to/a/directory</b> - You can specify the absolute path of a directory that contains the
  * unpacked version of a web application. This directory will be attached to the context path you specify without any
  * changes.</li>
+ * <li><b>file:/absolute/path/to/a/file.war</b> - You can specify the absolute path of a web application archive. This
+ * web application will be attached to the context path you specify.</li>
  * </ul>
  * <p>
  * <b>NOTE</b> - Attempting to reload or remove the application containing this servlet itself will not succeed.
@@ -1211,7 +1228,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Session information for the web application at the specified context path. Displays a profile of session
-     * thisAccessedTime listing number of sessions for each 10 minute interval up to 10 hours.
+     * thisAccessedTime as a histogram. The histogram covers the context default session timeout, divided into up to 60
+     * intervals.
      *
      * @param writer   Writer to render to
      * @param cn       Name of the application to list session information for

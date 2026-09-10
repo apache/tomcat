@@ -67,8 +67,7 @@ public class FastRemovalDequeue<T> {
     }
 
     /**
-     * Retrieve the size of the list. This method also needs to be externally synchronized to ensure correct publication
-     * of changes.
+     * Retrieve the size of the list.
      *
      * @return the size of the list.
      */

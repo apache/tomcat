@@ -34,12 +34,12 @@ public class ContextResourceEnvRef extends ResourceBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Does this environment entry allow overrides by the application deployment descriptor?
+     * Does this resource-env-ref allow overrides by the application deployment descriptor?
      */
     private boolean override = true;
 
     /**
-     * Returns whether this environment entry allows overrides by the application deployment descriptor.
+     * Returns whether this resource-env-ref allows overrides by the application deployment descriptor.
      *
      * @return true if overrides are allowed
      */
@@ -48,7 +48,7 @@ public class ContextResourceEnvRef extends ResourceBase {
     }
 
     /**
-     * Sets whether this environment entry allows overrides by the application deployment descriptor.
+     * Sets whether this resource-env-ref allows overrides by the application deployment descriptor.
      *
      * @param override true if overrides are allowed
      */

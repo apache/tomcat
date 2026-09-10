@@ -469,9 +469,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * Check to see if the request and path should be enforced or only observed and reported. Note that the
-     * <code>requestedPath</code> parameter is purely a performance optimization to avoid calling
-     * {@link #getRequestedPath(HttpServletRequest)} multiple times.
+     * Check to see if the request and path should be enforced or only observed and reported. The
+     * <code>requestedPath</code> parameter can be used as a performance optimization to avoid calling
+     * {@link #getRequestedPath(HttpServletRequest)} multiple times. The default implementation only considers
+     * {@link #isEnforce()} and ignores both parameters.
      *
      * @param req           The request.
      * @param requestedPath The path of the request being evaluated.

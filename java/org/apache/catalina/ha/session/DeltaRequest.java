@@ -195,7 +195,8 @@ public class DeltaRequest implements Externalizable {
     }
 
     /**
-     * Only support principals from type {@link GenericPrincipal GenericPrincipal}
+     * Only support principals from type {@link GenericPrincipal GenericPrincipal}. Any other principal type is logged
+     * as an error and recorded as a {@code null} value, which removes the principal on the replica nodes.
      *
      * @param p Session principal
      *

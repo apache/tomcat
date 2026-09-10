@@ -129,7 +129,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
 
     @Override
     protected String getObjectNameKeyProperties() {
-        // Same as connector but Mapper rather than Connector
+        // The domain of the resulting ObjectName is the name of the owning Engine.
         return "type=Mapper";
     }
 

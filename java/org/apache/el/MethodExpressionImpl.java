@@ -42,8 +42,9 @@ import org.apache.el.util.ReflectionUtil;
  * <p>
  * The {@link jakarta.el.ExpressionFactory#createMethodExpression} method can be used to parse an expression string and
  * return a concrete instance of <code>MethodExpression</code> that encapsulates the parsed expression. The
- * {@link FunctionMapper} is used at parse time, not evaluation time, so one is not needed to evaluate an expression
- * using this class. However, the {@link ELContext} is needed at evaluation time.
+ * {@link FunctionMapper} is used at parse time. This class retains the {@link FunctionMapper} used at parse time and
+ * uses it to resolve functions at evaluation time, so the {@link ELContext} used for evaluation does not need to have
+ * a {@link FunctionMapper} configured. However, the {@link ELContext} is needed at evaluation time.
  * </p>
  * <p>
  * The {@link #getMethodInfo} and {@link #invoke} methods will evaluate the expression each time they are called. The
@@ -122,7 +123,7 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      *
      * @return <code>true</code> if <code>obj</code> equals this <code>Expression</code>; <code>false</code> otherwise.
      *
-     * @see java.util.Hashtable
+     * @see java.util.HashMap
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -201,7 +202,7 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      * @return The hash code for this <code>Expression</code>.
      *
      * @see #equals
-     * @see java.util.Hashtable
+     * @see java.util.HashMap
      * @see java.lang.Object#hashCode()
      */
     @Override

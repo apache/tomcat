@@ -36,7 +36,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience on each node of a cluster, where the
  * security identity of a user who successfully authenticates to one web application is propagated to other web
- * applications and to other nodes cluster in the same security domain. For successful use, the following requirements
+ * applications and to other nodes in the cluster in the same security domain. For successful use, the following
+ * requirements
  * must be met:
  * <ul>
  * <li>This Valve must be configured on the Container that represents a virtual host (typically an implementation of

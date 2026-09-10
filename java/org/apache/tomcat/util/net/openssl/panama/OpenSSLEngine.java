@@ -181,7 +181,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param certificateVerificationOptionalNoCA Skip CA verification in optional mode
      * @param noOcspCheck                         Enable OCSP if true
      * @param ocspSoftFail                        Allow OCSP checks to pass if the responder can't be contacted
-     * @param ocspTimeout                         Timout in ms to use for OCSP requests
+     * @param ocspTimeout                         Timeout in ms to use for OCSP requests
      * @param ocspVerifyFlags                     Verification flags for OCSP
      */
     OpenSSLEngine(Cleaner cleaner, MemorySegment sslCtx, String fallbackApplicationProtocol, boolean clientMode,

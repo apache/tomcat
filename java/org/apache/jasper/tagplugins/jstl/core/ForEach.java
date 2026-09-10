@@ -68,8 +68,7 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("; " + index + "++) {");
         }
 
-        // If var is specified and the body contains an EL, then sync
-        // the var attribute
+        // If var is specified, sync the var attribute
         if (hasVar /* && ctxt.hasEL() */) {
             ctxt.generateJavaSource("_jspx_page_context.setAttribute(");
             ctxt.generateAttribute("var");
@@ -80,7 +79,7 @@ public final class ForEach implements TagPlugin {
     }
 
     /**
-     * Generate codes for Collections The pseudocode is:
+     * Generate codes for Collections.
      */
     private void doCollection(TagPluginContext ctxt) {
 

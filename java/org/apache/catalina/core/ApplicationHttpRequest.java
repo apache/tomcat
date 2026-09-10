@@ -55,10 +55,9 @@ import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code> that transforms an application request object
- * (which might be the original one passed to a servlet, or might be based on the 2.3
- * <code>jakarta.servlet.http.HttpServletRequestWrapper</code> class) back into an internal
- * <code>org.apache.catalina.connector.Request</code>.
+ * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code> that is used by the
+ * <code>RequestDispatcher</code> implementation to override the request attributes that are relevant to the current
+ * dispatch (e.g. the request URI, method and query string).
  * <p>
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these

@@ -432,7 +432,8 @@ public class ErrorReportValve extends ValveBase {
 
     /**
      * Sets a property for error page configuration. Properties starting with "errorCode." or "exceptionType." are used
-     * to configure error pages.
+     * to configure error pages. Note that subclasses that do not generate HTML error pages (e.g.
+     * {@link JsonErrorReportValve}) ignore the configured error pages.
      *
      * @param name  The property name
      * @param value The property value

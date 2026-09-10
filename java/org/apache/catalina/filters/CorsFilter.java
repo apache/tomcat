@@ -453,8 +453,8 @@ public class CorsFilter extends GenericFilter {
      * <li><b>cors.isCorsRequest:</b> Flag to determine if request is a CORS request. Set to <code>true</code> if CORS
      * request; <code>false</code> otherwise.</li>
      * <li><b>cors.request.origin:</b> The Origin URL.</li>
-     * <li><b>cors.request.type:</b> Type of request. Values: <code>simple</code> or <code>preflight</code> or
-     * <code>not_cors</code> or <code>invalid_cors</code></li>
+     * <li><b>cors.request.type:</b> Type of request. Values: <code>simple</code> or <code>actual</code> or
+     * <code>preflight</code> or <code>not_cors</code> or <code>invalid_cors</code></li>
      * <li><b>cors.request.headers:</b> Request headers sent as 'Access-Control-Request-Headers' header, for pre-flight
      * request.</li>
      * </ul>
@@ -505,7 +505,7 @@ public class CorsFilter extends GenericFilter {
      * Joins elements of {@link Set} into a string, where each element is separated by the provided separator.
      *
      * @param elements      The {@link Set} containing elements to join together.
-     * @param joinSeparator The character to be used for separating elements.
+     * @param joinSeparator The string to be used for separating elements.
      *
      * @return The joined {@link String}; <code>null</code> if elements {@link Set} is null.
      */

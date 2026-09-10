@@ -155,11 +155,11 @@ public class RequestGroupInfo extends BaseModelMBean {
      * @return the error count
      */
     public synchronized int getErrorCount() {
-        int requestCount = deadErrorCount;
+        int errorCount = deadErrorCount;
         for (RequestInfo rp : processors) {
-            requestCount += rp.getErrorCount();
+            errorCount += rp.getErrorCount();
         }
-        return requestCount;
+        return errorCount;
     }
 
     /**

@@ -43,7 +43,7 @@ import org.apache.tools.ant.BuildException;
  *           className="org.apache.catalina.mbeans.MBeanFactory"
  *           classLoader="Catalina:type=ServerClassLoader,name=server"&gt;
  *            &lt;Arg value="org.apache.catalina.mbeans.MBeanFactory" /&gt;
- *   &lt;/jmxCreate/&gt;
+ *   &lt;/jmx:create&gt;
  * </pre>
  * <p>
  * <b>WARNING</b>Not all Tomcat MBeans can create remotely and auto register by its parents! Please, use the

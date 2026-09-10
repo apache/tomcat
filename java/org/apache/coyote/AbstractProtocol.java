@@ -639,7 +639,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     /**
      * Gets the name of this protocol instance.
-     * The name will be prefix-address-port if address is non-null and prefix-port if the address is null.
+     * The name will be prefix-id if the endpoint id is non-null, prefix-address-port if address is non-null and
+     * prefix-port if the address is null.
      *
      * @return A name for this protocol instance that is appropriately quoted for use in an ObjectName.
      */

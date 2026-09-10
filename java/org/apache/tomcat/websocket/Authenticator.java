@@ -55,7 +55,7 @@ public abstract class Authenticator {
      *
      * @throws AuthenticationException When an error occurs
      *
-     * @deprecated Unused. Will be remove in Tomcat 12. Use
+     * @deprecated Unused. Will be removed in a future release. Use
      *                 {@link #getAuthorization(String, String, String, String, String, String)}
      */
     @Deprecated

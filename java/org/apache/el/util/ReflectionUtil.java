@@ -150,7 +150,7 @@ public class ReflectionUtil {
      * @throws MethodNotFoundException If a method cannot be found that matches the given criteria
      */
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
+     * This method duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     @SuppressWarnings("null")
     public static Method getMethod(EvaluationContext ctx, Object base, Object property, Class<?>[] paramTypes,
@@ -350,7 +350,7 @@ public class ReflectionUtil {
     }
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
+     * This method duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static Method resolveAmbiguousMethod(Set<Method> candidates, Class<?>[] paramTypes) {
         // Identify which parameter isn't an exact match
@@ -414,7 +414,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
+     * This method duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
@@ -451,7 +451,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
+     * This method duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
         // TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception.
@@ -465,7 +465,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
+     * This method duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static Method getMethod(Class<?> type, Object base, Method m) {
         if (m == null || (Modifier.isPublic(type.getModifiers()) &&

@@ -72,7 +72,7 @@ public class openssl_h_Macros {
      * }
      *
      * @param sslCtx  the SSL context
-     * @param version the maximum version
+     * @param version the minimum version
      *
      * @return > 0 if successful
      */
@@ -453,8 +453,8 @@ public class openssl_h_Macros {
     /**
      * Set list of groups in preference order.
      * {@snippet lang = c :
-     * # define SSL_set1_groups_list(s, str) \
-     *          SSL_ctrl(s,SSL_CTRL_SET_GROUPS_LIST,0,(char *)(str))
+     * # define SSL_CTX_set1_groups_list(s, str) \
+     *          SSL_CTX_ctrl(s,SSL_CTRL_SET_GROUPS_LIST,0,(char *)(str))
      * }
      *
      * @param sslCtx     the SSL context

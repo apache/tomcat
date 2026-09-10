@@ -24,8 +24,8 @@ import org.apache.tomcat.websocket.Util;
 /**
  * Stores the parameter type and name for a parameter that needs to be passed to an onXxx method of
  * {@link jakarta.websocket.Endpoint}. The name is only present for parameters annotated with
- * {@link jakarta.websocket.server.PathParam}. For the {@link jakarta.websocket.Session} and {@link java.lang.Throwable}
- * parameters, {@link #getName()} will always return <code>null</code>.
+ * {@link jakarta.websocket.server.PathParam}; for all other parameters, {@link #getName()} will always return
+ * <code>null</code>.
  */
 public class PojoPathParam {
 

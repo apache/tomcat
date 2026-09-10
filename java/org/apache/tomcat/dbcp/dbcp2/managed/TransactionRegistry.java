@@ -69,7 +69,7 @@ public class TransactionRegistry {
     }
 
     /**
-     * Gets the active TransactionContext or null if not Transaction is active.
+     * Gets the active TransactionContext or null if no Transaction is active.
      *
      * @return The active TransactionContext or null if no Transaction is active.
      * @throws SQLException
@@ -142,10 +142,10 @@ public class TransactionRegistry {
     }
 
     /**
-     * Unregisters a destroyed connection from {@link TransactionRegistry}.
+     * Unregisters a destroyed connection.
      *
      * @param connection
-     *            A destroyed connection from {@link TransactionRegistry}.
+     *            The destroyed connection.
      */
     public synchronized void unregisterConnection(final Connection connection) {
         xaResources.remove(getConnectionKey(connection));

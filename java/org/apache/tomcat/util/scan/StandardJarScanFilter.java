@@ -66,7 +66,7 @@ public class StandardJarScanFilter implements JarScanFilter {
      * <ul>
      * <li>JARs that match neither the skip nor the scan list will be included in scan results.</li>
      * <li>JARs that match the skip list but not the scan list will be excluded from scan results.</li>
-     * <li>JARs that match the scan list will be included from scan results.</li>
+     * <li>JARs that match the scan list will be included in scan results.</li>
      * </ul>
      * The default skip list and default scan list are obtained from the system properties
      * {@link Constants#SKIP_JARS_PROPERTY} and {@link Constants#SCAN_JARS_PROPERTY} respectively. These default values

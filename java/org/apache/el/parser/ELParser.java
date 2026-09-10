@@ -943,7 +943,8 @@ public class ELParser/* @bgen(jjtree) */ implements ELParserTreeConstants, ELPar
     }
 
     /*
-     * Compare For a bunch of them, then +=
+     * Compare a Concatenation operand against zero or more relational
+     * operators (&lt;, &gt;, &lt;=, &gt;=, lt, gt, le, ge).
      */
     final public void Compare() throws ParseException {
         Concatenation();

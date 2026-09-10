@@ -224,8 +224,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
 
 
     /**
-     * Render an HTML list of the currently active Contexts in our virtual host, and memory and server status
-     * information.
+     * Render an HTML list of the currently active virtual hosts in our engine, and server status information.
      *
      * @param request  The request
      * @param response The response

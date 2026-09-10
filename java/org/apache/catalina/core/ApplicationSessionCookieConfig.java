@@ -237,6 +237,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         for (Map.Entry<String,String> attribute : scc.getAttributes().entrySet()) {
             switch (attribute.getKey()) {
                 case Constants.COOKIE_COMMENT_ATTR:
+                    // Intentionally not applied. Since Servlet 6.0 the cookie comment is not supported (RFC 6265) so
+                    // setComment()/getComment() are no-ops.
                 case Constants.COOKIE_DOMAIN_ATTR:
                 case Constants.COOKIE_MAX_AGE_ATTR:
                 case Constants.COOKIE_PATH_ATTR:

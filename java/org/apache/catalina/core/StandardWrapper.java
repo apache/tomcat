@@ -932,7 +932,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         }
         unloading = true;
 
-        // Loaf a while if the current instance is allocated. Use wait() to
+        // Wait a while if the current instance is allocated. Use wait() to
         // release the lock while waiting to avoid blocking other threads.
         if (countAllocated.get() > 0) {
             int nRetries = 0;
@@ -1352,15 +1352,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     public MBeanNotificationInfo[] getNotificationInfo() {
         if (notificationInfo == null) {
             notificationInfo = new MBeanNotificationInfo[] {
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.created" }, Notification.class.getName(),
-                            "servlet is created"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.starting" }, Notification.class.getName(),
                             "servlet is starting"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.running" }, Notification.class.getName(),
                             "servlet is running"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopping" }, Notification.class.getName(),
                             "servlet is stopping"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
                             "servlet is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
                             "servlet is deleted") };

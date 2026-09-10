@@ -24,8 +24,7 @@ import java.lang.instrument.ClassFileTransformer;
  * only {@link org.apache.catalina.loader.WebappClassLoaderBase} implements this interface. This allows web application
  * frameworks or JPA providers bundled with a web application to instrument web application classes as necessary.
  * <p>
- * You should always program against the methods of this interface (whether using reflection or otherwise). The methods
- * in {@code WebappClassLoaderBase} are protected by the default security manager if one is in use.
+ * You should always program against the methods of this interface (whether using reflection or otherwise).
  *
  * @since 8.0, 7.0.64
  */

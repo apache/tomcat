@@ -70,7 +70,7 @@ public class JreCompat {
             Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
             result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
         } catch (ClassNotFoundException e) {
-            // Must be Graal
+            // Not running on a GraalVM native image
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
         }

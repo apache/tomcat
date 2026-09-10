@@ -174,7 +174,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     protected final List<ClusterListener> clusterListeners = new CopyOnWriteArrayList<>();
 
     /**
-     * Comment for <code>notifyLifecycleListenerOnFailure</code>
+     * Whether to notify the lifecycle listeners about message transfer failures.
      */
     private boolean notifyLifecycleListenerOnFailure = false;
 

@@ -118,8 +118,8 @@ public abstract class Rule {
 
 
     /**
-     * This method is called when the body of a matching XML element is encountered. If the element has no body, this
-     * method is not called at all. The default implementation is a NO-OP.
+     * This method is called when the body of a matching XML element is encountered. The method is also called for
+     * elements with no body, in which case the text is an empty string. The default implementation is a NO-OP.
      *
      * @param namespace the namespace URI of the matching element, or an empty string if the parser is not namespace
      *                      aware or the element has no namespace

@@ -519,7 +519,7 @@ public abstract class Node implements TagConstants {
         private boolean isEncodingSpecifiedInProlog;
 
         /*
-         * Indicates whether an encoding has been explicitly specified in the page's dom.
+         * Indicates whether a byte order mark (BOM) is present in the JSP source.
          */
         private boolean isBomPresent;
 
