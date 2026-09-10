@@ -108,6 +108,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.27 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        When starting a web application, don't try and use the web application
+        class loader until after the web application class loader has started.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.26 (markt)" rtext="release in progress">
   <subsection name="Catalina">
