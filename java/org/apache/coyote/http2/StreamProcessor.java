@@ -383,7 +383,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
             /*
              * Dispatch on new thread. Firstly, this avoids a deadlock on the SocketWrapper as Streams being processed
              * by container threads lock the SocketProcessor before they lock the SocketWrapper which is the opposite
-             * order to container threads processing via Http2UpgrageHandler. Secondly, this code executes after a
+             * order to container threads processing via Http2UpgradeHandler. Secondly, this code executes after a
              * Window update has released one or more Streams. By dispatching each Stream to a dedicated thread, those
              * Streams may progress concurrently.
              */
@@ -437,7 +437,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
     public final void recycle() {
         // StreamProcessor instances are not re-used.
 
-        // Calling removeRequestProcessor even though the RequestProcesser was
+        // Calling removeRequestProcessor even though the RequestProcessor was
         // never added will add the values from the RequestProcessor to the
         // running total for the GlobalRequestProcessor
         RequestGroupInfo global = handler.getProtocol().getGlobal();

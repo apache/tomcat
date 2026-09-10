@@ -339,8 +339,8 @@ public class HttpHeaderParser {
         /**
          * Reading a header name. All characters of header are HTTP_TOKEN_CHAR. Header name is followed by ':'. No
          * whitespace is allowed.<br>
-         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered before ':' will result in the whole line
-         * being ignored.
+         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered before ':' will cause an
+         * {@code IllegalArgumentException} to be thrown, resulting in the whole request being rejected.
          */
         HEADER_NAME,
         /**

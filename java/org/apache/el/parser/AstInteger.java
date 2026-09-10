@@ -44,9 +44,9 @@ public final class AstInteger extends SimpleNode {
                     this.number = new BigInteger(this.image);
                 }
             } catch (ArithmeticException | NumberFormatException e) {
-                // Too big for BigInteger.
-                // Catch NumberFormatException as well here just in case the
-                // parser provides invalid input.
+                // The parser only produces digit-only images for which
+                // new BigInteger(String) cannot overflow, so this catch is
+                // purely defensive.
                 throw new ELException(e);
             }
         }

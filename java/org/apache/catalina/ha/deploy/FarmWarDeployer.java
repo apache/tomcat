@@ -49,7 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <ul>
  * <li>watchDir - the directory where we watch for changes</li>
  * <li>deployDir - the directory where we install applications</li>
- * <li>tempDir - a temporaryDirectory to store binary data when downloading a war from the cluster</li>
+ * <li>tempDir - a temporary directory to store binary data when downloading a war from the cluster</li>
  * </ul>
  * Currently we only support deployment of WAR files since they are easier to send across the wire.
  */
@@ -336,7 +336,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * @param webapp      A WAR file or unpacked directory structure containing the web application to be installed
      *
      * @exception IllegalArgumentException if the specified context name is malformed
-     * @exception IllegalStateException    if the specified context name is already deployed
      * @exception IOException              if an input/output error was encountered during installation
      */
     @Override
@@ -762,7 +761,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Set the watcher checks frequency.
      *
-     * @param processExpiresFrequency the new manager checks frequency
+     * @param processExpiresFrequency the new watcher checks frequency
      */
     public void setProcessDeployFrequency(int processExpiresFrequency) {
 

@@ -72,7 +72,7 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><b><code>%l</code></b> - Remote logical username from identd (always returns '-')
  * <li><b><code>%m</code></b> - Request method
  * <li><b><code>%p</code></b> - Local port
- * <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists, otherwise an empty string
+ * <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists, otherwise '-')
  * <li><b><code>%r</code></b> - First line of the request
  * <li><b><code>%s</code></b> - HTTP status code of the response
  * <li><b><code>%S</code></b> - User session ID
@@ -2209,8 +2209,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * - %to trailer response header - %V server name per UseCanonicalName setting
      *
      * The following escaped elements are not escaped in Tomcat because values that would require escaping are rejected
-     * before they reach the AccessLogValve: - %h remote host - %H request protocol - %m request method - %v canonical
-     * server name
+     * before they reach the AccessLogValve: - %H request protocol - %m request method - %v canonical server name
+     * Note that %h is also not escaped but, when <code>enableLookups</code> is true, its value comes from a DNS
+     * lookup which is not validated.
      *
      * The following escaped elements are supported by Tomcat: - %{}i request header - %{}o response header - %u remote
      * user

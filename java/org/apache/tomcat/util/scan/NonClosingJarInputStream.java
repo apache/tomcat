@@ -22,7 +22,7 @@ import java.util.jar.JarInputStream;
 
 /**
  * When using a {@link JarInputStream} with an XML parser, the stream will be closed by the parser. This causes problems
- * if multiple entries from the JAR need to be parsed. This implementation makes {{@link #close()} a NO-OP and adds
+ * if multiple entries from the JAR need to be parsed. This implementation makes {@link #close()} a NO-OP and adds
  * {@link #reallyClose()} that will close the stream.
  */
 public class NonClosingJarInputStream extends JarInputStream {

@@ -149,7 +149,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
         }
         this.listener = listener;
-        // Container is responsible for first call to onWritePossible().
+        // The first call to onWritePossible() will be triggered by the poller
+        // once write interest is registered.
         synchronized (registeredLock) {
             registered = true;
             Request request = processor.getRequest();

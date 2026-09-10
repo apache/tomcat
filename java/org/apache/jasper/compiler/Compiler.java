@@ -41,7 +41,7 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
- * Main JSP compiler class. This class uses Ant for compiling.
+ * Main JSP compiler class. Subclasses provide the actual compilation of the generated servlet source.
  */
 public abstract class Compiler {
 
@@ -134,7 +134,8 @@ public abstract class Compiler {
 
 
     /**
-     * Compile the jsp file into equivalent servlet in .java file
+     * Compile the jsp file into equivalent servlet in .java file. The translation unit is parsed and validated, page
+     * info is collected, referenced tag files are processed and the JSR 045 source maps are generated.
      *
      * @return A map of class names to JSR 045 source maps
      *

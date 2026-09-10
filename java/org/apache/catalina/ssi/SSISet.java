@@ -42,7 +42,8 @@ public class SSISet implements SSICommand {
      * @param paramValues  the parameter values
      * @param writer       the print writer for output
      *
-     * @return the last modified timestamp
+     * @return the current time (in milliseconds) if a variable was set, or
+     *         zero if no variable was set
      *
      * @throws SSIStopProcessingException if processing should stop
      */

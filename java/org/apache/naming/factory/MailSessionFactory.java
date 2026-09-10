@@ -68,6 +68,22 @@ public class MailSessionFactory implements ObjectFactory {
     protected static final String factoryType = "javax.mail.Session";
 
 
+    /**
+     * Create a new resource instance.
+     * <p>
+     * The {@code password} attribute is only used when {@code mail.smtp.user} or {@code mail.user} is also
+     * configured; a password without a user is ignored.
+     * </p>
+     *
+     * @param refObj      The reference object describing the Session
+     * @param name        the bound name
+     * @param context     unused
+     * @param env         unused
+     *
+     * @return the object instance
+     *
+     * @throws Exception if an error occurs creating the instance
+     */
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context context, Hashtable<?,?> env) throws Exception {
 

@@ -1076,7 +1076,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         }
         unloading = true;
 
-        // Loaf a while if the current instance is allocated. Use wait() to
+        // Wait a while if the current instance is allocated. Use wait() to
         // release the lock while waiting to avoid blocking other threads.
         if (countAllocated.get() > 0) {
             int nRetries = 0;

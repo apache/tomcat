@@ -70,8 +70,9 @@ public final class CustomObjectInputStream extends ObjectInputStream {
      *
      * @param stream                  The input stream we will read from
      * @param classLoader             The class loader used to instantiate objects
-     * @param log                     The logger to use to report any issues. It may only be null if the filterMode does
-     *                                    not require logging
+     * @param log                     The logger to use to report any issues. It may only be null if
+     *                                    <code>warnOnFailure</code> is <code>false</code> or
+     *                                    <code>allowedClassNamePattern</code> is <code>null</code>
      * @param allowedClassNamePattern The regular expression to use to filter deserialized classes. The fully qualified
      *                                    class name must match this pattern for deserialization to be allowed.
      *                                    If null, filtering will be disabled.

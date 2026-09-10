@@ -503,9 +503,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         NioReplicationTask task = (NioReplicationTask) getTaskPool().getRxTask();
         if (task == null) {
             // No threads/tasks available, do nothing, the selection
-            // loop will keep calling this method until a
-            // thread becomes available, the thread pool itself has a waiting mechanism
-            // so we will not wait here.
+            // loop will keep calling this method. getRxTask() blocks until a task
+            // is released, so it only returns null after the pool has been stopped.
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("nioReceiver.noThread"));
             }

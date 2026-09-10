@@ -710,7 +710,8 @@
 
     <attributes>
       <attribute name="Port" required="false">
-        <p>Port the connector that will received proxied traffic from HTTPD, default the first connector will be used</p>
+        <p>Port of the connector that will receive proxied traffic from HTTPD, default 8009.
+        Set to 0 to match any port (the first connector will be used)</p>
       </attribute>
 
       <attribute name="Host" required="false">
@@ -718,8 +719,8 @@
         default empty the <strong>Port</strong> will be used</p>
       </attribute>
 
-      <attribute name="proxyURL" required="false">
-        <p>proxyURL is the URL corresponding to the <strong>Location</strong> in httpd configuration of the heartbeat Handler,
+      <attribute name="proxyURLString" required="false">
+        <p>proxyURLString is the URL corresponding to the <strong>Location</strong> in httpd configuration of the heartbeat Handler,
         default /HeartbeatListener</p>
       </attribute>
 

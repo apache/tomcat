@@ -64,7 +64,7 @@ public class WsFrameServer extends WsFrameBase {
 
 
     /**
-     * Called when there is data in the ServletInputStream to process.
+     * Called when there is data in the socket to process.
      *
      * @throws IOException if an I/O error occurs while processing the available data
      */

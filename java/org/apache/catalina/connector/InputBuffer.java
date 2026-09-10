@@ -104,7 +104,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
 
     /**
-     * State of the output buffer.
+     * State of the input buffer.
      */
     private int state = 0;
 
@@ -134,7 +134,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
 
     /**
-     * Char buffer limit.
+     * Maximum buffer growth position, set by {@link #mark(int)} and used as a limit when growing the char buffer.
      */
     private int readLimit;
 

@@ -45,8 +45,9 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <ul>
  * <li>URL-specific parameter limits that can be defined using regular expressions</li>
  * <li>Configurable through Tomcat's <code>server.xml</code> or <code>context.xml</code></li>
- * <li>Requires a <code>parameter_limit.config</code> file containing the URL-specific parameter limits. It must be
- * placed in the Host configuration folder or in the WEB-INF folder of the web application.</li>
+ * <li>URL-specific parameter limits may optionally be defined in a <code>parameter_limit.config</code> file. When
+ * present, it must be placed in the Host configuration folder or in the WEB-INF folder of the web application. Without
+ * this file the valve can be configured dynamically using the management operations.</li>
  * </ul>
  * <p>
  * The default limit, specified by Connector's value, applies to all requests unless a more specific URL pattern is

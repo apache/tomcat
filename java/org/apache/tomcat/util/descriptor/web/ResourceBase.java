@@ -25,7 +25,8 @@ import java.util.Map;
 
 
 /**
- * Representation of a Context element.
+ * Common base class for the JNDI resource entries (e.g. <code>&lt;resource-ref&gt;</code>,
+ * <code>&lt;message-destination-ref&gt;</code>) of a web deployment descriptor.
  */
 public class ResourceBase implements Serializable, Injectable {
     /**

@@ -28,7 +28,7 @@ package org.apache.catalina;
  * Wrapper) should be utilized to process this request.
  * <p>
  * The child containers attached to an Engine are generally implementations of Host (representing a virtual host) or
- * Context (representing individual an individual servlet context), depending upon the Engine implementation.
+ * Context (representing an individual servlet context), depending upon the Engine implementation.
  * <p>
  * If used, an Engine is always the top level Container in a Catalina hierarchy. Therefore, the implementation's
  * <code>setParent()</code> method should throw <code>IllegalArgumentException</code>.

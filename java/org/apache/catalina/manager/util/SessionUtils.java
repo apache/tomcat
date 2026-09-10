@@ -30,7 +30,7 @@ import org.apache.catalina.Session;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * Utility methods on HttpSessions.
+ * Utility methods on {@link Session} and {@link HttpSession} objects.
  */
 public class SessionUtils {
 
@@ -39,7 +39,7 @@ public class SessionUtils {
     }
 
     /**
-     * The session attributes key under which the user's selected <code>java.util.Locale</code> is stored, if any.
+     * The session attribute keys under which the user's selected <code>java.util.Locale</code> is stored, if any.
      */
     // org.apache.struts.Globals.LOCALE_KEY
     private static final String STRUTS_LOCALE_KEY = "org.apache.struts.action.LOCALE";//$NON-NLS-1$
@@ -167,7 +167,8 @@ public class SessionUtils {
      *
      * @param in_session The session
      *
-     * @return the user
+     * @return the user, that is the name of the session principal if the session has one, otherwise a value guessed
+     *         from the session attributes, or {@code null} if it cannot be determined
      */
     public static Object guessUserFromSession(final Session in_session) {
         if (null == in_session) {
@@ -229,10 +230,11 @@ public class SessionUtils {
 
 
     /**
-     * Returns the time in milliseconds that the session has been active.
+     * Returns the time in milliseconds between session creation and the session's last access.
      *
      * @param in_session The session
-     * @return the active time in milliseconds, or -1 if the session is invalidated
+     * @return the time in milliseconds between session creation and the last access, or -1 if the session is
+     *         invalidated
      */
     public static long getUsedTimeForSession(Session in_session) {
         try {

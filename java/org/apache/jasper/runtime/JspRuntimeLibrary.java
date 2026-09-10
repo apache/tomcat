@@ -219,7 +219,7 @@ public class JspRuntimeLibrary {
      *
      * @param s The string to coerce
      * @param target The target class
-     * @return the coerced value
+     * @return the coerced value, or {@code null} if the target type is not supported
      */
     public static Object coerce(String s, Class<?> target) {
 
@@ -419,7 +419,6 @@ public class JspRuntimeLibrary {
                     }
                     Class<?> t = type.getComponentType();
                     String[] values = request.getParameterValues(param);
-                    // XXX Please check.
                     if (values == null) {
                         return;
                     }
@@ -683,7 +682,8 @@ public class JspRuntimeLibrary {
     }
 
     /**
-     * Escape special shell characters.
+     * Escape special shell characters by prefixing them with a backslash. Despite the method name, this does not
+     * perform any URL or query string encoding.
      *
      * @param unescString The string to shell-escape
      *

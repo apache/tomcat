@@ -23,8 +23,8 @@ import java.util.Map;
 
 
 /**
- * Representation of an application resource reference, as represented in an <code>&lt;res-env-ref&gt;</code> element in
- * the deployment descriptor.
+ * Representation of a <code>&lt;Transaction&gt;</code> element in a context configuration file. The configured
+ * properties are applied to the <code>java:comp/UserTransaction</code> JNDI binding.
  */
 public class ContextTransaction implements Serializable {
 

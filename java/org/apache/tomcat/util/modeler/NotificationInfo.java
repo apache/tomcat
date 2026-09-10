@@ -123,8 +123,8 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * Create and return a <code>ModelMBeanNotificationInfo</code> object that corresponds to the attribute described by
-     * this instance.
+     * Create and return a <code>ModelMBeanNotificationInfo</code> object that corresponds to the notification
+     * described by this instance.
      *
      * @return the notification info
      */

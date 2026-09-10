@@ -29,7 +29,7 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 
 /**
- * Store server.xml elements Resources at context and GlobalNamingResources
+ * Store server.xml element NamingResources
  */
 public class NamingResourcesSF extends StoreFactoryBase {
 

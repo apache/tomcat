@@ -49,9 +49,9 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Adds encryption using a pre-shared key. The length of the key (in bytes) must be acceptable for the encryption
- * algorithm being used. For example, for AES, you must use a key of either 16 bytes (128 bits, 24 bytes 192 bits), or
- * 32 bytes (256 bits). You can supply the raw key bytes by calling {@link #setEncryptionKey(byte[])} or the hex-encoded
- * binary bytes by calling {@link #setEncryptionKey(String)}.
+ * algorithm being used. For example, for AES, you must use a key of either 16 bytes (128 bits), 24 bytes (192 bits),
+ * or 32 bytes (256 bits). You can supply the raw key bytes by calling {@link #setEncryptionKey(byte[])} or the
+ * hex-encoded binary bytes by calling {@link #setEncryptionKey(String)}.
  */
 public class EncryptInterceptor extends ChannelInterceptorBase implements EncryptInterceptorMBean {
 
@@ -169,8 +169,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             XByteBuffer xbb = msg.getMessage();
 
             /*
-             * Completely replace the message with the decrypted one. No need to replace time stamp. At this point it
-             * will be the same as the trusted time stamp.
+             * Completely replace the message with the decrypted one. The ChannelData header timestamp is not part of
+             * the encrypted payload and is not replaced with the trusted timestamp. On an untampered wire it is the
+             * same as the trusted timestamp.
              */
             xbb.clear();
             xbb.append(data, 8, data.length - 8);

@@ -31,14 +31,14 @@ public interface IStoreConfig {
     /**
      * Get Configuration Registry
      *
-     * @return aRegistry that handle the store operations
+     * @return the registry that handles the store operations
      */
     StoreRegistry getRegistry();
 
     /**
      * Set Configuration Registry
      *
-     * @param aRegistry aregistry that handle the store operations
+     * @param aRegistry the registry that handles the store operations
      */
     void setRegistry(StoreRegistry aRegistry);
 

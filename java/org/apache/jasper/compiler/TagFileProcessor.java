@@ -322,7 +322,6 @@ public class TagFileProcessor {
         public TagInfo getTagInfo() throws JasperException {
 
             if (name == null) {
-                // XXX Get it from tag file name
             }
 
             if (bodyContent == null) {
@@ -628,7 +627,7 @@ public class TagFileProcessor {
      * nodes.
      *
      * @param compiler Compiler to use to compile tag files
-     * @param page     The page from to scan for tag files to compile
+     * @param page     The page from which to scan for tag files to compile
      *
      * @throws JasperException If an error occurs during the scan or compilation
      */
@@ -639,7 +638,7 @@ public class TagFileProcessor {
     }
 
     /**
-     * Removed the java and class files for the tag prototype generated from the current compilation.
+     * Removes the java and class files for the tag prototype generated from the current compilation.
      *
      * @param classFileName If non-null, remove only the class file with this name.
      */

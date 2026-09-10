@@ -58,8 +58,8 @@ public interface CookieProcessor {
      * rely on this default method as it is present only for transitional compatibility and will be removed in Tomcat 10
      * at the same time as the {@link #generateHeader(Cookie)} method.
      *
-     * @param request The servlet request
      * @param cookie  The cookie for which the header will be generated
+     * @param request The servlet request
      *
      * @return The header value in a form that can be added directly to the response
      */

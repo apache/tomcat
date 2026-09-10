@@ -75,7 +75,7 @@ public class Ranges {
         /**
          * Creates a new range entry.
          *
-         * @param start the start position of the range
+         * @param start the start position of the range, or -1 if absent (suffix range)
          * @param end the end position of the range, or -1 if absent
          */
         public Entry(long start, long end) {

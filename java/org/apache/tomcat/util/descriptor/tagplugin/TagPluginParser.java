@@ -85,15 +85,16 @@ public class TagPluginParser {
     /**
      * Registers a plugin class for the given tag class.
      *
-     * @param tagClass the tag handler class name
-     * @param pluginClass the plugin class name
+     * @param tagClass    the tag handler class name. Must not be {@code null}.
+     * @param pluginClass the plugin class name. Must not be {@code null}.
      */
     public void addPlugin(String tagClass, String pluginClass) {
         plugins.put(tagClass, pluginClass);
     }
 
     /**
-     * Returns the map of registered tag plugins.
+     * Returns the map of registered tag plugins. The returned map is the parser's internal mutable map, so changes to
+     * it change the parser's state.
      *
      * @return the map from tag class names to plugin class names
      */

@@ -81,7 +81,7 @@ public final class Mapper {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Set default host.
+     * Set default host. The host name is resolved case-sensitively against the registered host names and aliases.
      *
      * @param defaultHostName Default host name
      */

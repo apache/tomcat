@@ -106,7 +106,8 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
 
     /**
-     * Set the options for sending map updates.
+     * Set the options for sending map updates. The value is only used when
+     * the context (re)starts.
      *
      * @param mapSendOptions the send options
      */

@@ -27,7 +27,7 @@ import java.util.logging.LogRecord;
  * <ul>
  * <li>time: the log record timestamp, with the default format as {@code yyyy-MM-dd'T'HH:mm:ss.SSSX}</li>
  * <li>level: the log level</li>
- * <li>thread: the current on which the log occurred</li>
+ * <li>thread: the name of the thread on which the log occurred</li>
  * <li>class: the class from which the log originated</li>
  * <li>method: the method from which the log originated</li>
  * <li>message: the log message</li>
@@ -35,6 +35,9 @@ import java.util.logging.LogRecord;
  * first, then one string per stack trace element prefixed by a whitespace, then moving on to the cause exception if
  * any)</li>
  * </ul>
+ * <p>
+ * Note that the values of the {@code level}, {@code thread}, {@code class} and {@code method} attributes are written
+ * to the JSON document without JSON escaping.
  */
 public class JsonFormatter extends OneLineFormatter {
 

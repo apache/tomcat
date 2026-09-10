@@ -74,7 +74,9 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     /**
      * Returns the SSL socket factory.
      *
-     * @return the socket factory, or null if not needed
+     * @return the socket factory, or {@code null} if not needed. Implementations that may open HTTPS connections must
+     *             not return {@code null} since the returned factory is applied unconditionally to HTTPS connections
+     *             by {@link #openStream(String, Map, int, int)}.
      */
     protected abstract SSLSocketFactory getSocketFactory();
 

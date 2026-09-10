@@ -54,7 +54,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     private static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * Keeps count of the number of stuck threads detected
+     * Keeps count of the number of threads currently detected as stuck
      */
     private final AtomicInteger stuckCount = new AtomicInteger(0);
 
@@ -115,7 +115,7 @@ public class StuckThreadDetectionValve extends ValveBase {
 
     /**
      * Specifies the threshold (in seconds) before stuck threads are interrupted. If &lt;=0, the interruption is
-     * disabled. The default is -1. If &gt;=0, the value must actually be &gt;= threshold.
+     * disabled. The default is -1.
      *
      * @param interruptThreadThreshold The new thread interruption threshold in seconds
      */

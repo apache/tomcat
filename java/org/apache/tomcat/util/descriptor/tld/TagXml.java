@@ -24,7 +24,7 @@ import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
 
 /**
- * Model of a tag define in a tag library descriptor. This represents the information as parsed from the XML but differs
+ * Model of a tag defined in a tag library descriptor. This represents the information as parsed from the XML but differs
  * from TagInfo in that it does not provide a link back to the tag library that defined it.
  */
 public class TagXml {

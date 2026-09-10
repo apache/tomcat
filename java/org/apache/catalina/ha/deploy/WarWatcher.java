@@ -27,7 +27,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The <b>WarWatcher </b> watches the deployDir for changes made to the directory (adding new WAR files-&gt;deploy or
+ * The <b>WarWatcher </b> watches the watchDir for changes made to the directory (adding new WAR files-&gt;deploy or
  * remove WAR files-&gt;undeploy) and notifies a listener of the changes made.
  */
 public class WarWatcher {

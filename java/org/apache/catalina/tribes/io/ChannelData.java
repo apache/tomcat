@@ -170,7 +170,7 @@ public class ChannelData implements ChannelMessage {
         return 4 + // options
                 8 + // timestamp off=4
                 4 + // unique id length off=12
-                uniqueId.length + // id data off=12+uniqueId.length
+                uniqueId.length + // id data off=16
                 4 + // addr length off=12+uniqueId.length+4
                 ((address != null) ? address.getDataLength() : 0) + // member data off=12+uniqueId.length+4+add.length
                 4 + // message length off=12+uniqueId.length+4+add.length+4

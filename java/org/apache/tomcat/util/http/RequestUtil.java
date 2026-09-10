@@ -171,8 +171,8 @@ public class RequestUtil {
         }
 
 
-        // Both scheme and host are case-insensitive usually
-        // However, CORS same origin check must be case-sensitive (from the CORS specification)
+        // Both scheme and host are case-insensitive and the CORS same origin check (from the Fetch/CORS
+        // specification) compares them case-insensitively.
         return origin.contentEquals(target);
     }
 
@@ -189,7 +189,8 @@ public class RequestUtil {
      *
      * @return <code>true</code> if the origin was valid
      *
-     * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
+     * @see <a href="http://tools.ietf.org/html/rfc6454">RFC 6454</a>
+     * @see <a href="http://tools.ietf.org/html/rfc3986">RFC 3986</a>
      */
     public static boolean isValidOrigin(String origin) {
         // Checks for encoded characters. Helps prevent CRLF injection.

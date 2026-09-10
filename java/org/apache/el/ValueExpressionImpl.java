@@ -50,8 +50,9 @@ import org.apache.el.util.ReflectionUtil;
  * <p>
  * The {@link javax.el.ExpressionFactory#createValueExpression} method can be used to parse an expression string and
  * return a concrete instance of <code>ValueExpression</code> that encapsulates the parsed expression. The
- * {@link FunctionMapper} is used at parse time, not evaluation time, so one is not needed to evaluate an expression
- * using this class. However, the {@link ELContext} is needed at evaluation time.
+ * {@link FunctionMapper} is used at parse time. This class retains the {@link FunctionMapper} used at parse time and
+ * uses it to resolve functions at evaluation time, so the {@link ELContext} used for evaluation does not need to have
+ * a {@link FunctionMapper} configured. However, the {@link ELContext} is needed at evaluation time.
  * </p>
  * <p>
  * The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and {@link #getType} methods will evaluate the
@@ -120,13 +121,19 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
         return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
     }
 
+    /**
+     * Returns the type the result of the expression will be coerced to after evaluation.
+     *
+     * @return the <code>expectedType</code> passed to the <code>ExpressionFactory.createValueExpression</code> method
+     *             that created this <code>ValueExpression</code>.
+     */
     @Override
     public Class<?> getExpectedType() {
         return this.expectedType;
     }
 
     /**
-     * Returns the type the result of the expression will be coerced to after evaluation.
+     * Returns the expression string.
      *
      * @return the <code>expectedType</code> passed to the <code>ExpressionFactory.createValueExpression</code> method
      *             that created this <code>ValueExpression</code>.

@@ -258,8 +258,8 @@ public class MimeHeaders {
     // -------------------- --------------------
 
     /**
-     * Returns an enumeration of strings representing the header field names. Field names may appear multiple times in
-     * this enumeration, indicating that multiple fields with that name exist in this header.
+     * Returns an enumeration of strings representing the distinct header field names. Each distinct name appears once
+     * in this enumeration, even if multiple fields with that name exist in this header.
      *
      * @return the enumeration
      */

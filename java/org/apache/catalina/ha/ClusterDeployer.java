@@ -42,11 +42,8 @@ public interface ClusterDeployer extends ChannelListener {
     void stop() throws LifecycleException;
 
     /**
-     * Install a new web application, whose web application archive is at the specified URL, into this container and all
+     * Install a new web application, whose web application archive is the specified file, into this container and all
      * the other members of the cluster with the specified context name.
-     * <p>
-     * If this application is successfully installed locally, a ContainerEvent of type <code>INSTALL_EVENT</code> will
-     * be sent to all registered listeners, with the newly created <code>Context</code> as an argument.
      *
      * @param contextName The context name to which this application should be installed (must be unique)
      * @param webapp      A WAR file or unpacked directory structure containing the web application to be installed
@@ -59,10 +56,8 @@ public interface ClusterDeployer extends ChannelListener {
     void install(String contextName, File webapp) throws IOException;
 
     /**
-     * Remove an existing web application, attached to the specified context name. If this application is successfully
-     * removed, a ContainerEvent of type <code>REMOVE_EVENT</code> will be sent to all registered listeners, with the
-     * removed <code>Context</code> as an argument. Deletes the web application war file and/or directory if they exist
-     * in the Host's appBase.
+     * Remove an existing web application, attached to the specified context name. Deletes the web application war file
+     * and/or directory if they exist in the Host's appBase.
      *
      * @param contextName The context name of the application to be removed
      * @param undeploy    boolean flag to remove web application from server

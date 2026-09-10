@@ -29,9 +29,9 @@ import org.apache.tools.ant.BuildException;
 /**
  * Access <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
- * <li>Get Mbeans attributes</li>
- * <li>Show Get result as Ant console log</li>
- * <li>Bind Get result as Ant properties</li>
+ * <li>Set Mbeans attributes</li>
+ * <li>Show Set result as Ant console log</li>
+ * <li>Bind Set result as Ant properties</li>
  * </ul>
  * <p>
  * Examples: Set a Mbean Manager attribute maxActiveSessions. Set this attribute with fresh jmx connection without save
@@ -43,12 +43,11 @@ import org.apache.tools.ant.BuildException;
  *           host="127.0.0.1"
  *           port="9014"
  *           ref=""
- *           name="Catalina:type=Manager,context="/ClusterTest",host=localhost"
+ *           name="Catalina:type=Manager,context=&quot;/ClusterTest&quot;,host=localhost"
  *           attribute="maxActiveSessions"
  *           value="100"
  *           type="int"
- *           echo="false"&gt;
- *       /&gt;
+ *           echo="false" /&gt;
  * </pre>
  * <p>
  * First call to a remote MBean server save the JMXConnection a reference <em>jmx.server</em>

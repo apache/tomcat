@@ -243,9 +243,9 @@ public class DataSourceRealm extends RealmBase {
     /**
      * {@inheritDoc}
      * <p>
-     * If there are any errors with the JDBC connection, executing the query or anything this method returns null
-     * (doesn't authenticate). This event is also logged, and the connection will be closed so that a subsequent request
-     * will automatically re-open it.
+     * If there are any errors with the JDBC connection or executing the query, this method returns null (doesn't
+     * authenticate). Such errors are also logged. A fresh database connection is opened for each call and closed again
+     * before the method returns.
      */
     @Override
     public Principal authenticate(String username, String credentials) {

@@ -75,7 +75,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The following servlet initialization parameters are recognized:
  * <ul>
  * <li><b>debug</b> - The debugging detail level that controls the amount of information that is logged by this servlet.
- * Default is zero.
+ * Default is one.
  * </ul>
  */
 public class HostManagerServlet extends HttpServlet implements ContainerServlet {
@@ -486,7 +486,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
 
 
     /**
-     * Render a list of the currently active Contexts in our virtual host.
+     * Render a list of the currently active virtual hosts in our engine.
      *
      * @param writer   Writer to render to
      * @param smClient StringManager for the client's locale
@@ -649,7 +649,8 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
      *
      * @return the config base for the host
      *
-     * @deprecated Unused. Will be removed in Tomcat 12. Use {@link #getConfigBase(String, PrintWriter, StringManager)}
+     * @deprecated Unused. Will be removed in a future version. Use
+     * {@link #getConfigBase(String, PrintWriter, StringManager)}
      */
     @Deprecated
     protected File getConfigBase(String hostName) {

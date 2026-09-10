@@ -212,8 +212,6 @@ import org.apache.tomcat.util.res.StringManager;
  *     }
  *   }
  * }}</pre>
- *
- * @since 1.5
  */
 public class ThreadPoolExecutor extends AbstractExecutorService {
 
@@ -1587,7 +1585,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * Sets the delay in milliseconds after which threads should be renewed.
      *
-     * @param threadRenewalDelay the renewal delay
+     * @param threadRenewalDelay the renewal delay (a negative value disables thread renewal)
      */
     public void setThreadRenewalDelay(long threadRenewalDelay) {
         this.threadRenewalDelay = threadRenewalDelay;
@@ -1785,7 +1783,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
 
     /**
-     * Returns the total number of tasks that have been submitted to this pool.
+     * Returns the number of tasks that have been submitted to this pool and not yet completed.
      *
      * @return the submitted task count
      */

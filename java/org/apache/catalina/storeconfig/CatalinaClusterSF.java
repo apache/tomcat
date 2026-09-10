@@ -68,8 +68,8 @@ public class CatalinaClusterSF extends StoreFactoryBase {
             if (deployer != null) {
                 storeElement(aWriter, indent, deployer);
             }
-            // Store nested <Valve> element
-            // ClusterValve are not store at Hosts element, see
+            // Store nested <Valve> elements. Cluster valves are stored here,
+            // not as <Valve> elements within the <Host> element.
             Valve[] valves = cluster.getValves();
             storeElementArray(aWriter, indent, valves);
 

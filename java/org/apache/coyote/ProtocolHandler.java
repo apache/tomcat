@@ -245,6 +245,7 @@ public interface ProtocolHandler {
      * @throws InvocationTargetException Exception occurred
      * @throws NoSuchMethodException     Exception occurred
      * @throws SecurityException         Exception occurred
+     * @throws ClassCastException        Specified protocol does not implement {@link ProtocolHandler}
      */
     @SuppressWarnings("deprecation")
     static ProtocolHandler create(String protocol, boolean apr)

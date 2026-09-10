@@ -310,7 +310,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             populatePort();
             return;
         } else if (valueMB.getLength() == 0) {
-            // Empty Host header so set sever name to empty string
+            // Empty Host header so set server name to empty string
             request.serverName().setString("");
             populatePort();
             return;

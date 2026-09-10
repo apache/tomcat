@@ -86,7 +86,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected LongAdder totalSendTime = new LongAdder();
     /**
-     * Total number of requests.
+     * Time (in milliseconds) of the last replication send.
      */
     protected AtomicLong lastSendTime = new AtomicLong();
     /**

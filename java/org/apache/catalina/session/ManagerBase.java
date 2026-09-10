@@ -874,7 +874,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * <p>
      * This implementation excludes session attributes from distribution if the:
      * <ul>
-     * <li>attribute name matches {@link #getSessionAttributeNameFilter()}</li>
+     * <li>attribute name does not match {@link #getSessionAttributeNameFilter()}</li>
+     * <li>attribute value class name does not match {@link #getSessionAttributeValueClassNameFilter()}</li>
      * </ul>
      */
     @Override

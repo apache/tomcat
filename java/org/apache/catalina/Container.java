@@ -166,9 +166,9 @@ public interface Container extends Lifecycle {
     /**
      * Get the delay between the invocation of the backgroundProcess method on this container and its children. Child
      * containers will not be invoked if their delay value is positive (which would mean they are using their own
-     * thread). Setting this to a positive value will cause a thread to be spawned. After waiting the specified amount
-     * of time, the thread will invoke the {@link #backgroundProcess()} method on this container and all children with
-     * non-positive delay values.
+     * thread). A positive value causes a thread to be spawned. After waiting the specified amount of time, the thread
+     * will invoke the {@link #backgroundProcess()} method on this container and all children with non-positive delay
+     * values.
      *
      * @return The delay between the invocation of the backgroundProcess method on this container and its children. A
      *             non-positive value indicates that background processing will be managed by the parent.
@@ -177,7 +177,7 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Set the delay between the invocation of the execute method on this container and its children.
+     * Set the delay between the invocation of the backgroundProcess method on this container and its children.
      *
      * @param delay The delay in seconds between the invocation of backgroundProcess methods
      */

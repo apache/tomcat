@@ -620,7 +620,8 @@ public class PerMessageDeflate implements Transformation {
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,
                                 writeTimeoutExpiry);
                     } else if (!fin && full/* note: needsInput is true here */) {
-                        // Write buffer full and input message not fully read.
+                        // Write buffer full and this part's input fully consumed, but the remainder of the message
+                        // is not yet read.
                         // Output and get more data.
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler, blocking,

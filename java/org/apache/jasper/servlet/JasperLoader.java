@@ -54,18 +54,17 @@ public class JasperLoader extends URLClassLoader {
     }
 
     /**
-     * Load the class with the specified name, searching using the following algorithm until it finds and returns the
-     * class. If the class cannot be found, returns <code>ClassNotFoundException</code>.
+     * Load the class with the specified name, using the following algorithm until it finds and returns the class. If
+     * the class cannot be found, a <code>ClassNotFoundException</code> is thrown.
      * <ul>
      * <li>Call <code>findLoadedClass(String)</code> to check if the class has already been loaded. If it has, the same
      * <code>Class</code> object is returned.</li>
-     * <li>If the <code>delegate</code> property is set to <code>true</code>, call the <code>loadClass()</code> method
-     * of the parent class loader, if any.</li>
-     * <li>Call <code>findClass()</code> to find this class in our locally defined repositories.</li>
-     * <li>Call the <code>loadClass()</code> method of our parent class loader, if any.</li>
+     * <li>If the class is not in the JSP package, call the <code>loadClass()</code> method of the parent class
+     * loader.</li>
+     * <li>Otherwise, call <code>findClass()</code> to find this class in our locally defined repositories.</li>
      * </ul>
-     * If the class was found using the above steps, and the <code>resolve</code> flag is <code>true</code>, this method
-     * will then call <code>resolveClass(Class)</code> on the resulting Class object.
+     * If the class was found by one of the first two steps, and the <code>resolve</code> flag is <code>true</code>, this
+     * method will then call <code>resolveClass(Class)</code> on the resulting Class object.
      *
      * @param name    Name of the class to be loaded
      * @param resolve If <code>true</code> then resolve the class
@@ -118,7 +117,8 @@ public class JasperLoader extends URLClassLoader {
 
 
     /**
-     * Delegate to parent
+     * Delegate to the parent class loader, falling back to the local repositories if the parent returns
+     * <code>null</code>.
      *
      * @see java.lang.ClassLoader#getResourceAsStream(String)
      */

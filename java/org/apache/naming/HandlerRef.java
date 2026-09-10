@@ -45,25 +45,25 @@ public class HandlerRef extends AbstractRef {
 
 
     /**
-     * Handler Classname address type.
+     * Handler Classname local part address type.
      */
     public static final String HANDLER_LOCALPART = "handlerlocalpart";
 
 
     /**
-     * Handler Classname address type.
+     * Handler Classname namespace address type.
      */
     public static final String HANDLER_NAMESPACE = "handlernamespace";
 
 
     /**
-     * Handler Classname address type.
+     * Handler param name address type.
      */
     public static final String HANDLER_PARAMNAME = "handlerparamname";
 
 
     /**
-     * Handler Classname address type.
+     * Handler param value address type.
      */
     public static final String HANDLER_PARAMVALUE = "handlerparamvalue";
 

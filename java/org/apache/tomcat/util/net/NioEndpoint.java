@@ -375,8 +375,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     /**
      * Number of keep-alive sockets.
      *
-     * @return The number of sockets currently in the keep-alive state waiting for the next request to be received on
-     *             the socket
+     * @return The number of sockets currently registered with the poller (i.e. all active sockets, including the
+     *             keep-alive sockets waiting for the next request to be received on the socket)
      */
     public int getKeepAliveCount() {
         if (poller == null) {
@@ -997,8 +997,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         /**
          * Add specified socket and associated pool to the poller. The socket will be added to a temporary array, and
-         * polled first after a maximum amount of time equal to pollTime (in most cases, latency will be much lower,
-         * however).
+         * polled first after a maximum amount of time equal to the <code>selectorTimeout</code> (in most cases, latency
+         * will be much lower, however).
          *
          * @param socketWrapper to add to the poller
          * @param interestOps   Operations for which to register this socket with the Poller

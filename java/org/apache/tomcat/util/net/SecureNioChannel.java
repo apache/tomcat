@@ -161,8 +161,9 @@ public class SecureNioChannel extends NioChannel {
      * @return 0 if handshake is complete, -1 if an error (other than an IOException) occurred, otherwise it returns a
      *             SelectionKey interestOps value
      *
-     * @throws IOException If an I/O error occurs during the handshake or if the handshake fails during wrapping or
-     *                         unwrapping
+     * @throws IOException           If an I/O error occurs during the handshake or if the handshake fails during
+     *                                 wrapping or unwrapping
+     * @throws IllegalStateException If an invalid handshake status is encountered during the handshake
      */
     @Override
     public int handshake(boolean read, boolean write) throws IOException {
@@ -566,7 +567,6 @@ public class SecureNioChannel extends NioChannel {
      * </pre>
      *
      * @throws IOException if an I/O error occurs
-     * @throws IOException if there is data on the outgoing network buffer, and we are unable to flush it
      */
     @Override
     public void close() throws IOException {

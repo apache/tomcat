@@ -27,7 +27,7 @@ import java.io.Serializable;
  *      try {
  * 2.     entry.lock();<br>
  * 3.     byte[] diff = entry.getDiff();<br>
- * 4.     entry.reset();<br>
+ * 4.     entry.resetDiff();<br>
  *      } finally {<br>
  * 5.     entry.unlock();<br>
  *      }<br>
@@ -132,7 +132,8 @@ public interface ReplicatedMapEntry extends Serializable {
     void setLastTimeReplicated(long lastTimeReplicated);
 
     /**
-     * If this returns true, to replicate that an object has been accessed
+     * Whether the object should be replicated to the backup nodes when it is accessed
+     * (see {@link #accessEntry()}) without being modified.
      *
      * @return boolean
      */

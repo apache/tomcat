@@ -75,7 +75,7 @@
                type="java.lang.String"/>
 
     <attribute   name="scope"
-               description="The sharing scope of this resource factory"
+               description="The sharing scope of this resource"
                type="java.lang.String"/>
 
     <attribute   name="type"

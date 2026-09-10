@@ -72,7 +72,7 @@ public interface Context extends Container, ContextBind {
     String ADD_WELCOME_FILE_EVENT = "addWelcomeFile";
 
     /**
-     * Container event for removing a wrapper.
+     * Container event for removing a welcome file.
      */
     String REMOVE_WELCOME_FILE_EVENT = "removeWelcomeFile";
 
@@ -96,10 +96,10 @@ public interface Context extends Container, ContextBind {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Returns <code>true</code> if requests mapped to servlets without "multipart config" to parse multipart/form-data
+     * Returns <code>true</code> if requests mapped to servlets without "multipart config" will parse multipart/form-data
      * requests anyway.
      *
-     * @return <code>true</code> if requests mapped to servlets without "multipart config" to parse multipart/form-data
+     * @return <code>true</code> if requests mapped to servlets without "multipart config" will parse multipart/form-data
      *             requests, <code>false</code> otherwise.
      */
     boolean getAllowCasualMultipartParsing();
@@ -553,7 +553,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Returns <code>true</code> if remaining request data will be read (swallowed) even the request violates a data
+     * Returns <code>true</code> if remaining request data will be read (swallowed) even if the request violates a data
      * size constraint.
      *
      * @return <code>true</code> if data will be swallowed (default), <code>false</code> otherwise.

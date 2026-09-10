@@ -686,7 +686,9 @@ public class SmapUtil {
      * attribute from the class file or an external .smap resource.
      * @param className the fully qualified class name
      * @param cl the class loader to use for loading the resource
-     * @return the parsed SmapStratum, or {@code null} if no or invalid SMAP data is found
+     * @return the parsed SmapStratum, or {@code null} if no SMAP data is found
+     * @throws NumberFormatException If the SMAP data is found but is malformed
+     * @throws ArrayIndexOutOfBoundsException If the SMAP data is found but is malformed
      */
     public static SmapStratum loadSmap(String className, ClassLoader cl) {
         // Extract SMAP from class file. First line "SMAP" is not included

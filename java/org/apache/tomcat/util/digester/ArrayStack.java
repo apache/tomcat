@@ -25,11 +25,6 @@ import java.util.EmptyStackException;
  * from Digester.
  * </p>
  * <p>
- * <strong>WARNING</strong> - This class is public solely to allow it to be used from subpackages of
- * <code>org.apache.commons.digester</code>. It should not be considered part of the public API of Commons Digester. If
- * you want to use such a class yourself, you should use the one from Commons Collections directly.
- * </p>
- * <p>
  * An implementation of the {@link java.util.Stack} API that is based on an <code>ArrayList</code> instead of a
  * <code>Vector</code>, so it is not synchronized to protect against multi-threaded access. The implementation is
  * therefore operates faster in environments where you do not need to worry about multiple thread contention.

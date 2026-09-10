@@ -53,7 +53,7 @@ public class Validation {
     }
 
     /**
-     * Test whether a string is a Java identifier. Note that the behaviour of this method depend on the system property
+     * Test whether a string is a Java identifier. Note that the behaviour of this method depends on the system property
      * {@code org.apache.el.parser.SKIP_IDENTIFIER_CHECK}
      *
      * @param key The string to test

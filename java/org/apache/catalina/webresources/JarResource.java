@@ -34,7 +34,8 @@ public class JarResource extends AbstractSingleArchiveResource {
      *
      * @param archiveResourceSet the archive resource set
      * @param webAppPath the web application path
-     * @param baseUrl the base URL
+     * @param baseUrl the base URL of the JAR file. The base URL of this resource is {@code jar:} + baseUrl +
+     *                    {@code !/}
      * @param jarEntry the JAR entry
      */
     public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,

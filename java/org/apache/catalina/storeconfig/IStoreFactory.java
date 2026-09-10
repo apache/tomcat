@@ -26,14 +26,14 @@ public interface IStoreFactory {
     /**
      * Get the store appender.
      *
-     * @return the writer
+     * @return the store appender
      */
     StoreAppender getStoreAppender();
 
     /**
      * Set the store appender.
      *
-     * @param storeWriter the writer
+     * @param storeWriter the store appender
      */
     void setStoreAppender(StoreAppender storeWriter);
 

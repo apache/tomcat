@@ -43,10 +43,11 @@ public class HPackHuffman {
     private static final HuffmanCode[] HUFFMAN_CODES;
 
     /**
-     * array based tree representation of a huffman code.
+     * Array based tree representation of the Huffman codes.
      * <p/>
-     * the high two bytes corresponds to the tree node if the bit is set, and the low two bytes for if it is clear if
-     * the high bit is set it is a terminal node, otherwise it contains the next node position.
+     * Each entry consists of two 16-bit halves: the high half is the branch to follow when the current bit is 1 and
+     * the low half is the branch to follow when the current bit is 0. Within each half, the top bit flags a terminal
+     * node and the remaining 15 bits hold either the symbol to append or the position of the next node in this array.
      */
     private static final int[] DECODING_TABLE;
 

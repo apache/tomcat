@@ -173,7 +173,9 @@ public class MediaType {
      *
      * @param input a reader over the header text
      *
-     * @return a MediaType parsed from the input, or null if not valid
+     * @return a MediaType parsed from the input, or null if the required type or subtype is missing. Some
+     *             syntactically invalid parameter values (e.g. a dangling {@code ;}) are accepted and produce a
+     *             non-null result.
      *
      * @throws IOException if there was a problem reading the input
      */

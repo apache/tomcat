@@ -88,7 +88,6 @@ final class StandardWrapperValve extends ValveBase {
         // Initialize local variables we may need
         boolean unavailable = false;
         Throwable throwable = null;
-        // This should be a Request attribute...
         long t1 = System.nanoTime();
         requestCount.incrementAndGet();
         StandardWrapper wrapper = (StandardWrapper) getContainer();
@@ -127,7 +126,6 @@ final class StandardWrapperValve extends ValveBase {
             container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), t);
             throwable = t;
             exception(request, response, t);
-            // servlet = null; is set here
         }
 
         MessageBytes requestPathMB = request.getRequestPathMB();

@@ -70,7 +70,8 @@ public final class UriUtil {
 
 
     /**
-     * Determine if the character is allowed in the scheme of a URI. See RFC 2396, Section 3.1
+     * Determine if the character is allowed in the scheme of a URI. See RFC 2396, Section 3.1. Note that this method
+     * is more permissive than RFC 2396 which requires the first scheme character to be an alpha.
      *
      * @param c The character to test
      *

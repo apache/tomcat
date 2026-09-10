@@ -108,10 +108,7 @@ public class Utils {
      * Common formatting to convert a String value for storage as a value in a property file. Values that contain
      * line-breaks need the line-break in the value to be replaced with the correct representation of a line-break in a
      * property file. Leading space needs to be escaped with a '\' and horizontal tabs need to be converted to "\t".
-     *
-     * Note that a single '\' needs to be escaped both in a Java string and in a property file so if a property value
-     * needs to contain a single `\` (e.g. to escape white space at the start of a line) that will appear as "\\\\" in
-     * the Java code.
+     * Backslashes are passed through unchanged.
      */
     static String formatValueCommon(String in) {
         String result = in.replace("\n", "\\n\\\n");

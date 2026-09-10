@@ -132,7 +132,7 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
-     * Controls the testing all files to see of they are JAR files extension.
+     * Controls the testing all files to see if they are JAR files extension.
      */
     private boolean scanAllFiles = false;
 
@@ -155,7 +155,7 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
-     * Controls the testing all directories to see of they are exploded JAR files extension.
+     * Controls the testing all directories to see if they are exploded JAR files extension.
      */
     private boolean scanAllDirectories = true;
 

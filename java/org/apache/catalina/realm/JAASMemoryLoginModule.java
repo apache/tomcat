@@ -62,9 +62,9 @@ import org.apache.tomcat.util.digester.Digester;
  * with a parameter of <code>"SHA256"</code></li>
  * </ul>
  * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - This class implements <code>Realm</code> only to satisfy the calling
- * requirements of the <code>GenericPrincipal</code> constructor. It does not actually perform the functionality
- * required of a <code>Realm</code> implementation.
+ * <strong>IMPLEMENTATION NOTE</strong> - This class extends {@link MemoryRealm} rather than implementing
+ * <code>Realm</code> directly, so that user lookup and credential validation are performed against the XML file
+ * configured for the memory realm.
  * </p>
  */
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {

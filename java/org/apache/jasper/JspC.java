@@ -83,7 +83,7 @@ import org.xml.sax.SAXException;
  *  &lt;jasper verbose="0"
  *           package="my.package"
  *           uriroot="${webapps.dir}/${webapp.name}"
- *           webXmlFragment="${build.dir}/generated_web.xml"
+ *           webXmlInclude="${build.dir}/generated_web.xml"
  *           outputDir="${webapp.dir}/${webapp.name}/WEB-INF/src/my/package" /&gt;
  * </pre>
  */
@@ -1379,7 +1379,7 @@ public class JspC extends Task implements Options {
     }
 
     /*
-     * Assumes valid xml
+     * Assumes valid xml with no attribute values containing a '>' character.
      */
     private String getElement(Reader reader) throws IOException {
         StringBuilder result = new StringBuilder();

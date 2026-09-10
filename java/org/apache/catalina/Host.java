@@ -76,7 +76,9 @@ public interface Host extends Container {
     void setXmlBase(String xmlBase);
 
     /**
-     * Get the default configuration path of this Host. The file will be canonical if possible.
+     * Get the configuration path of this Host. If a base path has been configured via {@link #setXmlBase(String)},
+     * that value is returned. Otherwise, the default path
+     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; is returned. The file will be canonical if possible.
      *
      * @return the configuration base file
      */
@@ -140,7 +142,7 @@ public interface Host extends Container {
 
     /**
      * Get the value of the deploy on startup flag. If true, it indicates that this host's child webapps should be
-     * discovered and automatically deployed.
+     * discovered and deployed when the Host starts, independently of the auto deploy flag.
      *
      * @return the deploy on startup flag
      */

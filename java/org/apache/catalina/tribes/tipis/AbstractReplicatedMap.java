@@ -66,7 +66,7 @@ public abstract class AbstractReplicatedMap<K, V>
     private final Log log = LogFactory.getLog(AbstractReplicatedMap.class); // must not be static
 
     /**
-     * The default initial capacity - MUST be a power of two.
+     * The default initial capacity.
      */
     public static final int DEFAULT_INITIAL_CAPACITY = 16;
 
@@ -1135,7 +1135,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param key   Object
      * @param value Object
      *
-     * @return Member - the backup node
+     * @return Member[] - the backup nodes
      *
      * @throws ChannelException Cluster error
      */
@@ -1473,8 +1473,6 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     @Override
     public Set<K> keySet() {
-        // todo implement
-        // should only return keys where this is active.
         LinkedHashSet<K> set = new LinkedHashSet<>(innerMap.size());
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             K key = e.getKey();

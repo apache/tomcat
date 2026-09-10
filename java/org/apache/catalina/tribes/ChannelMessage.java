@@ -100,14 +100,14 @@ public interface ChannelMessage extends Serializable, Cloneable {
     /**
      * Shallow clone, what gets cloned depends on the implementation
      *
-     * @return ChannelMessage
+     * @return a shallow copy of this ChannelMessage (cast to the concrete implementation type if needed)
      */
     Object clone();
 
     /**
      * Deep clone, all fields MUST get cloned
      *
-     * @return ChannelMessage
+     * @return a deep copy of this ChannelMessage (cast to the concrete implementation type if needed)
      */
     Object deepclone();
 }

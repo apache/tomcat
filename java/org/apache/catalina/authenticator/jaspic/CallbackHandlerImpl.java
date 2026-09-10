@@ -110,7 +110,8 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                 if (name != null) {
                     // If the Principal has been cached in the session, just return it.
                     if (principal instanceof GenericPrincipal) {
-                        // Duplicates are unlikely and will be handled in AuthenticatorBase.getPrincipal()
+                        // Duplicates are unlikely and are not merged; if present, AuthenticatorBase.getPrincipal()
+                        // returns an arbitrary element of the set of credentials
                         subject.getPrivateCredentials().add(principal);
                     } else {
                         /*

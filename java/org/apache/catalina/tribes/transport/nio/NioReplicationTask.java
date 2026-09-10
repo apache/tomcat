@@ -44,7 +44,8 @@ import org.apache.juli.logging.LogFactory;
 /**
  * A worker thread class which drains a channel and processes received messages.
  * Each instance services a single SelectionKey per invocation. After completion,
- * the worker returns itself to its parent pool for reuse.
+ * the worker returns itself to its parent pool for reuse, unless the key is null
+ * in which case it returns early without doing so.
  */
 public class NioReplicationTask extends AbstractRxTask {
 

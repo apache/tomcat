@@ -170,8 +170,8 @@ public class StoreFactoryBase implements IStoreFactory {
                 try {
                     storeElement(aWriter, indent, element);
                 } catch (IOException ignore) {
-                    // Ignore. Children report error themselves.
-                    // See StandardContext.storeWithBackup()
+                    // Ignore. Children do not report the error themselves (e.g.
+                    // StandardContextSF.storeWithBackup() throws without logging).
                 }
             }
         }

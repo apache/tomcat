@@ -158,7 +158,7 @@ public class TransactionContext {
     }
 
     /**
-     * Gets the transaction complete flag to true.
+     * Gets the transaction complete flag.
      *
      * @return The transaction complete flag.
      * @since 2.4.0

@@ -31,7 +31,7 @@ import org.apache.juli.logging.LogFactory;
  * primary and one node is always the backup. This map is synchronized across a cluster, and only has one backup
  * member.<br>
  * A perfect usage for this map would be a session map for a session manager in a clustered environment.<br>
- * The only way to modify this list is to use the <code>put, putAll, remove</code> methods. entrySet, entrySetFull,
+ * The only way to modify this map is to use the <code>put, putAll, remove</code> methods. entrySet, entrySetFull,
  * keySet, keySetFull, returns all non modifiable sets.<br>
  * <br>
  * If objects (values) in the map change without invoking <code>put()</code> or <code>remove()</code> the data can be
@@ -58,8 +58,6 @@ import org.apache.juli.logging.LogFactory;
  * node as primary. <br>
  * <br>
  * <b>REMEMBER TO CALL</b> <code>breakdown()</code> when you are done with the map to avoid memory leaks.<br>
- * <br>
- * TODO implement periodic sync/transfer thread
  *
  * @param <K> The type of Key
  * @param <V> The type of Value

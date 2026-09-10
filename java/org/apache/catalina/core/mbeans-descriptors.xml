@@ -374,12 +374,12 @@
     </operation>
 
     <operation name="addApplicationParameter"
-               description="Add a new application parameter for this application."
-               impact="ACTION"
-               returnType="void">
-      <parameter name="listener"
-                 description="Java class name of a listener class"
-                 type="java.lang.String"/>
+                description="Add a new application parameter for this application."
+                impact="ACTION"
+                returnType="void">
+       <parameter name="parameter"
+                  description="Application parameter to add"
+                  type="java.lang.String"/>
     </operation>
 
     <operation name="addChild"
@@ -545,15 +545,15 @@
     </operation>
 
     <operation name="findApplicationParameters"
-               description="Return the set of application parameters for this application."
-               impact="INFO"
-               returnType="java.lang.String">
+                description="Return the set of application parameters for this application."
+                impact="INFO"
+                returnType="[Ljava.lang.String;">
     </operation>
 
     <operation name="findConstraints"
-               description="Return the set of security constraints for this web application. If there are none, a zero-length array is returned."
-               impact="INFO"
-               returnType="java.lang.String">
+                description="Return the set of security constraints for this web application. If there are none, a zero-length array is returned."
+                impact="INFO"
+                returnType="[Ljava.lang.String;">
     </operation>
 
     <operation name="findContainerListenerNames"
@@ -587,12 +587,12 @@
     </operation>
 
     <operation name="findFilterDef"
-               description="Return the filter definition for the specified filter name, if any; otherwise return null."
-               impact="ACTION"
-               returnType="java.lang.String">
-      <parameter name="exceptionType"
-                 description="Exception type to look up"
-                 type="java.lang.String"/>
+                description="Return the filter definition for the specified filter name, if any; otherwise return null."
+                impact="ACTION"
+                returnType="java.lang.String">
+       <parameter name="name"
+                  description="Filter name to look up"
+                  type="java.lang.String"/>
     </operation>
 
     <operation name="findFilterDefs"

@@ -319,10 +319,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Should Tomcat attempt to terminate threads that have been started by the web application? Stopping threads is
-     * performed via the deprecated (for good reason) <code>Thread.stop()</code> method and is likely to result in
-     * instability. As such, enabling this should be viewed as an option of last resort in a development environment and
-     * is not recommended in a production environment. If not specified, the default value of <code>false</code> will be
-     * used.
+     * performed by interrupting the threads, after shutting down the associated executor when the thread was started
+     * via one, and is likely to result in instability. As such, enabling this should be viewed as an option of last
+     * resort in a development environment and is not recommended in a production environment. If not specified, the
+     * default value of <code>false</code> will be used.
      */
     private boolean clearReferencesStopThreads = false;
 
@@ -1478,8 +1478,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
     /**
-     * Get the Permissions for a CodeSource. If this instance of WebappClassLoaderBase is for a web application context,
-     * add read FilePermission for the appropriate resources.
+     * Get the Permissions for a CodeSource. This implementation always returns <code>null</code>.
      *
      * @param codeSource where the code was loaded from
      *

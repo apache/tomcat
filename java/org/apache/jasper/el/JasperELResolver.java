@@ -115,7 +115,7 @@ public class JasperELResolver extends CompositeELResolver {
                 }
             }
             // skip stream, static and collection-based resolvers (map,
-            // resource, list, array) and bean
+            // resource, list, array) and record
             start = index + 7;
             if (JspRuntimeLibrary.GRAAL) {
                 start++;
@@ -159,7 +159,7 @@ public class JasperELResolver extends CompositeELResolver {
 
         // skip collection (map, resource, list, and array) resolvers
         index += 4;
-        // call bean and the rest of resolvers
+        // call record and the rest of resolvers
         int size = resolversSize.get();
         for (int i = index; i < size; i++) {
             result = resolvers[i].invoke(context, base, targetMethod, paramTypes, params);

@@ -23,7 +23,8 @@ import javax.servlet.WriteListener;
 
 
 /**
- * Class that extends ServletOutputStream, used as a wrapper from within <code>SSIInclude</code>
+ * Class that extends ServletOutputStream to capture output into an in-memory byte array. Used by
+ * <code>SSIFilter</code> and <code>SSIServletExternalResolver</code>.
  *
  * @see ServletOutputStream and ByteArrayOutputStream
  */

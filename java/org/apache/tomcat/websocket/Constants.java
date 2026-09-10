@@ -56,7 +56,7 @@ public class Constants {
 
     // Internal OP Codes
     // RFC 6455 limits OP Codes to 4 bits so these should never clash
-    // Always set bit 4 so these will be treated as control codes
+    // Always set the 0x08 bit so these will be treated as control codes
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
