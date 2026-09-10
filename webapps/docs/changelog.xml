@@ -201,6 +201,9 @@
         Align cipher order with the results produced by OpenSSL if the cipher
         specification adds, removes and then re-adds ciphers. (markt)
       </fix>
+      <fix>
+        Correct a narrow race condition when processing HTTP/2 headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
