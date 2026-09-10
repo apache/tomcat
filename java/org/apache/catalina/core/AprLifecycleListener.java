@@ -199,7 +199,8 @@ public class AprLifecycleListener implements LifecycleListener {
 
     /**
      * Get a warning message if the installed Tomcat Native version is older than recommended.
-     * This performs the same version check used during Tomcat startup.
+     * Unlike the version check performed during Tomcat startup, this only compares the installed version against the
+     * recommended version and does not enforce the required minimum version.
      *
      * @return a warning message if the installed version is outdated, or null if the version
      *         is acceptable or APR is not available

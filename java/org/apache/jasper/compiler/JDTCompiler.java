@@ -57,7 +57,7 @@ import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
 /**
- * JDT class compiler. This compiler will load source dependencies from the context classloader, reducing dramatically
+ * JDT class compiler. This compiler will load source dependencies from the JSP classloader, reducing dramatically
  * disk access during the compilation process. Based on code from Cocoon2.
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {

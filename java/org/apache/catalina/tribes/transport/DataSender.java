@@ -59,7 +59,7 @@ public interface DataSender {
     /**
      * Keepalive.
      *
-     * @return {@code true} if kept alive
+     * @return {@code true} if the connection (or an idle pooled connection) was disconnected
      */
     boolean keepalive();
 

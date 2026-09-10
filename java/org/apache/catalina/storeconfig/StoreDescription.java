@@ -29,6 +29,7 @@ import java.util.List;
  *  standard=&quot;true&quot;
  *  default=&quot;true&quot;
  *  externalAllowed=&quot;true&quot;
+ *  externalOnly=&quot;true&quot;
  *  storeSeparate=&quot;true&quot;
  *  backup=&quot;true&quot;
  *  children=&quot;true&quot;
@@ -41,14 +42,17 @@ import java.util.List;
  *     &lt;TransientAttribute&gt;displayName&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;distributable&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;domain&lt;/TransientAttribute&gt;
- *     &lt;TransientAttribute&gt;engineName&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;name&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;publicId&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;originalDocBase&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;replaceWelcomeFiles&lt;/TransientAttribute&gt;
- *     &lt;TransientAttribute&gt;saveConfig&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;sessionTimeout&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;startupTime&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;tldScanTime&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;effectiveMajorVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;effectiveMinorVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;webappVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;metadataComplete&lt;/TransientAttribute&gt;
  *  &lt;/Description&gt;
  * </pre>
  */

@@ -76,10 +76,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * thread at a time, and a call to <code>parse()</code> must be completed before another can be initiated even from the
  * same thread.
  * </p>
- * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - A bug in Xerces 2.0.2 prevents the support of XML schema. You need Xerces
- * 2.1/2.3 and up to make this class working with XML schema
- * </p>
  */
 public class Digester extends DefaultHandler2 {
 
@@ -649,7 +645,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Sets a flag indicating whether the requested feature is supported by the underlying implementation of
+     * Sets the value of the requested feature in the underlying implementation of
      * <code>org.xml.sax.XMLReader</code>. See
      * <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description">
      * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a> for information about the
@@ -952,8 +948,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the XMLReader to be used for parsing the input document. FIX ME: there is a bug in JAXP/XERCES that
-     * prevent the use of a parser that contains a schema with a DTD.
+     * Return the XMLReader to be used for parsing the input document.
      *
      * @return the XML reader
      *
@@ -1304,7 +1299,7 @@ public class Digester extends DefaultHandler2 {
      *                         processing is not being performed.
      * @param localName    The local name (without prefix), or the empty string if Namespace processing is not being
      *                         performed.
-     * @param qName        The qualified name (with prefix), or the empty string if qualified names are not available.\
+     * @param qName        The qualified name (with prefix), or the empty string if qualified names are not available.
      * @param list         The attributes attached to the element. If there are no attributes, it shall be an empty
      *                         Attributes object.
      *

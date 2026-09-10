@@ -767,8 +767,8 @@ public abstract class SocketWrapperBase<E> {
      * Writes the provided data to the socket write buffer. If the socket write buffer fills during the write, the
      * content of the socket write buffer is written to the network using a blocking write. Once that blocking write is
      * complete, this method starts to fill the socket write buffer again. Depending on the size of the data to write,
-     * there may be multiple writes to the network. On completion of this method there will always be space remaining in
-     * the socket write buffer.
+     * there may be multiple writes to the network. On completion of this method the socket write buffer may contain
+     * data that still needs to be written to the socket.
      *
      * @param buf The byte array containing the data to be written
      * @param off The offset within the byte array of the data to be written
@@ -796,8 +796,8 @@ public abstract class SocketWrapperBase<E> {
      * Writes the provided data to the socket write buffer. If the socket write buffer fills during the write, the
      * content of the socket write buffer is written to the network using a blocking write. Once that blocking write is
      * complete, this method starts to fill the socket write buffer again. Depending on the size of the data to write,
-     * there may be multiple writes to the network. On completion of this method there will always be space remaining in
-     * the socket write buffer.
+     * there may be multiple writes to the network. On completion of this method the socket write buffer may contain
+     * data that still needs to be written to the socket.
      *
      * @param from The ByteBuffer containing the data to be written
      *
@@ -957,7 +957,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     /**
-     * Write the contents of the socketWriteBuffer to the socket. For blocking writes either then entire contents of the
+     * Write the contents of the socketWriteBuffer to the socket. For blocking writes either the entire contents of the
      * buffer will be written or an IOException will be thrown. Partial blocking writes will not occur.
      *
      * @param block Should the write be blocking or not?
@@ -971,7 +971,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     /**
-     * Write the contents of the ByteBuffer to the socket. For blocking writes either then entire contents of the buffer
+     * Write the contents of the ByteBuffer to the socket. For blocking writes either the entire contents of the buffer
      * will be written or an IOException will be thrown. Partial blocking writes will not occur.
      *
      * @param block Should the write be blocking or not?

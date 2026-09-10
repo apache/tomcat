@@ -66,7 +66,9 @@ import org.apache.tomcat.util.res.StringManager;
  * Note:
  * <ul>
  * <li>You will need to nest a &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
- * inside a TLS enabled Connector element in server.xml to enable HTTP/2 support.</li>
+ * inside a Connector element in server.xml to enable HTTP/2 support. For a TLS enabled Connector, HTTP/2 connections
+ * are negotiated using ALPN (h2). For a Connector that is not TLS enabled, HTTP/2 connections use the cleartext
+ * (h2c) mechanism.</li>
  * </ul>
  */
 class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler, Input, Output {

@@ -19,7 +19,8 @@ package org.apache.catalina.ant;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Ant task that implements the <code>/sessions</code> command supported by the Tomcat manager application.
+ * Ant task that implements the <code>/sessions</code> command supported by the Tomcat manager application. Note that
+ * the <code>/sessions</code> command is deprecated in favour of the <code>/expire</code> command.
  */
 public class SessionsTask extends AbstractCatalinaCommandTask {
 
@@ -30,12 +31,12 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
     }
 
     /**
-     * Minimum idle time in minutes for sessions to be included in the response.
+     * Minimum idle time in minutes for sessions to be expired (invalidated).
      */
     protected String idle = null;
 
     /**
-     * Returns the minimum idle time in minutes for sessions to be included.
+     * Returns the minimum idle time in minutes for sessions to be expired (invalidated).
      *
      * @return the minimum idle time
      */
@@ -44,7 +45,7 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
     }
 
     /**
-     * Sets the minimum idle time in minutes for sessions to be included.
+     * Sets the minimum idle time in minutes for sessions to be expired (invalidated).
      *
      * @param idle the minimum idle time
      */

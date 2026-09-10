@@ -69,7 +69,7 @@ import org.apache.tools.ant.Project;
  *
  * All calls after opening with same refid reuse the connection.
  * <p>
- * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
+ * First call to a remote MBeanserver save the JMXConnection a reference <em>jmx.server</em>
  * </p>
  * All JMXAccessorXXXTask support the attribute <em>if</em> and <em>unless</em>. With <em>if</em> the task is only
  * execute when property exist and with <em>unless</em> when property not exists. <br>
@@ -540,8 +540,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * Execute the specified command, based on the configured properties. The input stream will be closed upon
-     * completion of this task, whether it was executed successfully or not.
+     * Execute the specified command, based on the configured properties.
      *
      * @param jmxServerConnection The JMX connection that should be used
      *
@@ -659,8 +658,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * create result as property with name from property prefix When result is an array and isSeparateArrayResults is
-     * true, resultproperty used as prefix (<code>resultproperty.0-array.length</code> and store the result array length
-     * at <code>resultproperty.length</code>. Other option is that you delimit your result with a delimiter
+     * true, resultproperty used as prefix (<code>resultproperty.0-array.Length</code> and store the result array length
+     * at <code>resultproperty.Length</code>. Other option is that you delimit your result with a delimiter
      * (java.util.StringTokenizer is used).
      *
      * @param propertyPrefix Prefix for the property

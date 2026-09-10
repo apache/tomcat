@@ -120,7 +120,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * <tr>
  * <td>protocolHeader</td>
- * <td>Name of the http header read by this valve that holds the flag that this request</td>
+ * <td>Name of the http header read by this valve that holds the flag that this request was made over https</td>
  * <td>N/A</td>
  * <td>Compliant http header name like <code>X-Forwarded-Proto</code>, <code>X-Forwarded-Ssl</code> or
  * <code>Front-End-Https</code></td>
@@ -228,7 +228,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -271,7 +271,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -315,7 +315,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -341,7 +341,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * </table>
  * <p>
- * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-by</code> holds
+ * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-for</code> holds
  * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
  * <code>untrusted-proxy</code> is the actual remote ip. <code>request.remoteAddr</code> is <code>untrusted-proxy</code>
  * that is an IP verified by <code>proxy1</code>.

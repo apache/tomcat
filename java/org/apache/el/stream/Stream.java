@@ -444,7 +444,8 @@ public class Stream {
 
 
     /**
-     * Calculates the average of all numeric elements in the stream.
+     * Calculates the average of all elements in the stream. Elements are coerced to a numeric type; a non-convertible
+     * element results in an {@code ELException}.
      *
      * @return an Optional containing the average, or empty if the stream is empty
      */
@@ -466,7 +467,8 @@ public class Stream {
 
 
     /**
-     * Returns the sum of all numeric elements in the stream.
+     * Returns the sum of all elements in the stream. Elements are coerced to a numeric type; a non-convertible
+     * element results in an {@code ELException}.
      *
      * @return the sum of all elements
      */

@@ -23,7 +23,8 @@ package org.apache.catalina.util;
 public class TomcatCSS {
 
     /**
-     * Constructs a new TomcatCSS. This utility class should not be instantiated.
+     * Constructs a new TomcatCSS. This utility class provides only a static constant and does not need to be
+     * instantiated.
      */
     public TomcatCSS() {
     }

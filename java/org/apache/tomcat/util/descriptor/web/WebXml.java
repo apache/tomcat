@@ -294,9 +294,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     /**
-     * Set the version for this web.xml file
+     * Set the version for this web.xml file. Values of <code>null</code> are ignored. Unrecognised version strings
+     * only log a warning and the version is left unchanged (defaulting to 6.2 if not previously set).
      *
-     * @param version Values of <code>null</code> will be ignored
+     * @param version the version
      */
     public void setVersion(String version) {
         if (version == null) {
@@ -1406,13 +1407,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         // TODO - Various, icon, description etc elements are skipped - mainly
         // because they are ignored when web.xml is parsed - see above
 
-        // NOTE - Elements need to be written in the order defined in the 2.3
-        // DTD else validation of the merged web.xml will fail
+        // NOTE - Elements need to be written in the order defined in the
+        // schema for the version in use else validation of the merged web.xml
+        // will fail
 
         // NOTE - Some elements need to be skipped based on the version of the
-        // specification being used. Version is validated and starts at
-        // 2.2. The version tests used in this method take advantage of
-        // this.
+        // specification being used. The version tests used in this method take
+        // advantage of this.
 
         // Declaration
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

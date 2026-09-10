@@ -85,7 +85,7 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * Set the error code (hack for default XmlMapper data type).
+     * Set the error code, parsing the provided string value.
      *
      * @param errorCode The new error code
      */

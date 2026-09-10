@@ -85,9 +85,10 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * The minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep the active
-     * session count below maxActiveSessions. Setting to {@code -1} means sessions will not be swapped out to keep the
-     * active session count down.
+     * The minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is enforced
+     * both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in addition
+     * to maxIdleSwap, when swapping out due to inactivity. Setting to {@code -1} means sessions will not be swapped
+     * out to keep the active session count down.
      */
     protected int minIdleSwap = -1;
 
@@ -179,12 +180,12 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * Returns the minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
-     * the active session count below maxActiveSessions.
+     * Returns the minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is
+     * enforced both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in
+     * addition to maxIdleSwap, when swapping out due to inactivity.
      *
-     * @return The minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
-     *             the active session count below maxActiveSessions. A value of {@code -1} means sessions will not be
-     *             swapped out to keep the active session count down.
+     * @return The minimum time in seconds a session must be idle before it is eligible to be swapped to disk. A value
+     *             of {@code -1} means sessions will not be swapped out to keep the active session count down.
      */
     public int getMinIdleSwap() {
         return minIdleSwap;
@@ -192,9 +193,10 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * Sets the minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep the
-     * active session count below maxActiveSessions. Setting to {@code -1} means sessions will not be swapped out to
-     * keep the active session count down.
+     * Sets the minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is
+     * enforced both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in
+     * addition to maxIdleSwap, when swapping out due to inactivity. Setting to {@code -1} means sessions will not be
+     * swapped out to keep the active session count down.
      *
      * @param min time in seconds before a possible swap out
      */

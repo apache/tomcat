@@ -329,7 +329,7 @@ class Validator {
         /*
          * Compares page encodings specified in various places, and throws exception in case of page encoding mismatch.
          *
-         * @param thePageDirEnc The value of the pageEncoding attribute of the page directive @param pageDir The page
+         * @param thePageDirEnc The value of the pageEncoding attribute of the tag directive @param pageDir The tag
          * directive node
          *
          * @throws JasperException in case of page encoding mismatch

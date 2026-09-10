@@ -49,7 +49,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     public interface CharOutputChannel {
 
         /**
-         * Send the bytes ( usually the internal conversion buffer ). Expect 8k output if the buffer is full.
+         * Send the characters ( usually the internal conversion buffer ). Expect 8k output if the buffer is full.
          *
          * @param buf characters that will be written
          * @param off offset in the characters array
@@ -244,7 +244,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
         // Need more space than we can afford, need to flush buffer.
 
-        // The buffer is already at (or bigger than) limit.
+        // The buffer is below the limit but does not have enough contiguous space for the data to append.
 
         // Optimization:
         // If len-avail < length (i.e. after we fill the buffer with what we
@@ -469,7 +469,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Compares the message bytes to the specified String object.
+     * Compares the characters in this CharChunk to the specified String object.
      *
      * @param s the String to compare
      *
@@ -492,7 +492,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Compares the message bytes to the specified String object.
+     * Compares the characters in this CharChunk to the specified String object, ignoring case.
      *
      * @param s the String to compare
      *
@@ -660,7 +660,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Returns the first instance of the given character in this CharChunk starting at the specified char. If the
+     * Returns the first instance of the given character in this CharChunk starting at the specified position. If the
      * character is not found, -1 is returned. <br>
      *
      * @param c        The character

@@ -154,7 +154,7 @@ abstract class AbstractStream {
         windowAllocationLock.lock();
         try {
             // No need for overflow protection here. Decrement can never be larger
-            // the Integer.MAX_VALUE and once windowSize goes negative no further
+            // than the Integer.MAX_VALUE and once windowSize goes negative no further
             // decrements are permitted
             windowSize -= decrement;
             if (log.isTraceEnabled()) {

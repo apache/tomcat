@@ -131,11 +131,12 @@ public class RulesBase implements Rules {
      * @param namespaceURI Namespace URI for which to select matching rules, or <code>null</code> to match regardless of
      *                         namespace URI
      * @param pattern      Nesting pattern to be matched
+     *
+     * @return a rules list
      */
     @Override
     public List<Rule> match(String namespaceURI, String pattern) {
 
-        // List rulesList = (List) this.cache.get(pattern);
         List<Rule> rulesList = lookup(namespaceURI, pattern);
         if ((rulesList == null) || (rulesList.isEmpty())) {
             // Find the longest key, ie more discriminant
@@ -144,7 +145,6 @@ public class RulesBase implements Rules {
                 if (key.startsWith("*/")) {
                     if (pattern.equals(key.substring(2)) || pattern.endsWith(key.substring(1))) {
                         if (key.length() > longKey.length()) {
-                            // rulesList = (List) this.cache.get(key);
                             rulesList = lookup(namespaceURI, key);
                             longKey = key;
                         }

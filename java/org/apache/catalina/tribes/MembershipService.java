@@ -49,7 +49,7 @@ public interface MembershipService {
 
     /**
      * Starts the membership service. If a membership listeners is added the listener will start to receive membership
-     * events. Performs a start level 1 and 2
+     * events. Performs a start at {@link #MBR_RX} and {@link #MBR_TX} level
      *
      * @throws Exception if the service fails to start.
      */
@@ -62,7 +62,7 @@ public interface MembershipService {
      * @param level - level MBR_RX starts listening for members, level MBR_TX starts broadcasting the server
      *
      * @throws Exception                          if the service fails to start.
-     * @throws java.lang.IllegalArgumentException if the level is incorrect.
+     * @throws java.lang.IllegalArgumentException some implementations throw this if the level is incorrect
      */
     void start(int level) throws Exception;
 

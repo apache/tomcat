@@ -51,7 +51,7 @@ public class LookupFactory implements ObjectFactory {
     /**
      * Create a new Resource env instance.
      *
-     * @param obj         The reference object describing the DataSource
+     * @param obj         The reference object describing the LookupRef
      * @param name        the bound name
      * @param nameCtx     unused
      * @param environment unused

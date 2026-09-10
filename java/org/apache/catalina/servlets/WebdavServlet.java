@@ -1075,7 +1075,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * PROPPATCH Method. Dead properties support is a SHOULD in the specification and are not implemented.
+     * PROPPATCH Method. Sets, removes or tests the properties of a resource. The updated properties are persisted
+     * through the configured {@link PropertyStore} and are returned by subsequent PROPFIND requests.
      *
      * @param req  The Servlet request
      * @param resp The Servlet response

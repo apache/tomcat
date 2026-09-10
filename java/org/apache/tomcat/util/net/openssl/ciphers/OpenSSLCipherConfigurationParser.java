@@ -86,7 +86,7 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String eNULL = "eNULL";
     /**
-     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. T These cipher
+     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. These cipher
      * suites are vulnerable to a 'man in the middle' attack and so their use is normally discouraged.
      */
     private static final String aNULL = "aNULL";
@@ -861,8 +861,8 @@ public class OpenSSLCipherConfigurationParser {
      *
      * @param opensslCipherName The OpenSSL name for a cipher
      *
-     * @return The JSSE name for the specified OpenSSL cipher. If none is known, the IANA standard name will be returned
-     *             instead
+     * @return The first JSSE name for the specified OpenSSL cipher, or {@code null} if the name is not a known,
+     *             unambiguous OpenSSL cipher name
      */
     public static String openSSLToJsse(String opensslCipherName) {
         if (!initialized) {

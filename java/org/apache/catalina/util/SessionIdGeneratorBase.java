@@ -195,7 +195,8 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     /**
      * Set the number of bytes used for a session ID.
      *
-     * @param sessionIdLength the number of bytes
+     * @param sessionIdLength the number of bytes. Values less than 2 are rejected with a warning and the previous
+     *                         value is retained
      */
     @Override
     public void setSessionIdLength(int sessionIdLength) {

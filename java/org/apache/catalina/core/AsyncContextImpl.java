@@ -111,7 +111,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
      */
     private final List<AsyncListenerWrapper> listeners = new CopyOnWriteArrayList<>();
     private volatile Runnable dispatch = null;
-    // Default of 30000 (30s) is set by the connector
+    // Set to the connector's async timeout when async processing starts
     private long timeout = -1;
 
     /*

@@ -259,7 +259,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param portstart Starting port for bind attempts
      * @param retries   Number of times to attempt to bind (port incremented between attempts)
      *
-     * @return int The retry count
+     * @return int 0 on success; the non-positive retry count if no bind attempt was made
      *
      * @throws IOException Socket bind error
      */

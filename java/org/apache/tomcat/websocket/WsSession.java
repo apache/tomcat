@@ -138,7 +138,7 @@ public class WsSession implements Session {
      * @param secure               Was this session initiated over a secure connection?
      * @param clientEndpointConfig The configuration information for the client end point
      *
-     * @throws DeploymentException if an invalid encode is specified
+     * @throws DeploymentException if an invalid encoder is specified
      */
     public WsSession(ClientEndpointHolder clientEndpointHolder, WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer, List<Extension> negotiatedExtensions, String subProtocol,
@@ -201,7 +201,7 @@ public class WsSession implements Session {
      * @param secure               Was this session initiated over a secure connection?
      * @param serverEndpointConfig The configuration information for the server end point
      *
-     * @throws DeploymentException if an invalid encode is specified
+     * @throws DeploymentException if an invalid encoder is specified
      */
     public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint, WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String,List<String>> requestParameterMap, String queryString, Principal userPrincipal,
@@ -554,8 +554,8 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
-     * on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint
+     * receives a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -566,8 +566,8 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
-     * on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint
+     * receives a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint

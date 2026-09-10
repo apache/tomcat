@@ -186,7 +186,7 @@ public final class NetMask {
      * @param addr The {@link java.net.InetAddress} to test
      * @param port The port to test
      *
-     * @return true on match, false otherwise
+     * @return true on match, false otherwise. Always returns false if this netmask does not contain a port pattern
      */
     public boolean matches(final InetAddress addr, int port) {
         if (!foundPort) {

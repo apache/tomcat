@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
  */
 public class StringUtil {
     /**
-     * Constructs a new StringUtil. This utility class should not be instantiated.
+     * Constructs a new StringUtil. This utility class provides only static methods and does not need to be
+     * instantiated.
      */
     public StringUtil() {
     }
@@ -34,8 +35,8 @@ public class StringUtil {
     private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
 
     /**
-     * Splits a comma-separated string into an array of String values. Whitespace around the commas is removed. Null or
-     * empty values will return a zero-element array.
+     * Splits a comma-separated string into an array of String values. Whitespace around the commas between values is
+     * removed. Null or empty values will return a zero-element array.
      *
      * @param s The string to split by commas.
      *

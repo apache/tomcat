@@ -463,9 +463,10 @@ public interface Channel {
     }
 
     /**
-     * Translates a comma separated list of option names to their bitwise-ORd value
+     * Translates a channel send options specification to its bitwise-ORd value. The input is first attempted to be
+     * parsed as an integer bitmask. If that fails, the input is treated as a comma separated list of option names.
      *
-     * @param input A comma separated list of options, e.g. "async, multicast"
+     * @param input A comma separated list of options, e.g. "async, multicast", or an integer bitmask
      *
      * @return a bitwise ORd value of the passed option names
      */

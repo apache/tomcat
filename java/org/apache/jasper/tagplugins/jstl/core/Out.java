@@ -40,12 +40,12 @@ public final class Out implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        // these two data member are to indicate
+        // these two local variables are to indicate
         // whether the corresponding attribute is specified
         boolean hasDefault = ctxt.isAttributeSpecified("default");
         boolean hasEscapeXml = ctxt.isAttributeSpecified("escapeXml");
 
-        // strValName, strEscapeXmlName & strDefName are two variables' name
+        // strValName, strEscapeXmlName & strDefName are three variables' names
         // standing for value, escapeXml and default attribute
         String strObjectName = ctxt.getTemporaryVariableName();
         String strValName = ctxt.getTemporaryVariableName();
@@ -53,7 +53,7 @@ public final class Out implements TagPlugin {
         String strEscapeXmlName = ctxt.getTemporaryVariableName();
         String strSkipBodyName = ctxt.getTemporaryVariableName();
 
-        // according to the tag file, the value attribute is mandatory.
+        // the value attribute is not mandatory; the tag body is a fallback.
         ctxt.generateImport("java.io.Reader");
         ctxt.generateJavaSource("Object " + strObjectName + "=");
         ctxt.generateAttribute("value");

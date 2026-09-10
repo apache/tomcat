@@ -264,8 +264,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
             Subject subject = lc.getSubject();
 
-            // Assume the GSSContext is stateless
-            // TODO: Confirm this assumption
+            // The GSSContext is stateless: a new GSSContext is created for each request and the server response token
+            // is sent back even when a 401 response is returned
             final GSSManager manager = GSSManager.getInstance();
             // IBM JDK only understands indefinite lifetime
             final int credentialLifetime;

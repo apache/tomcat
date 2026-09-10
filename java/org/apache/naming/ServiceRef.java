@@ -140,9 +140,11 @@ public class ServiceRef extends AbstractRef {
 
 
     /**
-     * Add and Get Handlers classes.
+     * Get and remove the first handler.
      *
      * @return the handler
+     *
+     * @throws NoSuchElementException if there are no handlers
      */
     public HandlerRef getHandler() {
         return handlers.remove(0);

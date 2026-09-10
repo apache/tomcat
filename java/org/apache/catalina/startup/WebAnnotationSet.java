@@ -335,7 +335,7 @@ public class WebAnnotationSet {
 
         } else {
             /*
-             * General case. Also used for: - javax.resource.cci.InteractionSpec - jakarta.transaction.UserTransaction
+             * General case. Also used for: - jakarta.resource.cci.InteractionSpec - jakarta.transaction.UserTransaction
              */
 
             // resource-env-ref

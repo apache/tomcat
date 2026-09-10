@@ -53,8 +53,7 @@ public interface Jar extends AutoCloseable {
     /**
      * Obtain the last modified time for the JAR.
      *
-     * @return The time (in the same format as {@link System#currentTimeMillis()}) that the resource was last modified.
-     *             Returns -1 if the entry does not exist
+     * @return The time (in the same format as {@link System#currentTimeMillis()}) that the JAR was last modified.
      *
      * @throws IOException if an I/O error occurs while processing the JAR file
      */
@@ -128,8 +127,8 @@ public interface Jar extends AutoCloseable {
 
     /**
      * Obtain, in String form, the URL for an entry in this JAR. Note that for JARs nested in WAR files, the Tomcat
-     * specific war:file:... form will not be used, rather the jar:jar:file:... form (that the JRE does not understand
-     * will be used). Note that this means that any code using these URLs will need to understand the jar:jar:file:...
+     * specific war:file:... form will not be used, rather the jar:jar:file:... form (that the JRE does not understand)
+     * will be used. Note that this means that any code using these URLs will need to understand the jar:jar:file:...
      * form and use the {@link org.apache.tomcat.util.scan.JarFactory} to ensure resources are accessed correctly.
      *
      * @param entry The entry to generate the URL for

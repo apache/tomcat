@@ -44,8 +44,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS. This needs a lot more testing before it can be considered
- * robust.
+ * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS.
  */
 public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 

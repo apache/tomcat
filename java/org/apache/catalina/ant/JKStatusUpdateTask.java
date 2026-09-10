@@ -332,11 +332,11 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
 
             if (isLBMode) {
                 // http://localhost/status?cmd=update&mime=txt&w=lb&lf=false&ls=true
-                if ((lbRetries != null)) { // > 0
+                if ((lbRetries != null)) { // > 1
                     sb.append("&lr=");
                     sb.append(lbRetries);
                 }
-                if ((lbRecovertime != null)) { // > 59
+                if ((lbRecovertime != null)) { // >= 60
                     sb.append("&lt=");
                     sb.append(lbRecovertime);
                 }

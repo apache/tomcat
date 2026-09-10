@@ -115,7 +115,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * get name of failed request session attribute
+     * set name of failed request session attribute
      *
      * @param sessionIdAttribute The sessionIdAttribute to set.
      */

@@ -62,7 +62,8 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
 /**
- * RFC 1421 PEM file containing X509 certificates or private keys.
+ * RFC 7468 PEM file containing X509 certificates or private keys, including the OpenSSL specific DEK-Info and PKCS #8
+ * PBES2 formats for encrypted private keys.
  */
 public class PEMFile {
 
@@ -188,7 +189,8 @@ public class PEMFile {
      * Construct a PEMFile from the given file with the password read from a separate file.
      *
      * @param filename         The path to the PEM file
-     * @param password         The password to decrypt any encrypted private key
+     * @param password         The password to decrypt any encrypted private key (ignored if
+     *                         <code>passwordFilename</code> is non-null)
      * @param passwordFilename The path to the file containing the password
      * @param keyAlgorithm     The key algorithm, or null to auto-detect
      *
@@ -425,7 +427,7 @@ public class PEMFile {
                      *         OID              - PKCS #5 PBES2 KDF OID - must be PBKDF2
                      *         SEQ            5 - PKCS #5 PBKDF2-params
                      *           OCTET STRING   - PKCS #5 PBKDF2 salt
-                     *           INT            - PKCS #5 PBKDF2 interationCount
+                     *           INT            - PKCS #5 PBKDF2 iterationCount
                      *           INT            - PKCS #5 PBKDF2 key length OPTIONAL
                      *           SEQ          6 - PKCS #5 PBKDF2 PRF defaults to HmacSHA1 if not present
                      *             OID          - PKCS #5 PBKDF2 PRF OID

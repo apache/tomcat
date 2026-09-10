@@ -60,7 +60,7 @@ class JspReader {
      * @param ctxt     The compilation context
      * @param fname    The file name
      * @param encoding The file encoding
-     * @param jar      ?
+     * @param jar      The Jar containing the JSP file, or {@code null} if the JSP file is not in a Jar
      * @param err      The error dispatcher
      *
      * @throws JasperException       If a Jasper-internal error occurs

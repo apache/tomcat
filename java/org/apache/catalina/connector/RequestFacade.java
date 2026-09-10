@@ -44,7 +44,7 @@ import jakarta.servlet.http.Part;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
+ * Facade class that wraps a {@link Request} object. All methods are delegated to the wrapped request.
  */
 public class RequestFacade implements HttpServletRequest {
 

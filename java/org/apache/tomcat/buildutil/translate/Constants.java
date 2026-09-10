@@ -31,12 +31,12 @@ public class Constants {
     public static final String L10N_SUFFIX = ".properties";
 
     /**
-     * Directories to search for source files.
+     * Directories (relative to a source or target tree root) to search for LocalStrings files.
      */
     public static final String[] SEARCH_DIRS = new String[] { "java", "webapps" };
 
     /**
-     * Directory for storing translation settings.
+     * Directory for storing the exported and imported combined LocalStrings translation files.
      */
     public static final String STORAGE_DIR = ".settings/translations";
 

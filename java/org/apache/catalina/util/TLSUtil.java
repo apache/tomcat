@@ -25,7 +25,7 @@ import org.apache.tomcat.util.net.SSLSupport;
 public class TLSUtil {
 
     /**
-     * Constructs a new TLSUtil. This utility class should not be instantiated.
+     * Constructs a new TLSUtil. This utility class provides only static methods and does not need to be instantiated.
      */
     public TLSUtil() {
     }

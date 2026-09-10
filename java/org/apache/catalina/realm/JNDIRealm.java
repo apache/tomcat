@@ -80,7 +80,7 @@ import org.ietf.jgss.GSSName;
  * <ul>
  * <li>Each user that can be authenticated is represented by an individual element in the top level
  * <code>DirContext</code> that is accessed via the <code>connectionURL</code> property.</li>
- * <li>If a socket connection cannot be made to the <code>connectURL</code> an attempt will be made to use the
+ * <li>If a socket connection cannot be made to the <code>connectionURL</code> an attempt will be made to use the
  * <code>alternateURL</code> if it exists.</li>
  * <li>Each user element has a distinguished name that can be formed by substituting the presented username into a
  * pattern configured by the <code>userPattern</code> property.</li>
@@ -101,11 +101,10 @@ import org.ietf.jgss.GSSName;
  * specified, in which case:
  * <ul>
  * <li>The element for this user must contain an attribute named by the <code>userPassword</code> property.
- * <li>The value of the user password attribute is either a cleartext String, or the result of passing a cleartext
- * String through the <code>RealmBase.digest()</code> method (using the standard digest support included in
- * <code>RealmBase</code>).
- * <li>The user is considered to be authenticated if the presented credentials (after being passed through
- * <code>RealmBase.digest()</code>) are equal to the retrieved value for the user password attribute.</li>
+ * <li>The value of the user password attribute is either a cleartext String, or the result of mutating a cleartext
+ * String using the configured <code>CredentialHandler</code>.
+ * <li>The user is considered to be authenticated if the presented credentials match the retrieved value for the user
+ * password attribute when compared using the configured <code>CredentialHandler</code>.</li>
  * </ul>
  * </li>
  * <li>Each group of users that has been assigned a particular role may be represented by an individual element in the
@@ -241,9 +240,9 @@ public class JNDIRealm extends RealmBase {
     protected String userRoleAttribute = null;
 
     /**
-     * A string of LDAP user patterns or paths, ":"-separated These will be used to form the distinguished name of a
-     * user, with "{0}" marking the spot where the specified username goes. This is similar to userPattern, but allows
-     * for multiple searches for a user.
+     * A string of LDAP user patterns or paths, each enclosed in parentheses. These will be used to form the
+     * distinguished name of a user, with "{0}" marking the spot where the specified username goes. This is similar to
+     * userPattern, but allows for multiple searches for a user.
      */
     protected String[] userPatternArray = null;
 

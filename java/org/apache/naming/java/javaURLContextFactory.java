@@ -85,7 +85,7 @@ public class javaURLContextFactory implements ObjectFactory, InitialContextFacto
      *
      * @return a selector context if the thread or classloader are bound, and null otherwise
      *
-     * @throws NamingException not thrown by this implementationm
+     * @throws NamingException not thrown by this implementation
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -105,7 +105,7 @@ public class javaURLContextFactory implements ObjectFactory, InitialContextFacto
      *
      * @return a selector context if the thread or classloader are bound, and a shared writable context otherwise
      *
-     * @throws NamingException not thrown by this implementationm
+     * @throws NamingException not thrown by this implementation
      */
     @SuppressWarnings("unchecked")
     @Override

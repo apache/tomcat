@@ -58,7 +58,7 @@ public class ResourceLinkFactory implements ObjectFactory {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Set the global context (note: can only be used once).
+     * Set the global context (the last value set is used).
      *
      * @param newGlobalContext new global context value
      */
@@ -77,8 +77,6 @@ public class ResourceLinkFactory implements ObjectFactory {
     public static void registerGlobalResourceAccess(Context globalContext, String localName, String globalName) {
         validateGlobalContext(globalContext);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        // Web application initialization is single threaded so this is
-        // safe.
         globalResourceRegistrations.computeIfAbsent(cl, k -> new ConcurrentHashMap<>()).put(localName, globalName);
     }
 
@@ -142,7 +140,8 @@ public class ResourceLinkFactory implements ObjectFactory {
      *
      * @return the object instance
      *
-     * @throws NamingException if an error occur creating the instance
+     * @throws IllegalArgumentException if the type of the reference is missing or does not match the type of the
+     *                                  global resource
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)

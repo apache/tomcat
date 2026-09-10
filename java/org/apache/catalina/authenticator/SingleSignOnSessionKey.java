@@ -142,9 +142,6 @@ public class SingleSignOnSessionKey implements Serializable {
 
     @Override
     public String toString() {
-        // Session ID is 32. Standard text is 36. Host could easily be 20+.
-        // Context could be anything from 0 upwards. 128 seems like a reasonable
-        // size to accommodate most cases without being too big.
         return "Host: [" + hostName + "], Context: [" + contextName + "], SessionID: [" + sessionId + ']';
     }
 }

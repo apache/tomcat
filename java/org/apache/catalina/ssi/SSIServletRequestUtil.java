@@ -30,8 +30,11 @@ public class SSIServletRequestUtil {
     }
 
     /**
-     * Return the relative path associated with this servlet. Taken from DefaultServlet.java. Perhaps this should be put
-     * in org.apache.catalina.util somewhere? Seems like it would be widely used.
+     * Return the relative path associated with this request. If the request
+     * was dispatched via {@link RequestDispatcher#include}, the path is taken
+     * from the include attributes. Otherwise it is taken from the path info,
+     * falling back to the servlet path. A {@code null} or empty path results
+     * in {@code /}.
      *
      * @param request The servlet request we are processing
      *

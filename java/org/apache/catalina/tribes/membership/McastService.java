@@ -94,14 +94,17 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * Sets the properties for the membership service.
      *
      * @param properties <br>
-     *                       All are required<br>
+     *                       All of the following are required before {@code start()} is called<br>
      *                       1. mcastPort - the port to listen to<BR>
      *                       2. mcastAddress - the mcast group address<BR>
-     *                       4. bindAddress - the bind address if any - only one that can be null<BR>
-     *                       5. memberDropTime - the time a member is gone before it is considered gone.<BR>
-     *                       6. mcastFrequency - the frequency of sending messages<BR>
-     *                       7. tcpListenPort - the port this member listens to<BR>
-     *                       8. tcpListenHost - the bind address of this member<BR>
+     *                       3. memberDropTime - the time a member is gone before it is considered gone.<BR>
+     *                       4. mcastFrequency - the frequency of sending messages<BR>
+     *                       5. tcpListenPort - the port this member listens to<BR>
+     *                       6. tcpListenHost - the bind address of this member<BR>
+     *                       7. tcpSecurePort - the secure port of this member<BR>
+     *                       8. udpListenPort - the UDP port of this member<BR>
+     *                       Optionally:<BR>
+     *                       mcastBindAddress - the multicast bind address, if any<BR>
      *
      * @exception java.lang.IllegalArgumentException if a property is missing.
      */

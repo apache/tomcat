@@ -178,8 +178,8 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     /**
-     * Location of next write of the response message (used with non-blocking writes when the message may not be written
-     * in a single write). A value of -1 indicates that no message has been written to the buffer.
+     * Intended to hold the location of the next write of the response message when non-blocking writes do not write
+     * the message in a single write. Always -1 in the current implementation as the write path does not update it.
      */
     private int responseMsgPos = -1;
 

@@ -32,8 +32,8 @@ public interface Injectable {
     /**
      * Adds an injection target to this injectable.
      *
-     * @param injectionTargetName the name of the injection target
-     * @param jndiName the JNDI name for the injection
+     * @param injectionTargetName the class name of the injection target
+     * @param jndiName the name of the field or method the resource is injected into
      */
     void addInjectionTarget(String injectionTargetName, String jndiName);
 

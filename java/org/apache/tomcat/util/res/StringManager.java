@@ -54,7 +54,8 @@ public class StringManager {
 
     /**
      * Creates a new StringManager for a given package. This is a private method and all access to it is arbitrated by
-     * the static getManager method call so that only one StringManager per package will be created.
+     * the static getManager method call so that only one StringManager per package and Locale combination will be
+     * created. Created managers are held in a per package LRU cache (see {@link #getManager(String, Locale)}).
      *
      * @param packageName Name of package to create StringManager for.
      */
@@ -215,9 +216,10 @@ public class StringManager {
         Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
             /*
-             * Don't want the HashMap size to exceed LOCALE_CACHE_SIZE. Expansion occurs when size() exceeds capacity.
-             * Therefore, keep size at or below capacity. removeEldestEntry() executes after insertion therefore the
-             * test for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
+             * Note this is an LRU cache. The map holds at most LOCALE_CACHE_SIZE - 1 entries: removeEldestEntry()
+             * executes after insertion, so the test for removal uses one less than the maximum desired size. With the
+             * 0.75 load factor the underlying table resizes when size() exceeds 7, so the capacity argument is not a
+             * size limit.
              */
             map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 0.75f, true) {
                 @Serial
@@ -241,7 +243,9 @@ public class StringManager {
 
 
     /**
-     * Retrieve the StringManager for a list of Locales. The first StringManager found will be returned.
+     * Retrieve the StringManager for a list of Locales. The first StringManager whose effective locale exactly matches
+     * one of the requested Locales will be returned. Requested Locales that do not match exactly (e.g. regional
+     * variants such as <code>en-US</code>) are skipped.
      *
      * @param packageName      The package for which the StringManager was requested
      * @param requestedLocales The list of Locales

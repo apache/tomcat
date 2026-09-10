@@ -35,7 +35,8 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This listener must only be nested within {@link Server} elements.
+ * This listener should be nested within {@link Server} elements. If it is attached to any other component type, a
+ * warning is logged and the checks are still performed.
  */
 public class SecurityListener implements LifecycleListener {
 
@@ -150,7 +151,7 @@ public class SecurityListener implements LifecycleListener {
         try {
             buildDateWarningAgeDays = Integer.parseInt(ageDays);
         } catch (NumberFormatException nfe) {
-            // Just use the default and warn the user
+            // Keep the previously configured value (or the default) and warn the user
             log.warn(sm.getString("SecurityListener.buildDateAgeUnreadable", ageDays,
                     String.valueOf(DEFAULT_BUILD_DATE_WARNING_AGE_DAYS)));
         }

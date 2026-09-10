@@ -219,7 +219,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
              * '\"', ':', '<' and '>' are disallowed in Windows file names and there are known problems with these
              * characters when using File#getCanonicalPath().
              *
-             * Control characters (0x00-0x31) are not permitted and tend to be display strangely in log messages and
+             * Control characters (0x00-0x1F) are not permitted and tend to be display strangely in log messages and
              * similar.
              *
              * '*', '?' and '|' are also not allowed and, while they are not currently known to cause other
@@ -244,11 +244,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     /**
-     * Return a context-relative path, beginning with a "/", that represents the canonical version of the specified path
-     * after ".." and "." elements are resolved out. If the specified path attempts to go outside the boundaries of the
-     * current context (i.e. too many ".." path elements are present), return <code>null</code> instead.
+     * Return the canonical version of the specified absolute file system path after ".." and "." elements are resolved
+     * out. If the specified path attempts to go outside the file system root (i.e. too many ".." path elements are
+     * present), return <code>null</code> instead.
      *
-     * @param path Path to be normalized
+     * @param path Absolute path to be normalized
      */
     private String normalize(String path) {
         return RequestUtil.normalize(path, File.separatorChar == '\\');
