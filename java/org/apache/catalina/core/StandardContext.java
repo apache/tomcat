@@ -5149,7 +5149,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         Loader loader = getLoader();
         ClassLoader webApplicationClassLoader = null;
         if (loader != null) {
-            webApplicationClassLoader = loader.getClassLoader();
+            // Don't bind the web application class loader if it isn't started yet.
+            if (!(loader instanceof Lifecycle) || ((Lifecycle) loader).getState().isAvailable()) {
+                webApplicationClassLoader = loader.getClassLoader();
+            }
         }
 
         Thread currentThread = Thread.currentThread();

@@ -241,6 +241,11 @@
         interface must implement this method. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When starting a web application, don't try and use the web application
+        class loader until after the web application class loader has started.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
