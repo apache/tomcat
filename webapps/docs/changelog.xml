@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.25 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.26 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -241,97 +241,6 @@
         interface must implement this method. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Improve the handling of <code>AsyncContext.dispatch()</code> when the
-        <code>Context</code> attribute <code>dispatchersUseEncodedPaths</code>
-        is set to <code>false</code> since the application has no control over
-        the path used for the <code>AsyncContext.dispatch()</code>. Prior to
-        this fix, paths containing literal <code>'?'</code> characters were
-        truncated. (markt)
-      </fix>
-      <fix>
-        Ensure that capture groups from a <code>RewriteCond</code> always
-        reflect the result of the current request. (markt)
-      </fix>
-      <fix>
-        When a <code>PersistentManager</code> needs to reduce the number of
-        active sessions, swap out the least recently used eligible sessions
-        first. Pull request <pr>1045</pr> provided by sainadh777. (markt)
-      </fix>
-      <fix>
-        Improve robustness of DIGEST authentication to system clock jumps.
-        (markt)
-      </fix>
-      <add>
-        Support multiple protocol header values (treat as a single merged header
-        value) in the <code>RemoteIpFilter</code> and
-        <code>RemoteIpValve</code>. (markt)
-      </add>
-      <fix>
-        Fix potential concurrency issues when loading/saving sessions from/to a
-        session store. Custom Store implementations that do not extend StoreBase
-        must implement the new <code>getSessionStoreLock()</code> method of the
-        <code>Store</code> interface to ensure concurrency protection. The
-        default method implementation provided only provides the pre-fix
-        functionality. (markt)
-      </fix>
-      <fix>
-        Ensure that <code>PersistentManager</code> implementations that extend
-        <code>PersistentManagerBase</code> do not swap out sessions that are
-        associated with a request that is currently being processed. This
-        includes not swapping out a session unless the session was created when
-        activity tracking was enabled. (markt)
-      </fix>
-      <fix>
-        Ensure namespace attributes are XML escaped in WebDAV responses. (markt)
-      </fix>
-      <fix>
-        Resolve null or missing rewrite substitutions as an empty string, to
-        align with the mod_rewrite behavior. (remm)
-      </fix>
-      <add>
-        Add a best efforts protection in the
-        <code>CrawlerSessionManagerValve</code> against crawlers being
-        associated with an authenticated session. (markt)
-      </add>
-      <fix>
-        Clarify the meaning of various RewriteValve server variables and
-        explicitly use the canonical context path for the
-        <code>CONTEXT_PATH</code> server variable. (markt)
-      </fix>
-      <fix>
-        Fix storeconfig not saving the path when a context is saved in
-        server.xml. (remm)
-      </fix>
-      <fix>
-        WAR URLConnection should propagate use of caching. (remm)
-      </fix>
-      <fix>
-        Ensure resources are evicted from the static resource cache in the
-        correct order. (markt)
-      </fix>
-      <fix>
-        When Jakarta Authentication is configured for a web application, cache
-        the <code>ServerAuthConfig</code> in the <code>Authenticator</code>
-        valve. This ensures web application specific settings are cached on a
-        per web application basis. (markt)
-      </fix>
-      <fix>
-        <bug>70203</bug>: Fix <code>RegistrationListener</code> notifications in
-        Jakarta Authentication implementation. (markt)
-      </fix>
-      <fix>
-        Handle CGI scripts that write excessively to stdout after setting an
-        HTTP error status code. (schultz)
-      </fix>
-      <fix>
-        Require the request to the login action during FORM authentication to be
-        made using HTTP POST. (markt)
-      </fix>
-      <fix>
-        <bug>70208</bug>: Make URL encoding more robust. Based on pull request
-        <pr>1065</pr> by Chenjp. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -364,82 +273,6 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix parsing of client certificates that specify more than one OCSP
-        responder for configurations that use OpenSSL-FFM. (markt)
-      </fix>
-      <fix>
-        xreflection generated code stack overflow issue. (remm)
-      </fix>
-      <fix>
-        Align xreflection better with IntrospectionUtils. (remm)
-      </fix>
-      <fix>
-        In HTTP/2 after half closed (remote), any unexpected frame should be
-        a stream error. (remm)
-      </fix>
-      <fix>
-        Fix incorrect initial window size calculation when upgrading to HTTP/2.
-        (remm)
-      </fix>
-      <fix>
-        Avoid HTTP/2 exceptions with invalid <code>content-length</code>
-        values. (remm)
-      </fix>
-      <fix>
-        Only try and load the native library from the <code>CATALINA_HOME</code>
-        system property when the property is set. (markt)
-      </fix>
-      <fix>
-        Fix max connections enforcement after an enpoint resume. (remm)
-      </fix>
-      <fix>
-        Implement stricter ALPN matching for Connectors using FFM. (markt)
-      </fix>
-      <add>
-        Add length validation for ALPN protocol names. (markt)
-      </add>
-      <fix>
-        Make FFM certificate verification more robust. (markt)
-      </fix>
-      <fix>
-        Align FFM OCSP URL parsing with Tomcat Native and treat a parsing
-        failure as if no usable OCSP URLs were present. (markt)
-      </fix>
-      <fix>
-        Make the processing of OCSP responses more robust. (markt)
-      </fix>
-      <fix>
-        Stricter OCSP handling when soft-fail is disabled. (markt)
-      </fix>
-      <fix>
-        Cleaner handling of AJP response headers which overflow the maximum
-        message size. (remm)
-      </fix>
-      <fix>
-        Small per performance optimisation. Don't waste cycles swallowing an AJP
-        response body when the connection is going to be closed. (markt)
-      </fix>
-      <fix>
-        Fix OpenSSL support for CRLs when using OpenSSL trust with the server
-        key held in a Java key store. (markt)
-      </fix>
-      <fix>
-        Reject HTTP/1.0 requests that send a <code>transfer-encoding</code>
-        header. (markt)
-      </fix>
-      <fix>
-        Ensure per request HTTP/2 bad request marker is cleared when the request
-        is recycled. (markt)
-      </fix>
-      <fix>
-        Additional clean-up after HTTP/2 stream reset to aid GC. (markt)
-      </fix>
-      <fix>
-        Revert earlier refactoring of HTTP/2 header field validation that moved
-        it earlier since the refactoring made correct handling of invalid
-        headers more difficult. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -478,25 +311,11 @@
         (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix EL evaluation of some lambda expressions. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Validate that the <code>DeltaManager</code> attribute
-        <code>sendAllSessionsSize</code> is a positive integer. Zero or negative
-        values previously caused an infinite loop or a
-        <code>NegativeArraySizeException</code> during session state transfer.
-        Pull request <pr>1042</pr> provided by lihongyi87. (markt)
-      </fix>
-      <fix>
-        Improve robustness of cloud membership providers if an error occurs
-        fetching members. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -528,39 +347,6 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix an exception when an automatic Pong response races with the
-        closing of the WebSocket session. Pull request <pr>1041</pr> provided by
-        moritzfl. (markt)
-      </fix>
-      <fix>
-        Harden the WebSocket client and use a <code>SecureRandom</code> when
-        generating the <code>Sec-WebSocket-Key</code> header. (markt)
-      </fix>
-      <fix>
-        Improve robustness of client handshakes. (remm)
-      </fix>
-      <fix>
-        Ensure that WebSocket write timeouts apply to the complete message and
-        are not lost if two writes have the same timeout. (markt)
-      </fix>
-      <fix>
-        Reduce CPU usage while sending WebSocket close message. (markt)
-      </fix>
-      <fix>
-        Fix overly broad check that prevented request URIs containing literal
-        <code>{</code> and <code>}</code> characters from being mapped to
-        WebSocket end points. (markt)
-      </fix>
-      <fix>
-        Fix handling of WebSocket messages with compressed payloads using
-        per-message-deflate that have one or more non-final blocks where the
-        <code>BFINAL</code> bit is set. (markt)
-      </fix>
-      <fix>
-        Fix handling of per-message-deflate context takeover when receiving
-        compressed WebSocket messages. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -570,33 +356,11 @@
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Manager: Fix a potential concurrency issue when ordering sessions prior
-        to displaying a list of session. (markt)
-      </fix>
-      <docs>
-        Wrap the <code>RewriteRule</code> regular expression syntax reference
-        on narrow displays. Pull request <pr>1044</pr> by sainadh777. (markt)
-      </docs>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <code>DataSourceProxy.getPooledConnection(String,String)</code> now
-        delegates to <code>getConnection(String,String)</code> rather than
-        <code>getConnection()</code>. (markt)
-      </fix>
-      <add>
-        Log a warning if an attempt is made to obtain a connection with
-        credentials when <code>alternateUsernameAllowed</code> is set to
-        <code>false</code>. (markt)
-      </add>
-      <fix>
-        Ensure StatementCache interceptor resets properties of cached statements
-        between uses. (mark)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -624,22 +388,6 @@
         Update Checkstyle to 14.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update Easymock to 5.7.0. (markt)
-      </update>
-      <update>
-        Update bnd to 7.4.0. (markt)
-      </update>
-      <update>
-        Update Tomcat Native to 2.0.16. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji and
-        Ktamura.biz.80. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
