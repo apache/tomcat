@@ -1172,10 +1172,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public HeaderEmitter headersStart(int streamId, boolean headersEndStream) {
+        public void headersStart(int streamId, boolean headersEndStream) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-HeadersStart\n");
-            return this;
+            getHpackDecoder().setHeaderEmitter(this);
         }
 
 

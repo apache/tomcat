@@ -208,6 +208,9 @@
         Additional checks (enabled by default) have also been added for the
         directory where the Unix Domain Socket will be created.(markt)
       </add>
+      <fix>
+        Correct a narrow race condition when processing HTTP/2 headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

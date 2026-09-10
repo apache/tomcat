@@ -41,7 +41,6 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
-import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
@@ -1764,39 +1763,50 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException {
+    public void headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException {
 
-        Stream stream = getStream(streamId, false);
-        if (stream == null) {
-            // New stream
+        getHpackDecoder().getStreamEmitterLock().lock();
+        try {
+            Stream stream = getStream(streamId, false);
+            if (stream == null) {
+                // New stream
 
-            // Check the pause state before processing headers since the pause state
-            // determines if a new stream is created or if this stream is ignored.
-            checkPauseState();
+                // Check the pause state before processing headers since the pause state
+                // determines if a new stream is created or if this stream is ignored.
+                checkPauseState();
 
-            if (connectionState.get().isNewStreamAllowed()) {
-                if (streamId > maxProcessedStreamId) {
-                    stream = createRemoteStream(streamId);
-                    activeRemoteStreamCount.incrementAndGet();
-                    maxProcessedStreamId = streamId;
+                if (connectionState.get().isNewStreamAllowed()) {
+                    if (streamId > maxProcessedStreamId) {
+                        stream = createRemoteStream(streamId);
+                        activeRemoteStreamCount.incrementAndGet();
+                        maxProcessedStreamId = streamId;
+                    } else {
+                        // ID for new stream must always be greater than any previous stream
+                        throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
+                                Integer.valueOf(maxProcessedStreamId)), Http2Error.PROTOCOL_ERROR);
+                    }
                 } else {
-                    // ID for new stream must always be greater than any previous stream
-                    throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
-                            Integer.valueOf(maxProcessedStreamId)), Http2Error.PROTOCOL_ERROR);
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("upgradeHandler.noNewStreams", connectionId, Integer.toString(streamId)));
+                    }
+                    reduceOverheadCount(FrameType.HEADERS);
+                    // Stateless so a static can be used to save on GC
+                    getHpackDecoder().setHeaderEmitter(HEADER_SINK);
+                    return;
                 }
-            } else {
-                if (log.isTraceEnabled()) {
-                    log.trace(sm.getString("upgradeHandler.noNewStreams", connectionId, Integer.toString(streamId)));
-                }
-                reduceOverheadCount(FrameType.HEADERS);
-                // Stateless so a static can be used to save on GC
-                return HEADER_SINK;
             }
-        }
 
-        stream.checkState(FrameType.HEADERS);
-        stream.receivedStartOfHeaders(headersEndStream);
-        return stream;
+            try {
+                stream.checkState(FrameType.HEADERS);
+            } catch (StreamException se) {
+                getHpackDecoder().setHeaderEmitter(new HeaderSink(se));
+                return;
+            }
+            stream.receivedStartOfHeaders(headersEndStream);
+            getHpackDecoder().setHeaderEmitter(stream);
+        } finally {
+            getHpackDecoder().getStreamEmitterLock().unlock();
+        }
     }
 
 
@@ -2065,8 +2075,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("upgradeHandler.replace.first", getConnectionId(), original.getIdAsString()));
             }
-            streams.put(original.getIdentifier(), replacement);
-            getHpackDecoder().compareAndSetHeaderEmitter((Stream) current, HEADER_SINK);
+            getHpackDecoder().getStreamEmitterLock().lock();
+            try {
+                streams.put(original.getIdentifier(), replacement);
+                getHpackDecoder().compareAndSetHeaderEmitter((Stream) current, HEADER_SINK);
+            } finally {
+                getHpackDecoder().getStreamEmitterLock().unlock();
+            }
 
             int made;
             original.windowAllocationLock.lock();

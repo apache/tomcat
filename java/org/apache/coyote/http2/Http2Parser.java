@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.ProtocolException;
-import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
@@ -255,11 +254,7 @@ class Http2Parser {
 
         headersEndStream = Flags.isEndOfStream(flags);
 
-        try {
-            hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
-        } catch (StreamException se) {
-            hpackDecoder.setHeaderEmitter(new HeaderSink(se));
-        }
+        output.headersStart(streamId, headersEndStream);
 
         int padLength = 0;
         boolean padding = Flags.hasPadding(flags);
@@ -312,7 +307,12 @@ class Http2Parser {
 
         if (Flags.isEndOfHeaders(flags)) {
             // Validate the headers once complete
-            hpackDecoder.getHeaderEmitter().validateHeaders();
+            hpackDecoder.getStreamEmitterLock().lock();
+            try {
+                hpackDecoder.getHeaderEmitter().validateHeaders();
+            } finally {
+                hpackDecoder.getStreamEmitterLock().unlock();
+            }
             onHeadersComplete(streamId);
         } else {
             headersCurrentStream = streamId;
@@ -482,8 +482,12 @@ class Http2Parser {
             headersCurrentStream = -1;
 
             // Validate the headers once complete
-            hpackDecoder.getHeaderEmitter().validateHeaders();
-
+            hpackDecoder.getStreamEmitterLock().lock();
+            try {
+                hpackDecoder.getHeaderEmitter().validateHeaders();
+            } finally {
+                hpackDecoder.getStreamEmitterLock().unlock();
+            }
             onHeadersComplete(streamId);
         }
     }
@@ -580,14 +584,24 @@ class Http2Parser {
                 StreamException headerException = new StreamException(
                         sm.getString("http2Parser.headerLimitCount", connectionId, Integer.valueOf(streamId)),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
-                hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                hpackDecoder.getStreamEmitterLock().lock();
+                try {
+                    hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                } finally {
+                    hpackDecoder.getStreamEmitterLock().unlock();
+                }
             }
 
             if (hpackDecoder.isHeaderSizeExceeded(headerReadBuffer.position())) {
                 StreamException headerException = new StreamException(
                         sm.getString("http2Parser.headerLimitSize", connectionId, Integer.valueOf(streamId)),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
-                hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                hpackDecoder.getStreamEmitterLock().lock();
+                try {
+                    hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                } finally {
+                    hpackDecoder.getStreamEmitterLock().unlock();
+                }
             }
 
             if (hpackDecoder.isHeaderSwallowSizeExceeded(headerReadBuffer.position())) {
@@ -864,7 +878,7 @@ class Http2Parser {
                 throws ConnectionException, IOException;
 
         // Header frames
-        HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException;
+        void headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException;
 
         void headersContinue(int payloadSize, boolean endOfHeaders);
 
