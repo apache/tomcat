@@ -286,7 +286,7 @@ public final class SSL {
      */
     public static final long SSL_OP_ENABLE_KTLS = 0x8L;
     /**
-     * Obsolete option retained for compatibility. This option no longer has any effect.
+     * Obsolete option retained for compatibility. This option has no effect from OpenSSL 4.1 onwards.
      */
     public static final long SSL_OP_TLSEXT_PADDING = 0x10L;
     // Unused = 0x20L
@@ -296,7 +296,8 @@ public final class SSL {
      */
     public static final long SSL_OP_SAFARI_ECDHE_ECDSA_BUG = 0x40L;
     /**
-     * Treat a closed connection as if the close_notify alert was received, so the peer does not need to send it.
+     * Treat a closed connection as if the close_notify alert was received, so the peer does not need to send it. This
+     * is only safe to use when the application protocol independently detects truncation attacks.
      */
     public static final long SSL_OP_IGNORE_UNEXPECTED_EOF = 0x80L;
     /**
@@ -495,7 +496,7 @@ public final class SSL {
     /**
      * Mask of options that disable all DTLS protocol versions.
      */
-    public static final long SSL_OP_NO_DTLS_MASK = SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2;
+    public static final long SSL_OP_NO_DTLS_MASK = SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2 | SSL_OP_NO_DTLSv1_3;
 
     /**
      * Various bug workarounds that should be rather harmless.

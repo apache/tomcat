@@ -85,8 +85,8 @@ public interface InstanceManager {
      * Perform dependency injection on the given object.
      *
      * @param o The object to inject dependencies into
-     * @throws IllegalAccessException if the class or its nullary constructor is not accessible
-     * @throws InvocationTargetException if the nullary constructor throws an exception
+     * @throws IllegalAccessException if the injection or lifecycle targets are not accessible
+     * @throws InvocationTargetException if the injected setter or {@code @PostConstruct} throws an exception
      * @throws NamingException if a naming exception is encountered
      */
     void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException;
@@ -95,8 +95,8 @@ public interface InstanceManager {
      * Destroy the given instance, performing pre-destroy callbacks.
      *
      * @param o The object to destroy
-     * @throws IllegalAccessException if the class or its nullary constructor is not accessible
-     * @throws InvocationTargetException if the nullary constructor throws an exception
+     * @throws IllegalAccessException if the injection or lifecycle targets are not accessible
+     * @throws InvocationTargetException if {@code @PreDestroy} throws an exception
      */
     void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException;
 
