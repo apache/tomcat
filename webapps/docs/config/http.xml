@@ -646,6 +646,14 @@
       used.</p>
     </attribute>
 
+    <attribute name="maxTrailerCount" required="false">
+      <p>Limits the number of trailing headers (also known as trailers) that
+      are permitted in a chunked HTTP request. If the request contains more
+      trailing headers than this limit, the request will be rejected. A value
+      of less than 0 means no limit. If not specified, this attribute is set
+      to <code>100</code>.</p>
+    </attribute>
+
     <attribute name="minSpareThreads" required="false">
       <p>The minimum number of threads always kept running.  This includes both
       active and idle threads. If not specified, the default of <code>10</code>
