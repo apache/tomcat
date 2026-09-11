@@ -85,6 +85,8 @@ public interface InstanceManager {
      * Perform dependency injection on the given object.
      *
      * @param o The object to inject dependencies into
+     * @throws IllegalAccessException if the class or its nullary constructor is not accessible
+     * @throws InvocationTargetException if the nullary constructor throws an exception
      * @throws NamingException if a naming exception is encountered
      */
     void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException;
