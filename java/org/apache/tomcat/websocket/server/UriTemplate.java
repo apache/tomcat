@@ -51,6 +51,13 @@ public class UriTemplate {
         this(path, true);
     }
 
+    /**
+     * Creates a new UriTemplate from the given path.
+     *
+     * @param path the URI template path
+     * @param parseParameters whether to parse path parameters
+     * @throws DeploymentException if the path is invalid
+     */
     public UriTemplate(String path, boolean parseParameters) throws DeploymentException {
 
         if (path == null || !path.startsWith("/") || path.contains("/../") || path.contains("/./") ||
