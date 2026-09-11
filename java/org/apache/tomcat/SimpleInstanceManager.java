@@ -32,53 +32,49 @@ public class SimpleInstanceManager implements InstanceManager {
     public SimpleInstanceManager() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException,
             InstantiationException, NoSuchMethodException {
-        return prepareInstance(clazz.getConstructor().newInstance());
+        return clazz.getConstructor().newInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException,
             NamingException, InstantiationException, ClassNotFoundException, NoSuchMethodException {
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
-        return prepareInstance(clazz.getConstructor().newInstance());
+        return clazz.getConstructor().newInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Object newInstance(String fqcn, ClassLoader classLoader)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
             ClassNotFoundException, NoSuchMethodException {
         Class<?> clazz = classLoader.loadClass(fqcn);
-        return prepareInstance(clazz.getConstructor().newInstance());
+        return clazz.getConstructor().newInstance();
     }
+
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is a NO-OP in this implementation.
      */
     @Override
     public void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException {
         // NO-OP
     }
 
+
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is a NO-OP in this implementation.
      */
     @Override
     public void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException {
         // NO-OP
-    }
-
-    private Object prepareInstance(Object o) {
-        return o;
     }
 }
