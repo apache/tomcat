@@ -182,7 +182,8 @@ public class WebRuleSet implements RuleSet {
         digester.addCallParam(fullPrefix + "/context-param/param-name", 0);
         digester.addCallParam(fullPrefix + "/context-param/param-value", 1);
 
-        digester.addCallMethod(fullPrefix + "/display-name", "setDisplayName", 0);
+        digester.addRule(fullPrefix + "/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/display-name", new LocaleElementRule("addDisplayName"));
 
         digester.addRule(fullPrefix + "/distributable", new SetDistributableRule());
 
@@ -199,8 +200,8 @@ public class WebRuleSet implements RuleSet {
         digester.addObjectCreate(fullPrefix + "/filter", "org.apache.tomcat.util.descriptor.web.FilterDef");
         digester.addSetNext(fullPrefix + "/filter", "addFilter", "org.apache.tomcat.util.descriptor.web.FilterDef");
 
-        digester.addCallMethod(fullPrefix + "/filter/description", "setDescription", 0);
-        digester.addCallMethod(fullPrefix + "/filter/display-name", "setDisplayName", 0);
+        digester.addRule(fullPrefix + "/filter/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/filter/display-name", new LocaleElementRule("addDisplayName"));
         digester.addCallMethod(fullPrefix + "/filter/filter-class", "setFilterClass", 0);
         digester.addCallMethod(fullPrefix + "/filter/filter-name", "setFilterName", 0);
         digester.addCallMethod(fullPrefix + "/filter/icon/large-icon", "setLargeIcon", 0);
@@ -273,7 +274,8 @@ public class WebRuleSet implements RuleSet {
 
         digester.addRule(fullPrefix + "/security-constraint/auth-constraint", new SetAuthConstraintRule());
         digester.addCallMethod(fullPrefix + "/security-constraint/auth-constraint/role-name", "addAuthRole", 0);
-        digester.addCallMethod(fullPrefix + "/security-constraint/display-name", "setDisplayName", 0);
+        digester.addRule(fullPrefix + "/security-constraint/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/security-constraint/display-name", new LocaleElementRule("addDisplayName"));
         digester.addCallMethod(fullPrefix + "/security-constraint/user-data-constraint/transport-guarantee",
                 "setUserConstraint", 0);
 
@@ -281,6 +283,8 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.SecurityCollection");
         digester.addSetNext(fullPrefix + "/security-constraint/web-resource-collection", "addCollection",
                 "org.apache.tomcat.util.descriptor.web.SecurityCollection");
+        digester.addRule(fullPrefix + "/security-constraint/web-resource-collection/description",
+                new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method", "addMethod", 0);
         digester.addCallMethod(fullPrefix + "/security-constraint/web-resource-collection/http-method-omission",
                 "addOmittedMethod", 0);
@@ -294,6 +298,8 @@ public class WebRuleSet implements RuleSet {
         digester.addRule(fullPrefix + "/servlet", new ServletDefCreateRule());
         digester.addSetNext(fullPrefix + "/servlet", "addServlet", "org.apache.tomcat.util.descriptor.web.ServletDef");
 
+        digester.addRule(fullPrefix + "/servlet/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/servlet/display-name", new LocaleElementRule("addDisplayName"));
         digester.addCallMethod(fullPrefix + "/servlet/init-param", "addInitParameter", 2);
         digester.addCallParam(fullPrefix + "/servlet/init-param/param-name", 0);
         digester.addCallParam(fullPrefix + "/servlet/init-param/param-value", 1);
@@ -306,6 +312,8 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.SecurityRoleRef");
         digester.addSetNext(fullPrefix + "/servlet/security-role-ref", "addSecurityRoleRef",
                 "org.apache.tomcat.util.descriptor.web.SecurityRoleRef");
+        digester.addRule(fullPrefix + "/servlet/security-role-ref/description",
+                new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/servlet/security-role-ref/role-link", "setLink", 0);
         digester.addCallMethod(fullPrefix + "/servlet/security-role-ref/role-name", "setName", 0);
 
@@ -385,7 +393,7 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.ContextLocalEjb");
         digester.addSetNext(fullPrefix + "/ejb-local-ref", "addEjbLocalRef",
                 "org.apache.tomcat.util.descriptor.web.ContextLocalEjb");
-        digester.addCallMethod(fullPrefix + "/ejb-local-ref/description", "setDescription", 0);
+        digester.addRule(fullPrefix + "/ejb-local-ref/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/ejb-local-ref/ejb-link", "setLink", 0);
         digester.addCallMethod(fullPrefix + "/ejb-local-ref/ejb-ref-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/ejb-local-ref/ejb-ref-type", "setType", 0);
@@ -398,7 +406,7 @@ public class WebRuleSet implements RuleSet {
         // ejb-ref
         digester.addObjectCreate(fullPrefix + "/ejb-ref", "org.apache.tomcat.util.descriptor.web.ContextEjb");
         digester.addSetNext(fullPrefix + "/ejb-ref", "addEjbRef", "org.apache.tomcat.util.descriptor.web.ContextEjb");
-        digester.addCallMethod(fullPrefix + "/ejb-ref/description", "setDescription", 0);
+        digester.addRule(fullPrefix + "/ejb-ref/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/ejb-ref/ejb-link", "setLink", 0);
         digester.addCallMethod(fullPrefix + "/ejb-ref/ejb-ref-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/ejb-ref/ejb-ref-type", "setType", 0);
@@ -413,7 +421,7 @@ public class WebRuleSet implements RuleSet {
         digester.addSetNext(fullPrefix + "/env-entry", "addEnvEntry",
                 "org.apache.tomcat.util.descriptor.web.ContextEnvironment");
         digester.addRule(fullPrefix + "/env-entry", new SetOverrideRule());
-        digester.addCallMethod(fullPrefix + "/env-entry/description", "setDescription", 0);
+        digester.addRule(fullPrefix + "/env-entry/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/env-entry/env-entry-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/env-entry/env-entry-type", "setType", 0);
         digester.addCallMethod(fullPrefix + "/env-entry/env-entry-value", "setValue", 0);
@@ -426,6 +434,7 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef");
         digester.addSetNext(fullPrefix + "/resource-env-ref", "addResourceEnvRef",
                 "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef");
+        digester.addRule(fullPrefix + "/resource-env-ref/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/resource-env-ref/resource-env-ref-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/resource-env-ref/resource-env-ref-type", "setType", 0);
         digester.addRule(fullPrefix + "/resource-env-ref/mapped-name", new MappedNameRule());
@@ -437,8 +446,8 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.MessageDestination");
         digester.addSetNext(fullPrefix + "/message-destination", "addMessageDestination",
                 "org.apache.tomcat.util.descriptor.web.MessageDestination");
-        digester.addCallMethod(fullPrefix + "/message-destination/description", "setDescription", 0);
-        digester.addCallMethod(fullPrefix + "/message-destination/display-name", "setDisplayName", 0);
+        digester.addRule(fullPrefix + "/message-destination/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/message-destination/display-name", new LocaleElementRule("addDisplayName"));
         digester.addCallMethod(fullPrefix + "/message-destination/icon/large-icon", "setLargeIcon", 0);
         digester.addCallMethod(fullPrefix + "/message-destination/icon/small-icon", "setSmallIcon", 0);
         digester.addCallMethod(fullPrefix + "/message-destination/message-destination-name", "setName", 0);
@@ -450,7 +459,7 @@ public class WebRuleSet implements RuleSet {
                 "org.apache.tomcat.util.descriptor.web.MessageDestinationRef");
         digester.addSetNext(fullPrefix + "/message-destination-ref", "addMessageDestinationRef",
                 "org.apache.tomcat.util.descriptor.web.MessageDestinationRef");
-        digester.addCallMethod(fullPrefix + "/message-destination-ref/description", "setDescription", 0);
+        digester.addRule(fullPrefix + "/message-destination-ref/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/message-destination-ref/message-destination-link", "setLink", 0);
         digester.addCallMethod(fullPrefix + "/message-destination-ref/message-destination-ref-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/message-destination-ref/message-destination-type", "setType", 0);
@@ -463,7 +472,7 @@ public class WebRuleSet implements RuleSet {
         digester.addObjectCreate(fullPrefix + "/resource-ref", "org.apache.tomcat.util.descriptor.web.ContextResource");
         digester.addSetNext(fullPrefix + "/resource-ref", "addResourceRef",
                 "org.apache.tomcat.util.descriptor.web.ContextResource");
-        digester.addCallMethod(fullPrefix + "/resource-ref/description", "setDescription", 0);
+        digester.addRule(fullPrefix + "/resource-ref/description", new LocaleElementRule("addDescription"));
         digester.addCallMethod(fullPrefix + "/resource-ref/res-auth", "setAuth", 0);
         digester.addCallMethod(fullPrefix + "/resource-ref/res-ref-name", "setName", 0);
         digester.addCallMethod(fullPrefix + "/resource-ref/res-sharing-scope", "setScope", 0);
@@ -476,8 +485,8 @@ public class WebRuleSet implements RuleSet {
         digester.addObjectCreate(fullPrefix + "/service-ref", "org.apache.tomcat.util.descriptor.web.ContextService");
         digester.addSetNext(fullPrefix + "/service-ref", "addServiceRef",
                 "org.apache.tomcat.util.descriptor.web.ContextService");
-        digester.addCallMethod(fullPrefix + "/service-ref/description", "setDescription", 0);
-        digester.addCallMethod(fullPrefix + "/service-ref/display-name", "setDisplayname", 0);
+        digester.addRule(fullPrefix + "/service-ref/description", new LocaleElementRule("addDescription"));
+        digester.addRule(fullPrefix + "/service-ref/display-name", new LocaleElementRule("addDisplayname"));
         digester.addCallMethod(fullPrefix + "/service-ref/icon/large-icon", "setLargeIcon", 0);
         digester.addCallMethod(fullPrefix + "/service-ref/icon/small-icon", "setSmallIcon", 0);
         digester.addCallMethod(fullPrefix + "/service-ref/service-ref-name", "setName", 0);
@@ -1271,5 +1280,64 @@ final class SetOverrideRule extends Rule {
             code.append(digester.toVariableName(envEntry)).append(".setOverride(false);");
             code.append(System.lineSeparator());
         }
+    }
+}
+
+
+/**
+ * A rule that captures the body text of an element that supports internationalization (for example
+ * {@code <description>} and {@code <display-name>}) together with the optional {@code xml:lang} attribute as a
+ * {@link LocaleElement} and adds it to the current object via the configured method.
+ */
+final class LocaleElementRule extends Rule {
+
+    private final String methodName;
+    private String lang = null;
+
+    LocaleElementRule(String methodName) {
+        this.methodName = methodName;
+    }
+
+    @Override
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
+        lang = attributes.getValue("xml:lang");
+        if (lang == null) {
+            lang = attributes.getValue("http://www.w3.org/XML/1998/namespace", "lang");
+        }
+    }
+
+    @Override
+    public void body(String namespace, String name, String text) throws Exception {
+        if (text == null || text.trim().isEmpty()) {
+            return;
+        }
+        String content = text.trim();
+        LocaleElement element = new LocaleElement(content, lang);
+        Object target = digester.peek();
+        IntrospectionUtils.callMethodN(target, methodName, new Object[] { element },
+                new Class[] { LocaleElement.class });
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace(target.getClass().getName() + "." + methodName + "(LocaleElement)");
+        }
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(System.lineSeparator());
+            code.append(digester.toVariableName(target)).append('.').append(methodName).append("(new LocaleElement(\"");
+            code.append(content);
+            code.append("\", ");
+            if (lang == null) {
+                code.append("null");
+            } else {
+                code.append('"').append(lang).append('"');
+            }
+            code.append("));");
+            code.append(System.lineSeparator());
+        }
+    }
+
+    @Override
+    public void end(String namespace, String name) throws Exception {
+        lang = null;
     }
 }
