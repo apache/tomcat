@@ -5699,7 +5699,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                             "web application is running"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.stopping" }, Notification.class.getName(),
                             "web application is stopping"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
                             "web application is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
                             "web application is deleted"),

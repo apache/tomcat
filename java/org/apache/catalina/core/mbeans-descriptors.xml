@@ -379,7 +379,7 @@
                 returnType="void">
        <parameter name="parameter"
                   description="Application parameter to add"
-                  type="java.lang.String"/>
+                  type="org.apache.tomcat.util.descriptor.web.ApplicationParameter"/>
     </operation>
 
     <operation name="addChild"

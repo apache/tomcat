@@ -736,9 +736,9 @@ Example to get the Manager from <em>servlet-examples</em> application an bind al
     attributebinding="true"
     resultproperty="manager.servletExamples" />]]></source>
 <p>
-Now you can find the manager at <em>${manager.servletExamples.0.name}</em> property
+Now you can find the manager at <em>${manager.servletExamples.0.Name}</em> property
 and can access all properties from this manager with <em>${manager.servletExamples.0.[manager attribute names]</em>}.
-The result object counter from MBeans is stored ad ${manager.Length} property.
+The result object counter from MBeans is stored ad ${manager.servletExamples.Length} property.
 </p>
 
 <p>
