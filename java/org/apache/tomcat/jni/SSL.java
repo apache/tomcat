@@ -285,12 +285,33 @@ public final class SSL {
      * Enable support for Kernel TLS.
      */
     public static final long SSL_OP_ENABLE_KTLS = 0x8L;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     public static final long SSL_OP_TLSEXT_PADDING = 0x10L;
     // Unused = 0x20L
+    /**
+     * Don't prefer ECDHE-ECDSA ciphers when the client appears to be Safari on OS X. OS X 10.8..10.8.3 has broken
+     * support for ECDHE-ECDSA ciphers.
+     */
     public static final long SSL_OP_SAFARI_ECDHE_ECDSA_BUG = 0x40L;
+    /**
+     * Treat a closed connection as if the close_notify alert was received, so the peer does not need to send it.
+     */
     public static final long SSL_OP_IGNORE_UNEXPECTED_EOF = 0x80L;
+    /**
+     * Enable client-initiated renegotiation, which is disabled by default.
+     */
     public static final long SSL_OP_ALLOW_CLIENT_RENEGOTIATION = 0x100L;
+    /**
+     * Disable TLS Extension CA Names. You may want to disable it for security reasons or for compatibility with some
+     * Windows TLS implementations crashing when this extension is larger than 1024 bytes.
+     */
     public static final long SSL_OP_DISABLE_TLSEXT_CA_NAMES = 0x200L;
+    /**
+     * In TLSv1.3 allow a non-(ec)dhe based key exchange mode on resumption. This means that there will be no forward
+     * secrecy for the resumed session.
+     */
     public static final long SSL_OP_ALLOW_NO_DHE_KEX = 0x400L;
 
     /**
@@ -375,9 +396,21 @@ public final class SSL {
      * Disable TLSv1.1 protocol.
      */
     public static final long SSL_OP_NO_TLSv1_1 = 0x10000000L;
+    /**
+     * Disable TLSv1.3 protocol.
+     */
     public static final long SSL_OP_NO_TLSv1_3 = 0x20000000L;
+    /**
+     * Disable DTLSv1.0 protocol.
+     */
     public static final long SSL_OP_NO_DTLSv1 = SSL_OP_NO_TLSv1;
+    /**
+     * Disable DTLSv1.2 protocol.
+     */
     public static final long SSL_OP_NO_DTLSv1_2 = SSL_OP_NO_TLSv1_2;
+    /**
+     * Disable DTLSv1.3 protocol.
+     */
     public static final long SSL_OP_NO_DTLSv1_3 = SSL_OP_NO_TLSv1_3;
     /**
      * Disallow all renegotiation.
@@ -402,7 +435,16 @@ public final class SSL {
      * Enable KTLS TX zerocopy on Linux.
      */
     public static final long SSL_OP_ENABLE_KTLS_TX_ZEROCOPY_SENDFILE = 0x400000000L;
+    /**
+     * In TLSv1.3, on resumption let the server prefer a non-(ec)dhe based key exchange mode over an (ec)dhe based one.
+     * Ignored without SSL_OP_ALLOW_NO_DHE_KEX being set as well. Always ignored on the client.
+     */
     public static final long SSL_OP_PREFER_NO_DHE_KEX = 0x800000000L;
+    /**
+     * Enable use of the legacy point formats for elliptic curves. This option enables support for the deprecated ANSI
+     * X9.62 prime and char2 compressed point formats, in addition to the uncompressed format that is enabled by
+     * default.
+     */
     public static final long SSL_OP_LEGACY_EC_POINT_FORMATS = 0x1000000000L;
 
     /**
@@ -444,9 +486,15 @@ public final class SSL {
     /*
      * Option "collections."
      */
+    /**
+     * Mask of options that disable all SSL/TLS protocol versions.
+     */
     public static final long SSL_OP_NO_SSL_MASK =
             SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 | SSL_OP_NO_TLSv1_2 | SSL_OP_NO_TLSv1_3;
 
+    /**
+     * Mask of options that disable all DTLS protocol versions.
+     */
     public static final long SSL_OP_NO_DTLS_MASK = SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2;
 
     /**
@@ -459,34 +507,79 @@ public final class SSL {
     /*
      * OBSOLETE OPTIONS retained for compatibility.
      */
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_MICROSOFT_SESS_ID_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_NETSCAPE_CHALLENGE_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_MICROSOFT_BIG_SSLV3_BUFFER = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_MSIE_SSLV2_RSA_PADDING = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_SSLEAY_080_CLIENT_DH_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_TLS_D5_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_TLS_BLOCK_PADDING_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_SINGLE_ECDH_USE = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_SINGLE_DH_USE = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_EPHEMERAL_RSA = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_NO_SSLv2 = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_NETSCAPE_CA_DN_BUG = 0x0;
+    /**
+     * Obsolete option retained for compatibility. This option no longer has any effect.
+     */
     @Deprecated
     public static final long SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG = 0x0;
 

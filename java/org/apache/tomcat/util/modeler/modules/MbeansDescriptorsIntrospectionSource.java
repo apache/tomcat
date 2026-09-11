@@ -96,6 +96,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
 
     /**
      * Execute the descriptor loading. Errors are logged and not propagated.
+     *
+     * @throws Exception if an error occurs while loading the descriptors
      */
     public void execute() throws Exception {
         if (registry == null) {
@@ -268,6 +270,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     }
 
     /**
+     * Analyze the given class and create the ManagedBean descriptor for it.
+     *
      * @param registry  The Bean registry (not used)
      * @param domain    The bean domain (not used)
      * @param realClass The class to analyze
