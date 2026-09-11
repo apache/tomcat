@@ -115,7 +115,8 @@ public class SendMailFactory implements ObjectFactory {
             message.setSubject("");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            // Otherwise ignore
+            // Ignore. Failures to apply the mail.from address or the subject are swallowed; the resource is returned
+            // without them and no error is reported.
         }
         return new MimePartDataSource(message);
 

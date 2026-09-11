@@ -56,7 +56,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    uses, but now it is required.
  *  - some of the gratuitous flexibility removed - instead this is more predictive and
  *    strict with the use cases.
- *  - all Method and metadata is stored in ManagedBean. BaseModelBMean and ManagedBean act
+ *  - all Method and metadata is stored in ManagedBean. BaseModelMBean and ManagedBean act
  *    like Object and Class.
  *  - setModelMBean is no longer called on resources ( not used in tomcat )
  *  - no caching of Methods for now - operations and setters are not called repeatedly in most
@@ -64,9 +64,6 @@ import org.apache.tomcat.util.res.StringManager;
  *  are, the overhead of getting the method should be small compared with other JMX costs ( RMI, etc ).
  *  We can add getter cache if needed.
  *  - removed unused constructor, fields
- *
- *  TODO:
- *   - clean up catalina.mbeans, stop using weird inheritance
  */
 
 /**
@@ -88,6 +85,8 @@ import org.apache.tomcat.util.res.StringManager;
  * <ul>
  * <li>One of the Java primitive types (boolean, byte, char, double, float, integer, long, short). Corresponding value
  * will be wrapped in the appropriate wrapper class automatically.</li>
+ * <li>Any other Bean-compatible class, such as <code>String</code>, <code>String[]</code>, <code>Object[]</code>,
+ * <code>ObjectName</code>, <code>BigDecimal</code>, <code>BigInteger</code> or <code>java.io.File</code>.</li>
  * <li>Operations that return no value should declare a return type of <code>void</code>.</li>
  * </ul>
  * <li>Attribute caching is not supported</li>
@@ -466,7 +465,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @param resource The resource object to be managed
      * @param type     The type of reference for the managed resource ("ObjectReference", "Handle", "IOR", "EJBHandle",
-     *                     or "RMIReference")
+     *                     or "RMIReference"). This parameter is not used; the resource type is derived from the
+     *                     resource object.
      *
      * @exception InstanceNotFoundException  if the managed resource object cannot be found
      * @exception MBeanException             if the initializer of the object throws an exception

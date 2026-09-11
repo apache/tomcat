@@ -34,7 +34,7 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
     static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
-    static final long UNLIMITED = ((long) 1 << 32); // Use the maximum possible
+    static final long UNLIMITED = ((long) 1 << 32); // Internal "no limit" sentinel; not a valid 32-bit SETTINGS value
     static final int MAX_HEADER_TABLE_SIZE = 1 << 16;
 
     // Defaults (defined by the specification)
@@ -102,6 +102,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     /**
      * Specify a new value for setting with the option to force the change to take effect immediately rather than
      * waiting until an {@code ACK} is received.
+     * <p>
+     * The default implementation applies the value to the current settings and ignores {@code force}. The
+     * {@link ConnectionSettingsLocal} override honors {@code force}.
      *
      * @param setting The setting to update
      * @param value   The new value for the setting

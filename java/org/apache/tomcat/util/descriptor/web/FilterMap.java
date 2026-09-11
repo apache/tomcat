@@ -220,7 +220,7 @@ public class FilterMap implements Serializable {
             // apply ERROR to the global dispatcherMapping.
             dispatcherMapping |= ERROR;
         } else if (dispatcher.equals(DispatcherType.ASYNC.name())) {
-            // apply ERROR to the global dispatcherMapping.
+            // apply ASYNC to the global dispatcherMapping.
             dispatcherMapping |= ASYNC;
         }
     }

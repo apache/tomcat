@@ -25,10 +25,12 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state diagram</a> in RFC 7540. <br>
+ * See <a href="https://www.rfc-editor.org/rfc/rfc9113#section-5.1">section 5.1</a> of RFC 9113 for the state
+ * diagram. <br>
  * The following additions are supported by this state machine:
  * <ul>
- * <li>differentiate between closed (normal) and closed caused by reset</li>
+ * <li>the closed state is split into separate states that differentiate between a normal close and a close caused by
+ * a reset, and between which direction sent the final frame</li>
  * </ul>
  */
 class StreamStateMachine {

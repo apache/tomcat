@@ -100,7 +100,9 @@ public final class ContextName {
     /**
      * Construct an instance from a path and version.
      *
-     * @param path    Context path to use, which must not contain a version marker
+     * @param path    Context path to use, which must not contain a version marker. May be <code>null</code>,
+     *                 <code>""</code>, <code>"/"</code> or <code>"/ROOT"</code> to represent the root context. Any
+     *                 other value must start with <code>"/"</code>
      * @param version Context version to use
      */
     public ContextName(String path, String version) {

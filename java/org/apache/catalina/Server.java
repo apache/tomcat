@@ -32,8 +32,8 @@ import org.apache.catalina.startup.Catalina;
  * started or stopped.
  * <p>
  * In between, the implementation must open a server socket on the port number specified by the <code>port</code>
- * property. When a connection is accepted, the first line is read and compared with the specified shutdown command. If
- * the command matches, shutdown of the server is initiated.
+ * property (plus the <code>portOffset</code>, if set). When a connection is accepted, the first line is read and
+ * compared with the specified shutdown command. If the command matches, shutdown of the server is initiated.
  */
 public interface Server extends Lifecycle {
 
@@ -93,7 +93,7 @@ public interface Server extends Lifecycle {
 
     /**
      * Set the number that offsets the server port used for shutdown commands. For example, if port is 8005, and you set
-     * portOffset to 1000, connector listens at 9005.
+     * portOffset to 1000, the server listens at 9005.
      *
      * @param portOffset sets the port offset
      */

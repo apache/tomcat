@@ -61,7 +61,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Holds and manages the naming resources defined in the Jakarta EE Naming Context and their associated JNDI context.
+ * Holds and manages the naming resource descriptors. The associated JNDI context is created and maintained by
+ * NamingContextListener.
  */
 public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable, NamingResources {
 
@@ -98,7 +99,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * Set of naming entries, keyed by name.
+     * Set of naming entry names.
      */
     private final Set<String> entries = ConcurrentHashMap.newKeySet();
 
@@ -671,7 +672,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * Return the array of resource environment reference names for this web application.
+     * Return the array of resource environment references for this web application.
      *
      * @return the resource environment references, or a zero-length array if none
      */
@@ -992,7 +993,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
     /**
      * Clean up a resource by calling the defined close method. For example, closing a database connection pool will
-     * close it's open connections. This will happen on GC but that leaves db connections open that may cause issues.
+     * close its open connections. This will happen on GC but that leaves db connections open that may cause issues.
      *
      * @param resource The resource to close.
      */

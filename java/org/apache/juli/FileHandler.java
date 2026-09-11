@@ -60,8 +60,8 @@ import java.util.regex.Pattern;
  * will not be rotated and the filename will be <code>{prefix}{suffix}</code>. Default value: <code>true</code></li>
  * <li><code>prefix</code> - The leading part of the log file name. Default value: <code>juli.</code></li>
  * <li><code>suffix</code> - The trailing part of the log file name. Default value: <code>.log</code></li>
- * <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code> uses system default buffering
- * (typically an 8K buffer will be used). A value of <code>&lt;0</code> forces a writer flush upon each log write. A
+ * <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code> uses no application-level buffering.
+ * A value of <code>&lt;0</code> forces a writer flush upon each log write. A
  * value <code>&gt;0</code> uses a BufferedOutputStream with the defined value but note that the system default
  * buffering will also be applied. Default value: <code>-1</code></li>
  * <li><code>encoding</code> - Character set used by the log file. Default value: empty string, which means to use the

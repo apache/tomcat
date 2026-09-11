@@ -105,7 +105,7 @@ public final class ObjectReflectionPropertyInspector {
                 Class.forName("org.apache.tomcat.util.net.SocketProperties"))));
     }
 
-    // types of properties that IntrospectionUtils.setProperty supports
+    // types of properties that IntrospectionUtils supports (drives field, setter and getter discovery)
     private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(
             new LinkedHashSet<>(Arrays.asList(Boolean.TYPE, Boolean.class, Integer.TYPE, Integer.class,
                     Long.TYPE, Long.class, String.class, InetAddress.class)));
@@ -116,7 +116,8 @@ public final class ObjectReflectionPropertyInspector {
      *
      * @param baseClasses The classes to process
      * @param packageName The package name for generated code
-     * @param location The output directory
+     * @param location The output directory (the package sub-directory derived from <code>packageName</code> must
+     *                    already exist)
      * @param className The class name for generated code
      * @throws Exception if an error occurs
      */

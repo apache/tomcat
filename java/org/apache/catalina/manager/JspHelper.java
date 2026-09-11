@@ -36,7 +36,7 @@ public class JspHelper {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
-     * Public constructor, so that this class can be considered a JavaBean
+     * Private constructor, as this is a static utility class.
      */
     private JspHelper() {
         super();

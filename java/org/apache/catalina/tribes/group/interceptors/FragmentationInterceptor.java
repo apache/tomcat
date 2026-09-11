@@ -62,7 +62,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
     private int maxSize = 1024 * 100;
     private long expire = 1000 * 60; // one minute expiration
     /**
-     * Flag indicating whether deep cloning is enabled for fragments.
+     * Fragments are always deep cloned before storage.
      */
     protected final boolean deepclone = true;
 

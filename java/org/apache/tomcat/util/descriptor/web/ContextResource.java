@@ -61,12 +61,12 @@ public class ContextResource extends ResourceBase {
     }
 
     /**
-     * The sharing scope of this resource factory (<code>Shareable</code> or <code>Unshareable</code>).
+     * The sharing scope of this resource (<code>Shareable</code> or <code>Unshareable</code>).
      */
     private String scope = "Shareable";
 
     /**
-     * Returns the sharing scope of this resource factory.
+     * Returns the sharing scope of this resource.
      *
      * @return the sharing scope
      */
@@ -75,7 +75,7 @@ public class ContextResource extends ResourceBase {
     }
 
     /**
-     * Sets the sharing scope of this resource factory.
+     * Sets the sharing scope of this resource.
      *
      * @param scope the sharing scope
      */

@@ -36,7 +36,7 @@ import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
 
 /**
- * Main JSP compiler class. This class uses Ant for compiling.
+ * JSP compiler class. This class uses Ant for compiling.
  */
 public class AntCompiler extends Compiler {
 
@@ -305,7 +305,7 @@ public class AntCompiler extends Compiler {
 
 
         /**
-         * Construct the handler to capture the output of the given steam.
+         * Construct the handler to capture the output of the given stream.
          *
          * @param wrapped The wrapped stream
          */

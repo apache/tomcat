@@ -51,8 +51,9 @@ import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.Util.DecoderMatch;
 
 /**
- * For a POJO class annotated with {@link jakarta.websocket.server.ServerEndpoint}, an instance of this class creates
- * and caches the method handler, method information and parameter information for the onXXX calls.
+ * For a POJO class annotated with {@link jakarta.websocket.server.ServerEndpoint}, an instance of this class caches the
+ * method information and parameter information for the onXXX calls. The message handlers themselves are not cached;
+ * they are created per session from the cached information.
  */
 public class PojoMethodMapping {
 
@@ -72,7 +73,7 @@ public class PojoMethodMapping {
      * Create a method mapping for the given POJO
      *
      * @param clazzPojo       POJO implementation class
-     * @param decoderClazzes  Set of potential decoder classes
+     * @param decoderClazzes  List of potential decoder classes
      * @param wsPath          Path at which the endpoint will be deployed
      * @param instanceManager Instance manager to use to create Decoder instances
      *

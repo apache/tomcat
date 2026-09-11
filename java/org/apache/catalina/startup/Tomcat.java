@@ -311,7 +311,7 @@ public class Tomcat {
      * TODO: add the rest
      *
      * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase     Base directory for the context, for static files. Must exist, relative to the server home
+     * @param docBase     Base directory for the context, for static files
      *
      * @return the deployed context
      */
@@ -635,7 +635,7 @@ public class Tomcat {
      *
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context
-     * @param dir         Base directory for the context, for static files. Must exist, relative to the server home
+     * @param dir         Base directory for the context, for static files
      * @return the deployed context
      * @see #addContext(String, String)
      */
@@ -649,7 +649,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context
      * @param contextName The context name
-     * @param dir         Base directory for the context, for static files. Must exist, relative to the server home
+     * @param dir         Base directory for the context, for static files
      *
      * @return the deployed context
      *
@@ -955,7 +955,8 @@ public class Tomcat {
      *
      * @param host host for which the {@link Context} should be created, or <code>null</code> if default host should be
      *                 used
-     * @param url  path of the webapp which should get the {@link Context}
+     * @param url  context path of the {@link Context} to be created (used only in the error message if the context
+     *                 class cannot be instantiated)
      *
      * @return newly created {@link Context}
      */

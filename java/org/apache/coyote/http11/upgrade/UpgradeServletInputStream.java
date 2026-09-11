@@ -136,7 +136,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
         this.listener = listener;
 
-        // Container is responsible for first call to onDataAvailable().
+        // The first call to onDataAvailable() will be triggered by the poller
+        // once read interest is registered.
         Request request = processor.getRequest();
         if (request != null && request.isRequestThread()) {
             processor.addDispatch(DispatchType.NON_BLOCKING_READ);

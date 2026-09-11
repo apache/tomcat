@@ -95,9 +95,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     }
 
     /**
-     * Execute the descriptor loading.
+     * Execute the descriptor loading. Errors are logged and not propagated.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception if an error occurs while loading the descriptors
      */
     public void execute() throws Exception {
         if (registry == null) {
@@ -270,8 +270,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     }
 
     /**
-     * XXX Find if the 'className' is the name of the MBean or the real class ( I suppose first ) XXX Read (optional)
-     * descriptions from a .properties, generated from source XXX Deal with constructors
+     * Analyze the given class and create the ManagedBean descriptor for it.
      *
      * @param registry  The Bean registry (not used)
      * @param domain    The bean domain (not used)

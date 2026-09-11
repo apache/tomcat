@@ -422,7 +422,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Set the utility threads daemon flag. The default value is true.
+     * Set the utility threads daemon flag. The default value is false.
      *
      * @param utilityThreadsAsDaemon the new thread daemon flag
      */

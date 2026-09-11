@@ -108,6 +108,13 @@ public final class MessageBytes implements Cloneable, Serializable {
         return factory.newInstance();
     }
 
+    /**
+     * Creates a shallow clone of this message bytes. The internal byte and char chunks (and any cached String) are
+     * shared with this instance, so the clone is not an independent value.
+     *
+     * @return a shallow clone of this message bytes
+     * @throws CloneNotSupportedException if the object cannot be cloned
+     */
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -539,8 +546,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         };
     }
 
-    // Inefficient initial implementation. Will be replaced on the next
-    // round of tune-up
     /**
      * Find the index of a string.
      * @param s the string
@@ -552,8 +557,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         return strValue.indexOf(s, starting);
     }
 
-    // Inefficient initial implementation. Will be replaced on the next
-    // round of tune-up
     /**
      * Find the index of a string.
      * @param s the string

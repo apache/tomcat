@@ -21,7 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.NamingException;
 
 /**
- * SimpleInstanceManager implements the org.apache.tomcat.InstanceManager interface.
+ * SimpleInstanceManager implements the org.apache.tomcat.InstanceManager interface. Instances are created using their
+ * public no-argument constructor. No dependency injection is performed and no pre-destroy callbacks are invoked.
  */
 public class SimpleInstanceManager implements InstanceManager {
 
@@ -74,6 +75,7 @@ public class SimpleInstanceManager implements InstanceManager {
      */
     @Override
     public void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException {
+        // NO-OP
     }
 
     private Object prepareInstance(Object o) {

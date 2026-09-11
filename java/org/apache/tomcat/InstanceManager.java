@@ -37,7 +37,7 @@ public interface InstanceManager {
      *         an interface, an array class, a primitive type, or void
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException,
             InstantiationException, IllegalArgumentException, NoSuchMethodException, SecurityException;
@@ -55,7 +55,7 @@ public interface InstanceManager {
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(String className)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
@@ -75,7 +75,7 @@ public interface InstanceManager {
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(String fqcn, ClassLoader classLoader)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,

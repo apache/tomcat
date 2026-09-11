@@ -21,7 +21,7 @@ import java.io.Serial;
 import javax.naming.StringRefAddr;
 
 /**
- * Represents a reference address to a resource.
+ * Represents a reference address to a resource link.
  */
 public class ResourceLinkRef extends AbstractRef {
 
@@ -36,7 +36,7 @@ public class ResourceLinkRef extends AbstractRef {
 
 
     /**
-     * Description address type.
+     * Global name address type.
      */
     public static final String GLOBALNAME = "globalName";
 

@@ -82,7 +82,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * send that context manager does not exist after GET_ALL_SESSION received from this sender.<BR>
      *
      * @param contextName - the name of the context (application
-     * @param eventtype   - one of the 8 event type defined in this class
+     * @param eventtype   - one of the 9 event types defined in this class
      * @param session     - the serialized byte array of the session itself
      * @param sessionID   - the id that identifies this session
      * @param uniqueID    - the id that identifies this message

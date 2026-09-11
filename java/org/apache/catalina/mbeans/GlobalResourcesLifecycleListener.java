@@ -43,9 +43,8 @@ import org.apache.tomcat.util.res.StringManager;
  * Implementation of <code>LifecycleListener</code> that instantiates the set of MBeans associated with global JNDI
  * resources that are subject to management.
  * <p>
- * This listener must only be nested within {@link Server} elements.
- *
- * @since 4.1
+ * This listener should be nested within {@link Server} elements. If it is attached to any other component type, a
+ * warning is logged and the listener still processes the event.
  */
 public class GlobalResourcesLifecycleListener implements LifecycleListener {
     /**

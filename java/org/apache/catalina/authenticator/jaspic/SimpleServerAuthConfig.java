@@ -94,7 +94,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     /**
      * {@inheritDoc}
      * <p>
-     * Clears the cached ServerAuthConfig so it will be recreated on next use.
+     * Clears the cached ServerAuthContext so it will be recreated on next use.
      */
     @Override
     public void refresh() {

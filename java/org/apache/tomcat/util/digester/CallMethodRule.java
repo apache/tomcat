@@ -30,15 +30,13 @@ import org.xml.sax.Attributes;
  * By using {@link #CallMethodRule(String methodName)} a method call can be made to a method which accepts no arguments.
  * </p>
  * <p>
- * Incompatible method parameter types are converted using <code>org.apache.commons.beanutils.ConvertUtils</code>.
+ * Incompatible method parameter types are converted using
+ * <code>org.apache.tomcat.util.introspection.IntrospectionUtils#convert</code>.
  * </p>
  * <p>
- * This rule now uses
- * <a href="https://commons.apache.org/beanutils/apidocs/org/apache/commons/beanutils/MethodUtils.html">
- * org.apache.commons.beanutils.MethodUtils#invokeMethod </a> by default. This increases the kinds of methods
- * successfully and allows primitives to be matched by passing in wrapper classes. There are rare cases when
- * org.apache.commons.beanutils.MethodUtils#invokeExactMethod (the old default) is required. This method is much
- * stricter in its reflection. Setting the <code>UseExactMatch</code> to true reverts to the use of this method.
+ * The target method is invoked using
+ * <code>org.apache.tomcat.util.introspection.IntrospectionUtils#callMethodN</code> which allows primitives to be
+ * matched by passing in wrapper classes.
  * </p>
  * <p>
  * Note that the target method is invoked when the <i>end</i> of the tag the CallMethodRule fired on is encountered,
@@ -105,16 +103,16 @@ public class CallMethodRule extends Rule {
 
 
     /**
-     * Construct a "call method" rule with the specified method name and parameter types. If <code>paramCount</code> is
-     * set to zero the rule will use the body of this element as the single argument of the method, unless
-     * <code>paramTypes</code> is null or empty, in this case the rule will call the specified method with no arguments.
+     * Construct a "call method" rule with the specified method name and parameter types. If <code>paramTypes</code> is
+     * <code>null</code>, <code>paramCount</code> String parameters are collected. Otherwise, the number of parameters
+     * is taken from <code>paramTypes</code> and <code>paramCount</code> is ignored.
      *
      * @param targetOffset location of the target object. Positive numbers are relative to the top of the digester
      *                         object stack. Negative numbers are relative to the bottom of the stack. Zero implies the
      *                         top object on the stack.
      * @param methodName   Method name of the parent method to call
-     * @param paramCount   The number of parameters to collect, or zero for a single argument from the body of this
-     *                         element
+     * @param paramCount   The number of String parameters to collect when <code>paramTypes</code> is
+     *                         <code>null</code>
      * @param paramTypes   The Java classes that represent the parameter types of the method arguments (if you wish to
      *                         use a primitive type, specify the corresponding Java wrapper class instead, such as
      *                         <code>java.lang.Boolean.TYPE</code> for a <code>boolean</code> parameter)

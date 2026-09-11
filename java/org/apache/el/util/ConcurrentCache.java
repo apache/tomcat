@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A thread-safe cache that uses an eden space backed by a {@link ConcurrentHashMap}
- * and a long-term space backed by a {@link WeakHashMap}. When the eden space exceeds
+ * and a long-term space backed by a {@link WeakHashMap}. When the eden space reaches
  * the configured size, its contents are promoted to the long-term space.
  *
  * @param <K> the key type

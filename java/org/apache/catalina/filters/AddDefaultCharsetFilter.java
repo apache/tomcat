@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Filter that explicitly sets the default character set for media subtypes of the "text" type to ISO-8859-1, or another
- * user defined character set. RFC2616 explicitly states that browsers must use ISO-8859-1 if no character set is
+ * user defined character set. RFC 9110 explicitly states that browsers must use ISO-8859-1 if no character set is
  * defined for media with subtype "text". However, browsers may attempt to auto-detect the character set. This may be
  * exploited by an attacker to perform an XSS attack. Internet Explorer has this behaviour by default. Other browsers
  * have an option to enable it.<br>

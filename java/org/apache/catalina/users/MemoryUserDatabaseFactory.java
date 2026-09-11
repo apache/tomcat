@@ -39,9 +39,9 @@ import javax.naming.spi.ObjectFactory;
  * <li><strong>pathname</strong> - Absolute or relative (to the directory path specified by the
  * <code>catalina.base</code> system property) pathname to the XML file from which our user information is loaded, and
  * to which it is stored. [conf/tomcat-users.xml]</li>
+ * <li><strong>readonly</strong> - whether the user database is read only</li>
+ * <li><strong>watchSource</strong> - whether to watch the source file for changes</li>
  * </ul>
- *
- * @since 4.1
  */
 public class MemoryUserDatabaseFactory implements ObjectFactory {
 
@@ -58,8 +58,9 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
     /**
      * <p>
      * Create and return a new <code>MemoryUserDatabase</code> instance that has been configured according to the
-     * properties of the specified <code>Reference</code>. If the instance cannot be created, return <code>null</code>
-     * instead.
+     * properties of the specified <code>Reference</code>. Returns <code>null</code> if the object is not a
+     * <code>Reference</code> with a class name of <code>org.apache.catalina.UserDatabase</code>; other failures are
+     * reported as exceptions.
      * </p>
      *
      * @param obj         The possibly null object containing location or reference information that can be used in

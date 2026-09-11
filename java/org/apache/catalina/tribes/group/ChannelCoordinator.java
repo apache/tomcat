@@ -80,6 +80,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      */
     public ChannelCoordinator(ChannelReceiver receiver, ChannelSender sender, MembershipService service) {
 
+        // These option flags do not affect the send path of this coordinator (it never calls okToProcess). They are
+        // only visible to GroupChannel.checkOptionFlags() when optionCheck is enabled.
         this.optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE | Channel.SEND_OPTIONS_USE_ACK |
                 Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
 

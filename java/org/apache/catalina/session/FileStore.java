@@ -329,7 +329,7 @@ public final class FileStore extends StoreBase {
 
     /**
      * Return a File object representing the pathname to our session persistence directory, if any. The directory will
-     * be created if it does not already exist.
+     * be created if it does not already exist. If a non-directory file exists at the pathname, it is deleted first.
      */
     private synchronized File directory() throws IOException {
         // Synchronised to avoid concurrent attempts to create the directory.

@@ -33,7 +33,7 @@ public final class Otherwise implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        // See When.java for the reason whey "}" is need at the beginning and
+        // See When.java for the reason why "}" is needed at the beginning and
         // not at the end.
         ctxt.generateJavaSource("} else {");
         ctxt.generateBody();

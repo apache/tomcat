@@ -287,7 +287,8 @@ public class HpackDecoder {
         int dynamicIndex = index - Hpack.STATIC_TABLE_LENGTH;
         // The index is one based, but our table is zero based
         // Also, because of our ring buffer set up, the indexes are reversed
-        // index = 1 is at position firstSlotPosition + filledSlots
+        // Dynamic index 1 (the most recently added entry) is at position
+        // (firstSlotPosition + filledTableSlots - 1) % headerTable.length
         if (dynamicIndex < 1 || dynamicIndex > filledTableSlots) {
             throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
                     Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));

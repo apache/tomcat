@@ -211,7 +211,7 @@ public interface UserDatabase {
     /**
      * Is the database available.
      *
-     * @return true
+     * @return <code>true</code> if the database is available, <code>false</code> otherwise
      */
     default boolean isAvailable() {
         return true;

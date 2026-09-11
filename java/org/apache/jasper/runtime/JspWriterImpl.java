@@ -89,8 +89,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Flush the output buffer to the underlying character stream, without flushing the stream itself. This method is
-     * non-private only so that it may be invoked by PrintStream.
+     * Flush the output buffer to the underlying character stream, without flushing the stream itself.
      *
      * @throws IOException Error writing buffered data
      */
@@ -203,8 +202,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Our own little min method, to avoid loading java.lang.Math if we've run out of file descriptors, and we're trying
-     * to print a stack trace.
+     * Returns the smaller of the two given values.
      */
     private static int min(int a, int b) {
         return Math.min(a, b);

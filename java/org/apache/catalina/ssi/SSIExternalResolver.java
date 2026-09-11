@@ -53,8 +53,9 @@ public interface SSIExternalResolver {
 
 
     /**
-     * Returns the current date. This is useful for putting the SSI stuff in a regression test. Since you can make the
-     * current date a constant, it makes testing easier since the output won't change.
+     * Returns the current date. This is a hook that implementations may use to return a fixed date, e.g. to make SSI
+     * output deterministic for regression testing. Note that the built-in SSI date variables are not set from this
+     * method.
      *
      * @return the date
      */

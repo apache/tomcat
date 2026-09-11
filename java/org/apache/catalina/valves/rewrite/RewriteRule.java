@@ -223,7 +223,7 @@ public class RewriteRule {
     /**
      * This sets a cookie on the client's browser. The cookie's name is specified by NAME and the value is VAL. The
      * domain field is the domain of the cookie, such as '.apache.org',the optional lifetime is the lifetime of the
-     * cookie in minutes, and the optional path is the path of the cookie
+     * cookie in seconds, and the optional path is the path of the cookie
      */
     protected boolean cookie = false;
 
@@ -355,6 +355,8 @@ public class RewriteRule {
      * for your decision: whenever you prefix some URLs with CGI-scripts to force them to be processed by the
      * CGI-script, the chance is high that you will run into problems (or even overhead) on sub-requests. In these
      * cases, use this flag.
+     * <p>
+     * Note: this flag cannot be set from the {@code rewrite.config} file and has no effect in this implementation.
      */
     protected boolean nosubreq = false;
 
@@ -699,6 +701,8 @@ public class RewriteRule {
     /**
      * Set the nosubreq flag.
      * @param nosubreq true to set the nosubreq flag
+     *
+     * @see #nosubreq
      */
     public void setNosubreq(boolean nosubreq) {
         this.nosubreq = nosubreq;
@@ -914,7 +918,7 @@ public class RewriteRule {
 
     /**
      * Get the cookie lifetime.
-     * @return the cookie lifetime in minutes
+     * @return the cookie lifetime in seconds
      */
     public int getCookieLifetime() {
         return cookieLifetime;
@@ -922,7 +926,7 @@ public class RewriteRule {
 
     /**
      * Set the cookie lifetime.
-     * @param cookieLifetime the cookie lifetime in minutes
+     * @param cookieLifetime the cookie lifetime in seconds
      */
     public void setCookieLifetime(int cookieLifetime) {
         this.cookieLifetime = cookieLifetime;

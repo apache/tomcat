@@ -135,8 +135,8 @@ public class Request implements HttpServletRequest {
      * Create a new Request object associated with the given Connector.
      *
      * @param connector     The Connector with which this Request object will always be associated. In normal usage this
-     *                          must be non-null. In some test scenarios, it may be possible to use a null Connector
-     *                          without triggering an NPE.
+     *                          must be non-null. Some methods require the Connector and will throw a
+     *                          <code>NullPointerException</code> if it is null.
      * @param coyoteRequest The Coyote request with which this Request object will always be associated. In normal usage
      *                          this must be non-null. In some test scenarios, it may be possible to use a null request
      *                          without triggering an NPE.
@@ -404,7 +404,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Local address
+     * Local name
      */
     protected String localName = null;
 

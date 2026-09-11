@@ -32,9 +32,7 @@ import aQute.bnd.annotation.spi.ServiceConsumer;
  * particularly for those projects that embed Tomcat or some of Tomcat's components - is an alternative logging
  * implementation is desired.
  * <p>
- * Note that this implementation is not just a wrapper around JDK logging (like the original commons-logging impl). It
- * adds 2 features - a simpler configuration (which is in fact a subset of log4j.properties) and a formatter that is
- * less ugly.
+ * Note that this implementation is not just a wrapper around JDK logging (like the original commons-logging impl).
  * <p>
  * The removal of 'abstract' preserves binary backward compatibility. It is possible to preserve the abstract - and
  * introduce another (hardcoded) factory - but I see no benefit.
@@ -145,22 +143,9 @@ public class LogFactory {
 
     /**
      * <p>
-     * Construct (if necessary) and return a <code>LogFactory</code> instance, using the following ordered lookup
-     * procedure to determine the name of the implementation class to be loaded.
-     * </p>
-     * <ul>
-     * <li>The <code>org.apache.commons.logging.LogFactory</code> system property.</li>
-     * <li>The JDK 1.3 Service Discovery mechanism</li>
-     * <li>Use the properties file <code>commons-logging.properties</code> file, if found in the class path of this
-     * class. The configuration file is in standard <code>java.util.Properties</code> format and contains the fully
-     * qualified name of the implementation class with the key being the system property defined above.</li>
-     * <li>Fall back to a default implementation class
-     * (<code>org.apache.commons.logging.impl.LogFactoryImpl</code>).</li>
-     * </ul>
-     * <p>
-     * <em>NOTE</em> - If the properties file method of identifying the <code>LogFactory</code> implementation class is
-     * utilized, all of the properties defined in this file will be set as configuration attributes on the corresponding
-     * <code>LogFactory</code> instance.
+     * Return the singleton <code>LogFactory</code> instance. The {@link Log} implementation is discovered once, using
+     * a {@link java.util.ServiceLoader} lookup for providers of the <code>Log</code> interface, falling back to
+     * {@link DirectJDKLog} if no suitable provider is found.
      * </p>
      *
      * @return The singleton LogFactory instance
@@ -202,10 +187,11 @@ public class LogFactory {
 
 
     /**
-     * Release any internal references to previously created {@link LogFactory} instances that have been associated with
-     * the specified class loader (if any), after calling the instance method <code>release()</code> on each of them.
+     * Reset the {@link java.util.logging.LogManager}, unless the standard <code>java.util.logging.LogManager</code>
+     * implementation is in use. The given class loader is not used: the JULI log manager associates its configuration
+     * with the current thread's context class loader.
      *
-     * @param classLoader ClassLoader for which to release the LogFactory
+     * @param classLoader ClassLoader for which to release the LogFactory. Not used by this implementation.
      */
     public static void release(ClassLoader classLoader) {
         // JULI's log manager looks at the current classLoader so there is no

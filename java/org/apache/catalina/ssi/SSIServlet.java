@@ -57,7 +57,7 @@ public class SSIServlet extends HttpServlet {
     protected boolean isVirtualWebappRelative = false;
     /** Input encoding. If not specified, uses platform default */
     protected String inputEncoding = null;
-    /** Output encoding. If not specified, uses platform default */
+    /** Output encoding. Defaults to UTF-8. */
     protected String outputEncoding = "UTF-8";
     /** Allow exec (normally blocked for security) */
     protected boolean allowExec = false;
@@ -151,7 +151,7 @@ public class SSIServlet extends HttpServlet {
             log("SSIServlet.requestHandler()\n" + "Serving " + (buffered ? "buffered " : "unbuffered ") + "resource '" +
                     path + "'");
         }
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
+        // Exclude any resource whose path starts with /WEB-INF or /META-INF
         // (the "toUpperCase()" avoids problems on Windows systems)
         if (path == null || path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
                 path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF")) {

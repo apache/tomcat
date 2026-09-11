@@ -116,7 +116,7 @@ public class Diagnostics {
     }
 
     /**
-     * Enable or disable thread contention monitoring via the ThreadMxMXBean.
+     * Enable or disable thread contention monitoring via the ThreadMXBean.
      *
      * @param enable whether to enable thread contention monitoring
      */
@@ -139,7 +139,7 @@ public class Diagnostics {
     }
 
     /**
-     * Enable or disable thread cpu time measurement via the ThreadMxMXBean.
+     * Enable or disable thread cpu time measurement via the ThreadMXBean.
      *
      * @param enable whether to enable thread cpu time measurement
      */

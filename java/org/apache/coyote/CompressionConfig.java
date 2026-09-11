@@ -63,6 +63,8 @@ public class CompressionConfig {
 
     /**
      * Returns the list of content encodings that indicate already-compressed content.
+     * <p>
+     * The order of the encodings in the returned list is not guaranteed.
      *
      * @return comma-separated list of encoding names
      */
@@ -76,7 +78,7 @@ public class CompressionConfig {
      * When content is already encoded with one of these encodings, compression will not be applied
      * to prevent double compression.
      *
-     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
+     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br,deflate")
      */
     public void setNoCompressionEncodings(String encodings) {
         Set<String> newEncodings = new HashSet<>();

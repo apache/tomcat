@@ -301,7 +301,6 @@ public class MBeanFactory {
         retobj.setSecure(isSSL);
         retobj.setScheme(isSSL ? "https" : "http");
         // Add the new instance to its parent component
-        // FIX ME - addConnector will fail
         ObjectName pname = new ObjectName(parent);
         Service service = getService(pname);
         service.addConnector(retobj);

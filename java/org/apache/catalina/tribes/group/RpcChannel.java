@@ -49,7 +49,7 @@ public class RpcChannel implements ChannelListener {
     public static final int FIRST_REPLY = 1;
 
     /**
-     * Return replies from a majority of members.
+     * Return replies from at least half of the destination members.
      */
     public static final int MAJORITY_REPLY = 2;
 
@@ -92,7 +92,8 @@ public class RpcChannel implements ChannelListener {
      * @param message        Serializable - the message you are sending out
      * @param rpcOptions     int - FIRST_REPLY, MAJORITY_REPLY or ALL_REPLY
      * @param channelOptions channel sender options
-     * @param timeout        long - timeout in milliseconds, if no reply is received within this time null is returned
+     * @param timeout        long - timeout in milliseconds, if the requested replies are not received within this time
+     *                         the replies received so far (possibly none) are returned
      *
      * @return Response[] - an array of response objects.
      *

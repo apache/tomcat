@@ -5149,7 +5149,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         Loader loader = getLoader();
         ClassLoader webApplicationClassLoader = null;
         if (loader != null) {
-            webApplicationClassLoader = loader.getClassLoader();
+            // Don't bind the web application class loader if it isn't started yet.
+            if (!(loader instanceof Lifecycle) || ((Lifecycle) loader).getState().isAvailable()) {
+                webApplicationClassLoader = loader.getClassLoader();
+            }
         }
 
         Thread currentThread = Thread.currentThread();
@@ -5580,8 +5583,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     new MBeanNotificationInfo(new String[] { "j2ee.state.running" }, Notification.class.getName(),
                             "web application is running"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.stopping" }, Notification.class.getName(),
-                            "web application start to stopped"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
+                            "web application is stopping"),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
                             "web application is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
                             "web application is deleted"),

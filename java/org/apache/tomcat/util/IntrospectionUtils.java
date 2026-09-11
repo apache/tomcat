@@ -43,8 +43,8 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * Find a method with the right name If found, call the method ( if param is int or boolean we'll convert value to
-     * the right type before) - that means you can have setDebug(1).
+     * Find a method with the right name If found, call the method ( if param is int, long, boolean or
+     * {@code InetAddress} we'll convert value to the right type before) - that means you can have setDebug(1).
      *
      * @param o     The object to set a property on
      * @param name  The property name
@@ -110,7 +110,7 @@ public final class IntrospectionUtils {
                 }
             }
 
-            // Try a setFoo ( int ) or ( boolean )
+            // Try a setFoo ( int ), ( long ), ( boolean ) or ( InetAddress )
             for (Method method : methods) {
                 boolean ok = true;
                 if (setter.equals(method.getName()) && method.getParameterTypes().length == 1) {
@@ -328,9 +328,8 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * Replaces ${NAME} in the value with the value of the property 'NAME'. Replaces ${NAME:DEFAULT} with the value of
-     * the property 'NAME:DEFAULT', if the property 'NAME:DEFAULT' is not set, the expression is replaced with the value
-     * of the property 'NAME', if the property 'NAME' is not set, the expression is replaced with 'DEFAULT'. If the
+     * Replaces ${NAME} in the value with the value of the property 'NAME'. Replaces ${NAME:-DEFAULT} with the value of
+     * the property 'NAME', if the property 'NAME' is not set, the expression is replaced with 'DEFAULT'. If the
      * property is not set and there is no default the value will be returned unmodified.
      *
      * @param value       The value
