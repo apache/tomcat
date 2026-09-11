@@ -96,10 +96,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
 
     /**
      * Execute the descriptor loading. Errors are logged and not propagated.
-     *
-     * @throws Exception if an error occurs while loading the descriptors
      */
-    public void execute() throws Exception {
+    public void execute() {
         if (registry == null) {
             registry = Registry.getRegistry(null);
         }
