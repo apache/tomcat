@@ -155,4 +155,97 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
         }
 
     }
+
+
+    @Test
+    public void testThresholdDisabled() throws Exception {
+        StickingServlet stickingServlet = new StickingServlet(100L);
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet", stickingServlet);
+        servlet.addMapping("/myservlet");
+
+        StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
+        valve.setThreshold(0); // Disabled
+        context.addValve(valve);
+        tomcat.start();
+
+        ByteChunk result = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
+
+        Assert.assertTrue(result.toString().startsWith("OK"));
+        Assert.assertEquals(0, valve.getStuckThreadCount());
+        Assert.assertEquals(0, valve.getStuckThreadIds().length);
+        Assert.assertEquals(0, valve.getStuckThreadNames().length);
+    }
+
+
+    @Test
+    public void testGetStuckThreadNames() throws Exception {
+        StickingServlet stickingServlet = new StickingServlet(8000L);
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet", stickingServlet);
+        servlet.addMapping("/myservlet");
+
+        StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
+        valve.setThreshold(2);
+        context.addValve(valve);
+        context.setBackgroundProcessorDelay(1);
+        tomcat.start();
+
+        final ByteChunk result = new ByteChunk();
+        Thread asyncThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        };
+        asyncThread.start();
+        try {
+            Thread.sleep(5000L);
+            Assert.assertEquals(1, valve.getStuckThreadCount());
+            String[] names = valve.getStuckThreadNames();
+            Assert.assertEquals(1, names.length);
+            Assert.assertNotNull(names[0]);
+        } finally {
+            asyncThread.join(20000);
+            Assert.assertFalse(asyncThread.isAlive());
+        }
+    }
+
+
+    @Test
+    public void testGetInterruptedThreadsCount() throws Exception {
+        StickingServlet stickingServlet = new StickingServlet(TimeUnit.SECONDS.toMillis(20L));
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet", stickingServlet);
+        servlet.addMapping("/myservlet");
+
+        StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
+        valve.setThreshold(2);
+        valve.setInterruptThreadThreshold(5);
+        context.addValve(valve);
+        context.setBackgroundProcessorDelay(1);
+        tomcat.start();
+
+        Assert.assertEquals(0, valve.getInterruptedThreadsCount());
+
+        final ByteChunk result = new ByteChunk();
+        Thread asyncThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        };
+        asyncThread.start();
+        asyncThread.join(20000);
+        // check that we did not reach the join timeout
+        Assert.assertFalse(asyncThread.isAlive());
+        Assert.assertTrue(stickingServlet.wasInterrupted);
+        Assert.assertTrue(valve.getInterruptedThreadsCount() > 0);
+    }
 }
