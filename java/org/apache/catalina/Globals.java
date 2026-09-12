@@ -233,6 +233,15 @@ public final class Globals {
     public static final boolean STRICT_SERVLET_COMPLIANCE =
             Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
 
+    /**
+     * If {@code true}, every ServerInfo.properties on the class path is merged
+     * (bundled catalina.jar copy first as defaults, override files on top) so an
+     * override file can replace individual properties. Otherwise only the first
+     * ServerInfo.properties found is used.
+     */
+    public static final boolean LOAD_SERVER_INFO_OVERRIDE =
+            Boolean.getBoolean("org.apache.catalina.util.LOAD_SERVER_INFO_OVERRIDE");
+
 
     /**
      * Default domain for MBeans if none can be determined
