@@ -152,6 +152,8 @@ public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
     @Test
     public void testExpiredKeysNeverExpiringSessions() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre16Available());
+
         StandardManager manager = new StandardManager();
         TesterContext testerContext = new TesterContext();
         testerContext.setServletContext(new TesterServletContext());
