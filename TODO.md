@@ -369,14 +369,13 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 32. Jasper TLD Validation (2 items)
+### 32. Jasper TLD Validation (1 item)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
-| 32.1 | `TagLibraryInfoImpl.java:193` | Duplicate function name validation should move to parsing stage | Add duplicate name detection in the TLD parser (`TaglibXmlParser`) before the `TagLibraryInfoImpl` is constructed. | 1 day | Medium |
 | 32.2 | `TagLibraryInfoImpl.java:231` | URL resolution logic for TLD resource paths looks incorrect | Audit the URI resolution logic against JSP spec section 7.3.6.2. Fix any deviations. | 1-2 days | Medium |
 
-**Total estimated effort: 2-3 days, Medium difficulty**
+**Total estimated effort: 1-2 days, Medium difficulty**
 
 ---
 
