@@ -443,16 +443,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 39. Connection Pool Thread Dump Optimization (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 39.1 | `ConnectionPool.java:1273` | Stores full stack trace string; could store `StackTraceElement[]` directly | Change `getThreadDump()` to return `StackTraceElement[]`. Store array and format on-demand for display. Saves memory. | 0.5-1 day | Low |
-
-**Total estimated effort: 0.5-1 day, Low difficulty**
-
----
-
 ### 40. JDBC Pool JNDI Lookup (1 item)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
