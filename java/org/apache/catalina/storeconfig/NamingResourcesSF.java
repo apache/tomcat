@@ -27,6 +27,7 @@ import org.apache.tomcat.util.descriptor.web.ContextLocalEjb;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
+import org.apache.tomcat.util.descriptor.web.ContextService;
 
 /**
  * Store server.xml element NamingResources
@@ -86,6 +87,10 @@ public class NamingResourcesSF extends StoreFactoryBase {
             // Store nested <ResourceLink> elements
             ContextResourceLink[] resourceLinks = resources.findResourceLinks();
             storeElementArray(aWriter, indent, resourceLinks);
+
+            // Store nested <ServiceRef> elements
+            ContextService[] services = resources.findServices();
+            storeElementArray(aWriter, indent, services);
         }
     }
 }
