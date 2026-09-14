@@ -74,6 +74,28 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
+     * Remove a realm from the list of realms that are used to authenticate
+     * users.
+     *
+     * @param theRealm realm which should no longer be wrapped by the combined
+     *                 realm
+     *
+     * @return {@code true} if the realm was present and removed,
+     *         {@code false} otherwise
+     */
+    public boolean removeRealm(Realm theRealm) {
+        boolean removed = realms.remove(theRealm);
+
+        if (removed && log.isDebugEnabled()) {
+            log.debug(sm.getString("combinedRealm.removeRealm", theRealm.getClass().getName(),
+                    Integer.toString(realms.size())));
+        }
+
+        return removed;
+    }
+
+
+    /**
      * Returns the JMX ObjectNames of the realms that this realm is wrapping.
      * Entries for realms that do not implement LifecycleMBeanBase will be null.
      *
