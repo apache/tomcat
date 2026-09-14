@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.net.ssl.SSLHandshakeException;
-
+import javax.net.ssl.SSLException;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -121,7 +120,7 @@ public class TestCrlSupport extends TomcatBaseTest {
         try {
             ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
             body = res.toString();
-        } catch (SSLHandshakeException | SocketException e) {
+        } catch (SSLException | SocketException e) {
             // May be observed when client certificate is rejected
             body = "FAILED";
         }
