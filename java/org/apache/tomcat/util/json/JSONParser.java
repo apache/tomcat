@@ -75,6 +75,34 @@ public class JSONParser implements JSONParserConstants {
         return str.substring(0, pos);
     }
 
+    /**
+     * Resolve the JSON escape sequences of a string token body (the
+     * surrounding quotes are already removed). The token grammar only
+     * admits the short escapes: {@code \b}, {@code \f}, {@code \n},
+     * {@code \r}, {@code \t}, {@code \/}, {@code \\} and the
+     * self-escaped quote character.
+     */
+    private static String unescape(String value) {
+        StringBuilder result = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c != '\\' || i + 1 >= value.length()) {
+                result.append(c);
+                continue;
+            }
+            char next = value.charAt(++i);
+            switch (next) {
+                case 'b' -> result.append('\b');
+                case 'f' -> result.append('\f');
+                case 'n' -> result.append('\n');
+                case 'r' -> result.append('\r');
+                case 't' -> result.append('\t');
+                default -> result.append(next);
+            }
+        }
+        return result.toString();
+    }
+
     public void setNativeNumbers(boolean value) {
         this.nativeNumbers = value;
     }
@@ -452,7 +480,7 @@ public class JSONParser implements JSONParserConstants {
                 String image = token.image;
                 {
                     if ("" != null) {
-                        return image.substring(1, image.length() - 1);
+                        return unescape(image.substring(1, image.length() - 1));
                     }
                 }
                 break;
@@ -481,7 +509,7 @@ public class JSONParser implements JSONParserConstants {
                 String image = token.image;
                 {
                     if ("" != null) {
-                        return image.substring(1, image.length() - 1);
+                        return unescape(image.substring(1, image.length() - 1));
                     }
                 }
                 break;
