@@ -122,13 +122,18 @@ public class JSONParser {
                 continue;
             }
             char next = value.charAt(++i);
-            switch (next) {
-                case 'b' -> result.append('\b');
-                case 'f' -> result.append('\f');
-                case 'n' -> result.append('\n');
-                case 'r' -> result.append('\r');
-                case 't' -> result.append('\t');
-                default -> result.append(next);
+            if (next == 'b') {
+                result.append('\b');
+            } else if (next == 'f') {
+                result.append('\f');
+            } else if (next == 'n') {
+                result.append('\n');
+            } else if (next == 'r') {
+                result.append('\r');
+            } else if (next == 't') {
+                result.append('\t');
+            } else {
+                result.append(next);
             }
         }
         return result.toString();
