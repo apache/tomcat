@@ -404,6 +404,13 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
+        tag="ServiceRef"
+        standard="true"
+        default="false"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextService"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
         tag="Transaction"
         standard="true"
         default="false"
