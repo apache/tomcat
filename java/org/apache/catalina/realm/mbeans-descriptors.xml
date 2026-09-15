@@ -466,6 +466,15 @@
                  type="org.apache.catalina.Realm"/>
     </operation>
 
+    <operation   name="removeRealm"
+          description="Remove a Realm from the set of Realms wrapped by this realm"
+               impact="ACTION"
+           returnType="boolean">
+      <parameter name="theRealm"
+                 description="Realm to remove"
+                 type="org.apache.catalina.Realm"/>
+    </operation>
+
     <operation name="start" description="Start" impact="ACTION" returnType="void" />
     <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
     <operation name="init" description="Init" impact="ACTION" returnType="void" />
@@ -523,6 +532,15 @@
            returnType="void">
       <parameter name="theRealm"
                  description="New Realm to add"
+                 type="org.apache.catalina.Realm"/>
+    </operation>
+
+    <operation   name="removeRealm"
+          description="Remove a Realm from the set of Realms wrapped by this realm"
+               impact="ACTION"
+           returnType="boolean">
+      <parameter name="theRealm"
+                 description="Realm to remove"
                  type="org.apache.catalina.Realm"/>
     </operation>
 
