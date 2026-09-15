@@ -113,7 +113,9 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextLocalEjb;
@@ -137,11 +139,11 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * The Manager2 configuration API. Exposes the complete component tree of the Catalina {@code Server} (services,
  * engines, hosts, contexts, wrappers, valves, connectors, executors, listeners, host aliases, realms, TLS host
- * configurations, the context sub components manager, session id generator, resources, loader and cookie processor, and
- * the JNDI naming resources of the server and of the contexts), allows reading and updating the descriptor defined
- * attributes of any component, adding and removing child components, starting, stopping and restarting any component
- * that implements {@code Lifecycle}, and persisting the live state to {@code conf/server.xml} through the storeconfig
- * mechanism.
+ * configurations, the upgrade protocols of a connector, the context sub components manager, session id generator,
+ * resources, loader and cookie processor, and the JNDI naming resources of the server and of the contexts), allows
+ * reading and updating the descriptor defined attributes of any component, adding and removing child components,
+ * starting, stopping and restarting any component that implements {@code Lifecycle}, and persisting the live state to
+ * {@code conf/server.xml} through the storeconfig mechanism.
  * <p>
  * Changes are applied to the running server immediately. Persisting (store) rewrites {@code conf/server.xml} from the
  * live state and keeps a timestamped backup of the previous file.
@@ -198,6 +200,7 @@ import org.apache.tomcat.util.res.StringManager;
  *   server/service/{s}/connector/{index}
  *   server/service/{s}/connector/{i}/sslHostConfig/{hostName}
  *   server/service/{s}/connector/{i}/sslHostConfig/{h}/certificate/{index}
+ *   server/service/{s}/connector/{i}/upgradeProtocol/{index}
  *   server/service/{s}/executor/{name}
  *   server/service/{s}/valve/{index}
  *   server/service/{s}/listener/{index}
@@ -210,9 +213,10 @@ import org.apache.tomcat.util.res.StringManager;
  * <b>Attributes.</b> The property list of a node is derived from the modeler MBean descriptor of the component's class
  * (the same contract that defines the {@code Catalina:*} MBeans). The TLS components ({@code SSLHostConfig} and
  * {@code SSLHostConfigCertificate}), the context sub components ({@code WebappLoader}, {@code CookieProcessorBase}
- * subclasses and {@code SessionIdGeneratorBase} subclasses) and the JNDI entry nodes have no (complete) modeler
- * descriptor; their editable attribute list is defined explicitly by this servlet. Only attributes that map to a simple
- * UI type (boolean, integral, string, string array) are editable; everything else is reported read-only.
+ * subclasses and {@code SessionIdGeneratorBase} subclasses), the HTTP/2 upgrade protocol
+ * ({@code org.apache.coyote.http2.Http2Protocol}) and the JNDI entry nodes have no (complete) modeler descriptor; their
+ * editable attribute list is defined explicitly by this servlet. Only attributes that map to a simple UI type (boolean,
+ * integral, string, string array) are editable; everything else is reported read-only.
  * <p>
  * <b>Context sub components.</b> A running context always has exactly one manager, one resource root, one loader and
  * one cookie processor (the defaults are created at context start). Adding one of these to a context therefore replaces
@@ -226,6 +230,12 @@ import org.apache.tomcat.util.res.StringManager;
  * {@code sslHostConfig}, add or remove a {@code certificate}) restart the affected connector and roll back the change
  * if the restart fails (for example because the keystore does not exist or the password is wrong). The connector that
  * hosts this web application itself is never touched.
+ * <p>
+ * <b>Upgrade protocols.</b> A connector whose protocol handler is the HTTP/1.1 variant can carry upgrade protocols (the
+ * {@code UpgradeProtocol} interface; the only implementation shipped with Tomcat is the HTTP/2 one,
+ * {@code org.apache.coyote.http2.Http2Protocol}). An upgrade protocol is only referenced when the connector is
+ * initialised, so adding one does not change a running connector: it becomes active the next time the connector is
+ * (re)started (see the lifecycle operations). No live activation is attempted.
  * <p>
  * <b>JNDI naming resources.</b> The server and every context have a {@code namingResources} node (a
  * {@code NamingResourcesImpl}) that holds the JNDI entries: {@code resource}, {@code resourceLink},
@@ -495,6 +505,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             children.addAll(childrenOfListeners((LifecycleBase) context, id));
         } else if (component instanceof Connector connector) {
             children.addAll(sslHostConfigChildren(connector, id));
+            children.addAll(upgradeProtocolChildren(connector, id));
         } else if (component instanceof SSLHostConfig sslHostConfig) {
             children.addAll(certificateChildren(sslHostConfig, id));
         } else if (component instanceof CatalinaCluster cluster) {
@@ -581,6 +592,46 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    /**
+     * The tree entries of the upgrade protocols of a connector, addressed by a positional index in the order they were
+     * added.
+     */
+    private List<Map<String, Object>> upgradeProtocolChildren(Connector connector, String parentId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
+        for (int i = 0; i < upgradeProtocols.length; i++) {
+            UpgradeProtocol upgradeProtocol = upgradeProtocols[i];
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("id", parentId + "/upgradeProtocol/" + i);
+            entry.put("type", "upgradeProtocol");
+            entry.put("className", upgradeProtocol.getClass().getName());
+            entry.put("name", upgradeProtocolLabel(upgradeProtocol));
+            entry.put("children", new ArrayList<Map<String, Object>>());
+            result.add(entry);
+        }
+        return result;
+    }
+
+
+    /**
+     * A human readable name for an upgrade protocol: the ALPN name (e.g. h2), then the HTTP upgrade name (e.g. h2c),
+     * then the simple name of the class.
+     */
+    private static String upgradeProtocolLabel(UpgradeProtocol upgradeProtocol) {
+        String label = upgradeProtocol.getAlpnName();
+        if (label == null || label.isEmpty()) {
+            label = upgradeProtocol.getHttpUpgradeName(false);
+        }
+        if (label == null || label.isEmpty()) {
+            label = upgradeProtocol.getHttpUpgradeName(true);
+        }
+        if (label == null || label.isEmpty()) {
+            label = upgradeProtocol.getClass().getSimpleName();
+        }
+        return label;
+    }
+
+
     private List<Map<String, Object>> childrenOfConnectors(StandardService service, String parentId) {
         List<Map<String, Object>> result = new ArrayList<>();
         Connector[] connectors = service.findConnectors();
@@ -593,7 +644,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             entry.put("className", connector.getClass().getName());
             entry.put("name", connectorLabel(connector));
             entry.put("state", connector.getState().toString());
-            entry.put("children", sslHostConfigChildren(connector, id));
+            List<Map<String, Object>> connectorChildren = sslHostConfigChildren(connector, id);
+            connectorChildren.addAll(upgradeProtocolChildren(connector, id));
+            entry.put("children", connectorChildren);
             result.add(entry);
         }
         return result;
@@ -1018,6 +1071,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (component instanceof SSLHostConfigCertificate certificate) {
             return certificateLabel(certificate);
         }
+        if (component instanceof UpgradeProtocol upgradeProtocol) {
+            return upgradeProtocolLabel(upgradeProtocol);
+        }
         if (component instanceof ResourceBase entry) {
             return entry.getName();
         }
@@ -1341,6 +1397,51 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             new ExplicitAttribute("jvmRoute", "java.lang.String", true,
                     "The jvm route appended to the generated session ids (cluster failover)."),
             new ExplicitAttribute("sessionIdLength", "int", true, "The length of the generated session ids in bytes."));
+
+
+    // The HTTP/2 upgrade protocol has no modeler descriptor either. Only the
+    // common, documented knobs are listed (like the cluster channel
+    // components). All changes take effect when the owning connector is
+    // (re)started, the same as the protocol itself.
+    private static final List<ExplicitAttribute> HTTP2_PROTOCOL_ATTRIBUTES = List.of(
+            new ExplicitAttribute("readTimeout", "long", true, "The socket level read timeout in milliseconds."),
+            new ExplicitAttribute("writeTimeout", "long", true, "The socket level write timeout in milliseconds."),
+            new ExplicitAttribute("keepAliveTimeout", "long", true, "The keep alive timeout in milliseconds."),
+            new ExplicitAttribute("streamReadTimeout", "long", true, "The stream level read timeout in milliseconds."),
+            new ExplicitAttribute("streamWriteTimeout", "long", true,
+                    "The stream level write timeout in milliseconds."),
+            new ExplicitAttribute("maxConcurrentStreams", "long", true,
+                    "The maximum number of concurrent streams per connection."),
+            new ExplicitAttribute("maxConcurrentStreamExecution", "int", true,
+                    "The maximum number of concurrently executing streams per connection."),
+            new ExplicitAttribute("initialWindowSize", "int", true,
+                    "The initial window size advertised to the client in bytes."),
+            new ExplicitAttribute("useSendfile", "boolean", true, "Whether to use sendfile for file transfers."),
+            new ExplicitAttribute("allowSchemeMismatch", "boolean", true,
+                    "Whether HTTP/2 streams may provide a scheme that does not match the transport."),
+            new ExplicitAttribute("maxHeaderCount", "int", true, "The maximum number of headers allowed per request."),
+            new ExplicitAttribute("maxHeaderSize", "int", false,
+                    "The maximum size of request headers in bytes (set on the HTTP/1.1 protocol handler)."),
+            new ExplicitAttribute("maxTrailerCount", "int", true,
+                    "The maximum number of trailer headers allowed per request."),
+            new ExplicitAttribute("maxTrailerSize", "int", false,
+                    "The maximum size of trailer headers in bytes (set on the HTTP/1.1 protocol handler)."),
+            new ExplicitAttribute("overheadCountFactor", "int", true,
+                    "The overhead count factor used for overhead frame tracking."),
+            new ExplicitAttribute("overheadResetFactor", "int", true,
+                    "The overhead reset factor used for RST frame tracking."),
+            new ExplicitAttribute("overheadContinuationThreshold", "int", true,
+                    "The payload size threshold for CONTINUATION frame overhead tracking in bytes."),
+            new ExplicitAttribute("overheadDataThreshold", "int", true,
+                    "The payload size threshold for DATA frame overhead tracking in bytes."),
+            new ExplicitAttribute("overheadWindowUpdateThreshold", "int", true,
+                    "The payload size threshold for WINDOW_UPDATE frame overhead tracking in bytes."),
+            new ExplicitAttribute("initiatePingDisabled", "boolean", true,
+                    "Whether the periodic PING frames that keep the connection alive are disabled."),
+            new ExplicitAttribute("discardRequestsAndResponses", "boolean", true,
+                    "Whether requests and responses are discarded after processing instead of being recycled."),
+            new ExplicitAttribute("drainTimeout", "long", true,
+                    "The additional time in nanoseconds between the first and the final GOAWAY while a connection is drained."));
 
 
     // --------------------------------- Cluster channel attributes
@@ -1763,6 +1864,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (component instanceof SessionIdGeneratorBase) {
             return SESSION_ID_GENERATOR_ATTRIBUTES;
         }
+        if (component instanceof Http2Protocol) {
+            return HTTP2_PROTOCOL_ATTRIBUTES;
+        }
         if (component instanceof GroupChannel) {
             return CHANNEL_ATTRIBUTES;
         }
@@ -2106,6 +2210,18 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     }
                     parent = current;
                     current = found;
+                }
+                case "upgradeProtocol" -> {
+                    if (!(current instanceof Connector connector)) {
+                        throw notFound();
+                    }
+                    UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
+                    int index = index(value);
+                    if (index < 0 || index >= upgradeProtocols.length) {
+                        throw notFound();
+                    }
+                    parent = current;
+                    current = upgradeProtocols[index];
                 }
                 case "certificate" -> {
                     if (!(current instanceof SSLHostConfig hostConfig)) {
@@ -2496,6 +2612,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             type = "sslHostConfig";
         } else if (current instanceof SSLHostConfigCertificate) {
             type = "certificate";
+        } else if (current instanceof UpgradeProtocol) {
+            type = "upgradeProtocol";
         } else if (current instanceof LifecycleListener) {
             type = "listener";
         } else {
@@ -2952,6 +3070,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             case "localEjb" -> addNamingEntry(response, parent, body, "localEjb");
             case "serviceRef" -> addNamingEntry(response, parent, body, "serviceRef");
             case "sslHostConfig" -> addSslHostConfig(response, parent, body);
+            case "upgradeProtocol" -> addUpgradeProtocol(response, parent, body);
             case "certificate" -> addCertificate(response, parent, body);
             case "cluster" -> addCluster(response, parent, body);
             case "clusterValve" -> addClusterValve(response, parent, body);
@@ -4266,6 +4385,53 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
+     * Add an upgrade protocol (e.g. the HTTP/2 one) to a connector through {@code AbstractHttp11Protocol
+     * .addUpgradeProtocol}. An upgrade protocol is only referenced when the connector is initialised, so the new
+     * instance does not take effect on a running connector: it becomes active the next time the connector is
+     * (re)started (see the lifecycle operations). No live activation is attempted.
+     */
+    private void addUpgradeProtocol(HttpServletResponse response, NodeRef parent, Map<String, Object> body)
+            throws Exception {
+
+        if (!(parent.component instanceof Connector connector)) {
+            throw badParent("upgradeProtocol");
+        }
+        if (http11ProtocolHandler(connector) == null) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BAD_PARENT",
+                    sm.getString("manager2.configUpgradeUnsupported", connector.getProtocolHandlerClassName()));
+        }
+        String className = string(body.get("className"));
+        if (className == null || className.isEmpty()) {
+            // The only UpgradeProtocol shipped with Tomcat is the HTTP/2 one.
+            className = "org.apache.coyote.http2.Http2Protocol";
+        }
+        UpgradeProtocol upgradeProtocol;
+        try {
+            // Upgrade protocols are server level classes: never use the webapp
+            // class loader.
+            upgradeProtocol = (UpgradeProtocol) Class.forName(className, true, server.getClass().getClassLoader())
+                    .getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
+                    sm.getString("manager2.configInvalidClass", className));
+        }
+        // The protocol handler keeps the protocols in a plain list without
+        // checking for duplicates; a second protocol with the same name would
+        // be silently shadowed when the connector is next initialised, so
+        // reject it here.
+        String label = upgradeProtocolLabel(upgradeProtocol);
+        for (UpgradeProtocol existing : connector.findUpgradeProtocols()) {
+            if (label.equals(upgradeProtocolLabel(existing))) {
+                throw duplicate(label);
+            }
+        }
+        connector.addUpgradeProtocol(upgradeProtocol);
+        log(sm.getString("manager2.configAuditAdd", "upgradeProtocol", label));
+        Api.ok(response, sm.getString("manager2.configUpgradeProtocolAdded", label));
+    }
+
+
+    /**
      * Add a certificate configuration to an SSL host configuration. On a running, TLS enabled connector the new
      * certificate is applied at once (the SSL context of the virtual host is re-created, which also validates the
      * keystore); when that fails the certificate is rolled back.
@@ -4358,15 +4524,25 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
+     * The protocol handler of the connector when it is the HTTP/1.1 variant, otherwise {@code null} (for example an AJP
+     * connector).
+     */
+    @SuppressWarnings("rawtypes")
+    private static AbstractHttp11Protocol http11ProtocolHandler(Connector connector) {
+        if (connector.getProtocolHandler() instanceof AbstractHttp11Protocol http11) {
+            return http11;
+        }
+        return null;
+    }
+
+
+    /**
      * The protocol handler of the connector when it is the HTTP/1.1 variant that supports TLS, otherwise {@code null}
      * (for example an AJP connector).
      */
     @SuppressWarnings("rawtypes")
     private static AbstractHttp11Protocol sslProtocolHandler(Connector connector) {
-        if (connector.getProtocolHandler() instanceof AbstractHttp11Protocol http11) {
-            return http11;
-        }
-        return null;
+        return http11ProtocolHandler(connector);
     }
 
 
@@ -4431,6 +4607,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     }
 
 
+    @SuppressWarnings("rawtypes")
     private void removeChild(HttpServletResponse response, Map<String, Object> body) throws Exception {
 
         String id = string(body.get("id"));
@@ -4507,8 +4684,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         String label = ref.aliasValue != null ? ref.aliasValue : displayName(ref.component, ref.type);
         if (Set.of("host", "context", "service", "engine", "connector", "executor", "wrapper", "valve", "sslHostConfig",
-                "realm", "cluster", "resource", "resourceLink", "resourceEnvRef", "environment", "ejb", "localEjb",
-                "serviceRef").contains(ref.type)) {
+                "upgradeProtocol", "realm", "cluster", "resource", "resourceLink", "resourceEnvRef", "environment",
+                "ejb", "localEjb", "serviceRef").contains(ref.type)) {
             String confirm = string(body.get("confirm"));
             if (!label.equals(confirm)) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "CONFIRM_REQUIRED",
@@ -4536,6 +4713,13 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 case "alias" -> ((Host) ref.component).removeAlias(ref.aliasValue);
                 case "listener" ->
                     ((LifecycleBase) ref.parent).removeLifecycleListener((LifecycleListener) ref.component);
+                case "upgradeProtocol" -> {
+                    AbstractHttp11Protocol http11 = http11ProtocolHandler((Connector) ref.parent);
+                    if (http11 == null) {
+                        throw notFound();
+                    }
+                    http11.removeUpgradeProtocol((UpgradeProtocol) ref.component);
+                }
                 case "realm" -> removeRealm((Realm) ref.component, ref.parent);
                 case "engine" -> ((StandardService) ref.parent).setContainer(null);
                 case "service" -> server.removeService((Service) ref.component);
@@ -4858,8 +5042,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     /**
      * Whether stopping or starting this component would interrupt access to this web application: the component is the
      * server itself, or the service, engine, host, context, connector or wrapper that route or host the requests of
-     * this web application. A {@code restart} of such a component remains possible (the client reconnects at the end
-     * of the operation).
+     * this web application. A {@code restart} of such a component remains possible (the client reconnects at the end of
+     * the operation).
      */
     private boolean affectsSelf(NodeRef ref) {
         Object component = ref.component;

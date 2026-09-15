@@ -32,9 +32,10 @@ const CHILD_TYPES = {
   host: ['context', 'alias', 'realm', 'valve', 'cluster'],
   context: ['wrapper', 'realm', 'manager', 'resources', 'loader', 'cookieProcessor', 'valve', 'cluster'],
   wrapper: [],
-  connector: ['sslHostConfig'],
+  connector: ['sslHostConfig', 'upgradeProtocol'],
   sslHostConfig: ['certificate'],
   certificate: [],
+  upgradeProtocol: [],
   realm: [],
   manager: ['sessionIdGenerator'],
   cluster: ['channel', 'deployer', 'clusterValve', 'clusterManager', 'clusterListener'],
@@ -532,6 +533,11 @@ export async function configuration(container) {
         noteWrap.append(el('p', { class: 'muted' },
             'The options of a first party factory are shown as fields; further parameters can be edited in the entry detail.'));
       }
+      if (type === 'upgradeProtocol') {
+        noteWrap.append(el('p', { class: 'muted' },
+            'The default class is the HTTP/2 upgrade protocol. '
+            + 'The protocol only becomes active when the connector is restarted.'));
+      }
     }
     // The factory options of a resource depend on the (effective)
     // factory; re-render when the user leaves those fields.
@@ -765,6 +771,8 @@ export async function configuration(container) {
         ];
       case 'certificate':
         return certificateFields();
+      case 'upgradeProtocol':
+        return [['Class name', input('c-class', 'text', 'org.apache.coyote.http2.Http2Protocol'), true]];
       default:
         return [];
     }
@@ -828,6 +836,7 @@ export async function configuration(container) {
         return ids;
       }
       case 'certificate': return certificateFieldIds();
+      case 'upgradeProtocol': return [['className', 'c-class']];
       default: return [];
     }
   }

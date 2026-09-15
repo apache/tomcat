@@ -995,6 +995,160 @@ public class TestManager2Config extends TomcatBaseTest {
 
 
     @Test
+    public void testUpgradeProtocol() throws Exception {
+        setup();
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+        String token = loginAndGetToken(client, "manager1");
+
+        // A dedicated service so that the test never touches the
+        // connector that hosts this web application itself.
+        String serviceId = "server/service/CatalinaH2";
+        String connectorId = null;
+        int port = 0;
+
+        try {
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"server\",\"type\":\"service\",\"name\":\"CatalinaH2\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+
+            port = freePort();
+            request(client, "POST", MANAGER2 + "/api/config/child", token, "{\"parent\":\"" + serviceId +
+                    "\",\"type\":\"connector\",\"protocol\":\"HTTP/1.1\",\"port\":" + port + "}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            connectorId = serviceId + "/connector/0";
+
+            // Guards ---------------------------------------------------
+
+            // An upgrade protocol can only be added to a connector.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + serviceId + "/engine/CatalinaH2\"," + "\"type\":\"upgradeProtocol\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("BAD_PARENT"));
+
+            // A class that is not an UpgradeProtocol is rejected.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + connectorId + "\",\"type\":\"upgradeProtocol\"," +
+                            "\"className\":\"java.lang.String\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("INVALID_CLASS"));
+
+            // Add ------------------------------------------------------
+
+            // Add with the default class (no className in the body): the
+            // only UpgradeProtocol shipped with Tomcat is the HTTP/2 one.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + connectorId + "\",\"type\":\"upgradeProtocol\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            Assert.assertTrue(client.getResponseBody().contains("h2"));
+
+            String upgradeProtocolId = connectorId + "/upgradeProtocol/0";
+
+            // The protocol is visible in the tree ...
+            Map<String, Object> tree = fetchTree(client);
+            Map<String, Object> connectorNode = findChildById(tree, connectorId);
+            Assert.assertNotNull("Expected the connector in the tree", connectorNode);
+            Map<String, Object> upNode = findChild(connectorNode, "upgradeProtocol", "h2");
+            Assert.assertNotNull("Expected the upgrade protocol in the tree", upNode);
+            Assert.assertEquals(upgradeProtocolId, upNode.get("id"));
+            Assert.assertEquals("org.apache.coyote.http2.Http2Protocol", upNode.get("className"));
+            // ...and the node detail resolves (no lifecycle: no state).
+            Map<String, Object> detail = fetchNode(client, upgradeProtocolId);
+            Assert.assertEquals("upgradeProtocol", detail.get("type"));
+            Assert.assertEquals("h2", detail.get("name"));
+            Assert.assertEquals("org.apache.coyote.http2.Http2Protocol", detail.get("className"));
+            Assert.assertNull(detail.get("state"));
+            Assert.assertNull(detail.get("lifecycle"));
+
+            // The node detail lists the HTTP/2 settings of the protocol
+            // (the class has no modeler descriptor; the list is
+            // explicit).
+            Assert.assertEquals(22, getList(detail, "properties").size());
+            Assert.assertEquals(5000L,
+                    ((Number) findProperty(detail, "readTimeout").get("value")).longValue());
+            Assert.assertEquals(100L,
+                    ((Number) findProperty(detail, "maxConcurrentStreams").get("value")).longValue());
+            Assert.assertEquals(Boolean.TRUE, findProperty(detail, "useSendfile").get("writable"));
+            Assert.assertEquals(Boolean.TRUE, findProperty(detail, "maxConcurrentStreams").get("writable"));
+            // The header/trailer sizes come from the HTTP/1.1 protocol
+            // handler: they are read-only.
+            Assert.assertEquals(Boolean.FALSE, findProperty(detail, "maxHeaderSize").get("writable"));
+            Assert.assertEquals(Boolean.FALSE, findProperty(detail, "maxTrailerSize").get("writable"));
+
+            // A setting can be updated; like the protocol itself it
+            // takes effect when the connector is restarted.
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + upgradeProtocolId + "\",\"name\":\"maxConcurrentStreams\",\"value\":500}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            detail = fetchNode(client, upgradeProtocolId);
+            Assert.assertEquals(500L,
+                    ((Number) findProperty(detail, "maxConcurrentStreams").get("value")).longValue());
+
+            // Guards: a read-only and an unknown attribute are refused,
+            // as is a value that does not convert to the attribute type.
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + upgradeProtocolId + "\",\"name\":\"maxHeaderSize\",\"value\":100}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("READ_ONLY"));
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + upgradeProtocolId + "\",\"name\":\"bogus\",\"value\":1}", 404);
+            Assert.assertTrue(client.getResponseBody().contains("ATTRIBUTE_NOT_FOUND"));
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + upgradeProtocolId + "\",\"name\":\"maxConcurrentStreams\",\"value\":\"abc\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("INVALID_VALUE"));
+
+            // The running connector is unchanged: the protocol (and its
+            // settings) only take effect when the connector is
+            // restarted, so it keeps serving plain HTTP.
+            int status = httpGetPlain(port, "/");
+            Assert.assertTrue("Expected plain HTTP, got " + status, status >= 200 && status < 600);
+
+            // A second protocol with the same name is rejected.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + connectorId + "\",\"type\":\"upgradeProtocol\"}", 409);
+            Assert.assertTrue(client.getResponseBody().contains("DUPLICATE"));
+
+            // The upgrade protocol is part of the stored server.xml,
+            // including the changed setting (attributes that still have
+            // their default value are not written).
+            request(client, "GET", MANAGER2 + "/api/config/store/preview", null, null, 200);
+            String xml = (String) parseObject(client.getResponseBody()).get("xml");
+            Assert.assertTrue(xml.contains("<UpgradeProtocol"));
+            Assert.assertTrue(xml.contains("org.apache.coyote.http2.Http2Protocol"));
+            Assert.assertTrue(xml.contains("maxConcurrentStreams=\"500\""));
+
+            // Remove ---------------------------------------------------
+
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                    "{\"id\":\"" + upgradeProtocolId + "\",\"confirm\":\"h2\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            connectorNode = findChildById(fetchTree(client), connectorId);
+            Assert.assertNull("Expected the upgrade protocol to be gone",
+                    findChild(connectorNode, "upgradeProtocol", "h2"));
+        } finally {
+            // Best effort cleanup (ignore failures, including assertion
+            // errors: the failure of the test itself is reported).
+            try {
+                if (connectorId != null) {
+                    request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                            "{\"id\":\"" + connectorId + "\"," + "\"confirm\":\"HTTP/1.1 (port " + port + ")\"}",
+                            200);
+                }
+            } catch (Throwable e) {
+                // Best effort.
+            }
+            try {
+                request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                        "{\"id\":\"" + serviceId + "\",\"confirm\":\"CatalinaH2\"}", 200);
+            } catch (Throwable e) {
+                // Best effort.
+            }
+        }
+
+        client.disconnect();
+    }
+
+
+    @Test
     public void testRealm() throws Exception {
         setup();
 
