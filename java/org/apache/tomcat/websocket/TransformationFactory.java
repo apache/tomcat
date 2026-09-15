@@ -33,7 +33,7 @@ public class TransformationFactory {
 
     private static final TransformationFactory factory = new TransformationFactory();
 
-    private Map<String,TransformationBuilder> builders = new HashMap<>();
+    private final Map<String,TransformationBuilder> builders = new HashMap<>();
 
 
     private TransformationFactory() {
