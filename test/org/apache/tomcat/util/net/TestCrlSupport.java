@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.net.ssl.SSLException;
+
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
