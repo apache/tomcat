@@ -257,7 +257,7 @@
         message size. (remm)
       </fix>
       <fix>
-        Small per performance optimisation. Don't waste cycles swallowing an AJP
+        Small performance optimisation. Don't waste cycles swallowing an AJP
         request body when the connection is going to be closed. (markt)
       </fix>
       <fix>
