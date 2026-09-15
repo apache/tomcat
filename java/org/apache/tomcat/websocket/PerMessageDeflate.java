@@ -691,7 +691,8 @@ public class PerMessageDeflate implements Transformation {
         if (isServer && !serverContextTakeover || !isServer && !clientContextTakeover) {
             try {
                 deflater.reset();
-            } catch (NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
+                // As of Java 25, the JRE throws an ISE rather than an NPE
                 throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
             }
         }
