@@ -52,7 +52,8 @@ import org.apache.tomcat.util.json.JSONParser;
  * Integration tests for the manager2 configuration API ({@code /api/config/*}). The tests deploy the
  * {@code manager2.war} built by this module (via the {@code deploy} target) into a throw-away Tomcat instance and drive
  * it over HTTP with {@link SimpleHttpClient}, exercising the component tree, attribute updates, structural add/remove
- * of child components, and persistence to {@code server.xml} through storeconfig.
+ * of child components, lifecycle operations (start / stop / restart), and persistence to {@code server.xml} through
+ * storeconfig.
  */
 public class TestManager2Config extends TomcatBaseTest {
 
@@ -403,6 +404,162 @@ public class TestManager2Config extends TomcatBaseTest {
             Assert.assertFalse(client.getResponseBody().contains(serviceId));
         } finally {
             cleanup(client, token, serviceId, hostId, contextId, wrapperId, valveId, connectorId, executorId, aliasId);
+        }
+
+        client.disconnect();
+    }
+
+
+    @Test
+    public void testLifecycle() throws Exception {
+        setup(true);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+        String token = loginAndGetToken(client, "manager1");
+
+        String serviceId = null;
+        String hostId = null;
+        String contextId = null;
+
+        try {
+            // A throw-away service that never hosts this web application.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"server\",\"type\":\"service\",\"name\":\"LifecycleSvc\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            serviceId = "server/service/LifecycleSvc";
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + serviceId + "/engine/LifecycleSvc\"," +
+                            "\"type\":\"host\",\"name\":\"lifecycle-host\"}", 200);
+            hostId = serviceId + "/engine/LifecycleSvc/host/lifecycle-host";
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + hostId + "\",\"type\":\"context\",\"path\":\"/lifecycle\"}", 200);
+            contextId = hostId + "/context/+lifecycle";
+
+            // The node detail flags -------------------------------------
+            //
+            // The server is a lifecycle, and a start or stop of it always
+            // affects this web application.
+            Map<String, Object> serverNode = fetchNode(client, "server");
+            Assert.assertEquals(Boolean.TRUE, serverNode.get("lifecycle"));
+            Assert.assertEquals(Boolean.TRUE, serverNode.get("affectsSelf"));
+
+            // The components that route this web application are reported
+            // as affecting it as well. Their ids are derived from the id
+            // of the self context (server/service/{s}/engine/{e}/host/{h}/
+            // context/{p}).
+            String selfCtxId = selfContextId(fetchTree(client));
+            int ctxIx = selfCtxId.lastIndexOf("/context/");
+            String selfHostId = selfCtxId.substring(0, ctxIx);
+            int hostIx = selfHostId.lastIndexOf("/host/");
+            String selfEngineId = selfHostId.substring(0, hostIx);
+            int engIx = selfEngineId.lastIndexOf("/engine/");
+            String selfServiceId = selfEngineId.substring(0, engIx);
+            String selfConnectorId = selfServiceId + "/connector/0";
+            for (String id : new String[] { selfServiceId, selfEngineId, selfHostId, selfCtxId,
+                    selfConnectorId }) {
+                Map<String, Object> node = fetchNode(client, id);
+                Assert.assertEquals(Boolean.TRUE, node.get("lifecycle"));
+                Assert.assertEquals("Expected " + id + " to affect this web application",
+                        Boolean.TRUE, node.get("affectsSelf"));
+            }
+            // A wrapper of the context that runs this web application
+            // affects it as well.
+            Map<String, Object> selfWrapper = firstChildOfType(fetchNode(client, selfCtxId), "wrapper");
+            Assert.assertNotNull(selfWrapper);
+            Map<String, Object> wrapperNode = fetchNode(client, (String) selfWrapper.get("id"));
+            Assert.assertEquals(Boolean.TRUE, wrapperNode.get("lifecycle"));
+            Assert.assertEquals(Boolean.TRUE, wrapperNode.get("affectsSelf"));
+
+            // The throw-away components are lifecycles as well, but they
+            // do not affect this web application.
+            for (String id : new String[] { serviceId, hostId, contextId }) {
+                Map<String, Object> node = fetchNode(client, id);
+                Assert.assertEquals(Boolean.TRUE, node.get("lifecycle"));
+                Assert.assertNull("Expected " + id + " not to affect this web application",
+                        node.get("affectsSelf"));
+            }
+            // A valve is a lifecycle as well (ValveBase extends
+            // LifecycleBase).
+            Map<String, Object> valveNode = fetchNode(client, selfCtxId + "/valve/0");
+            Assert.assertEquals(Boolean.TRUE, valveNode.get("lifecycle"));
+            Assert.assertNull(valveNode.get("affectsSelf"));
+
+            // A component without a lifecycle (a JNDI entry) does not
+            // report the flag at all.
+            String envId = selfCtxId + "/namingResources/0/environment/lcenv";
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + selfCtxId + "/namingResources/0\",\"type\":\"environment\"," +
+                            "\"name\":\"lcenv\",\"jndiType\":\"java.lang.String\",\"value\":\"x\"}",
+                    200);
+            Map<String, Object> envNode = fetchNode(client, envId);
+            Assert.assertNull(envNode.get("lifecycle"));
+
+            // Guards: a start or stop of a component that affects this
+            // web application is refused (a restart is not - but it is
+            // not exercised here, as it would restart the very server
+            // that serves this test).
+            for (String id : new String[] { "server", selfServiceId, selfEngineId, selfHostId,
+                    selfCtxId, selfConnectorId, (String) selfWrapper.get("id") }) {
+                request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                        "{\"id\":\"" + id + "\",\"op\":\"stop\"}", 403);
+                Assert.assertTrue(client.getResponseBody().contains("SELF_COMPONENT"));
+                request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                        "{\"id\":\"" + id + "\",\"op\":\"start\"}", 403);
+                Assert.assertTrue(client.getResponseBody().contains("SELF_COMPONENT"));
+            }
+
+            // Stop / start / restart of a component that does not affect
+            // this web application.
+            //
+            // Stop.
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"stop\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            Map<String, Object> ctx = fetchNode(client, contextId);
+            Assert.assertEquals("STOPPED", ctx.get("state"));
+            // A second stop is a (reported) no-op.
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"stop\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("already stopped"));
+            // Start.
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"start\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            ctx = fetchNode(client, contextId);
+            Assert.assertEquals("STARTED", ctx.get("state"));
+            // A second start is a (reported) no-op.
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"start\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("already running"));
+            // Restart (stop followed by start).
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"restart\"}", 200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            ctx = fetchNode(client, contextId);
+            Assert.assertEquals("STARTED", ctx.get("state"));
+
+            // Guards: an unknown operation and a component without a
+            // lifecycle are rejected.
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + contextId + "\",\"op\":\"bogus\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("INVALID_OP"));
+            request(client, "POST", MANAGER2 + "/api/config/lifecycle", token,
+                    "{\"id\":\"" + envId + "\",\"op\":\"stop\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("NOT_A_LIFECYCLE"));
+
+            // Remove the throw-away components (leaves first).
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                    "{\"id\":\"" + envId + "\",\"confirm\":\"lcenv\"}", 200);
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                    "{\"id\":\"" + contextId + "\",\"confirm\":\"/lifecycle\"}", 200);
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                    "{\"id\":\"" + hostId + "\",\"confirm\":\"lifecycle-host\"}", 200);
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token,
+                    "{\"id\":\"" + serviceId + "\",\"confirm\":\"LifecycleSvc\"}", 200);
+        } finally {
+            cleanup(client, token, serviceId, hostId, contextId, null, null, null, null, null);
         }
 
         client.disconnect();

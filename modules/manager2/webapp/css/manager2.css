@@ -291,6 +291,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 table.data .muted { color: var(--text-faint); }
 
 .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.row-actions .row-actions-sep { align-self: stretch; width: 1px; margin: 2px 3px; background: var(--border); }
 
 /* ============================ Log pages ================================= */
 

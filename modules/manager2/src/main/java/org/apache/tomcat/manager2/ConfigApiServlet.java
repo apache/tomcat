@@ -139,11 +139,21 @@ import org.apache.tomcat.util.res.StringManager;
  * engines, hosts, contexts, wrappers, valves, connectors, executors, listeners, host aliases, realms, TLS host
  * configurations, the context sub components manager, session id generator, resources, loader and cookie processor, and
  * the JNDI naming resources of the server and of the contexts), allows reading and updating the descriptor defined
- * attributes of any component, adding and removing child components, and persisting the live state to
- * {@code conf/server.xml} through the storeconfig mechanism.
+ * attributes of any component, adding and removing child components, starting, stopping and restarting any component
+ * that implements {@code Lifecycle}, and persisting the live state to {@code conf/server.xml} through the storeconfig
+ * mechanism.
  * <p>
  * Changes are applied to the running server immediately. Persisting (store) rewrites {@code conf/server.xml} from the
  * live state and keeps a timestamped backup of the previous file.
+ * <p>
+ * <b>Lifecycle operations.</b> Not every change takes effect until the affected component is restarted (which
+ * attributes apply live is not documented), so the API offers explicit lifecycle operations: {@code start}, {@code
+ * stop} and {@code restart} (a stop followed by a start) for every component that implements {@code Lifecycle}. A
+ * {@code start} or {@code stop} of a component that would interrupt access to this web application (the server itself,
+ * the service, engine, host or context that route it, the connector that serves it and the wrappers of the context it
+ * runs in) is refused (403 {@code SELF_COMPONENT}): the request would lose its way back. A {@code restart} of such a
+ * component is still allowed: the client's connection may be interrupted during the operation, but the component is
+ * running again at the end and the client reconnects (re-logging in when the admin session was reset by the restart).
  * <p>
  * <b>Contexts keep their storage location</b> when the configuration is persisted, mirroring regular StoreConfig
  * behavior: a context that is backed by its own configuration file (its {@code META-INF/context.xml} or
@@ -361,6 +371,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 addChild(response, body);
             } else if ("/api/config/store".equals(path)) {
                 store(response);
+            } else if ("/api/config/lifecycle".equals(path)) {
+                lifecycle(response, body);
             } else {
                 Api.notFound(response);
             }
@@ -1041,6 +1053,20 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // is just a name, not a component that holds listeners).
         out.put("acceptsListener",
                 !"alias".equals(ref.type) && !CLUSTER_SUB_TYPES.contains(ref.type) && component instanceof Lifecycle);
+        // Whether the component has a lifecycle (and therefore supports
+        // the start / stop / restart operations).
+        if (component instanceof Lifecycle) {
+            out.put("lifecycle", Boolean.TRUE);
+            // Whether a start or stop of the component would interrupt
+            // access to this web application (only a restart is allowed
+            // for it; the client reconnects at the end of the operation).
+            // Not derivable on the client for the service, the engine
+            // and the connector (which of them route the requests of
+            // this web application is a server-side decision).
+            if (affectsSelf(ref)) {
+                out.put("affectsSelf", Boolean.TRUE);
+            }
+        }
 
         if ("connector".equals(ref.type) && component instanceof Connector connector) {
             out.put("sslEnabled", isSslEnabled(connector));
@@ -4727,6 +4753,126 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     private static ConfigException badParent(String type) {
         return new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BAD_PARENT",
                 sm.getString("manager2.configParentInvalid", type));
+    }
+
+
+    // -------------------------------------------------------- Lifecycle ops
+
+
+    /**
+     * Start, stop or restart one component of the server tree.
+     * <p>
+     * A {@code start} or {@code stop} of a component that would interrupt access to this web application itself (see
+     * {@link #affectsSelf(NodeRef)}) is refused (403 {@code SELF_COMPONENT}): the request would lose its way back. A
+     * {@code restart} (a stop, when the component is running, followed by a start) remains possible for those
+     * components: the client's connection may be interrupted during the operation, but the component is running again
+     * at the end and the client reconnects (re-logging in when the admin session was reset by the restart).
+     */
+    private void lifecycle(HttpServletResponse response, Map<String, Object> body) throws Exception {
+
+        String id = string(body.get("id"));
+        String op = string(body.get("op"));
+        if (id == null || op == null || op.isEmpty()) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
+                    sm.getString("manager2.configInvalidId"));
+        }
+        boolean start = "start".equals(op);
+        boolean stop = "stop".equals(op);
+        boolean restart = "restart".equals(op);
+        if (!start && !stop && !restart) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_OP",
+                    sm.getString("manager2.configInvalidOp", op));
+        }
+
+        NodeRef ref = resolve(id);
+        if (!(ref.component instanceof Lifecycle lifecycle)) {
+            String label = ref.aliasValue != null ? ref.aliasValue : displayName(ref.component, ref.type);
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "NOT_A_LIFECYCLE",
+                    sm.getString("manager2.configNotALifecycle", label));
+        }
+        if (!restart && affectsSelf(ref)) {
+            throw self();
+        }
+        String label = ref.aliasValue != null ? ref.aliasValue : displayName(ref.component, ref.type);
+
+        if (stop) {
+            if (!lifecycle.getState().isAvailable()) {
+                Api.ok(response, sm.getString("manager2.configAlreadyStopped", label));
+                return;
+            }
+            stopChecked(lifecycle, label);
+            log(sm.getString("manager2.configAuditLifecycle", "stopped", label));
+            Api.ok(response, sm.getString("manager2.configStopped", label));
+            return;
+        }
+
+        if (restart && lifecycle.getState().isAvailable()) {
+            stopChecked(lifecycle, label);
+        }
+        if (start && lifecycle.getState().isAvailable()) {
+            Api.ok(response, sm.getString("manager2.configAlreadyRunning", label));
+            return;
+        }
+        startChecked(lifecycle, label);
+        log(sm.getString("manager2.configAuditLifecycle", restart ? "restarted" : "started", label));
+        Api.ok(response, sm.getString(restart ? "manager2.configRestarted" : "manager2.configStarted", label));
+    }
+
+
+    /**
+     * Stop the component, raising a controlled error when it cannot be stopped or does not stop.
+     */
+    private void stopChecked(Lifecycle lifecycle, String label) throws ConfigException {
+        try {
+            lifecycle.stop();
+        } catch (Exception e) {
+            log(sm.getString("manager2.error.config"), e);
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "STOP_FAILED",
+                    sm.getString("manager2.configStopFailed", label, rootMessage(e)));
+        }
+        if (lifecycle.getState().isAvailable()) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "STOP_FAILED",
+                    sm.getString("manager2.configStopFailed", label, "the component did not stop"));
+        }
+    }
+
+
+    /**
+     * Start the component, raising a controlled error when it cannot be started or does not start.
+     */
+    private void startChecked(Lifecycle lifecycle, String label) throws ConfigException {
+        try {
+            lifecycle.start();
+        } catch (Exception e) {
+            log(sm.getString("manager2.error.config"), e);
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
+                    sm.getString("manager2.configStartFailed", label, rootMessage(e)));
+        }
+        if (!lifecycle.getState().isAvailable()) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
+                    sm.getString("manager2.configStartFailed", label, "the component did not start"));
+        }
+    }
+
+
+    /**
+     * Whether stopping or starting this component would interrupt access to this web application: the component is the
+     * server itself, or the service, engine, host, context, connector or wrapper that route or host the requests of
+     * this web application. A {@code restart} of such a component remains possible (the client reconnects at the end
+     * of the operation).
+     */
+    private boolean affectsSelf(NodeRef ref) {
+        Object component = ref.component;
+        return switch (ref.type) {
+            case "server" -> true;
+            case "service" -> component instanceof StandardService service && containsSelf(service);
+            case "engine" -> component instanceof Engine engine && engine.findChild(selfHost.getName()) instanceof Host;
+            case "host" -> component == selfHost;
+            case "context" -> component == selfContext;
+            case "connector" -> component instanceof Connector connector && isSelfConnector(connector);
+            case "wrapper" -> component instanceof Wrapper wrapper && wrapper.getParent() == selfContext;
+            default -> false;
+        };
     }
 
 

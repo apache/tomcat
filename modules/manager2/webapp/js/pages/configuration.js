@@ -265,7 +265,8 @@ export async function configuration(container) {
               disabled: d.self,
               title: d.self ? 'Cannot remove the component the manager is installed in' : 'Remove',
               onclick: () => removeNode(d),
-            }, 'Remove') : null));
+            }, 'Remove') : null,
+            ...lifecycleButtons(d)));
     detailCard.append(head);
 
     if (d.className) {
@@ -890,6 +891,133 @@ export async function configuration(container) {
     detailCard.append(el('div', { class: 'empty' },
         el('p', {}, 'Select a component in the tree to inspect and edit it.')));
   }
+
+  // ============================ Lifecycle =============================
+
+  // The states that count as "running" for a component. A context
+  // reports STARTED while it is accepting requests; AVAILABLE is
+  // accepted as well (some components report it instead).
+  function isRunning(d) {
+    return d.state === 'STARTED' || d.state === 'AVAILABLE';
+  }
+
+  // The Start / Stop / Restart buttons of the detail card, for the
+  // components that implement Lifecycle (the node detail reports this
+  // as `lifecycle`). Not every change takes effect until the affected
+  // component is restarted, so the buttons make the restart explicit.
+  // Start and Stop are disabled for the components that affect access
+  // to this page (`affectsSelf`): stopping them would destroy the admin
+  // session mid-request. Restart stays enabled for them: the client's
+  // connection may be interrupted during the operation, but the
+  // component is running again at the end and the client reconnects.
+  function lifecycleButtons(d) {
+    if (!d.lifecycle) return [];
+    const running = isRunning(d);
+    const selfImpact = d.affectsSelf;
+    const selfImpactTitle = 'This component serves this page: starting or stopping it would interrupt access to the manager. Use Restart instead.';
+    return [
+      el('span', { class: 'row-actions-sep', role: 'presentation' }),
+      el('button', {
+        type: 'button', class: 'btn btn-sm',
+        disabled: running || selfImpact,
+        title: selfImpact ? selfImpactTitle : 'Start',
+        onclick: () => lifecycleOp(d, 'start'),
+      }, 'Start'),
+      el('button', {
+        type: 'button', class: 'btn btn-sm',
+        disabled: !running || selfImpact,
+        title: selfImpact ? selfImpactTitle : 'Stop',
+        onclick: () => lifecycleOp(d, 'stop'),
+      }, 'Stop'),
+      el('button', {
+        type: 'button', class: 'btn btn-sm',
+        title: 'Stop the component and start it again',
+        onclick: () => lifecycleOp(d, 'restart'),
+      }, 'Restart'),
+    ];
+  }
+
+  async function lifecycleOp(d, op) {
+    const label = d.name || d.type;
+    let ok;
+    if (op === 'start') {
+      // Starting a stopped component is safe: no confirmation.
+      ok = true;
+    } else if (op === 'stop') {
+      ok = await confirm({
+        title: 'Stop ' + d.type,
+        message: 'Stop ' + label + '? Any in-memory state it holds (e.g. the sessions of the contexts below it) is lost.',
+        confirmLabel: 'Stop',
+        danger: false,
+      });
+    } else {
+      ok = await confirm({
+        title: 'Restart ' + d.type,
+        message: 'Restart ' + label + '?' + (d.affectsSelf
+            ? ' This component serves this page: the connection is interrupted during the operation and the page reconnects when it is done. When the restarted component holds the admin sessions (the server, a service, an engine, a host or this context) you will need to sign in again.'
+            : ''),
+        confirmLabel: 'Restart',
+        danger: true,
+        requireText: label,
+      });
+    }
+    if (!ok) return;
+    let res;
+    try {
+      res = await api('POST', '/api/config/lifecycle', { id: d.id, op });
+    } catch (err) {
+      // A network-level failure (fetch rejects with a TypeError) means
+      // the connection was interrupted mid-operation: what is expected
+      // when the component that serves this page itself is restarted.
+      // The operation may well have completed server-side; try to
+      // reconnect.
+      if (err && err.name === 'TypeError') {
+        await reconnectAfterLifecycle();
+      } else {
+        toast(err.message, 'error');
+      }
+      return;
+    }
+    toast(res.message, 'ok');
+    await loadTree();
+    if (selectedId) {
+      selectNode(selectedId);
+    } else {
+      renderEmpty();
+    }
+  }
+
+  // The connection was interrupted during a lifecycle operation (the
+  // component that serves this page - the server, a service, an engine,
+  // the host, the connector or this context - was restarted and its
+  // start phase has not necessarily finished yet). Wait for the server
+  // to come back and reconnect: a read-only API call re-establishes the
+  // CSRF token; when the admin session was reset by the restart, api()
+  // navigates to the login page, and a successful login returns to this
+  // page.
+  async function reconnectAfterLifecycle() {
+    toast('The connection was interrupted during the operation - this is expected when the component that serves this page is restarted. Reconnecting...', 'info', 8000);
+    for (let attempt = 0; attempt < 10; attempt++) {
+      await sleep(1000);
+      try {
+        await api('GET', '/api/csrf');
+        toast('Reconnected. Reloading the components.', 'ok');
+        await loadTree();
+        if (selectedId) {
+          selectNode(selectedId);
+        } else {
+          renderEmpty();
+        }
+        return;
+      } catch (err) {
+        // api() has already navigated to the login page.
+        if (err && err.message === 'unauthenticated') return;
+      }
+    }
+    toast('Could not reconnect after the operation. The component may still be stopped - check the server status and try again.', 'error', 10000);
+  }
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // ============================ Save to server.xml ===================
 
