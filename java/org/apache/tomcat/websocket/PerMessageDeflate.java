@@ -638,7 +638,8 @@ public class PerMessageDeflate implements Transformation {
                         int eomBufferWritten;
                         try {
                             eomBufferWritten = deflater.deflate(EOM_BUFFER, 0, EOM_BUFFER.length, Deflater.SYNC_FLUSH);
-                        } catch (NullPointerException e) {
+                        } catch (IllegalStateException | NullPointerException e) {
+                            // As of Java 25, the JRE throws an ISE rather than an NPE
                             throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
                         }
                         if (eomBufferWritten < EOM_BUFFER.length) {
