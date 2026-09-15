@@ -1713,6 +1713,32 @@ public class TestManager2Config extends TomcatBaseTest {
             Assert.assertEquals("false", findProperty(parseObject(client.getResponseBody()), "readonly").get("value"));
             Assert.assertNotNull(getTomcatInstance().getServer().getGlobalNamingContext().lookup("UserDatabaseTest"));
 
+            // A boolean factory option also accepts the JSON boolean the
+            // checkbox of the form sends (it is stored as its string
+            // form), and a value that does not fit the declared type of
+            // the option is rejected (the stored value is unchanged).
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + dbId + "\",\"name\":\"readonly\",\"value\":true}", 200);
+            request(client, "GET", MANAGER2 + "/api/config/node/" + dbId, null, null, 200);
+            Assert.assertEquals("true", findProperty(parseObject(client.getResponseBody()), "readonly").get("value"));
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + dbId + "\",\"name\":\"readonly\",\"value\":\"not-a-boolean\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("SET_FAILED"));
+            request(client, "GET", MANAGER2 + "/api/config/node/" + dbId, null, null, 200);
+            Assert.assertEquals("true", findProperty(parseObject(client.getResponseBody()), "readonly").get("value"));
+
+            // Removing a typed factory option clears the parameter (it
+            // must not be stored as the string "false"): the option is
+            // listed again with no value and can be set again.
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + dbId + "\",\"name\":\"readonly\",\"value\":\"\"}", 200);
+            request(client, "GET", MANAGER2 + "/api/config/node/" + dbId, null, null, 200);
+            Assert.assertNull(findProperty(parseObject(client.getResponseBody()), "readonly").get("value"));
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + dbId + "\",\"name\":\"readonly\",\"value\":\"true\"}", 200);
+            request(client, "GET", MANAGER2 + "/api/config/node/" + dbId, null, null, 200);
+            Assert.assertEquals("true", findProperty(parseObject(client.getResponseBody()), "readonly").get("value"));
+
             // Renaming requires a type-to-confirm and rebinds the resource.
             request(client, "POST", MANAGER2 + "/api/config/attribute", token,
                     "{\"id\":\"" + dbId + "\",\"name\":\"name\"," + "\"value\":\"UserDatabaseRenamed\"}", 400);

@@ -319,20 +319,35 @@ export async function configuration(container) {
           onclick: () => applyProperty(node, p, input),
         }, 'Apply'));
     if (p.param) {
-      edit.append(el('button', {
-        type: 'button', class: 'btn btn-sm btn-danger',
-        title: 'Remove this parameter',
-        onclick: () => removeParameter(node, p),
-      }, 'Remove'));
+      if (paramSet(p)) {
+        edit.append(el('button', {
+          type: 'button', class: 'btn btn-sm btn-danger',
+          title: 'Remove this parameter',
+          onclick: () => removeParameter(node, p),
+        }, 'Remove'));
+      } else {
+        // An unset parameter: nothing to remove. Applying a value adds
+        // the parameter (or, for a boolean, unchecking it is a no-op).
+        edit.append(el('span', { class: 'config-param-hint' }, 'not set'));
+      }
     }
     return el('div', { class: 'config-prop' }, label, edit);
+  }
+
+  // Whether a parameter of a JNDI entry is set (has a non empty value).
+  function paramSet(p) {
+    return p.value !== null && p.value !== undefined && String(p.value) !== '';
   }
 
   function buildInput(p) {
     const t = p.type;
     if (t === 'boolean') {
       const box = el('input', { type: 'checkbox', class: 'config-check' });
-      box.checked = Boolean(p.value);
+      // A parameter is stored as the string "true" or "false": only
+      // "true" checks the box (Boolean("false") would be wrongly
+      // truthy). A real boolean attribute is stored as an actual
+      // boolean.
+      box.checked = p.param ? p.value === 'true' : Boolean(p.value);
       return box;
     }
     if (NUMERIC_TYPES.has(t)) {
@@ -370,8 +385,15 @@ export async function configuration(container) {
 
   async function applyProperty(node, p, input) {
     let value = readInput(input, p);
-    // Guard against no-op writes.
-    if (sameValue(value, p.value)) {
+    // Guard against no-op writes. A boolean parameter is a toggle: the
+    // effective state is whether it is set to "true", so the no-op
+    // check is on the checkbox state. That also means applying while
+    // the box is unchecked does not store "false" for an absent
+    // parameter, and re-applying an already stored "false" is a no-op.
+    const noOp = p.param && p.type === 'boolean'
+        ? Boolean(value) === (p.value === 'true')
+        : sameValue(value, p.value);
+    if (noOp) {
       toast('No changes to apply.', 'info');
       return;
     }
@@ -437,8 +459,8 @@ export async function configuration(container) {
   // Remove a generic parameter from a JNDI entry by clearing it: the server
   // drops parameters whose value is empty.
   async function removeParameter(node, p) {
-    if (p.value === null || p.value === undefined || p.value === '') {
-      toast('This parameter is already empty.', 'info');
+    if (!paramSet(p)) {
+      toast('This parameter is not set.', 'info');
       return;
     }
     try {

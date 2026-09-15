@@ -2739,7 +2739,22 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     sm.getString("manager2.configReadOnly", name));
         }
 
-        Object value = param ? string(body.get("value")) : convert(attribute.getType(), body.get("value"));
+        Object value;
+        if (attribute.isParam()) {
+            // Parameters (the free form parameters of a JNDI entry and
+            // the typed factory options) are stored as string properties
+            // of the entry: keep the raw string form (an empty value
+            // removes the parameter, see setExplicitValue) and validate
+            // it against the declared type of the option (free form
+            // parameters are strings and always pass).
+            String paramValue = string(body.get("value"));
+            if (paramValue != null && !paramValue.isEmpty()) {
+                validateParamValue(name, paramValue, attribute.getType());
+            }
+            value = paramValue;
+        } else {
+            value = convert(attribute.getType(), body.get("value"));
+        }
         Object oldValue = param ? null : readExplicitValue(component, attribute);
         setExplicitValue(component, attribute, value);
 
