@@ -163,6 +163,11 @@
     <servlet-name>LogsApi</servlet-name>
     <url-pattern>/api/logs/file</url-pattern>
   </servlet-mapping>
+  <!-- The full raw file of a server log, for download -->
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/logs/download</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>LogsApi</servlet-name>
     <url-pattern>/api/access-log</url-pattern>
@@ -170,6 +175,11 @@
   <servlet-mapping>
     <servlet-name>LogsApi</servlet-name>
     <url-pattern>/api/access-log/file</url-pattern>
+  </servlet-mapping>
+  <!-- The full raw file of an access log, for download -->
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/access-log/download</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UsersApi</servlet-name>

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,9 +47,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * The Manager2 log API. Serves the list of server log files (JULI) and of access log files, and a filtered tail of one
- * file. Only the most recent part of a file is read (everything older is discarded), and the records of a response are
- * ordered from most recent to least recent.
+ * The Manager2 log API. Serves the list of server log files (JULI) and of access log files, a filtered tail of one
+ * file, and the full raw file for download. Only the most recent part of a file is read for the tail (everything older
+ * is discarded), and the records of a response are ordered from most recent to least recent.
  * <p>
  * Both log families are handled in their plain text <em>and</em> their JSON format (the JSON format is used when a log
  * handler or the access log valve is configured with the JSON formatter/valve). For the access log the pattern based
@@ -162,10 +163,14 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
                 list(response, false);
             } else if ("/api/logs/file".equals(path)) {
                 read(response, false, request);
+            } else if ("/api/logs/download".equals(path)) {
+                download(response, request);
             } else if ("/api/access-log".equals(path)) {
                 list(response, true);
             } else if ("/api/access-log/file".equals(path)) {
                 read(response, true, request);
+            } else if ("/api/access-log/download".equals(path)) {
+                download(response, request);
             } else {
                 Api.notFound(response);
             }
@@ -231,27 +236,8 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
 
     private void read(HttpServletResponse response, boolean access, HttpServletRequest request) throws IOException {
 
-        File dir = logsDirectory();
-        if (dir == null) {
-            Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "LOGS_DIR_MISSING",
-                    sm.getString("manager2.logsDirMissing"));
-            return;
-        }
-
-        String name = request.getParameter("name");
-        if (name == null || !SAFE_NAME.matcher(name).matches()) {
-            Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.invalidLogName"));
-            return;
-        }
-        File file = new File(dir, name);
-        try {
-            if (!file.getCanonicalFile().toPath().startsWith(dir.getCanonicalFile().toPath()) || !file.isFile()) {
-                Api.notFound(response);
-                return;
-            }
-        } catch (IOException e) {
-            Api.notFound(response);
+        File file = resolveRequestFile(response, request);
+        if (file == null) {
             return;
         }
 
@@ -282,6 +268,23 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
                     param(request, "search"));
         }
         Api.json(response, payload);
+    }
+
+
+    /**
+     * Stream the full, unfiltered raw file so that it can be saved.
+     */
+    private void download(HttpServletResponse response, HttpServletRequest request) throws IOException {
+
+        File file = resolveRequestFile(response, request);
+        if (file == null) {
+            return;
+        }
+        response.setContentType("text/plain; charset=utf-8");
+        response.setContentLengthLong(file.length());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+        Files.copy(file.toPath(), response.getOutputStream());
+        response.flushBuffer();
     }
 
 
@@ -561,6 +564,51 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
         }
         File dir = new File(base, "logs");
         return dir.isDirectory() ? dir : null;
+    }
+
+
+    /**
+     * Resolve the log file named by the {@code name} request parameter inside the logs directory. On failure the
+     * appropriate error response is already sent.
+     *
+     * @return the file or {@code null} when an error was sent
+     */
+    private static File resolveRequestFile(HttpServletResponse response, HttpServletRequest request)
+            throws IOException {
+        File dir = logsDirectory();
+        if (dir == null) {
+            Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "LOGS_DIR_MISSING",
+                    sm.getString("manager2.logsDirMissing"));
+            return null;
+        }
+        String name = request.getParameter("name");
+        if (name == null || !SAFE_NAME.matcher(name).matches()) {
+            Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
+                    sm.getString("manager2.invalidLogName"));
+            return null;
+        }
+        File file = resolveLogFile(dir, name);
+        if (file == null) {
+            Api.notFound(response);
+            return null;
+        }
+        return file;
+    }
+
+
+    /**
+     * A file inside the given directory, or {@code null} when the name escapes the directory or does not exist.
+     */
+    private static File resolveLogFile(File dir, String name) {
+        File file = new File(dir, name);
+        try {
+            if (!file.getCanonicalFile().toPath().startsWith(dir.getCanonicalFile().toPath()) || !file.isFile()) {
+                return null;
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return file;
     }
 
 

@@ -204,8 +204,10 @@ machine-readable `error` code and non-2xx status.
 | GET | `/api/diagnostics/threaddump` | manager-gui | thread dump text |
 | GET | `/api/logs` | manager-gui | server log files (JULI): name, size, modified, detected format (text/JSON) |
 | GET | `/api/logs/file?name=&lines=&level=&search=` | manager-gui | parsed + filtered tail of one server log file: the most recent `lines` (default 500) matching records, ordered most recent first (time, level, thread, source, message, throwable), level counts |
+| GET | `/api/logs/download?name=` | manager-gui | the full, unfiltered raw server log file (`Content-Disposition: attachment`) |
 | GET | `/api/access-log` | manager-gui | access log files: name, size, modified, format, configured pattern, available fields |
  | GET | `/api/access-log/file?name=&lines=&method=&status=&user=&session=&search=` | manager-gui | parsed + filtered tail of one access log file: records, status-class counts, method counts |
+ | GET | `/api/access-log/download?name=` | manager-gui | the full, unfiltered raw access log file (`Content-Disposition: attachment`) |
  | GET | `/api/users?name=` | manager-gui | configured `UserDatabase` JNDI resources (name, id, type, readonly, writable) plus users (username, fullName, hasPassword, roles, groups, effectiveRoles), groups (groupname, description, roles, members) and roles of the selected database |
  | POST | `/api/users` | manager-gui | `{"username", "password", "fullName"?, "roles"?, "name"?}` create a user (409 when it exists); new roles are created on the fly |
  | DELETE | `/api/users/{username}?name=` | manager-gui | remove a user (404 when absent; 400 `SELF_REMOVAL` for the signed-in account) |
@@ -270,7 +272,15 @@ server-side timestamp, so restarts and clock skew are handled.
   theme toggle.
 - Left navigation (collapses to bottom tab bar under 768 px): Dashboard,
   Applications, Hosts, Configuration, Users, Monitoring, Diagnostics,
-  Logs, Access log.
+  Logs, Access log. Each item has a single-path 24×24 icon (holes — server
+  LEDs/slots, the gear bore, beetle seam/spots, file text lines — filled
+  with `fill-rule: evenodd`); the active item takes a per-tab accent hue
+  (dashboard blue, apps violet, hosts teal, configuration slate, users
+  pink, monitoring green, diagnostics amber, logs cyan, access log indigo,
+  with lighter values in the dark theme) on icon, label and soft
+  background. The bottom tab bar shows icons only (the label is kept as
+  `aria-label`) because nine text labels do not fit legibly in a
+  360–430 px viewport.
 - History-API routing (deep links work), one `index.html`, no full page
   reloads. `login.html` is the FORM-login page (see §7); it POSTs to
   `j_security_check` and redirects back to the original URL.
@@ -571,7 +581,8 @@ server-side timestamp, so restarts and clock skew are handled.
 **Logs**
 - File selector over the JULI server log files (`catalina`, `localhost`,
   `manager`, `host-manager`, `catalina.out`), max-lines selector (500-5000),
-  refresh button.
+  refresh and download buttons (the download saves the full, unfiltered raw
+  file of the current selection).
 - Filters: severity (the levels actually present in the file) and free-text
   search.
 - Table: time, level (coloured badge), thread, source, message. Row click
@@ -581,8 +592,9 @@ server-side timestamp, so restarts and clock skew are handled.
   file from the first line.
 
 **Access log**
-- File selector over the access log files, max-lines selector, refresh
-  button.
+- File selector over the access log files, max-lines selector, refresh and
+  download buttons (the download saves the full, unfiltered raw file of the
+  current selection).
 - Filters that are shown depend on the fields the configured format
   provides: method, status (class `1xx`-`5xx` or exact code), user, session
   ID and free-text search. A filter is only offered when its field is part
@@ -606,7 +618,9 @@ server-side timestamp, so restarts and clock skew are handled.
   `localStorage`).
 - System font stack; 12-column grid; 8 px spacing scale; single accent
   colour; states (success/warning/danger) with colour + icon (never colour
-  alone).
+  alone). The accent is otherwise neutral: per-tab hues are reserved for
+  the active navigation item (see §5.1) so the current section is
+  recognisable at a glance, and are never used for content.
 - Responsive, below 768 px (and on landscape phones of any width up to
   932 px, via a `max-height` media): management tables (applications,
   hosts, users, sessions, connectors, servlets, …) convert to stacked
@@ -881,7 +895,7 @@ modules/manager2/
     HostsApiServlet.java      extends HostManagerServlet
     StatusApiServlet.java     status endpoints
     StatusSnapshot.java       MBean collection → JSON model
-    LogsApiServlet.java       /api/logs + /api/access-log (list, tail, filters)
+    LogsApiServlet.java       /api/logs + /api/access-log (list, tail, filters, raw download)
     LogParser.java            JULI text/JSON log lines, access log pattern→regex
     AccessLogSupport.java     access log field names, normalization
     UsersApiServlet.java      /api/users + /api/groups + /api/roles
@@ -967,7 +981,9 @@ modelled on the existing `TestManagerWebapp` but exercising the new flows:
      `USER_DATABASE_READONLY`; `manager-status` gets 403 on the users API.
  9. **Logs**: list (JULI + access log files, detected format), tail with
     level / method / status / user / session / free-text filters (text and
-    JSON formats, pattern driven access log fields), and the returned
+    JSON formats, pattern driven access log fields), the raw download
+    (`/api/logs/download`, `/api/access-log/download`) returns the full
+    unfiltered file and rejects path traversal, and the returned
     records are asserted to be the most recent matching lines ordered from
     most recent to least recent. `manager-status` gets 403.
 10. **Deploy wizard (browser E2E)**: the modal opens with only the
@@ -1148,8 +1164,9 @@ disabled); high-volume tables (logs, access log, workers) scroll
 horizontally with the first column pinned and long values wrapping, not
 squeezed; tabs scroll when crowded; page-head, log and diagnostics
 controls go full width; modals show stacked full-width buttons; toasts
-appear above the bottom nav; the bottom nav keeps all nine items with
-labels truncated inside their slot; inputs are 16 px at ≤480 px (no iOS
+appear above the bottom nav; the bottom nav keeps all nine items as icons
+only (labels as `aria-label`, active item in its per-tab hue); inputs are
+16 px at ≤480 px (no iOS
 focus zoom); the Configuration detail scrolls into view after a tree
 selection; a multi-segment deep link (e.g. an application detail) reloads
 to the correct page (the base-element fix above).

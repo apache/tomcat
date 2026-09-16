@@ -658,6 +658,15 @@ public class TestManager2Webapp extends TomcatBaseTest {
         // Invalid file names are rejected.
         request(client, "GET", MANAGER2 + "/api/logs/file?name=..%2Fweb.xml", null, null, 400);
 
+        // The full raw file can be downloaded, unfiltered and without a line
+        // limit.
+        request(client, "GET", MANAGER2 + "/api/logs/download?name=catalina.2026-01-01.log", null, null, 200);
+        body = client.getResponseBody();
+        Assert.assertTrue(body.contains("Server starting"));
+        Assert.assertTrue(body.contains("Server done"));
+        // Invalid file names are rejected for downloads as well.
+        request(client, "GET", MANAGER2 + "/api/logs/download?name=..%2Fweb.xml", null, null, 400);
+
         client.disconnect();
     }
 
@@ -741,6 +750,13 @@ public class TestManager2Webapp extends TomcatBaseTest {
         Assert.assertTrue(body.contains("\"matched\":1"));
         Assert.assertTrue(body.contains("/submit"));
 
+        // The full raw file can be downloaded.
+        request(client, "GET", MANAGER2 + "/api/access-log/download?name=localhost_access_log.2026-01-01.txt",
+                null, null, 200);
+        body = client.getResponseBody();
+        Assert.assertTrue(body.contains("GET /ok HTTP/1.1"));
+        Assert.assertTrue(body.contains("POST /submit HTTP/1.1"));
+
         client.disconnect();
     }
 
@@ -791,6 +807,13 @@ public class TestManager2Webapp extends TomcatBaseTest {
         Assert.assertTrue(body.contains("\"matched\":1"));
         Assert.assertTrue(body.contains("/forbidden"));
 
+        // The full raw file can be downloaded.
+        request(client, "GET", MANAGER2 + "/api/access-log/download?name=localhost_access_log.2026-01-02.txt",
+                null, null, 200);
+        body = client.getResponseBody();
+        Assert.assertTrue(body.contains("AAAA-1111"));
+        Assert.assertTrue(body.contains("/forbidden"));
+
         client.disconnect();
     }
 
@@ -807,6 +830,8 @@ public class TestManager2Webapp extends TomcatBaseTest {
         // The log API is not part of the read-only status endpoints.
         request(client, "GET", MANAGER2 + "/api/logs", null, null, 403);
         request(client, "GET", MANAGER2 + "/api/access-log", null, null, 403);
+        request(client, "GET", MANAGER2 + "/api/logs/download?name=catalina.log", null, null, 403);
+        request(client, "GET", MANAGER2 + "/api/access-log/download?name=localhost_access_log.txt", null, null, 403);
 
         client.disconnect();
     }

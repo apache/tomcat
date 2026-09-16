@@ -72,6 +72,26 @@
   --danger-soft: #fde8ea;
   --info: #2456a6;
   --info-soft: #e7eefb;
+
+  /* Accent hue of each nav item for its active state (one per tab). */
+  --nav-dashboard: #2456a6;
+  --nav-dashboard-soft: #e7edf9;
+  --nav-apps: #7c3aed;
+  --nav-apps-soft: #f1ebfd;
+  --nav-hosts: #0d9488;
+  --nav-hosts-soft: #e4f5f3;
+  --nav-config: #64748b;
+  --nav-config-soft: #eef1f5;
+  --nav-users: #db2777;
+  --nav-users-soft: #fce8f1;
+  --nav-monitoring: #16a34a;
+  --nav-monitoring-soft: #e6f6ec;
+  --nav-diagnostics: #d97706;
+  --nav-diagnostics-soft: #fdf2e2;
+  --nav-logs: #0891b2;
+  --nav-logs-soft: #e2f4f8;
+  --nav-access-log: #4f46e5;
+  --nav-access-log-soft: #ebeafd;
 }
 
 :root[data-theme="dark"] {
@@ -101,6 +121,26 @@
   --danger-soft: #3d1a20;
   --info: #6ea8ff;
   --info-soft: #16233d;
+
+  /* Accent hue of each nav item for its active state (one per tab). */
+  --nav-dashboard: #6ea8ff;
+  --nav-dashboard-soft: #16233d;
+  --nav-apps: #a78bfa;
+  --nav-apps-soft: #2a2144;
+  --nav-hosts: #2dd4bf;
+  --nav-hosts-soft: #143532;
+  --nav-config: #94a3b8;
+  --nav-config-soft: #262d3a;
+  --nav-users: #f472b6;
+  --nav-users-soft: #442031;
+  --nav-monitoring: #4cc98a;
+  --nav-monitoring-soft: #16321f;
+  --nav-diagnostics: #e5b93c;
+  --nav-diagnostics-soft: #38300f;
+  --nav-logs: #38bdf8;
+  --nav-logs-soft: #12333c;
+  --nav-access-log: #818cf8;
+  --nav-access-log-soft: #222044;
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.5);
@@ -220,7 +260,18 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .nav-item svg { fill: currentColor; flex: none; }
 .nav-item:hover { background: var(--bg-hover); color: var(--text); }
-.nav-item.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+/* The active tab takes the accent hue of its section (see the per-tab
+   --nav-* tokens); the hover state stays neutral. */
+.nav-item.active { font-weight: 600; }
+.nav-item.active.nav-tab-dashboard { color: var(--nav-dashboard); background: var(--nav-dashboard-soft); }
+.nav-item.active.nav-tab-apps { color: var(--nav-apps); background: var(--nav-apps-soft); }
+.nav-item.active.nav-tab-hosts { color: var(--nav-hosts); background: var(--nav-hosts-soft); }
+.nav-item.active.nav-tab-config { color: var(--nav-config); background: var(--nav-config-soft); }
+.nav-item.active.nav-tab-users { color: var(--nav-users); background: var(--nav-users-soft); }
+.nav-item.active.nav-tab-monitoring { color: var(--nav-monitoring); background: var(--nav-monitoring-soft); }
+.nav-item.active.nav-tab-diagnostics { color: var(--nav-diagnostics); background: var(--nav-diagnostics-soft); }
+.nav-item.active.nav-tab-logs { color: var(--nav-logs); background: var(--nav-logs-soft); }
+.nav-item.active.nav-tab-access-log { color: var(--nav-access-log); background: var(--nav-access-log-soft); }
 
 .content {
   min-width: 0;
@@ -323,6 +374,7 @@ table.data .muted { color: var(--text-faint); }
 .log-field { width: 220px; margin-bottom: 0; }
 .log-field-search { width: 260px; }
 .log-field-btn { width: auto; }
+.log-btns { display: flex; gap: var(--space-2); }
 .log-filters { display: flex; gap: var(--space-4); flex-wrap: wrap; flex: 1 1 auto; }
 .log-filters .field { width: 160px; margin-bottom: 0; }
 .log-filters .log-field-search { width: 220px; }
@@ -870,7 +922,8 @@ pre.block {
     height: var(--bottomnav-h);
     z-index: 30;
   }
-  .nav-item { flex-direction: column; gap: 3px; font-size: 10.5px; padding: 6px 10px; }
+  .nav-item { flex-direction: column; gap: 3px; font-size: 10.5px; padding: 6px 10px; justify-content: center; }
+  .nav-item svg { width: 20px; height: 20px; }
   .content { padding: var(--space-4) var(--space-4) calc(var(--bottomnav-h) + var(--space-5)); }
   .topbar-status { display: none; }
   .brand-version { display: none; }
@@ -940,6 +993,7 @@ pre.block {
   .log-controls { flex-direction: column; align-items: stretch; gap: var(--space-3); }
   .log-controls .field { width: 100%; }
   .log-field-btn .btn { width: 100%; }
+  .log-btns { flex-direction: column; }
   .log-filters { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   .log-filters .log-field-search { grid-column: 1 / -1; }
 
@@ -961,14 +1015,11 @@ pre.block {
   /* Toasts render above the bottom nav */
   .toast-region { bottom: calc(var(--bottomnav-h) + var(--space-4)); }
 
-  /* Bottom nav: keep the labels inside their slot */
+  /* Bottom nav: icons only. The labels are not readable at this width
+     (9 items in ~390 px) and the icons carry the meaning; the accessible
+     name is kept via the aria-label set in main.js. */
   .nav-item { min-width: 0; }
-  .nav-item .nav-label {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  .nav-item .nav-label { display: none; }
 
   .icon-btn { min-width: 44px; min-height: 44px; }
 }

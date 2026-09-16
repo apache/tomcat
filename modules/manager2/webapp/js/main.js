@@ -96,19 +96,16 @@ function buildNav() {
   for (const item of NAV_ITEMS) {
     const btn = nav.querySelector('[data-nav="' + item.route + '"]');
     btn.innerHTML = '';
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('width', '18');
-    svg.setAttribute('height', '18');
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', svgPath(item.icon));
-    svg.append(path);
-    // The label is a span so that it can be truncated on narrow screens
-    // (see the bottom nav rules in the CSS).
+    // The per-tab class selects the accent hue of the active state (CSS);
+    // the aria-label keeps the accessible name when the visible label is
+    // hidden on narrow screens (bottom nav).
+    btn.classList.add('nav-tab-' + item.icon);
+    btn.setAttribute('aria-label', item.label);
+    btn.append(icon(item.icon, 18));
     const label = document.createElement('span');
     label.className = 'nav-label';
     label.textContent = item.label;
-    btn.append(svg, label);
+    btn.append(label);
     btn.addEventListener('click', () => {
       window.history.pushState({}, '', BASE + item.route);
       render();

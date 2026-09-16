@@ -20,7 +20,7 @@
 // selected file, so that only what the configured log format actually
 // provides is filterable.
 
-import { api } from './api.js';
+import { api, BASE } from './api.js';
 import { el, clear, table, drawer, formatBytes, formatMs } from './ui.js';
 
 // Column definitions per field name. `render` receives the row and returns a
@@ -42,7 +42,6 @@ const COLUMNS = {
   localAddr: { label: 'Local addr' },
   localServerName: { label: 'Server' },
   user: { label: 'User' },
-  logicalUserName: { label: 'User (identd)' },
   path: { label: 'Path' },
   query: { label: 'Query' },
   request: { label: 'Request', wide: true },
@@ -115,6 +114,7 @@ function showRecord(row) {
   const body = el('div', {});
   for (const [key, value] of Object.entries(row)) {
     if (value === null || value === undefined) continue;
+    if (key === 'logicalUserName') continue;
     if (key === 'throwable' || key === 'raw' || key === 'message') {
       body.append(
           el('h3', { style: 'margin:14px 0 8px;' }, labelFor(key)),
@@ -214,6 +214,25 @@ export async function logPage(container, opts) {
       'Refresh');
   refreshBtn.addEventListener('click', () => { loadList(); });
 
+  // Download the full, unfiltered raw file of the current selection. A
+  // throw-away anchor keeps the SPA in place: the server answers with
+  // Content-Disposition: attachment, so the browser saves the file instead
+  // of navigating.
+  const downloadBtn = el('button', { type: 'button', class: 'btn btn-sm' },
+      'Download');
+  downloadBtn.disabled = true;
+  downloadBtn.addEventListener('click', () => {
+    if (!state.file) return;
+    const path = kind === 'log' ? '/api/logs/download' : '/api/access-log/download';
+    const a = el('a', {
+      href: BASE + path + '?name=' + encodeURIComponent(state.file),
+      download: state.file,
+    });
+    document.body.append(a);
+    a.click();
+    a.remove();
+  });
+
   const filterHolder = el('div', { class: 'log-filters' });
 
   const fileField = el('div', { class: 'field log-field' },
@@ -221,7 +240,8 @@ export async function logPage(container, opts) {
   const linesField = el('div', { class: 'field log-field' },
       el('label', {}, 'Max lines'), linesSelect);
   const refreshField = el('div', { class: 'field log-field log-field-btn' },
-      el('label', {}, '\u00a0'), refreshBtn);
+      el('label', {}, '\u00a0'),
+      el('div', { class: 'log-btns' }, refreshBtn, downloadBtn));
 
   fileSelect.addEventListener('change', () => {
     state.file = fileSelect.value;
@@ -269,7 +289,7 @@ export async function logPage(container, opts) {
                 }))),
                 f.status || '', (v) => { state.filters.status = v; loadFile(); })));
       }
-      if (has(fields, 'user') || has(fields, 'logicalUserName')) {
+      if (has(fields, 'user')) {
         filterHolder.append(el('div', { class: 'field log-field' },
             el('label', {}, 'User'),
             textInput('Filter by user', (v) => { state.filters.user = v; loadFile(); }, f.user || '')));
@@ -302,6 +322,7 @@ export async function logPage(container, opts) {
     if (state.files.length === 0) {
       fileSelect.append(el('option', { value: '' }, 'No log files found'));
       fileSelect.disabled = true;
+      downloadBtn.disabled = true;
       clear(tableHolder);
       tableHolder.append(el('div', { class: 'empty' },
           'No ' + (kind === 'log' ? 'log' : 'access log') + ' files were found in the logs directory.'));
@@ -318,6 +339,7 @@ export async function logPage(container, opts) {
       state.file = state.files[0].name;
     }
     fileSelect.value = state.file;
+    downloadBtn.disabled = !state.file;
     loadFile();
   }
 
@@ -344,7 +366,9 @@ export async function logPage(container, opts) {
       return;
     }
 
-    state.fields = data.fields || [];
+    // The identd field (%l, "User (identd)") is dead in practice: the value
+    // is always "-", so it is dropped from the columns and the user filter.
+    state.fields = (data.fields || []).filter((f) => f !== 'logicalUserName');
     buildFilters(state.fields, data);
 
     const records = data.records || [];
