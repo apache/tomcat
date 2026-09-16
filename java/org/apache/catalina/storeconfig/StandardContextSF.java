@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -141,8 +142,12 @@ public class StandardContextSF extends StoreFactoryBase {
             }
             try (FileOutputStream fos = new FileOutputStream(config);
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(fos, getRegistry().getEncoding()))) {
-                storeXMLHead(writer);
-                super.store(writer, -2, aContext);
+                // Generate the configuration in memory so that the layout of the previous version of the file can
+                // be preserved
+                StringWriter buffer = new StringWriter();
+                storeXMLHead(new PrintWriter(buffer));
+                super.store(new PrintWriter(buffer), -2, aContext);
+                writer.write(XMLFormatPreserver.preserve(config, buffer.toString(), getRegistry().getEncoding()));
             }
         } else {
             super.store(aWriter, indent, aContext);
@@ -173,8 +178,13 @@ public class StandardContextSF extends StoreFactoryBase {
                         mover.getConfigSave()));
             }
             try (PrintWriter writer = mover.getWriter()) {
-                storeXMLHead(writer);
-                super.store(writer, -2, aContext);
+                // Generate the configuration in memory so that the layout of the previous version of the file can
+                // be preserved
+                StringWriter buffer = new StringWriter();
+                storeXMLHead(new PrintWriter(buffer));
+                super.store(new PrintWriter(buffer), -2, aContext);
+                writer.write(XMLFormatPreserver.preserve(mover.getConfigOld(), buffer.toString(),
+                        getRegistry().getEncoding()));
             }
             mover.move();
         }

@@ -255,6 +255,12 @@
         <code>Realm</code> instance may not be reused apart from re-adding it to
         the same <code>CombinedRealm</code>. (markt)
       </fix>
+      <update>
+        When <code>StoreConfig</code> re-writes an existing
+        <code>server.xml</code> or context configuration file, preserve the
+        layout of the existing file (comments, blank lines and attribute
+        order) on a best effort basis. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

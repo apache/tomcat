@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -27,11 +29,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.realm.LockOutRealm;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.startup.CatalinaBaseConfigurationSource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.catalina.valves.AccessLogValve;
 import org.xml.sax.InputSource;
 
 public class TestStoreConfig extends TomcatBaseTest {
@@ -159,6 +163,73 @@ public class TestStoreConfig extends TomcatBaseTest {
         }
         Assert.assertTrue("SSL connector not found after round-trip", foundSsl);
         tomcat.stop();
+    }
+
+    /**
+     * Verify that StoreConfig preserves the comments of the existing server.xml when it rewrites the file.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testStorePreservesComments() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        // Add a component so that the stored configuration differs from the original file
+        AccessLogValve accessLogValve = new AccessLogValve();
+        accessLogValve.setDirectory("logs");
+        accessLogValve.setPrefix("localhost_access_log");
+        accessLogValve.setSuffix(".txt");
+        accessLogValve.setPattern("%h %l %u %t \"%r\" %s %b");
+        tomcat.getHost().getPipeline().addValve(accessLogValve);
+
+        // Write a server.xml with comments that StoreConfig must preserve
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        // Delete the whole conf directory (including any timestamped backup) after the test
+        addDeleteOnTearDown(conf);
+        File serverXml = new File(conf, "server.xml");
+        Files.write(serverXml.toPath(), String.join("\n",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<!--",
+                "  Header comment line",
+                "-->",
+                "<Server port=\"8005\" shutdown=\"SHUTDOWN\">",
+                "    <!-- Service comment -->",
+                "    <Service name=\"Catalina\">",
+                "        <!-- Commented out connector",
+                "        <Connector port=\"8009\"/>",
+                "        -->",
+                "    </Service>",
+                "</Server>",
+                "").getBytes(StandardCharsets.UTF_8));
+
+        tomcat.start();
+
+        // Save configuration
+        storeConfigListener.getStoreConfig().storeConfig();
+
+        // Read written configuration
+        String serverXmlDump;
+        try (FileReader reader = new FileReader(serverXml);
+                StringWriter writer = new StringWriter()) {
+            IOTools.flow(reader, writer);
+            serverXmlDump = writer.toString();
+        }
+        Assert.assertTrue(serverXmlDump.contains("Header comment line"));
+        Assert.assertTrue(serverXmlDump.contains("Service comment"));
+        Assert.assertTrue(serverXmlDump.contains("Commented out connector"));
+        Assert.assertTrue(serverXmlDump.contains("AccessLogValve"));
+        // The stored configuration must remain well-formed
+        SAXParserFactory.newInstance().newSAXParser().getXMLReader()
+                .parse(new InputSource(new StringReader(serverXmlDump)));
     }
 
 }
