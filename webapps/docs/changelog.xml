@@ -246,6 +246,15 @@
         class loader until after the web application class loader has started.
         (markt)
       </fix>
+      <fix>
+        Fix various concurrency issues around adding and removing
+        <code>Realm</code>s from a <code>CombinedRealm</code>, in particular
+        doing so while the <code>CombinedRealm</code> is in use. Note that once
+        a <code>Realm</code> instance has been removed from a
+        <code>CombinedRealm</code> instance at run-time, the removed
+        <code>Realm</code> instance may not be reused apart from re-adding it to
+        the same <code>CombinedRealm</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
