@@ -18,9 +18,10 @@ package org.apache.catalina.realm;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.ObjectName;
 
@@ -40,10 +41,28 @@ import org.ietf.jgss.GSSName;
 
 /**
  * Realm implementation that contains one or more realms. Authentication is attempted for each realm in the order they
- * were configured. If any realm authenticates the user then the authentication succeeds. When combining realms
- * usernames should be unique across all combined realms.
+ * were configured. If any realm authenticates the user then the authentication succeeds. When combining realms user
+ * names should be unique across all combined realms.
+ * <p>
+ * For the typical usage (create realms, add realms to container, start container), each realm will be registered with
+ * JMX and {@link #getRealmPath()} will match the JMX object name. For simple changes (remove a realm, add a new realm)
+ * {@link #getRealmPath()} and the JMX object name will remain synchronized. For more unusual changes such as moving the
+ * realm to a new container, the JMX object names and {@link #getRealmPath()} are very likely to end up out of sync. If
+ * there are naming conflicts it is possible for realms that are still in use to not be registered in JMX.
  */
 public class CombinedRealm extends RealmBase {
+
+    private static final Log log = LogFactory.getLog(CombinedRealm.class);
+
+    /**
+     * The list of Realms contained by this Realm.
+     */
+    protected final List<Realm> realms = new CopyOnWriteArrayList<>();
+
+    private final Set<Realm> realmsToDestroy = new HashSet<>();
+
+    private int nextRealmIndex = 0;
+
 
     /**
      * Default constructor for CombinedRealm.
@@ -51,60 +70,97 @@ public class CombinedRealm extends RealmBase {
     public CombinedRealm() {
     }
 
-    private static final Log log = LogFactory.getLog(CombinedRealm.class);
-
-    /**
-     * The list of Realms contained by this Realm.
-     */
-    protected final List<Realm> realms = new ArrayList<>();
 
     /**
      * Add a realm to the list of realms that will be used to authenticate users.
      *
-     * @param theRealm realm which should be wrapped by the combined realm
+     * @param realm Realm which should be added to the combined realm
      */
-    public void addRealm(Realm theRealm) {
-        realms.add(theRealm);
+    public synchronized void addRealm(Realm realm) {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(),
-                    Integer.toString(realms.size())));
+        if (realms.contains(realm)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("combinedRealm.addRealmDuplicate", realm));
+            }
+            return;
+        }
+
+        boolean addRealm = true;
+
+        setSubRealmPath(realm);
+
+        if (getState().isAvailable()) {
+            addRealm = startRealm(realm);
+        }
+        if (addRealm) {
+            nextRealmIndex++;
+            realms.add(realm);
+            // In case the Realm has been removed and then re-added
+            realmsToDestroy.remove(realm);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("combinedRealm.addRealm", realm.getClass().getName(),
+                        Integer.toString(realms.size())));
+            }
+        } else {
+            destroyRealm(realm);
         }
     }
 
 
-    /**
-     * Remove a realm from the list of realms that are used to authenticate
-     * users.
-     *
-     * @param theRealm realm which should no longer be wrapped by the combined
-     *                 realm
-     *
-     * @return {@code true} if the realm was present and removed,
-     *         {@code false} otherwise
-     */
-    public boolean removeRealm(Realm theRealm) {
-        boolean removed = realms.remove(theRealm);
-
-        if (removed && log.isDebugEnabled()) {
-            log.debug(sm.getString("combinedRealm.removeRealm", theRealm.getClass().getName(),
-                    Integer.toString(realms.size())));
+    private boolean startRealm(Realm realm) {
+        realm.setContainer(getContainer());
+        if (realm instanceof Lifecycle) {
+            try {
+                ((Lifecycle) realm).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("combinedRealm.realmStartFail", realm.getClass().getName()), e);
+                return false;
+            }
         }
+        return true;
+    }
 
+
+    /**
+     * Remove a realm from the list of realms that are used to authenticate users.
+     *
+     * @param realm Realm which should be removed from the combined realm
+     *
+     * @return {@code true} if the realm was present and removed, {@code false} otherwise
+     */
+    public synchronized boolean removeRealm(Realm realm) {
+        boolean removed = realms.remove(realm);
+
+        if (removed) {
+            if (getState().isAvailable()) {
+                /*
+                 * This realm could be being used in an authenticate() call. Delay destroying it until after the
+                 * combined realm has stopped.
+                 */
+                realmsToDestroy.add(realm);
+            } else {
+                destroyRealm(realm);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("combinedRealm.removeRealm", realm.getClass().getName(),
+                        Integer.toString(realms.size())));
+            }
+        }
         return removed;
     }
 
 
     /**
-     * Returns the JMX ObjectNames of the realms that this realm is wrapping.
-     * Entries for realms that do not implement LifecycleMBeanBase will be null.
+     * Returns the JMX ObjectNames of the realms that this realm is wrapping. Entries for realms that do not implement
+     * LifecycleMBeanBase will be null.
      *
      * @return the array of realm ObjectNames, which may contain null entries
      */
     public ObjectName[] getRealms() {
-        ObjectName[] result = new ObjectName[realms.size()];
+        Realm[] realmsSnapshot = getNestedRealms();
+        ObjectName[] result = new ObjectName[realmsSnapshot.length];
         int i = 0;
-        for (Realm realm : realms) {
+        for (Realm realm : realmsSnapshot) {
             if (realm instanceof LifecycleMBeanBase) {
                 result[i] = ((LifecycleMBeanBase) realm).getObjectName();
             }
@@ -206,35 +262,45 @@ public class CombinedRealm extends RealmBase {
 
     @Override
     public void setContainer(Container container) {
-        int i = 0;
         for (Realm realm : realms) {
-            // Set the realmPath for JMX naming
-            if (realm instanceof RealmBase) {
-                ((RealmBase) realm).setRealmPath(getRealmPath() + "/realm" + Integer.toString(i));
-            }
             // Set the container for sub-realms. Mainly so logging works.
             realm.setContainer(container);
-            i++;
         }
         super.setContainer(container);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calling this method will also (re)set the paths for all of the nested realms. If a nested realm has been removed
+     * this will result in the remaining nested realms being re-numbered which may create an inconsistency between the
+     * nested realm's path and its JMX registration (if any).
+     */
+    @Override
+    public synchronized void setRealmPath(String theRealmPath) {
+        super.setRealmPath(theRealmPath);
+        nextRealmIndex = 0;
+        for (Realm realm : realms) {
+            setSubRealmPath(realm);
+            nextRealmIndex++;
+        }
+    }
+
+
+    private void setSubRealmPath(Realm realm) {
+        if (realm instanceof RealmBase) {
+            ((RealmBase) realm).setRealmPath(getRealmPath() + "/realm" + Integer.toString(nextRealmIndex));
+        }
     }
 
 
     @Override
     protected void startInternal() throws LifecycleException {
         // Start 'sub-realms' then this one
-        Iterator<Realm> iter = realms.iterator();
-
-        while (iter.hasNext()) {
-            Realm realm = iter.next();
-            if (realm instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) realm).start();
-                } catch (LifecycleException e) {
-                    // If realm doesn't start can't authenticate against it
-                    iter.remove();
-                    log.error(sm.getString("combinedRealm.realmStartFail", realm.getClass().getName()), e);
-                }
+        for (Realm realm : realms) {
+            if (!startRealm(realm)) {
+                removeRealm(realm);
             }
         }
 
@@ -252,8 +318,22 @@ public class CombinedRealm extends RealmBase {
         // Stop this realm, then the sub-realms (reverse order to start)
         super.stopInternal();
         for (Realm realm : realms) {
-            if (realm instanceof Lifecycle) {
-                ((Lifecycle) realm).stop();
+            stopRealm(realm);
+        }
+        for (Realm realm : realmsToDestroy) {
+            stopRealm(realm);
+        }
+    }
+
+
+    private void stopRealm(Realm realm) {
+        if (realm instanceof Lifecycle) {
+            if (((Lifecycle) realm).getState().isAvailable()) {
+                try {
+                    ((Lifecycle) realm).stop();
+                } catch (LifecycleException e) {
+                    log.error(sm.getString("combinedRealm.realmStopFail", realm.getClass().getName()), e);
+                }
             }
         }
     }
@@ -265,11 +345,25 @@ public class CombinedRealm extends RealmBase {
     @Override
     protected void destroyInternal() throws LifecycleException {
         for (Realm realm : realms) {
-            if (realm instanceof Lifecycle) {
-                ((Lifecycle) realm).destroy();
-            }
+            destroyRealm(realm);
         }
         super.destroyInternal();
+
+        for (Realm realm : realmsToDestroy) {
+            destroyRealm(realm);
+        }
+    }
+
+
+    private void destroyRealm(Realm realm) {
+        stopRealm(realm);
+        if (realm instanceof Lifecycle) {
+            try {
+                ((Lifecycle) realm).destroy();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("combinedRealm.realmDestroyFail", realm.getClass().getName()), e);
+            }
+        }
     }
 
 
