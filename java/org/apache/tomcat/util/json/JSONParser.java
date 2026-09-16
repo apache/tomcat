@@ -91,18 +91,25 @@ public class JSONParser implements JSONParserConstants {
                 continue;
             }
             char next = value.charAt(++i);
-            if (next == 'b') {
-                result.append('\b');
-            } else if (next == 'f') {
-                result.append('\f');
-            } else if (next == 'n') {
-                result.append('\n');
-            } else if (next == 'r') {
-                result.append('\r');
-            } else if (next == 't') {
-                result.append('\t');
-            } else {
-                result.append(next);
+            switch (next) {
+                case 'b':
+                    result.append('\b');
+                    break;
+                 case 'f':
+                    result.append('\f');
+                    break;
+                 case 'n':
+                    result.append('\n');
+                    break;
+                 case 'r':
+                    result.append('\r');
+                    break;
+                 case 't':
+                    result.append('\t');
+                    break;
+                 default:
+                    result.append(next);
+                    break;
             }
         }
         return result.toString();
