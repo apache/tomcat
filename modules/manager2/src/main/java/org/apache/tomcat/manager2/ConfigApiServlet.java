@@ -92,6 +92,7 @@ import org.apache.catalina.storeconfig.StoreConfig;
 import org.apache.catalina.storeconfig.StoreDescription;
 import org.apache.catalina.storeconfig.StoreFileMover;
 import org.apache.catalina.storeconfig.StoreLoader;
+import org.apache.catalina.storeconfig.XMLFormatPreserver;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelReceiver;
@@ -5204,6 +5205,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
      */
     private void storeServer(StoreConfig storeConfig, PrintWriter writer, CapturingContextSF capturing)
             throws Exception {
+        StoreFileMover mover =
+                new StoreFileMover(Bootstrap.getCatalinaBase(), storeConfig.getServerFilename(), storeConfig.getRegistry().getEncoding());
 
         StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
         boolean oldSeparate = desc.isStoreSeparate();
@@ -5221,7 +5224,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 }
                 desc.setStoreFactory(capturing);
             }
-            storeConfig.store(writer, -2, server);
+            StringWriter buffer = new StringWriter();
+            storeConfig.store(new PrintWriter(buffer), -2, server);
+            writer.write(XMLFormatPreserver.preserve(mover.getConfigOld(), buffer.toString(),
+                    storeConfig.getRegistry().getEncoding()));
         } finally {
             desc.setStoreSeparate(oldSeparate);
             desc.setExternalAllowed(oldAllowed);
