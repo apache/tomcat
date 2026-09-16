@@ -119,7 +119,7 @@ public class TestCombinedRealm {
         @Override
         protected Principal getPrincipal(String username) {
             if (this.username.equals(username)) {
-                return new GenericPrincipal(username, null);
+                return new GenericPrincipal(username, null, null);
             }
             return null;
         }
