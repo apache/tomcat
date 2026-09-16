@@ -57,7 +57,7 @@ public class JSONParser implements JSONParserConstants {
     }
 
     /**
-     * Parses any JSON-parseable object, returning the value.
+     * Parses any JSON-parsable object, returning the value.
      */
     public Object parse() throws ParseException {
         Object toReturn = anything();
@@ -76,11 +76,9 @@ public class JSONParser implements JSONParserConstants {
     }
 
     /**
-     * Resolve the JSON escape sequences of a string token body (the
-     * surrounding quotes are already removed). The token grammar only
-     * admits the short escapes: {@code \b}, {@code \f}, {@code \n},
-     * {@code \r}, {@code \t}, {@code \/}, {@code \\} and the
-     * self-escaped quote character.
+     * Resolve the JSON escape sequences of a string token body (the surrounding quotes are already removed). The token
+     * grammar only admits the short escapes: {@code \b}, {@code \f}, {@code \n}, {@code \r}, {@code \t}, {@code \/},
+     * {@code \\} and the self-escaped quote character.
      */
     private static String unescape(String value) {
         StringBuilder result = new StringBuilder(value.length());
@@ -92,12 +90,40 @@ public class JSONParser implements JSONParserConstants {
             }
             char next = value.charAt(++i);
             switch (next) {
-                case 'b' -> result.append('\b');
-                case 'f' -> result.append('\f');
-                case 'n' -> result.append('\n');
-                case 'r' -> result.append('\r');
-                case 't' -> result.append('\t');
-                default -> result.append(next);
+                case 'b':
+                    result.append('\b');
+                    break;
+                case 'f':
+                    result.append('\f');
+                    break;
+                case 'n':
+                    result.append('\n');
+                    break;
+                case 'r':
+                    result.append('\r');
+                    break;
+                case 't':
+                    result.append('\t');
+                    break;
+                case 'u':
+                    if (i + 4 >= value.length()) {
+                        throw new IllegalArgumentException("Incomplete Unicode escape sequence");
+                    }
+                    int codeUnit = 0;
+                    for (int j = 0; j < 4; j++) {
+                        char hex = value.charAt(++i);
+                        int digit = Character.digit(hex, 16);
+                        if (digit == -1) {
+                            throw new IllegalArgumentException(
+                                    "Invalid hexadecimal character in Unicode escape: " + hex);
+                        }
+                        codeUnit = codeUnit << 4 | digit;
+                    }
+                    result.append((char) codeUnit);
+                    break;
+                default:
+                    result.append(next);
+                    break;
             }
         }
         return result.toString();
@@ -534,7 +560,7 @@ public class JSONParser implements JSONParserConstants {
 
     /** Generated Token Manager. */
     public JSONParserTokenManager token_source;
-    JavaCharStream jj_input_stream;
+    SimpleCharStream jj_input_stream;
     /** Current token. */
     public Token token;
     /** Next token. */
@@ -547,8 +573,8 @@ public class JSONParser implements JSONParserConstants {
     }
 
     private static void jj_la1_init_0() {
-        jj_la1_0 = new int[] { 0xccf8480, 0x78000, 0x1ccf8000, 0x40, 0x1ccf8000, 0x40, 0xccf8480, 0xccf8000, 0x60000,
-                0x18000, 0xcc00000, 0x8800000, 0x4400000, };
+        jj_la1_0 = new int[] { 0x330f8480, 0x78000, 0x730f8000, 0x40, 0x730f8000, 0x40, 0x330f8480, 0x330f8000, 0x60000,
+                0x18000, 0x33000000, 0x22000000, 0x11000000, };
     }
 
     /** Constructor with InputStream. */
@@ -559,7 +585,7 @@ public class JSONParser implements JSONParserConstants {
     /** Constructor with InputStream and supplied encoding */
     public JSONParser(java.io.InputStream stream, String encoding) {
         try {
-            jj_input_stream = new JavaCharStream(stream, encoding, 1, 1);
+            jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1);
         } catch (java.io.UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -595,7 +621,7 @@ public class JSONParser implements JSONParserConstants {
 
     /** Constructor. */
     public JSONParser(java.io.Reader stream) {
-        jj_input_stream = new JavaCharStream(stream, 1, 1);
+        jj_input_stream = new SimpleCharStream(stream, 1, 1);
         token_source = new JSONParserTokenManager(jj_input_stream);
         token = new Token();
         token.next = jj_nt = token_source.getNextToken();
@@ -608,7 +634,7 @@ public class JSONParser implements JSONParserConstants {
     /** Reinitialise. */
     public void ReInit(java.io.Reader stream) {
         if (jj_input_stream == null) {
-            jj_input_stream = new JavaCharStream(stream, 1, 1);
+            jj_input_stream = new SimpleCharStream(stream, 1, 1);
         } else {
             jj_input_stream.ReInit(stream, 1, 1);
         }
@@ -696,7 +722,7 @@ public class JSONParser implements JSONParserConstants {
     /** Generate ParseException. */
     public ParseException generateParseException() {
         jj_expentries.clear();
-        boolean[] la1tokens = new boolean[29];
+        boolean[] la1tokens = new boolean[31];
         if (jj_kind >= 0) {
             la1tokens[jj_kind] = true;
             jj_kind = -1;
@@ -710,7 +736,7 @@ public class JSONParser implements JSONParserConstants {
                 }
             }
         }
-        for (int i = 0; i < 29; i++) {
+        for (int i = 0; i < 31; i++) {
             if (la1tokens[i]) {
                 jj_expentry = new int[1];
                 jj_expentry[0] = i;
@@ -724,7 +750,6 @@ public class JSONParser implements JSONParserConstants {
         return new ParseException(token, exptokseq, tokenImage);
     }
 
-    private int trace_indent = 0;
     private boolean trace_enabled;
 
     /** Trace enabled. */

@@ -19,7 +19,7 @@ options {
     CHOICE_AMBIGUITY_CHECK=3;
     OTHER_AMBIGUITY_CHECK=2;
     ERROR_REPORTING=true;
-    JAVA_UNICODE_ESCAPE=true;
+    JAVA_UNICODE_ESCAPE=false;
     UNICODE_INPUT=true;
     IGNORE_CASE=true;
     SUPPORT_CLASS_VISIBILITY_PUBLIC=true;
@@ -123,12 +123,39 @@ public class JSONParser {
             }
             char next = value.charAt(++i);
             switch (next) {
-                case 'b' -> result.append('\b');
-                case 'f' -> result.append('\f');
-                case 'n' -> result.append('\n');
-                case 'r' -> result.append('\r');
-                case 't' -> result.append('\t');
-                default -> result.append(next);
+                case 'b':
+                   result.append('\b');
+                   break;
+                case 'f':
+                   result.append('\f');
+                   break;
+                case 'n':
+                   result.append('\n');
+                   break;
+                case 'r':
+                   result.append('\r');
+                   break;
+                case 't':
+                   result.append('\t');
+                   break;
+                case 'u':
+                    if (i + 4 >= value.length()) {
+                        throw new IllegalArgumentException("Incomplete Unicode escape sequence");
+                    }
+                    int codeUnit = 0;
+                    for (int j = 0; j < 4; j++) {
+                        char hex = value.charAt(++i);
+                        int digit = Character.digit(hex, 16);
+                        if (digit == -1) {
+                            throw new IllegalArgumentException("Invalid hexadecimal character in Unicode escape: " + hex);
+                        }
+                        codeUnit = codeUnit << 4 | digit;
+                    }
+                    result.append((char) codeUnit);
+                    break;
+                default:
+                   result.append(next);
+                   break;
             }
         }
         return result.toString();
@@ -211,15 +238,19 @@ TOKEN:{
 TOKEN:{
     <#QUOTE_DOUBLE: "\"">
 | <#QUOTE_SINGLE: "'">
+| <#HEX_DIGIT: ["0"-"9","a"-"f","A"-"F"]>
+| <#UNICODE_ESCAPE: "\\" "u" <HEX_DIGIT> <HEX_DIGIT> <HEX_DIGIT> <HEX_DIGIT>>
 | <STRING_SINGLE_EMPTY: "''">
 | <STRING_DOUBLE_EMPTY: "\"\"">
 | <#STRING_SINGLE_BODY: (
         (~["'","\\","\r","\n","\f","\t"]) |
-        ( "\\" ( "r" | "n" | "f" | "\\" | "/" | "'" | "b" | "t" ) )
+        ( "\\" ( "r" | "n" | "f" | "\\" | "/" | "'" | "b" | "t" ) ) |
+        <UNICODE_ESCAPE>
     )+>
 | <#STRING_DOUBLE_BODY: (
         (~["\"","\\","\r","\n","\f","\t"]) |
-        ( "\\" ( "r" | "n" | "f" | "\\" | "/" | "\"" | "b" | "t" ) )
+        ( "\\" ( "r" | "n" | "f" | "\\" | "/" | "\"" | "b" | "t" ) ) |
+        <UNICODE_ESCAPE>
     )+>
 | <STRING_SINGLE_NONEMPTY: <QUOTE_SINGLE> <STRING_SINGLE_BODY> <QUOTE_SINGLE>>
 | <STRING_DOUBLE_NONEMPTY: <QUOTE_DOUBLE> <STRING_DOUBLE_BODY> <QUOTE_DOUBLE>>
