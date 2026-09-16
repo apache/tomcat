@@ -16,14 +16,14 @@
  */
 
 import { api } from '../api.js';
-import { el, clear, table, toast, modal, confirm } from '../ui.js';
+import { el, clear, table, toast, modal, confirm, actionMenu } from '../ui.js';
 
 export async function hosts(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
           el('h1', {}, 'Virtual hosts'),
           el('p', {}, 'Add, start, stop and remove virtual hosts on this engine.'),
-          el('span', { style: 'flex:1' }),
+          el('span', { class: 'head-spacer' }),
           el('button', { type: 'button', class: 'btn', onclick: () => persist() }, 'Save to server.xml'),
           el('button', { type: 'button', class: 'btn btn-primary', onclick: () => addHostModal() }, 'Add host')));
   container.append(view);
@@ -53,27 +53,29 @@ export async function hosts(container) {
           render: (h) => el('span', { class: 'badge ' + (h.started ? 'ok' : 'stop') },
               h.started ? 'Running' : 'Stopped'),
         },
-        { key: 'self', label: '', render: (h) => h.self ? el('span', { class: 'badge plain' }, 'this host') : '' },
+        {
+          key: 'self', label: 'Self',
+          render: (h) => h.self
+              ? el('span', { class: 'badge plain' }, 'this host')
+              : el('span', { class: 'muted' }, '-'),
+        },
         {
           key: 'actions', label: 'Actions',
-          render: (h) => el('div', { class: 'row-actions' },
+          render: (h) => actionMenu([
               h.started
-                  ? el('button', {
-                    type: 'button', class: 'btn btn-sm', disabled: h.self,
-                    onclick: () => startStop(h, 'stop'),
-                  }, 'Stop')
-                  : el('button', {
-                    type: 'button', class: 'btn btn-sm btn-primary', disabled: h.self,
-                    onclick: () => startStop(h, 'start'),
-                  }, 'Start'),
-              el('button', {
-                type: 'button', class: 'btn btn-sm btn-danger', disabled: h.self,
+                  ? { label: 'Stop', disabled: h.self, onclick: () => startStop(h, 'stop') }
+                  : { label: 'Start', class: 'btn-primary', disabled: h.self, onclick: () => startStop(h, 'start') },
+              {
+                label: 'Remove', class: 'btn-danger', disabled: h.self,
                 title: h.self ? 'Cannot remove the host the manager is installed in' : 'Remove',
                 onclick: () => removeHost(h),
-              }, 'Remove')),
-      }],
+              },
+          ]),
+        },
+      ],
       rows: data,
       empty: 'No virtual hosts configured',
+      stackable: true,
     }));
   }
 

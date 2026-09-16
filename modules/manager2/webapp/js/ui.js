@@ -270,17 +270,122 @@ export function drawer({ title, content, onClose = null }) {
   return close;
 }
 
+// ============================ Menu =====================================
+
+/**
+ * Show a small dropdown menu anchored to a trigger element (e.g. the kebab
+ * button of a row action list). Returns a close function.
+ *
+ * @param {object} opts { trigger (HTMLElement), items: [{label, variant
+ *          ('danger'|'primary'), disabled, title, onClick}] }
+ */
+export function menu({ trigger, items }) {
+  const node = el('div', { class: 'menu', role: 'menu' },
+      items.map((it) => el('button', {
+        type: 'button',
+        role: 'menuitem',
+        class: 'menu-item' + (it.variant ? ' ' + it.variant : ''),
+        disabled: it.disabled || null,
+        title: it.title || null,
+        onclick: () => {
+          close();
+          if (it.onClick) it.onClick();
+        },
+      }, it.label)));
+
+  const backdrop = el('div', { class: 'menu-backdrop' });
+  document.body.append(backdrop, node);
+
+  // Position below the trigger, right aligned; flip above when there is no
+  // room and clamp to the viewport.
+  const rect = trigger.getBoundingClientRect();
+  const left = Math.max(8, Math.min(rect.right - node.offsetWidth,
+      window.innerWidth - node.offsetWidth - 8));
+  let top = rect.bottom + 4;
+  if (top + node.offsetHeight > window.innerHeight - 8) {
+    top = Math.max(8, rect.top - 4 - node.offsetHeight);
+  }
+  node.style.cssText = 'left:' + left + 'px;top:' + top + 'px;';
+
+  let closed = false;
+  function close() {
+    if (closed) return;
+    closed = true;
+    backdrop.remove();
+    node.remove();
+    document.removeEventListener('keydown', onKey, true);
+    trigger.focus({ preventScroll: true });
+  }
+  const onKey = (e) => {
+    if (e.key === 'Escape') close();
+  };
+  document.addEventListener('keydown', onKey, true);
+  backdrop.addEventListener('click', close);
+  const first = node.querySelector('.menu-item:not(:disabled)');
+  if (first) first.focus();
+  return close;
+}
+
+/**
+ * Build a row action list that collapses into a kebab (overflow) menu on
+ * narrow screens: the buttons always render, CSS hides all of them except
+ * the kebab below 768 px, and the kebab opens the same actions in a
+ * dropdown menu.
+ *
+ * @param {Array<{label, class, onclick, disabled, title}>} actions
+ */
+export function actionMenu(actions) {
+  const wrap = el('div', { class: 'row-actions has-kebab' });
+  for (const a of actions) {
+    wrap.append(el('button', {
+      type: 'button',
+      class: 'btn btn-sm' + (a.class ? ' ' + a.class : ''),
+      disabled: a.disabled || null,
+      title: a.title || null,
+      onclick: (e) => {
+        e.stopPropagation();
+        if (a.onclick) a.onclick();
+      },
+    }, a.label));
+  }
+  const kebab = el('button', {
+    type: 'button',
+    class: 'row-actions-kebab',
+    'aria-label': 'More actions',
+    'aria-haspopup': 'menu',
+    onclick: (e) => {
+      e.stopPropagation();
+      menu({
+        trigger: kebab,
+        items: actions.map((a) => ({
+          label: a.label,
+          variant: a.class === 'btn-danger' ? 'danger'
+              : (a.class === 'btn-primary' ? 'primary' : ''),
+          disabled: a.disabled,
+          title: a.title,
+          onClick: a.onclick,
+        })),
+      });
+    },
+  }, icon('more', 16));
+  wrap.append(kebab);
+  return wrap;
+}
+
 // ============================ Table ====================================
 
 /**
  * Build a data table.
  *
- * @param {object} opts { columns: [{key, label, sortable, render, numeric}],
+ * @param {object} opts { columns: [{key, label, sortable, render, numeric,
+ *          wide (long text column that may wrap on narrow screens)}],
  *          rows: [object], sortKey, sortAsc, onSort(key), onRowClick(row),
- *          empty (string) }
+ *          empty (string), stackable (boolean - render as stacked cards on
+ *          narrow screens; each cell carries its column label) }
  */
 export function table(opts) {
-  const { columns, rows, sortKey = null, sortAsc = true, onSort, onRowClick, empty = 'No data' } = opts;
+  const { columns, rows, sortKey = null, sortAsc = true, onSort, onRowClick,
+      empty = 'No data', stackable = false } = opts;
 
   const thead = el('tr', {}, columns.map((c) => {
     const label = c.sortable
@@ -295,12 +400,19 @@ export function table(opts) {
 
   const tbody = el('tbody', {}, rows.length === 0
       ? el('tr', {}, el('td', { colspan: columns.length, class: 'empty' }, empty))
-      : rows.map((row) => el('tr', {
-        onclick: onRowClick ? () => onRowClick(row) : null,
-        style: onRowClick ? 'cursor:pointer' : null,
-      }, columns.map((c) => {
-        const value = c.render ? c.render(row) : row[c.key];
-        const node = el('td', { class: c.numeric ? 'num' : (c.muted ? 'muted' : '') });
+       : rows.map((row) => el('tr', {
+         onclick: onRowClick ? () => onRowClick(row) : null,
+         style: onRowClick ? 'cursor:pointer' : null,
+       }, columns.map((c) => {
+          const value = c.render ? c.render(row) : row[c.key];
+          const classes = [];
+          if (c.numeric) classes.push('num');
+          else if (c.muted) classes.push('muted');
+          if (c.wide) classes.push('wide');
+          const node = el('td', {
+            class: classes.length > 0 ? classes.join(' ') : null,
+            'data-label': stackable && c.label ? c.label : null,
+          });
         if (value === null || value === undefined) {
           node.append(document.createTextNode('-'));
         } else if (value.nodeType) {
@@ -311,7 +423,7 @@ export function table(opts) {
         return node;
       }))));
 
-  return el('div', { class: 'table-wrap' },
+  return el('div', { class: 'table-wrap' + (stackable ? ' stackable' : '') },
       el('table', { class: 'data' }, el('thead', {}, thead), tbody));
 }
 
@@ -337,6 +449,7 @@ const ICONS = {
   users: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
   close: 'M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6 6.4 5Z',
   config: 'M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h3v3h3v-3h3v3h-3v3h3v3h-3v-3h-3v3h-3v-3h3v-3h-3Z',
+  more: 'M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
 };
 
 export function icon(name, size = 18) {

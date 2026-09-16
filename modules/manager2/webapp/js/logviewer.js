@@ -138,6 +138,7 @@ function columnsFor(fields) {
       label: def.label || key,
       numeric: def.numeric ? true : null,
       muted: !def.render && !def.numeric ? true : null,
+      wide: def.wide ? true : null,
       render: def.render
         ? def.render
         : def.mono

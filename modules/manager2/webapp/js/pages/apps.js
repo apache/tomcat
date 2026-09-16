@@ -16,7 +16,7 @@
  */
 
 import { BASE, api, getCsrfToken, setCsrfToken } from '../api.js';
-import { el, clear, table, stateBadge, toast, modal, confirm, drawer,
+import { el, clear, table, stateBadge, toast, modal, confirm, drawer, actionMenu,
     formatTimestamp, formatDuration } from '../ui.js';
 
 /**
@@ -43,7 +43,7 @@ export async function apps(container) {
       el('div', { class: 'page-head' },
           el('h1', {}, 'Applications'),
           el('p', {}, 'Deploy, start, stop, reload and undeploy web applications.'),
-          el('span', { style: 'flex:1' }),
+          el('span', { class: 'head-spacer' }),
           el('button', { type: 'button', class: 'btn btn-primary', onclick: () => deployModal() },
               'Deploy application')));
   container.append(view);
@@ -83,32 +83,25 @@ export async function apps(container) {
         },
         {
           key: 'actions', label: 'Actions',
-          render: (a) => el('div', { class: 'row-actions' },
+          render: (a) => actionMenu([
               a.available
-                  ? el('button', {
-                    type: 'button', class: 'btn btn-sm',
-                    onclick: (e) => { e.stopPropagation(); lifecycle(a, 'stop'); },
-                  }, 'Stop')
-                  : el('button', {
-                    type: 'button', class: 'btn btn-sm btn-primary',
-                    onclick: (e) => { e.stopPropagation(); lifecycle(a, 'start'); },
-                  }, 'Start'),
-              el('button', {
-                type: 'button', class: 'btn btn-sm', disabled: !a.available,
-                onclick: (e) => { e.stopPropagation(); lifecycle(a, 'reload'); },
-              }, 'Reload'),
-              el('button', {
-                type: 'button', class: 'btn btn-sm btn-danger', disabled: a.self,
+                  ? { label: 'Stop', onclick: () => lifecycle(a, 'stop') }
+                  : { label: 'Start', class: 'btn-primary', onclick: () => lifecycle(a, 'start') },
+              { label: 'Reload', disabled: !a.available, onclick: () => lifecycle(a, 'reload') },
+              {
+                label: 'Undeploy', class: 'btn-danger', disabled: a.self,
                 title: a.self ? 'Cannot undeploy the manager itself' : 'Undeploy',
-                onclick: (e) => { e.stopPropagation(); undeploy(a); },
-              }, 'Undeploy')),
-      }],
+                onclick: () => undeploy(a),
+              },
+          ]),
+        }],
       rows: data.apps,
       onRowClick: (a) => {
         window.history.pushState({}, '', BASE + appUrl(a.host, a.path));
         window.dispatchEvent(new PopStateEvent('popstate'));
       },
       empty: 'No applications deployed',
+      stackable: true,
     }));
   }
 
@@ -422,7 +415,7 @@ export async function appDetail(container, params) {
     const controls = el('div', { class: 'row-actions', style: 'margin-bottom:12px;' },
         el('input', {
           type: 'number', id: 'expire-idle', min: '0', placeholder: 'idle seconds',
-          style: 'width:130px;',
+          class: 'expire-idle-input',
         }),
         el('button', {
           type: 'button', class: 'btn btn-sm',
@@ -441,7 +434,7 @@ export async function appDetail(container, params) {
             }
           },
         }, 'Expire idle'),
-        el('span', { style: 'flex:1' }),
+        el('span', { class: 'head-spacer' }),
         el('button', {
           type: 'button', class: 'btn btn-sm btn-danger',
           onclick: async () => {
@@ -523,21 +516,22 @@ export async function appDetail(container, params) {
               s.active ? 'active' : 'proxy'),
         },
       ],
-      rows: data.sessions,
-      sortKey: data.sort || sortKey,
-      sortAsc: data.order === 'ASC',
-      onSort: (key) => {
-        if (sortKey === key) {
-          asc = !asc;
-        } else {
-          sortKey = key;
-          asc = true;
-        }
-        loadSessionTable(sortKey, asc);
-      },
-      onRowClick: (s) => sessionDrawer(s),
-      empty: 'No sessions',
-    }));
+        rows: data.sessions,
+        sortKey: data.sort || sortKey,
+        sortAsc: data.order === 'ASC',
+        onSort: (key) => {
+          if (sortKey === key) {
+            asc = !asc;
+          } else {
+            sortKey = key;
+            asc = true;
+          }
+          loadSessionTable(sortKey, asc);
+        },
+        onRowClick: (s) => sessionDrawer(s),
+        empty: 'No sessions',
+        stackable: true,
+      }));
   }
 
   function sessionDrawer(session) {
@@ -657,7 +651,7 @@ export async function appDetail(container, params) {
 
     pane.append(el('div', { class: 'card' },
         el('h3', {}, 'Servlets'),
-        el('div', { class: 'table-wrap' },
+        el('div', { class: 'table-wrap stackable' },
             el('table', { class: 'data' },
                 el('thead', {}, el('tr', {},
                     el('th', {}, 'Name'),
@@ -667,12 +661,12 @@ export async function appDetail(container, params) {
                     el('th', { class: 'num' }, 'Processing time'),
                     el('th', { class: 'num' }, 'Max time'))),
                 el('tbody', {}, (data.wrappers || []).map((w) => el('tr', {},
-                    el('td', {}, el('code', {}, w.name)),
-                    el('td', { class: 'muted' }, (w.mappings || []).join(', ')),
-                    el('td', { class: 'num' }, String(w.requestCount)),
-                    el('td', { class: 'num' }, String(w.errorCount)),
-                    el('td', { class: 'num' }, formatDuration(w.processingTime)),
-                    el('td', { class: 'num' }, formatDuration(w.maxTime)))))))));
+                    el('td', { 'data-label': 'Name' }, el('code', {}, w.name)),
+                    el('td', { class: 'muted', 'data-label': 'Mappings' }, (w.mappings || []).join(', ')),
+                    el('td', { class: 'num', 'data-label': 'Requests' }, String(w.requestCount)),
+                    el('td', { class: 'num', 'data-label': 'Errors' }, String(w.errorCount)),
+                    el('td', { class: 'num', 'data-label': 'Processing time' }, formatDuration(w.processingTime)),
+                    el('td', { class: 'num', 'data-label': 'Max time' }, formatDuration(w.maxTime)))))))));
   }
 
   function kpi(label, value) {

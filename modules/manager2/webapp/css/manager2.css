@@ -179,6 +179,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 
 .topbar-actions { display: flex; align-items: center; gap: var(--space-2); }
+/* The logout button carries an icon that is only shown on narrow screens
+   (where the text label is hidden). */
+#logout svg { display: none; fill: currentColor; }
 
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -232,6 +235,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   flex-wrap: wrap;
 }
 .page-head p { margin: 0; color: var(--text-soft); font-size: 13px; }
+.page-head h1 { overflow-wrap: anywhere; }
+.head-spacer { flex: 1; }
 
 /* ============================ Cards / grid ============================= */
 
@@ -293,6 +298,20 @@ table.data .muted { color: var(--text-faint); }
 .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .row-actions .row-actions-sep { align-self: stretch; width: 1px; margin: 2px 3px; background: var(--border); }
 
+/* Overflow (kebab) button of a .row-actions.has-kebab list. It is hidden
+   on wide screens, where the individual buttons are shown instead. */
+.row-actions-kebab {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-s);
+  color: var(--text-soft);
+}
+.row-actions-kebab:hover { background: var(--bg-hover); color: var(--text); }
+.row-actions-kebab svg { fill: currentColor; }
+
 /* ============================ Log pages ================================= */
 
 .muted { color: var(--text-faint); }
@@ -310,6 +329,12 @@ table.data .muted { color: var(--text-faint); }
 .log-status { font-size: 12.5px; }
 .log-table table.data td { overflow-wrap: anywhere; max-width: 640px; }
 .log-table table.data code { word-break: break-all; }
+
+/* Fixed-width inline controls (diagnostics, app detail). On narrow screens
+   these drop to full width (see the responsive section). */
+.tls-host { width: 280px; max-width: 100%; }
+.res-type { width: 220px; max-width: 100%; }
+.expire-idle-input { width: 130px; max-width: 100%; }
 
 /* ============================ Users page =============================== */
 
@@ -429,8 +454,9 @@ textarea { resize: vertical; min-height: 90px; font-family: var(--mono); font-si
 
 /* ============================ Tabs ===================================== */
 
-.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); overflow-x: auto; }
 .tab {
+  flex: none;
   padding: 9px 14px;
   background: transparent; border: none; border-bottom: 2px solid transparent;
   color: var(--text-soft);
@@ -485,6 +511,39 @@ textarea { resize: vertical; min-height: 90px; font-family: var(--mono); font-si
   border-bottom: 1px solid var(--border);
 }
 .drawer-body { padding: var(--space-5); overflow-y: auto; }
+
+/* ============================ Menu =================================== */
+
+.menu-backdrop { position: fixed; inset: 0; z-index: 150; }
+.menu {
+  position: fixed;
+  z-index: 151;
+  min-width: 150px;
+  max-width: min(260px, calc(100vw - 16px));
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  box-shadow: var(--shadow-2);
+  padding: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.menu-item {
+  display: flex; align-items: center;
+  width: 100%;
+  padding: 9px 10px;
+  background: transparent;
+  border: none; border-radius: 4px;
+  color: var(--text);
+  font-size: 13.5px; font-weight: 550;
+  text-align: left;
+  white-space: nowrap;
+}
+.menu-item:hover { background: var(--bg-hover); }
+.menu-item:disabled { opacity: 0.5; cursor: not-allowed; }
+.menu-item.danger { color: var(--danger); }
+.menu-item.danger:hover:not(:disabled) { background: var(--danger-soft); }
+.menu-item.primary { color: var(--accent-text); }
+.menu-item.primary:hover:not(:disabled) { background: var(--accent-soft); }
 
 /* ============================ Toasts =================================== */
 
@@ -820,4 +879,173 @@ pre.block {
   .kv { grid-template-columns: 1fr; gap: 2px; }
   .kv dt { margin-top: 8px; }
   h1 { font-size: 19px; }
+}
+
+/* ============================ Responsive: phone ======================== */
+
+@media (max-width: 768px) {
+  /* Page head: title first, then full width action buttons */
+  .page-head { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+  .page-head .btn { width: 100%; }
+  .head-spacer { display: none; }
+
+  /* Tables: the opt-in tables render as stacked cards (one row per card,
+     each cell labelled with its column). High volume tables stay
+     scrollable and pin their first column instead. */
+  .table-wrap.stackable table.data,
+  .table-wrap.stackable table.data tbody,
+  .table-wrap.stackable table.data tr,
+  .table-wrap.stackable table.data td { display: block; width: 100%; }
+  .table-wrap.stackable thead { display: none; }
+  .table-wrap.stackable tbody tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    margin-bottom: var(--space-2);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+  }
+  /* Note: the selector must repeat "table.data" to keep a specificity at
+     least as high as the display:block rule above. */
+  .table-wrap.stackable table.data td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+  .table-wrap.stackable td:last-child { border-bottom: none; }
+  .table-wrap.stackable td::before {
+    content: attr(data-label);
+    flex: none;
+    max-width: 45%;
+    text-align: left;
+    font-size: 11.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  /* Cells without a label (e.g. the row checkbox) are dropped from the
+     card; the empty-state cell stays visible. */
+  .table-wrap.stackable table.data td:not([data-label]):not(.empty) { display: none; }
+  .table-wrap.stackable table.data td.empty { display: flex; justify-content: center; }
+  .table-wrap.stackable table.data td code,
+  .table-wrap.stackable table.data td .mono { overflow-wrap: anywhere; }
+
+  /* Row actions collapse into a kebab menu */
+  .row-actions.has-kebab > :not(.row-actions-kebab) { display: none !important; }
+  .row-actions.has-kebab .row-actions-kebab { display: inline-flex; min-width: 44px; min-height: 44px; }
+
+  /* Log page controls stack */
+  .log-controls { flex-direction: column; align-items: stretch; gap: var(--space-3); }
+  .log-controls .field { width: 100%; }
+  .log-field-btn .btn { width: 100%; }
+  .log-filters { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .log-filters .log-field-search { grid-column: 1 / -1; }
+
+  /* Inline controls go full width */
+  .tls-host, .res-type, .expire-idle-input { width: 100%; }
+  .row-actions .tls-host + .btn,
+  .row-actions .res-type + .btn { width: 100%; }
+
+  /* Configuration page */
+  .config-tree { max-height: 260px; }
+  .config-prop-edit { flex-wrap: wrap; }
+  .config-prop-edit .config-input { flex: 1 1 100%; }
+  .config-detail-card { scroll-margin-top: var(--space-3); }
+
+  /* Modals: full width stacked actions */
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions .btn { width: 100%; }
+
+  /* Toasts render above the bottom nav */
+  .toast-region { bottom: calc(var(--bottomnav-h) + var(--space-4)); }
+
+  /* Bottom nav: keep the labels inside their slot */
+  .nav-item { min-width: 0; }
+  .nav-item .nav-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .icon-btn { min-width: 44px; min-height: 44px; }
+}
+
+/* Scrollable tables on phones. (max-width: 768px) covers portrait phones;
+   the landscape media adds the wider landscape phones (769-932 px) whose
+   shell is still desktop-sized but which need the same table treatment. */
+@media (max-width: 768px), (orientation: landscape) and (max-height: 520px) {
+  /* Size to content (floored at the container width) so columns are not
+     squeezed, and keep cells on one line. */
+  .table-wrap:not(.stackable) table.data {
+    width: auto;
+    min-width: 100%;
+  }
+  /* Pin the first column while the table scrolls horizontally. */
+  .table-wrap:not(.stackable) table.data th:first-child,
+  .table-wrap:not(.stackable) table.data td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg-card);
+    box-shadow: 1px 0 0 var(--border);
+  }
+  .table-wrap:not(.stackable) table.data th:first-child { z-index: 2; }
+  .table-wrap:not(.stackable) tbody tr:hover td:first-child { background: var(--bg-hover); }
+  .table-wrap:not(.stackable) table.data td { white-space: nowrap; }
+  /* Long text columns (log messages, requests) wrap within a capped
+     width instead of making the table extremely wide. min-width is what
+     actually steers table-layout:auto: width/max-width alone would let
+     the layout squeeze the column and the text would wrap at a few
+     characters per line. With table-layout:auto any table width beyond
+     the sum of the column minimums flows into these wrap-able columns,
+     so a larger min width directly shortens the rows. */
+  .table-wrap:not(.stackable) table.data td.wide {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 60vw;
+  }
+  .table-wrap code { overflow-wrap: anywhere; }
+}
+
+/* The log pages are information dense. In portrait the pinned Time column
+   would dominate the viewport and leave a sliver for the scrolling
+   content, so let the whole table scroll. And give the message/request
+   column most of the viewport so typical lines wrap to at most two rows;
+   max-width:none drops the 640 px desktop cell cap that would starve the
+   column again. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .table-wrap.log-table:not(.stackable) table.data th:first-child,
+  .table-wrap.log-table:not(.stackable) table.data td:first-child {
+    position: static;
+    background: transparent;
+    box-shadow: none;
+  }
+  .table-wrap.log-table table.data td.wide { min-width: 90vw; max-width: none; }
+}
+
+/* Landscape phones: even more of the viewport for the message/request
+   column so rows stay one or two lines tall. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .table-wrap.log-table table.data td.wide { min-width: 100vw; max-width: none; }
+}
+
+@media (max-width: 480px) {
+  .content { padding: var(--space-4) var(--space-3) calc(var(--bottomnav-h) + var(--space-4)); }
+  .card { padding: var(--space-4); }
+  .topbar { padding: 0 var(--space-3); gap: var(--space-2); }
+  .tab { padding: 9px 10px; }
+  #logout svg { display: block; }
+  #logout .logout-label { display: none; }
+  /* 16 px controls stop iOS Safari from zooming in on focus */
+  input[type="text"], input[type="password"], input[type="number"], select, textarea { font-size: 16px; }
+}
+
+/* Compact phones held in landscape */
+@media (orientation: landscape) and (max-width: 768px) and (max-height: 480px) {
+  .content { padding-top: var(--space-3); padding-bottom: calc(var(--bottomnav-h) + var(--space-3)); }
+  .card { margin-bottom: var(--space-3); }
+  .page-head { margin-bottom: var(--space-4); }
 }

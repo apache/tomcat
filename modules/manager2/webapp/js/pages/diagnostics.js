@@ -57,7 +57,7 @@ export async function diagnostics(container) {
     const pane = paneNodes[0];
     const reloadRow = el('div', { class: 'row-actions', style: 'margin-bottom:14px;' },
         el('input', {
-          type: 'text', placeholder: 'TLS SNI host name (optional)', style: 'width:280px;', id: 'tls-host',
+          type: 'text', placeholder: 'TLS SNI host name (optional)', class: 'tls-host', id: 'tls-host',
         }),
         el('button', {
           type: 'button', class: 'btn btn-sm',
@@ -165,7 +165,7 @@ export async function diagnostics(container) {
     const pane = paneNodes[2];
     pane.append(el('div', { class: 'card' },
         el('div', { class: 'row-actions', style: 'margin-bottom:14px;' },
-            el('select', { id: 'res-type', style: 'width:220px;' },
+            el('select', { id: 'res-type', class: 'res-type' },
                 el('option', { value: '' }, 'All types'),
                 el('option', { value: 'env/java:comp/env' }, 'env/java:comp/env'),
                 el('option', { value: 'env/ejb' }, 'env/ejb'),

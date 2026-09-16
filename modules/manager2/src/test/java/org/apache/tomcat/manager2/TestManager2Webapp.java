@@ -270,6 +270,13 @@ public class TestManager2Webapp extends TomcatBaseTest {
         requestRaw(client, "GET", MANAGER2 + "/apps", 200);
         Assert.assertTrue(client.getResponseBody().contains("shell-main"));
 
+        // A multi-segment deep link (e.g. an application detail page) must also
+        // serve the shell, with a base element so the shell's relative asset URLs
+        // resolve against the context instead of the deep path.
+        requestRaw(client, "GET", MANAGER2 + "/apps/localhost/myapp", 200);
+        Assert.assertTrue(client.getResponseBody().contains("shell-main"));
+        Assert.assertTrue(client.getResponseBody().contains("<base href=\"" + MANAGER2 + "/\">"));
+
         client.disconnect();
     }
 

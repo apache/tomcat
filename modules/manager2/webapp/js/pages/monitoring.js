@@ -39,7 +39,7 @@ export async function monitoring(container) {
   const connectorsCard = el('div', { class: 'card' },
       el('div', { class: 'card-title-row' },
           el('h3', {}, el('span', { class: 'live-dot' }), 'Connectors')),
-      el('div', { class: 'table-wrap' }));
+      el('div', { class: 'table-wrap stackable' }));
   const connectorsWrap = connectorsCard.querySelector('.table-wrap');
   view.append(connectorsCard);
 
@@ -76,16 +76,16 @@ export async function monitoring(container) {
   function renderConnectors(connectors) {
     clear(connectorsWrap);
     const rows = connectors.map((c) => el('tr', {},
-        el('td', {}, el('strong', {}, c.name)),
-        el('td', { class: 'num' }, c.threads.busy + ' / ' + c.threads.current + ' / ' + c.threads.max),
-        el('td', { class: 'num' }, String(c.threads.keepAlive)),
+        el('td', { 'data-label': 'Connector' }, el('strong', {}, c.name)),
+        el('td', { class: 'num', 'data-label': 'Threads' }, c.threads.busy + ' / ' + c.threads.current + ' / ' + c.threads.max),
+        el('td', { class: 'num', 'data-label': 'Keep-alive' }, String(c.threads.keepAlive)),
         c.requests
-            ? el('td', { class: 'num' }, formatMs(c.requests.processingTime) + ' (max ' + formatMs(c.requests.maxTime) + ')')
-            : el('td', {}, '-'),
-        el('td', { class: 'num' }, String(c.requests ? c.requests.count : '-')),
-        el('td', { class: 'num' }, String(c.requests ? c.requests.errors : '-')),
-        el('td', { class: 'num' }, c.requests ? formatBytes(c.requests.bytesReceived) : '-'),
-        el('td', { class: 'num' }, c.requests ? formatBytes(c.requests.bytesSent) : '-')));
+            ? el('td', { class: 'num', 'data-label': 'Processing time' }, formatMs(c.requests.processingTime) + ' (max ' + formatMs(c.requests.maxTime) + ')')
+            : el('td', { 'data-label': 'Processing time' }, '-'),
+        el('td', { class: 'num', 'data-label': 'Requests' }, String(c.requests ? c.requests.count : '-')),
+        el('td', { class: 'num', 'data-label': 'Errors' }, String(c.requests ? c.requests.errors : '-')),
+        el('td', { class: 'num', 'data-label': 'Bytes in' }, c.requests ? formatBytes(c.requests.bytesReceived) : '-'),
+        el('td', { class: 'num', 'data-label': 'Bytes out' }, c.requests ? formatBytes(c.requests.bytesSent) : '-')));
     connectorsWrap.append(el('table', { class: 'data' },
         el('thead', {}, el('tr', {},
             el('th', {}, 'Connector'),
@@ -116,7 +116,7 @@ export async function monitoring(container) {
         el('td', {}, el('code', {},
             (w.remoteAddrForwarded ? w.remoteAddrForwarded + ' (' + w.remoteAddr + ')' : (w.remoteAddr || '-')))),
         el('td', {}, w.virtualHost || '-'),
-        el('td', {},
+        el('td', { class: 'wide' },
             (w.method)
                 ? el('code', {}, w.method + ' ' + w.uri + (w.queryString ? '?' + w.queryString : '') + ' ' + w.protocol)
                 : '-')));

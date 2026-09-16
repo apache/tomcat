@@ -28,8 +28,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * Serves the SPA entry point and the SPA deep-link routes (e.g. {@code /apps}, {@code /hosts}, {@code /monitoring},
  * {@code /diagnostics}) which have no server-side resource of their own.
  * <p>
- * Unauthenticated visitors are forwarded to the login page. Authenticated users are forwarded to the SPA shell
- * ({@code /index.html}) so that the browser keeps the requested URL (deep links survive a reload).
+ * Unauthenticated visitors are forwarded to the login page. Authenticated users get the SPA shell (rendered from
+ * {@code /index.html}, with the {@code <base>} element injected) so that the browser keeps the requested URL (deep
+ * links survive a reload). Rendering the shell as a template - instead of forwarding to the static file - is what
+ * makes multi-segment deep links (e.g. {@code /apps/localhost/myapp}) work: without a base element the browser would
+ * resolve the shell's relative asset URLs against the deep path.
  * <p>
  * The SPA shell itself is deliberately <em>not</em> protected with a security constraint: a constraint on {@code /}
  * would match every request in the context (including the CSS and JS that the login page needs) and would poison the
@@ -61,7 +64,12 @@ public class HomeServlet extends HttpServlet {
         }
 
         if (request.getUserPrincipal() != null) {
-            request.getRequestDispatcher("/index.html").forward(request, response);
+            String template = Html.readTemplate(getServletContext(), "/index.html");
+            if (template == null) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SPA shell missing");
+                return;
+            }
+            Html.render(request, response, template);
         } else {
             request.getRequestDispatcher("/login").forward(request, response);
         }

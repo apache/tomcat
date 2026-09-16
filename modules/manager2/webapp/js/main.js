@@ -17,7 +17,7 @@
 
 import { BASE, get } from './api.js';
 import { register, setNotFound, render, setNavUpdater } from './router.js';
-import { el, clear, svgPath, toast, formatDuration } from './ui.js';
+import { el, clear, icon, svgPath, toast, formatDuration } from './ui.js';
 import { dashboard } from './pages/dashboard.js';
 import { apps, appDetail } from './pages/apps.js';
 import { hosts } from './pages/hosts.js';
@@ -103,7 +103,12 @@ function buildNav() {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', svgPath(item.icon));
     svg.append(path);
-    btn.append(svg, document.createTextNode(item.label));
+    // The label is a span so that it can be truncated on narrow screens
+    // (see the bottom nav rules in the CSS).
+    const label = document.createElement('span');
+    label.className = 'nav-label';
+    label.textContent = item.label;
+    btn.append(svg, label);
     btn.addEventListener('click', () => {
       window.history.pushState({}, '', BASE + item.route);
       render();
@@ -151,6 +156,16 @@ async function boot() {
   initTheme();
   buildNav();
   setNavUpdater(updateNav);
+
+  // Rebuild the logout button as icon + label: on narrow screens the label
+  // is hidden and the icon takes its place (see the CSS).
+  const logoutBtn = document.getElementById('logout');
+  logoutBtn.setAttribute('aria-label', 'Log out');
+  const logoutLabel = document.createElement('span');
+  logoutLabel.className = 'logout-label';
+  logoutLabel.textContent = logoutBtn.textContent;
+  logoutBtn.textContent = '';
+  logoutBtn.append(icon('logout', 18), logoutLabel);
 
   document.getElementById('logout').addEventListener('click', async () => {
     try {

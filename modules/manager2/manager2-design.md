@@ -607,8 +607,20 @@ server-side timestamp, so restarts and clock skew are handled.
 - System font stack; 12-column grid; 8 px spacing scale; single accent
   colour; states (success/warning/danger) with colour + icon (never colour
   alone).
-- Responsive: tables convert to stacked cards below 768 px; charts
-  re-flow to a single column; actions move into an overflow menu.
+- Responsive, below 768 px (and on landscape phones of any width up to
+  932 px, via a `max-height` media): management tables (applications,
+  hosts, users, sessions, connectors, servlets, …) convert to stacked
+  cards, each cell labelled with its column header; high-volume tables
+  (server logs, access log, active workers) size to their content so
+  columns are never squeezed, with the first column pinned while the table
+  scrolls horizontally — except on the log pages in portrait, where the
+  wide Time column would dominate the viewport, so the whole table scrolls.
+  The log pages' long text columns (messages, requests) are given most of
+  the viewport (90vw portrait, 100vw landscape) because with
+  `table-layout:auto` any extra table width flows into the only wrapping
+  column, keeping rows to one or two lines for information density.
+  Charts re-flow to a single column; row actions move into an overflow
+  (kebab) menu; form fields and modals go full width.
 - Accessibility (WCAG 2.1 AA): semantic landmarks, visible focus states,
   keyboard-operable modals/drawers (focus trap, `Esc` closes),
   `aria-live="polite"` toasts, live chart updates announced at reduced
@@ -725,8 +737,15 @@ saved request (sending the browser to a CSS file after login). Instead:
 - `HomeServlet` gates the SPA entry point (`/`) and the SPA deep-link routes
   (`/apps`, `/hosts`, `/configuration`, `/users`, `/monitoring`,
   `/diagnostics`, `/logs`, `/access-log`, `/apps/*`): it forwards
-  unauthenticated visitors to the login page and authenticated users to the
-  shell, preserving the requested URL so deep links survive a reload.
+  unauthenticated visitors to the login page and authenticated users get the
+  shell rendered from `index.html` as a template, preserving the requested
+  URL so deep links survive a reload. The template rendering (rather than a
+  plain forward to the static file) injects a `<base>` element (the
+  `<!-- MANAGER2_BASE -->` placeholder, see `Html`): a *multi-segment* deep
+  link such as `/apps/localhost/myapp` would otherwise make the browser
+  resolve the shell's relative asset URLs (`js/main.js`, `css/manager2.css`)
+  against the deep path (`/apps/localhost/js/main.js`), which the server
+  answers with the shell HTML and the browser then refuses as a script.
 - The context root *without* a trailing slash (e.g. `/manager2`) is
   redirected (302) to the trailing-slash form by `HomeServlet`. Without the
   redirect the browser would resolve the page's relative URLs (`css/*`,
@@ -1120,3 +1139,17 @@ deploy upload, live chart behaviour, mobile widths); the JS is small
 enough that a lint pass (`--check` via a CI node step, optional) plus the
 integration tests above gives adequate coverage without a JS test
 harness.
+
+Mobile checklist (portrait 360/390/414 px and landscape 667/812/932 px,
+both themes): no page-level horizontal overflow; management tables render
+as labelled stacked cards and row actions collapse into the kebab menu
+(kebab opens, closes on outside tap and `Esc`, disabled actions stay
+disabled); high-volume tables (logs, access log, workers) scroll
+horizontally with the first column pinned and long values wrapping, not
+squeezed; tabs scroll when crowded; page-head, log and diagnostics
+controls go full width; modals show stacked full-width buttons; toasts
+appear above the bottom nav; the bottom nav keeps all nine items with
+labels truncated inside their slot; inputs are 16 px at ≤480 px (no iOS
+focus zoom); the Configuration detail scrolls into view after a tree
+selection; a multi-segment deep link (e.g. an application detail) reloads
+to the correct page (the base-element fix above).

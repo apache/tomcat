@@ -16,7 +16,7 @@
  */
 
 import { api, get } from '../api.js';
-import { el, clear, toast, table, modal, confirm, icon } from '../ui.js';
+import { el, clear, toast, table, modal, confirm, icon, actionMenu } from '../ui.js';
 
 export async function users(container) {
   let data = null;
@@ -133,17 +133,17 @@ export async function users(container) {
         { key: 'roles', label: 'Roles', render: (u) => rolesBadges(u.roles, u.effectiveRoles) },
         { key: 'groups', label: 'Groups', render: (u) => nameBadges(u.groups) },
         {
-          key: 'actions', label: '', render: (u) => el('div', { class: 'row-actions' },
-              el('button', { type: 'button', class: 'btn btn-sm', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); rolesModal('user', u); } }, 'Roles'),
-              el('button', { type: 'button', class: 'btn btn-sm', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); passwordModal(u); } }, 'Password'),
-              el('button', { type: 'button', class: 'btn btn-sm btn-danger', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); removeUser(u); } }, 'Remove')),
+          key: 'actions', label: 'Actions',
+          render: (u) => actionMenu([
+              { label: 'Roles', disabled: !canEdit(), onclick: () => rolesModal('user', u) },
+              { label: 'Password', disabled: !canEdit(), onclick: () => passwordModal(u) },
+              { label: 'Remove', class: 'btn-danger', disabled: !canEdit(), onclick: () => removeUser(u) },
+          ]),
         },
       ],
       rows: data.users || [],
       empty: 'No users in this database.',
+      stackable: true,
     });
 
     const card = el('div', { class: 'card' },
@@ -166,17 +166,17 @@ export async function users(container) {
         { key: 'roles', label: 'Roles', render: (g) => rolesBadges(g.roles, null) },
         { key: 'members', label: 'Members', render: (g) => nameBadges(g.members) },
         {
-          key: 'actions', label: '', render: (g) => el('div', { class: 'row-actions' },
-              el('button', { type: 'button', class: 'btn btn-sm', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); membersModal(g); } }, 'Members'),
-              el('button', { type: 'button', class: 'btn btn-sm', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); rolesModal('group', g); } }, 'Roles'),
-              el('button', { type: 'button', class: 'btn btn-sm btn-danger', disabled: canEdit() ? null : true,
-                  onclick: (e) => { e.stopPropagation(); removeGroup(g); } }, 'Remove')),
+          key: 'actions', label: 'Actions',
+          render: (g) => actionMenu([
+              { label: 'Members', disabled: !canEdit(), onclick: () => membersModal(g) },
+              { label: 'Roles', disabled: !canEdit(), onclick: () => rolesModal('group', g) },
+              { label: 'Remove', class: 'btn-danger', disabled: !canEdit(), onclick: () => removeGroup(g) },
+          ]),
         },
       ],
       rows: data.groups || [],
       empty: 'No groups in this database.',
+      stackable: true,
     });
 
     return el('div', { class: 'card' },
@@ -205,13 +205,14 @@ export async function users(container) {
             .filter((g) => (g.roles || []).includes(r.rolename))
             .map((g) => g.groupname)) },
         {
-          key: 'actions', label: '', render: (r) => el('div', { class: 'row-actions' },
+          key: 'actions', label: 'Actions', render: (r) => el('div', { class: 'row-actions' },
               el('button', { type: 'button', class: 'btn btn-sm btn-danger', disabled: canEdit() ? null : true,
                   onclick: (e) => { e.stopPropagation(); removeRole(r); } }, 'Remove')),
         },
       ],
       rows: data.roles || [],
       empty: 'No roles defined in this database.',
+      stackable: true,
     });
 
     return el('div', { class: 'card' },

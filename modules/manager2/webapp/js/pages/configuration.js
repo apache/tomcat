@@ -16,7 +16,7 @@
  */
 
 import { api } from '../api.js';
-import { el, clear, toast, modal, confirm, stateBadge } from '../ui.js';
+import { el, clear, toast, modal, confirm, stateBadge, actionMenu } from '../ui.js';
 
 const NUMERIC_TYPES = new Set(['int', 'long', 'short', 'byte', 'float', 'double']);
 const RISKY_ATTRIBUTES = new Set(['name', 'path', 'defaultHost']);
@@ -163,7 +163,7 @@ export async function configuration(container) {
       el('div', { class: 'page-head' },
           el('h1', {}, 'Configuration'),
           el('p', {}, 'The live component tree of this server. Changes apply immediately; save to make them permanent.'),
-          el('span', { style: 'flex:1' }),
+          el('span', { class: 'head-spacer' }),
           el('button', { type: 'button', class: 'btn', onclick: reloadAll }, 'Reload'),
           el('button', { type: 'button', class: 'btn btn-primary', onclick: () => saveToServerXml() }, 'Save to server.xml')));
   view.append(el('div', { class: 'config-split' },
@@ -201,7 +201,9 @@ export async function configuration(container) {
     const hasKids = kids.length > 0;
     const isOpen = expanded.has(node.id);
 
-    const row = el('div', { class: 'config-node', style: 'padding-left:' + (depth * 16 + 4) + 'px' },
+    // The indent is capped so that deeply nested branches still fit on
+    // narrow screens.
+    const row = el('div', { class: 'config-node', style: 'padding-left:' + (Math.min(depth, 6) * 16 + 4) + 'px' },
         el('button', {
           type: 'button', class: 'config-node-toggle' + (hasKids ? '' : ' leaf'),
           'aria-label': hasKids ? 'Toggle' : '',
@@ -248,26 +250,35 @@ export async function configuration(container) {
     }
     selectedDetail = data;
     renderDetail();
+    // On narrow screens the detail card is stacked below the tree; bring it
+    // into view after a selection so the result is immediately visible.
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      detailCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function renderDetail() {
     const d = selectedDetail;
     clear(detailCard);
 
+    const actions = [];
+    if (addable(d)) {
+      actions.push({ label: '+ Add', onclick: () => addChildModal(d) });
+    }
+    if (d.type !== 'server') {
+      actions.push({
+        label: 'Remove', class: 'btn-danger', disabled: d.self,
+        title: d.self ? 'Cannot remove the component the manager is installed in' : 'Remove',
+        onclick: () => removeNode(d),
+      });
+    }
+    actions.push(...lifecycleActions(d));
     const head = el('div', { class: 'card-title-row' },
         el('div', { class: 'config-detail-title' },
             el('span', { class: 'config-type ' + d.type }, d.type),
             el('h3', {}, d.name || '(unnamed)'),
             d.state ? stateBadge(d.state) : ''),
-        el('div', { class: 'row-actions' },
-            addable(d) ? el('button', { type: 'button', class: 'btn btn-sm', onclick: () => addChildModal(d) }, '+ Add') : null,
-            d.type !== 'server' ? el('button', {
-              type: 'button', class: 'btn btn-sm btn-danger',
-              disabled: d.self,
-              title: d.self ? 'Cannot remove the component the manager is installed in' : 'Remove',
-              onclick: () => removeNode(d),
-            }, 'Remove') : null,
-            ...lifecycleButtons(d)));
+        actionMenu(actions));
     detailCard.append(head);
 
     if (d.className) {
@@ -932,39 +943,40 @@ export async function configuration(container) {
     return d.state === 'STARTED' || d.state === 'AVAILABLE';
   }
 
-  // The Start / Stop / Restart buttons of the detail card, for the
-  // components that implement Lifecycle (the node detail reports this
-  // as `lifecycle`). Not every change takes effect until the affected
-  // component is restarted, so the buttons make the restart explicit.
+  // The Start / Stop / Restart actions of the detail card, for the
+  // components that implement Lifecycle (the node detail reports this as
+  // `lifecycle`). Not every change takes effect until the affected
+  // component is restarted, so the actions make the restart explicit.
   // Start and Stop are disabled for the components that affect access
   // to this page (`affectsSelf`): stopping them would destroy the admin
   // session mid-request. Restart stays enabled for them: the client's
   // connection may be interrupted during the operation, but the
   // component is running again at the end and the client reconnects.
-  function lifecycleButtons(d) {
+  // Returned as action descriptors (see ui.js actionMenu): they render
+  // inline on wide screens and inside the overflow menu on narrow ones.
+  function lifecycleActions(d) {
     if (!d.lifecycle) return [];
     const running = isRunning(d);
     const selfImpact = d.affectsSelf;
     const selfImpactTitle = 'This component serves this page: starting or stopping it would interrupt access to the manager. Use Restart instead.';
     return [
-      el('span', { class: 'row-actions-sep', role: 'presentation' }),
-      el('button', {
-        type: 'button', class: 'btn btn-sm',
+      {
+        label: 'Start',
         disabled: running || selfImpact,
         title: selfImpact ? selfImpactTitle : 'Start',
         onclick: () => lifecycleOp(d, 'start'),
-      }, 'Start'),
-      el('button', {
-        type: 'button', class: 'btn btn-sm',
+      },
+      {
+        label: 'Stop',
         disabled: !running || selfImpact,
         title: selfImpact ? selfImpactTitle : 'Stop',
         onclick: () => lifecycleOp(d, 'stop'),
-      }, 'Stop'),
-      el('button', {
-        type: 'button', class: 'btn btn-sm',
+      },
+      {
+        label: 'Restart',
         title: 'Stop the component and start it again',
         onclick: () => lifecycleOp(d, 'restart'),
-      }, 'Restart'),
+      },
     ];
   }
 
