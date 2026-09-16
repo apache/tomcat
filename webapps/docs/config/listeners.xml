@@ -446,6 +446,14 @@
       Before overwriting <code>server.xml</code>, a backup of the existing file
       is created.</p>
 
+    <p>When an existing configuration file is re-written, the generated
+      configuration is reformatted on a best effort basis to preserve the
+      layout of the existing file, including comments, blank lines and the
+      order of attributes. Layout information that cannot be matched to the
+      stored content, for example comments attached to elements that no longer
+      exist, is not preserved. If the layout of the existing file cannot be
+      preserved, the file is written without layout information.</p>
+
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
