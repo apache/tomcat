@@ -278,9 +278,15 @@ server-side timestamp, so restarts and clock skew are handled.
   (dashboard blue, apps violet, hosts teal, configuration slate, users
   pink, monitoring green, diagnostics amber, logs cyan, access log indigo,
   with lighter values in the dark theme) on icon, label and soft
-  background. The bottom tab bar shows icons only (the label is kept as
-  `aria-label`) because nine text labels do not fit legibly in a
-  360–430 px viewport.
+  background. The navigation is always an icons-only 60 px rail (the
+  labels are kept as `aria-label`): a 220 px rail of text is too costly at
+  every width, and nine labels are not legible at phone widths. In
+  landscape viewports, hovering the rail — or landing keyboard focus in
+  it — pops the sidenav out at full width (220 px) and label over the
+  content as a `position: fixed` flyout; the content is pinned to the
+  second grid column, so the grid and the view are never resized. Portrait
+  viewports keep the rail collapsed, and the bottom tab bar is icons-only
+  as well.
 - History-API routing (deep links work), one `index.html`, no full page
   reloads. `login.html` is the FORM-login page (see §7); it POSTs to
   `j_security_check` and redirects back to the original URL.
@@ -634,7 +640,10 @@ server-side timestamp, so restarts and clock skew are handled.
   `table-layout:auto` any extra table width flows into the only wrapping
   column, keeping rows to one or two lines for information density.
   Charts re-flow to a single column; row actions move into an overflow
-  (kebab) menu; form fields and modals go full width.
+   (kebab) menu; form fields and modals go full width.
+- The side navigation is an icons-only 60 px rail at all widths where it
+  is shown; in landscape viewports it pops out at full width and label on
+  hover/focus as a fixed flyout that never resizes the view (see §5.1).
 - Accessibility (WCAG 2.1 AA): semantic landmarks, visible focus states,
   keyboard-operable modals/drawers (focus trap, `Esc` closes),
   `aria-live="polite"` toasts, live chart updates announced at reduced

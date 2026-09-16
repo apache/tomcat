@@ -34,6 +34,7 @@
 
   --topbar-h: 56px;
   --sidenav-w: 220px;
+  --sidenav-icon-w: 60px;
   --bottomnav-h: 56px;
 
   --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.10);
@@ -232,9 +233,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .icon-btn:hover { background: var(--bg-hover); border-color: var(--border); }
 .icon-btn svg { fill: currentColor; }
 
+/* The sidenav is an icon rail at all widths where it is shown (the bottom
+   tab bar takes over at 768 px and below). In landscape the rail pops out
+   to full width and label on hover/focus (see the landscape media below);
+   in portrait it stays collapsed. The content is pinned to the second
+   grid column so the pop-out — position:fixed, out of the grid flow —
+   never resizes the view. */
 .shell-main {
   display: grid;
-  grid-template-columns: var(--sidenav-w) 1fr;
+  grid-template-columns: var(--sidenav-icon-w) 1fr;
   min-height: 0;
 }
 
@@ -242,15 +249,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .sidenav {
   display: flex; flex-direction: column; gap: 2px;
-  padding: var(--space-4) var(--space-3);
+  padding: var(--space-3) var(--space-2);
   background: var(--bg-sidenav);
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  /* Nine items do not always fit the rail's height; it may scroll, but
+     the scrollbar is hidden in the collapsed state (wheel, touch and
+     keyboard still scroll) and restored when the rail pops out. */
+  scrollbar-width: none;
 }
+.sidenav::-webkit-scrollbar { display: none; }
 
 .nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 0;
+  padding: 10px 0;
   background: transparent;
   border: none; border-radius: var(--radius-s);
   color: var(--text-soft);
@@ -258,6 +271,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   text-align: left;
   transition: background var(--transition), color var(--transition);
 }
+.nav-label { display: none; }
 .nav-item svg { fill: currentColor; flex: none; }
 .nav-item:hover { background: var(--bg-hover); color: var(--text); }
 /* The active tab takes the accent hue of its section (see the per-tab
@@ -274,6 +288,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .nav-item.active.nav-tab-access-log { color: var(--nav-access-log); background: var(--nav-access-log-soft); }
 
 .content {
+  grid-column: 2;
   min-width: 0;
   overflow-y: auto;
   padding: var(--space-5) var(--space-6) 60px;
@@ -911,6 +926,8 @@ pre.block {
 
 @media (max-width: 768px) {
   .shell-main { grid-template-columns: 1fr; }
+  /* The sidenav is a bottom bar here; the content takes the only column. */
+  .content { grid-column: 1; }
   .sidenav {
     position: fixed; bottom: 0; left: 0; right: 0;
     top: auto;
@@ -1082,6 +1099,42 @@ pre.block {
 @media (orientation: landscape) and (max-height: 520px) {
   .table-wrap.log-table table.data td.wide { min-width: 100vw; max-width: none; }
 }
+
+/* In landscape, hovering the icon rail — or landing keyboard focus in it —
+   pops the sidenav out at full width and label over the content. The
+   flyout is position:fixed (out of the grid flow) so the grid and the
+   view are never resized; leaving the rail collapses it again. Portrait
+   viewports keep the rail collapsed (no hover pop-out). */
+@media (orientation: landscape) and (min-width: 769px) {
+  .sidenav:hover,
+  .sidenav:focus-within {
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    left: 0;
+    width: var(--sidenav-w);
+    z-index: 30;
+    padding: var(--space-4) var(--space-3);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    box-shadow: var(--shadow-2);
+    scrollbar-width: auto;
+  }
+  .sidenav:hover::-webkit-scrollbar,
+  .sidenav:focus-within::-webkit-scrollbar { display: block; }
+  .sidenav:hover .nav-item,
+  .sidenav:focus-within .nav-item {
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 9px 12px;
+  }
+  .sidenav:hover .nav-label,
+  .sidenav:focus-within .nav-label {
+    display: block;
+    animation: sidenav-label-in 120ms ease;
+  }
+}
+
+@keyframes sidenav-label-in { from { opacity: 0; } }
 
 @media (max-width: 480px) {
   .content { padding: var(--space-4) var(--space-3) calc(var(--bottomnav-h) + var(--space-4)); }
