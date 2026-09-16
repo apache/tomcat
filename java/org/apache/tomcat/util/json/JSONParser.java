@@ -57,7 +57,7 @@ public class JSONParser implements JSONParserConstants {
     }
 
     /**
-     * Parses any JSON-parseable object, returning the value.
+     * Parses any JSON-parsable object, returning the value.
      */
     public Object parse() throws ParseException {
         Object toReturn = anything();
@@ -76,11 +76,9 @@ public class JSONParser implements JSONParserConstants {
     }
 
     /**
-     * Resolve the JSON escape sequences of a string token body (the
-     * surrounding quotes are already removed). The token grammar only
-     * admits the short escapes: {@code \b}, {@code \f}, {@code \n},
-     * {@code \r}, {@code \t}, {@code \/}, {@code \\} and the
-     * self-escaped quote character.
+     * Resolve the JSON escape sequences of a string token body (the surrounding quotes are already removed). The token
+     * grammar only admits the short escapes: {@code \b}, {@code \f}, {@code \n}, {@code \r}, {@code \t}, {@code \/},
+     * {@code \\} and the self-escaped quote character.
      */
     private static String unescape(String value) {
         StringBuilder result = new StringBuilder(value.length());
@@ -95,19 +93,19 @@ public class JSONParser implements JSONParserConstants {
                 case 'b':
                     result.append('\b');
                     break;
-                 case 'f':
+                case 'f':
                     result.append('\f');
                     break;
-                 case 'n':
+                case 'n':
                     result.append('\n');
                     break;
-                 case 'r':
+                case 'r':
                     result.append('\r');
                     break;
-                 case 't':
+                case 't':
                     result.append('\t');
                     break;
-                 default:
+                default:
                     result.append(next);
                     break;
             }
@@ -736,7 +734,6 @@ public class JSONParser implements JSONParserConstants {
         return new ParseException(token, exptokseq, tokenImage);
     }
 
-    private int trace_indent = 0;
     private boolean trace_enabled;
 
     /** Trace enabled. */
