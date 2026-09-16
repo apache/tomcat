@@ -17,6 +17,7 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 
 import javax.management.MBeanServer;
@@ -203,7 +204,12 @@ public class StoreConfig implements IStoreConfig {
         // Open an output writer for the new configuration file
         try {
             try (PrintWriter writer = mover.getWriter()) {
-                store(writer, -2, aServer);
+                // Generate the configuration in memory so that the layout of the previous version of the file can
+                // be preserved
+                StringWriter buffer = new StringWriter();
+                store(new PrintWriter(buffer), -2, aServer);
+                writer.write(XMLFormatPreserver.preserve(mover.getConfigOld(), buffer.toString(),
+                        getRegistry().getEncoding()));
             }
             mover.move();
             return true;
