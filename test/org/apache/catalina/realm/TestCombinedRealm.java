@@ -235,10 +235,10 @@ public class TestCombinedRealm {
         Assert.assertEquals(0, removed.getStopCount());
         Assert.assertEquals(0, removed.getDestroyCount());
 
-        // Stopping the combined Realm only stops the Realms it still contains
+        // Stopping the combined Realm stops the Realms it still contains and those that were removed
         combinedRealm.stop();
         Assert.assertEquals(LifecycleState.STOPPED, retained.getState());
-        Assert.assertEquals(LifecycleState.STARTED, removed.getState());
+        Assert.assertEquals(LifecycleState.STOPPED, removed.getState());
 
         // Destroying the combined Realm must clean up both, each exactly once
         combinedRealm.destroy();

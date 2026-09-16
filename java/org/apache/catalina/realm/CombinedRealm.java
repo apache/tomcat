@@ -318,7 +318,17 @@ public class CombinedRealm extends RealmBase {
         // Stop this realm, then the sub-realms (reverse order to start)
         super.stopInternal();
         for (Realm realm : realms) {
-            if (realm instanceof Lifecycle) {
+            stopRealm(realm);
+        }
+        for (Realm realm : realmsToDestroy) {
+            stopRealm(realm);
+        }
+    }
+
+
+    private void stopRealm(Realm realm) {
+        if (realm instanceof Lifecycle) {
+            if (((Lifecycle) realm).getState().isAvailable()) {
                 try {
                     ((Lifecycle) realm).stop();
                 } catch (LifecycleException e) {
@@ -346,14 +356,8 @@ public class CombinedRealm extends RealmBase {
 
 
     private void destroyRealm(Realm realm) {
+        stopRealm(realm);
         if (realm instanceof Lifecycle) {
-            if (((Lifecycle) realm).getState().isAvailable()) {
-                try {
-                    ((Lifecycle) realm).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("combinedRealm.realmStopFail", realm.getClass().getName()), e);
-                }
-            }
             try {
                 ((Lifecycle) realm).destroy();
             } catch (LifecycleException e) {
