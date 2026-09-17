@@ -271,6 +271,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
+     * Indicates that this Context was deployed from a Context element defined in server.xml. The flag is for internal
+     * use only (it is not exposed via JMX and is not persisted by storeconfig).
+     */
+    private boolean deployedFromServerXml = false;
+
+
+    /**
      * The security constraints for this web application.
      */
     private volatile SecurityConstraint[] constraints = new SecurityConstraint[0];
@@ -1508,6 +1515,29 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setConfigFile(URL configFile) {
         this.configFile = configFile;
+    }
+
+
+    /**
+     * Indicates whether this Context was deployed from a Context element defined in server.xml. The flag is set by the
+     * server.xml digester and is for internal use only. In particular, it is not exposed via JMX and is not stored by
+     * storeconfig.
+     *
+     * @return <code>true</code> if the Context element was parsed from server.xml
+     */
+    public boolean getDeployedFromServerXml() {
+        return this.deployedFromServerXml;
+    }
+
+
+    /**
+     * Sets the flag indicating that this Context was deployed from a Context element defined in server.xml. The flag is
+     * for internal use only. In particular, it is not exposed via JMX and is not stored by storeconfig.
+     *
+     * @param deployedFromServerXml The new flag value
+     */
+    public void setDeployedFromServerXml(boolean deployedFromServerXml) {
+        this.deployedFromServerXml = deployedFromServerXml;
     }
 
 
