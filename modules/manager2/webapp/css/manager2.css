@@ -518,6 +518,31 @@ textarea { resize: vertical; min-height: 90px; font-family: var(--mono); font-si
   background: var(--bg-inset); margin-top: var(--space-3);
 }
 .progress > div { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 200ms ease; }
+.progress.warn > div { background: var(--warn); }
+.progress.danger > div { background: var(--danger); }
+
+/* CPU / memory instant snapshot cards (Monitoring) */
+.sys-metric { margin-top: var(--space-3); }
+.sys-metric:first-child { margin-top: 0; }
+.sys-metric-head {
+  display: flex; justify-content: space-between; gap: var(--space-3);
+  font-size: 13px; margin-bottom: 6px;
+}
+.sys-metric-head .sys-label { font-weight: 600; }
+.sys-metric-head .sys-value { color: var(--text-soft); font-variant-numeric: tabular-nums; }
+.sys-metric .progress { margin-top: 0; }
+.sys-facts {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-2); margin-top: var(--space-4);
+}
+.sys-fact {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-inset); border-radius: var(--radius);
+}
+.sys-fact-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); }
+.sys-fact-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sys-body .table-wrap { margin-top: var(--space-4); }
 
 /* ============================ Tabs ===================================== */
 

@@ -34,12 +34,56 @@ const STAGE_LABELS = {
 const ACTIVE_STAGES = new Set(['P', 'S', 'F']);
 const STAGE_BADGES = { P: 'info', S: 'ok', F: 'warn' };
 
+function pctText(fraction) {
+  return fraction == null ? '-' : (fraction * 100).toFixed(1) + ' %';
+}
+
+function usageBar(fraction) {
+  const bar = el('div', { class: 'progress' }, el('div'));
+  const fill = bar.firstChild;
+  if (fraction != null) {
+    fill.style.width = Math.min(100, Math.max(0, fraction * 100)) + '%';
+    if (fraction >= 0.9) bar.classList.add('danger');
+    else if (fraction >= 0.75) bar.classList.add('warn');
+  }
+  return bar;
+}
+
+function metric(label, value, fraction) {
+  return el('div', { class: 'sys-metric' },
+      el('div', { class: 'sys-metric-head' },
+          el('span', { class: 'sys-label' }, label),
+          el('span', { class: 'sys-value' }, value)),
+      usageBar(fraction));
+}
+
+function fact(label, value) {
+  return el('div', { class: 'sys-fact' },
+      el('span', { class: 'sys-fact-label' }, label),
+      el('span', { class: 'sys-fact-value' }, value));
+}
+
 export async function monitoring(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
           el('h1', {}, 'Monitoring'),
-          el('p', {}, 'Live worker (socket) table. Refreshes every 5 seconds; paused while the tab is hidden.')));
+          el('p', {}, 'Instant CPU and memory snapshot, live connectors and worker (socket) table. ' +
+              'Refreshes every 5 seconds; paused while the tab is hidden.')));
   container.append(view);
+
+  const sysGrid = el('div', { class: 'grid charts' });
+  const cpuCard = el('div', { class: 'card col-6' },
+      el('div', { class: 'card-title-row' },
+          el('h3', {}, el('span', { class: 'live-dot' }), 'CPU')),
+      el('div', { class: 'sys-body' }));
+  const cpuBody = cpuCard.querySelector('.sys-body');
+  const memoryCard = el('div', { class: 'card col-6' },
+      el('div', { class: 'card-title-row' },
+          el('h3', {}, el('span', { class: 'live-dot' }), 'Memory')),
+      el('div', { class: 'sys-body' }));
+  const memoryBody = memoryCard.querySelector('.sys-body');
+  sysGrid.append(cpuCard, memoryCard);
+  view.append(sysGrid);
 
   const connectorsCard = el('div', { class: 'card' },
       el('div', { class: 'card-title-row' },
@@ -69,6 +113,14 @@ export async function monitoring(container) {
       return;
     }
 
+    try {
+      const sys = await get('/api/status/system');
+      renderCpu(sys.cpu);
+      renderMemory(sys.memory);
+    } catch (err) {
+      // The cards keep the values of the previous snapshot.
+    }
+
     let workers;
     try {
       workers = await get('/api/status/workers');
@@ -76,6 +128,69 @@ export async function monitoring(container) {
       return;
     }
     renderWorkers(workers);
+  }
+
+  function renderCpu(cpu) {
+    clear(cpuBody);
+    if (!cpu) {
+      cpuBody.append(el('div', { class: 'empty' }, 'Not available'));
+      return;
+    }
+    cpuBody.append(
+        metric('System CPU', pctText(cpu.systemLoad), cpu.systemLoad),
+        metric('JVM process CPU', pctText(cpu.processLoad), cpu.processLoad),
+        el('div', { class: 'sys-facts' },
+            fact('Cores', String(cpu.availableProcessors)),
+            fact('Load average', cpu.loadAverage != null ? cpu.loadAverage.toFixed(2) : '-'),
+            fact('Threads', cpu.threads + ' live'),
+            fact('Daemon threads', String(cpu.daemonThreads)),
+            fact('Peak threads', String(cpu.peakThreads))));
+  }
+
+  function renderMemory(mem) {
+    clear(memoryBody);
+    if (!mem) {
+      memoryBody.append(el('div', { class: 'empty' }, 'Not available'));
+      return;
+    }
+    const heap = mem.heap || {};
+    const nonHeap = mem.nonHeap || {};
+    memoryBody.append(
+        mem.physical && mem.physical.total > 0
+            ? metric('Physical memory',
+                formatBytes(mem.physical.total - mem.physical.free) + ' / ' +
+                formatBytes(mem.physical.total),
+                (mem.physical.total - mem.physical.free) / mem.physical.total)
+            : metric('Physical memory', '-', null),
+        mem.swap && mem.swap.total > 0
+            ? metric('Swap',
+                formatBytes(mem.swap.total - mem.swap.free) + ' / ' + formatBytes(mem.swap.total),
+                (mem.swap.total - mem.swap.free) / mem.swap.total)
+            : metric('Swap', 'none', null),
+        heap.max > 0
+            ? metric('JVM heap', formatBytes(heap.used) + ' / ' + formatBytes(heap.max),
+                heap.used / heap.max)
+            : metric('JVM heap', formatBytes(heap.used) + ' (unbounded)', null));
+    memoryBody.append(el('div', { class: 'sys-facts' },
+        fact('Heap committed', formatBytes(heap.committed)),
+        fact('Non-heap used', formatBytes(nonHeap.used))));
+
+    const pools = mem.pools || [];
+    if (pools.length > 0) {
+      const rows = pools.map((p) => el('tr', {},
+          el('td', {}, el('strong', {}, p.name)),
+          el('td', { class: 'num' }, formatBytes(p.used)),
+          el('td', { class: 'num' }, formatBytes(p.committed)),
+          el('td', { class: 'num' }, p.max >= 0 ? formatBytes(p.max) : '-')));
+      memoryBody.append(el('div', { class: 'table-wrap' },
+          el('table', { class: 'data' },
+              el('thead', {}, el('tr', {},
+                  el('th', {}, 'Pool'),
+                  el('th', {}, 'Used'),
+                  el('th', {}, 'Committed'),
+                  el('th', {}, 'Max'))),
+              el('tbody', {}, rows))));
+    }
   }
 
   function renderConnectors(connectors) {

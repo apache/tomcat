@@ -51,8 +51,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * The Manager2 status API. Serves the compact live snapshot, the live worker table and the detailed per-application
- * state. The MBean queries mirror {@link org.apache.catalina.manager.StatusManagerServlet}.
+ * The Manager2 status API. Serves the compact live snapshot, the instant CPU and memory snapshot, the live worker
+ * table and the detailed per-application state. The MBean queries mirror
+ * {@link org.apache.catalina.manager.StatusManagerServlet}.
  */
 public class StatusApiServlet extends HttpServlet implements ContainerServlet, NotificationListener {
 
@@ -230,6 +231,8 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
                 } else {
                     Api.json(response, history.payload());
                 }
+            } else if (path.startsWith("/api/status/system")) {
+                Api.json(response, StatusSnapshot.system());
             } else if (path.startsWith("/api/status")) {
                 Api.json(response, StatusSnapshot.snapshot(mBeanServer, threadPools, host));
             } else {

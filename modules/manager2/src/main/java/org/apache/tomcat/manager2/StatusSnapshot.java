@@ -19,6 +19,7 @@ package org.apache.tomcat.manager2;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,37 @@ import org.apache.catalina.Manager;
  * {@link org.apache.catalina.manager.StatusTransformer}.
  */
 public final class StatusSnapshot {
+
+
+    /*
+     * The CPU loads, the physical memory and the swap of the machine are only
+     * exposed by the HotSpot specific MBean
+     * com.sun.management.OperatingSystemMXBean (jdk.management module). It is
+     * accessed reflectively rather than directly, for two reasons:
+     * <ul>
+     * <li>JVMs without the module (embedded JVMs, stripped runtime images)
+     * are handled without any linkage error: the metrics are simply reported
+     * as unavailable;</li>
+     * <li>the same code backports cleanly to older Tomcat branches running on
+     * older Java releases: each accessor names the methods newest first, with
+     * the names of older releases as fallbacks (the getters for the total /
+     * free physical memory and the swap space have existed since Java 6,
+     * getProcessCpuLoad since Java 10, getCpuLoad since Java 14 where it
+     * replaced getSystemCpuLoad).</li>
+     * </ul>
+     * A resolved method is null when neither name exists on the running JVM,
+     * which the callers report as an unavailable metric.
+     */
+
+    private static final Class<?> SUN_OS_MXBEAN = findSunOsMxBean();
+
+    private static final Method SUN_CPU_LOAD = sunMethod("getCpuLoad", "getSystemCpuLoad");
+    private static final Method SUN_PROCESS_CPU_LOAD = sunMethod("getProcessCpuLoad");
+    private static final Method SUN_PHYSICAL_TOTAL = sunMethod("getTotalMemorySize",
+            "getTotalPhysicalMemorySize");
+    private static final Method SUN_PHYSICAL_FREE = sunMethod("getFreeMemorySize", "getFreePhysicalMemorySize");
+    private static final Method SUN_SWAP_TOTAL = sunMethod("getTotalSwapSpaceSize");
+    private static final Method SUN_SWAP_FREE = sunMethod("getFreeSwapSpaceSize");
 
 
     /**
@@ -132,6 +164,96 @@ public final class StatusSnapshot {
             }
             result.add(worker);
         }
+        return result;
+    }
+
+
+    /**
+     * Build the instant CPU and memory snapshot served by {@code GET /api/status/system}. Unlike the compact live
+     * snapshot this is not collected into the history; it is computed on demand, so the values reflect the moment of
+     * the request.
+     *
+     * @return the snapshot
+     */
+    public static Map<String, Object> system() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("ts", Long.valueOf(System.currentTimeMillis()));
+        result.put("cpu", cpu());
+        result.put("memory", memory());
+        return result;
+    }
+
+
+    private static Map<String, Object> cpu() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        java.lang.management.OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+        result.put("availableProcessors", Integer.valueOf(os.getAvailableProcessors()));
+
+        // The load average is not available on all platforms (negative = not available).
+        double loadAverage = os.getSystemLoadAverage();
+        result.put("loadAverage", loadAverage >= 0 ? Double.valueOf(loadAverage) : null);
+
+        // The CPU loads are only exposed by the HotSpot specific MBean. They
+        // are negative before the first monitoring interval completes.
+        Number systemLoad = sunInvoke(SUN_CPU_LOAD, os);
+        result.put("systemLoad", systemLoad != null && systemLoad.doubleValue() >= 0
+                ? Double.valueOf(systemLoad.doubleValue()) : null);
+        Number processLoad = sunInvoke(SUN_PROCESS_CPU_LOAD, os);
+        result.put("processLoad", processLoad != null && processLoad.doubleValue() >= 0
+                ? Double.valueOf(processLoad.doubleValue()) : null);
+
+        java.lang.management.ThreadMXBean threads = ManagementFactory.getThreadMXBean();
+        result.put("threads", Integer.valueOf(threads.getThreadCount()));
+        result.put("daemonThreads", Integer.valueOf(threads.getDaemonThreadCount()));
+        result.put("peakThreads", Integer.valueOf(threads.getPeakThreadCount()));
+
+        return result;
+    }
+
+
+    private static Map<String, Object> memory() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        Map<String, Object> heapMap = new LinkedHashMap<>();
+        heapMap.put("used", Long.valueOf(heap.getUsed()));
+        heapMap.put("committed", Long.valueOf(heap.getCommitted()));
+        heapMap.put("max", Long.valueOf(heap.getMax()));
+        result.put("heap", heapMap);
+
+        MemoryUsage nonHeap = ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage();
+        Map<String, Object> nonHeapMap = new LinkedHashMap<>();
+        nonHeapMap.put("used", Long.valueOf(nonHeap.getUsed()));
+        nonHeapMap.put("committed", Long.valueOf(nonHeap.getCommitted()));
+        result.put("nonHeap", nonHeapMap);
+
+        // The physical memory and swap of the machine are only exposed by the
+        // HotSpot specific MBean.
+        java.lang.management.OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+        Number physicalTotal = sunInvoke(SUN_PHYSICAL_TOTAL, os);
+        Number physicalFree = sunInvoke(SUN_PHYSICAL_FREE, os);
+        if (physicalTotal != null && physicalFree != null) {
+            Map<String, Object> physical = new LinkedHashMap<>();
+            physical.put("total", Long.valueOf(physicalTotal.longValue()));
+            physical.put("free", Long.valueOf(physicalFree.longValue()));
+            result.put("physical", physical);
+        } else {
+            result.put("physical", null);
+        }
+
+        Number swapTotal = sunInvoke(SUN_SWAP_TOTAL, os);
+        Number swapFree = sunInvoke(SUN_SWAP_FREE, os);
+        if (swapTotal != null && swapFree != null) {
+            Map<String, Object> swap = new LinkedHashMap<>();
+            swap.put("total", Long.valueOf(swapTotal.longValue()));
+            swap.put("free", Long.valueOf(swapFree.longValue()));
+            result.put("swap", swap);
+        } else {
+            result.put("swap", null);
+        }
+
+        result.put("pools", memoryPools());
         return result;
     }
 
@@ -232,6 +354,12 @@ public final class StatusSnapshot {
         result.put("memory", memory);
         result.put("nonHeapUsed", Long.valueOf(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed()));
 
+        result.put("pools", memoryPools());
+        return result;
+    }
+
+
+    private static List<Map<String, Object>> memoryPools() {
         Map<String, MemoryPoolMXBean> pools = new TreeMap<>();
         for (MemoryPoolMXBean pool : ManagementFactory.getMemoryPoolMXBeans()) {
             pools.put(pool.getType().toString() + ":" + pool.getName(), pool);
@@ -248,8 +376,7 @@ public final class StatusSnapshot {
             entry.put("used", Long.valueOf(usage.getUsed()));
             poolList.add(entry);
         }
-        result.put("pools", poolList);
-        return result;
+        return poolList;
     }
 
 
@@ -332,6 +459,43 @@ public final class StatusSnapshot {
             }
         }
         return null;
+    }
+
+
+    private static Class<?> findSunOsMxBean() {
+        try {
+            return Class.forName("com.sun.management.OperatingSystemMXBean");
+        } catch (ClassNotFoundException | LinkageError e) {
+            // No HotSpot management MBean on this JVM
+            return null;
+        }
+    }
+
+
+    private static Method sunMethod(String... names) {
+        if (SUN_OS_MXBEAN == null) {
+            return null;
+        }
+        for (String name : names) {
+            try {
+                return SUN_OS_MXBEAN.getMethod(name);
+            } catch (ReflectiveOperationException | LinkageError e) {
+                // Not in this Java release; try the next (older) name
+            }
+        }
+        return null;
+    }
+
+
+    private static Number sunInvoke(Method method, Object target) {
+        if (method == null || target == null || !SUN_OS_MXBEAN.isInstance(target)) {
+            return null;
+        }
+        try {
+            return (Number) method.invoke(target);
+        } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
+            return null;
+        }
     }
 
 

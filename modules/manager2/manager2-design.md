@@ -193,6 +193,7 @@ machine-readable `error` code and non-2xx status.
 | DELETE | `/api/apps/{path}/sessions/{id}/attributes/{name}` | manager-gui | remove one session attribute |
 | GET | `/api/status` | manager-gui, manager-status | compact live snapshot (see below) |
 | GET | `/api/status/workers` | manager-gui, manager-status | live per-socket (RequestProcessor) table |
+| GET | `/api/status/system` | manager-gui, manager-status | instant CPU and memory snapshot (cores, CPU loads, load average, thread counts; physical memory, swap, heap, non-heap, memory pools) |
 | GET | `/api/status/apps/{path}` | manager-gui, manager-status | detailed per-app: state, times, sessions, JSPs, servlets |
 | GET | `/api/ssl/ciphers` | manager-gui | SSL ciphers per connector |
 | GET | `/api/ssl/certs` | manager-gui | SSL certs per connector |
@@ -573,6 +574,16 @@ server-side timestamp, so restarts and clock skew are handled.
   of the database.
 
 **Monitoring**
+- CPU and memory status cards (5 s cadence): an instant snapshot from
+  `GET /api/status/system`, not a chart. The CPU card shows the system and
+  JVM process CPU load as percentage bars, plus cores, 1-minute load
+  average and live/daemon/peak thread counts; the memory card shows
+  physical memory and swap usage, the JVM heap (used / max bar, committed)
+  and non-heap usage as bars and facts, and a per-memory-pool table
+  (used, committed, max). Values the platform does not expose (CPU loads
+  before the first monitoring interval, the load average on Windows,
+  physical/swap memory on a JVM without the HotSpot management MBean)
+  render as "-".
 - Live workers table (5 s cadence): stage, processing time, bytes
   sent/received, remote address (forwarded + actual), virtual host,
   request line. Only *active* workers are listed — stages P (parsing,

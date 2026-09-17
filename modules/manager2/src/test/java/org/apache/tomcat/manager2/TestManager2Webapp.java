@@ -427,6 +427,38 @@ public class TestManager2Webapp extends TomcatBaseTest {
 
 
     @Test
+    public void testStatusSystemEndpoint() throws Exception {
+        setup(false);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+        login(client, "manager1");
+
+        // The instant CPU and memory snapshot.
+        request(client, "GET", MANAGER2 + "/api/status/system", null, null, 200);
+        String body = client.getResponseBody();
+        Assert.assertTrue(body.contains("\"cpu\""));
+        Assert.assertTrue(body.contains("\"memory\""));
+        Assert.assertTrue(body.contains("\"availableProcessors\""));
+        Assert.assertTrue(body.contains("\"systemLoad\""));
+        Assert.assertTrue(body.contains("\"processLoad\""));
+        Assert.assertTrue(body.contains("\"loadAverage\""));
+        Assert.assertTrue(body.contains("\"threads\""));
+        Assert.assertTrue(body.contains("\"heap\""));
+        Assert.assertTrue(body.contains("\"nonHeap\""));
+        Assert.assertTrue(body.contains("\"pools\""));
+        // The JVM runs on at least one core, so the snapshot must not report
+        // an unusable machine.
+        Assert.assertFalse(body.contains("\"availableProcessors\":0"));
+        // The heap is always present and in use by the running webapp.
+        Assert.assertFalse(body.contains("\"heap\":{\"used\":0,"));
+
+        client.disconnect();
+    }
+
+
+    @Test
     public void testStatusHistory() throws Exception {
         setup(false);
 
