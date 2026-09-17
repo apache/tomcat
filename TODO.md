@@ -912,16 +912,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 82. OCSP Test Hardcoded Serials (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 82.1 | `TesterOcspResponderServlet.java:221` | Certificate serial numbers hardcoded instead of read from index.db | Parse the OpenSSL CA `index.txt` file to extract serial numbers dynamically. | 1 day | Medium |
-
-**Total estimated effort: 1 day, Medium difficulty**
-
----
-
 ### 83. EL in JSP Escape Test (1 item)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
