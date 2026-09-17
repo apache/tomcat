@@ -234,7 +234,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .icon-btn svg { fill: currentColor; }
 
 /* The sidenav is an icon rail at all widths where it is shown (the bottom
-   tab bar takes over at 768 px and below). In landscape the rail pops out
+   tab bar takes over at 900 px and below). In landscape the rail pops out
    to full width and label on hover/focus (see the landscape media below);
    in portrait it stays collapsed. The content is pinned to the second
    grid column so the pop-out — position:fixed, out of the grid flow —
@@ -924,7 +924,7 @@ pre.block {
   .grid.charts .col-4 { grid-column: span 12; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .shell-main { grid-template-columns: 1fr; }
   /* The sidenav is a bottom bar here; the content takes the only column. */
   .content { grid-column: 1; }
@@ -953,7 +953,7 @@ pre.block {
 
 /* ============================ Responsive: phone ======================== */
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   /* Page head: title first, then full width action buttons */
   .page-head { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
   .page-head .btn { width: 100%; }
@@ -1041,10 +1041,14 @@ pre.block {
   .icon-btn { min-width: 44px; min-height: 44px; }
 }
 
-/* Scrollable tables on phones. (max-width: 768px) covers portrait phones;
-   the landscape media adds the wider landscape phones (769-932 px) whose
-   shell is still desktop-sized but which need the same table treatment. */
-@media (max-width: 768px), (orientation: landscape) and (max-height: 520px) {
+/* Scrollable high-volume tables: size to content (columns are never
+   squeezed or wrapped) and let the container scroll horizontally, pinning
+   the first column. This runs up to 1150 px: below that even the thirteen
+   access-log columns do not fit without wrapping, and the horizontal
+   scroll is the better trade; above it the ordinary desktop tables take
+   over. The cap also keeps ordinary desktop windows — however short, e.g.
+   a vertically split screen — on the desktop treatment. */
+@media (max-width: 1150px) {
   /* Size to content (floored at the container width) so columns are not
      squeezed, and keep cells on one line. */
   .table-wrap:not(.stackable) table.data {
@@ -1078,25 +1082,31 @@ pre.block {
   .table-wrap code { overflow-wrap: anywhere; }
 }
 
-/* The log pages are information dense. In portrait the pinned Time column
-   would dominate the viewport and leave a sliver for the scrolling
-   content, so let the whole table scroll. And give the message/request
-   column most of the viewport so typical lines wrap to at most two rows;
+/* The log pages are information dense: a pinned first column next to the
+   wide Time column leaves only a sliver for the scrolling content and
+   hurts readability, so the log tables never pin the first column — the
+   whole table scrolls across the entire range where the scrollable
+   treatment applies (up to the 1150 px desktop switch), in any
+   orientation. In portrait phones also give the message column most of
+   the viewport so typical lines wrap to at most two rows;
    max-width:none drops the 640 px desktop cell cap that would starve the
    column again. */
-@media (orientation: portrait) and (max-width: 600px) {
+@media (max-width: 1150px) {
   .table-wrap.log-table:not(.stackable) table.data th:first-child,
   .table-wrap.log-table:not(.stackable) table.data td:first-child {
     position: static;
     background: transparent;
     box-shadow: none;
   }
+}
+@media (orientation: portrait) and (max-width: 900px) {
   .table-wrap.log-table table.data td.wide { min-width: 90vw; max-width: none; }
 }
 
 /* Landscape phones: even more of the viewport for the message/request
-   column so rows stay one or two lines tall. */
-@media (orientation: landscape) and (max-height: 520px) {
+   column so rows stay one or two lines tall. Capped at the widest landscape
+   phone so short desktop windows keep the ordinary desktop table. */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 932px) {
   .table-wrap.log-table table.data td.wide { min-width: 100vw; max-width: none; }
 }
 
@@ -1105,7 +1115,7 @@ pre.block {
    flyout is position:fixed (out of the grid flow) so the grid and the
    view are never resized; leaving the rail collapses it again. Portrait
    viewports keep the rail collapsed (no hover pop-out). */
-@media (orientation: landscape) and (min-width: 769px) {
+@media (orientation: landscape) and (min-width: 901px) {
   .sidenav:hover,
   .sidenav:focus-within {
     position: fixed;

@@ -132,6 +132,10 @@ function showRecord(row) {
 function columnsFor(fields) {
   const cols = [];
   for (const key of fields) {
+    // The raw request line duplicates the method / path / query / protocol
+    // columns derived from it and is the widest column of the table; it
+    // stays available in the record drawer and in the method filter.
+    if (key === 'request') continue;
     const def = COLUMNS[key] || { label: key };
     cols.push({
       key,

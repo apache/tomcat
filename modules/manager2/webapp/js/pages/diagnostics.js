@@ -256,6 +256,7 @@ export async function diagnostics(container) {
     }
   }
 
+  loaded[0] = true;
   await loaders[0]();
   return null;
 }

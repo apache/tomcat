@@ -252,7 +252,7 @@ export async function configuration(container) {
     renderDetail();
     // On narrow screens the detail card is stacked below the tree; bring it
     // into view after a selection so the result is immediately visible.
-    if (window.matchMedia('(max-width: 768px)').matches) {
+    if (window.matchMedia('(max-width: 900px)').matches) {
       detailCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }

@@ -329,7 +329,7 @@ export function menu({ trigger, items }) {
 /**
  * Build a row action list that collapses into a kebab (overflow) menu on
  * narrow screens: the buttons always render, CSS hides all of them except
- * the kebab below 768 px, and the kebab opens the same actions in a
+ * the kebab below 900 px, and the kebab opens the same actions in a
  * dropdown menu.
  *
  * @param {Array<{label, class, onclick, disabled, title}>} actions

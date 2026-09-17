@@ -29,6 +29,11 @@ const STAGE_LABELS = {
   '?': 'Unknown',
 };
 
+// Only these stages are doing real work; R (ready), K (keep-alive) and '?'
+// are idle one way or another and are left out of the table.
+const ACTIVE_STAGES = new Set(['P', 'S', 'F']);
+const STAGE_BADGES = { P: 'info', S: 'ok', F: 'warn' };
+
 export async function monitoring(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
@@ -102,14 +107,16 @@ export async function monitoring(container) {
 
   function renderWorkers(workers) {
     clear(workersWrap);
+    const active = workers.filter((w) => ACTIVE_STAGES.has(w.stage));
     const countBadge = document.getElementById('worker-count');
     if (countBadge) {
-      countBadge.textContent = workers.length + ' active';
+      countBadge.textContent = active.length + ' active · ' +
+          (workers.length - active.length) + ' idle';
     }
-    const rows = workers.map((w) => el('tr', {},
+    const rows = active.map((w) => el('tr', {},
         el('td', {},
-            el('span', { class: 'badge ' + (w.stage === 'S' ? 'ok' : 'plain') },
-                w.stage + (w.stage === 'S' ? ' · ' + (STAGE_LABELS[w.stage] || '') : ''))),
+            el('span', { class: 'badge ' + (STAGE_BADGES[w.stage] || 'plain') },
+                w.stage + ' · ' + (STAGE_LABELS[w.stage] || ''))),
         el('td', { class: 'num' }, w.time != null ? formatMs(w.time) : '-'),
         el('td', { class: 'num' }, w.bytesSent != null ? formatBytes(w.bytesSent) : '-'),
         el('td', { class: 'num' }, w.bytesReceived != null ? formatBytes(w.bytesReceived) : '-'),

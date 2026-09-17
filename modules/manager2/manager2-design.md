@@ -270,7 +270,9 @@ server-side timestamp, so restarts and clock skew are handled.
   used as `favicon.ico` and on the login page) + product name, server
   identity (version, host, uptime), global search, user menu (logout),
   theme toggle.
-- Left navigation (collapses to bottom tab bar under 768 px): Dashboard,
+- Left navigation (collapses to bottom tab bar under 900 px — slightly
+  above the old 768 px breakpoint so iPad portrait and small tablets get
+  the phone layout): Dashboard,
   Applications, Hosts, Configuration, Users, Monitoring, Diagnostics,
   Logs, Access log. Each item has a single-path 24×24 icon (holes — server
   LEDs/slots, the gear bore, beetle seam/spots, file text lines — filled
@@ -573,7 +575,11 @@ server-side timestamp, so restarts and clock skew are handled.
 **Monitoring**
 - Live workers table (5 s cadence): stage, processing time, bytes
   sent/received, remote address (forwarded + actual), virtual host,
-  request line. Stage codes colour-coded; "P/R/K" rows dimmed.
+  request line. Only *active* workers are listed — stages P (parsing,
+  blue), S (service, green) and F (finishing, amber), each with its own
+  bullet colour; R (ready), K (keep-alive) and unknown stages are idle
+  one way or another and are left out so the table stays short; the
+  header badge reports "N active · X idle".
 - Connector detail cards with the same data as the Dashboard, plus
   max-processing-time history chart.
 
@@ -613,9 +619,12 @@ server-side timestamp, so restarts and clock skew are handled.
   line. Both formats expose the same field names, and the method / path /
   query / protocol are derived from the request line when only `%r` is
   logged.
-- Table: host, user, time, request (or the derived method / path / query /
-  protocol), status (coloured badge), size, session ID (when logged). Row
-  click opens a drawer with the full record.
+- Table: host, user, time, the method / path / query / protocol columns
+  (derived from `%r` when the format logs only the request line), status
+  (coloured badge), size, session ID (when logged). The raw request line
+  is not a column — it repeats the derived columns and is by far the
+  widest; it stays available in the record drawer, which a row click
+  opens with the full record.
 
 ### 5.3 Design system
 
@@ -627,19 +636,27 @@ server-side timestamp, so restarts and clock skew are handled.
   alone). The accent is otherwise neutral: per-tab hues are reserved for
   the active navigation item (see §5.1) so the current section is
   recognisable at a glance, and are never used for content.
-- Responsive, below 768 px (and on landscape phones of any width up to
-  932 px, via a `max-height` media): management tables (applications,
+- Responsive. Phone mode below 900 px (bottom tab bar, management tables
+  (applications,
   hosts, users, sessions, connectors, servlets, …) convert to stacked
-  cards, each cell labelled with its column header; high-volume tables
-  (server logs, access log, active workers) size to their content so
-  columns are never squeezed, with the first column pinned while the table
-  scrolls horizontally — except on the log pages in portrait, where the
-  wide Time column would dominate the viewport, so the whole table scrolls.
-  The log pages' long text columns (messages, requests) are given most of
+  cards, each cell labelled with its column header; kebab menus, full-width
+  forms and modals) — 900 px rather than the classic 768 px so iPad
+  portrait and small tablets get it too. Independently, high-volume tables
+  (server logs, access log, active workers) get the scrollable treatment —
+  size to content so columns are never squeezed or wrapped, first column
+  pinned while the table scrolls horizontally — up to 1150 px, because
+  below that even the thirteen access-log columns do not fit without
+  squeezing and a horizontal scroll is the better trade; above it the
+  ordinary desktop tables take over (which also keeps ordinary desktop
+  windows, however short, on the desktop treatment). The log pages never
+  pin their first column at any width in that range — the pinned Time
+  column would dominate the viewport and leave a sliver for the scrolling
+  content, so the whole log table scrolls.
+   The log pages' long text columns (messages) are given most of
   the viewport (90vw portrait, 100vw landscape) because with
   `table-layout:auto` any extra table width flows into the only wrapping
   column, keeping rows to one or two lines for information density.
-  Charts re-flow to a single column; row actions move into an overflow
+   Charts re-flow to a single column; row actions move into an overflow
    (kebab) menu; form fields and modals go full width.
 - The side navigation is an icons-only 60 px rail at all widths where it
   is shown; in landscape viewports it pops out at full width and label on
@@ -1165,13 +1182,14 @@ enough that a lint pass (`--check` via a CI node step, optional) plus the
 integration tests above gives adequate coverage without a JS test
 harness.
 
-Mobile checklist (portrait 360/390/414 px and landscape 667/812/932 px,
-both themes): no page-level horizontal overflow; management tables render
+Mobile checklist (portrait 360/390/414/820 px and landscape 667/812/932 px,
+both themes, plus mid-width windows at 901/1024 px): no page-level
+horizontal overflow; below 900 px management tables render
 as labelled stacked cards and row actions collapse into the kebab menu
 (kebab opens, closes on outside tap and `Esc`, disabled actions stay
 disabled); high-volume tables (logs, access log, workers) scroll
-horizontally with the first column pinned and long values wrapping, not
-squeezed; tabs scroll when crowded; page-head, log and diagnostics
+horizontally with the first column pinned (log pages: never pinned, the
+whole table scrolls) and single-line rows below 1150 px, not squeezed; tabs scroll when crowded; page-head, log and diagnostics
 controls go full width; modals show stacked full-width buttons; toasts
 appear above the bottom nav; the bottom nav keeps all nine items as icons
 only (labels as `aria-label`, active item in its per-tab hue); inputs are
