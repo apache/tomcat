@@ -81,9 +81,12 @@ public class Redirect implements TagPlugin {
         // do redirect
         ctxt.generateJavaSource("try{");
         ctxt.generateJavaSource("    " + responseName + ".sendRedirect(" + resultName + ");");
+        // Avoid unreachable code error in compiler
+        ctxt.generateJavaSource("    if (true) {");
+        ctxt.generatePageTermination();
+        ctxt.generateJavaSource("    }");
         ctxt.generateJavaSource("}catch(java.io.IOException ex){");
         ctxt.generateJavaSource("    throw new JspTagException(ex.toString(), ex);");
         ctxt.generateJavaSource("}");
     }
-
 }

@@ -425,6 +425,10 @@
         an Ant task. (sainadh777)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix the tag plugin for the JSTL &lt;c:redirtect&gt; tag so that page
+        processing ends with the redirect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
