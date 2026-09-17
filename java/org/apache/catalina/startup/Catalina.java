@@ -852,7 +852,21 @@ public class Catalina {
     public void start() {
 
         if (getServer() == null) {
-            load();
+            try {
+                load();
+            } catch (Throwable t) {
+                // Re-throw critical errors immediately. Otherwise, try and clean-up first.
+                ExceptionUtils.handleThrowable(t);
+                log.fatal(sm.getString("catalina.initError"), t);
+                if (getServer() != null) {
+                    try {
+                        getServer().destroy();
+                    } catch (LifecycleException e) {
+                        log.debug(sm.getString("catalina.destroyFail"), e);
+                    }
+                }
+                return;
+            }
         }
 
         if (getServer() == null) {
