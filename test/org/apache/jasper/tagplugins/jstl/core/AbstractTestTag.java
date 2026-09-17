@@ -47,13 +47,17 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
                 lib.getAbsolutePath(), null, "/");
 
         // Configure the use of the plug-in rather than the standard impl
-        File plugin = new File(
-                "java/org/apache/jasper/tagplugins/jstl/tagPlugins.xml");
+        File plugin = getTagPluginsFile();
         Assert.assertTrue(plugin.isFile());
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, "/WEB-INF/tagPlugins.xml",
                 plugin.getAbsolutePath(), null, "/");
 
         tomcat.start();
+    }
+
+
+    protected File getTagPluginsFile() {
+        return new File("java/org/apache/jasper/tagplugins/jstl/tagPlugins.xml");
     }
 }
