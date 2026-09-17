@@ -830,7 +830,14 @@ public class Catalina {
         try {
             getServer().init();
         } catch (LifecycleException e) {
-            if (throwOnInitFailure) {
+            /*
+             * The server will be in the FAILED state. If start() is then called, that will first call stop() to
+             * clean-up before trying to start the server. Calling stop() means a future call to getServer().await()
+             * will return immediately. That in turn means if the call to start() succeeds it will be immediately
+             * followed by another call to stop(). If await is enabled then it is better to throw the error here than to
+             * start the Server only to immediately stop it again.
+             */
+            if (throwOnInitFailure || await) {
                 throw new Error(e);
             } else {
                 log.error(sm.getString("catalina.initError"), e);
