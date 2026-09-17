@@ -16,8 +16,11 @@
  */
 package org.apache.catalina.startup;
 
+import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSet;
+import org.xml.sax.Attributes;
 
 /**
  * <strong>RuleSet</strong> for processing the contents of a Context definition element.
@@ -80,6 +83,7 @@ public class ContextRuleSet implements RuleSet {
         if (create) {
             digester.addObjectCreate(prefix + "Context", "org.apache.catalina.core.StandardContext", "className");
             digester.addSetProperties(prefix + "Context");
+            digester.addRule(prefix + "Context", new SetDeployedFromServerXmlRule());
         } else {
             digester.addSetProperties(prefix + "Context", new String[] { "path", "docBase" });
         }
@@ -191,4 +195,36 @@ public class ContextRuleSet implements RuleSet {
         digester.addSetNext(prefix + "Context/CookieProcessor", "setCookieProcessor",
                 "org.apache.tomcat.util.http.CookieProcessor");
     }
+}
+
+
+/**
+ * A Rule that calls <code>setDeployedFromServerXml(true)</code> for the top object on the stack when a Context element
+ * is created, which only occurs for Context elements defined in server.xml. The flag allows storeconfig to detect a
+ * Context that is defined inline in server.xml so it is not moved to a separate configuration file when the
+ * configuration is stored.
+ */
+final class SetDeployedFromServerXmlRule extends Rule {
+
+    SetDeployedFromServerXmlRule() {
+        // NO-OP
+    }
+
+    @Override
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
+        if (digester.peek() instanceof StandardContext context) {
+            context.setDeployedFromServerXml(true);
+            if (digester.getLogger().isTraceEnabled()) {
+                digester.getLogger().trace("Calling StandardContext.setDeployedFromServerXml(true)");
+            }
+
+            StringBuilder code = digester.getGeneratedCode();
+            if (code != null) {
+                code.append(System.lineSeparator());
+                code.append(digester.toVariableName(context)).append(".setDeployedFromServerXml(true);");
+                code.append(System.lineSeparator());
+            }
+        }
+    }
+
 }
