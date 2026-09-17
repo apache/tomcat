@@ -267,6 +267,9 @@
         <code>server.xml</code>. Use it to have <code>StoreConfig</code>
         save to a new config file. (remm)
       </fix>
+      <fix>
+        Improve error handling on start-up. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
