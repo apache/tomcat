@@ -112,6 +112,7 @@ public class SecureNioChannel extends NioChannel {
         if (channel != null) {
             sniComplete = false;
             handshakeComplete = false;
+            needHandshakeWrap = false;
             closed = false;
             closing = false;
             netInBuffer.clear();
@@ -917,6 +918,8 @@ public class SecureNioChannel extends NioChannel {
         netOutBuffer.clear();
 
         SSLEngineResult result = sslEngine.wrap(srcs, offset, length, netOutBuffer);
+        // Call to wrap() will have included any required handshake data
+        needHandshakeWrap = false;
         // The number of bytes written
         int written = result.bytesConsumed();
         netOutBuffer.flip();

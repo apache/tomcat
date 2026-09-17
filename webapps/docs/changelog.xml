@@ -204,6 +204,10 @@
       <fix>
         Correct a narrow race condition when processing HTTP/2 headers. (markt)
       </fix>
+      <fix>
+        Fix possible TLS connections failures caused by one of the flags Tomcat
+        uses to track TLS handshake progress not being correctly reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
