@@ -15,21 +15,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>403 &middot; Tomcat Manager</title>
+  <title>403 &middot; #{manager2.ui.brand.name}</title>
   <!-- MANAGER2_BASE -->
   <link rel="stylesheet" href="css/manager2.css">
 </head>
 <body class="login-body">
   <main class="login-card">
     <p class="error-code">403</p>
-    <h1>Access denied</h1>
-    <p>Your account does not have permission to perform this action. If you
-    believe this is an error, contact your server administrator.</p>
-    <a class="btn btn-primary" href=".">Back to dashboard</a>
+    <h1>#{manager2.ui.error.403.heading}</h1>
+    <p>#{manager2.ui.error.403.text}</p>
+    <a class="btn btn-primary" href=".">#{manager2.ui.error.back}</a>
   </main>
 </body>
 </html>

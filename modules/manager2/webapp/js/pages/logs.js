@@ -16,12 +16,13 @@
  */
 
 import { logPage } from '../logviewer.js';
+import { t } from '../i18n.js';
 
 export async function logs(container) {
   return logPage(container, {
     kind: 'log',
-    title: 'Logs',
-    subtitle: 'Server log files (JULI). Filter by severity and search the records.',
+    title: t('manager2.ui.nav.logs'),
+    subtitle: t('manager2.ui.logs.subtitle'),
     listUrl: '/api/logs',
     fileUrl: '/api/logs/file',
   });

@@ -18,6 +18,7 @@
 import { BASE, api, getCsrfToken, setCsrfToken } from '../api.js';
 import { el, clear, table, stateBadge, toast, modal, confirm, drawer, actionMenu,
     formatTimestamp, formatDuration } from '../ui.js';
+import { t } from '../i18n.js';
 
 /**
  * The segment used in URLs to refer to a context path.
@@ -41,11 +42,11 @@ function appUrl(host, contextPath) {
 export async function apps(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Applications'),
-          el('p', {}, 'Deploy, start, stop, reload and undeploy web applications.'),
+          el('h1', {}, t('manager2.ui.nav.apps')),
+          el('p', {}, t('manager2.ui.apps.subtitle')),
           el('span', { class: 'head-spacer' }),
           el('button', { type: 'button', class: 'btn btn-primary', onclick: () => deployModal() },
-              'Deploy application')));
+              t('manager2.ui.apps.deployButton'))));
   container.append(view);
 
   const wrap = el('div', { class: 'card' });
@@ -63,7 +64,7 @@ export async function apps(container) {
     wrap.append(table({
       columns: [
         {
-          key: 'path', label: 'Path',
+          key: 'path', label: t('manager2.ui.col.path'),
           render: (a) => el('a', {
             href: BASE + appUrl(a.host, a.path),
             onclick: (e) => {
@@ -73,24 +74,24 @@ export async function apps(container) {
             },
           }, a.path === '' ? '/' : a.path),
         },
-        { key: 'displayName', label: 'Display name', muted: true },
-        { key: 'version', label: 'Version', muted: true, render: (a) => a.version || '-' },
-        { key: 'state', label: 'State', render: (a) => stateBadge(a.available ? 'RUNNABLE' : 'STOPPED') },
-        { key: 'sessions', label: 'Sessions', numeric: true },
+        { key: 'displayName', label: t('manager2.ui.apps.displayName'), muted: true },
+        { key: 'version', label: t('manager2.ui.col.version'), muted: true, render: (a) => a.version || '-' },
+        { key: 'state', label: t('manager2.ui.col.state'), render: (a) => stateBadge(a.available ? 'RUNNABLE' : 'STOPPED') },
+        { key: 'sessions', label: t('manager2.ui.col.sessions'), numeric: true },
         {
-          key: 'docBase', label: 'Doc base', muted: true,
+          key: 'docBase', label: t('manager2.ui.apps.docBase'), muted: true,
           render: (a) => el('code', {}, a.docBase || '-'),
         },
         {
-          key: 'actions', label: 'Actions',
+          key: 'actions', label: t('manager2.ui.col.actions'),
           render: (a) => actionMenu([
               a.available
-                  ? { label: 'Stop', onclick: () => lifecycle(a, 'stop') }
-                  : { label: 'Start', class: 'btn-primary', onclick: () => lifecycle(a, 'start') },
-              { label: 'Reload', disabled: !a.available, onclick: () => lifecycle(a, 'reload') },
+                  ? { label: t('manager2.ui.common.stop'), onclick: () => lifecycle(a, 'stop') }
+                  : { label: t('manager2.ui.common.start'), class: 'btn-primary', onclick: () => lifecycle(a, 'start') },
+              { label: t('manager2.ui.common.reload'), disabled: !a.available, onclick: () => lifecycle(a, 'reload') },
               {
-                label: 'Undeploy', class: 'btn-danger', disabled: a.self,
-                title: a.self ? 'Cannot undeploy the manager itself' : 'Undeploy',
+                label: t('manager2.ui.apps.undeploy'), class: 'btn-danger', disabled: a.self,
+                title: a.self ? t('manager2.ui.apps.cannotUndeploySelf') : t('manager2.ui.apps.undeploy'),
                 onclick: () => undeploy(a),
               },
           ]),
@@ -100,7 +101,7 @@ export async function apps(container) {
         window.history.pushState({}, '', BASE + appUrl(a.host, a.path));
         window.dispatchEvent(new PopStateEvent('popstate'));
       },
-      empty: 'No applications deployed',
+      empty: t('manager2.ui.apps.noApps'),
       stackable: true,
     }));
   }
@@ -113,9 +114,9 @@ async function lifecycle(app, action) {
   const ok = action === 'start'
       ? true
       : await confirm({
-        title: action === 'stop' ? 'Stop application' : 'Reload application',
-        message: 'Stop or reload ' + (app.path === '' ? '/' : app.path) + '?',
-        confirmLabel: action === 'stop' ? 'Stop' : 'Reload',
+        title: action === 'stop' ? t('manager2.ui.apps.stopConfirmTitle') : t('manager2.ui.apps.reloadConfirmTitle'),
+        message: t('manager2.ui.apps.stopOrReloadConfirm', app.path === '' ? '/' : app.path),
+        confirmLabel: action === 'stop' ? t('manager2.ui.common.stop') : t('manager2.ui.common.reload'),
         danger: false,
       });
   if (!ok) return;
@@ -131,9 +132,9 @@ async function lifecycle(app, action) {
 
 async function undeploy(app) {
   const ok = await confirm({
-    title: 'Undeploy application',
-    message: 'Undeploy ' + (app.path === '' ? '/' : app.path) + '? The deployed files are kept on disk.',
-    confirmLabel: 'Undeploy',
+    title: t('manager2.ui.apps.undeployConfirmTitle'),
+    message: t('manager2.ui.apps.undeployConfirm', app.path === '' ? '/' : app.path),
+    confirmLabel: t('manager2.ui.apps.undeploy'),
     danger: true,
     requireText: app.path === '' ? '/' : app.path,
   });
@@ -155,45 +156,45 @@ function deployModal() {
 
   const uploadPane = el('div', {},
       el('div', { class: 'field' },
-          el('label', {}, 'WAR file'),
+          el('label', {}, t('manager2.ui.apps.warFile')),
           el('input', { type: 'file', accept: '.war', id: 'deploy-war' })),
       el('div', { class: 'form-grid' },
           el('div', { class: 'field' },
-              el('label', {}, 'Context path (optional)'),
+              el('label', {}, t('manager2.ui.apps.contextPathOptional')),
               el('input', { type: 'text', id: 'deploy-path', placeholder: '/myapp' }),
-              el('span', { class: 'hint' }, 'Defaults to the WAR file name.')),
+              el('span', { class: 'hint' }, t('manager2.ui.apps.contextPathHint'))),
           el('div', { class: 'field' },
-              el('label', {}, 'Version (optional)'),
+              el('label', {}, t('manager2.ui.apps.versionOptional')),
               el('input', { type: 'text', id: 'deploy-version' }))));
 
   const serverPane = el('div', { style: 'display:none' },
       el('div', { class: 'form-grid' },
           el('div', { class: 'field' },
-              el('label', {}, 'Context path'),
+              el('label', {}, t('manager2.ui.apps.contextPath')),
               el('input', { type: 'text', id: 'srv-path', placeholder: '/myapp' })),
           el('div', { class: 'field' },
-              el('label', {}, 'Version (optional)'),
+              el('label', {}, t('manager2.ui.apps.versionOptional')),
               el('input', { type: 'text', id: 'srv-version' })),
           el('div', { class: 'field span-2' },
-              el('label', {}, 'XML configuration (optional)'),
+              el('label', {}, t('manager2.ui.apps.xmlConfigOptional')),
               el('input', { type: 'text', id: 'srv-config', placeholder: 'http://.../context.xml' })),
           el('div', { class: 'field span-2' },
-              el('label', {}, 'WAR location (optional)'),
+              el('label', {}, t('manager2.ui.apps.warLocationOptional')),
               el('input', { type: 'text', id: 'srv-war', placeholder: 'file:///.../myapp.war' })),
           el('div', { class: 'field span-2' },
               el('label', {}, ''),
               el('label', { class: 'check' },
                   el('input', { type: 'checkbox', id: 'srv-replace' }),
-                  'Replace an existing deployment'))));
+                  t('manager2.ui.apps.replaceExisting')))));
 
   const tabs = el('div', { class: 'tabs' },
-      el('button', { type: 'button', class: 'tab active', onclick: () => switchTab('upload') }, 'Upload'),
-      el('button', { type: 'button', class: 'tab', onclick: () => switchTab('server') }, 'From server'));
+      el('button', { type: 'button', class: 'tab active', onclick: () => switchTab('upload') }, t('manager2.ui.apps.tabUpload')),
+      el('button', { type: 'button', class: 'tab', onclick: () => switchTab('server') }, t('manager2.ui.apps.tabServer')));
 
   function switchTab(name) {
     tab = name;
-    tabs.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', (i === 0) === (name === 'upload'));
+    tabs.querySelectorAll('.tab').forEach((tab, i) => {
+      tab.classList.toggle('active', (i === 0) === (name === 'upload'));
     });
     uploadPane.style.display = name === 'upload' ? '' : 'none';
     serverPane.style.display = name === 'server' ? '' : 'none';
@@ -203,7 +204,7 @@ function deployModal() {
   let busy = false;
 
   const close = modal({
-    title: 'Deploy application',
+    title: t('manager2.ui.apps.deployTitle'),
     wide: true,
     content: el('div', {},
         tabs,
@@ -211,9 +212,9 @@ function deployModal() {
         serverPane,
         progress),
     actions: [
-      { label: 'Cancel' },
+      { label: t('manager2.ui.common.cancel') },
       {
-        label: 'Deploy',
+        label: t('manager2.ui.apps.deploy'),
         class: 'btn-primary',
         onClick: async (c) => {
           if (busy) return;
@@ -224,7 +225,7 @@ function deployModal() {
               const fileInput = document.getElementById('deploy-war');
               const file = fileInput.files[0];
               if (!file) {
-                toast('Select a WAR file first.', 'warn');
+                toast(t('manager2.ui.apps.selectWarFirst'), 'warn');
                 return;
               }
               const fd = new FormData();
@@ -290,12 +291,12 @@ function uploadWithProgress(path, formData, onProgress) {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(data ? data.message : xhr.responseText);
       } else {
-        const err = new Error((data && data.message) || ('Upload failed with status ' + xhr.status));
+        const err = new Error((data && data.message) || t('manager2.ui.apps.uploadFailedStatus', xhr.status));
         err.status = xhr.status;
         reject(err);
       }
     });
-    xhr.addEventListener('error', () => reject(new Error('Upload failed (network error)')));
+    xhr.addEventListener('error', () => reject(new Error(t('manager2.ui.apps.uploadNetworkError'))));
     xhr.send(formData);
   });
 }
@@ -314,7 +315,7 @@ export async function appDetail(container, params) {
             e.preventDefault();
             window.history.pushState({}, '', BASE + '/apps');
             window.dispatchEvent(new PopStateEvent('popstate'));
-          } }, 'Applications'),
+          } }, t('manager2.ui.nav.apps')),
           ' / ',
           document.createTextNode(contextPath === '' ? '/' : contextPath)));
 
@@ -324,9 +325,9 @@ export async function appDetail(container, params) {
   view.append(head);
 
   const tabs = el('div', { class: 'tabs' },
-      el('button', { type: 'button', class: 'tab active' }, 'Overview'),
-      el('button', { type: 'button', class: 'tab' }, 'Sessions'),
-      el('button', { type: 'button', class: 'tab' }, 'Metrics'));
+      el('button', { type: 'button', class: 'tab active' }, t('manager2.ui.apps.tabOverview')),
+      el('button', { type: 'button', class: 'tab' }, t('manager2.ui.apps.tabSessions')),
+      el('button', { type: 'button', class: 'tab' }, t('manager2.ui.apps.tabMetrics')));
   const panes = el('div', {},
       el('div', { class: 'pane' }, el('div', { class: 'spinner' })),
       el('div', { class: 'pane', style: 'display:none' }),
@@ -339,7 +340,7 @@ export async function appDetail(container, params) {
   let loaded = [false, false, false];
 
   function switchTab(index) {
-    tabButtons.forEach((t, i) => t.classList.toggle('active', i === index));
+    tabButtons.forEach((tab, i) => tab.classList.toggle('active', i === index));
     paneNodes.forEach((p, i) => { p.style.display = i === index ? '' : 'none'; });
     if (!loaded[index]) {
       loaded[index] = true;
@@ -348,7 +349,7 @@ export async function appDetail(container, params) {
       else loadMetrics();
     }
   }
-  tabButtons.forEach((t, i) => t.addEventListener('click', () => switchTab(i)));
+  tabButtons.forEach((tab, i) => tab.addEventListener('click', () => switchTab(i)));
 
   // ---------------- Overview ----------------
   let appInfo = null;
@@ -364,7 +365,7 @@ export async function appDetail(container, params) {
     }
     const app = data.apps.find((a) => a.host === host && a.path === contextPath);
     if (!app) {
-      pane.append(el('div', { class: 'empty' }, 'Application not found.'));
+      pane.append(el('div', { class: 'empty' }, t('manager2.ui.apps.notFound')));
       return;
     }
     appInfo = app;
@@ -376,26 +377,26 @@ export async function appDetail(container, params) {
 
     const actions = el('div', { class: 'row-actions', style: 'margin-bottom:16px;' },
         available
-            ? el('button', { type: 'button', class: 'btn', onclick: () => lifecycle(app, 'stop') }, 'Stop')
-            : el('button', { type: 'button', class: 'btn btn-primary', onclick: () => lifecycle(app, 'start') }, 'Start'),
-        el('button', { type: 'button', class: 'btn', disabled: !available, onclick: () => lifecycle(app, 'reload') }, 'Reload'),
+            ? el('button', { type: 'button', class: 'btn', onclick: () => lifecycle(app, 'stop') }, t('manager2.ui.common.stop'))
+            : el('button', { type: 'button', class: 'btn btn-primary', onclick: () => lifecycle(app, 'start') }, t('manager2.ui.common.start')),
+        el('button', { type: 'button', class: 'btn', disabled: !available, onclick: () => lifecycle(app, 'reload') }, t('manager2.ui.common.reload')),
         el('button', {
           type: 'button', class: 'btn btn-danger', disabled: app.self,
-          title: app.self ? 'Cannot undeploy the manager itself' : 'Undeploy',
+          title: app.self ? t('manager2.ui.apps.cannotUndeploySelf') : t('manager2.ui.apps.undeploy'),
           onclick: () => undeploy(app),
-        }, 'Undeploy'));
+        }, t('manager2.ui.apps.undeploy')));
 
     const dl = el('dl', { class: 'kv' },
-        kv('Host', host),
-        kv('Path', contextPath === '' ? '/' : contextPath),
-        kv('Display name', app.displayName || '-'),
-        kv('Version', app.version || '-'),
-        kv('Doc base', el('code', {}, app.docBase || '-')),
-        kv('Session timeout', app.sessionTimeout != null ? app.sessionTimeout + ' min' : '-'),
-        kv('Active sessions', String(app.sessions)));
+        kv(t('manager2.ui.col.host'), host),
+        kv(t('manager2.ui.col.path'), contextPath === '' ? '/' : contextPath),
+        kv(t('manager2.ui.apps.displayName'), app.displayName || '-'),
+        kv(t('manager2.ui.col.version'), app.version || '-'),
+        kv(t('manager2.ui.apps.docBase'), el('code', {}, app.docBase || '-')),
+        kv(t('manager2.ui.apps.sessionTimeout'), app.sessionTimeout != null ? t('manager2.ui.apps.minutes', app.sessionTimeout) : '-'),
+        kv(t('manager2.ui.dashboard.kpi.activeSessions'), String(app.sessions)));
 
     pane.append(el('div', { class: 'card' },
-        el('h3', {}, 'Details'),
+        el('h3', {}, t('manager2.ui.apps.details')),
         actions,
         dl));
   }
@@ -414,7 +415,7 @@ export async function appDetail(container, params) {
 
     const controls = el('div', { class: 'row-actions', style: 'margin-bottom:12px;' },
         el('input', {
-          type: 'number', id: 'expire-idle', min: '0', placeholder: 'idle seconds',
+          type: 'number', id: 'expire-idle', min: '0', placeholder: t('manager2.ui.apps.idleSecondsPlaceholder'),
           class: 'expire-idle-input',
         }),
         el('button', {
@@ -422,7 +423,7 @@ export async function appDetail(container, params) {
           onclick: async () => {
             const idle = parseInt(document.getElementById('expire-idle').value, 10);
             if (isNaN(idle) || idle < 0) {
-              toast('Enter an idle timeout in seconds.', 'warn');
+              toast(t('manager2.ui.apps.idleTimeoutNeeded'), 'warn');
               return;
             }
             try {
@@ -433,7 +434,7 @@ export async function appDetail(container, params) {
               toast(err.message, 'error');
             }
           },
-        }, 'Expire idle'),
+        }, t('manager2.ui.apps.expireIdle')),
         el('span', { class: 'head-spacer' }),
         el('button', {
           type: 'button', class: 'btn btn-sm btn-danger',
@@ -441,13 +442,13 @@ export async function appDetail(container, params) {
             const selected = Array.from(pane.querySelectorAll('input.session-check:checked'))
                 .map((c) => c.dataset.id);
             if (selected.length === 0) {
-              toast('Select sessions to invalidate.', 'warn');
+              toast(t('manager2.ui.apps.selectSessions'), 'warn');
               return;
             }
             const ok = await confirm({
-              title: 'Invalidate sessions',
-              message: 'Invalidate ' + selected.length + ' session(s)?',
-              confirmLabel: 'Invalidate',
+              title: t('manager2.ui.apps.invalidateSessionsTitle'),
+              message: t('manager2.ui.apps.invalidateSessionsConfirm', selected.length),
+              confirmLabel: t('manager2.ui.apps.invalidate'),
               danger: true,
             });
             if (!ok) return;
@@ -459,7 +460,7 @@ export async function appDetail(container, params) {
               toast(err.message, 'error');
             }
           },
-        }, 'Invalidate selected'));
+        }, t('manager2.ui.apps.invalidateSelected')));
     pane.append(controls, el('div', { id: 'sessions-table' }));
 
     let sort = 'lastAccessedTime';
@@ -492,28 +493,28 @@ export async function appDetail(container, params) {
           }),
         },
         {
-          key: 'id', label: 'Id', sortable: true,
+          key: 'id', label: t('manager2.ui.apps.colId'), sortable: true,
           render: (s) => el('code', {}, s.id),
         },
         {
-          key: 'user', label: 'User', sortable: true,
+          key: 'user', label: t('manager2.ui.col.user'), sortable: true,
           render: (s) => s.user || '-',
         },
         {
-          key: 'creationTime', label: 'Created', sortable: true,
+          key: 'creationTime', label: t('manager2.ui.apps.colCreated'), sortable: true,
           render: (s) => formatTimestamp(s.creationTime),
         },
         {
-          key: 'lastAccessedTime', label: 'Last accessed', sortable: true,
+          key: 'lastAccessedTime', label: t('manager2.ui.apps.colLastAccessed'), sortable: true,
           render: (s) => formatTimestamp(s.lastAccessedTime),
         },
         {
-          key: 'maxInactiveInterval', label: 'Timeout (s)', sortable: true, numeric: true,
+          key: 'maxInactiveInterval', label: t('manager2.ui.apps.colTimeout'), sortable: true, numeric: true,
         },
         {
-          key: 'active', label: 'State',
+          key: 'active', label: t('manager2.ui.col.state'),
           render: (s) => el('span', { class: 'badge ' + (s.active ? 'ok' : 'stop') },
-              s.active ? 'active' : 'proxy'),
+              s.active ? t('manager2.ui.apps.sessionActive') : t('manager2.ui.apps.sessionProxy')),
         },
       ],
         rows: data.sessions,
@@ -529,7 +530,7 @@ export async function appDetail(container, params) {
           loadSessionTable(sortKey, asc);
         },
         onRowClick: (s) => sessionDrawer(s),
-        empty: 'No sessions',
+        empty: t('manager2.ui.apps.noSessions'),
         stackable: true,
       }));
   }
@@ -537,21 +538,21 @@ export async function appDetail(container, params) {
   function sessionDrawer(session) {
     const body = el('div', {},
         el('dl', { class: 'kv', style: 'margin-bottom:20px;' },
-            el('dt', {}, 'Id'), el('dd', {}, el('code', {}, session.id)),
-            el('dt', {}, 'User'), el('dd', {}, session.user || '-'),
-            el('dt', {}, 'Locale'), el('dd', {}, session.locale || '-'),
-            el('dt', {}, 'Created'), el('dd', {}, formatTimestamp(session.creationTime)),
-            el('dt', {}, 'Last accessed'), el('dd', {}, formatTimestamp(session.lastAccessedTime)),
-            el('dt', {}, 'Timeout'), el('dd', {}, session.maxInactiveInterval + ' s')));
+            el('dt', {}, t('manager2.ui.apps.colId')), el('dd', {}, el('code', {}, session.id)),
+            el('dt', {}, t('manager2.ui.col.user')), el('dd', {}, session.user || '-'),
+            el('dt', {}, t('manager2.ui.apps.colLocale')), el('dd', {}, session.locale || '-'),
+            el('dt', {}, t('manager2.ui.apps.colCreated')), el('dd', {}, formatTimestamp(session.creationTime)),
+            el('dt', {}, t('manager2.ui.apps.colLastAccessed')), el('dd', {}, formatTimestamp(session.lastAccessedTime)),
+            el('dt', {}, t('manager2.ui.apps.timeoutLabel')), el('dd', {}, t('manager2.ui.apps.seconds', session.maxInactiveInterval))));
 
     const actions = el('div', { class: 'row-actions', style: 'margin-bottom:16px;' },
         el('button', {
           type: 'button', class: 'btn btn-sm btn-danger',
           onclick: async () => {
             const ok = await confirm({
-              title: 'Invalidate session',
-              message: 'Invalidate session ' + session.id + '?',
-              confirmLabel: 'Invalidate',
+              title: t('manager2.ui.apps.invalidateSessionTitle'),
+              message: t('manager2.ui.apps.invalidateSessionConfirm', session.id),
+              confirmLabel: t('manager2.ui.apps.invalidate'),
               danger: true,
             });
             if (!ok) return;
@@ -565,25 +566,25 @@ export async function appDetail(container, params) {
               toast(err.message, 'error');
             }
           },
-        }, 'Invalidate session'));
-    body.append(actions, el('h3', {}, 'Attributes'), el('div', { id: 'attr-holder' }));
+        }, t('manager2.ui.apps.invalidateSession')));
+    body.append(actions, el('h3', {}, t('manager2.ui.apps.attributes')), el('div', { id: 'attr-holder' }));
 
-    const close = drawer({ title: 'Session ' + session.id, content: body });
+    const close = drawer({ title: t('manager2.ui.apps.sessionTitle', session.id), content: body });
 
     api('GET', '/api/apps/' + seg + '/sessions/' + encodeURIComponent(session.id) + query)
         .then((detail) => {
           const holder = body.querySelector('#attr-holder');
           clear(holder);
           if (!detail.attributes || detail.attributes.length === 0) {
-            holder.append(el('div', { class: 'empty' }, 'No attributes'));
+            holder.append(el('div', { class: 'empty' }, t('manager2.ui.apps.noAttributes')));
             return;
           }
           holder.append(el('div', { class: 'table-wrap' },
               el('table', { class: 'data' },
                   el('thead', {}, el('tr', {},
-                      el('th', {}, 'Name'),
-                      el('th', {}, 'Class'),
-                      el('th', {}, 'Value'),
+                      el('th', {}, t('manager2.ui.col.name')),
+                      el('th', {}, t('manager2.ui.apps.colClass')),
+                      el('th', {}, t('manager2.ui.apps.colValue')),
                       el('th', {}))),
                   el('tbody', {}, detail.attributes.map((a) => el('tr', {},
                       el('td', {}, el('code', {}, a.name)),
@@ -594,9 +595,9 @@ export async function appDetail(container, params) {
                             type: 'button', class: 'btn btn-sm btn-danger',
                             onclick: async () => {
                               const ok = await confirm({
-                                title: 'Remove attribute',
-                                message: 'Remove attribute ' + a.name + '?',
-                                confirmLabel: 'Remove',
+                                title: t('manager2.ui.apps.removeAttributeTitle'),
+                                message: t('manager2.ui.apps.removeAttributeConfirm', a.name),
+                                confirmLabel: t('manager2.ui.common.remove'),
                                 danger: true,
                               });
                               if (!ok) return;
@@ -604,14 +605,14 @@ export async function appDetail(container, params) {
                                 await api('DELETE', '/api/apps/' + seg + '/sessions/' +
                                     encodeURIComponent(session.id) + '/attributes/' +
                                     encodeURIComponent(a.name) + query);
-                                toast('Attribute removed.', 'ok');
+                                toast(t('manager2.ui.apps.attributeRemoved'), 'ok');
                                 close();
                                 loadSessions();
                               } catch (err) {
                                 toast(err.message, 'error');
                               }
                             },
-                          }, 'Remove'))))))));
+                          }, t('manager2.ui.common.remove')))))))));
         })
         .catch((err) => {
           const holder = body.querySelector('#attr-holder');
@@ -634,39 +635,39 @@ export async function appDetail(container, params) {
 
     const m = data.manager || {};
     pane.append(el('div', { class: 'grid kpis' },
-        kpi('Active sessions', m.activeSessions != null ? String(m.activeSessions) : '-'),
-        kpi('Expired sessions', m.expiredSessions != null ? String(m.expiredSessions) : '-'),
-        kpi('Avg session lifetime', m.sessionAverageAliveTime != null ?
+        kpi(t('manager2.ui.dashboard.kpi.activeSessions'), m.activeSessions != null ? String(m.activeSessions) : '-'),
+        kpi(t('manager2.ui.apps.expiredSessions'), m.expiredSessions != null ? String(m.expiredSessions) : '-'),
+        kpi(t('manager2.ui.apps.avgSessionLifetime'), m.sessionAverageAliveTime != null ?
             formatDuration(m.sessionAverageAliveTime) : '-'),
-        kpi('Max session life', m.sessionMaxAliveTime != null ?
+        kpi(t('manager2.ui.apps.maxSessionLife'), m.sessionMaxAliveTime != null ?
             formatDuration(m.sessionMaxAliveTime) : '-')));
 
     if (data.jsp) {
       pane.append(el('div', { class: 'card' },
-          el('h3', {}, 'JSPs'),
+          el('h3', {}, t('manager2.ui.apps.jsps')),
           el('dl', { class: 'kv' },
-              el('dt', {}, 'JSP files'), el('dd', {}, String(data.jsp.jspCount)),
-              el('dt', {}, 'Reloads'), el('dd', {}, String(data.jsp.jspReloadCount)))));
+              el('dt', {}, t('manager2.ui.apps.jspFiles')), el('dd', {}, String(data.jsp.jspCount)),
+              el('dt', {}, t('manager2.ui.apps.reloads')), el('dd', {}, String(data.jsp.jspReloadCount)))));
     }
 
     pane.append(el('div', { class: 'card' },
-        el('h3', {}, 'Servlets'),
+        el('h3', {}, t('manager2.ui.apps.servlets')),
         el('div', { class: 'table-wrap stackable' },
             el('table', { class: 'data' },
                 el('thead', {}, el('tr', {},
-                    el('th', {}, 'Name'),
-                    el('th', {}, 'Mappings'),
-                    el('th', { class: 'num' }, 'Requests'),
-                    el('th', { class: 'num' }, 'Errors'),
-                    el('th', { class: 'num' }, 'Processing time'),
-                    el('th', { class: 'num' }, 'Max time'))),
+                    el('th', {}, t('manager2.ui.col.name')),
+                    el('th', {}, t('manager2.ui.apps.mappings')),
+                    el('th', { class: 'num' }, t('manager2.ui.col.requests')),
+                    el('th', { class: 'num' }, t('manager2.ui.col.errors')),
+                    el('th', { class: 'num' }, t('manager2.ui.monitoring.col.processingTime')),
+                    el('th', { class: 'num' }, t('manager2.ui.apps.colMaxTime')))),
                 el('tbody', {}, (data.wrappers || []).map((w) => el('tr', {},
-                    el('td', { 'data-label': 'Name' }, el('code', {}, w.name)),
-                    el('td', { class: 'muted', 'data-label': 'Mappings' }, (w.mappings || []).join(', ')),
-                    el('td', { class: 'num', 'data-label': 'Requests' }, String(w.requestCount)),
-                    el('td', { class: 'num', 'data-label': 'Errors' }, String(w.errorCount)),
-                    el('td', { class: 'num', 'data-label': 'Processing time' }, formatDuration(w.processingTime)),
-                    el('td', { class: 'num', 'data-label': 'Max time' }, formatDuration(w.maxTime)))))))));
+                    el('td', { 'data-label': t('manager2.ui.col.name') }, el('code', {}, w.name)),
+                    el('td', { class: 'muted', 'data-label': t('manager2.ui.apps.mappings') }, (w.mappings || []).join(', ')),
+                    el('td', { class: 'num', 'data-label': t('manager2.ui.col.requests') }, String(w.requestCount)),
+                    el('td', { class: 'num', 'data-label': t('manager2.ui.col.errors') }, String(w.errorCount)),
+                    el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.processingTime') }, formatDuration(w.processingTime)),
+                    el('td', { class: 'num', 'data-label': t('manager2.ui.apps.colMaxTime') }, formatDuration(w.maxTime)))))))));
   }
 
   function kpi(label, value) {

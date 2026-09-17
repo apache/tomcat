@@ -157,6 +157,89 @@ public class TestManager2Webapp extends TomcatBaseTest {
 
         requestRaw(client, "GET", MANAGER2 + "/js/main.js", 200);
 
+        // The i18n endpoint is public too (the login page needs it).
+        requestRaw(client, "GET", MANAGER2 + "/i18n", 200);
+
+        client.disconnect();
+    }
+
+
+    @Test
+    public void testI18nEndpointServesClientMessages() throws Exception {
+        setup(false);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+
+        // Public endpoint: it carries only the manager2.ui.* messages of the
+        // bundle, localized with the best bundle match for the request
+        // (the bundle is English only, so the base bundle always wins).
+        requestRaw(client, "GET", MANAGER2 + "/i18n", 200);
+        String body = client.getResponseBody();
+        Assert.assertTrue(body.contains("\"locale\":\"en\""));
+        Assert.assertTrue(body.contains("\"manager2.ui.brand.name\":\"Tomcat Manager\""));
+        Assert.assertTrue(body.contains("\"manager2.ui.nav.dashboard\":\"Dashboard\""));
+        // The dynamic manager2.ui.type.* keys are served as well.
+        Assert.assertTrue(body.contains("\"manager2.ui.type.connector\":\"connector\""));
+        // Server-side-only keys are never exposed to the browser.
+        Assert.assertFalse(body.contains("manager2.uploadNoFile"));
+        Assert.assertFalse(body.contains("csrfFilter.invalid"));
+        boolean vary = false;
+        for (String header : client.getResponseHeaders()) {
+            if (header.toLowerCase().startsWith("vary:") && header.toLowerCase().contains("accept-language")) {
+                vary = true;
+            }
+        }
+        Assert.assertTrue("Expected a Vary: Accept-Language header", vary);
+
+        // A locale without a bundle falls back to the base (English) bundle.
+        client.setRequest(new String[] { "GET " + MANAGER2 + "/i18n HTTP/1.1" + CRLF,
+                "Host: localhost:" + getPort() + CRLF, "Accept-Language: de-DE,de;q=0.9" + CRLF,
+                "Connection: Close" + CRLF, CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(200, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("\"locale\":\"en\""));
+
+        // Messages only: the endpoint answers GET.
+        request(client, "POST", MANAGER2 + "/i18n", null, null, 405);
+
+        client.disconnect();
+    }
+
+
+    @Test
+    public void testLoginAndErrorPagesAreLocalizedServerSide() throws Exception {
+        setup(false);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+
+        // Unauthenticated SPA entry point: the login template is rendered
+        // with the bundle's messages, including the lang attribute, before
+        // any script runs.
+        client.setRequest(new String[] { "GET " + MANAGER2 + "/ HTTP/1.1" + CRLF, "Host: localhost:" + getPort() + CRLF,
+                "Connection: Close" + CRLF, CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(200, client.getStatusCode());
+        String login = client.getResponseBody();
+        Assert.assertTrue(login.contains("j_security_check"));
+        Assert.assertTrue(login.contains("lang=\"en\""));
+        Assert.assertTrue(login.contains("Sign in"));
+        Assert.assertTrue(login.contains("User name"));
+        Assert.assertFalse("Unsubstituted token left in the login page", login.contains("#{"));
+        Assert.assertFalse("Unsubstituted lang token left in the login page", login.contains("{{"));
+
+        // 404 error page, rendered by the ErrorServlet.
+        requestRaw(client, "GET", MANAGER2 + "/does-not-exist", 404);
+        String error = client.getResponseBody();
+        Assert.assertTrue(error.contains("Not found"));
+        Assert.assertTrue(error.contains("Back to dashboard"));
+        Assert.assertFalse("Unsubstituted token left in the error page", error.contains("#{"));
+
         client.disconnect();
     }
 

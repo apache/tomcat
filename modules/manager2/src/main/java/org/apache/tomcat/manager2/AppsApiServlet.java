@@ -57,12 +57,6 @@ public class AppsApiServlet extends HTMLManagerServlet {
     private static final long serialVersionUID = 1L;
 
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
-
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
@@ -241,7 +235,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             String message = invoke(pw -> {
@@ -265,7 +259,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             String message = invoke(pw -> super.undeploy(pw, cn, legacySm(request)));
@@ -281,7 +275,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             Map<String, Object> body = readJson(request);
@@ -318,7 +312,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
                 cn = ContextName.extractFromPath(war);
             } else {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
 
@@ -332,19 +326,18 @@ public class AppsApiServlet extends HTMLManagerServlet {
 
     private void handleUpload(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringManager smClient = legacySm(request);
-        StringManager smLegacy = StringManager.getManager("org.apache.catalina.manager", request.getLocales());
 
         try {
             Part warPart = request.getPart("war");
             if (warPart == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "UPLOAD_NO_FILE",
-                        smLegacy.getString("htmlManagerServlet.deployUploadNoFile"));
+                        Strings.sm().getString("manager2.uploadNoFile"));
                 return;
             }
             String filename = warPart.getSubmittedFileName();
             if (filename == null || !filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "UPLOAD_NOT_WAR",
-                        smLegacy.getString("htmlManagerServlet.deployUploadNotWar", filename));
+                        Strings.sm().getString("manager2.uploadNotWar", filename));
                 return;
             }
             int slash = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
@@ -374,7 +367,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
             Context existing = (Context) host.findChild(name);
             if (existing != null && !replace) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "ALREADY_DEPLOYED",
-                        smLegacy.getString("managerServlet.alreadyContext", cn.getDisplayName()));
+                        Strings.sm().getString("manager2.alreadyDeployed", cn.getDisplayName()));
                 return;
             }
 
@@ -386,7 +379,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
             File target = replace ? new File(deployedWar.getAbsolutePath() + ".tmp") : deployedWar;
             if (!replace && target.exists()) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "WAR_EXISTS",
-                        smLegacy.getString("htmlManagerServlet.deployUploadWarExists", filename));
+                        Strings.sm().getString("manager2.uploadWarExists", filename));
                 return;
             }
 
@@ -396,12 +389,12 @@ public class AppsApiServlet extends HTMLManagerServlet {
                     if (replace) {
                         if (deployedWar.exists() && !deployedWar.delete()) {
                             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "DELETE_FAILED",
-                                    smLegacy.getString("managerServlet.deleteFail", deployedWar));
+                                    Strings.sm().getString("manager2.uploadDeleteFailed", deployedWar));
                             return;
                         }
                         if (!target.renameTo(deployedWar)) {
                             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "RENAME_FAILED",
-                                    smLegacy.getString("managerServlet.renameFail", target, deployedWar));
+                                    Strings.sm().getString("manager2.uploadRenameFailed", target, deployedWar));
                             return;
                         }
                     }
@@ -411,26 +404,26 @@ public class AppsApiServlet extends HTMLManagerServlet {
                 check(name);
             } else {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "IN_SERVICE",
-                        smLegacy.getString("managerServlet.inService", cn.getDisplayName()));
+                        Strings.sm().getString("manager2.contextInService", cn.getDisplayName()));
                 return;
             }
 
             Context deployed = (Context) host.findChild(name);
             String message;
             if (deployed != null && deployed.getConfigured() && deployed.getState().isAvailable()) {
-                message = smLegacy.getString("managerServlet.deployed", cn.getDisplayName());
+                message = Strings.sm().getString("manager2.deployed", cn.getDisplayName());
             } else if (deployed != null && !deployed.getState().isAvailable()) {
-                message = smLegacy.getString("managerServlet.deployedButNotStarted", cn.getDisplayName());
+                message = Strings.sm().getString("manager2.deployedNotStarted", cn.getDisplayName());
             } else {
-                message = smLegacy.getString("managerServlet.deployFailed", cn.getDisplayName());
+                message = Strings.sm().getString("manager2.deployFailed", cn.getDisplayName());
             }
             Api.ok(response, message);
         } catch (IllegalArgumentException e) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_JSON", e.getMessage());
         } catch (Exception e) {
-            log(sm.getString("manager2.error.upload"), e);
+            log(Strings.sm().getString("manager2.error.upload"), e);
             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "UPLOAD_FAILED",
-                    smLegacy.getString("htmlManagerServlet.deployUploadFail", e.getMessage()));
+                    Strings.sm().getString("manager2.uploadFailed", e.getMessage()));
         }
     }
 
@@ -440,7 +433,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             StringManager smClient = legacySm(request);
@@ -485,7 +478,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             String path = path(request);
@@ -499,7 +492,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
             Session session = getSessionForNameAndId(cn, sessionId, legacySm(request));
             if (session == null) {
                 Api.error(response, HttpServletResponse.SC_NOT_FOUND, "SESSION_NOT_FOUND",
-                        sm.getString("manager2.sessionNotFound", sessionId));
+                        Strings.sm().getString("manager2.sessionNotFound", sessionId));
                 return;
             }
             Map<String, Object> payload = sessionToJson(session);
@@ -516,7 +509,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             Map<String, Object> body = readJson(request);
@@ -530,7 +523,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
             Map<String, Object> payload = new LinkedHashMap<>();
             payload.put("ok", Boolean.TRUE);
             payload.put("count", Integer.valueOf(count));
-            payload.put("message", count + " sessions invalidated.");
+            payload.put("message", Strings.sm().getString("manager2.sessionsInvalidated", Integer.valueOf(count)));
             Api.json(response, payload);
         } catch (IllegalArgumentException e) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH", e.getMessage());
@@ -543,7 +536,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (cn == null) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                        sm.getString("manager2.missingPath"));
+                        Strings.sm().getString("manager2.missingPath"));
                 return;
             }
             String path = path(request);
@@ -559,10 +552,10 @@ public class AppsApiServlet extends HTMLManagerServlet {
 
             boolean removed = removeSessionAttribute(cn, sessionId, attributeName, legacySm(request));
             if (removed) {
-                Api.ok(response, sm.getString("manager2.attributeRemoved", attributeName));
+                Api.ok(response, Strings.sm().getString("manager2.attributeRemoved", attributeName));
             } else {
                 Api.error(response, HttpServletResponse.SC_NOT_FOUND, "ATTRIBUTE_NOT_FOUND",
-                        sm.getString("manager2.attributeNotFound", attributeName));
+                        Strings.sm().getString("manager2.attributeNotFound", attributeName));
             }
         } catch (IllegalArgumentException e) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH", e.getMessage());
@@ -706,7 +699,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             return new JSONParser(body).parseObject();
         } catch (Exception e) {
-            throw new IllegalArgumentException(sm.getString("manager2.invalidJson", e.getMessage()), e);
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", e.getMessage()), e);
         }
     }
 
@@ -717,13 +710,6 @@ public class AppsApiServlet extends HTMLManagerServlet {
             operation.run(writer);
         }
         return stringWriter.toString().trim();
-    }
-
-
-    // Keep it since it can be useful eventually
-    @SuppressWarnings("unused")
-    private static StringManager clientSm(HttpServletRequest request) {
-        return StringManager.getManager(Constants.Package, request.getLocales());
     }
 
 
@@ -744,12 +730,12 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try {
             if (!input.getCanonicalFile().toPath().startsWith(expected.getCanonicalFile().toPath())) {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "PATH_CHECK_FAILED",
-                        sm.getString("manager2.pathCheckFail", input, expected));
+                        Strings.sm().getString("manager2.pathCheckFail", input, expected));
                 return false;
             }
         } catch (IOException ioe) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "PATH_CHECK_ERROR",
-                    sm.getString("manager2.pathCheckError", input, expected, ioe.getMessage()));
+                    Strings.sm().getString("manager2.pathCheckError", input, expected, ioe.getMessage()));
             return false;
         }
         return true;

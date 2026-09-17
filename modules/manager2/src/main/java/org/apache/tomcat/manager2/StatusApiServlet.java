@@ -47,7 +47,6 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -60,12 +59,6 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
 
 
     private transient MBeanServer mBeanServer = null;
@@ -127,7 +120,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
             mBeanServer.addNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this, null,
                     null);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.jmx"), e);
+            log(Strings.sm().getString("manager2.error.jmx"), e);
         }
 
         // Start the background collection of status samples for
@@ -165,7 +158,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
             mBeanServer.removeNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this,
                     null, null);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.jmx"), e);
+            log(Strings.sm().getString("manager2.error.jmx"), e);
         }
     }
 
@@ -239,7 +232,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
                 Api.notFound(response);
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.status"), e);
+            log(Strings.sm().getString("manager2.error.status"), e);
             throw new ServletException(e);
         }
     }
@@ -293,7 +286,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
         try {
             history.record(StatusSnapshot.snapshot(mBeanServer, threadPools, host));
         } catch (Exception e) {
-            log(sm.getString("manager2.error.status"), e);
+            log(Strings.sm().getString("manager2.error.status"), e);
         }
     }
 
@@ -319,7 +312,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
             } catch (NumberFormatException e) {
                 // Fall through to the default
             }
-            log(sm.getString("manager2.history.invalidParameter", name, value));
+            log(Strings.sm().getString("manager2.history.invalidParameter", name, value));
         }
         return defaultValue;
     }

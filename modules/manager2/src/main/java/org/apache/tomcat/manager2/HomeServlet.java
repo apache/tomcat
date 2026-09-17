@@ -66,7 +66,8 @@ public class HomeServlet extends HttpServlet {
         if (request.getUserPrincipal() != null) {
             String template = Html.readTemplate(getServletContext(), "/index.html");
             if (template == null) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SPA shell missing");
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        Strings.manager(request).getString("manager2.shellMissing"));
                 return;
             }
             Html.render(request, response, template);

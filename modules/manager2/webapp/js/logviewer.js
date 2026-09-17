@@ -22,63 +22,64 @@
 
 import { api, BASE } from './api.js';
 import { el, clear, table, drawer, formatBytes, formatMs } from './ui.js';
+import { t } from './i18n.js';
 
 // Column definitions per field name. `render` receives the row and returns a
 // node or a string.
 const COLUMNS = {
-  time: { label: 'Time' },
+  time: { labelKey: 'manager2.ui.logviewer.col.time' },
   level: {
-    label: 'Level',
+    labelKey: 'manager2.ui.logviewer.col.level',
     render: (r) => levelBadge(r.level),
   },
-  thread: { label: 'Thread' },
-  source: { label: 'Source' },
-  message: { label: 'Message', wide: true },
-  raw: { label: 'Line', wide: true },
-  throwable: { label: 'Stack trace', wide: true },
-  method: { label: 'Method' },
-  host: { label: 'Host' },
-  remoteAddr: { label: 'Remote addr' },
-  localAddr: { label: 'Local addr' },
-  localServerName: { label: 'Server' },
-  user: { label: 'User' },
-  path: { label: 'Path' },
-  query: { label: 'Query' },
-  request: { label: 'Request', wide: true },
-  protocol: { label: 'Protocol' },
+  thread: { labelKey: 'manager2.ui.logviewer.col.thread' },
+  source: { labelKey: 'manager2.ui.logviewer.col.source' },
+  message: { labelKey: 'manager2.ui.logviewer.col.message', wide: true },
+  raw: { labelKey: 'manager2.ui.logviewer.col.raw', wide: true },
+  throwable: { labelKey: 'manager2.ui.logviewer.col.throwable', wide: true },
+  method: { labelKey: 'manager2.ui.logviewer.col.method' },
+  host: { labelKey: 'manager2.ui.col.host' },
+  remoteAddr: { labelKey: 'manager2.ui.logviewer.col.remoteAddr' },
+  localAddr: { labelKey: 'manager2.ui.logviewer.col.localAddr' },
+  localServerName: { labelKey: 'manager2.ui.logviewer.col.server' },
+  user: { labelKey: 'manager2.ui.logviewer.col.user' },
+  path: { labelKey: 'manager2.ui.col.path' },
+  query: { labelKey: 'manager2.ui.logviewer.col.query' },
+  request: { labelKey: 'manager2.ui.logviewer.col.request', wide: true },
+  protocol: { labelKey: 'manager2.ui.logviewer.col.protocol' },
   statusCode: {
-    label: 'Status',
+    labelKey: 'manager2.ui.logviewer.col.status',
     numeric: true,
     render: (r) => statusBadge(r.statusCode),
   },
   size: {
-    label: 'Size',
+    labelKey: 'manager2.ui.logviewer.col.size',
     numeric: true,
     render: (r) => formatBytes(r.size),
   },
   byteSentNC: {
-    label: 'Size (no C-L)',
+    labelKey: 'manager2.ui.logviewer.col.sizeNoContentLength',
     numeric: true,
     render: (r) => formatBytes(r.byteSentNC),
   },
   elapsedTime: {
-    label: 'Elapsed',
+    labelKey: 'manager2.ui.logviewer.col.elapsed',
     numeric: true,
     render: (r) => formatMs(r.elapsedTime),
   },
   elapsedTimeS: {
-    label: 'Elapsed (s)',
+    labelKey: 'manager2.ui.logviewer.col.elapsedSeconds',
     numeric: true,
   },
   firstByteTime: {
-    label: 'First byte',
+    labelKey: 'manager2.ui.logviewer.col.firstByte',
     numeric: true,
     render: (r) => formatMs(r.firstByteTime),
   },
-  port: { label: 'Port', numeric: true },
-  sessionId: { label: 'Session', mono: true },
-  threadName: { label: 'Thread' },
-  connectionStatus: { label: 'Connection' },
+  port: { labelKey: 'manager2.ui.logviewer.col.port', numeric: true },
+  sessionId: { labelKey: 'manager2.ui.logviewer.col.session', mono: true },
+  threadName: { labelKey: 'manager2.ui.logviewer.col.thread' },
+  connectionStatus: { labelKey: 'manager2.ui.logviewer.col.connection' },
 };
 
 function levelBadge(level) {
@@ -106,7 +107,8 @@ function statusBadge(status) {
 }
 
 function labelFor(key) {
-  return (COLUMNS[key] && COLUMNS[key].label) || key;
+  const def = COLUMNS[key];
+  return def && def.labelKey ? t(def.labelKey) : key;
 }
 
 // Show all fields of a record in a drawer (full messages and stack traces).
@@ -125,7 +127,7 @@ function showRecord(row) {
           el('code', {}, typeof value === 'object' ? JSON.stringify(value) : String(value))));
     }
   }
-  drawer({ title: 'Record', content: body });
+  drawer({ title: t('manager2.ui.logviewer.recordTitle'), content: body });
 }
 
 // Build the column descriptors from the ordered field list the server sent.
@@ -136,10 +138,10 @@ function columnsFor(fields) {
     // columns derived from it and is the widest column of the table; it
     // stays available in the record drawer and in the method filter.
     if (key === 'request') continue;
-    const def = COLUMNS[key] || { label: key };
+    const def = COLUMNS[key] || {};
     cols.push({
       key,
-      label: def.label || key,
+      label: labelFor(key),
       numeric: def.numeric ? true : null,
       muted: !def.render && !def.numeric ? true : null,
       wide: def.wide ? true : null,
@@ -215,7 +217,7 @@ export async function logPage(container, opts) {
       (v) => { state.lines = Number(v); loadFile(); });
 
   const refreshBtn = el('button', { type: 'button', class: 'btn btn-sm' },
-      'Refresh');
+      t('manager2.ui.common.refresh'));
   refreshBtn.addEventListener('click', () => { loadList(); });
 
   // Download the full, unfiltered raw file of the current selection. A
@@ -223,7 +225,7 @@ export async function logPage(container, opts) {
   // Content-Disposition: attachment, so the browser saves the file instead
   // of navigating.
   const downloadBtn = el('button', { type: 'button', class: 'btn btn-sm' },
-      'Download');
+      t('manager2.ui.common.download'));
   downloadBtn.disabled = true;
   downloadBtn.addEventListener('click', () => {
     if (!state.file) return;
@@ -240,9 +242,9 @@ export async function logPage(container, opts) {
   const filterHolder = el('div', { class: 'log-filters' });
 
   const fileField = el('div', { class: 'field log-field' },
-      el('label', {}, 'File'), fileSelect);
+      el('label', {}, t('manager2.ui.logviewer.file')), fileSelect);
   const linesField = el('div', { class: 'field log-field' },
-      el('label', {}, 'Max lines'), linesSelect);
+      el('label', {}, t('manager2.ui.logviewer.maxLines')), linesSelect);
   const refreshField = el('div', { class: 'field log-field log-field-btn' },
       el('label', {}, '\u00a0'),
       el('div', { class: 'log-btns' }, refreshBtn, downloadBtn));
@@ -267,27 +269,27 @@ export async function logPage(container, opts) {
       // Severity filter from the levels present in the file.
       const levels = Object.keys(meta.levels || {});
       if (levels.length > 0) {
-        const options = [{ value: '', label: 'All severities' }]
+        const options = [{ value: '', label: t('manager2.ui.logviewer.allSeverities') }]
             .concat(levels.map((l) => ({ value: l, label: l })));
         filterHolder.append(el('div', { class: 'field log-field' },
-            el('label', {}, 'Severity'),
+            el('label', {}, t('manager2.ui.logviewer.severity')),
             select(options, f.level || '', (v) => { state.filters.level = v; loadFile(); })));
       }
     } else {
       if (has(fields, 'method') || has(fields, 'request')) {
         const methods = (meta.methods || []).map((m) => m.name);
         filterHolder.append(el('div', { class: 'field log-field' },
-            el('label', {}, 'Method'),
-            select([{ value: '', label: 'All' }].concat(methods.map((m) => ({ value: m, label: m }))),
+            el('label', {}, t('manager2.ui.logviewer.col.method')),
+            select([{ value: '', label: t('manager2.ui.common.all') }].concat(methods.map((m) => ({ value: m, label: m }))),
                 f.method || '', (v) => { state.filters.method = v; loadFile(); })));
       }
       if (has(fields, 'statusCode')) {
         const cls = ['1xx', '2xx', '3xx', '4xx', '5xx'];
         const counts = meta.statusClasses || {};
         filterHolder.append(el('div', { class: 'field log-field' },
-            el('label', {}, 'Status'),
+            el('label', {}, t('manager2.ui.logviewer.col.status')),
             select(
-                [{ value: '', label: 'All' }].concat(cls.map((c) => ({
+                [{ value: '', label: t('manager2.ui.common.all') }].concat(cls.map((c) => ({
                     value: c,
                     label: c + (counts[c] ? ' (' + counts[c] + ')' : ''),
                 }))),
@@ -295,19 +297,19 @@ export async function logPage(container, opts) {
       }
       if (has(fields, 'user')) {
         filterHolder.append(el('div', { class: 'field log-field' },
-            el('label', {}, 'User'),
-            textInput('Filter by user', (v) => { state.filters.user = v; loadFile(); }, f.user || '')));
+            el('label', {}, t('manager2.ui.logviewer.col.user')),
+            textInput(t('manager2.ui.logviewer.filterByUser'), (v) => { state.filters.user = v; loadFile(); }, f.user || '')));
       }
       if (has(fields, 'sessionId')) {
         filterHolder.append(el('div', { class: 'field log-field' },
-            el('label', {}, 'Session ID'),
-            textInput('Filter by session ID', (v) => { state.filters.session = v; loadFile(); }, f.session || '')));
+            el('label', {}, t('manager2.ui.logviewer.sessionId')),
+            textInput(t('manager2.ui.logviewer.filterBySessionId'), (v) => { state.filters.session = v; loadFile(); }, f.session || '')));
       }
     }
     // Free text search is available for both kinds.
     filterHolder.append(el('div', { class: 'field log-field log-field-search' },
-        el('label', {}, 'Search'),
-        textInput('Search', (v) => { state.filters.search = v; loadFile(); }, f.search || '')));
+        el('label', {}, t('manager2.ui.logviewer.search')),
+        textInput(t('manager2.ui.logviewer.searchPlaceholder'), (v) => { state.filters.search = v; loadFile(); }, f.search || '')));
   }
 
   // ---- loading ----
@@ -324,12 +326,12 @@ export async function logPage(container, opts) {
     state.files = data.logs || [];
     clear(fileSelect);
     if (state.files.length === 0) {
-      fileSelect.append(el('option', { value: '' }, 'No log files found'));
+      fileSelect.append(el('option', { value: '' }, t('manager2.ui.logviewer.noFiles')));
       fileSelect.disabled = true;
       downloadBtn.disabled = true;
       clear(tableHolder);
       tableHolder.append(el('div', { class: 'empty' },
-          'No ' + (kind === 'log' ? 'log' : 'access log') + ' files were found in the logs directory.'));
+          t(kind === 'log' ? 'manager2.ui.logviewer.noLogFiles' : 'manager2.ui.logviewer.noAccessLogFiles')));
       statusLine.textContent = '';
       return;
     }
@@ -351,7 +353,7 @@ export async function logPage(container, opts) {
     if (!state.file || loading) return;
     loading = true;
     clear(tableHolder);
-    tableHolder.append(el('div', { class: 'spinner', role: 'status', 'aria-label': 'Loading' }));
+    tableHolder.append(el('div', { class: 'spinner', role: 'status', 'aria-label': t('manager2.ui.common.loading') }));
 
     const params = new URLSearchParams();
     params.set('name', state.file);
@@ -376,11 +378,12 @@ export async function logPage(container, opts) {
     buildFilters(state.fields, data);
 
     const records = data.records || [];
-    let summary = 'Showing ' + records.length + ' of ' + data.matched +
-        ' matching line' + (data.matched === 1 ? '' : 's') +
-        ' (total ' + data.total + ')';
+    let summary = data.matched === 1
+        ? t('manager2.ui.logviewer.summarySingular', records.length, data.matched, data.total)
+        : t('manager2.ui.logviewer.summaryPlural', records.length, data.matched, data.total);
     if (data.truncated) {
-      summary += ' - file truncated to the last ' + Math.round((data.readBytes / 1024 / 1024) * 10) / 10 + ' MiB';
+      summary += ' - ' + t('manager2.ui.logviewer.truncated',
+          Math.round((data.readBytes / 1024 / 1024) * 10) / 10);
     }
     statusLine.textContent = summary;
 
@@ -388,17 +391,17 @@ export async function logPage(container, opts) {
     if (records.length === 0) {
       clear(tableHolder);
       tableHolder.append(el('div', { class: 'empty' },
-          'No lines match the current filters.'));
+          t('manager2.ui.logviewer.noMatches')));
     } else {
       clear(tableHolder);
-      const t = table({
+      const tbl = table({
         columns: cols,
         rows: records,
         onRowClick: (row) => showRecord(row),
-        empty: 'No lines match the current filters.',
+        empty: t('manager2.ui.logviewer.noMatches'),
       });
-      t.classList.add('log-table');
-      tableHolder.append(t);
+      tbl.classList.add('log-table');
+      tableHolder.append(tbl);
     }
     loading = false;
   }

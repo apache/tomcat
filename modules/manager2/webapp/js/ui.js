@@ -17,6 +17,8 @@
 
 // ============================ DOM helpers ============================
 
+import { t, locale, numberFormatter } from './i18n.js';
+
 /**
  * Create an element.
  *
@@ -69,31 +71,35 @@ export function clear(node) {
 
 // ============================ Formatting ===============================
 
+const fBytes1 = () => numberFormatter({ minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const fBytes2 = () => numberFormatter({ minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fInt = () => numberFormatter({ maximumFractionDigits: 0 });
+
 export function formatBytes(n) {
   if (n === null || n === undefined || isNaN(n)) return '-';
   const abs = Math.abs(n);
-  if (abs < 1024) return n + ' B';
-  if (abs < 1024 * 1024) return (n / 1024).toFixed(1) + ' KiB';
-  if (abs < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + ' MiB';
-  return (n / 1024 / 1024 / 1024).toFixed(2) + ' GiB';
+  if (abs < 1024) return fInt().format(n) + ' B';
+  if (abs < 1024 * 1024) return fBytes1().format(n / 1024) + ' KiB';
+  if (abs < 1024 * 1024 * 1024) return fBytes1().format(n / 1024 / 1024) + ' MiB';
+  return fBytes2().format(n / 1024 / 1024 / 1024) + ' GiB';
 }
 
 export function formatRate(n) {
   if (n === null || n === undefined || isNaN(n)) return '-';
-  return n.toFixed(1) + '/s';
+  return numberFormatter({ minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n) + '/s';
 }
 
 export function formatMs(n) {
   if (n === null || n === undefined || isNaN(n)) return '-';
-  if (n < 1000) return Math.round(n) + ' ms';
-  return (n / 1000).toFixed(2) + ' s';
+  if (n < 1000) return fInt().format(n) + ' ms';
+  return fBytes2().format(n / 1000) + ' s';
 }
 
 export function formatSeconds(n) {
   if (n === null || n === undefined || isNaN(n)) return '-';
-  if (n < 60) return Math.round(n) + ' s';
-  if (n < 3600) return Math.floor(n / 60) + ' min ' + Math.round(n % 60) + ' s';
-  return Math.floor(n / 3600) + ' h ' + Math.floor((n % 3600) / 60) + ' min';
+  if (n < 60) return fInt().format(n) + ' s';
+  if (n < 3600) return fInt().format(Math.floor(n / 60)) + ' min ' + fInt().format(Math.round(n % 60)) + ' s';
+  return fInt().format(Math.floor(n / 3600)) + ' h ' + fInt().format(Math.floor((n % 3600) / 60)) + ' min';
 }
 
 export function formatDuration(ms) {
@@ -102,20 +108,20 @@ export function formatDuration(ms) {
   const d = Math.floor(s / 86400);
   const h = Math.floor((s % 86400) / 3600);
   const m = Math.floor((s % 3600) / 60);
-  if (d > 0) return d + ' d ' + h + ' h';
-  if (h > 0) return h + ' h ' + m + ' min';
-  if (m > 0) return m + ' min';
-  return Math.max(0, s) + ' s';
+  if (d > 0) return fInt().format(d) + ' d ' + fInt().format(h) + ' h';
+  if (h > 0) return fInt().format(h) + ' h ' + fInt().format(m) + ' min';
+  if (m > 0) return fInt().format(m) + ' min';
+  return fInt().format(Math.max(0, s)) + ' s';
 }
 
 export function formatTimestamp(ts) {
   if (!ts) return '-';
-  return new Date(ts).toLocaleString();
+  return new Date(ts).toLocaleString(locale);
 }
 
 export function formatTime(ts) {
   if (!ts) return '-';
-  return new Date(ts).toLocaleTimeString();
+  return new Date(ts).toLocaleTimeString(locale);
 }
 
 // ============================ State badges =============================
@@ -125,7 +131,7 @@ export function stateBadge(state) {
   // "RUNNABLE" is accepted for compatibility with callers that normalize
   // the available flag themselves.
   const running = state === 'RUNNABLE' || state === 'STARTED' || state === 'AVAILABLE';
-  return el('span', { class: 'badge ' + (running ? 'ok' : 'stop') }, running ? 'Running' : 'Stopped');
+  return el('span', { class: 'badge ' + (running ? 'ok' : 'stop') }, running ? t('manager2.ui.state.running') : t('manager2.ui.state.stopped'));
 }
 
 // ============================ Toasts ===================================
@@ -209,7 +215,7 @@ export function confirm(opts) {
     let input = null;
     if (opts.requireText) {
       input = el('div', { class: 'field', style: 'margin-top:16px;' },
-          el('label', {}, 'Type ', el('code', {}, opts.requireText), ' to confirm'),
+          typeToConfirmLabel(opts.requireText),
           el('input', { type: 'text', autocomplete: 'off' }));
       content.append(input);
     }
@@ -217,9 +223,9 @@ export function confirm(opts) {
       title: opts.title,
       content,
       actions: [
-        { label: 'Cancel', onClick: () => finish(false) },
+        { label: t('manager2.ui.common.cancel'), onClick: () => finish(false) },
         {
-          label: opts.confirmLabel || 'Confirm',
+          label: opts.confirmLabel || t('manager2.ui.common.confirm'),
           class: opts.danger ? 'btn-danger' : 'btn-primary',
           onClick: () => {
             if (input) {
@@ -237,6 +243,21 @@ export function confirm(opts) {
       onClose: () => finish(false),
     });
   });
+}
+
+/**
+ * The label of a confirmation that requires typing a value; the typed value
+ * keeps its code styling and its position is defined by the message itself.
+ */
+function typeToConfirmLabel(value) {
+  const label = el('label', {});
+  t('manager2.ui.confirm.typeToConfirm', '\u0000').split('\u0000').forEach((part, index) => {
+    if (index > 0) {
+      label.append(el('code', {}, value));
+    }
+    label.append(document.createTextNode(part));
+  });
+  return label;
 }
 
 // ============================ Drawer ===================================
@@ -258,7 +279,7 @@ export function drawer({ title, content, onClose = null }) {
   const panel = el('aside', { class: 'drawer', role: 'dialog', 'aria-modal': 'true' },
       el('div', { class: 'drawer-head' },
           el('h3', {}, title),
-          el('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Close', onclick: close },
+          el('button', { type: 'button', class: 'icon-btn', 'aria-label': t('manager2.ui.common.close'), onclick: close },
               el('span', { html: '&times;', style: 'font-size:20px;line-height:1;' }))),
       el('div', { class: 'drawer-body' }, content));
 
@@ -351,7 +372,7 @@ export function actionMenu(actions) {
   const kebab = el('button', {
     type: 'button',
     class: 'row-actions-kebab',
-    'aria-label': 'More actions',
+    'aria-label': t('manager2.ui.common.moreActions'),
     'aria-haspopup': 'menu',
     onclick: (e) => {
       e.stopPropagation();
@@ -385,7 +406,7 @@ export function actionMenu(actions) {
  */
 export function table(opts) {
   const { columns, rows, sortKey = null, sortAsc = true, onSort, onRowClick,
-      empty = 'No data', stackable = false } = opts;
+      empty = t('manager2.ui.common.noData'), stackable = false } = opts;
 
   const thead = el('tr', {}, columns.map((c) => {
     const label = c.sortable

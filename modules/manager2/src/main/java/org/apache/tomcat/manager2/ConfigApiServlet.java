@@ -134,7 +134,6 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -263,12 +262,6 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
-
-
-    /**
      * A component name that may be used for new hosts, wrappers, executors and services (and that is accepted for
      * engines).
      */
@@ -361,7 +354,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         } catch (ConfigException e) {
             Api.error(response, e.status, e.code, e.getMessage());
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ServletException(e);
         }
     }
@@ -392,7 +385,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         } catch (IllegalArgumentException e) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_JSON", e.getMessage());
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ServletException(e);
         }
     }
@@ -417,7 +410,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         } catch (IllegalArgumentException e) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_JSON", e.getMessage());
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ServletException(e);
         }
     }
@@ -1155,14 +1148,20 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // descriptor branch because the registry falls back to an
         // introspected ManagedBean for them, which would otherwise
         // shadow the (more complete) explicit list.
-        List<ExplicitAttribute> explicit = explicitAttributes(component, ref.type);
-        if (!explicit.isEmpty()) {
-            for (ExplicitAttribute attribute : explicit) {
+        ExplicitSpec explicit = explicitAttributes(component, ref.type);
+        if (!explicit.attributes().isEmpty()) {
+            // Factory options of a resource are localized per factory (the
+            // same parameter name may carry a different text depending on
+            // the factory that consumes it).
+            String paramScope = "resource".equals(ref.type) && component instanceof ContextResource resource
+                    ? factoryKey(effectiveFactory(resource)) : null;
+            for (ExplicitAttribute attribute : explicit.attributes()) {
                 Map<String, Object> entry = new LinkedHashMap<>();
                 entry.put("name", attribute.getName());
                 entry.put("type", attribute.getType());
-                if (attribute.getDescription() != null) {
-                    entry.put("description", attribute.getDescription());
+                String description = attributeDescription(explicit.scope(), paramScope, attribute);
+                if (description != null) {
+                    entry.put("description", description);
                 }
                 entry.put("writable", Boolean.valueOf(attribute.isWritable()));
                 if (attribute.isParam()) {
@@ -1181,8 +1180,16 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     Map<String, Object> entry = new LinkedHashMap<>();
                     entry.put("name", attribute.getName());
                     entry.put("type", attribute.getType());
-                    if (attribute.getDescription() != null) {
-                        entry.put("description", attribute.getDescription());
+                    // The bundle wins when it defines the attribute (the
+                    // hook that lets the standard, descriptor-provided
+                    // descriptions be localized); otherwise the descriptor
+                    // text is used as-is.
+                    String description = Strings.sm().getString("manager2.attr." + ref.type + "." + attribute.getName());
+                    if (description == null) {
+                        description = attribute.getDescription();
+                    }
+                    if (description != null) {
+                        entry.put("description", description);
                     }
                     entry.put("writable",
                             Boolean.valueOf(attribute.isWriteable() && EDITABLE_TYPES.contains(attribute.getType())));
@@ -1252,6 +1259,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
      * One explicitly defined attribute of a component whose class has no modeler MBean descriptor (the TLS components
      * {@code SSLHostConfig}/{@code SSLHostConfigCertificate} and the context sub components {@code WebappLoader},
      * {@code CookieProcessorBase} and {@code SessionIdGeneratorBase}), defined here instead of being derived.
+     * Descriptions are not carried here: they are looked up from the message bundle by scope and attribute name (see
+     * {@link #attributeDescription}).
      */
     private static final class ExplicitAttribute {
 
@@ -1261,21 +1270,18 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         private final boolean writable;
 
-        private final String description;
-
         private final boolean param;
 
 
-        ExplicitAttribute(String name, String type, boolean writable, String description) {
-            this(name, type, writable, description, false);
+        ExplicitAttribute(String name, String type, boolean writable) {
+            this(name, type, writable, false);
         }
 
 
-        ExplicitAttribute(String name, String type, boolean writable, String description, boolean param) {
+        ExplicitAttribute(String name, String type, boolean writable, boolean param) {
             this.name = name;
             this.type = type;
             this.writable = writable;
-            this.description = description;
             this.param = param;
         }
 
@@ -1295,11 +1301,6 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
 
 
-        String getDescription() {
-            return description;
-        }
-
-
         /**
          * {@code true} for attributes that are not bean properties but string parameters of the generic property map of
          * a JNDI entry (the {@code ResourceBase} properties).
@@ -1311,93 +1312,64 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     private static final List<ExplicitAttribute> SSL_HOST_CONFIG_ATTRIBUTES = List.of(
-            new ExplicitAttribute("hostName", "java.lang.String", false,
-                    "The SNI host name this configuration applies to (lower case)."),
-            new ExplicitAttribute("protocols", "java.lang.String", true,
-                    "Enabled TLS protocols, e.g. TLSv1.2+TLSv1.3, or All."),
-            new ExplicitAttribute("certificateVerification", "java.lang.String", true,
-                    "Client certificate verification: none, optional, optionalNoCA or required."),
-            new ExplicitAttribute("certificateVerificationDepth", "int", true,
-                    "The depth of the client certificate chain verification."),
-            new ExplicitAttribute("ciphers", "java.lang.String", true,
-                    "The cipher list for TLS 1.2 and below (OpenSSL or JSSE names)."),
-            new ExplicitAttribute("cipherSuites", "java.lang.String", true, "The cipher suite list for TLS 1.3."),
-            new ExplicitAttribute("honorCipherOrder", "boolean", true, "Whether to honor the server cipher order."),
-            new ExplicitAttribute("sessionCacheSize", "int", true, "The SSL session cache size."),
-            new ExplicitAttribute("sessionTimeout", "int", true, "The SSL session timeout in seconds."),
-            new ExplicitAttribute("groups", "java.lang.String", true, "The enabled named groups (comma separated)."),
-            new ExplicitAttribute("keyManagerAlgorithm", "java.lang.String", true, "The key manager algorithm (JSSE)."),
-            new ExplicitAttribute("sslProtocol", "java.lang.String", true, "The SSL protocol (JSSE)."),
-            new ExplicitAttribute("revocationEnabled", "boolean", true,
-                    "Whether CRL/OCSP revocation checking is enabled (JSSE)."),
-            new ExplicitAttribute("trustManagerClassName", "java.lang.String", true,
-                    "The trust manager class name (JSSE)."),
-            new ExplicitAttribute("truststoreAlgorithm", "java.lang.String", true, "The truststore algorithm (JSSE)."),
-            new ExplicitAttribute("truststoreFile", "java.lang.String", true, "The truststore file (JSSE)."),
-            new ExplicitAttribute("truststorePassword", "java.lang.String", true, "The truststore password (JSSE)."),
-            new ExplicitAttribute("truststoreProvider", "java.lang.String", true, "The truststore provider (JSSE)."),
-            new ExplicitAttribute("truststoreType", "java.lang.String", true, "The truststore type (JSSE)."),
-            new ExplicitAttribute("caCertificateFile", "java.lang.String", true, "The CA certificate file (OpenSSL)."),
-            new ExplicitAttribute("caCertificatePath", "java.lang.String", true,
-                    "The CA certificate directory (OpenSSL)."),
-            new ExplicitAttribute("certificateRevocationListPath", "java.lang.String", true,
-                    "The certificate revocation list directory (OpenSSL)."),
-            new ExplicitAttribute("disableCompression", "boolean", true,
-                    "Whether TLS compression is disabled (OpenSSL)."),
-            new ExplicitAttribute("disableSessionTickets", "boolean", true,
-                    "Whether TLS session tickets are disabled (OpenSSL)."),
-            new ExplicitAttribute("insecureRenegotiation", "boolean", true,
-                    "Whether insecure renegotiation is allowed (OpenSSL)"));
+            new ExplicitAttribute("hostName", "java.lang.String", false),
+            new ExplicitAttribute("protocols", "java.lang.String", true),
+            new ExplicitAttribute("certificateVerification", "java.lang.String", true),
+            new ExplicitAttribute("certificateVerificationDepth", "int", true),
+            new ExplicitAttribute("ciphers", "java.lang.String", true),
+            new ExplicitAttribute("cipherSuites", "java.lang.String", true),
+            new ExplicitAttribute("honorCipherOrder", "boolean", true),
+            new ExplicitAttribute("sessionCacheSize", "int", true),
+            new ExplicitAttribute("sessionTimeout", "int", true),
+            new ExplicitAttribute("groups", "java.lang.String", true),
+            new ExplicitAttribute("keyManagerAlgorithm", "java.lang.String", true),
+            new ExplicitAttribute("sslProtocol", "java.lang.String", true),
+            new ExplicitAttribute("revocationEnabled", "boolean", true),
+            new ExplicitAttribute("trustManagerClassName", "java.lang.String", true),
+            new ExplicitAttribute("truststoreAlgorithm", "java.lang.String", true),
+            new ExplicitAttribute("truststoreFile", "java.lang.String", true),
+            new ExplicitAttribute("truststorePassword", "java.lang.String", true),
+            new ExplicitAttribute("truststoreProvider", "java.lang.String", true),
+            new ExplicitAttribute("truststoreType", "java.lang.String", true),
+            new ExplicitAttribute("caCertificateFile", "java.lang.String", true),
+            new ExplicitAttribute("caCertificatePath", "java.lang.String", true),
+            new ExplicitAttribute("certificateRevocationListPath", "java.lang.String", true),
+            new ExplicitAttribute("disableCompression", "boolean", true),
+            new ExplicitAttribute("disableSessionTickets", "boolean", true),
+            new ExplicitAttribute("insecureRenegotiation", "boolean", true));
 
 
     private static final List<ExplicitAttribute> CERTIFICATE_ATTRIBUTES = List.of(
-            new ExplicitAttribute("type", "java.lang.String", false,
-                    "The certificate type (the default certificate has no type)."),
-            new ExplicitAttribute("certificateKeystoreFile", "java.lang.String", true,
-                    "The keystore file (JKS or PKCS12)."),
-            new ExplicitAttribute("certificateKeystorePassword", "java.lang.String", true, "The keystore password."),
-            new ExplicitAttribute("certificateKeystorePasswordFile", "java.lang.String", true,
-                    "The file that contains the keystore password."),
-            new ExplicitAttribute("certificateKeystoreType", "java.lang.String", true,
-                    "The keystore type (e.g. PKCS12)."),
-            new ExplicitAttribute("certificateKeystoreProvider", "java.lang.String", true, "The keystore provider."),
-            new ExplicitAttribute("certificateKeyAlias", "java.lang.String", true,
-                    "The alias of the key entry in the keystore."),
-            new ExplicitAttribute("certificateKeyPassword", "java.lang.String", true,
-                    "The private key password (if different from the keystore password)."),
-            new ExplicitAttribute("certificateKeyPasswordFile", "java.lang.String", true,
-                    "The file that contains the private key password."),
-            new ExplicitAttribute("certificateFile", "java.lang.String", true, "The certificate file (PEM, OpenSSL)."),
-            new ExplicitAttribute("certificateChainFile", "java.lang.String", true,
-                    "The certificate chain file (PEM, OpenSSL)."),
-            new ExplicitAttribute("certificateKeyFile", "java.lang.String", true,
-                    "The private key file (PEM, OpenSSL)"));
+            new ExplicitAttribute("type", "java.lang.String", false),
+            new ExplicitAttribute("certificateKeystoreFile", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeystorePassword", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeystorePasswordFile", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeystoreType", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeystoreProvider", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeyAlias", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeyPassword", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeyPasswordFile", "java.lang.String", true),
+            new ExplicitAttribute("certificateFile", "java.lang.String", true),
+            new ExplicitAttribute("certificateChainFile", "java.lang.String", true),
+            new ExplicitAttribute("certificateKeyFile", "java.lang.String", true));
 
 
     private static final List<ExplicitAttribute> WEBAPP_LOADER_ATTRIBUTES = List.of(
-            new ExplicitAttribute("delegate", "boolean", true,
-                    "Whether the web application class loader delegates to the parent class loader first."),
-            new ExplicitAttribute("loaderClass", "java.lang.String", true,
-                    "The class of the web application class loader instance."),
-            new ExplicitAttribute("jakartaConverter", "java.lang.String", true,
-                    "The class that converts Jakarta Servlet API classes to their equivalent in the deployed application."));
+            new ExplicitAttribute("delegate", "boolean", true),
+            new ExplicitAttribute("loaderClass", "java.lang.String", true),
+            new ExplicitAttribute("jakartaConverter", "java.lang.String", true));
 
 
     private static final List<ExplicitAttribute> COOKIE_PROCESSOR_ATTRIBUTES = List.of(
-            new ExplicitAttribute("cookiesWithoutEquals", "java.lang.String", true,
-                    "How to handle cookie names without an equals sign in the cookie header."),
-            new ExplicitAttribute("sameSiteCookies", "java.lang.String", true,
-                    "The SameSite attribute added to the cookies of this web application (Unset, None, Lax or Strict)."),
-            new ExplicitAttribute("partitioned", "boolean", true,
-                    "Whether the Partitioned attribute is added to the cookies of this web application."));
+            new ExplicitAttribute("cookiesWithoutEquals", "java.lang.String", true),
+            new ExplicitAttribute("sameSiteCookies", "java.lang.String", true),
+            new ExplicitAttribute("partitioned", "boolean", true));
 
 
     private static final List<ExplicitAttribute> SESSION_ID_GENERATOR_ATTRIBUTES = List.of(
-            new ExplicitAttribute("secureRandomClass", "java.lang.String", true,
-                    "The secure random number generator class used to create the session ids."),
-            new ExplicitAttribute("jvmRoute", "java.lang.String", true,
-                    "The jvm route appended to the generated session ids (cluster failover)."),
-            new ExplicitAttribute("sessionIdLength", "int", true, "The length of the generated session ids in bytes."));
+            new ExplicitAttribute("secureRandomClass", "java.lang.String", true),
+            new ExplicitAttribute("jvmRoute", "java.lang.String", true),
+            new ExplicitAttribute("sessionIdLength", "int", true));
 
 
     // The HTTP/2 upgrade protocol has no modeler descriptor either. Only the
@@ -1405,44 +1377,28 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     // components). All changes take effect when the owning connector is
     // (re)started, the same as the protocol itself.
     private static final List<ExplicitAttribute> HTTP2_PROTOCOL_ATTRIBUTES = List.of(
-            new ExplicitAttribute("readTimeout", "long", true, "The socket level read timeout in milliseconds."),
-            new ExplicitAttribute("writeTimeout", "long", true, "The socket level write timeout in milliseconds."),
-            new ExplicitAttribute("keepAliveTimeout", "long", true, "The keep alive timeout in milliseconds."),
-            new ExplicitAttribute("streamReadTimeout", "long", true, "The stream level read timeout in milliseconds."),
-            new ExplicitAttribute("streamWriteTimeout", "long", true,
-                    "The stream level write timeout in milliseconds."),
-            new ExplicitAttribute("maxConcurrentStreams", "long", true,
-                    "The maximum number of concurrent streams per connection."),
-            new ExplicitAttribute("maxConcurrentStreamExecution", "int", true,
-                    "The maximum number of concurrently executing streams per connection."),
-            new ExplicitAttribute("initialWindowSize", "int", true,
-                    "The initial window size advertised to the client in bytes."),
-            new ExplicitAttribute("useSendfile", "boolean", true, "Whether to use sendfile for file transfers."),
-            new ExplicitAttribute("allowSchemeMismatch", "boolean", true,
-                    "Whether HTTP/2 streams may provide a scheme that does not match the transport."),
-            new ExplicitAttribute("maxHeaderCount", "int", true, "The maximum number of headers allowed per request."),
-            new ExplicitAttribute("maxHeaderSize", "int", false,
-                    "The maximum size of request headers in bytes (set on the HTTP/1.1 protocol handler)."),
-            new ExplicitAttribute("maxTrailerCount", "int", true,
-                    "The maximum number of trailer headers allowed per request."),
-            new ExplicitAttribute("maxTrailerSize", "int", false,
-                    "The maximum size of trailer headers in bytes (set on the HTTP/1.1 protocol handler)."),
-            new ExplicitAttribute("overheadCountFactor", "int", true,
-                    "The overhead count factor used for overhead frame tracking."),
-            new ExplicitAttribute("overheadResetFactor", "int", true,
-                    "The overhead reset factor used for RST frame tracking."),
-            new ExplicitAttribute("overheadContinuationThreshold", "int", true,
-                    "The payload size threshold for CONTINUATION frame overhead tracking in bytes."),
-            new ExplicitAttribute("overheadDataThreshold", "int", true,
-                    "The payload size threshold for DATA frame overhead tracking in bytes."),
-            new ExplicitAttribute("overheadWindowUpdateThreshold", "int", true,
-                    "The payload size threshold for WINDOW_UPDATE frame overhead tracking in bytes."),
-            new ExplicitAttribute("initiatePingDisabled", "boolean", true,
-                    "Whether the periodic PING frames that keep the connection alive are disabled."),
-            new ExplicitAttribute("discardRequestsAndResponses", "boolean", true,
-                    "Whether requests and responses are discarded after processing instead of being recycled."),
-            new ExplicitAttribute("drainTimeout", "long", true,
-                    "The additional time in nanoseconds between the first and the final GOAWAY while a connection is drained."));
+            new ExplicitAttribute("readTimeout", "long", true),
+            new ExplicitAttribute("writeTimeout", "long", true),
+            new ExplicitAttribute("keepAliveTimeout", "long", true),
+            new ExplicitAttribute("streamReadTimeout", "long", true),
+            new ExplicitAttribute("streamWriteTimeout", "long", true),
+            new ExplicitAttribute("maxConcurrentStreams", "long", true),
+            new ExplicitAttribute("maxConcurrentStreamExecution", "int", true),
+            new ExplicitAttribute("initialWindowSize", "int", true),
+            new ExplicitAttribute("useSendfile", "boolean", true),
+            new ExplicitAttribute("allowSchemeMismatch", "boolean", true),
+            new ExplicitAttribute("maxHeaderCount", "int", true),
+            new ExplicitAttribute("maxHeaderSize", "int", false),
+            new ExplicitAttribute("maxTrailerCount", "int", true),
+            new ExplicitAttribute("maxTrailerSize", "int", false),
+            new ExplicitAttribute("overheadCountFactor", "int", true),
+            new ExplicitAttribute("overheadResetFactor", "int", true),
+            new ExplicitAttribute("overheadContinuationThreshold", "int", true),
+            new ExplicitAttribute("overheadDataThreshold", "int", true),
+            new ExplicitAttribute("overheadWindowUpdateThreshold", "int", true),
+            new ExplicitAttribute("initiatePingDisabled", "boolean", true),
+            new ExplicitAttribute("discardRequestsAndResponses", "boolean", true),
+            new ExplicitAttribute("drainTimeout", "long", true));
 
 
     // --------------------------------- Cluster channel attributes
@@ -1453,76 +1409,62 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     // defined explicitly. Only the common, documented knobs are listed.
 
     private static final List<ExplicitAttribute> CHANNEL_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The name of the channel."),
-            new ExplicitAttribute("heartbeat", "boolean", true,
-                    "Whether the channel manages its own heartbeat thread."),
-            new ExplicitAttribute("heartbeatSleeptime", "long", true,
-                    "The interval in milliseconds between heartbeats."),
-            new ExplicitAttribute("jmxDomain", "java.lang.String", true, "The JMX domain for the channel components."),
-            new ExplicitAttribute("jmxPrefix", "java.lang.String", true,
-                    "The JMX name prefix for the channel components."),
-            new ExplicitAttribute("optionCheck", "boolean", true,
-                    "Whether to check that the channel is correctly configured before starting."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("heartbeat", "boolean", true),
+            new ExplicitAttribute("heartbeatSleeptime", "long", true),
+            new ExplicitAttribute("jmxDomain", "java.lang.String", true),
+            new ExplicitAttribute("jmxPrefix", "java.lang.String", true),
+            new ExplicitAttribute("optionCheck", "boolean", true));
 
     private static final List<ExplicitAttribute> MCAST_ATTRIBUTES = List.of(
-            new ExplicitAttribute("address", "java.lang.String", true,
-                    "The multicast address to join (e.g. 228.0.0.4)."),
-            new ExplicitAttribute("port", "int", true, "The multicast port to join (e.g. 45564)."),
-            new ExplicitAttribute("frequency", "long", true,
-                    "The interval in milliseconds between membership messages."),
-            new ExplicitAttribute("dropTime", "long", true,
-                    "The time in milliseconds a member may be silent before being dropped."),
-            new ExplicitAttribute("ttl", "int", true, "The time to live for multicast packets."),
-            new ExplicitAttribute("soTimeout", "int", true, "The socket timeout in milliseconds."),
-            new ExplicitAttribute("recoveryEnabled", "boolean", true, "Whether membership recovery is enabled."),
-            new ExplicitAttribute("recoverySleepTime", "long", true,
-                    "The sleep time in milliseconds between recovery attempts."),
-            new ExplicitAttribute("localLoopbackDisabled", "boolean", true,
-                    "Whether local loopback of multicast packets is disabled."));
+            new ExplicitAttribute("address", "java.lang.String", true),
+            new ExplicitAttribute("port", "int", true),
+            new ExplicitAttribute("frequency", "long", true),
+            new ExplicitAttribute("dropTime", "long", true),
+            new ExplicitAttribute("ttl", "int", true),
+            new ExplicitAttribute("soTimeout", "int", true),
+            new ExplicitAttribute("recoveryEnabled", "boolean", true),
+            new ExplicitAttribute("recoverySleepTime", "long", true),
+            new ExplicitAttribute("localLoopbackDisabled", "boolean", true));
 
     private static final List<ExplicitAttribute> RECEIVER_ATTRIBUTES = List.of(
-            new ExplicitAttribute("port", "int", true, "The TCP port to listen on."),
-            new ExplicitAttribute("autoBind", "int", true, "The number of attempts to auto bind an available port."),
-            new ExplicitAttribute("address", "java.lang.String", true, "The address to bind to."),
-            new ExplicitAttribute("udpPort", "int", true, "The UDP port to listen on."),
-            new ExplicitAttribute("maxThreads", "int", true, "The maximum number of listener threads."),
-            new ExplicitAttribute("minThreads", "int", true, "The minimum number of listener threads."),
-            new ExplicitAttribute("selectorTimeout", "long", true, "The selector timeout in milliseconds."),
-            new ExplicitAttribute("tcpNoDelay", "boolean", true, "Whether TCP_NODELAY is set on the sockets."),
-            new ExplicitAttribute("soKeepAlive", "boolean", true, "Whether SO_KEEPALIVE is set on the sockets."),
-            new ExplicitAttribute("soReuseAddress", "boolean", true, "Whether SO_REUSEADDR is set on the sockets."));
+            new ExplicitAttribute("port", "int", true),
+            new ExplicitAttribute("autoBind", "int", true),
+            new ExplicitAttribute("address", "java.lang.String", true),
+            new ExplicitAttribute("udpPort", "int", true),
+            new ExplicitAttribute("maxThreads", "int", true),
+            new ExplicitAttribute("minThreads", "int", true),
+            new ExplicitAttribute("selectorTimeout", "long", true),
+            new ExplicitAttribute("tcpNoDelay", "boolean", true),
+            new ExplicitAttribute("soKeepAlive", "boolean", true),
+            new ExplicitAttribute("soReuseAddress", "boolean", true));
 
     private static final List<ExplicitAttribute> TRANSPORT_ATTRIBUTES = List.of(
-            new ExplicitAttribute("poolSize", "int", true, "The number of sockets in the pool (pooled senders)."),
-            new ExplicitAttribute("timeout", "long", true, "The socket timeout in milliseconds."),
-            new ExplicitAttribute("maxRetryAttempts", "int", true, "The number of attempts to retransmit a message."),
-            new ExplicitAttribute("udpPort", "int", true, "The UDP port to send to."),
-            new ExplicitAttribute("directBuffer", "boolean", true, "Whether to use direct (off heap) buffers."),
-            new ExplicitAttribute("tcpNoDelay", "boolean", true, "Whether TCP_NODELAY is set on the sockets."),
-            new ExplicitAttribute("soKeepAlive", "boolean", true, "Whether SO_KEEPALIVE is set on the sockets."),
-            new ExplicitAttribute("soReuseAddress", "boolean", true, "Whether SO_REUSEADDR is set on the sockets."));
+            new ExplicitAttribute("poolSize", "int", true),
+            new ExplicitAttribute("timeout", "long", true),
+            new ExplicitAttribute("maxRetryAttempts", "int", true),
+            new ExplicitAttribute("udpPort", "int", true),
+            new ExplicitAttribute("directBuffer", "boolean", true),
+            new ExplicitAttribute("tcpNoDelay", "boolean", true),
+            new ExplicitAttribute("soKeepAlive", "boolean", true),
+            new ExplicitAttribute("soReuseAddress", "boolean", true));
 
     private static final List<ExplicitAttribute> MESSAGE_DISPATCH_INTERCEPTOR_ATTRIBUTES = List.of(
-            new ExplicitAttribute("maxQueueSize", "long", true, "The maximum number of messages to queue."),
-            new ExplicitAttribute("maxThreads", "int", true, "The maximum number of threads in the dispatch pool."),
-            new ExplicitAttribute("maxSpareThreads", "int", true, "The maximum number of idle threads to keep."),
-            new ExplicitAttribute("keepAliveTime", "long", true,
-                    "The keep alive time in milliseconds for idle threads."),
-            new ExplicitAttribute("useDeepClone", "boolean", true, "Whether messages are deep cloned before dispatch."),
-            new ExplicitAttribute("alwaysSend", "boolean", true,
-                    "Whether to always send messages even with no other members."));
+            new ExplicitAttribute("maxQueueSize", "long", true),
+            new ExplicitAttribute("maxThreads", "int", true),
+            new ExplicitAttribute("maxSpareThreads", "int", true),
+            new ExplicitAttribute("keepAliveTime", "long", true),
+            new ExplicitAttribute("useDeepClone", "boolean", true),
+            new ExplicitAttribute("alwaysSend", "boolean", true));
 
     private static final List<ExplicitAttribute> TCP_FAILURE_DETECTOR_ATTRIBUTES = List.of(
-            new ExplicitAttribute("connectTimeout", "long", true,
-                    "The timeout in milliseconds for the connection test."),
-            new ExplicitAttribute("readTestTimeout", "long", true, "The timeout in milliseconds for the read test."),
-            new ExplicitAttribute("performSendTest", "boolean", true, "Whether to perform a send test."),
-            new ExplicitAttribute("performReadTest", "boolean", true, "Whether to perform a read test."),
-            new ExplicitAttribute("removeSuspectsTimeout", "int", true,
-                    "The time in milliseconds a suspect member is kept before removal."));
+            new ExplicitAttribute("connectTimeout", "long", true),
+            new ExplicitAttribute("readTestTimeout", "long", true),
+            new ExplicitAttribute("performSendTest", "boolean", true),
+            new ExplicitAttribute("performReadTest", "boolean", true),
+            new ExplicitAttribute("removeSuspectsTimeout", "int", true));
 
-    private static final List<ExplicitAttribute> INTERCEPTOR_ATTRIBUTES = List.of(new ExplicitAttribute("optionFlag",
-            "int", true, "The option flag that controls the behaviour of the interceptor."));
+    private static final List<ExplicitAttribute> INTERCEPTOR_ATTRIBUTES = List.of(new ExplicitAttribute("optionFlag", "int", true));
 
 
     // ------------------------------------------------- JNDI entry attributes
@@ -1530,81 +1472,58 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     // The JNDI entry types (children of a namingResources node).
 
     private static final List<ExplicitAttribute> RESOURCE_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the resource (e.g. jdbc/MyDB)."),
-            new ExplicitAttribute("type", "java.lang.String", true,
-                    "The type of the object to look up (e.g. javax.sql.DataSource)."),
-            new ExplicitAttribute("auth", "java.lang.String", true,
-                    "The JNDI authentication mode (Application or Container)."),
-            new ExplicitAttribute("scope", "java.lang.String", true,
-                    "The JNDI scope of the resource (Shareable or Unshareable)."),
-            new ExplicitAttribute("singleton", "boolean", true,
-                    "Whether the resource is a shared, long lived instance."),
-            new ExplicitAttribute("closeMethod", "java.lang.String", true,
-                    "The method invoked to close the resource when it is unbound."),
-            new ExplicitAttribute("lookupName", "java.lang.String", true,
-                    "A JNDI name to look up; when set, the other parameters are ignored."),
-            new ExplicitAttribute("description", "java.lang.String", true, "The description of the resource."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("auth", "java.lang.String", true),
+            new ExplicitAttribute("scope", "java.lang.String", true),
+            new ExplicitAttribute("singleton", "boolean", true),
+            new ExplicitAttribute("closeMethod", "java.lang.String", true),
+            new ExplicitAttribute("lookupName", "java.lang.String", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> RESOURCE_LINK_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The local JNDI name of the resource link."),
-            new ExplicitAttribute("type", "java.lang.String", true, "The type of the object the link resolves to."),
-            new ExplicitAttribute("global", "java.lang.String", true,
-                    "The JNDI name of the (global) resource the link points to."),
-            new ExplicitAttribute("factory", "java.lang.String", true,
-                    "The JNDI ObjectFactory used to resolve the global resource."),
-            new ExplicitAttribute("description", "java.lang.String", true, "The description of the resource link."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("global", "java.lang.String", true),
+            new ExplicitAttribute("factory", "java.lang.String", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> RESOURCE_ENV_REF_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the resource."),
-            new ExplicitAttribute("type", "java.lang.String", true, "The type of the object to look up."),
-            new ExplicitAttribute("override", "boolean", true,
-                    "Whether the context environment entry overrides a global resource with the same name."),
-            new ExplicitAttribute("description", "java.lang.String", true, "The description of the resource."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("override", "boolean", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> ENVIRONMENT_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the environment entry."),
-            new ExplicitAttribute("type", "java.lang.String", true,
-                    "The type of the entry (e.g. java.lang.String, javax.sql.DataSource)."),
-            new ExplicitAttribute("value", "java.lang.String", true, "The value of the entry."),
-            new ExplicitAttribute("override", "boolean", true,
-                    "Whether the context entry overrides a global entry with the same name."),
-            new ExplicitAttribute("description", "java.lang.String", true, "The description of the entry."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("value", "java.lang.String", true),
+            new ExplicitAttribute("override", "boolean", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> EJB_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the EJB reference."),
-            new ExplicitAttribute("type", "java.lang.String", true, "The fully qualified name of the home interface."),
-            new ExplicitAttribute("home", "java.lang.String", true,
-                    "The fully qualified name of the home interface (alternative to type)."),
-            new ExplicitAttribute("link", "java.lang.String", true,
-                    "The JNDI name of the remote EJB the reference links to."),
-            new ExplicitAttribute("remote", "java.lang.String", true,
-                    "The fully qualified name of the remote interface."),
-            new ExplicitAttribute("description", "java.lang.String", true, "The description of the EJB reference."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("home", "java.lang.String", true),
+            new ExplicitAttribute("link", "java.lang.String", true),
+            new ExplicitAttribute("remote", "java.lang.String", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> LOCAL_EJB_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the local EJB reference."),
-            new ExplicitAttribute("type", "java.lang.String", true,
-                    "The fully qualified name of the local home interface."),
-            new ExplicitAttribute("local", "java.lang.String", true,
-                    "The fully qualified name of the local business interface."),
-            new ExplicitAttribute("home", "java.lang.String", true,
-                    "The fully qualified name of the local home interface (alternative to type)."),
-            new ExplicitAttribute("link", "java.lang.String", true,
-                    "The JNDI name of the local EJB the reference links to."),
-            new ExplicitAttribute("description", "java.lang.String", true,
-                    "The description of the local EJB reference."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("local", "java.lang.String", true),
+            new ExplicitAttribute("home", "java.lang.String", true),
+            new ExplicitAttribute("link", "java.lang.String", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     private static final List<ExplicitAttribute> SERVICE_ATTRIBUTES = List.of(
-            new ExplicitAttribute("name", "java.lang.String", true, "The JNDI name of the service reference."),
-            new ExplicitAttribute("type", "java.lang.String", true,
-                    "The fully qualified name of the service interface."),
-            new ExplicitAttribute("interface", "java.lang.String", true,
-                    "The fully qualified name of the service interface (alternative to type)."),
-            new ExplicitAttribute("displayname", "java.lang.String", true,
-                    "The display name of the service reference."),
-            new ExplicitAttribute("wsdlfile", "java.lang.String", true, "The WSDL document of the service."),
-            new ExplicitAttribute("description", "java.lang.String", true,
-                    "The description of the service reference."));
+            new ExplicitAttribute("name", "java.lang.String", true),
+            new ExplicitAttribute("type", "java.lang.String", true),
+            new ExplicitAttribute("interface", "java.lang.String", true),
+            new ExplicitAttribute("displayname", "java.lang.String", true),
+            new ExplicitAttribute("wsdlfile", "java.lang.String", true),
+            new ExplicitAttribute("description", "java.lang.String", true));
 
     // The first party JNDI ObjectFactory implementations shipped with
     // Tomcat and the string parameters (RefAddr keys) each one consumes.
@@ -1620,127 +1539,111 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     private static final String SHARED_POOL_DATA_SOURCE_FACTORY = "org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSourceFactory";
 
     private static final List<ExplicitAttribute> BASIC_DATA_SOURCE_FACTORY_OPTIONS = List.of(
-            option("defaultAutoCommit", "boolean", "The default auto commit mode of the connections."),
-            option("defaultReadOnly", "boolean", "The default read only mode of the connections."),
-            option("defaultTransactionIsolation", "java.lang.String",
-                    "The default transaction isolation level (NONE, READ_COMMITTED, READ_UNCOMMITTED, REPEATABLE_READ, SERIALIZABLE or a JDBC constant)."),
-            option("defaultCatalog", "java.lang.String", "The default catalog of the connections."),
-            option("defaultSchema", "java.lang.String", "The default schema of the connections."),
-            option("cacheState", "boolean", "Whether to cache the connection state on the wrapper."),
-            option("driverClassName", "java.lang.String", "The JDBC driver class name."),
-            option("lifo", "boolean", "Whether to allocate idle connections in LIFO order."),
-            option("maxTotal", "int", "The maximum number of active connections in the pool."),
-            option("maxIdle", "int", "The maximum number of idle connections in the pool."),
-            option("minIdle", "int", "The minimum number of idle connections to retain."),
-            option("initialSize", "int", "The number of connections created at pool startup."),
-            option("maxWaitMillis", "long", "The maximum time in milliseconds to wait for a connection."),
-            option("testOnCreate", "boolean", "Whether to validate a connection when it is created."),
-            option("testOnBorrow", "boolean", "Whether to validate a connection when it is borrowed."),
-            option("testOnReturn", "boolean", "Whether to validate a connection when it is returned."),
-            option("timeBetweenEvictionRunsMillis", "long", "The time in milliseconds between eviction runs."),
-            option("numTestsPerEvictionRun", "int", "The number of connections tested per eviction run."),
-            option("minEvictableIdleTimeMillis", "long",
-                    "The minimum idle time in milliseconds before a connection is evicted."),
-            option("softMinEvictableIdleTimeMillis", "long", "The soft minimum idle time in milliseconds."),
-            option("evictionPolicyClassName", "java.lang.String", "The class of the idle object eviction policy."),
-            option("testWhileIdle", "boolean", "Whether to validate connections while they are idle."),
-            option("password", "java.lang.String", "The JDBC connection password."),
-            option("url", "java.lang.String", "The JDBC connection URL."),
-            option("username", "java.lang.String", "The JDBC connection user name."),
-            option("validationQuery", "java.lang.String",
-                    "The SQL query (or callable statement) used to validate connections."),
-            option("validationQueryTimeout", "long", "The timeout in seconds for the validation query."),
-            option("connectionInitSqls", "java.lang.String",
-                    "Semicolon separated statements executed on each new connection."),
-            option("accessToUnderlyingConnectionAllowed", "boolean",
-                    "Whether the underlying driver connection can be obtained."),
-            option("removeAbandonedOnBorrow", "boolean", "Whether abandoned connections are removed on borrow."),
-            option("removeAbandonedOnMaintenance", "boolean",
-                    "Whether abandoned connections are removed during maintenance."),
-            option("removeAbandonedTimeout", "long",
-                    "The timeout in seconds after which a connection is considered abandoned."),
-            option("logAbandoned", "boolean", "Whether to log the stack trace of abandoned connections."),
-            option("abandonedUsageTracking", "java.lang.String",
-                    "The stack trace tracking mode for abandoned connections."),
-            option("poolPreparedStatements", "boolean", "Whether prepared statements are pooled."),
-            option("clearStatementPoolOnReturn", "boolean",
-                    "Whether the statement pool is cleared when the connection is returned."),
-            option("maxOpenPreparedStatements", "int",
-                    "The maximum number of pooled prepared statements per connection."),
-            option("connectionProperties", "java.lang.String",
-                    "Semicolon separated key=value pairs passed to the driver."),
-            option("maxConnLifetimeMillis", "long", "The maximum lifetime in milliseconds of a connection."),
-            option("logExpiredConnections", "boolean", "Whether to log the expiration of pooled connections."),
-            option("rollbackOnReturn", "boolean", "Whether to roll back uncommitted transactions on return."),
-            option("enableAutoCommitOnReturn", "boolean", "Whether to re-enable auto commit on return."),
-            option("defaultQueryTimeout", "long", "The default query timeout in seconds."),
-            option("fastFailValidation", "boolean", "Whether validation fails fast on a known dead connection."),
-            option("disconnectionSqlCodes", "java.lang.String",
-                    "Comma separated SQL state codes treated as disconnections."),
-            option("disconnectionIgnoreSqlCodes", "java.lang.String",
-                    "Comma separated SQL state codes ignored during disconnection checks."),
-            option("jmxName", "java.lang.String", "The JMX ObjectName under which the pool is registered."),
-            option("registerConnectionMBean", "boolean", "Whether each connection is registered as an MBean."),
-            option("connectionFactoryClassName", "java.lang.String",
-                    "A custom connection factory class (instead of the driver)."));
+            option("defaultAutoCommit", "boolean"),
+            option("defaultReadOnly", "boolean"),
+            option("defaultTransactionIsolation", "java.lang.String"),
+            option("defaultCatalog", "java.lang.String"),
+            option("defaultSchema", "java.lang.String"),
+            option("cacheState", "boolean"),
+            option("driverClassName", "java.lang.String"),
+            option("lifo", "boolean"),
+            option("maxTotal", "int"),
+            option("maxIdle", "int"),
+            option("minIdle", "int"),
+            option("initialSize", "int"),
+            option("maxWaitMillis", "long"),
+            option("testOnCreate", "boolean"),
+            option("testOnBorrow", "boolean"),
+            option("testOnReturn", "boolean"),
+            option("timeBetweenEvictionRunsMillis", "long"),
+            option("numTestsPerEvictionRun", "int"),
+            option("minEvictableIdleTimeMillis", "long"),
+            option("softMinEvictableIdleTimeMillis", "long"),
+            option("evictionPolicyClassName", "java.lang.String"),
+            option("testWhileIdle", "boolean"),
+            option("password", "java.lang.String"),
+            option("url", "java.lang.String"),
+            option("username", "java.lang.String"),
+            option("validationQuery", "java.lang.String"),
+            option("validationQueryTimeout", "long"),
+            option("connectionInitSqls", "java.lang.String"),
+            option("accessToUnderlyingConnectionAllowed", "boolean"),
+            option("removeAbandonedOnBorrow", "boolean"),
+            option("removeAbandonedOnMaintenance", "boolean"),
+            option("removeAbandonedTimeout", "long"),
+            option("logAbandoned", "boolean"),
+            option("abandonedUsageTracking", "java.lang.String"),
+            option("poolPreparedStatements", "boolean"),
+            option("clearStatementPoolOnReturn", "boolean"),
+            option("maxOpenPreparedStatements", "int"),
+            option("connectionProperties", "java.lang.String"),
+            option("maxConnLifetimeMillis", "long"),
+            option("logExpiredConnections", "boolean"),
+            option("rollbackOnReturn", "boolean"),
+            option("enableAutoCommitOnReturn", "boolean"),
+            option("defaultQueryTimeout", "long"),
+            option("fastFailValidation", "boolean"),
+            option("disconnectionSqlCodes", "java.lang.String"),
+            option("disconnectionIgnoreSqlCodes", "java.lang.String"),
+            option("jmxName", "java.lang.String"),
+            option("registerConnectionMBean", "boolean"),
+            option("connectionFactoryClassName", "java.lang.String"));
 
     private static final List<ExplicitAttribute> MEMORY_USER_DATABASE_FACTORY_OPTIONS = List.of(
-            option("pathname", "java.lang.String", "The path of the XML user file (default conf/tomcat-users.xml)."),
-            option("readonly", "boolean", "Whether the user database is read only."),
-            option("watchSource", "boolean", "Whether the user file is watched for changes and reloaded."));
+            option("pathname", "java.lang.String"),
+            option("readonly", "boolean"),
+            option("watchSource", "boolean"));
 
     private static final List<ExplicitAttribute> DATA_SOURCE_USER_DATABASE_FACTORY_OPTIONS = List.of(
-            option("dataSourceName", "java.lang.String", "The JNDI name of the DataSource to use."),
-            option("readonly", "boolean", "Whether the user database is read only."),
-            option("userTable", "java.lang.String", "The name of the user table."),
-            option("groupTable", "java.lang.String", "The name of the group table."),
-            option("roleTable", "java.lang.String", "The name of the role table."),
-            option("userRoleTable", "java.lang.String", "The name of the user/role mapping table."),
-            option("userGroupTable", "java.lang.String", "The name of the user/group mapping table."),
-            option("groupRoleTable", "java.lang.String", "The name of the group/role mapping table."),
-            option("roleNameCol", "java.lang.String", "The column name of the role name."),
-            option("roleAndGroupDescriptionCol", "java.lang.String", "The column name of the role/group description."),
-            option("groupNameCol", "java.lang.String", "The column name of the group name."),
-            option("userCredCol", "java.lang.String", "The column name of the user credential (password)."),
-            option("userFullNameCol", "java.lang.String", "The column name of the user full name."),
-            option("userNameCol", "java.lang.String", "The column name of the user name."));
+            option("dataSourceName", "java.lang.String"),
+            option("readonly", "boolean"),
+            option("userTable", "java.lang.String"),
+            option("groupTable", "java.lang.String"),
+            option("roleTable", "java.lang.String"),
+            option("userRoleTable", "java.lang.String"),
+            option("userGroupTable", "java.lang.String"),
+            option("groupRoleTable", "java.lang.String"),
+            option("roleNameCol", "java.lang.String"),
+            option("roleAndGroupDescriptionCol", "java.lang.String"),
+            option("groupNameCol", "java.lang.String"),
+            option("userCredCol", "java.lang.String"),
+            option("userFullNameCol", "java.lang.String"),
+            option("userNameCol", "java.lang.String"));
 
     private static final List<ExplicitAttribute> POOL_DATA_SOURCE_FACTORY_OPTIONS = List.of(
-            option("instanceKey", "java.lang.String",
-                    "The unique key of this pool instance (defaults to the JNDI name)."),
-            option("description", "java.lang.String", "A description of the pool."),
-            option("loginTimeout", "int", "The login timeout in seconds."),
-            option("blockWhenExhausted", "boolean", "Whether to block when the pool is exhausted."),
-            option("evictionPolicyClassName", "java.lang.String", "The class of the idle object eviction policy."),
-            option("lifo", "boolean", "Whether to allocate idle connections in LIFO order."),
-            option("maxIdlePerKey", "int", "The maximum number of idle connections per instance key."),
-            option("maxTotalPerKey", "int", "The maximum number of active connections per instance key."),
-            option("maxWaitMillis", "long", "The maximum time in milliseconds to wait for a connection."),
-            option("minEvictableIdleTimeMillis", "long",
-                    "The minimum idle time in milliseconds before a connection is evicted."),
-            option("minIdlePerKey", "int", "The minimum number of idle connections per instance key."),
-            option("numTestsPerEvictionRun", "int", "The number of connections tested per eviction run."),
-            option("softMinEvictableIdleTimeMillis", "long", "The soft minimum idle time in milliseconds."),
-            option("testOnCreate", "boolean", "Whether to validate a connection when it is created."),
-            option("testOnBorrow", "boolean", "Whether to validate a connection when it is borrowed."),
-            option("testOnReturn", "boolean", "Whether to validate a connection when it is returned."),
-            option("testWhileIdle", "boolean", "Whether to validate connections while they are idle."),
-            option("timeBetweenEvictionRunsMillis", "long", "The time in milliseconds between eviction runs."),
-            option("validationQuery", "java.lang.String", "The SQL query used to validate connections."),
-            option("validationQueryTimeout", "int", "The timeout in seconds for the validation query."),
-            option("rollbackAfterValidation", "boolean", "Whether to roll back after a validation query."),
-            option("maxConnLifetimeMillis", "long", "The maximum lifetime in milliseconds of a connection."),
-            option("defaultAutoCommit", "boolean", "The default auto commit mode of the connections."),
-            option("defaultTransactionIsolation", "int", "The default transaction isolation level (JDBC constant)."),
-            option("defaultReadOnly", "boolean", "The default read only mode of the connections."));
+            option("instanceKey", "java.lang.String"),
+            option("description", "java.lang.String"),
+            option("loginTimeout", "int"),
+            option("blockWhenExhausted", "boolean"),
+            option("evictionPolicyClassName", "java.lang.String"),
+            option("lifo", "boolean"),
+            option("maxIdlePerKey", "int"),
+            option("maxTotalPerKey", "int"),
+            option("maxWaitMillis", "long"),
+            option("minEvictableIdleTimeMillis", "long"),
+            option("minIdlePerKey", "int"),
+            option("numTestsPerEvictionRun", "int"),
+            option("softMinEvictableIdleTimeMillis", "long"),
+            option("testOnCreate", "boolean"),
+            option("testOnBorrow", "boolean"),
+            option("testOnReturn", "boolean"),
+            option("testWhileIdle", "boolean"),
+            option("timeBetweenEvictionRunsMillis", "long"),
+            option("validationQuery", "java.lang.String"),
+            option("validationQueryTimeout", "int"),
+            option("rollbackAfterValidation", "boolean"),
+            option("maxConnLifetimeMillis", "long"),
+            option("defaultAutoCommit", "boolean"),
+            option("defaultTransactionIsolation", "int"),
+            option("defaultReadOnly", "boolean"));
 
     private static final List<ExplicitAttribute> PER_USER_POOL_DATA_SOURCE_FACTORY_OPTIONS = poolOptions(
-            option("defaultMaxTotal", "int", "The default maximum number of connections per user."),
-            option("defaultMaxIdle", "int", "The default maximum number of idle connections per user."),
-            option("defaultMaxWaitMillis", "long", "The default maximum wait time in milliseconds per user."));
+            option("defaultMaxTotal", "int"),
+            option("defaultMaxIdle", "int"),
+            option("defaultMaxWaitMillis", "long"));
 
     private static final List<ExplicitAttribute> SHARED_POOL_DATA_SOURCE_FACTORY_OPTIONS = poolOptions(
-            option("maxTotal", "int", "The maximum number of active connections in the pool."));
+            option("maxTotal", "int"));
 
     private static List<ExplicitAttribute> poolOptions(ExplicitAttribute... first) {
         List<ExplicitAttribute> result = new ArrayList<>(Arrays.asList(first));
@@ -1748,8 +1651,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         return List.copyOf(result);
     }
 
-    private static ExplicitAttribute option(String name, String type, String description) {
-        return new ExplicitAttribute(name, type, true, description, true);
+    private static ExplicitAttribute option(String name, String type) {
+        return new ExplicitAttribute(name, type, true, true);
     }
 
 
@@ -1839,7 +1742,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         for (Iterator<String> it = entry.listProperties(); it.hasNext();) {
             String key = it.next();
             if (covered.add(key)) {
-                result.add(new ExplicitAttribute(key, "java.lang.String", true, null, true));
+                result.add(new ExplicitAttribute(key, "java.lang.String", true, true));
             }
         }
     }
@@ -1849,55 +1752,114 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
      * The explicitly defined attributes of the given component, or an empty list when the component's class has a
      * modeler descriptor (or is not one of the explicitly supported classes).
      */
-    private static List<ExplicitAttribute> explicitAttributes(Object component, String type) {
+    private static ExplicitSpec explicitAttributes(Object component, String type) {
         if ("sslHostConfig".equals(type)) {
-            return SSL_HOST_CONFIG_ATTRIBUTES;
+            return new ExplicitSpec("sslHostConfig", SSL_HOST_CONFIG_ATTRIBUTES);
         }
         if ("certificate".equals(type)) {
-            return CERTIFICATE_ATTRIBUTES;
+            return new ExplicitSpec("certificate", CERTIFICATE_ATTRIBUTES);
         }
         if (component instanceof WebappLoader) {
-            return WEBAPP_LOADER_ATTRIBUTES;
+            return new ExplicitSpec("loader", WEBAPP_LOADER_ATTRIBUTES);
         }
         if (component instanceof CookieProcessorBase) {
-            return COOKIE_PROCESSOR_ATTRIBUTES;
+            return new ExplicitSpec("cookieProcessor", COOKIE_PROCESSOR_ATTRIBUTES);
         }
         if (component instanceof SessionIdGeneratorBase) {
-            return SESSION_ID_GENERATOR_ATTRIBUTES;
+            return new ExplicitSpec("sessionIdGenerator", SESSION_ID_GENERATOR_ATTRIBUTES);
         }
         if (component instanceof Http2Protocol) {
-            return HTTP2_PROTOCOL_ATTRIBUTES;
+            return new ExplicitSpec("http2Protocol", HTTP2_PROTOCOL_ATTRIBUTES);
         }
         if (component instanceof GroupChannel) {
-            return CHANNEL_ATTRIBUTES;
+            return new ExplicitSpec("channel", CHANNEL_ATTRIBUTES);
         }
         if (component instanceof McastService) {
-            return MCAST_ATTRIBUTES;
+            return new ExplicitSpec("membership", MCAST_ATTRIBUTES);
         }
         if (component instanceof ReceiverBase) {
-            return RECEIVER_ATTRIBUTES;
+            return new ExplicitSpec("receiver", RECEIVER_ATTRIBUTES);
         }
         if (component instanceof AbstractSender) {
-            return TRANSPORT_ATTRIBUTES;
+            return new ExplicitSpec("transport", TRANSPORT_ATTRIBUTES);
         }
         if (component instanceof MessageDispatchInterceptor) {
-            return MESSAGE_DISPATCH_INTERCEPTOR_ATTRIBUTES;
+            return new ExplicitSpec("messageDispatchInterceptor", MESSAGE_DISPATCH_INTERCEPTOR_ATTRIBUTES);
         }
         if (component instanceof TcpFailureDetector) {
-            return TCP_FAILURE_DETECTOR_ATTRIBUTES;
+            return new ExplicitSpec("tcpFailureDetector", TCP_FAILURE_DETECTOR_ATTRIBUTES);
         }
         if (component instanceof ChannelInterceptor) {
-            return INTERCEPTOR_ATTRIBUTES;
+            return new ExplicitSpec("channelInterceptor", INTERCEPTOR_ATTRIBUTES);
         }
         if (isNamingEntry(type) && component instanceof ResourceBase) {
-            return namingEntryAttributes(component, type);
+            return new ExplicitSpec(type, namingEntryAttributes(component, type));
         }
-        return List.of();
+        return new ExplicitSpec(type, List.of());
+    }
+
+
+    /**
+     * The explicit attribute list of a component together with the key scope its descriptions are looked up under
+     * (see {@link #attributeDescription}).
+     */
+    private record ExplicitSpec(String scope, List<ExplicitAttribute> attributes) {
+    }
+
+
+    /**
+     * The localized description of one explicitly defined attribute, looked up from the message bundle by its
+     * {@code name}: {@code manager2.attr.<scope>.<name>} for a bean attribute; for a string parameter,
+     * {@code manager2.param.<factoryKey>.<name>} first (a factory with a closed parameter set may give the name its
+     * own text) and then {@code manager2.param.<name>}.
+     *
+     * @param scope      the key scope of the attribute list the attribute belongs to
+     * @param paramScope the factory key scope for the parameters of a resource bound to a first party factory, or
+     *                   {@code null}
+     * @param attribute  the attribute
+     *
+     * @return the localized description, or {@code null} when the bundle defines no message for the attribute
+     */
+    private static String attributeDescription(String scope, String paramScope, ExplicitAttribute attribute) {
+        var sm = Strings.sm();
+        if (attribute.isParam()) {
+            if (paramScope != null) {
+                String scoped = sm.getString("manager2.param." + paramScope + "." + attribute.getName());
+                if (scoped != null) {
+                    return scoped;
+                }
+            }
+            return sm.getString("manager2.param." + attribute.getName());
+        }
+        return sm.getString("manager2.attr." + scope + "." + attribute.getName());
+    }
+
+
+    /**
+     * The bundle key scope of the parameters of a first party JNDI factory (see
+     * {@link #attributeDescription(String, String, ExplicitAttribute)}).
+     *
+     * @param factory the factory class name, possibly {@code null}
+     *
+     * @return the key scope of the factory, or {@code null} for a factory that is not shipped with Tomcat
+     */
+    private static String factoryKey(String factory) {
+        if (factory == null) {
+            return null;
+        }
+        return switch (factory) {
+            case BASIC_DATA_SOURCE_FACTORY -> "basicDataSource";
+            case MEMORY_USER_DATABASE_FACTORY -> "memoryUserDatabase";
+            case DATA_SOURCE_USER_DATABASE_FACTORY -> "dataSourceUserDatabase";
+            case PER_USER_POOL_DATA_SOURCE_FACTORY -> "perUserPoolDataSource";
+            case SHARED_POOL_DATA_SOURCE_FACTORY -> "sharedPoolDataSource";
+            default -> null;
+        };
     }
 
 
     private static ExplicitAttribute findExplicitAttribute(Object component, String type, String name) {
-        for (ExplicitAttribute attribute : explicitAttributes(component, type)) {
+        for (ExplicitAttribute attribute : explicitAttributes(component, type).attributes()) {
             if (attribute.getName().equals(name)) {
                 return attribute;
             }
@@ -1961,15 +1923,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             m.invoke(component, value);
         } catch (NoSuchMethodException e) {
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "NO_SETTER",
-                    sm.getString("manager2.configNoSetter", method));
+                    Strings.sm().getString("manager2.configNoSetter", method));
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "SET_FAILED",
-                    sm.getString("manager2.configSetFailed", attribute.getName(),
+                    Strings.sm().getString("manager2.configSetFailed", attribute.getName(),
                             t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage()));
         } catch (IllegalAccessException e) {
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "NO_SETTER",
-                    sm.getString("manager2.configNoSetter", method));
+                    Strings.sm().getString("manager2.configNoSetter", method));
         }
     }
 
@@ -2044,13 +2006,13 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         if (id == null || id.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
 
         String[] segments = id.split("/", -1);
         if (!"server".equals(segments[0])) {
             throw new ConfigException(HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND",
-                    sm.getString("manager2.configNotFound"));
+                    Strings.sm().getString("manager2.configNotFound"));
         }
 
         Object current = server;
@@ -2059,7 +2021,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         for (int i = 1; i < segments.length; i += 2) {
             if (i + 1 >= segments.length) {
                 throw new ConfigException(HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND",
-                        sm.getString("manager2.configNotFound"));
+                        Strings.sm().getString("manager2.configNotFound"));
             }
             String kind = segments[i];
             String value = dec(segments[i + 1]);
@@ -2626,7 +2588,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
     private static ConfigException notFound() {
         return new ConfigException(HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND",
-                sm.getString("manager2.configNotFound"));
+                Strings.sm().getString("manager2.configNotFound"));
     }
 
 
@@ -2648,19 +2610,19 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String name = string(body.get("name"));
         if (id == null || name == null || name.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
 
         NodeRef ref = resolve(id);
         if (!"server".equals(ref.type) && ref.component == selfContext &&
                 ("name".equals(name) || "path".equals(name))) {
             throw new ConfigException(HttpServletResponse.SC_FORBIDDEN, "SELF_COMPONENT",
-                    sm.getString("manager2.configSelfComponent"));
+                    Strings.sm().getString("manager2.configSelfComponent"));
         }
 
         // Components without a modeler descriptor take their attributes
         // from the explicit list.
-        if (!explicitAttributes(ref.component, ref.type).isEmpty()) {
+        if (!explicitAttributes(ref.component, ref.type).attributes().isEmpty()) {
             updateExplicitAttribute(response, ref, name, body);
             return;
         }
@@ -2669,11 +2631,11 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         AttributeInfo attribute = findAttribute(descriptor, name);
         if (attribute == null) {
             throw new ConfigException(HttpServletResponse.SC_NOT_FOUND, "ATTRIBUTE_NOT_FOUND",
-                    sm.getString("manager2.configAttributeNotFound", name));
+                    Strings.sm().getString("manager2.configAttributeNotFound", name));
         }
         if (!attribute.isWriteable() || !EDITABLE_TYPES.contains(attribute.getType())) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "READ_ONLY",
-                    sm.getString("manager2.configReadOnly", name));
+                    Strings.sm().getString("manager2.configReadOnly", name));
         }
 
         if (RISKY_ATTRIBUTES.contains(name)) {
@@ -2683,16 +2645,16 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             String expected = displayName(ref.component, ref.type);
             if (!expected.equals(confirm)) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "CONFIRM_REQUIRED",
-                        sm.getString("manager2.configConfirmRequired", expected));
+                        Strings.sm().getString("manager2.configConfirmRequired", expected));
             }
         }
 
         Object value = convert(attribute.getType(), body.get("value"));
         setValue(ref.component, attribute, value);
 
-        log(sm.getString("manager2.configAuditAttribute", name, displayName(ref.component, ref.type),
+        log(Strings.sm().getString("manager2.configAuditAttribute", name, displayName(ref.component, ref.type),
                 String.valueOf(value)));
-        Api.ok(response, sm.getString("manager2.configAttributeUpdated", name, displayName(ref.component, ref.type)));
+        Api.ok(response, Strings.sm().getString("manager2.configAttributeUpdated", name, displayName(ref.component, ref.type)));
     }
 
 
@@ -2716,7 +2678,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             String expected = displayName(component, ref.type);
             if (!expected.equals(confirm)) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "CONFIRM_REQUIRED",
-                        sm.getString("manager2.configConfirmRequired", expected));
+                        Strings.sm().getString("manager2.configConfirmRequired", expected));
             }
         }
 
@@ -2729,15 +2691,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             // consumes.
             if (!namingEntry) {
                 throw new ConfigException(HttpServletResponse.SC_NOT_FOUND, "ATTRIBUTE_NOT_FOUND",
-                        sm.getString("manager2.configAttributeNotFound", name));
+                        Strings.sm().getString("manager2.configAttributeNotFound", name));
             }
             param = true;
             Object current = entry.getProperty(name);
             oldParamValue = current == null ? null : String.valueOf(current);
-            attribute = new ExplicitAttribute(name, "java.lang.String", true, null, true);
+            attribute = new ExplicitAttribute(name, "java.lang.String", true, true);
         } else if (!attribute.isWritable()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "READ_ONLY",
-                    sm.getString("manager2.configReadOnly", name));
+                    Strings.sm().getString("manager2.configReadOnly", name));
         }
 
         Object value;
@@ -2781,10 +2743,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     entry.setName(oldEntryName);
                     rebindEntry(ref, oldEntryName);
                 } catch (Exception rollbackError) {
-                    log(sm.getString("manager2.error.config"), rollbackError);
+                    log(Strings.sm().getString("manager2.error.config"), rollbackError);
                 }
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "UPDATE_FAILED",
-                        sm.getString("manager2.configSetFailed", name, rootMessage(e)));
+                        Strings.sm().getString("manager2.configSetFailed", name, rootMessage(e)));
             }
         }
 
@@ -2808,14 +2770,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 endpointOf(connector).reloadSslHostConfig(sslHostConfig.getHostName());
             } catch (Exception e) {
                 setExplicitValue(ref.component, attribute, oldValue);
-                throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "UPDATE_FAILED", sm.getString(
+                throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "UPDATE_FAILED", Strings.sm().getString(
                         "manager2.configSslReloadFailed", name, displayName(ref.component, ref.type), rootMessage(e)));
             }
         }
 
-        log(sm.getString("manager2.configAuditAttribute", name, displayName(ref.component, ref.type),
+        log(Strings.sm().getString("manager2.configAuditAttribute", name, displayName(ref.component, ref.type),
                 String.valueOf(value)));
-        Api.ok(response, sm.getString("manager2.configAttributeUpdated", name, displayName(ref.component, ref.type)));
+        Api.ok(response, Strings.sm().getString("manager2.configAttributeUpdated", name, displayName(ref.component, ref.type)));
     }
 
 
@@ -2847,7 +2809,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // The add is a silent no-op when the (new) name is already used
         // by another entry; detect that so the caller can roll back.
         if (findNamingEntry(namingResources, ref.type, newName) != entry) {
-            throw new IllegalStateException(sm.getString("manager2.configJndiNameTaken", newName));
+            throw new IllegalStateException(Strings.sm().getString("manager2.configJndiNameTaken", newName));
         }
     }
 
@@ -2900,7 +2862,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
      * Convert a JSON value to the Java type of the attribute.
      */
     private static Object convert(String type, Object json) throws ConfigException {
-        String message = sm.getString("manager2.configInvalidValue", type);
+        String message = Strings.sm().getString("manager2.configInvalidValue", type);
         try {
             switch (type) {
                 case "boolean":
@@ -2951,15 +2913,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             m.invoke(component, value);
         } catch (NoSuchMethodException e) {
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "NO_SETTER",
-                    sm.getString("manager2.configNoSetter", method));
+                    Strings.sm().getString("manager2.configNoSetter", method));
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "SET_FAILED",
-                    sm.getString("manager2.configSetFailed", attribute.getName(),
+                    Strings.sm().getString("manager2.configSetFailed", attribute.getName(),
                             t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage()));
         } catch (IllegalAccessException e) {
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "NO_SETTER",
-                    sm.getString("manager2.configNoSetter", method));
+                    Strings.sm().getString("manager2.configNoSetter", method));
         }
     }
 
@@ -3008,15 +2970,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             add.run();
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             rollback(label, undo);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    sm.getString("manager2.configStartFailed", label, rootMessage(e)));
+                    Strings.sm().getString("manager2.configStartFailed", label, rootMessage(e)));
         }
         if (component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
             rollback(label, undo);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    sm.getString("manager2.configStartFailed", label, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", label, "the component did not start"));
         }
     }
 
@@ -3025,7 +2987,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             undo.run();
         } catch (Exception e) {
-            log(sm.getString("manager2.configRollbackFailed", label,
+            log(Strings.sm().getString("manager2.configRollbackFailed", label,
                     e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage()), e);
         }
     }
@@ -3050,7 +3012,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String type = string(body.get("type"));
         if (parentId == null || type == null) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
         NodeRef parent = resolve(parentId);
 
@@ -3100,7 +3062,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             case "transport" -> addClusterTransport(response, parent, body);
             case "clusterListener" -> addClusterListener(response, parent, body);
             default -> throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "UNSUPPORTED_TYPE",
-                    sm.getString("manager2.configTypeUnsupported", type));
+                    Strings.sm().getString("manager2.configTypeUnsupported", type));
         }
     }
 
@@ -3113,14 +3075,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String alias = string(body.get("alias"));
         if (alias == null || alias.isEmpty() || alias.contains(" ") || alias.contains(",")) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", alias));
+                    Strings.sm().getString("manager2.configInvalidName", alias));
         }
         if (Arrays.asList(host.findAliases()).contains(alias)) {
             throw duplicate(alias);
         }
         host.addAlias(alias);
-        log(sm.getString("manager2.configAuditAdd", "alias", alias));
-        Api.ok(response, sm.getString("manager2.configAdded", alias));
+        log(Strings.sm().getString("manager2.configAuditAdd", "alias", alias));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", alias));
     }
 
 
@@ -3146,8 +3108,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         Server serverComponent = (Server) parent.component;
         addChecked(name, service, () -> serverComponent.addService(service),
                 () -> serverComponent.removeService(service));
-        log(sm.getString("manager2.configAuditAdd", "service", name));
-        Api.ok(response, sm.getString("manager2.configAdded", name));
+        log(Strings.sm().getString("manager2.configAuditAdd", "service", name));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", name));
     }
 
 
@@ -3173,11 +3135,11 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (!appBaseFile.getPath().startsWith(engine.getCatalinaBase().getPath() + File.separator) &&
                 !appBaseFile.getPath().equals(engine.getCatalinaBase().getPath())) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                    sm.getString("manager2.configInvalidPath", appBase));
+                    Strings.sm().getString("manager2.configInvalidPath", appBase));
         }
         if (!appBaseFile.mkdirs() && !appBaseFile.isDirectory()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                    sm.getString("manager2.configInvalidPath", appBase));
+                    Strings.sm().getString("manager2.configInvalidPath", appBase));
         }
 
         StandardHost host = new StandardHost();
@@ -3193,8 +3155,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         host.setUnpackWARs(bool(body.get("unpackWARs"), true));
         host.setCopyXML(bool(body.get("copyXML"), false));
         addChecked(name, host, () -> engine.addChild(host), () -> engine.removeChild(host));
-        log(sm.getString("manager2.configAuditAdd", "host", name));
-        Api.ok(response, sm.getString("manager2.configAdded", name));
+        log(Strings.sm().getString("manager2.configAuditAdd", "host", name));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", name));
     }
 
 
@@ -3207,7 +3169,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String path = string(body.get("path"));
         if (path == null || !path.startsWith("/") || path.length() < 2 || path.contains("..") || path.contains(" ")) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                    sm.getString("manager2.configInvalidPath", path));
+                    Strings.sm().getString("manager2.configInvalidPath", path));
         }
         if (host.findChild(path) instanceof Context) {
             throw duplicate(path);
@@ -3230,7 +3192,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (docBaseFile != null && !docBaseFile.getName().endsWith(".war") && !docBaseFile.isDirectory() &&
                 !docBaseFile.mkdirs()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                    sm.getString("manager2.configDocBaseMissing", docBaseFile.getPath()));
+                    Strings.sm().getString("manager2.configDocBaseMissing", docBaseFile.getPath()));
         }
         String displayName = string(body.get("displayName"));
         if (displayName != null && !displayName.isEmpty()) {
@@ -3238,8 +3200,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         context.addLifecycleListener(new ContextConfig());
         addChecked(path, context, () -> host.addChild(context), () -> host.removeChild(context));
-        log(sm.getString("manager2.configAuditAdd", "context", path));
-        Api.ok(response, sm.getString("manager2.configAdded", path));
+        log(Strings.sm().getString("manager2.configAuditAdd", "context", path));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", path));
     }
 
 
@@ -3265,7 +3227,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String servletClass = string(body.get("servletClass"));
         if (servletClass == null || servletClass.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "servletClass"));
+                    Strings.sm().getString("manager2.configInvalidName", "servletClass"));
         }
         String name = string(body.get("name"));
         if (name == null || name.isEmpty()) {
@@ -3273,7 +3235,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (!SAFE_NAME.matcher(name).matches()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", name));
+                    Strings.sm().getString("manager2.configInvalidName", name));
         }
         if (context.findChild(name) instanceof Wrapper) {
             throw duplicate(name);
@@ -3287,8 +3249,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         for (String pattern : stringList(body.get("urlPatterns"))) {
             context.addServletMapping(pattern, name);
         }
-        log(sm.getString("manager2.configAuditAdd", "wrapper", name));
-        Api.ok(response, sm.getString("manager2.configAdded", name));
+        log(Strings.sm().getString("manager2.configAuditAdd", "wrapper", name));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", name));
     }
 
 
@@ -3300,7 +3262,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         Valve valve;
         try {
@@ -3310,12 +3272,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
         Pipeline pipeline = ((Container) parent.component).getPipeline();
         addChecked(className, valve, () -> pipeline.addValve(valve), () -> pipeline.removeValve(valve));
-        log(sm.getString("manager2.configAuditAdd", "valve", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "valve", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3331,7 +3293,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         LifecycleListener listener;
         try {
@@ -3341,7 +3303,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .getConstructor().newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
         // A listener is registered, not started: the parent never drives
         // its lifecycle (a listener that is itself a Lifecycle, such as a
@@ -3349,12 +3311,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             lifecycle.addLifecycleListener(listener);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
         }
-        log(sm.getString("manager2.configAuditAdd", "listener", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "listener", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3372,7 +3334,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .cast(Class.forName(name, true, server.getClass().getClassLoader()).getConstructor().newInstance());
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", name));
+                    Strings.sm().getString("manager2.configInvalidClass", name));
         }
     }
 
@@ -3391,8 +3353,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         CatalinaCluster cluster = newClusterComponent(className, SimpleTcpCluster.class.getName(),
                 CatalinaCluster.class);
         addChecked(label, cluster, () -> container.setCluster(cluster), () -> container.setCluster(null));
-        log(sm.getString("manager2.configAuditAdd", "cluster", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "cluster", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3407,7 +3369,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         Valve valve;
         try {
@@ -3415,21 +3377,21 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
         if (!(valve instanceof ClusterValve)) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
         try {
             cluster.addValve(valve);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
         }
-        log(sm.getString("manager2.configAuditAdd", "clusterValve", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "clusterValve", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3451,8 +3413,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             cluster.setChannel(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "channel", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "channel", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3475,8 +3437,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             managed.setMembershipService(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "membership", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "membership", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3499,8 +3461,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             managed.setChannelSender(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "sender", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "sender", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3525,8 +3487,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             managed.setChannelReceiver(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "receiver", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "receiver", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3541,17 +3503,17 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         ChannelInterceptor interceptor = newClusterComponent(className, null, ChannelInterceptor.class);
         try {
             managed.addInterceptor(interceptor);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw addFailed(className, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "interceptor", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "interceptor", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3575,8 +3537,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             cluster.setClusterDeployer(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "deployer", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "deployer", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3600,8 +3562,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             tcp.setManagerTemplate(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "clusterManager", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "clusterManager", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3626,8 +3588,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             transmitter.setTransport(previous);
             throw addFailed(label, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "transport", label));
-        Api.ok(response, sm.getString("manager2.configAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "transport", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
     }
 
 
@@ -3642,23 +3604,23 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         ClusterListener listener = newClusterComponent(className, null, ClusterListener.class);
         try {
             cluster.addClusterListener(listener);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw addFailed(className, e);
         }
-        log(sm.getString("manager2.configAuditAdd", "clusterListener", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "clusterListener", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
     private static ConfigException addFailed(String label, Exception e) {
         return new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                sm.getString("manager2.configAddFailed", label, rootMessage(e)));
+                Strings.sm().getString("manager2.configAddFailed", label, rootMessage(e)));
     }
 
 
@@ -3671,7 +3633,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         Realm realm;
         try {
@@ -3681,7 +3643,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
 
         if (parent.component instanceof Container container) {
@@ -3707,9 +3669,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             // container, starts it.
             container.setRealm(realm);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
         }
         // A realm that does not start on a running container is not
         // useful; roll the change back. On a stopped container the realm
@@ -3717,10 +3679,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (running && realm instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
             container.setRealm(oldRealm);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    sm.getString("manager2.configStartFailed", className, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
         }
-        log(sm.getString("manager2.configAuditAdd", "realm", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "realm", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3732,7 +3694,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // still round trips through server.xml.
         if (nestedRealmDepth(combined) >= MAX_NESTED_REALM_LEVELS) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                    sm.getString("manager2.configMaxNestedRealms"));
+                    Strings.sm().getString("manager2.configMaxNestedRealms"));
         }
         boolean running = combined.getState().isAvailable();
         try {
@@ -3754,7 +3716,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 lifecycle.start();
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             combined.removeRealm(realm);
             if (realm instanceof Lifecycle lifecycle && lifecycle.getState().isAvailable()) {
                 try {
@@ -3764,10 +3726,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 }
             }
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
         }
-        log(sm.getString("manager2.configAuditAdd", "realm", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "realm", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3814,7 +3776,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         Object component;
         try {
@@ -3830,7 +3792,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
 
         boolean running = context.getState().isAvailable();
@@ -3843,9 +3805,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     // the new one.
                     context.setManager((Manager) component);
                 } catch (Exception e) {
-                    log(sm.getString("manager2.error.config"), e);
+                    log(Strings.sm().getString("manager2.error.config"), e);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                            sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                            Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
                 }
                 // A manager that does not start on a running context is
                 // not useful; roll the change back. On a stopped context
@@ -3853,7 +3815,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 if (running && component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
                     context.setManager(oldManager);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                            sm.getString("manager2.configStartFailed", className, "the component did not start"));
+                            Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
                 }
             }
             case "loader" -> {
@@ -3864,14 +3826,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     // the new one.
                     context.setLoader((Loader) component);
                 } catch (Exception e) {
-                    log(sm.getString("manager2.error.config"), e);
+                    log(Strings.sm().getString("manager2.error.config"), e);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                            sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                            Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
                 }
                 if (running && component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
                     context.setLoader(oldLoader);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                            sm.getString("manager2.configStartFailed", className, "the component did not start"));
+                            Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
                 }
             }
             case "resources" -> {
@@ -3880,16 +3842,16 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 // application cannot be swapped out from under it.
                 if (running) {
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "CONTEXT_RUNNING",
-                            sm.getString("manager2.configContextMustBeStopped", displayName(context, "context")));
+                            Strings.sm().getString("manager2.configContextMustBeStopped", displayName(context, "context")));
                 }
                 try {
                     // setResources wires the resources to the context.
                     // Their lifecycle is driven by the context (start).
                     context.setResources((WebResourceRoot) component);
                 } catch (Exception e) {
-                    log(sm.getString("manager2.error.config"), e);
+                    log(Strings.sm().getString("manager2.error.config"), e);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                            sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                            Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
                 }
             }
             default -> {
@@ -3898,14 +3860,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 try {
                     context.setCookieProcessor((CookieProcessor) component);
                 } catch (Exception e) {
-                    log(sm.getString("manager2.error.config"), e);
+                    log(Strings.sm().getString("manager2.error.config"), e);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                            sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                            Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
                 }
             }
         }
-        log(sm.getString("manager2.configAuditAdd", type, className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", type, className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -3922,7 +3884,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", "className"));
+                    Strings.sm().getString("manager2.configInvalidName", "className"));
         }
         SessionIdGenerator generator;
         try {
@@ -3932,7 +3894,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .getConstructor().newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
 
         // The Manager interface does not extend Lifecycle; all standard
@@ -3954,7 +3916,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 lifecycle.start();
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             // Best effort rollback: stop the new generator (if it
             // started) and restore the previous one (the setter rejects
             // null, so "none" cannot be restored).
@@ -3972,10 +3934,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 // Best effort; the failure is already logged.
             }
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", className, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", className, rootMessage(e)));
         }
-        log(sm.getString("manager2.configAuditAdd", "sessionIdGenerator", className));
-        Api.ok(response, sm.getString("manager2.configAdded", className));
+        log(Strings.sm().getString("manager2.configAuditAdd", "sessionIdGenerator", className));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
     }
 
 
@@ -4003,7 +3965,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String name = string(body.get("name"));
         if (name == null || name.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
         if (findNamingEntry(namingResources, type, name) != null) {
             throw duplicate(name);
@@ -4011,7 +3973,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String jndiType = string(body.get("jndiType"));
         if (jndiType == null || jndiType.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
-                    sm.getString("manager2.configJndiTypeRequired", type));
+                    Strings.sm().getString("manager2.configJndiTypeRequired", type));
         }
 
         ResourceBase entry;
@@ -4046,7 +4008,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 String global = string(body.get("global"));
                 if (global == null || global.isEmpty()) {
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
-                            sm.getString("manager2.configJndiGlobalRequired"));
+                            Strings.sm().getString("manager2.configJndiGlobalRequired"));
                 }
                 link.setGlobal(global);
                 String description = string(body.get("description"));
@@ -4171,10 +4133,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             addNamingEntryTo(namingResources, type, entry);
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", name, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", name, rootMessage(e)));
         }
-        log(sm.getString("manager2.configAuditAdd", type, name));
-        Api.ok(response, sm.getString("manager2.configAdded", name));
+        log(Strings.sm().getString("manager2.configAuditAdd", type, name));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", name));
     }
 
 
@@ -4225,7 +4187,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (NumberFormatException e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "SET_FAILED",
-                    sm.getString("manager2.configSetFailed", name, sm.getString("manager2.configInvalidType", type)));
+                    Strings.sm().getString("manager2.configSetFailed", name, Strings.sm().getString("manager2.configInvalidType", type)));
         }
     }
 
@@ -4237,7 +4199,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             Class.forName(factory, false, server.getClass().getClassLoader());
         } catch (ClassNotFoundException e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configFactoryInvalid", factory));
+                    Strings.sm().getString("manager2.configFactoryInvalid", factory));
         }
     }
 
@@ -4254,14 +4216,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         Integer port = intValue(body.get("port"), -1);
         if (port < 1 || port > 65535) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                    sm.getString("manager2.configInvalidValue", "port"));
+                    Strings.sm().getString("manager2.configInvalidValue", "port"));
         }
         Connector connector = new Connector(protocol);
         connector.setPort(port);
         addChecked(connectorLabel(connector), connector, () -> service.addConnector(connector),
                 () -> service.removeConnector(connector));
-        log(sm.getString("manager2.configAuditAdd", "connector", protocol + " (port " + port + ")"));
-        Api.ok(response, sm.getString("manager2.configAdded", protocol + " (port " + port + ")"));
+        log(Strings.sm().getString("manager2.configAuditAdd", "connector", protocol + " (port " + port + ")"));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", protocol + " (port " + port + ")"));
     }
 
 
@@ -4291,11 +4253,11 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // explicit maxThreads below the default minimum must be rejected).
         if (executor.getMinSpareThreads() > executor.getMaxThreads()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                    sm.getString("manager2.configExecutorInvalid"));
+                    Strings.sm().getString("manager2.configExecutorInvalid"));
         }
         addChecked(name, executor, () -> service.addExecutor(executor), () -> service.removeExecutor(executor));
-        log(sm.getString("manager2.configAuditAdd", "executor", name));
-        Api.ok(response, sm.getString("manager2.configAdded", name));
+        log(Strings.sm().getString("manager2.configAuditAdd", "executor", name));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", name));
     }
 
 
@@ -4315,7 +4277,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         AbstractHttp11Protocol http11 = sslProtocolHandler(connector);
         if (http11 == null) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BAD_PARENT",
-                    sm.getString("manager2.configSslUnsupported", connector.getProtocolHandlerClassName()));
+                    Strings.sm().getString("manager2.configSslUnsupported", connector.getProtocolHandlerClassName()));
         }
         if (isSelfConnector(connector)) {
             throw self();
@@ -4328,7 +4290,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (!SAFE_NAME.matcher(hostName).matches()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", hostName));
+                    Strings.sm().getString("manager2.configInvalidName", hostName));
         }
         String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
         SSLHostConfig[] existing = connector.findSslHostConfigs();
@@ -4351,7 +4313,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         boolean certificateProvided = body.get("certificate") instanceof Map;
         if (wasRunning && !wasSslEnabled && !certificateProvided) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                    sm.getString("manager2.configSslCertificateRequired"));
+                    Strings.sm().getString("manager2.configSslCertificateRequired"));
         }
         if (certificateProvided) {
             SSLHostConfigCertificate certificate = buildCertificate(sslHostConfig,
@@ -4360,7 +4322,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 sslHostConfig.addCertificate(certificate);
             } catch (IllegalArgumentException e) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                        sm.getString("manager2.configInvalidValue", "certificate"));
+                        Strings.sm().getString("manager2.configInvalidValue", "certificate"));
             }
         }
 
@@ -4368,7 +4330,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             connector.addSslHostConfig(sslHostConfig);
         } catch (IllegalArgumentException e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", hostNameLower, rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", hostNameLower, rootMessage(e)));
         }
 
         if (wasRunning && !wasSslEnabled) {
@@ -4388,15 +4350,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 try {
                     endpointOf(connector).removeSslHostConfig(hostNameLower);
                 } catch (Exception e2) {
-                    log(sm.getString("manager2.configRollbackFailed", hostNameLower, rootMessage(e2)), e2);
+                    log(Strings.sm().getString("manager2.configRollbackFailed", hostNameLower, rootMessage(e2)), e2);
                 }
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                        sm.getString("manager2.configAddFailed", hostNameLower, rootMessage(e)));
+                        Strings.sm().getString("manager2.configAddFailed", hostNameLower, rootMessage(e)));
             }
         }
 
-        log(sm.getString("manager2.configAuditAdd", "sslHostConfig", hostNameLower));
-        Api.ok(response, sm.getString("manager2.configAdded", hostNameLower));
+        log(Strings.sm().getString("manager2.configAuditAdd", "sslHostConfig", hostNameLower));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", hostNameLower));
     }
 
 
@@ -4414,7 +4376,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (http11ProtocolHandler(connector) == null) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BAD_PARENT",
-                    sm.getString("manager2.configUpgradeUnsupported", connector.getProtocolHandlerClassName()));
+                    Strings.sm().getString("manager2.configUpgradeUnsupported", connector.getProtocolHandlerClassName()));
         }
         String className = string(body.get("className"));
         if (className == null || className.isEmpty()) {
@@ -4429,7 +4391,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     .getConstructor().newInstance();
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_CLASS",
-                    sm.getString("manager2.configInvalidClass", className));
+                    Strings.sm().getString("manager2.configInvalidClass", className));
         }
         // The protocol handler keeps the protocols in a plain list without
         // checking for duplicates; a second protocol with the same name would
@@ -4442,8 +4404,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             }
         }
         connector.addUpgradeProtocol(upgradeProtocol);
-        log(sm.getString("manager2.configAuditAdd", "upgradeProtocol", label));
-        Api.ok(response, sm.getString("manager2.configUpgradeProtocolAdded", label));
+        log(Strings.sm().getString("manager2.configAuditAdd", "upgradeProtocol", label));
+        Api.ok(response, Strings.sm().getString("manager2.configUpgradeProtocolAdded", label));
     }
 
 
@@ -4464,7 +4426,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             sslHostConfig.addCertificate(certificate);
         } catch (IllegalArgumentException e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                    sm.getString("manager2.configAddFailed", certificateLabel(certificate), rootMessage(e)));
+                    Strings.sm().getString("manager2.configAddFailed", certificateLabel(certificate), rootMessage(e)));
         }
 
         Connector connector = connectorOfSsl(sslHostConfig);
@@ -4475,12 +4437,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             } catch (Exception e) {
                 sslHostConfig.getCertificates().remove(certificate);
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
-                        sm.getString("manager2.configAddFailed", certificateLabel(certificate), rootMessage(e)));
+                        Strings.sm().getString("manager2.configAddFailed", certificateLabel(certificate), rootMessage(e)));
             }
         }
 
-        log(sm.getString("manager2.configAuditAdd", "certificate", certificateLabel(certificate)));
-        Api.ok(response, sm.getString("manager2.configAdded", certificateLabel(certificate)));
+        log(Strings.sm().getString("manager2.configAuditAdd", "certificate", certificateLabel(certificate)));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", certificateLabel(certificate)));
     }
 
 
@@ -4499,7 +4461,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 type = SSLHostConfigCertificate.Type.valueOf(typeName.trim().toUpperCase(Locale.ENGLISH));
             } catch (IllegalArgumentException e) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                        sm.getString("manager2.configInvalidName", typeName));
+                        Strings.sm().getString("manager2.configInvalidName", typeName));
             }
         }
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, type);
@@ -4534,7 +4496,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             target.getClass().getMethod("set" + capitalize(name), String.class).invoke(target, s);
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_VALUE",
-                    sm.getString("manager2.configInvalidValue", name));
+                    Strings.sm().getString("manager2.configInvalidValue", name));
         }
     }
 
@@ -4606,9 +4568,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             m.setAccessible(true);
             return (AbstractEndpoint<?, ?>) m.invoke(connector.getProtocolHandler());
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SERVER_UNAVAILABLE",
-                    sm.getString("manager2.configServerUnavailable"));
+                    Strings.sm().getString("manager2.configServerUnavailable"));
         }
     }
 
@@ -4629,7 +4591,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String id = string(body.get("id"));
         if (id == null) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
         NodeRef ref = resolve(id);
 
@@ -4649,7 +4611,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // structural invariant is the more informative answer.
         if (ref.type.equals("service") && server.findServices().length <= 1) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "LAST_SERVICE",
-                    sm.getString("manager2.configLastService"));
+                    Strings.sm().getString("manager2.configLastService"));
         }
         if (ref.type.equals("service") && containsSelf((StandardService) ref.component)) {
             throw self();
@@ -4661,20 +4623,20 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         if (ref.type.equals("valve") && isBasicValve(ref)) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BASIC_COMPONENT",
-                    sm.getString("manager2.configBasicValve"));
+                    Strings.sm().getString("manager2.configBasicValve"));
         }
         // The sub components a context holds exactly one of (and the
         // manager's session id generator) are required: they cannot be
         // removed, only replaced.
         if (Set.of("manager", "resources", "loader", "cookieProcessor", "sessionIdGenerator").contains(ref.type)) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REQUIRED_COMPONENT",
-                    sm.getString("manager2.configRequiredComponent", ref.type));
+                    Strings.sm().getString("manager2.configRequiredComponent", ref.type));
         }
         // The JNDI naming resources of the server and of a context are
         // always present and required: they cannot be removed.
         if (ref.type.equals("namingResources")) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REQUIRED_COMPONENT",
-                    sm.getString("manager2.configRequiredNamingResources"));
+                    Strings.sm().getString("manager2.configRequiredNamingResources"));
         }
         // Cluster valves and channel interceptors are repeatable sub
         // components that have no removal API on a running cluster; only
@@ -4682,20 +4644,20 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         // detached.
         if (ref.type.equals("clusterValve") || ref.type.equals("interceptor")) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REMOVE_NOT_SUPPORTED",
-                    sm.getString("manager2.configRemoveNotSupported", ref.type));
+                    Strings.sm().getString("manager2.configRemoveNotSupported", ref.type));
         }
         // A service holds exactly one engine (its container); it cannot be
         // removed while it still contains hosts.
         if (ref.type.equals("engine") && ref.component instanceof Engine engine && countHosts(engine) > 0) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "NOT_EMPTY",
-                    sm.getString("manager2.configNotEmpty", "engine"));
+                    Strings.sm().getString("manager2.configNotEmpty", "engine"));
         }
         // A directly attached realm can only be removed when the container
         // falls back to a parent realm afterwards; otherwise the container
         // (and everything below it) would have no realm at all.
         if (ref.type.equals("realm") && ref.parent instanceof Container container && fallbackRealm(container) == null) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "LAST_REALM",
-                    sm.getString("manager2.configLastRealm"));
+                    Strings.sm().getString("manager2.configLastRealm"));
         }
 
         String label = ref.aliasValue != null ? ref.aliasValue : displayName(ref.component, ref.type);
@@ -4705,7 +4667,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             String confirm = string(body.get("confirm"));
             if (!label.equals(confirm)) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "CONFIRM_REQUIRED",
-                        sm.getString("manager2.configConfirmRequired", label));
+                        Strings.sm().getString("manager2.configConfirmRequired", label));
             }
         }
 
@@ -4770,12 +4732,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             throw e;
         } catch (Exception e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REMOVE_FAILED",
-                    sm.getString("manager2.configRemoveFailed",
+                    Strings.sm().getString("manager2.configRemoveFailed",
                             e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage()));
         }
 
-        log(sm.getString("manager2.configAuditRemove", ref.type, label));
-        Api.ok(response, sm.getString("manager2.configRemoved", label));
+        log(Strings.sm().getString("manager2.configAuditRemove", ref.type, label));
+        Api.ok(response, Strings.sm().getString("manager2.configRemoved", label));
     }
 
 
@@ -4846,7 +4808,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             // removed from a running, TLS enabled connector while other
             // configurations remain.
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "SSL_DEFAULT",
-                    sm.getString("manager2.configSslDefault"));
+                    Strings.sm().getString("manager2.configSslDefault"));
         }
 
         boolean disablesSsl = sslEnabled && remaining == 0;
@@ -4861,15 +4823,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             endpointOf(connector).removeSslHostConfig(sslHostConfig.getHostName());
         } catch (IllegalArgumentException e) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REMOVE_FAILED",
-                    sm.getString("manager2.configRemoveFailed", rootMessage(e)));
+                    Strings.sm().getString("manager2.configRemoveFailed", rootMessage(e)));
         }
         // When the removal disabled TLS no further action is needed: the
         // endpoint decides per accepted connection whether it is TLS, so
         // new connections are served over plain HTTP from this point on
         // (in-flight TLS connections complete normally).
 
-        log(sm.getString("manager2.configAuditRemove", ref.type, label));
-        Api.ok(response, sm.getString("manager2.configRemoved", label));
+        log(Strings.sm().getString("manager2.configAuditRemove", ref.type, label));
+        Api.ok(response, Strings.sm().getString("manager2.configRemoved", label));
     }
 
 
@@ -4889,7 +4851,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         boolean live = connector != null && connector.getState().isAvailable() && isSslEnabled(connector);
         if (live && sslHostConfig.getCertificates().size() <= 1) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "SSL_LAST_CERTIFICATE",
-                    sm.getString("manager2.configSslLastCertificate", connectorLabel(connector)));
+                    Strings.sm().getString("manager2.configSslLastCertificate", connectorLabel(connector)));
         }
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates();
@@ -4900,13 +4862,13 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             } catch (Exception e) {
                 certificates.add(certificate);
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REMOVE_FAILED",
-                        sm.getString("manager2.configRemoveFailed", rootMessage(e)));
+                        Strings.sm().getString("manager2.configRemoveFailed", rootMessage(e)));
             }
         }
 
         String label = displayName(certificate, "certificate");
-        log(sm.getString("manager2.configAuditRemove", "certificate", label));
-        Api.ok(response, sm.getString("manager2.configRemoved", label));
+        log(Strings.sm().getString("manager2.configAuditRemove", "certificate", label));
+        Api.ok(response, Strings.sm().getString("manager2.configRemoved", label));
     }
 
 
@@ -4940,19 +4902,19 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
     private static ConfigException self() {
         return new ConfigException(HttpServletResponse.SC_FORBIDDEN, "SELF_COMPONENT",
-                sm.getString("manager2.configSelfComponent"));
+                Strings.sm().getString("manager2.configSelfComponent"));
     }
 
 
     private static ConfigException duplicate(String name) {
         return new ConfigException(HttpServletResponse.SC_CONFLICT, "DUPLICATE",
-                sm.getString("manager2.configDuplicate", name));
+                Strings.sm().getString("manager2.configDuplicate", name));
     }
 
 
     private static ConfigException badParent(String type) {
         return new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "BAD_PARENT",
-                sm.getString("manager2.configParentInvalid", type));
+                Strings.sm().getString("manager2.configParentInvalid", type));
     }
 
 
@@ -4974,21 +4936,21 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String op = string(body.get("op"));
         if (id == null || op == null || op.isEmpty()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_ID",
-                    sm.getString("manager2.configInvalidId"));
+                    Strings.sm().getString("manager2.configInvalidId"));
         }
         boolean start = "start".equals(op);
         boolean stop = "stop".equals(op);
         boolean restart = "restart".equals(op);
         if (!start && !stop && !restart) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_OP",
-                    sm.getString("manager2.configInvalidOp", op));
+                    Strings.sm().getString("manager2.configInvalidOp", op));
         }
 
         NodeRef ref = resolve(id);
         if (!(ref.component instanceof Lifecycle lifecycle)) {
             String label = ref.aliasValue != null ? ref.aliasValue : displayName(ref.component, ref.type);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "NOT_A_LIFECYCLE",
-                    sm.getString("manager2.configNotALifecycle", label));
+                    Strings.sm().getString("manager2.configNotALifecycle", label));
         }
         if (!restart && affectsSelf(ref)) {
             throw self();
@@ -4997,12 +4959,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         if (stop) {
             if (!lifecycle.getState().isAvailable()) {
-                Api.ok(response, sm.getString("manager2.configAlreadyStopped", label));
+                Api.ok(response, Strings.sm().getString("manager2.configAlreadyStopped", label));
                 return;
             }
             stopChecked(lifecycle, label);
-            log(sm.getString("manager2.configAuditLifecycle", "stopped", label));
-            Api.ok(response, sm.getString("manager2.configStopped", label));
+            log(Strings.sm().getString("manager2.configAuditLifecycle", "stopped", label));
+            Api.ok(response, Strings.sm().getString("manager2.configStopped", label));
             return;
         }
 
@@ -5010,12 +4972,12 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             stopChecked(lifecycle, label);
         }
         if (start && lifecycle.getState().isAvailable()) {
-            Api.ok(response, sm.getString("manager2.configAlreadyRunning", label));
+            Api.ok(response, Strings.sm().getString("manager2.configAlreadyRunning", label));
             return;
         }
         startChecked(lifecycle, label);
-        log(sm.getString("manager2.configAuditLifecycle", restart ? "restarted" : "started", label));
-        Api.ok(response, sm.getString(restart ? "manager2.configRestarted" : "manager2.configStarted", label));
+        log(Strings.sm().getString("manager2.configAuditLifecycle", restart ? "restarted" : "started", label));
+        Api.ok(response, Strings.sm().getString(restart ? "manager2.configRestarted" : "manager2.configStarted", label));
     }
 
 
@@ -5026,13 +4988,13 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             lifecycle.stop();
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "STOP_FAILED",
-                    sm.getString("manager2.configStopFailed", label, rootMessage(e)));
+                    Strings.sm().getString("manager2.configStopFailed", label, rootMessage(e)));
         }
         if (lifecycle.getState().isAvailable()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "STOP_FAILED",
-                    sm.getString("manager2.configStopFailed", label, "the component did not stop"));
+                    Strings.sm().getString("manager2.configStopFailed", label, "the component did not stop"));
         }
     }
 
@@ -5044,13 +5006,13 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             lifecycle.start();
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    sm.getString("manager2.configStartFailed", label, rootMessage(e)));
+                    Strings.sm().getString("manager2.configStartFailed", label, rootMessage(e)));
         }
         if (!lifecycle.getState().isAvailable()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    sm.getString("manager2.configStartFailed", label, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", label, "the component did not start"));
         }
     }
 
@@ -5108,9 +5070,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try (PrintWriter writer = mover.getWriter()) {
             storeServerPreservingContexts(storeConfig, writer);
         } catch (Exception e) {
-            log(sm.getString("manager2.error.config"), e);
+            log(Strings.sm().getString("manager2.error.config"), e);
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "STORE_FAILED",
-                    sm.getString("manager2.configStoreFailed"));
+                    Strings.sm().getString("manager2.configStoreFailed"));
         }
         mover.move();
 
@@ -5118,10 +5080,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         after.removeAll(before);
         String backup = after.isEmpty() ? null : after.iterator().next();
 
-        log(sm.getString("manager2.configAuditStore", backup));
+        log(Strings.sm().getString("manager2.configAuditStore", backup));
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("ok", Boolean.TRUE);
-        payload.put("message", sm.getString("manager2.configStored", "conf/server.xml", backup == null ? "-" : backup));
+        payload.put("message", Strings.sm().getString("manager2.configStored", "conf/server.xml", backup == null ? "-" : backup));
         payload.put("file", "conf/server.xml");
         payload.put("backup", backup);
         Api.json(response, payload);
@@ -5307,7 +5269,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
     private void requireServer() throws ConfigException {
         if (server == null) {
             throw new ConfigException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SERVER_UNAVAILABLE",
-                    sm.getString("manager2.configServerUnavailable"));
+                    Strings.sm().getString("manager2.configServerUnavailable"));
         }
     }
 
@@ -5333,7 +5295,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         try {
             return new JSONParser(body).parseObject();
         } catch (Exception e) {
-            throw new IllegalArgumentException(sm.getString("manager2.invalidJson", e.getMessage()), e);
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", e.getMessage()), e);
         }
     }
 
@@ -5394,7 +5356,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         String name = string(value);
         if (name == null || name.isEmpty() || !SAFE_NAME.matcher(name).matches()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.configInvalidName", name));
+                    Strings.sm().getString("manager2.configInvalidName", name));
         }
         return name;
     }

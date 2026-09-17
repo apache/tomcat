@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -50,10 +49,7 @@ public class CsrfFilter implements Filter {
 
 
     /**
-     * The string manager for this package.
      */
-    protected static final StringManager sm = Strings.manager();
-
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final int TOKEN_BYTES = 16;
@@ -103,8 +99,8 @@ public class CsrfFilter implements Filter {
 
         String provided = req.getHeader(Constants.CSRF_HEADER);
         if (provided == null || !constantTimeEquals(token, provided)) {
-            log(req, sm.getString("csrfFilter.invalid"));
-            Api.error(resp, HttpServletResponse.SC_FORBIDDEN, "CSRF", sm.getString("csrfFilter.invalid"));
+            log(req, Strings.sm().getString("csrfFilter.invalid"));
+            Api.error(resp, HttpServletResponse.SC_FORBIDDEN, "CSRF", Strings.sm().getString("csrfFilter.invalid"));
             return;
         }
 

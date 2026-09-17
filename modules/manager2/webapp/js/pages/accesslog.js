@@ -16,12 +16,13 @@
  */
 
 import { logPage } from '../logviewer.js';
+import { t } from '../i18n.js';
 
 export async function accessLog(container) {
   return logPage(container, {
     kind: 'access',
-    title: 'Access log',
-    subtitle: 'Access log files. The available filters (method, status, user, session ID) depend on the configured log format.',
+    title: t('manager2.ui.nav.accessLog'),
+    subtitle: t('manager2.ui.accesslog.subtitle'),
     listUrl: '/api/access-log',
     fileUrl: '/api/access-log/file',
   });

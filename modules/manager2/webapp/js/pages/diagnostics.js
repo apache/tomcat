@@ -17,19 +17,20 @@
 
 import { api } from '../api.js';
 import { el, clear, toast, confirm } from '../ui.js';
+import { t } from '../i18n.js';
 
 export async function diagnostics(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Diagnostics'),
-          el('p', {}, 'SSL, memory leaks, JNDI resources and JVM diagnostics.')));
+          el('h1', {}, t('manager2.ui.nav.diagnostics')),
+          el('p', {}, t('manager2.ui.diagnostics.subtitle'))));
   container.append(view);
 
   const tabs = el('div', { class: 'tabs' },
-      el('button', { type: 'button', class: 'tab active' }, 'SSL'),
-      el('button', { type: 'button', class: 'tab' }, 'Memory leaks'),
-      el('button', { type: 'button', class: 'tab' }, 'JNDI resources'),
-      el('button', { type: 'button', class: 'tab' }, 'JVM'));
+      el('button', { type: 'button', class: 'tab active' }, t('manager2.ui.diagnostics.tab.ssl')),
+      el('button', { type: 'button', class: 'tab' }, t('manager2.ui.diagnostics.tab.leaks')),
+      el('button', { type: 'button', class: 'tab' }, t('manager2.ui.diagnostics.tab.jndi')),
+      el('button', { type: 'button', class: 'tab' }, t('manager2.ui.diagnostics.tab.jvm')));
   const panes = el('div', {},
       el('div', { class: 'pane' }),
       el('div', { class: 'pane', style: 'display:none' }),
@@ -43,29 +44,29 @@ export async function diagnostics(container) {
   let loaded = [false, false, false, false];
 
   function switchTab(index) {
-    tabButtons.forEach((t, i) => t.classList.toggle('active', i === index));
+    tabButtons.forEach((tab, i) => tab.classList.toggle('active', i === index));
     paneNodes.forEach((p, i) => { p.style.display = i === index ? '' : 'none'; });
     if (!loaded[index]) {
       loaded[index] = true;
       loaders[index]();
     }
   }
-  tabButtons.forEach((t, i) => t.addEventListener('click', () => switchTab(i)));
+  tabButtons.forEach((tab, i) => tab.addEventListener('click', () => switchTab(i)));
 
   // ---------------- SSL ----------------
   async function loadSsl() {
     const pane = paneNodes[0];
     const reloadRow = el('div', { class: 'row-actions', style: 'margin-bottom:14px;' },
         el('input', {
-          type: 'text', placeholder: 'TLS SNI host name (optional)', class: 'tls-host', id: 'tls-host',
+          type: 'text', placeholder: t('manager2.ui.diagnostics.tlsHostPlaceholder'), class: 'tls-host', id: 'tls-host',
         }),
         el('button', {
           type: 'button', class: 'btn btn-sm',
           onclick: async () => {
             const ok = await confirm({
-              title: 'Reload SSL',
-              message: 'Reload the SSL context? Connections in flight are interrupted.',
-              confirmLabel: 'Reload',
+              title: t('manager2.ui.diagnostics.sslReloadTitle'),
+              message: t('manager2.ui.diagnostics.sslReloadConfirm'),
+              confirmLabel: t('manager2.ui.diagnostics.sslReloadConfirmButton'),
             });
             if (!ok) return;
             const body = {};
@@ -78,14 +79,14 @@ export async function diagnostics(container) {
               toast(err.message, 'error');
             }
           },
-        }, 'Reload SSL context'));
+        }, t('manager2.ui.diagnostics.sslReloadButton')));
     const list = el('div');
     pane.append(reloadRow, list);
 
     const subTabs = el('div', { class: 'tabs' },
-        el('button', { type: 'button', class: 'tab active' }, 'Cipher suites'),
-        el('button', { type: 'button', class: 'tab' }, 'Certificates'),
-        el('button', { type: 'button', class: 'tab' }, 'Trusted certificates'));
+        el('button', { type: 'button', class: 'tab active' }, t('manager2.ui.diagnostics.cipherSuites')),
+        el('button', { type: 'button', class: 'tab' }, t('manager2.ui.diagnostics.certificates')),
+        el('button', { type: 'button', class: 'tab' }, t('manager2.ui.diagnostics.trustedCertificates')));
     list.append(subTabs, el('div', { id: 'ssl-content' }));
 
     let current = 'ciphers';
@@ -110,7 +111,7 @@ export async function diagnostics(container) {
       const entries = Object.entries(data);
       if (entries.length === 0) {
         holder.append(el('div', { class: 'empty' },
-            'No SSL connector configured on this server.'));
+            t('manager2.ui.diagnostics.noSslConnector')));
         return;
       }
       for (const [connector, values] of entries) {
@@ -131,8 +132,7 @@ export async function diagnostics(container) {
     const holder = el('div', { style: 'margin-top:14px;' });
     pane.append(el('div', { class: 'card' },
         el('p', { style: 'color:var(--text-soft);margin-top:0;' },
-            'Check whether the deployed web applications hold any memory-leaking references '
-            + '(class loaders, threads or file handles).'),
+            t('manager2.ui.diagnostics.leaksDescription')),
         el('div', { class: 'row-actions' },
             el('button', {
               type: 'button', class: 'btn',
@@ -140,12 +140,12 @@ export async function diagnostics(container) {
                 const btn = e.currentTarget;
                 btn.disabled = true;
                 clear(holder);
-                holder.append(document.createTextNode('Checking… this can take a while.'));
+                holder.append(document.createTextNode(t('manager2.ui.diagnostics.leaksChecking')));
                 try {
                   const data = await api('GET', '/api/leaks');
                   clear(holder);
                   if (!data.leaks || data.leaks.length === 0) {
-                    holder.append(el('div', { class: 'empty' }, 'No leaks found.'));
+                    holder.append(el('div', { class: 'empty' }, t('manager2.ui.diagnostics.leaksNone')));
                   } else {
                     holder.append(el('pre', { class: 'block' }, data.leaks.join('\n')));
                   }
@@ -156,7 +156,7 @@ export async function diagnostics(container) {
                   btn.disabled = false;
                 }
               },
-            }, 'Check for leaks')),
+            }, t('manager2.ui.diagnostics.leaksCheck'))),
         holder));
   }
 
@@ -166,14 +166,14 @@ export async function diagnostics(container) {
     pane.append(el('div', { class: 'card' },
         el('div', { class: 'row-actions', style: 'margin-bottom:14px;' },
             el('select', { id: 'res-type', class: 'res-type' },
-                el('option', { value: '' }, 'All types'),
+                el('option', { value: '' }, t('manager2.ui.diagnostics.allTypes')),
                 el('option', { value: 'env/java:comp/env' }, 'env/java:comp/env'),
                 el('option', { value: 'env/ejb' }, 'env/ejb'),
                 el('option', { value: 'env/jndi/kerberos' }, 'env/jndi/kerberos')),
             el('button', {
               type: 'button', class: 'btn btn-sm',
               onclick: () => loadResTable(),
-            }, 'Refresh')),
+            }, t('manager2.ui.common.refresh'))),
         el('div', { id: 'resources-table' })));
 
     async function loadResTable() {
@@ -190,12 +190,12 @@ export async function diagnostics(container) {
       clear(holder);
       const lines = (data.resources || '').split('\n').filter((l) => l.trim());
       if (lines.length === 0) {
-        holder.append(el('div', { class: 'empty' }, 'No resources found.'));
+        holder.append(el('div', { class: 'empty' }, t('manager2.ui.diagnostics.noResources')));
         return;
       }
       holder.append(el('div', { class: 'table-wrap' },
           el('table', { class: 'data' },
-              el('thead', {}, el('tr', {}, el('th', {}, 'Name'), el('th', {}, 'Class'))),
+              el('thead', {}, el('tr', {}, el('th', {}, t('manager2.ui.col.name')), el('th', {}, t('manager2.ui.diagnostics.colClass')))),
               el('tbody', {}, lines.map((line) => {
                 const idx = line.indexOf(':');
                 const name = idx >= 0 ? line.substring(0, idx).trim() : line;
@@ -214,20 +214,20 @@ export async function diagnostics(container) {
     const holder = el('div');
     pane.append(el('div', { class: 'card' },
         el('p', { style: 'color:var(--text-soft);margin-top:0;' },
-            'VM information and a thread dump of this process.'),
+            t('manager2.ui.diagnostics.jvmDescription')),
         el('div', { class: 'row-actions' },
             el('button', {
               type: 'button', class: 'btn',
               onclick: (e) => show('info', e.currentTarget),
-            }, 'VM information'),
+            }, t('manager2.ui.diagnostics.vmInfo')),
             el('button', {
               type: 'button', class: 'btn',
               onclick: (e) => show('threaddump', e.currentTarget),
-            }, 'Thread dump')),
+            }, t('manager2.ui.diagnostics.threadDump'))),
         holder));
 
     async function show(which, btn) {
-      const title = which === 'info' ? 'VM information' : 'Thread dump';
+      const title = which === 'info' ? t('manager2.ui.diagnostics.vmInfo') : t('manager2.ui.diagnostics.threadDump');
       const url = which === 'info' ? '/api/diagnostics/vminfo' : '/api/diagnostics/threaddump';
       let section = holder.querySelector('#jvm-' + which);
       let body;
@@ -246,7 +246,7 @@ export async function diagnostics(container) {
         const data = await api('GET', url);
         const text = which === 'info' ? data.info : data.dump;
         clear(body);
-        body.append(el('pre', { class: 'block' }, text || '(empty)'));
+        body.append(el('pre', { class: 'block' }, text || t('manager2.ui.common.empty')));
       } catch (err) {
         clear(body);
         body.append(el('div', { class: 'empty' }, err.message));

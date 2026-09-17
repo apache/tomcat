@@ -96,7 +96,8 @@ public final class Api {
      * @throws IOException if a write error occurs
      */
     public static void notFound(HttpServletResponse response) throws IOException {
-        error(response, HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND", "Resource not found");
+        error(response, HttpServletResponse.SC_NOT_FOUND, "NOT_FOUND",
+                Strings.sm().getString("manager2.notFound"));
     }
 
 

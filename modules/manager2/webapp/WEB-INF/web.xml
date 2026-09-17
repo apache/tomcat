@@ -113,6 +113,15 @@
     <servlet-class>org.apache.tomcat.manager2.ErrorServlet</servlet-class>
   </servlet>
 
+  <!-- Serves the client-side messages of the LocalStrings bundle, localized
+       with the locales sent by the browser. Not under /api/* on purpose: the
+       login page (unauthenticated) needs it, and it only exposes message
+       templates, never server data. -->
+  <servlet>
+    <servlet-name>I18n</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.I18nServlet</servlet-class>
+  </servlet>
+
   <!-- ===================== Servlet Mappings =================== -->
 
   <servlet-mapping>
@@ -265,8 +274,23 @@
     <servlet-name>Error</servlet-name>
     <url-pattern>/error</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>I18n</servlet-name>
+    <url-pattern>/i18n</url-pattern>
+  </servlet-mapping>
 
   <!-- ========================= Filters ======================== -->
+
+  <!-- Binds the locales sent by the browser to the request thread so that
+       responses are localized with them. Must stay the first filter. -->
+  <filter>
+    <filter-name>Locale</filter-name>
+    <filter-class>org.apache.tomcat.manager2.LocaleFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Locale</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <!-- CSRF protection for the JSON API (synchronizer token pattern).
        The token is delivered in the X-CSRF-Token response header of

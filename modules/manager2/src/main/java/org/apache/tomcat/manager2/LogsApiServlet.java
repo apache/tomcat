@@ -43,7 +43,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.Container;
 import org.apache.catalina.Valve;
 import org.apache.catalina.valves.AbstractAccessLogValve;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -64,12 +63,6 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
 
 
     /**
@@ -175,7 +168,7 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
                 Api.notFound(response);
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.logs"), e);
+            log(Strings.sm().getString("manager2.error.logs"), e);
             throw new ServletException(e);
         }
     }
@@ -186,7 +179,7 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
         File dir = logsDirectory();
         if (dir == null) {
             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "LOGS_DIR_MISSING",
-                    sm.getString("manager2.logsDirMissing"));
+                    Strings.sm().getString("manager2.logsDirMissing"));
             return;
         }
 
@@ -578,13 +571,13 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
         File dir = logsDirectory();
         if (dir == null) {
             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "LOGS_DIR_MISSING",
-                    sm.getString("manager2.logsDirMissing"));
+                    Strings.sm().getString("manager2.logsDirMissing"));
             return null;
         }
         String name = request.getParameter("name");
         if (name == null || !SAFE_NAME.matcher(name).matches()) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.invalidLogName"));
+                    Strings.sm().getString("manager2.invalidLogName"));
             return null;
         }
         File file = resolveLogFile(dir, name);

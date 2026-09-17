@@ -17,6 +17,35 @@
 
 import { api } from '../api.js';
 import { el, clear, toast, modal, confirm, stateBadge, actionMenu } from '../ui.js';
+import { t, has } from '../i18n.js';
+
+// Localized display name of a component type: falls back to the raw type
+// identifier when the bundle has no label for it.
+function typeLabel(type) {
+  const key = 'manager2.ui.type.' + type;
+  return has(key) ? t(key) : type;
+}
+
+// Build a localized message with inline code spans (the {0}, ...
+// placeholders are replaced by the given code values).
+function codeNodes(key, codes) {
+  const message = t(key);
+  const nodes = [];
+  const regex = /\{(\d+)\}/g;
+  let last = 0;
+  let m;
+  while ((m = regex.exec(message))) {
+    if (m.index > last) {
+      nodes.push(document.createTextNode(message.substring(last, m.index)));
+    }
+    nodes.push(el('code', {}, codes[Number(m[1])]));
+    last = regex.lastIndex;
+  }
+  if (last < message.length) {
+    nodes.push(document.createTextNode(message.substring(last)));
+  }
+  return nodes;
+}
 
 const NUMERIC_TYPES = new Set(['int', 'long', 'short', 'byte', 'float', 'double']);
 const RISKY_ATTRIBUTES = new Set(['name', 'path', 'defaultHost']);
@@ -161,14 +190,14 @@ export async function configuration(container) {
 
   const view = el('div', { class: 'config-page' },
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Configuration'),
-          el('p', {}, 'The live component tree of this server. Changes apply immediately; save to make them permanent.'),
+          el('h1', {}, t('manager2.ui.nav.configuration')),
+          el('p', {}, t('manager2.ui.config.subtitle')),
           el('span', { class: 'head-spacer' }),
-          el('button', { type: 'button', class: 'btn', onclick: reloadAll }, 'Reload'),
-          el('button', { type: 'button', class: 'btn btn-primary', onclick: () => saveToServerXml() }, 'Save to server.xml')));
+          el('button', { type: 'button', class: 'btn', onclick: reloadAll }, t('manager2.ui.common.reload')),
+          el('button', { type: 'button', class: 'btn btn-primary', onclick: () => saveToServerXml() }, t('manager2.ui.config.save'))));
   view.append(el('div', { class: 'config-split' },
       el('div', { class: 'card config-tree-card' }, el('div', { class: 'card-title-row' },
-          el('h3', {}, 'Components'))),
+          el('h3', {}, t('manager2.ui.config.components')))),
       el('div', { class: 'card config-detail-card' })));
   container.append(view);
 
@@ -182,7 +211,7 @@ export async function configuration(container) {
   async function loadTree() {
     const savedScroll = treeWrap.scrollTop;
     clear(treeWrap);
-    treeWrap.append(el('div', { class: 'spinner', role: 'status', 'aria-label': 'Loading' }));
+    treeWrap.append(el('div', { class: 'spinner', role: 'status', 'aria-label': t('manager2.ui.common.loading') }));
     let data;
     try {
       data = await api('GET', '/api/config/tree');
@@ -206,7 +235,7 @@ export async function configuration(container) {
     const row = el('div', { class: 'config-node', style: 'padding-left:' + (Math.min(depth, 6) * 16 + 4) + 'px' },
         el('button', {
           type: 'button', class: 'config-node-toggle' + (hasKids ? '' : ' leaf'),
-          'aria-label': hasKids ? 'Toggle' : '',
+          'aria-label': hasKids ? t('manager2.ui.config.toggle') : '',
           onclick: (e) => {
             e.stopPropagation();
             if (!hasKids) return;
@@ -215,9 +244,9 @@ export async function configuration(container) {
           },
         }, hasKids ? (isOpen ? '\u25BC' : '\u25B6') : ''),
         el('span', { class: 'config-node-label', onclick: () => selectNode(node.id), style: 'cursor:pointer' },
-            el('span', { class: 'config-type ' + node.type }, node.type),
-            el('span', { class: 'config-node-name' }, node.name || '(unnamed)'),
-            node.self ? el('span', { class: 'badge plain', style: 'margin-left:6px' }, 'this app') : '',
+            el('span', { class: 'config-type ' + node.type }, typeLabel(node.type)),
+            el('span', { class: 'config-node-name' }, node.name || t('manager2.ui.config.unnamed')),
+            node.self ? el('span', { class: 'badge plain', style: 'margin-left:6px' }, t('manager2.ui.config.thisApp')) : '',
             node.state ? el('span', {
               class: 'badge ' + (node.state === 'STARTED' || node.state === 'AVAILABLE' ? 'ok' : 'stop'),
               style: 'margin-left:6px',
@@ -238,7 +267,7 @@ export async function configuration(container) {
   async function selectNode(id) {
     selectedId = id;
     clear(detailCard);
-    detailCard.append(el('div', { class: 'spinner', role: 'status', 'aria-label': 'Loading' }));
+    detailCard.append(el('div', { class: 'spinner', role: 'status', 'aria-label': t('manager2.ui.common.loading') }));
     let data;
     try {
       data = await api('GET', '/api/config/node/' + nodePath(id));
@@ -263,20 +292,20 @@ export async function configuration(container) {
 
     const actions = [];
     if (addable(d)) {
-      actions.push({ label: '+ Add', onclick: () => addChildModal(d) });
+      actions.push({ label: t('manager2.ui.config.addChild'), onclick: () => addChildModal(d) });
     }
     if (d.type !== 'server') {
       actions.push({
-        label: 'Remove', class: 'btn-danger', disabled: d.self,
-        title: d.self ? 'Cannot remove the component the manager is installed in' : 'Remove',
+        label: t('manager2.ui.common.remove'), class: 'btn-danger', disabled: d.self,
+        title: d.self ? t('manager2.ui.config.cannotRemoveSelf') : t('manager2.ui.common.remove'),
         onclick: () => removeNode(d),
       });
     }
     actions.push(...lifecycleActions(d));
     const head = el('div', { class: 'card-title-row' },
         el('div', { class: 'config-detail-title' },
-            el('span', { class: 'config-type ' + d.type }, d.type),
-            el('h3', {}, d.name || '(unnamed)'),
+            el('span', { class: 'config-type ' + d.type }, typeLabel(d.type)),
+            el('h3', {}, d.name || t('manager2.ui.config.unnamed')),
             d.state ? stateBadge(d.state) : ''),
         actionMenu(actions));
     detailCard.append(head);
@@ -290,31 +319,31 @@ export async function configuration(container) {
     if (props.length || naming) {
       const rows = props.map((p) => propRow(d, p));
       const head = el('div', { class: 'config-section-head' },
-          el('h4', {}, 'Properties'),
+          el('h4', {}, t('manager2.ui.config.properties')),
           naming ? el('button', {
             type: 'button', class: 'btn btn-sm',
             onclick: () => paramForm(head, d),
-          }, '+ Add parameter') : null);
+          }, t('manager2.ui.config.addParameter')) : null);
       const body = rows.length
           ? el('div', { class: 'config-props' }, rows)
-          : el('p', { class: 'muted' }, 'No parameters set. Use "+ Add parameter" to add one.');
+          : el('p', { class: 'muted' }, t('manager2.ui.config.noParameters'));
       detailCard.append(head, body);
     } else {
-      detailCard.append(el('p', { class: 'muted' }, 'This component exposes no editable properties.'));
+      detailCard.append(el('p', { class: 'muted' }, t('manager2.ui.config.noProperties')));
     }
 
     const kids = d.children || [];
     if (kids.length) {
-      detailCard.append(el('h4', {}, 'Children'),
+      detailCard.append(el('h4', {}, t('manager2.ui.config.children')),
           el('div', { class: 'config-children' }, kids.map((k) => el('button', {
             type: 'button', class: 'config-child-chip', onclick: () => selectNode(k.id),
-          }, k.type + ': ' + (k.name || '(unnamed)')))));
+          }, typeLabel(k.type) + ': ' + (k.name || t('manager2.ui.config.unnamed'))))));
     }
   }
 
   function propRow(node, p) {
     const label = el('label', { class: 'config-prop-name' }, p.name,
-        p.param ? el('span', { class: 'config-param-hint' }, 'parameter') : '',
+        p.param ? el('span', { class: 'config-param-hint' }, t('manager2.ui.config.parameter')) : '',
         p.description ? el('span', { class: 'config-prop-desc', title: p.description }, p.description) : '');
     if (!p.writable) {
       return el('div', { class: 'config-prop readonly' },
@@ -328,18 +357,18 @@ export async function configuration(container) {
         el('button', {
           type: 'button', class: 'btn btn-sm',
           onclick: () => applyProperty(node, p, input),
-        }, 'Apply'));
+        }, t('manager2.ui.common.apply')));
     if (p.param) {
       if (paramSet(p)) {
         edit.append(el('button', {
           type: 'button', class: 'btn btn-sm btn-danger',
-          title: 'Remove this parameter',
+          title: t('manager2.ui.config.removeParameter'),
           onclick: () => removeParameter(node, p),
-        }, 'Remove'));
+        }, t('manager2.ui.common.remove')));
       } else {
         // An unset parameter: nothing to remove. Applying a value adds
         // the parameter (or, for a boolean, unchecking it is a no-op).
-        edit.append(el('span', { class: 'config-param-hint' }, 'not set'));
+        edit.append(el('span', { class: 'config-param-hint' }, t('manager2.ui.config.notSet')));
       }
     }
     return el('div', { class: 'config-prop' }, label, edit);
@@ -351,8 +380,8 @@ export async function configuration(container) {
   }
 
   function buildInput(p) {
-    const t = p.type;
-    if (t === 'boolean') {
+    const ptype = p.type;
+    if (ptype === 'boolean') {
       const box = el('input', { type: 'checkbox', class: 'config-check' });
       // A parameter is stored as the string "true" or "false": only
       // "true" checks the box (Boolean("false") would be wrongly
@@ -361,14 +390,14 @@ export async function configuration(container) {
       box.checked = p.param ? p.value === 'true' : Boolean(p.value);
       return box;
     }
-    if (NUMERIC_TYPES.has(t)) {
+    if (NUMERIC_TYPES.has(ptype)) {
       return el('input', { type: 'text', inputmode: 'numeric', value: p.value == null ? '' : String(p.value), class: 'config-input num' });
     }
-    if (t === '[Ljava.lang.String;') {
+    if (ptype === '[Ljava.lang.String;') {
       const arr = Array.isArray(p.value) ? p.value : (p.value == null ? [] : [p.value]);
-      return el('input', { type: 'text', value: arr.join(', '), class: 'config-input', placeholder: 'comma, separated' });
+      return el('input', { type: 'text', value: arr.join(', '), class: 'config-input', placeholder: t('manager2.ui.config.commaSeparated') });
     }
-    if (t === 'java.lang.String') {
+    if (ptype === 'java.lang.String') {
       return el('input', { type: 'text', value: p.value == null ? '' : String(p.value), class: 'config-input' });
     }
     // Non editable simple type: show as read only text.
@@ -385,10 +414,10 @@ export async function configuration(container) {
   }
 
   function readInput(input, p) {
-    const t = p.type;
-    if (t === 'boolean') return input.checked;
-    if (NUMERIC_TYPES.has(t)) return input.value.trim();
-    if (t === '[Ljava.lang.String;') {
+    const ptype = p.type;
+    if (ptype === 'boolean') return input.checked;
+    if (NUMERIC_TYPES.has(ptype)) return input.value.trim();
+    if (ptype === '[Ljava.lang.String;') {
       return input.value.split(',').map((s) => s.trim()).filter(Boolean);
     }
     return input.value;
@@ -405,14 +434,14 @@ export async function configuration(container) {
         ? Boolean(value) === (p.value === 'true')
         : sameValue(value, p.value);
     if (noOp) {
-      toast('No changes to apply.', 'info');
+      toast(t('manager2.ui.config.noChanges'), 'info');
       return;
     }
     if (RISKY_ATTRIBUTES.has(p.name)) {
       const ok = await confirm({
-        title: 'Change ' + p.name,
-        message: 'Changing ' + p.name + ' of ' + (node.name || node.type) + ' may break routing. Continue?',
-        confirmLabel: 'Change',
+        title: t('manager2.ui.config.changeTitle', p.name),
+        message: t('manager2.ui.config.changeMessage', p.name, node.name || typeLabel(node.type)),
+        confirmLabel: t('manager2.ui.config.change'),
         danger: true,
         requireText: formatValue(p.value) || node.name,
       });
@@ -436,16 +465,16 @@ export async function configuration(container) {
       existing.remove();
       return;
     }
-    const nameInput = el('input', { type: 'text', class: 'config-input', placeholder: 'parameter name (e.g. url, maxTotal)' });
-    const valueInput = el('input', { type: 'text', class: 'config-input', placeholder: 'value' });
+    const nameInput = el('input', { type: 'text', class: 'config-input', placeholder: t('manager2.ui.config.paramNamePlaceholder') });
+    const valueInput = el('input', { type: 'text', class: 'config-input', placeholder: t('manager2.ui.config.valuePlaceholder') });
     const form = el('div', { class: 'config-param-form' },
         nameInput,
         valueInput,
         el('button', {
           type: 'button', class: 'btn btn-sm btn-primary',
           onclick: () => addParameter(node, nameInput.value.trim(), valueInput.value),
-        }, 'Add'),
-        el('button', { type: 'button', class: 'btn btn-sm', onclick: () => form.remove() }, 'Cancel'));
+        }, t('manager2.ui.common.add')),
+        el('button', { type: 'button', class: 'btn btn-sm', onclick: () => form.remove() }, t('manager2.ui.common.cancel')));
     heading.after(form);
     nameInput.focus();
   }
@@ -455,7 +484,7 @@ export async function configuration(container) {
   // time.
   async function addParameter(node, name, value) {
     if (!name) {
-      toast('A parameter name is required.', 'error');
+      toast(t('manager2.ui.config.paramNameRequired'), 'error');
       return;
     }
     try {
@@ -471,7 +500,7 @@ export async function configuration(container) {
   // drops parameters whose value is empty.
   async function removeParameter(node, p) {
     if (!paramSet(p)) {
-      toast('This parameter is not set.', 'info');
+      toast(t('manager2.ui.config.paramNotSet'), 'info');
       return;
     }
     try {
@@ -519,15 +548,15 @@ export async function configuration(container) {
     if (!types.length) return;
 
     const select = el('select', { class: 'config-input' },
-        types.map((t) => el('option', { value: t }, t)));
+        types.map((ty) => el('option', { value: ty }, typeLabel(ty))));
     const fieldsWrap = el('div', { class: 'form-grid' });
     const noteWrap = el('div', {});
 
     function currentCtx(type) {
       if (type !== 'resource') return {};
-      const t = document.getElementById('c-type');
-      const f = document.getElementById('c-factory');
-      return { jndiType: t ? t.value.trim() : '', factory: f ? f.value.trim() : '' };
+      const typeEl = document.getElementById('c-type');
+      const factoryEl = document.getElementById('c-factory');
+      return { jndiType: typeEl ? typeEl.value.trim() : '', factory: factoryEl ? factoryEl.value.trim() : '' };
     }
 
     function renderFields() {
@@ -559,17 +588,16 @@ export async function configuration(container) {
         const current = (parent.children || []).find((c) => c.type === type);
         if (current) {
           noteWrap.append(el('p', { class: 'muted' },
-              'Replaces the current ' + type + ' (' + (current.name || current.className) + ').'));
+              t('manager2.ui.config.replaceNote', typeLabel(type), current.name || current.className)));
         }
       }
       if (type === 'resource') {
         noteWrap.append(el('p', { class: 'muted' },
-            'The options of a first party factory are shown as fields; further parameters can be edited in the entry detail.'));
+            t('manager2.ui.config.factoryOptionsNote')));
       }
       if (type === 'upgradeProtocol') {
         noteWrap.append(el('p', { class: 'muted' },
-            'The default class is the HTTP/2 upgrade protocol. '
-            + 'The protocol only becomes active when the connector is restarted.'));
+            t('manager2.ui.config.upgradeProtocolNote')));
       }
     }
     // The factory options of a resource depend on the (effective)
@@ -584,17 +612,17 @@ export async function configuration(container) {
     renderFields();
 
     const body = el('div', {},
-        el('div', { class: 'field' }, el('label', {}, 'Component type'), select),
+        el('div', { class: 'field' }, el('label', {}, t('manager2.ui.config.componentType')), select),
         fieldsWrap,
         noteWrap);
 
     modal({
-      title: 'Add ' + parent.type + ' child',
+      title: t('manager2.ui.config.addChildTitle', typeLabel(parent.type)),
       content: body,
       actions: [
-        { label: 'Cancel' },
+        { label: t('manager2.ui.common.cancel') },
         {
-          label: 'Add',
+          label: t('manager2.ui.common.add'),
           class: 'btn-primary',
           onClick: async (close) => {
             const type = select.value;
@@ -633,11 +661,11 @@ export async function configuration(container) {
   // location (and, for PEM files, the individual file paths).
   function certificateFields() {
     return [
-      ['Certificate type', select('c-cert-type', CERT_TYPES)],
-      ['Keystore file', input('c-cert-file', 'text', 'conf/keystore.p12'), true],
-      ['Keystore password', input('c-cert-pass', 'password', 'changeit')],
-      ['Key alias', input('c-cert-alias', 'text', 'tomcat')],
-      ['Keystore type', input('c-cert-storetype', 'text', 'PKCS12')],
+      [t('manager2.ui.config.certType'), select('c-cert-type', CERT_TYPES)],
+      [t('manager2.ui.config.keystoreFile'), input('c-cert-file', 'text', 'conf/keystore.p12'), true],
+      [t('manager2.ui.config.keystorePassword'), input('c-cert-pass', 'password', 'changeit')],
+      [t('manager2.ui.config.keyAlias'), input('c-cert-alias', 'text', 'tomcat')],
+      [t('manager2.ui.config.keystoreType'), input('c-cert-storetype', 'text', 'PKCS12')],
     ];
   }
 
@@ -680,132 +708,132 @@ export async function configuration(container) {
   function childFields(type, ctx) {
     switch (type) {
       case 'service':
-        return [['Name', input('c-name', 'text', 'Catalina2')]];
+        return [[t('manager2.ui.config.name'), input('c-name', 'text', 'Catalina2')]];
       case 'resource': {
         const fields = [
-          ['JNDI name', input('c-name', 'text', 'jdbc/MyDB')],
-          ['Type', input('c-type', 'text', 'javax.sql.DataSource')],
-          ['Factory', input('c-factory', 'text', BASIC_DATA_SOURCE_FACTORY), true],
-          ['Auth', input('c-auth', 'text', 'Container')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'jdbc/MyDB')],
+          [t('manager2.ui.config.typeLabel'), input('c-type', 'text', 'javax.sql.DataSource')],
+          [t('manager2.ui.config.factory'), input('c-factory', 'text', BASIC_DATA_SOURCE_FACTORY), true],
+          [t('manager2.ui.config.auth'), input('c-auth', 'text', 'Container')],
         ];
         fields.push(...resourceOptionFields(ctx && ctx.jndiType, ctx && ctx.factory).fields);
         return fields;
       }
       case 'resourceLink':
         return [
-          ['JNDI name', input('c-name', 'text', 'jdbc/MyDB')],
-          ['Type', input('c-type', 'text', 'javax.sql.DataSource')],
-          ['Global JNDI name', input('c-global', 'text', 'jdbc/MyGlobalDB')],
-          ['Factory', input('c-factory', 'text', ''), true],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'jdbc/MyDB')],
+          [t('manager2.ui.config.typeLabel'), input('c-type', 'text', 'javax.sql.DataSource')],
+          [t('manager2.ui.config.globalJndiName'), input('c-global', 'text', 'jdbc/MyGlobalDB')],
+          [t('manager2.ui.config.factory'), input('c-factory', 'text', ''), true],
         ];
       case 'resourceEnvRef':
         return [
-          ['JNDI name', input('c-name', 'text', 'jdbc/MyDB')],
-          ['Type', input('c-type', 'text', 'javax.sql.DataSource')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'jdbc/MyDB')],
+          [t('manager2.ui.config.typeLabel'), input('c-type', 'text', 'javax.sql.DataSource')],
         ];
       case 'environment':
         return [
-          ['JNDI name', input('c-name', 'text', 'mail/Session')],
-          ['Type', input('c-type', 'text', 'java.lang.String')],
-          ['Value', input('c-value', 'text', '')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'mail/Session')],
+          [t('manager2.ui.config.typeLabel'), input('c-type', 'text', 'java.lang.String')],
+          [t('manager2.ui.config.valueLabel'), input('c-value', 'text', '')],
         ];
       case 'ejb':
         return [
-          ['JNDI name', input('c-name', 'text', 'ejb/MyBean')],
-          ['Type (home interface)', input('c-type', 'text', 'org.example.MyBeanHome')],
-          ['Link', input('c-link', 'text', '')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'ejb/MyBean')],
+          [t('manager2.ui.config.typeHomeInterface'), input('c-type', 'text', 'org.example.MyBeanHome')],
+          [t('manager2.ui.config.link'), input('c-link', 'text', '')],
         ];
       case 'localEjb':
         return [
-          ['JNDI name', input('c-name', 'text', 'ejb/MyBean')],
-          ['Type (local home)', input('c-type', 'text', 'org.example.MyBeanLocalHome')],
-          ['Local (business interface)', input('c-local', 'text', '')],
-          ['Link', input('c-link', 'text', '')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'ejb/MyBean')],
+          [t('manager2.ui.config.typeLocalHome'), input('c-type', 'text', 'org.example.MyBeanLocalHome')],
+          [t('manager2.ui.config.typeLocalInterface'), input('c-local', 'text', '')],
+          [t('manager2.ui.config.link'), input('c-link', 'text', '')],
         ];
       case 'serviceRef':
         return [
-          ['JNDI name', input('c-name', 'text', 'service/MyService')],
-          ['Type (service interface)', input('c-type', 'text', 'org.example.MyService')],
-          ['Display name', input('c-displayname', 'text', '')],
+          [t('manager2.ui.config.jndiName'), input('c-name', 'text', 'service/MyService')],
+          [t('manager2.ui.config.typeServiceInterface'), input('c-type', 'text', 'org.example.MyService')],
+          [t('manager2.ui.apps.displayName'), input('c-displayname', 'text', '')],
         ];
       case 'host':
         return [
-          ['Name', input('c-name', 'text', 'example.com')],
-          ['Aliases (comma separated)', input('c-aliases', 'text', 'www.example.com')],
-          ['App base', input('c-appbase', 'text', 'webapps/example.com'), true],
+          [t('manager2.ui.config.name'), input('c-name', 'text', 'example.com')],
+          [t('manager2.ui.hosts.aliasesLabel'), input('c-aliases', 'text', 'www.example.com')],
+          [t('manager2.ui.hosts.appBase'), input('c-appbase', 'text', 'webapps/example.com'), true],
         ];
       case 'context':
         return [
-          ['Path', input('c-path', 'text', '/myapp')],
-          ['Display name', input('c-display', 'text', '')],
-          ['Doc base', input('c-docbase', 'text', 'relative to the host app base, or a .war'), true],
+          [t('manager2.ui.config.path'), input('c-path', 'text', '/myapp')],
+          [t('manager2.ui.apps.displayName'), input('c-display', 'text', '')],
+          [t('manager2.ui.apps.docBase'), input('c-docbase', 'text', t('manager2.ui.config.docBasePlaceholder')), true],
         ];
       case 'wrapper':
         return [
-          ['Name', input('c-name', 'text', 'myservlet')],
-          ['Servlet class', input('c-servlet', 'text', 'org.example.MyServlet'), true],
-          ['URL patterns (comma separated)', input('c-urlpats', 'text', '/hello, /hi'), true],
+          [t('manager2.ui.config.name'), input('c-name', 'text', 'myservlet')],
+          [t('manager2.ui.config.servletClass'), input('c-servlet', 'text', 'org.example.MyServlet'), true],
+          [t('manager2.ui.config.urlPatterns'), input('c-urlpats', 'text', '/hello, /hi'), true],
         ];
       case 'valve':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.valves.AccessLogValve'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.valves.AccessLogValve'), true]];
       case 'listener':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.mbeans.GlobalResourcesLifecycleListener'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.mbeans.GlobalResourcesLifecycleListener'), true]];
       case 'cluster':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.ha.tcp.SimpleTcpCluster'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.ha.tcp.SimpleTcpCluster'), true]];
       case 'clusterValve':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.ha.tcp.ReplicationValve'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.ha.tcp.ReplicationValve'), true]];
       case 'channel':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.group.GroupChannel'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.group.GroupChannel'), true]];
       case 'membership':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.membership.McastService'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.membership.McastService'), true]];
       case 'sender':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.transport.ReplicationTransmitter'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.transport.ReplicationTransmitter'), true]];
       case 'receiver':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.transport.nio.NioReceiver'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.transport.nio.NioReceiver'), true]];
       case 'interceptor':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor'), true]];
       case 'deployer':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.ha.deploy.FarmWarDeployer'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.ha.deploy.FarmWarDeployer'), true]];
       case 'clusterManager':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.ha.session.DeltaManager'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.ha.session.DeltaManager'), true]];
       case 'transport':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.tribes.transport.nio.PooledParallelSender'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.tribes.transport.nio.PooledParallelSender'), true]];
       case 'clusterListener':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.ha.session.ClusterSessionListener'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.ha.session.ClusterSessionListener'), true]];
       case 'realm':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.realm.UserDatabaseRealm'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.realm.UserDatabaseRealm'), true]];
       case 'manager':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.session.StandardManager'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.session.StandardManager'), true]];
       case 'sessionIdGenerator':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.util.StandardSessionIdGenerator'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.util.StandardSessionIdGenerator'), true]];
       case 'resources':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.webresources.StandardRoot'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.webresources.StandardRoot'), true]];
       case 'loader':
-        return [['Class name', input('c-class', 'text', 'org.apache.catalina.loader.WebappLoader'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.catalina.loader.WebappLoader'), true]];
       case 'cookieProcessor':
-        return [['Class name', input('c-class', 'text', 'org.apache.tomcat.util.http.Rfc6265CookieProcessor'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.tomcat.util.http.Rfc6265CookieProcessor'), true]];
       case 'connector':
         return [
-          ['Protocol', input('c-protocol', 'text', 'HTTP/1.1')],
-          ['Port', input('c-port', 'text', '8081')],
+          [t('manager2.ui.config.protocol'), input('c-protocol', 'text', 'HTTP/1.1')],
+          [t('manager2.ui.config.port'), input('c-port', 'text', '8081')],
         ];
       case 'executor':
         return [
-          ['Name', input('c-name', 'text', 'tomcatThreadPool')],
-          ['Max threads', input('c-maxthreads', 'text', '150')],
-          ['Min spare threads', input('c-minspare', 'text', '4')],
+          [t('manager2.ui.config.name'), input('c-name', 'text', 'tomcatThreadPool')],
+          [t('manager2.ui.config.maxThreads'), input('c-maxthreads', 'text', '150')],
+          [t('manager2.ui.config.minSpareThreads'), input('c-minspare', 'text', '4')],
         ];
       case 'alias':
-        return [['Alias', input('c-alias', 'text', 'www.example.com')]];
+        return [[t('manager2.ui.config.alias'), input('c-alias', 'text', 'www.example.com')]];
       case 'sslHostConfig':
         return [
-          ['Host name', input('c-hostname', 'text', '_default_'), true],
+          [t('manager2.ui.config.hostName'), input('c-hostname', 'text', '_default_'), true],
           ...certificateFields(),
         ];
       case 'certificate':
         return certificateFields();
       case 'upgradeProtocol':
-        return [['Class name', input('c-class', 'text', 'org.apache.coyote.http2.Http2Protocol'), true]];
+        return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.coyote.http2.Http2Protocol'), true]];
       default:
         return [];
     }
@@ -909,9 +937,9 @@ export async function configuration(container) {
   async function removeNode(d) {
     const label = d.name || d.type;
     const ok = await confirm({
-      title: 'Remove ' + d.type,
-      message: 'Remove ' + label + ' from the running server? This cannot be undone without a reload.',
-      confirmLabel: 'Remove',
+      title: t('manager2.ui.config.removeTitle', typeLabel(d.type)),
+      message: t('manager2.ui.config.removeMessage', label),
+      confirmLabel: t('manager2.ui.common.remove'),
       danger: true,
       requireText: label,
     });
@@ -931,7 +959,7 @@ export async function configuration(container) {
 
   function renderEmpty() {
     detailCard.append(el('div', { class: 'empty' },
-        el('p', {}, 'Select a component in the tree to inspect and edit it.')));
+        el('p', {}, t('manager2.ui.config.selectComponent'))));
   }
 
   // ============================ Lifecycle =============================
@@ -958,23 +986,23 @@ export async function configuration(container) {
     if (!d.lifecycle) return [];
     const running = isRunning(d);
     const selfImpact = d.affectsSelf;
-    const selfImpactTitle = 'This component serves this page: starting or stopping it would interrupt access to the manager. Use Restart instead.';
+    const selfImpactTitle = t('manager2.ui.config.selfImpactTitle');
     return [
       {
-        label: 'Start',
+        label: t('manager2.ui.common.start'),
         disabled: running || selfImpact,
-        title: selfImpact ? selfImpactTitle : 'Start',
+        title: selfImpact ? selfImpactTitle : t('manager2.ui.common.start'),
         onclick: () => lifecycleOp(d, 'start'),
       },
       {
-        label: 'Stop',
+        label: t('manager2.ui.common.stop'),
         disabled: !running || selfImpact,
-        title: selfImpact ? selfImpactTitle : 'Stop',
+        title: selfImpact ? selfImpactTitle : t('manager2.ui.common.stop'),
         onclick: () => lifecycleOp(d, 'stop'),
       },
       {
-        label: 'Restart',
-        title: 'Stop the component and start it again',
+        label: t('manager2.ui.common.restart'),
+        title: t('manager2.ui.config.restartHelp'),
         onclick: () => lifecycleOp(d, 'restart'),
       },
     ];
@@ -988,18 +1016,18 @@ export async function configuration(container) {
       ok = true;
     } else if (op === 'stop') {
       ok = await confirm({
-        title: 'Stop ' + d.type,
-        message: 'Stop ' + label + '? Any in-memory state it holds (e.g. the sessions of the contexts below it) is lost.',
-        confirmLabel: 'Stop',
+        title: t('manager2.ui.config.stopTitle', typeLabel(d.type)),
+        message: t('manager2.ui.config.stopMessage', label),
+        confirmLabel: t('manager2.ui.common.stop'),
         danger: false,
       });
     } else {
       ok = await confirm({
-        title: 'Restart ' + d.type,
-        message: 'Restart ' + label + '?' + (d.affectsSelf
-            ? ' This component serves this page: the connection is interrupted during the operation and the page reconnects when it is done. When the restarted component holds the admin sessions (the server, a service, an engine, a host or this context) you will need to sign in again.'
-            : ''),
-        confirmLabel: 'Restart',
+        title: t('manager2.ui.config.restartTitle', typeLabel(d.type)),
+        message: d.affectsSelf
+            ? t('manager2.ui.config.restartMessageSelf', label)
+            : t('manager2.ui.config.restartMessage', label),
+        confirmLabel: t('manager2.ui.common.restart'),
         danger: true,
         requireText: label,
       });
@@ -1039,12 +1067,12 @@ export async function configuration(container) {
   // navigates to the login page, and a successful login returns to this
   // page.
   async function reconnectAfterLifecycle() {
-    toast('The connection was interrupted during the operation - this is expected when the component that serves this page is restarted. Reconnecting...', 'info', 8000);
+    toast(t('manager2.ui.config.reconnecting'), 'info', 8000);
     for (let attempt = 0; attempt < 10; attempt++) {
       await sleep(1000);
       try {
         await api('GET', '/api/csrf');
-        toast('Reconnected. Reloading the components.', 'ok');
+        toast(t('manager2.ui.config.reconnected'), 'ok');
         await loadTree();
         if (selectedId) {
           selectNode(selectedId);
@@ -1057,7 +1085,7 @@ export async function configuration(container) {
         if (err && err.message === 'unauthenticated') return;
       }
     }
-    toast('Could not reconnect after the operation. The component may still be stopped - check the server status and try again.', 'error', 10000);
+    toast(t('manager2.ui.config.reconnectFailed'), 'error', 10000);
   }
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -1078,30 +1106,30 @@ export async function configuration(container) {
     const input = el('input', { type: 'text', autocomplete: 'off', placeholder: 'server.xml', class: 'config-input' });
     const body = el('div', {},
         el('p', { style: 'margin-top:0;color:var(--text-soft)' },
-            'This will overwrite conf/server.xml with the live state (a timestamped backup is kept).'));
+            t('manager2.ui.config.storeWarning')));
     if (files.length) {
       body.append(el('p', { style: 'color:var(--text-soft)' },
-          'It will also rewrite the following context configuration files:'),
+          t('manager2.ui.config.storeFiles')),
           el('ul', { class: 'config-file-list' },
               files.map((f) => el('li', {}, el('code', {}, f)))));
     }
     body.append(
         el('div', { class: 'field', style: 'margin-bottom:12px' },
-            el('label', {}, 'Type ', el('code', {}, 'server.xml'), ' to confirm'), input),
+            el('label', {}, ...codeNodes('manager2.ui.confirm.typeToConfirm', ['server.xml'])), input),
         pre);
     if (data.restartsManager) {
       body.append(el('div', { class: 'config-store-warning' },
-          el('strong', {}, 'Warning: '),
-          'the file of the context this manager runs in is among them. Saving will restart the manager and reset your session - you will need to log in again.'));
+          el('strong', {}, t('manager2.ui.config.warning')),
+          t('manager2.ui.config.storeManagerWarning')));
     }
     modal({
-      title: 'Save to server.xml',
+      title: t('manager2.ui.config.save'),
       wide: true,
       content: body,
       actions: [
-        { label: 'Cancel' },
+        { label: t('manager2.ui.common.cancel') },
         {
-          label: 'Save',
+          label: t('manager2.ui.common.save'),
           class: 'btn-primary',
           onClick: async (close) => {
             if (input.value.trim() !== 'server.xml') {

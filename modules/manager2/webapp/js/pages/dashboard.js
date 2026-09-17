@@ -16,6 +16,7 @@
  */
 
 import { BASE, get } from '../api.js';
+import { t } from '../i18n.js';
 import { el, clear, formatBytes, formatRate, formatDuration, stateBadge } from '../ui.js';
 import { LineChart, palette } from '../charts.js';
 
@@ -35,7 +36,7 @@ function chartCard(title, extra) {
 export async function dashboard(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Dashboard'),
+          el('h1', {}, t('manager2.ui.dashboard.title')),
           el('p', {}, '')));
   const subtitle = view.querySelector('.page-head p');
   container.append(view);
@@ -54,16 +55,16 @@ export async function dashboard(container) {
     };
     kpiGrid.append(card);
   }
-  kpi('heap', 'Heap used');
-  kpi('threads', 'Busy threads');
-  kpi('sessions', 'Active sessions');
-  kpi('rps', 'Requests / s');
-  kpi('errors', 'Errors / s');
+  kpi('heap', t('manager2.ui.dashboard.kpi.heapUsed'));
+  kpi('threads', t('manager2.ui.dashboard.kpi.busyThreads'));
+  kpi('sessions', t('manager2.ui.dashboard.kpi.activeSessions'));
+  kpi('rps', t('manager2.ui.dashboard.kpi.requestsPerSecond'));
+  kpi('errors', t('manager2.ui.dashboard.kpi.errorsPerSecond'));
   view.append(kpiGrid);
 
   // ---------------- Charts ----------------
   const grid = el('div', { class: 'grid charts' });
-  const heapCard = chartCard('JVM heap', 'col-6');
+  const heapCard = chartCard(t('manager2.ui.dashboard.chart.heap'), 'col-6');
   const heapCanvas = heapCard.querySelector('canvas');
   const heapChart = new LineChart(heapCanvas, {
     series: [
@@ -74,10 +75,10 @@ export async function dashboard(container) {
     formatValue: (v) => formatBytes(v),
   });
   heapCard.append(el('div', { class: 'chart-legend' },
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(0) }), 'used'),
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(1) }), 'committed')));
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(0) }), t('manager2.ui.dashboard.legend.used')),
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(1) }), t('manager2.ui.dashboard.legend.committed'))));
 
-  const threadsCard = chartCard('Busy threads', 'col-6');
+  const threadsCard = chartCard(t('manager2.ui.dashboard.chart.threads'), 'col-6');
   const threadsCanvas = threadsCard.querySelector('canvas');
   const threadsChart = new LineChart(threadsCanvas, {
     series: [{ name: 'busy', color: palette(2) }],
@@ -85,7 +86,7 @@ export async function dashboard(container) {
     formatValue: (v) => String(Math.round(v)),
   });
 
-  const rateCard = chartCard('Request rate', 'col-6');
+  const rateCard = chartCard(t('manager2.ui.dashboard.chart.requestRate'), 'col-6');
   const rateCanvas = rateCard.querySelector('canvas');
   const rateChart = new LineChart(rateCanvas, {
     series: [
@@ -96,10 +97,10 @@ export async function dashboard(container) {
     formatValue: (v) => v.toFixed(1),
   });
   rateCard.append(el('div', { class: 'chart-legend' },
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(1) }), 'requests/s'),
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(3) }), 'errors/s')));
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(1) }), t('manager2.ui.dashboard.legend.requestsPerSecond')),
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(3) }), t('manager2.ui.dashboard.legend.errorsPerSecond'))));
 
-  const bytesCard = chartCard('Network', 'col-6');
+  const bytesCard = chartCard(t('manager2.ui.dashboard.chart.network'), 'col-6');
   const bytesCanvas = bytesCard.querySelector('canvas');
   const bytesChart = new LineChart(bytesCanvas, {
     series: [
@@ -110,8 +111,8 @@ export async function dashboard(container) {
     formatValue: (v) => formatBytes(v),
   });
   bytesCard.append(el('div', { class: 'chart-legend' },
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(4) }), 'sent B/s'),
-      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(5) }), 'received B/s')));
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(4) }), t('manager2.ui.dashboard.legend.sentPerSecond')),
+      el('span', {}, el('span', { class: 'swatch', style: 'background:' + palette(5) }), t('manager2.ui.dashboard.legend.receivedPerSecond'))));
 
   grid.append(heapCard, threadsCard, rateCard, bytesCard);
   view.append(grid);
@@ -119,7 +120,7 @@ export async function dashboard(container) {
   // ---------------- Applications strip ----------------
   const appsCard = el('div', { class: 'card' },
       el('div', { class: 'card-title-row' },
-          el('h3', {}, el('span', { class: 'live-dot' }), 'Applications')),
+          el('h3', {}, el('span', { class: 'live-dot' }), t('manager2.ui.nav.apps'))),
       el('div', { class: 'table-wrap' }));
   const appsTableWrap = appsCard.querySelector('.table-wrap');
   view.append(appsCard);
@@ -134,16 +135,15 @@ export async function dashboard(container) {
 
   function render(data) {
     if (!subtitleSet) {
-      subtitle.textContent = 'Charts show the last ' + formatDuration(data.windowMs) +
-          ' of server activity. One sample every ' + (data.tickMs / 1000) +
-          ' s, collected in the background.';
+      subtitle.textContent = t('manager2.ui.dashboard.subtitle',
+          formatDuration(data.windowMs), data.tickMs / 1000);
       subtitleSet = true;
     }
 
     const sample = data.samples.length > 0 ? data.samples[data.samples.length - 1] : null;
     if (sample) {
       kpiRefs.heap.value.textContent = formatBytes(sample.heapUsed);
-      kpiRefs.heap.sub.textContent = 'of ' + formatBytes(sample.heapMax);
+      kpiRefs.heap.sub.textContent = t('manager2.ui.dashboard.of', formatBytes(sample.heapMax));
       kpiRefs.threads.value.textContent = sample.threadsBusy + ' / ' + sample.threadsMax;
       kpiRefs.sessions.value.textContent = String(sample.sessions);
       // The rates are computed by the server; the first sample has no
@@ -179,9 +179,9 @@ export async function dashboard(container) {
         el('td', { class: 'num' }, String(a.activeSessions))));
     appsTableWrap.append(el('table', { class: 'data' },
         el('thead', {}, el('tr', {},
-            el('th', {}, 'Path'),
-            el('th', {}, 'State'),
-            el('th', {}, 'Sessions'))),
+            el('th', {}, t('manager2.ui.col.path')),
+            el('th', {}, t('manager2.ui.col.state')),
+            el('th', {}, t('manager2.ui.col.sessions')))),
         el('tbody', {}, rows.length > 0 ? rows
             : el('tr', {}, el('td', { colspan: '3', class: 'empty' }, 'No applications deployed')))));
   }

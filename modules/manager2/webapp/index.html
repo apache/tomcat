@@ -15,12 +15,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Tomcat Manager</title>
+  <title>#{manager2.ui.brand.name}</title>
   <!-- MANAGER2_BASE -->
   <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/manager2.css">
@@ -30,17 +30,17 @@
     <header class="topbar">
       <div class="topbar-brand">
         <img class="logo" src="images/tomcat.svg" alt="" aria-hidden="true">
-        <span class="brand-name">Tomcat Manager</span>
+        <span class="brand-name">#{manager2.ui.brand.name}</span>
         <span class="brand-version" id="server-version"></span>
       </div>
       <div class="topbar-status" id="server-status"></div>
       <div class="topbar-actions">
-        <button type="button" class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme"></button>
-        <button type="button" class="btn btn-ghost" id="logout" data-logout>Log out</button>
+        <button type="button" class="icon-btn" id="theme-toggle" title="#{manager2.ui.shell.theme.toggle}" aria-label="#{manager2.ui.shell.theme.toggle}"></button>
+        <button type="button" class="btn btn-ghost" id="logout" data-logout>#{manager2.ui.shell.logout}</button>
       </div>
     </header>
     <div class="shell-main">
-      <nav class="sidenav" aria-label="Main navigation">
+      <nav class="sidenav" aria-label="#{manager2.ui.shell.nav}">
         <button type="button" class="nav-item" data-nav="/" data-route="/"></button>
         <button type="button" class="nav-item" data-nav="/apps" data-route="/apps"></button>
         <button type="button" class="nav-item" data-nav="/hosts" data-route="/hosts"></button>
@@ -57,7 +57,7 @@
   <div id="toast-region" class="toast-region" role="status" aria-live="polite"></div>
   <div id="modal-root"></div>
   <noscript>
-    <p>The Tomcat Manager requires JavaScript.</p>
+    <p>#{manager2.ui.shell.noscript}</p>
   </noscript>
   <script type="module" src="js/main.js"></script>
 </body>

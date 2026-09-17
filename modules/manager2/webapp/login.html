@@ -15,12 +15,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Log in &middot; Tomcat Manager</title>
+  <title>#{manager2.ui.login.title}</title>
 
   <link rel="icon" href="images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/manager2.css">
@@ -31,25 +31,24 @@
       <span class="login-logo" aria-hidden="true">
         <img src="images/tomcat.svg" alt="">
       </span>
-      <h1>Apache Tomcat</h1>
-      <p class="login-sub">Manager &mdash; sign in to manage your server.</p>
+      <h1>#{manager2.ui.login.brand}</h1>
+      <p class="login-sub">#{manager2.ui.login.subtitle}</p>
     </div>
     <div class="login-error" id="login-error" hidden role="alert">
-      <strong>Sign in failed.</strong> Your user name or password was incorrect.
+      <strong>#{manager2.ui.login.errorTitle}</strong> #{manager2.ui.login.errorText}
     </div>
     <form method="post" action="j_security_check" class="login-form">
       <div class="field">
-        <label for="j_username">User name</label>
+        <label for="j_username">#{manager2.ui.login.username}</label>
         <input type="text" id="j_username" name="j_username" autocomplete="username" required autofocus>
       </div>
       <div class="field">
-        <label for="j_password">Password</label>
+        <label for="j_password">#{manager2.ui.login.password}</label>
         <input type="password" id="j_password" name="j_password" autocomplete="current-password" required>
       </div>
-      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+      <button type="submit" class="btn btn-primary btn-block">#{manager2.ui.login.submit}</button>
     </form>
-    <p class="login-foot">Use an account with the <code>manager-gui</code> role for full access or
-      <code>manager-status</code> for read-only monitoring.</p>
+    <p class="login-foot">#{manager2.ui.login.foot}</p>
   </main>
 </body>
 </html>

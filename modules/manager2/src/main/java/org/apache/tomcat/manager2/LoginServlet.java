@@ -106,7 +106,8 @@ public class LoginServlet extends HttpServlet {
 
         String template = Html.readTemplate(getServletContext(), TEMPLATE);
         if (template == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Login page template missing");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    Strings.manager(request).getString("manager2.loginTemplateMissing"));
             return;
         }
         if (request.getParameter("error") != null) {

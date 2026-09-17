@@ -17,16 +17,17 @@
 
 import { get } from '../api.js';
 import { el, clear, formatBytes, formatMs } from '../ui.js';
+import { t, numberFormatter } from '../i18n.js';
 
 const POLL_MS = 5000;
 
 const STAGE_LABELS = {
-  P: 'Parsing request',
-  S: 'Service',
-  F: 'Finishing',
-  R: 'Ready',
-  K: 'Keep-alive',
-  '?': 'Unknown',
+  P: 'manager2.ui.monitoring.stage.parsing',
+  S: 'manager2.ui.monitoring.stage.service',
+  F: 'manager2.ui.monitoring.stage.finishing',
+  R: 'manager2.ui.monitoring.stage.ready',
+  K: 'manager2.ui.monitoring.stage.keepAlive',
+  '?': 'manager2.ui.monitoring.stage.unknown',
 };
 
 // Only these stages are doing real work; R (ready), K (keep-alive) and '?'
@@ -35,7 +36,9 @@ const ACTIVE_STAGES = new Set(['P', 'S', 'F']);
 const STAGE_BADGES = { P: 'info', S: 'ok', F: 'warn' };
 
 function pctText(fraction) {
-  return fraction == null ? '-' : (fraction * 100).toFixed(1) + ' %';
+  return fraction == null
+      ? '-'
+      : numberFormatter({ minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(fraction * 100) + ' %';
 }
 
 function usageBar(fraction) {
@@ -66,20 +69,19 @@ function fact(label, value) {
 export async function monitoring(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Monitoring'),
-          el('p', {}, 'Instant CPU and memory snapshot, live connectors and worker (socket) table. ' +
-              'Refreshes every 5 seconds; paused while the tab is hidden.')));
+          el('h1', {}, t('manager2.ui.nav.monitoring')),
+          el('p', {}, t('manager2.ui.monitoring.subtitle'))));
   container.append(view);
 
   const sysGrid = el('div', { class: 'grid charts' });
   const cpuCard = el('div', { class: 'card col-6' },
       el('div', { class: 'card-title-row' },
-          el('h3', {}, el('span', { class: 'live-dot' }), 'CPU')),
+          el('h3', {}, el('span', { class: 'live-dot' }), t('manager2.ui.monitoring.cpu'))),
       el('div', { class: 'sys-body' }));
   const cpuBody = cpuCard.querySelector('.sys-body');
   const memoryCard = el('div', { class: 'card col-6' },
       el('div', { class: 'card-title-row' },
-          el('h3', {}, el('span', { class: 'live-dot' }), 'Memory')),
+          el('h3', {}, el('span', { class: 'live-dot' }), t('manager2.ui.monitoring.memory'))),
       el('div', { class: 'sys-body' }));
   const memoryBody = memoryCard.querySelector('.sys-body');
   sysGrid.append(cpuCard, memoryCard);
@@ -87,14 +89,14 @@ export async function monitoring(container) {
 
   const connectorsCard = el('div', { class: 'card' },
       el('div', { class: 'card-title-row' },
-          el('h3', {}, el('span', { class: 'live-dot' }), 'Connectors')),
+          el('h3', {}, el('span', { class: 'live-dot' }), t('manager2.ui.monitoring.connectors'))),
       el('div', { class: 'table-wrap stackable' }));
   const connectorsWrap = connectorsCard.querySelector('.table-wrap');
   view.append(connectorsCard);
 
   const workersCard = el('div', { class: 'card' },
       el('div', { class: 'card-title-row' },
-          el('h3', {}, el('span', { class: 'live-dot' }), 'Active workers'),
+          el('h3', {}, el('span', { class: 'live-dot' }), t('manager2.ui.monitoring.workers')),
           el('span', { id: 'worker-count', class: 'badge plain' })),
       el('div', { class: 'table-wrap' }));
   const workersWrap = workersCard.querySelector('.table-wrap');
@@ -133,47 +135,53 @@ export async function monitoring(container) {
   function renderCpu(cpu) {
     clear(cpuBody);
     if (!cpu) {
-      cpuBody.append(el('div', { class: 'empty' }, 'Not available'));
+      cpuBody.append(el('div', { class: 'empty' }, t('manager2.ui.monitoring.notAvailable')));
       return;
     }
     cpuBody.append(
-        metric('System CPU', pctText(cpu.systemLoad), cpu.systemLoad),
-        metric('JVM process CPU', pctText(cpu.processLoad), cpu.processLoad),
+        metric(t('manager2.ui.monitoring.systemCpu'), pctText(cpu.systemLoad), cpu.systemLoad),
+        metric(t('manager2.ui.monitoring.processCpu'), pctText(cpu.processLoad), cpu.processLoad),
         el('div', { class: 'sys-facts' },
-            fact('Cores', String(cpu.availableProcessors)),
-            fact('Load average', cpu.loadAverage != null ? cpu.loadAverage.toFixed(2) : '-'),
-            fact('Threads', cpu.threads + ' live'),
-            fact('Daemon threads', String(cpu.daemonThreads)),
-            fact('Peak threads', String(cpu.peakThreads))));
+            fact(t('manager2.ui.monitoring.cores'), String(cpu.availableProcessors)),
+            fact(t('manager2.ui.monitoring.loadAverage'),
+                cpu.loadAverage != null
+                    ? numberFormatter({ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cpu.loadAverage)
+                    : '-'),
+            fact(t('manager2.ui.monitoring.threads'), t('manager2.ui.monitoring.threadsLive', cpu.threads)),
+            fact(t('manager2.ui.monitoring.daemonThreads'), String(cpu.daemonThreads)),
+            fact(t('manager2.ui.monitoring.peakThreads'), String(cpu.peakThreads))));
   }
 
   function renderMemory(mem) {
     clear(memoryBody);
     if (!mem) {
-      memoryBody.append(el('div', { class: 'empty' }, 'Not available'));
+      memoryBody.append(el('div', { class: 'empty' }, t('manager2.ui.monitoring.notAvailable')));
       return;
     }
     const heap = mem.heap || {};
     const nonHeap = mem.nonHeap || {};
     memoryBody.append(
         mem.physical && mem.physical.total > 0
-            ? metric('Physical memory',
-                formatBytes(mem.physical.total - mem.physical.free) + ' / ' +
-                formatBytes(mem.physical.total),
+            ? metric(t('manager2.ui.monitoring.physicalMemory'),
+                t('manager2.ui.monitoring.usedOfTotal',
+                    formatBytes(mem.physical.total - mem.physical.free), formatBytes(mem.physical.total)),
                 (mem.physical.total - mem.physical.free) / mem.physical.total)
-            : metric('Physical memory', '-', null),
+            : metric(t('manager2.ui.monitoring.physicalMemory'), '-', null),
         mem.swap && mem.swap.total > 0
-            ? metric('Swap',
-                formatBytes(mem.swap.total - mem.swap.free) + ' / ' + formatBytes(mem.swap.total),
+            ? metric(t('manager2.ui.monitoring.swap'),
+                t('manager2.ui.monitoring.usedOfTotal',
+                    formatBytes(mem.swap.total - mem.swap.free), formatBytes(mem.swap.total)),
                 (mem.swap.total - mem.swap.free) / mem.swap.total)
-            : metric('Swap', 'none', null),
+            : metric(t('manager2.ui.monitoring.swap'), t('manager2.ui.monitoring.none'), null),
         heap.max > 0
-            ? metric('JVM heap', formatBytes(heap.used) + ' / ' + formatBytes(heap.max),
+            ? metric(t('manager2.ui.monitoring.jvmHeap'),
+                t('manager2.ui.monitoring.usedOfTotal', formatBytes(heap.used), formatBytes(heap.max)),
                 heap.used / heap.max)
-            : metric('JVM heap', formatBytes(heap.used) + ' (unbounded)', null));
+            : metric(t('manager2.ui.monitoring.jvmHeap'),
+                t('manager2.ui.monitoring.heapUnbounded', formatBytes(heap.used)), null));
     memoryBody.append(el('div', { class: 'sys-facts' },
-        fact('Heap committed', formatBytes(heap.committed)),
-        fact('Non-heap used', formatBytes(nonHeap.used))));
+        fact(t('manager2.ui.monitoring.heapCommitted'), formatBytes(heap.committed)),
+        fact(t('manager2.ui.monitoring.nonHeapUsed'), formatBytes(nonHeap.used))));
 
     const pools = mem.pools || [];
     if (pools.length > 0) {
@@ -185,10 +193,10 @@ export async function monitoring(container) {
       memoryBody.append(el('div', { class: 'table-wrap' },
           el('table', { class: 'data' },
               el('thead', {}, el('tr', {},
-                  el('th', {}, 'Pool'),
-                  el('th', {}, 'Used'),
-                  el('th', {}, 'Committed'),
-                  el('th', {}, 'Max'))),
+                  el('th', {}, t('manager2.ui.monitoring.pool')),
+                  el('th', {}, t('manager2.ui.col.used')),
+                  el('th', {}, t('manager2.ui.col.committed')),
+                  el('th', {}, t('manager2.ui.col.max')))),
               el('tbody', {}, rows))));
     }
   }
@@ -196,28 +204,30 @@ export async function monitoring(container) {
   function renderConnectors(connectors) {
     clear(connectorsWrap);
     const rows = connectors.map((c) => el('tr', {},
-        el('td', { 'data-label': 'Connector' }, el('strong', {}, c.name)),
-        el('td', { class: 'num', 'data-label': 'Threads' }, c.threads.busy + ' / ' + c.threads.current + ' / ' + c.threads.max),
-        el('td', { class: 'num', 'data-label': 'Keep-alive' }, String(c.threads.keepAlive)),
+        el('td', { 'data-label': t('manager2.ui.monitoring.col.connector') }, el('strong', {}, c.name)),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.threads') },
+            c.threads.busy + ' / ' + c.threads.current + ' / ' + c.threads.max),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.keepAlive') }, String(c.threads.keepAlive)),
         c.requests
-            ? el('td', { class: 'num', 'data-label': 'Processing time' }, formatMs(c.requests.processingTime) + ' (max ' + formatMs(c.requests.maxTime) + ')')
-            : el('td', { 'data-label': 'Processing time' }, '-'),
-        el('td', { class: 'num', 'data-label': 'Requests' }, String(c.requests ? c.requests.count : '-')),
-        el('td', { class: 'num', 'data-label': 'Errors' }, String(c.requests ? c.requests.errors : '-')),
-        el('td', { class: 'num', 'data-label': 'Bytes in' }, c.requests ? formatBytes(c.requests.bytesReceived) : '-'),
-        el('td', { class: 'num', 'data-label': 'Bytes out' }, c.requests ? formatBytes(c.requests.bytesSent) : '-')));
+            ? el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.processingTime') },
+                t('manager2.ui.monitoring.processingTime', formatMs(c.requests.processingTime), formatMs(c.requests.maxTime)))
+            : el('td', { 'data-label': t('manager2.ui.monitoring.col.processingTime') }, '-'),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.requests') }, String(c.requests ? c.requests.count : '-')),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.errors') }, String(c.requests ? c.requests.errors : '-')),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.bytesIn') }, c.requests ? formatBytes(c.requests.bytesReceived) : '-'),
+        el('td', { class: 'num', 'data-label': t('manager2.ui.monitoring.col.bytesOut') }, c.requests ? formatBytes(c.requests.bytesSent) : '-')));
     connectorsWrap.append(el('table', { class: 'data' },
         el('thead', {}, el('tr', {},
-            el('th', {}, 'Connector'),
-            el('th', {}, 'Threads (busy / current / max)'),
-            el('th', {}, 'Keep-alive'),
-            el('th', {}, 'Processing time'),
-            el('th', {}, 'Requests'),
-            el('th', {}, 'Errors'),
-            el('th', {}, 'Bytes in'),
-            el('th', {}, 'Bytes out'))),
+            el('th', {}, t('manager2.ui.monitoring.col.connector')),
+            el('th', {}, t('manager2.ui.monitoring.col.threadsBusyCurrentMax')),
+            el('th', {}, t('manager2.ui.monitoring.col.keepAlive')),
+            el('th', {}, t('manager2.ui.monitoring.col.processingTime')),
+            el('th', {}, t('manager2.ui.monitoring.col.requests')),
+            el('th', {}, t('manager2.ui.monitoring.col.errors')),
+            el('th', {}, t('manager2.ui.monitoring.col.bytesIn')),
+            el('th', {}, t('manager2.ui.monitoring.col.bytesOut')))),
         el('tbody', {}, rows.length > 0 ? rows
-            : el('tr', {}, el('td', { colspan: '8', class: 'empty' }, 'No connectors found')))));
+            : el('tr', {}, el('td', { colspan: '8', class: 'empty' }, t('manager2.ui.monitoring.noConnectors'))))));
   }
 
   function renderWorkers(workers) {
@@ -225,13 +235,13 @@ export async function monitoring(container) {
     const active = workers.filter((w) => ACTIVE_STAGES.has(w.stage));
     const countBadge = document.getElementById('worker-count');
     if (countBadge) {
-      countBadge.textContent = active.length + ' active · ' +
-          (workers.length - active.length) + ' idle';
+      countBadge.textContent = t('manager2.ui.monitoring.workerCount',
+          active.length, workers.length - active.length);
     }
     const rows = active.map((w) => el('tr', {},
         el('td', {},
             el('span', { class: 'badge ' + (STAGE_BADGES[w.stage] || 'plain') },
-                w.stage + ' · ' + (STAGE_LABELS[w.stage] || ''))),
+                w.stage + ' · ' + (STAGE_LABELS[w.stage] ? t(STAGE_LABELS[w.stage]) : ''))),
         el('td', { class: 'num' }, w.time != null ? formatMs(w.time) : '-'),
         el('td', { class: 'num' }, w.bytesSent != null ? formatBytes(w.bytesSent) : '-'),
         el('td', { class: 'num' }, w.bytesReceived != null ? formatBytes(w.bytesReceived) : '-'),
@@ -244,15 +254,15 @@ export async function monitoring(container) {
                 : '-')));
     workersWrap.append(el('table', { class: 'data' },
         el('thead', {}, el('tr', {},
-            el('th', {}, 'Stage'),
-            el('th', {}, 'Time'),
-            el('th', {}, 'Sent'),
-            el('th', {}, 'Received'),
-            el('th', {}, 'Remote address'),
-            el('th', {}, 'Virtual host'),
-            el('th', {}, 'Request'))),
+            el('th', {}, t('manager2.ui.monitoring.col.stage')),
+            el('th', {}, t('manager2.ui.monitoring.col.time')),
+            el('th', {}, t('manager2.ui.monitoring.col.sent')),
+            el('th', {}, t('manager2.ui.monitoring.col.received')),
+            el('th', {}, t('manager2.ui.monitoring.col.remoteAddress')),
+            el('th', {}, t('manager2.ui.monitoring.col.virtualHost')),
+            el('th', {}, t('manager2.ui.monitoring.col.request')))),
         el('tbody', {}, rows.length > 0 ? rows
-            : el('tr', {}, el('td', { colspan: '7', class: 'empty' }, 'No active sockets')))));
+            : el('tr', {}, el('td', { colspan: '7', class: 'empty' }, t('manager2.ui.monitoring.noWorkers'))))));
   }
 
   const interval = setInterval(tick, POLL_MS);

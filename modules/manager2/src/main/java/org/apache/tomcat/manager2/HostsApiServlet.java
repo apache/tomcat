@@ -47,12 +47,6 @@ public class HostsApiServlet extends HostManagerServlet {
     private static final long serialVersionUID = 1L;
 
 
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
-
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -78,11 +72,11 @@ public class HostsApiServlet extends HostManagerServlet {
                 Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_JSON", e.getMessage());
             }
         } else if (path.equals("/api/hosts/persist")) {
-            sendResult(response, invoke(pw -> super.persist(pw, clientSm(request))));
+            sendResult(response, invoke(pw -> super.persist(pw, legacySm(request))));
         } else if (path.matches("/api/hosts/[^/]+/start")) {
-            sendResult(response, invoke(pw -> super.start(pw, nameOf(path), clientSm(request))));
+            sendResult(response, invoke(pw -> super.start(pw, nameOf(path), legacySm(request))));
         } else if (path.matches("/api/hosts/[^/]+/stop")) {
-            sendResult(response, invoke(pw -> super.stop(pw, nameOf(path), clientSm(request))));
+            sendResult(response, invoke(pw -> super.stop(pw, nameOf(path), legacySm(request))));
         } else {
             Api.notFound(response);
         }
@@ -96,7 +90,7 @@ public class HostsApiServlet extends HostManagerServlet {
 
         if (path.matches("/api/hosts/[^/]+")) {
             String name = nameOf(path);
-            sendResult(response, invoke(pw -> super.remove(pw, name, clientSm(request))));
+            sendResult(response, invoke(pw -> super.remove(pw, name, legacySm(request))));
         } else {
             Api.notFound(response);
         }
@@ -117,7 +111,7 @@ public class HostsApiServlet extends HostManagerServlet {
         boolean copyXML = booleanValue(body.get("copyXML"), false);
 
         sendResult(response, invoke(pw -> super.add(pw, name, aliases, appBase, manager, autoDeploy, deployOnStartup,
-                deployXML, unpackWARs, copyXML, clientSm(request))));
+                deployXML, unpackWARs, copyXML, legacySm(request))));
     }
 
 
@@ -212,7 +206,7 @@ public class HostsApiServlet extends HostManagerServlet {
         try {
             return new JSONParser(body).parseObject();
         } catch (Exception e) {
-            throw new IllegalArgumentException(sm.getString("manager2.invalidJson", e.getMessage()), e);
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", e.getMessage()), e);
         }
     }
 
@@ -230,10 +224,10 @@ public class HostsApiServlet extends HostManagerServlet {
 
 
     /**
-     * A StringManager for the legacy host manager message bundle. All the inherited operations report their results
+     * A StringManager for the legacy host-manager message bundle. All the inherited operations report their results
      * using the {@code org.apache.catalina.manager.host} strings.
      */
-    private static StringManager clientSm(HttpServletRequest request) {
+    private static StringManager legacySm(HttpServletRequest request) {
         return StringManager.getManager("org.apache.catalina.manager.host", request.getLocales());
     }
 

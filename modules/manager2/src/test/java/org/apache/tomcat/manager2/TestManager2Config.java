@@ -176,6 +176,11 @@ public class TestManager2Config extends TomcatBaseTest {
         Assert.assertEquals("server", node.get("type"));
         Assert.assertNotNull(node.get("className"));
         Assert.assertTrue(getList(node, "properties").size() > 0);
+        // The descriptions come from the message bundle: the standard,
+        // descriptor-backed attributes of a seeded type are overridden with
+        // the (translatable) bundle text.
+        Assert.assertEquals("TCP port (excluding any offset) for shutdown messages",
+                propertyDescription(node, "port"));
 
         // The self context reports the self flag and its id.
         String ctxId = selfContextId(fetchTree(client));
@@ -184,6 +189,18 @@ public class TestManager2Config extends TomcatBaseTest {
         Assert.assertEquals("context", node.get("type"));
         Assert.assertEquals(Boolean.TRUE, node.get("self"));
         Assert.assertTrue(((String) node.get("id")).endsWith("/context/+manager2"));
+        Assert.assertEquals("The display name of this web application",
+                propertyDescription(node, "displayName"));
+
+        // A component without a modeler descriptor: the description of an
+        // explicitly defined attribute is looked up from the bundle by scope
+        // and name (manager2.attr.cookieProcessor.sameSiteCookies).
+        request(client, "GET", MANAGER2 + "/api/config/node/" + ctxId + "/cookieProcessor/0", null, null, 200);
+        node = parseObject(client.getResponseBody());
+        Assert.assertEquals("cookieProcessor", node.get("type"));
+        Assert.assertEquals(
+                "The SameSite attribute added to the cookies of this web application (Unset, None, Lax or Strict).",
+                propertyDescription(node, "sameSiteCookies"));
 
         // An unknown node is reported.
         request(client, "GET", MANAGER2 + "/api/config/node/nowhere", null, null, 404);
@@ -2227,6 +2244,18 @@ public class TestManager2Config extends TomcatBaseTest {
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getMap(Map<String, Object> map, String key) {
         return (Map<String, Object>) map.get(key);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static String propertyDescription(Map<String, Object> node, String name) {
+        for (Object entry : getList(node, "properties")) {
+            Map<String, Object> property = (Map<String, Object>) entry;
+            if (name.equals(property.get("name"))) {
+                return (String) property.get("description");
+            }
+        }
+        return null;
     }
 
 

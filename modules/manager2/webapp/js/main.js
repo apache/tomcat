@@ -16,6 +16,7 @@
  */
 
 import { BASE, get } from './api.js';
+import { t, loadMessages } from './i18n.js';
 import { register, setNotFound, render, setNavUpdater } from './router.js';
 import { el, clear, icon, svgPath, toast, formatDuration } from './ui.js';
 import { dashboard } from './pages/dashboard.js';
@@ -29,15 +30,15 @@ import { users } from './pages/users.js';
 import { configuration } from './pages/configuration.js';
 
 const NAV_ITEMS = [
-  { route: '/', icon: 'dashboard', label: 'Dashboard' },
-  { route: '/apps', icon: 'apps', label: 'Applications' },
-  { route: '/hosts', icon: 'hosts', label: 'Hosts' },
-  { route: '/configuration', icon: 'config', label: 'Configuration' },
-  { route: '/users', icon: 'users', label: 'Users' },
-  { route: '/monitoring', icon: 'monitoring', label: 'Monitoring' },
-  { route: '/diagnostics', icon: 'diagnostics', label: 'Diagnostics' },
-  { route: '/logs', icon: 'logs', label: 'Logs' },
-  { route: '/access-log', icon: 'access-log', label: 'Access log' },
+  { route: '/', icon: 'dashboard', labelKey: 'manager2.ui.nav.dashboard' },
+  { route: '/apps', icon: 'apps', labelKey: 'manager2.ui.nav.apps' },
+  { route: '/hosts', icon: 'hosts', labelKey: 'manager2.ui.nav.hosts' },
+  { route: '/configuration', icon: 'config', labelKey: 'manager2.ui.nav.configuration' },
+  { route: '/users', icon: 'users', labelKey: 'manager2.ui.nav.users' },
+  { route: '/monitoring', icon: 'monitoring', labelKey: 'manager2.ui.nav.monitoring' },
+  { route: '/diagnostics', icon: 'diagnostics', labelKey: 'manager2.ui.nav.diagnostics' },
+  { route: '/logs', icon: 'logs', labelKey: 'manager2.ui.nav.logs' },
+  { route: '/access-log', icon: 'access-log', labelKey: 'manager2.ui.nav.accessLog' },
 ];
 
 let currentCleanup = null;
@@ -94,18 +95,19 @@ function isActive(route, path) {
 function buildNav() {
   const nav = document.querySelector('.sidenav');
   for (const item of NAV_ITEMS) {
+    const label = t(item.labelKey);
     const btn = nav.querySelector('[data-nav="' + item.route + '"]');
     btn.innerHTML = '';
     // The per-tab class selects the accent hue of the active state (CSS);
     // the aria-label keeps the accessible name when the visible label is
     // hidden on narrow screens (bottom nav).
     btn.classList.add('nav-tab-' + item.icon);
-    btn.setAttribute('aria-label', item.label);
+    btn.setAttribute('aria-label', label);
     btn.append(icon(item.icon, 18));
-    const label = document.createElement('span');
-    label.className = 'nav-label';
-    label.textContent = item.label;
-    btn.append(label);
+    const labelNode = document.createElement('span');
+    labelNode.className = 'nav-label';
+    labelNode.textContent = label;
+    btn.append(labelNode);
     btn.addEventListener('click', () => {
       window.history.pushState({}, '', BASE + item.route);
       render();
@@ -130,7 +132,7 @@ function pageRoute(pattern, handler) {
     }
     const container = document.getElementById('view');
     clear(container);
-    container.append(el('div', { class: 'spinner', role: 'status', 'aria-label': 'Loading' }));
+    container.append(el('div', { class: 'spinner', role: 'status', 'aria-label': t('manager2.ui.common.loading') }));
     try {
       clear(container);
       const cleanup = await handler(container, params, path);
@@ -140,7 +142,7 @@ function pageRoute(pattern, handler) {
     } catch (err) {
       clear(container);
       container.append(el('div', { class: 'card' },
-          el('h3', {}, 'Something went wrong'),
+          el('h3', {}, t('manager2.ui.common.errorTitle')),
           el('p', { style: 'color:var(--text-soft);' }, err.message)));
     }
     container.focus({ preventScroll: true });
@@ -150,6 +152,7 @@ function pageRoute(pattern, handler) {
 // ============================ Boot =====================================
 
 async function boot() {
+  await loadMessages();
   initTheme();
   buildNav();
   setNavUpdater(updateNav);
@@ -157,7 +160,7 @@ async function boot() {
   // Rebuild the logout button as icon + label: on narrow screens the label
   // is hidden and the icon takes its place (see the CSS).
   const logoutBtn = document.getElementById('logout');
-  logoutBtn.setAttribute('aria-label', 'Log out');
+  logoutBtn.setAttribute('aria-label', t('manager2.ui.shell.logout'));
   const logoutLabel = document.createElement('span');
   logoutLabel.className = 'logout-label';
   logoutLabel.textContent = logoutBtn.textContent;
@@ -188,7 +191,7 @@ async function boot() {
     const container = document.getElementById('view');
     clear(container);
     container.append(el('div', { class: 'card empty' },
-        el('p', {}, 'Not found: ' + path)));
+        el('p', {}, t('manager2.ui.common.notFoundPath', path))));
   });
 
   try {
@@ -208,7 +211,7 @@ async function boot() {
     status.append(
         el('span', {}, serverInfo.host.name),
         el('span', { style: 'color:var(--text-faint);' }, '·'),
-        el('span', {}, 'up ' + formatDuration(serverInfo.runtime.uptimeMs)));
+        el('span', {}, t('manager2.ui.shell.uptime', formatDuration(serverInfo.runtime.uptimeMs))));
   }
 
   document.getElementById('app').hidden = false;

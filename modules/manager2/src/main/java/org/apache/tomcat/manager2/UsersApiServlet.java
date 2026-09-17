@@ -53,7 +53,6 @@ import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.users.MemoryUserDatabase;
 import org.apache.tomcat.util.json.JSONParser;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -77,12 +76,6 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = Strings.manager();
 
 
     /**
@@ -143,7 +136,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
                 Api.notFound(response);
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.users"), e);
+            log(Strings.sm().getString("manager2.error.users"), e);
             throw new ServletException(e);
         }
     }
@@ -183,7 +176,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
                 Api.notFound(response);
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.users"), e);
+            log(Strings.sm().getString("manager2.error.users"), e);
             throw new ServletException(e);
         }
     }
@@ -207,7 +200,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
                 Api.notFound(response);
             }
         } catch (Exception e) {
-            log(sm.getString("manager2.error.users"), e);
+            log(Strings.sm().getString("manager2.error.users"), e);
             throw new ServletException(e);
         }
     }
@@ -221,7 +214,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         List<Map.Entry<String, UserDatabase>> found = discover();
         if (found.isEmpty()) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "USER_DATABASE_MISSING",
-                    sm.getString("manager2.userDatabaseMissing"));
+                    Strings.sm().getString("manager2.userDatabaseMissing"));
             return;
         }
 
@@ -325,12 +318,12 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         String username = asString(body.get("username"));
         if (!validName(username)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.usernameMissing", username));
+                    Strings.sm().getString("manager2.usernameMissing", username));
             return;
         }
         if (!body.containsKey("password") || !(body.get("password") instanceof String password)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
-                    sm.getString("manager2.passwordMissing"));
+                    Strings.sm().getString("manager2.passwordMissing"));
             return;
         }
         List<String> roles = asStringList(body.get("roles"));
@@ -346,7 +339,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         User user = db.createUser(username, password, asString(body.get("fullName")));
         if (user == null) {
             Api.error(response, HttpServletResponse.SC_CONFLICT, "USER_EXISTS",
-                    sm.getString("manager2.userExists", username));
+                    Strings.sm().getString("manager2.userExists", username));
             return;
         }
         for (String role : roles) {
@@ -366,12 +359,12 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         User user = db.findUser(username);
         if (user == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "USER_NOT_FOUND",
-                    sm.getString("manager2.userNotFound", username));
+                    Strings.sm().getString("manager2.userNotFound", username));
             return;
         }
         if (request.getUserPrincipal() != null && username.equals(request.getUserPrincipal().getName())) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "SELF_REMOVAL",
-                    sm.getString("manager2.selfRemoval"));
+                    Strings.sm().getString("manager2.selfRemoval"));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -388,7 +381,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Map<String, Object> body = readJson(request);
         if (!body.containsKey("password") || !(body.get("password") instanceof String password)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
-                    sm.getString("manager2.passwordMissing"));
+                    Strings.sm().getString("manager2.passwordMissing"));
             return;
         }
 
@@ -399,7 +392,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         User user = db.findUser(username);
         if (user == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "USER_NOT_FOUND",
-                    sm.getString("manager2.userNotFound", username));
+                    Strings.sm().getString("manager2.userNotFound", username));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -423,7 +416,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         User user = db.findUser(username);
         if (user == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "USER_NOT_FOUND",
-                    sm.getString("manager2.userNotFound", username));
+                    Strings.sm().getString("manager2.userNotFound", username));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -443,7 +436,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         String groupname = asString(body.get("groupname"));
         if (!validName(groupname)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.groupnameMissing", groupname));
+                    Strings.sm().getString("manager2.groupnameMissing", groupname));
             return;
         }
         List<String> roles = asStringList(body.get("roles"));
@@ -459,7 +452,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Group group = db.createGroup(groupname, asString(body.get("description")));
         if (group == null) {
             Api.error(response, HttpServletResponse.SC_CONFLICT, "GROUP_EXISTS",
-                    sm.getString("manager2.groupExists", groupname));
+                    Strings.sm().getString("manager2.groupExists", groupname));
             return;
         }
         for (String role : roles) {
@@ -479,7 +472,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Group group = db.findGroup(groupname);
         if (group == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "GROUP_NOT_FOUND",
-                    sm.getString("manager2.groupNotFound", groupname));
+                    Strings.sm().getString("manager2.groupNotFound", groupname));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -503,7 +496,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Group group = db.findGroup(groupname);
         if (group == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "GROUP_NOT_FOUND",
-                    sm.getString("manager2.groupNotFound", groupname));
+                    Strings.sm().getString("manager2.groupNotFound", groupname));
             return;
         }
 
@@ -515,7 +508,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (!missing.isEmpty()) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "UNKNOWN_GROUP_MEMBER",
-                    sm.getString("manager2.unknownGroupMember", String.join(", ", missing)));
+                    Strings.sm().getString("manager2.unknownGroupMember", String.join(", ", missing)));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -548,7 +541,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Group group = db.findGroup(groupname);
         if (group == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "GROUP_NOT_FOUND",
-                    sm.getString("manager2.groupNotFound", groupname));
+                    Strings.sm().getString("manager2.groupNotFound", groupname));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -568,7 +561,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         String rolename = asString(body.get("rolename"));
         if (!validName(rolename)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
-                    sm.getString("manager2.rolenameMissing", rolename));
+                    Strings.sm().getString("manager2.rolenameMissing", rolename));
             return;
         }
 
@@ -583,7 +576,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Role role = db.createRole(rolename, asString(body.get("description")));
         if (role == null) {
             Api.error(response, HttpServletResponse.SC_CONFLICT, "ROLE_EXISTS",
-                    sm.getString("manager2.roleExists", rolename));
+                    Strings.sm().getString("manager2.roleExists", rolename));
             return;
         }
         save(db, response);
@@ -600,7 +593,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         Role role = db.findRole(rolename);
         if (role == null) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "ROLE_NOT_FOUND",
-                    sm.getString("manager2.roleNotFound", rolename));
+                    Strings.sm().getString("manager2.roleNotFound", rolename));
             return;
         }
         // Removing a role detaches it from every user and group that holds it,
@@ -609,7 +602,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         String principalName = request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : null;
         if (principalName != null && holdsRole(db, principalName, rolename)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "SELF_ROLE_REMOVAL",
-                    sm.getString("manager2.selfRoleRemoval", rolename));
+                    Strings.sm().getString("manager2.selfRoleRemoval", rolename));
             return;
         }
         if (!writableForMutation(db, response)) {
@@ -657,11 +650,11 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
                         }
                     }
                 } catch (NamingException e) {
-                    log(sm.getString("manager2.userDatabaseLookup", name), e);
+                    log(Strings.sm().getString("manager2.userDatabaseLookup", name), e);
                 }
             }
         } catch (NamingException e) {
-            log(sm.getString("manager2.error.users"), e);
+            log(Strings.sm().getString("manager2.error.users"), e);
         }
         return found;
     }
@@ -692,7 +685,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
             }
         }
         Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "USER_DATABASE_NOT_FOUND",
-                sm.getString("manager2.userDatabaseNotFound", name));
+                Strings.sm().getString("manager2.userDatabaseNotFound", name));
         return null;
     }
 
@@ -714,7 +707,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         List<Map.Entry<String, UserDatabase>> found = discover();
         if (found.isEmpty()) {
             Api.error(response, HttpServletResponse.SC_NOT_FOUND, "USER_DATABASE_MISSING",
-                    sm.getString("manager2.userDatabaseMissing"));
+                    Strings.sm().getString("manager2.userDatabaseMissing"));
             return null;
         }
         Map.Entry<String, UserDatabase> selected = select(name, found, response);
@@ -730,12 +723,12 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
 
         if (readonly(db)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "USER_DATABASE_READONLY",
-                    sm.getString("manager2.userDatabaseReadonly", db.getId()));
+                    Strings.sm().getString("manager2.userDatabaseReadonly", db.getId()));
             return false;
         }
         if (!writable(db)) {
             Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "USER_DATABASE_NOT_WRITABLE",
-                    sm.getString("manager2.userDatabaseNotWritable", db.getId()));
+                    Strings.sm().getString("manager2.userDatabaseNotWritable", db.getId()));
             return false;
         }
         return true;
@@ -746,12 +739,12 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         try {
             db.save();
         } catch (Exception e) {
-            log(sm.getString("manager2.error.users"), e);
+            log(Strings.sm().getString("manager2.error.users"), e);
             Api.error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "USER_DATABASE_SAVE_FAILED",
-                    sm.getString("manager2.userDatabaseSaveFailed", String.valueOf(e.getMessage())));
+                    Strings.sm().getString("manager2.userDatabaseSaveFailed", String.valueOf(e.getMessage())));
             return;
         }
-        Api.ok(response, sm.getString("manager2.usersSaved"));
+        Api.ok(response, Strings.sm().getString("manager2.usersSaved"));
     }
 
 
@@ -879,7 +872,7 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
         try {
             return new JSONParser(body).parseObject();
         } catch (Exception e) {
-            throw new IllegalArgumentException(sm.getString("manager2.invalidJson", e.getMessage()), e);
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", e.getMessage()), e);
         }
     }
 
@@ -897,13 +890,13 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
             return new ArrayList<>();
         }
         if (!(value instanceof List<?> list)) {
-            throw new IllegalArgumentException(sm.getString("manager2.invalidJson", "expected an array of strings"));
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", "expected an array of strings"));
         }
         List<String> result = new ArrayList<>();
         for (Object item : list) {
             if (!(item instanceof String s) || !validName(s)) {
                 throw new IllegalArgumentException(
-                        sm.getString("manager2.invalidJson", "expected an array of strings"));
+                        Strings.sm().getString("manager2.invalidJson", "expected an array of strings"));
             }
             result.add(s);
         }

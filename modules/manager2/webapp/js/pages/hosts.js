@@ -17,15 +17,16 @@
 
 import { api } from '../api.js';
 import { el, clear, table, toast, modal, confirm, actionMenu } from '../ui.js';
+import { t } from '../i18n.js';
 
 export async function hosts(container) {
   const view = el('div', {},
       el('div', { class: 'page-head' },
-          el('h1', {}, 'Virtual hosts'),
-          el('p', {}, 'Add, start, stop and remove virtual hosts on this engine.'),
+          el('h1', {}, t('manager2.ui.hosts.title')),
+          el('p', {}, t('manager2.ui.hosts.subtitle')),
           el('span', { class: 'head-spacer' }),
-          el('button', { type: 'button', class: 'btn', onclick: () => persist() }, 'Save to server.xml'),
-          el('button', { type: 'button', class: 'btn btn-primary', onclick: () => addHostModal() }, 'Add host')));
+          el('button', { type: 'button', class: 'btn', onclick: () => persist() }, t('manager2.ui.hosts.save')),
+          el('button', { type: 'button', class: 'btn btn-primary', onclick: () => addHostModal() }, t('manager2.ui.hosts.add'))));
   container.append(view);
 
   const wrap = el('div', { class: 'card' });
@@ -42,39 +43,39 @@ export async function hosts(container) {
     clear(wrap);
     wrap.append(table({
       columns: [
-        { key: 'name', label: 'Name' },
-        { key: 'aliases', label: 'Aliases', muted: true, render: (h) => h.aliases.join(', ') || '-' },
+        { key: 'name', label: t('manager2.ui.col.name') },
+        { key: 'aliases', label: t('manager2.ui.col.aliases'), muted: true, render: (h) => h.aliases.join(', ') || '-' },
         {
-          key: 'appBase', label: 'App base', muted: true,
+          key: 'appBase', label: t('manager2.ui.hosts.appBase'), muted: true,
           render: (h) => el('code', {}, h.appBase || '-'),
         },
         {
-          key: 'state', label: 'State',
+          key: 'state', label: t('manager2.ui.col.state'),
           render: (h) => el('span', { class: 'badge ' + (h.started ? 'ok' : 'stop') },
-              h.started ? 'Running' : 'Stopped'),
+              h.started ? t('manager2.ui.state.running') : t('manager2.ui.state.stopped')),
         },
         {
-          key: 'self', label: 'Self',
+          key: 'self', label: t('manager2.ui.hosts.selfColumn'),
           render: (h) => h.self
-              ? el('span', { class: 'badge plain' }, 'this host')
+              ? el('span', { class: 'badge plain' }, t('manager2.ui.hosts.thisHost'))
               : el('span', { class: 'muted' }, '-'),
         },
         {
-          key: 'actions', label: 'Actions',
+          key: 'actions', label: t('manager2.ui.col.actions'),
           render: (h) => actionMenu([
               h.started
-                  ? { label: 'Stop', disabled: h.self, onclick: () => startStop(h, 'stop') }
-                  : { label: 'Start', class: 'btn-primary', disabled: h.self, onclick: () => startStop(h, 'start') },
+                  ? { label: t('manager2.ui.common.stop'), disabled: h.self, onclick: () => startStop(h, 'stop') }
+                  : { label: t('manager2.ui.common.start'), class: 'btn-primary', disabled: h.self, onclick: () => startStop(h, 'start') },
               {
-                label: 'Remove', class: 'btn-danger', disabled: h.self,
-                title: h.self ? 'Cannot remove the host the manager is installed in' : 'Remove',
+                label: t('manager2.ui.common.remove'), class: 'btn-danger', disabled: h.self,
+                title: h.self ? t('manager2.ui.hosts.cannotRemoveSelf') : t('manager2.ui.common.remove'),
                 onclick: () => removeHost(h),
               },
           ]),
         },
       ],
       rows: data,
-      empty: 'No virtual hosts configured',
+      empty: t('manager2.ui.hosts.empty'),
       stackable: true,
     }));
   }
@@ -82,9 +83,9 @@ export async function hosts(container) {
   async function startStop(host, action) {
     const ok = action === 'stop'
         ? await confirm({
-          title: 'Stop host',
-          message: 'Stop host ' + host.name + '? All applications on it will be stopped.',
-          confirmLabel: 'Stop',
+          title: t('manager2.ui.hosts.stopConfirmTitle'),
+          message: t('manager2.ui.hosts.stopConfirm', host.name),
+          confirmLabel: t('manager2.ui.common.stop'),
           danger: false,
         })
         : true;
@@ -100,9 +101,9 @@ export async function hosts(container) {
 
   async function removeHost(host) {
     const ok = await confirm({
-      title: 'Remove host',
-      message: 'Remove host ' + host.name + '? Applications on it will be undeployed (files are kept).',
-      confirmLabel: 'Remove',
+      title: t('manager2.ui.hosts.removeConfirmTitle'),
+      message: t('manager2.ui.hosts.removeConfirm', host.name),
+      confirmLabel: t('manager2.ui.common.remove'),
       danger: true,
       requireText: host.name,
     });
@@ -128,48 +129,48 @@ export async function hosts(container) {
   function addHostModal() {
     const body = el('div', {},
         el('div', { class: 'form-grid' },
-            field('Name', el('input', { type: 'text', id: 'h-name', required: true, placeholder: 'localhost' })),
-            field('Aliases (comma separated)', el('input', { type: 'text', id: 'h-aliases', placeholder: 'example.com, www.example.com' })),
-            fieldSpan2('App base', el('input', { type: 'text', id: 'h-appbase', placeholder: '${catalina.base}/webapps' })),
-            field('Manager webapp',
+            field(t('manager2.ui.col.name'), el('input', { type: 'text', id: 'h-name', required: true, placeholder: t('manager2.ui.hosts.namePlaceholder') })),
+            field(t('manager2.ui.hosts.aliasesLabel'), el('input', { type: 'text', id: 'h-aliases', placeholder: t('manager2.ui.hosts.aliasesPlaceholder') })),
+            fieldSpan2(t('manager2.ui.hosts.appBase'), el('input', { type: 'text', id: 'h-appbase', placeholder: '${catalina.base}/webapps' })),
+            field(t('manager2.ui.hosts.managerWebapp'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-manager' }),
-                    'Deploy the manager webapp to this host')),
-            field('Auto deploy',
+                    t('manager2.ui.hosts.managerWebappHelp'))),
+            field(t('manager2.ui.hosts.autoDeploy'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-autodeploy', checked: true }),
-                    'Auto deploy')),
-            field('Deploy on startup',
+                    t('manager2.ui.hosts.autoDeploy'))),
+            field(t('manager2.ui.hosts.deployOnStartup'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-deployonstartup', checked: true }),
-                    'Deploy on startup')),
-            field('Deploy XML',
+                    t('manager2.ui.hosts.deployOnStartup'))),
+            field(t('manager2.ui.hosts.deployXml'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-deployxml', checked: true }),
-                    'Deploy XML')),
-            field('Unpack WARs',
+                    t('manager2.ui.hosts.deployXml'))),
+            field(t('manager2.ui.hosts.unpackWars'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-unpackwars', checked: true }),
-                    'Unpack WARs')),
-            fieldSpan2('Copy XML',
+                    t('manager2.ui.hosts.unpackWars'))),
+            fieldSpan2(t('manager2.ui.hosts.copyXml'),
                 el('label', { class: 'check' },
                     el('input', { type: 'checkbox', id: 'h-copyxml' }),
-                    'Copy context XML from the deployed WAR into META-INF/context.xml'))));
+                    t('manager2.ui.hosts.copyXmlHelp')))));
 
     modal({
-      title: 'Add virtual host',
+      title: t('manager2.ui.hosts.addTitle'),
       content: body,
       actions: [
-        { label: 'Cancel' },
+        { label: t('manager2.ui.common.cancel') },
         {
-          label: 'Add',
+          label: t('manager2.ui.common.add'),
           class: 'btn-primary',
           onClick: async (close) => {
             const body_ = {
               name: document.getElementById('h-name').value.trim(),
             };
             if (!body_.name) {
-              toast('Enter a host name.', 'warn');
+              toast(t('manager2.ui.hosts.nameMissing'), 'warn');
               return;
             }
             const aliases = document.getElementById('h-aliases').value.trim();

@@ -20,6 +20,8 @@
 // e.g. this file lives at {context}/js/api.js -> BASE = {context}
 export const BASE = new URL('.', import.meta.url).pathname.replace(/js\/$/, '').replace(/\/$/, '');
 
+import { t } from './i18n.js';
+
 let csrfToken = null;
 
 /**
@@ -41,7 +43,7 @@ export async function api(method, path, body) {
   }
   if (method !== 'GET' && method !== 'HEAD') {
     if (!csrfToken) {
-      throw new Error('CSRF token not available. Reload the page and try again.');
+      throw new Error(t('manager2.ui.api.csrfTokenMissing'));
     }
     headers['X-CSRF-Token'] = csrfToken;
   }
@@ -89,12 +91,12 @@ export async function api(method, path, body) {
     } catch (e) {
       data = null;
     }
-    let message = (data && data.message) || ('Request failed with status ' + resp.status);
+    let message = (data && data.message) || t('manager2.ui.api.requestFailed', resp.status);
     if (resp.status === 403 && !data) {
       // The container's HTML 403 page: the signed-in account lacks the
       // role required for this endpoint (e.g. manager-status on a
       // manager-gui-only API).
-      message = 'Access denied (403): the signed-in account does not have the role required for this operation.';
+      message = t('manager2.ui.api.forbidden');
     }
     const err = new Error(message);
     err.code = data && data.error;
