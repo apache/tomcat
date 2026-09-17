@@ -287,6 +287,11 @@
         premature end of stream as an I/O error. Based on pull request
         <pr>1067</pr> by aoto-tech. (markt)
       </fix>
+      <fix>
+        Align <code>OpenSSLLifecycleListener</code> with
+        <code>AprLifecycleListener</code> and throw an Error when FIPS is
+        requested but not available. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
