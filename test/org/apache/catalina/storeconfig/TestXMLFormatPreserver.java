@@ -224,6 +224,52 @@ public class TestXMLFormatPreserver {
     }
 
     @Test
+    public void testRemovedFirstTextElementDoesNotMoveComment() {
+        String originalXml = String.join("\n",
+                "<Host name=\"localhost\">",
+                "    <!-- web.xml -->",
+                "    <WatchedResource>WEB-INF/web.xml</WatchedResource>",
+                "    <WatchedResource>conf/context.xml</WatchedResource>",
+                "</Host>",
+                "");
+        String newXml = String.join("\n",
+                "<Host name=\"localhost\">",
+                "  <WatchedResource>conf/context.xml</WatchedResource>",
+                "</Host>",
+                "");
+        String expected = String.join("\n",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<Host name=\"localhost\">",
+                "  <WatchedResource>conf/context.xml</WatchedResource>",
+                "</Host>",
+                "");
+        Assert.assertEquals(expected, XMLFormatPreserver.preserve(originalXml, newXml, "UTF-8"));
+    }
+
+    @Test
+    public void testRootElementLayoutPreserved() {
+        String originalXml = String.join("\n",
+                "<Context docBase=\"/foo\" reloadable=\"true\">",
+                "    <WatchedResource>WEB-INF/web.xml</WatchedResource>",
+                "    <!-- Trailing comment -->",
+                "</Context>",
+                "");
+        String newXml = String.join("\n",
+                "<Context reloadable=\"true\" docBase=\"/foo\">",
+                "  <WatchedResource>WEB-INF/web.xml</WatchedResource>",
+                "</Context>",
+                "");
+        String expected = String.join("\n",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<Context docBase=\"/foo\" reloadable=\"true\">",
+                "  <WatchedResource>WEB-INF/web.xml</WatchedResource>",
+                "    <!-- Trailing comment -->",
+                "</Context>",
+                "");
+        Assert.assertEquals(expected, XMLFormatPreserver.preserve(originalXml, newXml, "UTF-8"));
+    }
+
+    @Test
     public void testEscaping() {
         String originalXml = "<Server><Connector port=\"8080\" note=\"a &amp; b &lt; c\"/></Server>";
         String newXml = "<Server><Connector port=\"8080\" note=\"a &amp; b &lt; c\"/></Server>";
