@@ -28,7 +28,9 @@ import javax.xml.parsers.SAXParserFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.LockOutRealm;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.startup.CatalinaBaseConfigurationSource;
@@ -230,6 +232,85 @@ public class TestStoreConfig extends TomcatBaseTest {
         // The stored configuration must remain well-formed
         SAXParserFactory.newInstance().newSAXParser().getXMLReader()
                 .parse(new InputSource(new StringReader(serverXmlDump)));
+    }
+
+    /**
+     * Verify that StoreConfig preserves the comments of the existing context.xml when the context is stored to its
+     * configuration file without a backup. The output stream must not truncate the file before XMLFormatPreserver
+     * has read the layout of the previous version from it.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testStoreContextSeparatePreservesComments() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        File appDir = new File(getTemporaryDirectory(), "webapps/test");
+        if (!appDir.mkdirs()) {
+            Assert.fail("Unable to create the webapp directory");
+        }
+        Context context = tomcat.addContext("/test", appDir.getAbsolutePath());
+        // WatchedResource values pointing at WEB-INF/web.xml are filtered out when storing, so use a resource that
+        // survives the filtering
+        ((StandardContext) context).addWatchedResource("conf/test.txt");
+
+        // Write a context.xml with comments that StoreConfig must preserve
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        addDeleteOnTearDown(conf);
+        File contextXml = new File(conf, "test.xml");
+        Files.write(contextXml.toPath(), String.join("\n",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<!-- Context comment -->",
+                "<Context reloadable=\"true\">",
+                "    <!-- watched resources -->",
+                "    <WatchedResource>conf/test.txt</WatchedResource>",
+                "</Context>",
+                "").getBytes(StandardCharsets.UTF_8));
+
+        tomcat.start();
+
+        context.setConfigFile(contextXml.toURI().toURL());
+
+        // Store the context to its configuration file without a backup (the storeContextSeparate path)
+        IStoreConfig storeConfig = storeConfigListener.getStoreConfig();
+        StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
+        Assert.assertNotNull(desc);
+        boolean oldSeparate = desc.isStoreSeparate();
+        boolean oldBackup = desc.isBackup();
+        boolean oldExternalAllowed = desc.isExternalAllowed();
+        try {
+            desc.setStoreSeparate(true);
+            desc.setBackup(false);
+            desc.setExternalAllowed(true);
+            desc.getStoreFactory().store(null, -2, context);
+        } finally {
+            desc.setStoreSeparate(oldSeparate);
+            desc.setBackup(oldBackup);
+            desc.setExternalAllowed(oldExternalAllowed);
+        }
+
+        // Read written configuration
+        String contextXmlDump;
+        try (FileReader reader = new FileReader(contextXml);
+                StringWriter writer = new StringWriter()) {
+            IOTools.flow(reader, writer);
+            contextXmlDump = writer.toString();
+        }
+        Assert.assertTrue(contextXmlDump, contextXmlDump.contains("Context comment"));
+        Assert.assertTrue(contextXmlDump, contextXmlDump.contains("watched resources"));
+        Assert.assertTrue(contextXmlDump, contextXmlDump.contains("conf/test.txt"));
+        // The stored configuration must remain well-formed
+        SAXParserFactory.newInstance().newSAXParser().getXMLReader()
+                .parse(new InputSource(new StringReader(contextXmlDump)));
     }
 
 }
