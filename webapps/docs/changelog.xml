@@ -261,6 +261,12 @@
         layout of the existing file (comments, blank lines and attribute
         order) on a best effort basis. (remm)
       </update>
+      <fix>
+        Track in <code>StandardContext</code> whether the context was
+        deployed from a <code>Context</code> element in
+        <code>server.xml</code>. Use it to have <code>StoreConfig</code>
+        save to a new config file. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

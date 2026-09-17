@@ -54,7 +54,8 @@ import org.apache.tomcat.util.http.CookieProcessor;
  * <li>Store a context that has an external configuration file to that file</li>
  * <li>Store a context without an external configuration file to
  * conf/enginename/hostname/context.xml, unless the registry allows inline
- * storage in server.xml</li>
+ * storage in server.xml and the context was deployed from a Context element
+ * in server.xml, in which case it is stored back inline to server.xml</li>
  * <li>Store with backup</li>
  * </ul>
  */
@@ -96,8 +97,10 @@ public class StandardContextSF extends StoreFactoryBase {
                         }
                         return;
                     }
-                } else if (desc.isExternalOnly()) {
-                    // Set a configFile so that the configuration is actually saved
+                } else if (desc.isExternalOnly() || !((StandardContext) aContext).getDeployedFromServerXml()) {
+                    // Set a configFile so that the configuration is actually saved. This only happens when the
+                    // registry requires external storage or when the Context was not deployed from a Context element
+                    // in server.xml (a Context defined in server.xml is stored back inline to server.xml instead).
                     Context context = ((StandardContext) aContext);
                     Host host = (Host) context.getParent();
                     File configBase = host.getConfigBaseFile();
@@ -109,6 +112,12 @@ public class StandardContextSF extends StoreFactoryBase {
                         storeWithBackup((StandardContext) aContext);
                     } else {
                         storeContextSeparate(aWriter, indent, (StandardContext) aContext);
+                    }
+                    return;
+                } else if (aWriter == null) {
+                    if (log.isInfoEnabled()) {
+                        log.info(sm.getString("standardContextSF.storeContextInlineSkipped",
+                                ((StandardContext) aContext).getPath()));
                     }
                     return;
                 }
