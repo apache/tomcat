@@ -111,6 +111,7 @@ import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
+import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.coyote.AbstractProtocol;
@@ -5216,25 +5217,34 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         public void store(PrintWriter aWriter, int indent, Object aContext) throws Exception {
             if (aContext instanceof StandardContext context && getRegistry() != null) {
                 StoreDescription desc = getRegistry().findDescription(context.getClass());
-                if (desc != null && desc.isStoreSeparate() && desc.isExternalAllowed() &&
-                        context.getConfigFile() != null) {
-                    // Capture the external context file in memory instead of
-                    // writing it. The element is written inline (storeSeparate
-                    // is temporarily off) so the separate-file branch of
-                    // StandardContextSF.store is not re-entered.
-                    StringWriter buffer = new StringWriter();
-                    PrintWriter w = new PrintWriter(buffer);
-                    storeXMLHead(w);
-                    boolean savedSeparate = desc.isStoreSeparate();
-                    desc.setStoreSeparate(false);
-                    try {
-                        super.store(w, -2, aContext);
-                    } finally {
-                        desc.setStoreSeparate(savedSeparate);
+                if (desc != null && desc.isStoreSeparate() && desc.isExternalAllowed()) {
+                    URL configFile = context.getConfigFile();
+                    if (configFile == null && !desc.isExternalOnly() && !context.getDeployedFromServerXml()) {
+                        // The store creates a new configuration file for a context that was not deployed from
+                        // server.xml. Compute the path that file would get, without setting it on the context.
+                        Host host = (Host) context.getParent();
+                        ContextName cn = new ContextName(context.getName(), false);
+                        File config = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
+                        configFile = config.toURI().toURL();
                     }
-                    w.flush();
-                    captured.put(displayPath(context.getConfigFile()), buffer.toString());
-                    return;
+                    if (configFile != null) {
+                        // Capture the (new) external context file in memory instead of writing it. The element is
+                        // written inline (storeSeparate is temporarily off) so the separate-file branch of
+                        // StandardContextSF.store is not re-entered.
+                        StringWriter buffer = new StringWriter();
+                        PrintWriter w = new PrintWriter(buffer);
+                        storeXMLHead(w);
+                        boolean savedSeparate = desc.isStoreSeparate();
+                        desc.setStoreSeparate(false);
+                        try {
+                            super.store(w, -2, aContext);
+                        } finally {
+                            desc.setStoreSeparate(savedSeparate);
+                        }
+                        w.flush();
+                        captured.put(displayPath(configFile), buffer.toString());
+                        return;
+                    }
                 }
             }
             super.store(aWriter, indent, aContext);

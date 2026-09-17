@@ -1300,12 +1300,18 @@ public class TestManager2Config extends TomcatBaseTest {
             Assert.assertEquals("MemoryRealm", realmDetail.get("name"));
             Assert.assertEquals(Boolean.FALSE, realmDetail.get("acceptsSubRealm"));
 
-            // The combined realm and its sub realms are part of the
-            // stored server.xml.
+            // The context was not deployed from server.xml and has no
+            // configuration file, so the store gives it a new context file
+            // instead of inlining it in server.xml. The combined realm and
+            // its sub realms are part of that file, not of the server.xml.
             request(client, "GET", MANAGER2 + "/api/config/store/preview", null, null, 200);
-            String xml = (String) parseObject(client.getResponseBody()).get("xml");
-            Assert.assertTrue(xml.contains("org.apache.catalina.realm.LockOutRealm"));
-            Assert.assertTrue(xml.contains("org.apache.catalina.realm.MemoryRealm"));
+            Map<String, Object> preview = parseObject(client.getResponseBody());
+            String xml = (String) preview.get("xml");
+            Assert.assertFalse(xml.contains("org.apache.catalina.realm.LockOutRealm"));
+            @SuppressWarnings("unchecked")
+            List<Object> previewFiles = (List<Object>) preview.get("files");
+            Assert.assertTrue("Expected a new context file for /realmapp: " + previewFiles,
+                    previewFiles.stream().anyMatch(f -> String.valueOf(f).endsWith("realmapp.xml")));
 
             // Remove ---------------------------------------------------
 
