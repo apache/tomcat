@@ -19,6 +19,7 @@ package org.apache.catalina.servlets;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -2779,23 +2780,23 @@ public class DefaultServlet extends HttpServlet {
         }
 
         IOException exception = null;
-        long bytesToRead = end - start + 1;
+        long rangeLength = end - start + 1;
+        long bytesToRead = rangeLength;
 
         byte[] buffer = new byte[input];
-        int len = buffer.length;
-        while ((bytesToRead > 0) && (len >= buffer.length)) {
+        while (bytesToRead > 0) {
             try {
-                len = istream.read(buffer);
-                if (bytesToRead >= len) {
-                    ostream.write(buffer, 0, len);
-                    bytesToRead -= len;
-                } else {
-                    ostream.write(buffer, 0, (int) bytesToRead);
-                    bytesToRead = 0;
+                int len = istream.read(buffer, 0, (int) Math.min(buffer.length, bytesToRead));
+                if (len == -1) {
+                    exception = new EOFException(sm.getString("defaultServlet.wrongByteCountForRange",
+                            Long.valueOf(rangeLength - bytesToRead), Long.valueOf(rangeLength)));
+                    break;
                 }
+                ostream.write(buffer, 0, len);
+                bytesToRead -= len;
             } catch (IOException ioe) {
                 exception = ioe;
-                len = -1;
+                break;
             }
         }
 
