@@ -70,6 +70,7 @@
         <TransientAttribute>configured</TransientAttribute>
         <TransientAttribute>displayName</TransientAttribute>
         <TransientAttribute>distributable</TransientAttribute>
+        <TransientAttribute>deployedFromServerXml</TransientAttribute>
         <TransientAttribute>domain</TransientAttribute>
         <TransientAttribute>name</TransientAttribute>
         <TransientAttribute>publicId</TransientAttribute>
