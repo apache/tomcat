@@ -2289,6 +2289,17 @@ public abstract class Node implements TagConstants {
     }
 
     /**
+     * Used as a placeholder for the insertion of page termination code (used by the tag plugin machinery only).
+     */
+    public static class PageTerminationGenerator extends Node {
+
+        @Override
+        void accept(Visitor v) throws JasperException {
+            v.visit(this);
+        }
+    }
+
+    /**
      * Represents the body of a &lt;jsp:text&gt; element
      */
     public static class JspText extends Node {
@@ -3284,6 +3295,16 @@ public abstract class Node implements TagConstants {
          * @throws JasperException if an error occurs while visiting the node
          */
         public void visit(AttributeGenerator n) throws JasperException {
+            doVisit(n);
+        }
+
+        /**
+         * Visits an page termination generator node.
+         *
+         * @param n The page termination generator node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
+        public void visit(PageTerminationGenerator n) throws JasperException {
             doVisit(n);
         }
     }
