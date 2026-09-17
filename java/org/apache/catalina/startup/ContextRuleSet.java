@@ -209,7 +209,8 @@ final class SetDeployedFromServerXmlRule extends Rule {
 
     @Override
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
-        if (digester.peek() instanceof StandardContext context) {
+        if (digester.peek() instanceof StandardContext) {
+            StandardContext context = (StandardContext) digester.peek();
             context.setDeployedFromServerXml(true);
             if (digester.getLogger().isTraceEnabled()) {
                 digester.getLogger().trace("Calling StandardContext.setDeployedFromServerXml(true)");
