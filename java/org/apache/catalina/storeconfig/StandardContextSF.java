@@ -140,14 +140,16 @@ public class StandardContextSF extends StoreFactoryBase {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("standardContextSF.storeContext", aContext.getPath(), config));
             }
+            // Generate the configuration in memory so that the layout of the previous version of the file can
+            // be preserved. This has to happen before the output stream is opened because opening the output
+            // stream truncates the file that XMLFormatPreserver reads the previous layout from.
+            StringWriter buffer = new StringWriter();
+            storeXMLHead(new PrintWriter(buffer));
+            super.store(new PrintWriter(buffer), -2, aContext);
+            String formatted = XMLFormatPreserver.preserve(config, buffer.toString(), getRegistry().getEncoding());
             try (FileOutputStream fos = new FileOutputStream(config);
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(fos, getRegistry().getEncoding()))) {
-                // Generate the configuration in memory so that the layout of the previous version of the file can
-                // be preserved
-                StringWriter buffer = new StringWriter();
-                storeXMLHead(new PrintWriter(buffer));
-                super.store(new PrintWriter(buffer), -2, aContext);
-                writer.write(XMLFormatPreserver.preserve(config, buffer.toString(), getRegistry().getEncoding()));
+                writer.write(formatted);
             }
         } else {
             super.store(aWriter, indent, aContext);

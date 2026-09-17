@@ -148,13 +148,16 @@ public final class XMLFormatPreserver {
             return newXml;
         }
         String lineSeparator = originalXml.contains("\r\n") ? "\r\n" : "\n";
+        // The roots have the same name, so they match. The preamble of the root is emitted by emitElement()
+        // through this match, which also preserves the attribute order of the root and the layout tokens before
+        // the closing tag of the root.
+        fresh.root.match = original.root;
         matchChildren(original.root, fresh.root);
         StringBuilder result = new StringBuilder(newXml.length() + 512);
         result.append("<?xml version=\"1.0\" encoding=\"").append(encoding).append("\"?>").append(lineSeparator);
         if (original.doctype != null) {
             result.append(original.doctype).append(lineSeparator);
         }
-        emitTokens(result, original.root.preamble, 0, lineSeparator);
         emitElement(result, fresh.root, 0, lineSeparator);
         emitTokens(result, original.trailing, 0, lineSeparator);
         String formatted = result.toString();
@@ -264,17 +267,20 @@ public final class XMLFormatPreserver {
      * @return The match score, 0 if nothing is shared
      */
     private static int matchScore(XmlElement fresh, XmlElement candidate) {
-        // Identical attribute sets (the order may differ) are the strongest match
-        if (attributesEqual(fresh, candidate)) {
-            return 1000;
-        }
         int score = 0;
-        for (int i = 0; i < fresh.attributeNames.size(); i++) {
-            String name = fresh.attributeNames.get(i);
-            String value = fresh.attributeValues.get(i);
-            int index = candidate.attributeIndex(name);
-            if (index >= 0 && candidate.attributeValues.get(index).equals(value)) {
-                score += isKeyAttribute(name) ? 100 : 10;
+        // Identical attribute sets (the order may differ) are the strongest match. The text is still scored on
+        // top of the attribute score so that repeated elements with an equal (e.g. empty) attribute set, like
+        // WatchedResource, are matched by content instead of by position.
+        if (attributesEqual(fresh, candidate)) {
+            score = 1000;
+        } else {
+            for (int i = 0; i < fresh.attributeNames.size(); i++) {
+                String name = fresh.attributeNames.get(i);
+                String value = fresh.attributeValues.get(i);
+                int index = candidate.attributeIndex(name);
+                if (index >= 0 && candidate.attributeValues.get(index).equals(value)) {
+                    score += isKeyAttribute(name) ? 100 : 10;
+                }
             }
         }
         String freshText = fresh.getText();
