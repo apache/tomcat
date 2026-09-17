@@ -917,7 +917,14 @@ public class HttpParser {
         reader.mark(1);
         do {
             c = reader.read();
-            if (c == '.') {
+            if (c == -1) {
+                if (inIPv6) {
+                    throw new IllegalArgumentException(sm.getString("http.noClosingBracket"));
+                } else {
+                    pos = -1;
+                    break;
+                }
+            } else if (c == '.') {
                 if (octet > -1 && octet < 256) {
                     // Valid
                     octetCount++;
@@ -951,13 +958,6 @@ public class HttpParser {
                 }
             } else if (c == ':') {
                 break;
-            } else if (c == -1) {
-                if (inIPv6) {
-                    throw new IllegalArgumentException(sm.getString("http.noClosingBracket"));
-                } else {
-                    pos = -1;
-                    break;
-                }
             } else if (c == ']') {
                 if (inIPv6) {
                     pos++;
