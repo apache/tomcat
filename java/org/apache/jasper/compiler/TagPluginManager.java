@@ -292,7 +292,11 @@ public class TagPluginManager {
             }
             return null;
         }
-    }
 
+        @Override
+        public void generatePageTermination() {
+            curNodes.add(new Node.PageTerminationGenerator());
+        }
+    }
 }
 
