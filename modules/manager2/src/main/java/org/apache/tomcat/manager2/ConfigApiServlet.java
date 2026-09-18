@@ -671,9 +671,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             entry.put("type", "executor");
             entry.put("className", executor.getClass().getName());
             entry.put("name", executor.getName());
-            if (executor instanceof Lifecycle lifecycle) {
-                entry.put("state", lifecycle.getState().toString());
-            }
+            entry.put("state", executor.getState().toString());
             entry.put("children", new ArrayList<Map<String, Object>>());
             result.add(entry);
         }
@@ -2018,6 +2016,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         Object current = server;
         Object parent = null;
+        String type = "server";
 
         for (int i = 1; i < segments.length; i += 2) {
             if (i + 1 >= segments.length) {
@@ -2501,88 +2500,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 }
                 default -> throw notFound();
             }
+
+            type = "localMember".equals(kind) ? "member" : kind;
         }
 
-        String type;
-        if (current instanceof Server) {
-            type = "server";
-        } else if (current instanceof Service) {
-            type = "service";
-        } else if (current instanceof Engine) {
-            type = "engine";
-        } else if (current instanceof Host) {
-            type = "host";
-        } else if (current instanceof Context) {
-            type = "context";
-        } else if (current instanceof Wrapper) {
-            type = "wrapper";
-        } else if (current instanceof Connector) {
-            type = "connector";
-        } else if (current instanceof Executor) {
-            type = "executor";
-        } else if (current instanceof Realm) {
-            type = "realm";
-        } else if (current instanceof ClusterManager) {
-            type = "clusterManager";
-        } else if (current instanceof Manager) {
-            type = "manager";
-        } else if (current instanceof CatalinaCluster) {
-            type = "cluster";
-        } else if (current instanceof Channel) {
-            type = "channel";
-        } else if (current instanceof MembershipService) {
-            type = "membership";
-        } else if (current instanceof ChannelSender) {
-            type = "sender";
-        } else if (current instanceof MultiPointSender) {
-            type = "transport";
-        } else if (current instanceof ChannelReceiver) {
-            type = "receiver";
-        } else if (current instanceof ClusterDeployer) {
-            type = "deployer";
-        } else if (current instanceof ClusterValve) {
-            type = "clusterValve";
-        } else if (current instanceof ClusterListener) {
-            type = "clusterListener";
-        } else if (current instanceof Member) {
-            type = "member";
-        } else if (current instanceof ChannelInterceptor) {
-            type = "interceptor";
-        } else if (current instanceof SessionIdGenerator) {
-            type = "sessionIdGenerator";
-        } else if (current instanceof WebResourceRoot) {
-            type = "resources";
-        } else if (current instanceof Loader) {
-            type = "loader";
-        } else if (current instanceof CookieProcessor) {
-            type = "cookieProcessor";
-        } else if (current instanceof NamingResourcesImpl) {
-            type = "namingResources";
-        } else if (current instanceof ContextResource) {
-            type = "resource";
-        } else if (current instanceof ContextResourceLink) {
-            type = "resourceLink";
-        } else if (current instanceof ContextResourceEnvRef) {
-            type = "resourceEnvRef";
-        } else if (current instanceof ContextEnvironment) {
-            type = "environment";
-        } else if (current instanceof ContextEjb) {
-            type = "ejb";
-        } else if (current instanceof ContextLocalEjb) {
-            type = "localEjb";
-        } else if (current instanceof ContextService) {
-            type = "serviceRef";
-        } else if (current instanceof SSLHostConfig) {
-            type = "sslHostConfig";
-        } else if (current instanceof SSLHostConfigCertificate) {
-            type = "certificate";
-        } else if (current instanceof UpgradeProtocol) {
-            type = "upgradeProtocol";
-        } else if (current instanceof LifecycleListener) {
-            type = "listener";
-        } else {
-            type = "valve";
-        }
         return new NodeRef(current, parent, type, null, id);
     }
 
