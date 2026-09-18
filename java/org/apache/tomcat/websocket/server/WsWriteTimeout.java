@@ -40,12 +40,12 @@ public class WsWriteTimeout implements BackgroundProcess {
     private final ReentrantLock backgroundProcessLock = new ReentrantLock();
     private int count = 0;
 
-    private volatile int backgroundProcessCount = 0;
+    private int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;
 
     @Override
     public void backgroundProcess() {
-        // This method gets called once a second.
+        // This method gets called once a second. Always by the WsBackgroundThread instance so no concurrency concerns.
         backgroundProcessCount++;
 
         if (backgroundProcessCount >= processPeriod) {
