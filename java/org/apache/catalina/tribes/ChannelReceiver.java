@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The <code>ChannelReceiver</code> interface is the data receiver component at the bottom layer, the IO layer (for
@@ -30,6 +31,11 @@ public interface ChannelReceiver extends Heartbeat {
     int MAX_UDP_SIZE = 65535;
 
     /**
+     * Default timeout in milliseconds for {@link #waitForReady(long, TimeUnit)}.
+     */
+    long DEFAULT_READY_TIMEOUT_MS = 5000;
+
+    /**
      * Start listening for incoming messages on the host/port
      *
      * @throws IOException Listen failed
@@ -40,6 +46,23 @@ public interface ChannelReceiver extends Heartbeat {
      * Stop listening for messages
      */
     void stop();
+
+    /**
+     * Wait until the receiver is ready to accept connections, or the timeout expires.
+     * <p>
+     * The default implementation returns immediately, preserving backward compatibility
+     * for receivers that do not implement readiness signaling. Implementations that
+     * start background listener threads should override this method to block until
+     * the listener thread has entered its accept/select loop.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return {@code true} if the receiver is ready; {@code false} if the timeout elapsed
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     */
+    default boolean waitForReady(long timeout, TimeUnit unit) throws InterruptedException {
+        return true;
+    }
 
     /**
      * String representation of the IPv4 or IPv6 address that this host is listening to.
