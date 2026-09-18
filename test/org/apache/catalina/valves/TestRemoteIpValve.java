@@ -1213,15 +1213,13 @@ public class TestRemoteIpValve {
     }
 
     @Test
-    public void testInternalProxiesCidrWithNull() throws Exception {
+    public void testInternalProxiesInvalidCidr() {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
         try {
-            // Multiple invalid CIDR formats
             remoteIpValve.setInternalProxies("192.168.0.0/33,2001:db8::/129");
-            Assert.fail("Expected IllegalArgumentException was not thrown");
+            Assert.fail("Expected IllegalArgumentException was not thrown for out-of-range prefix lengths");
         } catch (IllegalArgumentException e) {
-            // Test passes - exception was thrown as expected
-            Assert.assertNotNull("Exception message should not be null", e.getMessage());
+            Assert.assertNotNull(e.getMessage());
         }
     }
 
