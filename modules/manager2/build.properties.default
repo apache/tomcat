@@ -1,0 +1,63 @@
+# -----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -----------------------------------------------------------------------------
+#
+# Build properties for the Tomcat Manager2 module.
+#
+# Copy this file to "build.properties" (in this directory) and customize it
+# for your local environment. Values in "build.properties" override the
+# values here.
+# -----------------------------------------------------------------------------
+
+# ----- Version -----
+version.major=1
+version.minor=0
+version.build=0
+version.patch=0
+version.suffix=-SNAPSHOT
+
+# ----- Base path of the Tomcat source tree -----
+# The module is built against a Tomcat build (ant) from the main source
+# tree. By default the main tree is assumed to be two levels up.
+tomcat.home=${basedir}/../..
+
+# Build output of the main Tomcat build (ant) in the main tree. The
+# manager2 module needs the built lib/ jars (catalina.jar, servlet-api.jar,
+# tomcat-util.jar) to compile and the built distribution to deploy into.
+tomcat.build=${tomcat.home}/output/build
+
+# ----- Base path for dependent packages (main tree) -----
+# Must match the main tree's build.properties "base.path" so that the
+# JUnit/Hamcrest jars used by the main build can be found for testing.
+base.path=${user.home}/tomcat-build-libs
+
+junit.version=4.13.2
+junit.home=${base.path}/junit-${junit.version}
+junit.jar=${junit.home}/junit-${junit.version}.jar
+
+hamcrest.version=3.0
+hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
+hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
+
+# ----- Compile settings (keep in sync with the main tree) -----
+compile.release=21
+compile.debug=true
+compile.deprecation=false
+encoding=UTF-8
+
+# ----- Test settings -----
+test.entry=
+test.reports=${tomcat.output}/reports
