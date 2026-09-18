@@ -214,6 +214,9 @@
         Fix possible TLS connections failures caused by one of the flags Tomcat
         uses to track TLS handshake progress not being correctly reset. (markt)
       </fix>
+      <fix>
+        Allow for absolute host names in SNI checks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
