@@ -1389,7 +1389,8 @@ public class TestManager2Webapp extends TomcatBaseTest {
     private File createTestWar() throws IOException {
         File warFile = new File(TEMP_DIR, "manager2-test.war");
         deleteRecursive(warFile);
-        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(warFile))) {
+        try (FileOutputStream fos = new FileOutputStream(warFile);
+                JarOutputStream jos = new JarOutputStream(fos)) {
             jos.putNextEntry(new JarEntry("index.html"));
             jos.write("<html><body>manager2 war test</body></html>".getBytes(StandardCharsets.UTF_8));
             jos.closeEntry();

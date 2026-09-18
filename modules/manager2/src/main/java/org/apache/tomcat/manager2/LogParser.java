@@ -240,7 +240,8 @@ public final class LogParser {
                 literal.setLength(0);
             }
             if (i + 1 >= pattern.length()) {
-                throw new IllegalArgumentException("Dangling '%' in access log pattern: " + pattern);
+                throw new IllegalArgumentException(
+                        Strings.sm().getString("manager2.accessPatternDangling", pattern));
             }
             char next = pattern.charAt(++i);
             if (next == '%') {
@@ -250,14 +251,15 @@ public final class LogParser {
             if (next == '{') {
                 int close = pattern.indexOf('}', i + 1);
                 if (close < 0 || close + 1 >= pattern.length()) {
-                    throw new IllegalArgumentException("Malformed access log pattern: " + pattern);
+                    throw new IllegalArgumentException(
+                            Strings.sm().getString("manager2.accessPatternMalformed", pattern));
                 }
                 String key = pattern.substring(i + 1, close);
                 char directive = pattern.charAt(close + 1);
                 String field = AccessLogSupport.keyedField(directive, key);
                 if (field == null) {
                     throw new IllegalArgumentException(
-                            "Unsupported directive %{%s}%c in access log pattern".formatted(key, directive));
+                            Strings.sm().getString("manager2.accessPatternUnsupported", "%{" + key + "}%" + directive));
                 }
                 regex.append("([^\\\"]*)");
                 groupFields.add(field);
@@ -266,7 +268,8 @@ public final class LogParser {
             }
             String[] directive = AccessLogSupport.directives().get(next);
             if (directive == null) {
-                throw new IllegalArgumentException("Unsupported directive %c in access log pattern".formatted(next));
+                throw new IllegalArgumentException(
+                        Strings.sm().getString("manager2.accessPatternUnsupported", "%" + next));
             }
             regex.append(directive[0]);
             groupFields.add(directive[1]);
@@ -279,7 +282,7 @@ public final class LogParser {
         try {
             regexPattern = Pattern.compile(regex.toString());
         } catch (RuntimeException e) {
-            throw new IllegalArgumentException("Invalid access log pattern: " + pattern, e);
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.accessPatternInvalid", pattern), e);
         }
 
         return new AccessParser(regexPattern, groupFields, AccessLogSupport.displayFields(groupFields));

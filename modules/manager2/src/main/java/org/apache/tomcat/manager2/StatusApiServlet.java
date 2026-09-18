@@ -220,7 +220,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
             } else if (path.startsWith("/api/status/history")) {
                 if (history == null) {
                     Api.error(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "NOT_AVAILABLE",
-                            "The status history is not available.");
+                            Strings.sm().getString("manager2.historyNotAvailable"));
                 } else {
                     Api.json(response, history.payload());
                 }

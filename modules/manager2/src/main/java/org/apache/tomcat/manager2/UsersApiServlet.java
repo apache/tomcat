@@ -890,13 +890,14 @@ public class UsersApiServlet extends HttpServlet implements ContainerServlet {
             return new ArrayList<>();
         }
         if (!(value instanceof List<?> list)) {
-            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson", "expected an array of strings"));
+            throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson",
+                    Strings.sm().getString("manager2.expectedStringArray")));
         }
         List<String> result = new ArrayList<>();
         for (Object item : list) {
             if (!(item instanceof String s) || !validName(s)) {
-                throw new IllegalArgumentException(
-                        Strings.sm().getString("manager2.invalidJson", "expected an array of strings"));
+                throw new IllegalArgumentException(Strings.sm().getString("manager2.invalidJson",
+                        Strings.sm().getString("manager2.expectedStringArray")));
             }
             result.add(s);
         }

@@ -2979,7 +2979,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
             rollback(label, undo);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    Strings.sm().getString("manager2.configStartFailed", label, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", label, Strings.sm().getString("manager2.configNotStarted")));
         }
     }
 
@@ -3680,7 +3680,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         if (running && realm instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
             container.setRealm(oldRealm);
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", className, Strings.sm().getString("manager2.configNotStarted")));
         }
         log(Strings.sm().getString("manager2.configAuditAdd", "realm", className));
         Api.ok(response, Strings.sm().getString("manager2.configAdded", className));
@@ -3816,7 +3816,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 if (running && component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
                     context.setManager(oldManager);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                            Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
+                            Strings.sm().getString("manager2.configStartFailed", className, Strings.sm().getString("manager2.configNotStarted")));
                 }
             }
             case "loader" -> {
@@ -3834,7 +3834,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 if (running && component instanceof Lifecycle lifecycle && !lifecycle.getState().isAvailable()) {
                     context.setLoader(oldLoader);
                     throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                            Strings.sm().getString("manager2.configStartFailed", className, "the component did not start"));
+                            Strings.sm().getString("manager2.configStartFailed", className, Strings.sm().getString("manager2.configNotStarted")));
                 }
             }
             case "resources" -> {
@@ -4995,7 +4995,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (lifecycle.getState().isAvailable()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "STOP_FAILED",
-                    Strings.sm().getString("manager2.configStopFailed", label, "the component did not stop"));
+                    Strings.sm().getString("manager2.configStopFailed", label, Strings.sm().getString("manager2.configNotStopped")));
         }
     }
 
@@ -5013,7 +5013,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (!lifecycle.getState().isAvailable()) {
             throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "START_FAILED",
-                    Strings.sm().getString("manager2.configStartFailed", label, "the component did not start"));
+                    Strings.sm().getString("manager2.configStartFailed", label, Strings.sm().getString("manager2.configNotStarted")));
         }
     }
 
