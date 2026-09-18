@@ -18,8 +18,10 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,50 +50,108 @@ public class ServletDef implements Serializable {
 
 
     /**
-     * The description of this servlet.
+     * The descriptions of this servlet. Multiple descriptions, each with an optional language, are supported as per
+     * the deployment descriptor specification.
      */
-    private String description = null;
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
     /**
-     * Returns the description of this servlet.
+     * Returns the descriptions of this servlet.
+     *
+     * @return The descriptions
+     */
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
+    }
+
+    /**
+     * Adds a description to this servlet.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+    /**
+     * Returns the description of this servlet. The default description (the one without a language) is returned if
+     * present, otherwise the first description is returned.
      *
      * @return the description
      */
     public String getDescription() {
-        return this.description;
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
     }
 
     /**
-     * Sets the description of this servlet.
+     * Sets the description of this servlet. Any existing descriptions, including language specific ones, are replaced
+     * by a single default description.
      *
      * @param description the description
      */
     public void setDescription(String description) {
-        this.description = description;
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
     }
 
 
     /**
-     * The display name of this servlet.
+     * The display names of this servlet. Multiple display names, each with an optional language, are supported as per
+     * the deployment descriptor specification.
      */
-    private String displayName = null;
+    private final List<LocaleElement> displayNames = new ArrayList<>();
 
     /**
-     * Returns the display name of this servlet.
+     * Returns the display names of this servlet.
+     *
+     * @return The display names
+     */
+    public List<LocaleElement> getDisplayNames() {
+        return displayNames;
+    }
+
+    /**
+     * Adds a display name to this servlet.
+     *
+     * @param displayName The display name to add
+     */
+    public void addDisplayName(LocaleElement displayName) {
+        displayNames.add(displayName);
+    }
+
+    /**
+     * Returns the display name of this servlet. The default display name (the one without a language) is returned if
+     * present, otherwise the first display name is returned.
      *
      * @return the display name
      */
     public String getDisplayName() {
-        return this.displayName;
+        for (LocaleElement element : displayNames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displayNames.isEmpty() ? null : displayNames.get(0).getContent();
     }
 
     /**
-     * Sets the display name of this servlet.
+     * Sets the display name of this servlet. Any existing display names, including language specific ones, are
+     * replaced by a single default display name.
      *
      * @param displayName the display name
      */
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+        displayNames.clear();
+        if (displayName != null) {
+            displayNames.add(new LocaleElement(displayName, null));
+        }
     }
 
 

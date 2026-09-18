@@ -18,6 +18,8 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -91,6 +93,59 @@ public class SecurityRoleRef implements Serializable {
     }
 
 
+    /**
+     * The descriptions of this security role reference. Multiple descriptions, each with an optional language, are
+     * supported as per the deployment descriptor specification.
+     */
+    private final List<LocaleElement> descriptions = new ArrayList<>();
+
+    /**
+     * Returns the descriptions of this security role reference.
+     *
+     * @return The descriptions
+     */
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
+    }
+
+    /**
+     * Adds a description to this security role reference.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+    /**
+     * Returns the description of this security role reference. The default description (the one without a language) is
+     * returned if present, otherwise the first description is returned.
+     *
+     * @return The description
+     */
+    public String getDescription() {
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
+    }
+
+    /**
+     * Sets the description of this security role reference. Any existing descriptions, including language specific
+     * ones, are replaced by a single default description.
+     *
+     * @param description The description
+     */
+    public void setDescription(String description) {
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -115,6 +170,7 @@ public class SecurityRoleRef implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + descriptions.hashCode();
         result = prime * result + ((link == null) ? 0 : link.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
@@ -130,6 +186,9 @@ public class SecurityRoleRef implements Serializable {
             return false;
         }
         SecurityRoleRef other = (SecurityRoleRef) obj;
+        if (!descriptions.equals(other.descriptions)) {
+            return false;
+        }
         if (!Objects.equals(link, other.link)) {
             return false;
         }
