@@ -28,9 +28,55 @@
 
 <body>
 
-
 <section name="Status">
-    <p>TODO</p>
+  <p>Tribes exposes the state of a running channel through JMX. Use a JMX
+     client to inspect the channel and its components. See the
+     <a href="../monitoring.html">Tomcat monitoring documentation</a> for
+     ways to connect a JMX client.</p>
+
+  <p>The channel's <code>jmxEnabled</code> attribute controls registration and
+     defaults to <code>true</code>. The default JMX domain is
+     <code>ClusterChannel</code>; <code>jmxDomain</code> and
+     <code>jmxPrefix</code> can change the object names. Each object name
+     includes <code>type=Channel</code>, the channel name, and a
+     <code>component</code> property. A channel must have a name for its
+     components to register. See the
+     <a href="../config/cluster-channel.html">channel configuration</a> for
+     these attributes.</p>
+</section>
+
+<section name="Membership">
+  <p>Inspect the <code>component=Membership</code> MBean to see the members
+     known to this node. Multicast, static, and cloud membership services
+     expose <code>hasMembers</code> and <code>getMembersByName</code>. Compare
+     the list on each node with the expected cluster membership. A node that
+     intentionally runs alone has no remote members.</p>
+</section>
+
+<section name="Message transport">
+  <p>The <code>component=Receiver</code> MBean for an NIO receiver exposes
+     <code>Listening</code>, <code>ActiveCount</code>, and
+     <code>PoolSize</code>. Check <code>Listening</code> when a node should
+     accept cluster messages. The <code>component=Sender</code> MBean exposes
+     properties of the configured sender.</p>
+
+  <p>If a <code>ThroughputInterceptor</code> is configured, its
+     <code>component=Interceptor</code> MBean exposes transmitted and received
+     message counts and transmit errors. A
+     <code>MessageDispatchInterceptor</code> exposes <code>CurrentSize</code>
+     and worker counts for its asynchronous send queue. Compare counters over
+     time; a growing queue or increasing error count warrants investigation.
+     Interceptor MBeans are present only for configured interceptors.</p>
+</section>
+
+<section name="Session replication">
+  <p>When Tribes is used by a Tomcat cluster, the session manager provides
+     additional replication statistics. For example, a
+     <code>DeltaManager</code> with statistics enabled exposes counters for
+     sent and received session events and state transfers. These are manager
+     statistics, separate from the channel component MBeans. See the
+     <a href="../config/cluster-manager.html">cluster manager
+     configuration</a> for the <code>enableStatistics</code> attribute.</p>
 </section>
 </body>
 

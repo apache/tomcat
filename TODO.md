@@ -827,19 +827,18 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ## Documentation TODOs
 
-### 75. Tribes Documentation (7 files)
+### 75. Tribes Documentation (6 files)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
 | 75.1 | `docs/tribes/transport.xml:33` | Empty TODO placeholder | Write transport layer documentation: NIO vs BIO sender, UDP vs TCP, configuration options. | 2-3 days | Medium |
-| 75.2 | `docs/tribes/status.xml:33` | Empty TODO placeholder | Document cluster status monitoring: MBeans, statistics, health checks. | 1-2 days | Medium |
 | 75.3 | `docs/tribes/setup.xml:33` | Empty TODO placeholder | Write cluster setup guide: single-point vs multi-point, load balancer config, session replication. | 3-5 days | Medium |
 | 75.4 | `docs/tribes/membership.xml:33` | Empty TODO placeholder | Document membership service: multicast, static members, dynamic discovery. | 1-2 days | Medium |
 | 75.5 | `docs/tribes/interceptors.xml:33` | Empty TODO placeholder | Document all cluster interceptors: fault tolerance, flow control, message dispatch, etc. | 2-3 days | Medium |
 | 75.6 | `docs/tribes/faq.xml:33` | Empty TODO placeholder | Compile common clustering questions and answers from mailing lists and JIRA. | 2-3 days | Medium |
 | 75.7 | `docs/tribes/developers.xml:33` | Empty TODO placeholder | Developer guide for extending Tribes: custom channels, interceptors, senders. | 2-3 days | Medium |
 
-**Total estimated effort: 13-21 days, Medium difficulty**
+**Total estimated effort: 11-18 days, Medium difficulty**
 
 ---
 
