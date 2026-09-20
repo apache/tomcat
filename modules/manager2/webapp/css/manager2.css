@@ -1149,7 +1149,10 @@ pre.block {
     left: 0;
     width: var(--sidenav-w);
     z-index: 30;
-    padding: var(--space-4) var(--space-3);
+    /* Padding matches the collapsed rail (top var(--space-3), left
+       var(--space-2)) so the icon rows and the item pills do not shift
+       when the rail pops out; only the right padding grows. */
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-2);
     border-radius: 0 var(--radius) var(--radius) 0;
     box-shadow: var(--shadow-2);
     scrollbar-width: auto;
@@ -1160,11 +1163,17 @@ pre.block {
   .sidenav:focus-within .nav-item {
     justify-content: flex-start;
     gap: 10px;
-    padding: 9px 12px;
+    /* With the container's 8 px left padding this lands the icon at
+       20.5 px, where the collapsed rail centres it in the 60 px column
+       ((60 - 8 - 8 - 1 - 18) / 2 + 8 = 20.5); hence the half pixel. */
+    padding: 10px 12px 10px 12.5px;
   }
   .sidenav:hover .nav-label,
   .sidenav:focus-within .nav-label {
     display: block;
+    /* Keep the label's line box under the 18 px icon so the item height
+       (and therefore the icon rows) match the collapsed rail exactly. */
+    line-height: 1;
     animation: sidenav-label-in 120ms ease;
   }
 }
