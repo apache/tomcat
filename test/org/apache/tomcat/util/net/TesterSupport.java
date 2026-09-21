@@ -99,6 +99,9 @@ public final class TesterSupport {
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
     public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_CERT_PEM = SSL_DIR + "localhost-rsa-longchain-cert.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_KEY_PEM = SSL_DIR + "localhost-rsa-longchain-key.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_CHAIN_PEM = SSL_DIR + "localhost-rsa-longchain-chain.pem";
     public static final String DB_INDEX = SSL_DIR + "index.db";
     public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "ocsp-responder-rsa-cert.pem";
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
