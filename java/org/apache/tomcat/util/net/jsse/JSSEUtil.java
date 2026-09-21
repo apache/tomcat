@@ -158,6 +158,10 @@ public class JSSEUtil extends SSLUtilBase {
                         log.warn(sm.getString("jsseUtil.opensslconf.present"));
                     }
 
+                    if (!sslHostConfig.getPreSharedKeys().isEmpty()) {
+                        log.warn(sm.getString("jsseUtil.psk.present"));
+                    }
+
                     initialized = true;
                 }
             }

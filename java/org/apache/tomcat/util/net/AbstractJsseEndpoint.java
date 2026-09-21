@@ -124,7 +124,9 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
                 certificate.setSslContextGenerated(sslContext);
             }
 
-            logCertificate(certificate);
+            if (!sslHostConfig.isPreSharedKeyOnly()) {
+                logCertificate(certificate);
+            }
         }
 
     }
