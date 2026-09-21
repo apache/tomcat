@@ -141,6 +141,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>70236</bug>: Fix a stalled TLS handshake with the OpenSSL based
+        implementations of <code>SSLEngine</code> when the first flight of
+        handshake messages sent by the server is too large to fit in the
+        buffer used by the BIO pair. Patch submitted by Lukas Hellebrandt.
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.60 (schultz)" rtext="2026-09-15">
   <subsection name="Catalina">

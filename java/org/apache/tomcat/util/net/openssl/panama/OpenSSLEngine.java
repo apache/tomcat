@@ -391,6 +391,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 shutdown();
             }
 
+            // The network BIO has just been drained. Give OpenSSL the opportunity to write out any part of the
+            // current handshake flight that it did not previously have space for, before the handshake status is
+            // calculated below.
+            if (!handshakeFinished && !engineClosed) {
+                continueHandshake();
+            }
+
             return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), 0, bytesProduced);
         }
 
@@ -908,6 +915,21 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // if SSL_do_handshake returns > 0 it means the handshake was finished. This means we can update
             // handshakeFinished directly and so eliminate unnecessary calls to SSL.isInInit(...)
             handshakeFinished = true;
+        }
+    }
+
+    /*
+     * Continue a handshake that is already in progress.
+     *
+     * OpenSSL writes a complete handshake flight to the network BIO in a single operation. If the flight does not fit
+     * in the buffer of the BIO pair, the remainder is retained inside OpenSSL and can only be written once the BIO has
+     * been drained, which requires OpenSSL to be driven again. Unlike handshake(), this method does not reset the
+     * handshake tracking state, so completion continues to be detected via the handshake counter.
+     */
+    private void continueHandshake() throws SSLException {
+        clearLastError();
+        if (SSL_do_handshake(state.ssl) <= 0) {
+            checkLastError();
         }
     }
 
