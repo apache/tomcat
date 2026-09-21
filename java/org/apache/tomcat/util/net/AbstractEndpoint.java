@@ -1901,6 +1901,15 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     /**
+     * Number of keep-alive sockets.
+     *
+     * @return the default implementation returns 0
+     */
+    public int getKeepAliveCount() {
+        return 0;
+    }
+
+    /**
      * Check if the endpoint is running.
      *
      * @return True if the endpoint is running
