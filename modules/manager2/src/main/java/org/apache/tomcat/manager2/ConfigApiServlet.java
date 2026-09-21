@@ -442,85 +442,111 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             node.put("global", Boolean.valueOf(namingResources.getContainer() instanceof Server));
         }
 
+        // The node type identifies the component kind; the tree is built from
+        // components of exactly these types (and resolve() enforces the same
+        // types for the node endpoint). Only the cluster (whose implementation
+        // class is not constrained beyond the Cluster interface), the managed
+        // nature of a channel and the static membership interceptor remain
+        // instanceof checks: they are capability probes, not type dispatch.
         List<Map<String, Object>> children = new ArrayList<>();
-        if (component instanceof StandardServer s) {
-            children.add(build(s.getGlobalNamingResources(), id + "/namingResources/0", "namingResources"));
-            for (Service service : s.findServices()) {
-                children.add(build(service, id + "/service/" + enc(service.getName()), "service"));
+        switch (type) {
+            case "server" -> {
+                StandardServer s = (StandardServer) component;
+                children.add(build(s.getGlobalNamingResources(), id + "/namingResources/0", "namingResources"));
+                for (Service service : s.findServices()) {
+                    children.add(build(service, id + "/service/" + enc(service.getName()), "service"));
+                }
+                children.addAll(childrenOfListeners(s, id));
             }
-            children.addAll(childrenOfListeners(s, id));
-        } else if (component instanceof StandardService service) {
-            Engine engine = service.getContainer();
-            if (engine != null) {
-                children.add(build(engine, id + "/engine/" + enc(engine.getName()), "engine"));
+            case "service" -> {
+                StandardService service = (StandardService) component;
+                Engine engine = service.getContainer();
+                if (engine != null) {
+                    children.add(build(engine, id + "/engine/" + enc(engine.getName()), "engine"));
+                }
+                children.addAll(childrenOfConnectors(service, id));
+                children.addAll(childrenOfExecutors(service, id));
+                children.addAll(childrenOfListeners(service, id));
             }
-            children.addAll(childrenOfConnectors(service, id));
-            children.addAll(childrenOfExecutors(service, id));
-            children.addAll(childrenOfListeners(service, id));
-        } else if (component instanceof StandardEngine engine) {
-            for (Container host : engine.findChildren()) {
-                if (host instanceof Host) {
-                    children.add(build(host, id + "/host/" + enc(host.getName()), "host"));
+            case "engine" -> {
+                StandardEngine engine = (StandardEngine) component;
+                for (Container child : engine.findChildren()) {
+                    if (child instanceof Host) {
+                        children.add(build(child, id + "/host/" + enc(child.getName()), "host"));
+                    }
+                }
+                children.addAll(childrenOfRealm(engine, id));
+                children.addAll(childrenOfCluster(engine, id));
+                children.addAll(childrenOfValves(engine, id));
+                children.addAll(childrenOfListeners(engine, id));
+            }
+            case "host" -> {
+                Host host = (Host) component;
+                for (String alias : host.findAliases()) {
+                    Map<String, Object> entry = new LinkedHashMap<>();
+                    entry.put("id", id + "/alias/" + enc(alias));
+                    entry.put("type", "alias");
+                    entry.put("className", String.class.getName());
+                    entry.put("name", alias);
+                    entry.put("children", new ArrayList<Map<String, Object>>());
+                    children.add(entry);
+                }
+                for (Container child : host.findChildren()) {
+                    if (child instanceof Context context) {
+                        children.add(build(context, id + "/context/" + encContextPath(context.getPath()), "context"));
+                    }
+                }
+                children.addAll(childrenOfRealm(host, id));
+                children.addAll(childrenOfCluster(host, id));
+                children.addAll(childrenOfValves(host, id));
+                children.addAll(childrenOfListeners((LifecycleBase) host, id));
+            }
+            case "context" -> {
+                Context context = (Context) component;
+                for (Container child : context.findChildren()) {
+                    if (child instanceof Wrapper wrapper) {
+                        children.add(build(wrapper, id + "/wrapper/" + enc(wrapper.getName()), "wrapper"));
+                    }
+                }
+                children.addAll(childrenOfRealm(context, id));
+                children.addAll(childrenOfCluster(context, id));
+                children.addAll(childrenOfContextComponents(context, id));
+                children.add(build(context.getNamingResources(), id + "/namingResources/0", "namingResources"));
+                children.addAll(childrenOfValves(context, id));
+                children.addAll(childrenOfListeners((LifecycleBase) context, id));
+            }
+            case "connector" -> {
+                Connector connector = (Connector) component;
+                children.addAll(sslHostConfigChildren(connector, id));
+                children.addAll(upgradeProtocolChildren(connector, id));
+            }
+            case "sslHostConfig" -> children.addAll(certificateChildren((SSLHostConfig) component, id));
+            case "cluster" -> {
+                if (component instanceof CatalinaCluster cluster) {
+                    children.addAll(clusterChildren(cluster, id));
                 }
             }
-            children.addAll(childrenOfRealm(engine, id));
-            children.addAll(childrenOfCluster(engine, id));
-            children.addAll(childrenOfValves(engine, id));
-            children.addAll(childrenOfListeners(engine, id));
-        } else if (component instanceof Host host) {
-            for (String alias : host.findAliases()) {
-                Map<String, Object> entry = new LinkedHashMap<>();
-                entry.put("id", id + "/alias/" + enc(alias));
-                entry.put("type", "alias");
-                entry.put("className", String.class.getName());
-                entry.put("name", alias);
-                entry.put("children", new ArrayList<Map<String, Object>>());
-                children.add(entry);
-            }
-            for (Container child : host.findChildren()) {
-                if (child instanceof Context context) {
-                    children.add(build(context, id + "/context/" + encContextPath(context.getPath()), "context"));
+            case "channel" -> {
+                if (component instanceof ManagedChannel managed) {
+                    children.addAll(channelChildren(managed, id));
                 }
             }
-            children.addAll(childrenOfRealm(host, id));
-            children.addAll(childrenOfCluster(host, id));
-            children.addAll(childrenOfValves(host, id));
-            children.addAll(childrenOfListeners((LifecycleBase) host, id));
-        } else if (component instanceof Context context) {
-            for (Container child : context.findChildren()) {
-                if (child instanceof Wrapper wrapper) {
-                    children.add(build(wrapper, id + "/wrapper/" + enc(wrapper.getName()), "wrapper"));
+            case "sender" -> children.addAll(senderChildren((ChannelSender) component, id));
+            case "membership" -> children.addAll(membershipChildren((MembershipService) component, id));
+            case "interceptor" -> {
+                if (component instanceof StaticMembershipInterceptor interceptor) {
+                    children.addAll(interceptorChildren(interceptor, id));
                 }
             }
-            children.addAll(childrenOfRealm(context, id));
-            children.addAll(childrenOfCluster(context, id));
-            children.addAll(childrenOfContextComponents(context, id));
-            children.add(build(context.getNamingResources(), id + "/namingResources/0", "namingResources"));
-            children.addAll(childrenOfValves(context, id));
-            children.addAll(childrenOfListeners((LifecycleBase) context, id));
-        } else if (component instanceof Connector connector) {
-            children.addAll(sslHostConfigChildren(connector, id));
-            children.addAll(upgradeProtocolChildren(connector, id));
-        } else if (component instanceof SSLHostConfig sslHostConfig) {
-            children.addAll(certificateChildren(sslHostConfig, id));
-        } else if (component instanceof CatalinaCluster cluster) {
-            children.addAll(clusterChildren(cluster, id));
-        } else if (component instanceof Channel channel) {
-            if (channel instanceof ManagedChannel managed) {
-                children.addAll(channelChildren(managed, id));
+            case "realm" -> children.addAll(childrenOfSubRealms((Realm) component, id));
+            // A cluster manager template is a Manager as well; its session id
+            // generator is shown (and can be replaced) the same way.
+            case "manager", "clusterManager" ->
+                    children.addAll(sessionIdGeneratorChildren((Manager) component, id));
+            case "namingResources" ->
+                    children.addAll(childrenOfNamingResources((NamingResourcesImpl) component, id));
+            default -> {
             }
-        } else if (component instanceof ChannelSender sender) {
-            children.addAll(senderChildren(sender, id));
-        } else if (component instanceof MembershipService membership) {
-            children.addAll(membershipChildren(membership, id));
-        } else if (component instanceof StaticMembershipInterceptor interceptor) {
-            children.addAll(interceptorChildren(interceptor, id));
-        } else if (component instanceof Realm realm) {
-            children.addAll(childrenOfSubRealms(realm, id));
-        } else if (component instanceof Manager manager) {
-            children.addAll(sessionIdGeneratorChildren(manager, id));
-        } else if (component instanceof NamingResourcesImpl namingResources) {
-            children.addAll(childrenOfNamingResources(namingResources, id));
         }
         node.put("children", children);
         return node;
@@ -1035,45 +1061,28 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     private static String displayName(Object component, String type) {
-        if (component instanceof Service s) {
-            return s.getName();
-        }
-        if (component instanceof Engine e) {
-            return e.getName();
-        }
-        if (component instanceof Host h) {
-            return h.getName();
-        }
-        if (component instanceof Context c) {
-            // The root context has the empty path; display it as "/".
-            String path = c.getPath();
-            return path.isEmpty() ? "/" : path;
-        }
-        if (component instanceof Wrapper w) {
-            return w.getName();
-        }
-        if (component instanceof Executor e) {
-            return e.getName();
-        }
-        if (component instanceof Connector connector) {
-            return connectorLabel(connector);
-        }
-        if (component instanceof SSLHostConfig hostConfig) {
-            return hostConfig.getHostName();
-        }
-        if (component instanceof SSLHostConfigCertificate certificate) {
-            return certificateLabel(certificate);
-        }
-        if (component instanceof UpgradeProtocol upgradeProtocol) {
-            return upgradeProtocolLabel(upgradeProtocol);
-        }
-        if (component instanceof ResourceBase entry) {
-            return entry.getName();
-        }
-        if (component instanceof Member member) {
-            return memberLabel(member);
-        }
-        return component.getClass().getSimpleName();
+
+        // Same reasoning as in build(): the node type identifies the component
+        // kind, so dispatch on it instead of an instanceof chain.
+        return switch (type) {
+            case "service" -> ((Service) component).getName();
+            case "engine" -> ((Engine) component).getName();
+            case "host" -> ((Host) component).getName();
+            case "context" -> {
+                // The root context has the empty path; display it as "/".
+                String path = ((Context) component).getPath();
+                yield path.isEmpty() ? "/" : path;
+            }
+            case "wrapper" -> ((Wrapper) component).getName();
+            case "executor" -> ((Executor) component).getName();
+            case "connector" -> connectorLabel((Connector) component);
+            case "sslHostConfig" -> ((SSLHostConfig) component).getHostName();
+            case "certificate" -> certificateLabel((SSLHostConfigCertificate) component);
+            case "upgradeProtocol" -> upgradeProtocolLabel((UpgradeProtocol) component);
+            case "member" -> memberLabel((Member) component);
+            default -> isNamingEntry(type) ? ((ResourceBase) component).getName()
+                    : component.getClass().getSimpleName();
+        };
     }
 
 
