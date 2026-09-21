@@ -481,6 +481,15 @@ public final class SSLContext {
     public static native void setPskServerCallback(long ctx, PreSharedKeySelector selector);
 
     /**
+     * Allow to hook {@link PreSharedKeySelector} into the TLSv1.3 handshake processing. This will call
+     * {@code SSL_CTX_set_psk_find_session_callback}.
+     *
+     * @param ctx      Server context to use.
+     * @param selector the selector to call during handshake, or {@code null} to remove the current selector
+     */
+    public static native void setPskFindSessionCallback(long ctx, PreSharedKeySelector selector);
+
+    /**
      * Set application layer protocol for application layer protocol negotiation extension
      *
      * @param ctx                     Server context to use.
