@@ -23,6 +23,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 
@@ -85,8 +86,13 @@ public class SSLHostConfigSF extends StoreFactoryBase {
         if (aSSLHostConfig instanceof SSLHostConfig) {
             SSLHostConfig sslHostConfig = (SSLHostConfig) aSSLHostConfig;
             // Store nested <SSLHostConfigCertificate> elements
-            SSLHostConfigCertificate[] hostConfigsCertificates =
-                    sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
+            SSLHostConfigCertificate[] hostConfigsCertificates;
+            if (sslHostConfig.isPreSharedKeyOnly()) {
+                hostConfigsCertificates = new SSLHostConfigCertificate[0];
+            } else {
+                hostConfigsCertificates =
+                        sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
+            }
             // Remove the runtime placeholder certificate that was created when
             // no certificate was configured
             SSLHostConfigCertificate defaultCertificate = sslHostConfig.getDefaultCertificate();
@@ -100,6 +106,10 @@ public class SSLHostConfigSF extends StoreFactoryBase {
                 hostConfigsCertificates = certificates.toArray(new SSLHostConfigCertificate[0]);
             }
             storeElementArray(aWriter, indent, hostConfigsCertificates);
+            // Store nested <PreSharedKey> elements
+            SSLHostConfigPreSharedKey[] preSharedKeys =
+                    sslHostConfig.getPreSharedKeys().toArray(new SSLHostConfigPreSharedKey[0]);
+            storeElementArray(aWriter, indent, preSharedKeys);
             // Store nested <OpenSSLConf> element
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             openSslConf = removeRuntimeCommands(openSslConf, sslHostConfig);

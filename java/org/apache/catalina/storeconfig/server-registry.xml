@@ -186,6 +186,14 @@
         storeAppenderClass="org.apache.catalina.storeconfig.CertificateStoreAppender">
      </Description>
      <Description
+        tag="PreSharedKey"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.SSLHostConfigPreSharedKey"
+        children="false"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
         tag="OpenSSLConf"
         standard="true"
         default="true"
@@ -548,4 +556,3 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
 </Registry>
-

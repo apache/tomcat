@@ -32,7 +32,7 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.Set;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
@@ -47,6 +47,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
+import org.apache.tomcat.jni.PreSharedKeySelector;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
 import org.apache.tomcat.jni.SSLContext;
@@ -56,6 +57,7 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -384,12 +386,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
             SSLContext.setCipherSuitesEx(ctx, sslHostConfig.getCipherSuites());
 
-            // If there is no certificate file must be using a KeyStore so a KeyManager is required.
-            // If there is a certificate file a KeyManager is helpful but not strictly necessary.
-            certificate.setCertificateKeyManager(
-                    OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
+            if (!sslHostConfig.isPreSharedKeyOnly()) {
+                // If there is no certificate file must be using a KeyStore so a KeyManager is required.
+                // If there is a certificate file a KeyManager is helpful but not strictly necessary.
+                certificate.setCertificateKeyManager(
+                        OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
 
-            addCertificate(certificate);
+                addCertificate(certificate);
+            }
 
             // Client certificate verification
             int value = 0;
@@ -457,6 +461,19 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (!foundGroupsConfig) {
                     sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS,
                             sslHostConfig.getGroups().replace(',', ':')));
+                }
+            }
+
+            Set<SSLHostConfigPreSharedKey> psks = sslHostConfig.getPreSharedKeys();
+            if (!psks.isEmpty()) {
+                PreSharedKeySelector selector = new OpenSSLPreSharedKeySelector(psks);
+
+                for (String protocol : sslHostConfig.getEnabledProtocols()) {
+                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
+                        SSLContext.setPskServerCallback(ctx, selector);
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol)) {
+                        SSLContext.setPskFindSessionCallback(ctx, selector);
+                    }
                 }
             }
 

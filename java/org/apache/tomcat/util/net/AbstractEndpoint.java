@@ -2371,4 +2371,3 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected abstract void destroySocket(U socket);
 }
-

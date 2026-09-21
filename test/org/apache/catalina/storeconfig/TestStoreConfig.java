@@ -48,6 +48,7 @@ import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.xml.sax.InputSource;
@@ -99,6 +100,11 @@ public class TestStoreConfig extends TomcatBaseTest {
         tc_SSLHostConfigCertificate_23.setCertificateKeystoreFile("conf/localhost-rsa.jks");
         tc_SSLHostConfigCertificate_23.setCertificateKeystorePassword("mypassword");
         tc_SSLHostConfig_22.addCertificate(tc_SSLHostConfigCertificate_23);
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(tc_SSLHostConfig_22);
+        preSharedKey.setIdentity("test");
+        preSharedKey.setKey("000102030405060708090a0b0c0d0e0f");
+        preSharedKey.setDigest("SHA256");
+        tc_SSLHostConfig_22.addPreSharedKey(preSharedKey);
         tomcat.getConnector().addSslHostConfig(tc_SSLHostConfig_22);
 
         org.apache.catalina.ha.tcp.SimpleTcpCluster tc_SimpleTcpCluster_51 = new org.apache.catalina.ha.tcp.SimpleTcpCluster();
@@ -163,6 +169,8 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertTrue(serverXmlDump.contains("channelStartOptions"));
         Assert.assertTrue(serverXmlDump.contains("SecretKeyCredentialHandler"));
         Assert.assertTrue(serverXmlDump.contains("certificateKeystorePassword="));
+        Assert.assertTrue(serverXmlDump.contains(
+                "<PreSharedKey digest=\"SHA256\" identity=\"test\" key=\"000102030405060708090a0b0c0d0e0f\""));
         Assert.assertTrue(serverXmlDump.contains("+TLSv1.1"));
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(serverXmlDump)));
 
