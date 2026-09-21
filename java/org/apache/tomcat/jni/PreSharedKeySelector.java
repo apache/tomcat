@@ -17,7 +17,9 @@
 package org.apache.tomcat.jni;
 
 /**
- * Is called during a TLSv1.2 handshake and hooked into OpenSSL via {@code SSL_CTX_set_psk_server_callback}.
+ * The interface for the Tomcat code that responds to the callback from the OpenSSL layer in Tomcat Native to allow
+ * Tomcat to select a pre-shared key. It supports TLSv1.2 {@code SSL_CTX_set_psk_server_callback} and TLSv1.3
+ * {@code SSL_CTX_set_psk_find_session_callback}.
  */
 public interface PreSharedKeySelector {
 
@@ -27,7 +29,26 @@ public interface PreSharedKeySelector {
      * @param ssl      the SSL instance
      * @param identity the PSK identity provided by the client
      *
-     * @return the pre-shared key, or {@code null} if the identity is not recognized
+     * @return the pre-shared key, or {@code null} if the identity is not recognized. OpenSSL limits the key to between
+     *             1 and 512 bytes long (inclusive). If the byte sequence is truly random then 16 bytes are recommended
+     *             for 128-bit ciphers and 32 bytes for 256-bit ciphers.
      */
     byte[] select(long ssl, String identity);
+
+    /**
+     * Selects the TLSv1.3 pre-shared key and digest for the provided identity.
+     * <p>
+     * The callback is a little more complex for TLSv1.3. The return value is still the pre-shared key but OpenSSL also
+     * needs to know which digest to use. Because the OpenSSL API only exposes a cipher for this, that is what Tomcat
+     * populates the {@code cipherSuite} array with but only the digest is relevant.
+     *
+     * @param ssl         the SSL instance
+     * @param identity    the PSK identity provided by the client
+     * @param cipherSuite a single-element array that must be populated with a IANA TLSv1.3 cipher suite identifier
+     *
+     * @return the pre-shared key (strictly the input to the KDF), or {@code null} if the identity is not recognized.
+     *             OpenSSL limits the key to between 1 and 48 bytes long (inclusive). If the byte sequence is truly
+     *             random then 16 bytes are recommended for 128-bit ciphers and 32 bytes for 256-bit ciphers.
+     */
+    byte[] select(long ssl, byte[] identity, int[] cipherSuite);
 }
