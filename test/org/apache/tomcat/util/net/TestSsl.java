@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,16 +31,20 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.SessionTrackingMode;
@@ -125,6 +130,87 @@ public class TestSsl extends TomcatBaseTest {
         Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
     }
+
+
+    /*
+     * The certificate chain used by this test is deliberately large. It consists of an RSA 8192 leaf, six
+     * intermediates and a root so the certificate message alone is a little over 20KiB. That means the first flight
+     * of handshake messages sent by the server does not fit in the 17408 byte buffer used by the BIO pair of the
+     * OpenSSL based engines. The chain is kept to eight certificates because the default value of
+     * jdk.tls.maxCertificateChainLength limits the client to ten.
+     *
+     * TLSv1.2 is used because the client must not send anything between the ClientHello and the completion of the
+     * server's first flight. A TLSv1.3 client normally sends a change cipher spec record before then. That allows
+     * unwrap() to be called and the priming read it performs has the side effect of flushing the remainder of the
+     * flight, which hides the problem this test is checking for.
+     */
+    @Test
+    public void testLargeCertificateChain() throws Exception {
+        AtomicReference<X509Certificate[]> serverChain = new AtomicReference<>();
+        X509TrustManager trustManager = new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                // NO-OP - trust everything
+            }
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                // Trust everything but retain the chain so its size can be checked below
+                serverChain.set(chain);
+            }
+        };
+        SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
+        sc.init(null, new TrustManager[] { trustManager }, null);
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
+        ctxt.addServletMapping("/", "TesterServlet");
+
+        Connector connector = tomcat.getConnector();
+        connector.setSecure(true);
+        Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
+
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+        certificate.setCertificateFile(new File(TesterSupport.LOCALHOST_RSA_LONGCHAIN_CERT_PEM).getAbsolutePath());
+        certificate.setCertificateKeyFile(new File(TesterSupport.LOCALHOST_RSA_LONGCHAIN_KEY_PEM).getAbsolutePath());
+        certificate.setCertificateChainFile(
+                new File(TesterSupport.LOCALHOST_RSA_LONGCHAIN_CHAIN_PEM).getAbsolutePath());
+        sslHostConfig.addCertificate(certificate);
+        connector.addSslHostConfig(sslHostConfig);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
+        tomcat.start();
+
+        /*
+         * The failure mode is a stalled handshake so use a read timeout that is significantly shorter than the
+         * default to avoid a long delay before the test fails.
+         */
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("https://localhost:" + getPort() + "/", res, 30_000, null, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", res.toString());
+
+        /*
+         * Confirm that the server really did send a certificate chain large enough to overflow the buffer of the BIO
+         * pair. Without this the test could silently stop testing anything if the chain were ever regenerated.
+         */
+        int chainLength = 0;
+        for (X509Certificate cert : serverChain.get()) {
+            chainLength += cert.getEncoded().length;
+        }
+        Assert.assertTrue("Certificate chain of [" + chainLength + "] bytes is too small to test this",
+                chainLength > 17408);
+    }
+
 
     private static final int POST_DATA_SIZE = 16 * 1024 * 1024;
     private static final byte[] POST_DATA;
