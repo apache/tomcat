@@ -71,6 +71,9 @@ public abstract class SocketProcessorBase<S> implements Runnable {
             if (socketWrapper.isClosed()) {
                 return;
             }
+            if (event == SocketEvent.OPEN_WRITE) {
+                socketWrapper.clearWriteInterest();
+            }
             doRun();
         } finally {
             lock.unlock();

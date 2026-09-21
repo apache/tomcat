@@ -301,6 +301,10 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <fix>
+        Enforce that write interest is not registered more than once before
+        write event processing starts. (sainadh777)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

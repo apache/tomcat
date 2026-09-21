@@ -1159,6 +1159,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                                     }
                                 } else if (socketWrapper.writeBlocking) {
                                     synchronized (socketWrapper.writeLock) {
+                                        socketWrapper.clearWriteInterest();
                                         socketWrapper.writeBlocking = false;
                                         socketWrapper.writeLock.notify();
                                     }
@@ -1886,7 +1887,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
 
         @Override
-        public void registerWriteInterest() {
+        protected void doRegisterWriteInterest() {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("endpoint.debug.registerWrite", this));
             }
@@ -2041,6 +2042,9 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
             @Override
             public void run() {
+                if (!read && !inline) {
+                    clearWriteInterest();
+                }
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
                 long nBytes = 0;

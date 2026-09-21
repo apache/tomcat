@@ -68,6 +68,8 @@ public abstract class SocketWrapperBase<E> {
     /** Indicates whether the socket has been closed. */
     protected final AtomicBoolean closed = new AtomicBoolean(false);
 
+    private final AtomicBoolean writeInterest = new AtomicBoolean(false);
+
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
     /** Read timeout in milliseconds. */
@@ -507,9 +509,8 @@ public abstract class SocketWrapperBase<E> {
      * Checks to see if there are any writes pending and if there are calls {@link #registerWriteInterest()} to trigger
      * a callback once the pending writes have completed.
      * <p>
-     * Note: Once this method has returned <code>false</code> it <b>MUST NOT</b> be called again until the pending write
-     * has completed and the callback has been fired. TODO: Modify {@link #registerWriteInterest()} so the above
-     * restriction is enforced there rather than relying on the caller.
+     * Once this method has returned <code>false</code>, it must not be called again until the pending write has completed
+     * and the callback has been fired.
      *
      * @return <code>true</code> if no writes are pending and data can be written otherwise <code>false</code>
      */
@@ -1000,8 +1001,28 @@ public abstract class SocketWrapperBase<E> {
 
     /**
      * Registers interest in write events.
+     *
+     * @throws IllegalStateException If write interest has already been registered and the associated callback has not
+     *                                   started
      */
-    public abstract void registerWriteInterest();
+    public final void registerWriteInterest() {
+        if (!writeInterest.compareAndSet(false, true)) {
+            throw new IllegalStateException(sm.getString("socket.writeInterest"));
+        }
+        doRegisterWriteInterest();
+    }
+
+    /**
+     * Clears the write interest registration when write event processing starts.
+     */
+    final void clearWriteInterest() {
+        writeInterest.set(false);
+    }
+
+    /**
+     * Registers interest in write events with the endpoint implementation.
+     */
+    protected abstract void doRegisterWriteInterest();
 
     /**
      * Creates a sendfile data object for the specified file.

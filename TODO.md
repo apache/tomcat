@@ -210,16 +210,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 17. SocketWrapperBase Write Interest Enforcement (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 17.1 | `SocketWrapperBase.java:511` | `isReadyForWrite()` restriction not enforced in `registerWriteInterest()` | Add a state guard in `registerWriteInterest()` that throws `IllegalStateException` if called when a pending write callback hasn't fired. | 1 day | Medium |
-
-**Total estimated effort: 1 day, Medium difficulty**
-
----
-
 ### 18. WebSocket POJO Handler Accessibility (1 item)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
