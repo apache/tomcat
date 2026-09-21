@@ -407,6 +407,10 @@
         directly via the configured trust store) is not subject to OCSP
         checking. (markt)
       </fix>
+      <add>
+        Add support for configuring TLS pre-shared keys under an
+        <code>SSLHostConfig</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

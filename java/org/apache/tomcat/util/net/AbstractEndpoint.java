@@ -594,7 +594,9 @@ public abstract class AbstractEndpoint<S, U> {
                 certificate.setSslContextGenerated(sslContext);
             }
 
-            logCertificate(certificate);
+            if (!sslHostConfig.isPreSharedKeyOnly()) {
+                logCertificate(certificate);
+            }
         }
 
     }
@@ -2572,4 +2574,3 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected abstract void destroySocket(U socket);
 }
-
