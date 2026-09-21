@@ -134,6 +134,10 @@
         startup. (csutherl)
       </fix>
       <add>
+        Add support for configuring TLS pre-shared keys under an
+        <code>SSLHostConfig</code>. (markt)
+      </add>
+      <add>
         Add the Jakarta EE 12 XML schemas. (markt)
       </add>
       <add>
