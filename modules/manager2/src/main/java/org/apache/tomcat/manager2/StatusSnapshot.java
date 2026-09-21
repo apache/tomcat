@@ -392,7 +392,10 @@ public final class StatusSnapshot {
             Map<String, Object> threads = new LinkedHashMap<>();
             threads.put("max", number(mBeanServer.getAttribute(pool, "maxThreads")));
             threads.put("current", number(mBeanServer.getAttribute(pool, "currentThreadCount")));
-            threads.put("busy", number(mBeanServer.getAttribute(pool, "currentThreadsBusy")));
+            // A connector may report a negative number of busy threads on startup in particular,
+            // this is not a bug
+            long busy = number(mBeanServer.getAttribute(pool, "currentThreadsBusy")).longValue();
+            threads.put("busy", Long.valueOf(Math.max(0L, busy)));
             threads.put("keepAlive", number(mBeanServer.getAttribute(pool, "keepAliveCount")));
             connector.put("threads", threads);
 
