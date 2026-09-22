@@ -378,6 +378,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      * @return The number of sockets currently registered with the poller (i.e. all active sockets, including the
      *             keep-alive sockets waiting for the next request to be received on the socket)
      */
+    @Override
     public int getKeepAliveCount() {
         if (poller == null) {
             return 0;
