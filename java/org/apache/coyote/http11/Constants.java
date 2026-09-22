@@ -107,6 +107,10 @@ public final class Constants {
      */
     public static final String KEEP_ALIVE_HEADER_NAME = "Keep-Alive";
     /**
+     * Alt-Svc header name.
+     */
+    public static final String ALT_SVC_HEADER_NAME = "Alt-Svc";
+    /**
      * HTTP 200 OK response bytes.
      */
     public static final byte[] _200_BYTES = ByteChunk.convertToBytes("200");

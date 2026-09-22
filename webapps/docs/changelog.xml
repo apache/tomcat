@@ -309,6 +309,12 @@
         (remm)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Allow UDP based protocols (without conflicting with a TCP based
+        protocol on the same port), and setting a <code>Alt-Svc</code>
+        header using the <code>altService</code> attribute of the
+        <code>Connector</code> element. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

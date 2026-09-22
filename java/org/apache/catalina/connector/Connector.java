@@ -1226,6 +1226,9 @@ public class Connector extends LifecycleMBeanBase {
                 sb.append(ObjectName.quote(address));
             }
         }
+        if (protocolHandler != null && protocolHandler.isUdp()) {
+            sb.append(",transport=UDP");
+        }
         return sb.toString();
     }
 

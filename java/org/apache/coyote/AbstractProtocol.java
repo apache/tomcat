@@ -915,6 +915,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             name.append(",address=");
             name.append(ObjectName.quote(address.getHostAddress()));
         }
+        if (isUdp()) {
+            name.append(",transport=UDP");
+        }
         return new ObjectName(name.toString());
     }
 

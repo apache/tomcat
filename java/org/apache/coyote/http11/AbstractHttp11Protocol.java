@@ -602,6 +602,41 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private String altService;
+
+    /**
+     * Get the alternative service that is announced to clients in the {@code Alt-Svc} response header.
+     *
+     * @return The alternative service protocol identifier or {@code null} if no alternative service is announced
+     */
+    public String getAltService() {
+        return altService;
+    }
+
+
+    /**
+     * Set the alternative service that is announced to clients in the {@code Alt-Svc} response header. The alternative
+     * service is assumed to be reachable at the same host and port as this connector. Announcing an alternative
+     * service allows clients to discover it from the first HTTP response without any client-side configuration. The
+     * value is used as the alternative service protocol identifier and must therefore be a valid HTTP token (RFC
+     * 7230).
+     *
+     * @param altService  The alternative service protocol identifier or {@code null}/empty to not announce an
+     *                        alternative service
+     *
+     * @throws IllegalArgumentException  If the value is not a valid alternative service protocol identifier
+     */
+    public void setAltService(String altService) {
+        if (altService == null || altService.isEmpty()) {
+            this.altService = null;
+        } else if (HttpParser.isToken(altService)) {
+            this.altService = altService;
+        } else {
+            throw new IllegalArgumentException(sm.getString("abstractHttp11Protocol.invalidAltSvc", altService));
+        }
+    }
+
+
     /**
      * Maximum size of trailing headers in bytes
      */

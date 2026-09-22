@@ -1035,6 +1035,16 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Server").setString(server);
         }
 
+        // Announce the configured alternative service so clients can
+        // discover it without any pre-configuration. The alternative
+        // service is assumed to listen on the same port as this request. An
+        // Alt-Svc header set by the application takes precedence.
+        String altService = protocol.getAltService();
+        if (altService != null && headers.getValue(Constants.ALT_SVC_HEADER_NAME) == null) {
+            headers.addValue(Constants.ALT_SVC_HEADER_NAME)
+                    .setString(altService + "=\":" + request.getServerPort() + "\"");
+        }
+
         writeHeaders(response.getStatus(), headers);
 
         outputBuffer.commit();
