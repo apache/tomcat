@@ -138,6 +138,10 @@
         <code>SSLHostConfig</code>. (markt)
       </add>
       <add>
+        Add TLS pre-shared key support to the OpenSSL FFM implementation.
+        (markt)
+      </add>
+      <add>
         Add the Jakarta EE 12 XML schemas. (markt)
       </add>
       <add>

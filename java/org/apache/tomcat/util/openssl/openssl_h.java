@@ -5373,6 +5373,57 @@ public class openssl_h {
         }
     }
 
+    private static class SSL_CIPHER_get_version {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CIPHER_get_version");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_version(const SSL_CIPHER *c)
+     * }
+     */
+    public static FunctionDescriptor SSL_CIPHER_get_version$descriptor() {
+        return SSL_CIPHER_get_version.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_version(const SSL_CIPHER *c)
+     * }
+     */
+    public static MethodHandle SSL_CIPHER_get_version$handle() {
+        return SSL_CIPHER_get_version.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_version(const SSL_CIPHER *c)
+     * }
+     */
+    public static MemorySegment SSL_CIPHER_get_version$address() {
+        return SSL_CIPHER_get_version.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_version(const SSL_CIPHER *c)
+     * }
+     */
+    public static MemorySegment SSL_CIPHER_get_version(MemorySegment c) {
+        var mh$ = SSL_CIPHER_get_version.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CIPHER_get_version", c);
+            }
+            return (MemorySegment) mh$.invokeExact(c);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class SSL_CIPHER_get_kx_nid {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
@@ -10213,5 +10264,154 @@ public class openssl_h {
     public static long SSL_OP_ALL() {
         return SSL_OP_ALL;
     }
-}
 
+    private static class SSL_CIPHER_find {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CIPHER_find");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static MemorySegment SSL_CIPHER_find(MemorySegment ssl, MemorySegment ptr) {
+        var mh$ = SSL_CIPHER_find.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CIPHER_find", ssl, ptr);
+            }
+            return (MemorySegment) mh$.invokeExact(ssl, ptr);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_CTX_set_psk_server_callback {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_psk_server_callback");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static void SSL_CTX_set_psk_server_callback(MemorySegment ctx, MemorySegment callback) {
+        var mh$ = SSL_CTX_set_psk_server_callback.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_psk_server_callback", ctx, callback);
+            }
+            mh$.invokeExact(ctx, callback);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_CTX_set_psk_find_session_callback {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_psk_find_session_callback");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static void SSL_CTX_set_psk_find_session_callback(MemorySegment ctx, MemorySegment callback) {
+        var mh$ = SSL_CTX_set_psk_find_session_callback.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_psk_find_session_callback", ctx, callback);
+            }
+            mh$.invokeExact(ctx, callback);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_new {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_new");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static MemorySegment SSL_SESSION_new() {
+        var mh$ = SSL_SESSION_new.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_new");
+            }
+            return (MemorySegment) mh$.invokeExact();
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_free {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_free");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static void SSL_SESSION_free(MemorySegment session) {
+        var mh$ = SSL_SESSION_free.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_free", session);
+            }
+            mh$.invokeExact(session);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_set1_master_key {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_LONG);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_set1_master_key");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static int SSL_SESSION_set1_master_key(MemorySegment session, MemorySegment key, long keyLength) {
+        var mh$ = SSL_SESSION_set1_master_key.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_set1_master_key", session, key, keyLength);
+            }
+            return (int) mh$.invokeExact(session, key, keyLength);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_set_cipher {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_set_cipher");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static int SSL_SESSION_set_cipher(MemorySegment session, MemorySegment cipher) {
+        var mh$ = SSL_SESSION_set_cipher.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_set_cipher", session, cipher);
+            }
+            return (int) mh$.invokeExact(session, cipher);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_set_protocol_version {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_set_protocol_version");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static int SSL_SESSION_set_protocol_version(MemorySegment session, int version) {
+        var mh$ = SSL_SESSION_set_protocol_version.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_set_protocol_version", session, version);
+            }
+            return (int) mh$.invokeExact(session, version);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+}

@@ -1254,9 +1254,8 @@
 
   <p>Each <strong>SSLHostConfig</strong> must in turn define at least one
   <strong>Certificate</strong> or <strong>PreSharedKey</strong>. A configuration
-  with no <strong>Certificate</strong> requires the Tomcat Native OpenSSL
-  implementation. The types of the <strong>Certificate</strong>s must be
-  unique.</p>
+  with no <strong>Certificate</strong> requires an OpenSSL-based implementation.
+  The types of the <strong>Certificate</strong>s must be unique.</p>
 
   <p>In addition to the standard TLS related request attributes defined in
   section 3.10 of the Servlet specification, Tomcat supports a number of
