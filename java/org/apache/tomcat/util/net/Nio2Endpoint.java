@@ -99,6 +99,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      *
      * @return Always returns -1.
      */
+    @Override
     public int getKeepAliveCount() {
         // For this connector, only the overall connection count is relevant
         return -1;
