@@ -52,6 +52,10 @@ public interface GroupChannelMBean {
      */
     long getHeartbeatSleeptime();
 
+    boolean getSecure();
+
+    String getPskIdentity();
+
     // Operations
     /**
      * Starts the channel with the given service type.

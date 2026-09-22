@@ -220,7 +220,7 @@ public final class SSLContext {
      * @param ctx      Server or Client context to use.
      * @param cert     Certificate file.
      * @param key      Private Key file to use if not in cert.
-     * @param password Certificate password. If null and the certificate is encrypted, loading the certificate will fail.
+     * @param password Certificate password. If null and certificate is encrypted, loading the certificate will fail.
      * @param idx      Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
      *
      * @return <code>true</code> if the operation was successful
@@ -472,7 +472,7 @@ public final class SSLContext {
     public static native void setCertVerifyCallback(long ctx, CertificateVerifier verifier);
 
     /**
-     * Allow to hook {@link PreSharedKeySelector} into the TLSv1.2 handshake processing. This will call
+     * Sets the TLSv1.2 server-side pre-shared key callback to a {@link PreSharedKeySelector} instance. This will call
      * {@code SSL_CTX_set_psk_server_callback}.
      *
      * @param ctx      Server context to use.
@@ -481,13 +481,21 @@ public final class SSLContext {
     public static native void setPskServerCallback(long ctx, PreSharedKeySelector selector);
 
     /**
-     * Allow to hook {@link PreSharedKeySelector} into the TLSv1.3 handshake processing. This will call
+     * Sets the TLSv1.3 server-side pre-shared key callback to a {@link PreSharedKeySelector} instance. This will call
      * {@code SSL_CTX_set_psk_find_session_callback}.
      *
      * @param ctx      Server context to use.
      * @param selector the selector to call during handshake, or {@code null} to remove the current selector
      */
     public static native void setPskFindSessionCallback(long ctx, PreSharedKeySelector selector);
+
+    /**
+     * Sets the TLSv1.2 client-side pre-shared key callback.
+     *
+     * @param ctx      Client context to use
+     * @param selector pre-shared key selector
+     */
+    public static native void setPskClientCallback(long ctx, PreSharedKeySelector selector);
 
     /**
      * Set application layer protocol for application layer protocol negotiation extension
@@ -513,7 +521,7 @@ public final class SSLContext {
 
     /**
      * Set CertificateRaw <br>
-     * Use a keystore certificate and key to fill the BIO
+     * Use a keystore certificate and key to fill the BIO.
      *
      * @param ctx        Server or Client context to use.
      * @param cert       Byte array with the certificate in DER encoding.
@@ -527,7 +535,7 @@ public final class SSLContext {
     /**
      * Add a certificate to the certificate chain. Certs should be added in order starting with the issuer of the host
      * certs and working up the certificate chain to the CA. <br>
-     * Use a keystore certificate chain to fill the BIO
+     * Use a keystore certificate chain to fill the BIO.
      *
      * @param ctx  Server or Client context to use.
      * @param cert Byte array with the certificate in DER encoding.

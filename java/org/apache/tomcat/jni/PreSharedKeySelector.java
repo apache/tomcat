@@ -24,7 +24,7 @@ package org.apache.tomcat.jni;
 public interface PreSharedKeySelector {
 
     /**
-     * Selects the pre-shared key for the provided identity.
+     * Selects the TLSv1.2 pre-shared key on the server side given the provided client identity.
      *
      * @param ssl      the SSL instance
      * @param identity the PSK identity provided by the client
@@ -36,7 +36,7 @@ public interface PreSharedKeySelector {
     byte[] select(long ssl, String identity);
 
     /**
-     * Selects the TLSv1.3 pre-shared key and digest for the provided identity.
+     * Selects the TLSv1.3 pre-shared key and digest on the server side given the provided client identity.
      * <p>
      * The callback is a little more complex for TLSv1.3. The return value is still the pre-shared key but OpenSSL also
      * needs to know which digest to use. Because the OpenSSL API only exposes a cipher for this, that is what Tomcat
@@ -51,4 +51,16 @@ public interface PreSharedKeySelector {
      *             random then 16 bytes are recommended for 128-bit ciphers and 32 bytes for 256-bit ciphers.
      */
     byte[] select(long ssl, byte[] identity, int[] cipherSuite);
+
+
+    /**
+     * Selects the TLS1v2 identity and pre-shared key that the client will present to a server.
+     *
+     * @param ssl      the SSL instance
+     * @param identity a single-element array that must be populated with the PSK identity
+     *
+     * @return the pre-shared key, or {@code null} if no key is available
+     */
+    byte[] selectClient(long ssl, String[] identity);
+
 }

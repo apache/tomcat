@@ -246,6 +246,30 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                         log.info(sm.getString("receiverBase.unable.bind", addr));
                         throw ioe;
                     }
+
+                    port++;
+                }
+
+            }
+        }
+    }
+
+    protected void bindSecure(ServerSocket socket, int portstart, int retries) throws IOException {
+        synchronized (bindLock) {
+            InetSocketAddress address = null;
+            int port = portstart;
+            while (retries > 0) {
+                try {
+                    address = new InetSocketAddress(getBind(), port);
+                    socket.bind(address);
+                    setSecurePort(port);
+                    log.info(sm.getString("receiverBase.socket.bind", address));
+                    return;
+                } catch (IOException ioe) {
+                    if (--retries <= 0) {
+                        log.info(sm.getString("receiverBase.unable.bind", address));
+                        throw ioe;
+                    }
                     port++;
                 }
             }

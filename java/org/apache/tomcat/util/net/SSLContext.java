@@ -63,6 +63,19 @@ public interface SSLContext {
     SSLEngine createSSLEngine();
 
     /**
+     * Creates a new SSL engine for the requested mode.
+     *
+     * @param clientMode {@code true} for client mode, otherwise server mode
+     *
+     * @return The new SSL engine
+     */
+    default SSLEngine createSSLEngine(boolean clientMode) {
+        SSLEngine result = createSSLEngine();
+        result.setUseClientMode(clientMode);
+        return result;
+    }
+
+    /**
      * Returns the server socket factory.
      *
      * @return The server socket factory
