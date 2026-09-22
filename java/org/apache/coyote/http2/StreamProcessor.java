@@ -261,6 +261,18 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 // server always overrides anything the app might set
                 headers.setValue("Server").setString(server);
             }
+
+            // Announce the configured alternative service so clients can
+            // discover it without any pre-configuration. The alternative
+            // service is assumed to listen on the same port as this
+            // request. An Alt-Svc header set by the application takes
+            // precedence.
+            String altService = protocol.getHttp11Protocol().getAltService();
+            if (altService != null &&
+                    headers.getValue(org.apache.coyote.http11.Constants.ALT_SVC_HEADER_NAME) == null) {
+                headers.addValue(org.apache.coyote.http11.Constants.ALT_SVC_HEADER_NAME)
+                        .setString(altService + "=\":" + coyoteRequest.getServerPort() + "\"");
+            }
         }
     }
 

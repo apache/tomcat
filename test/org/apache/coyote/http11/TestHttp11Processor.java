@@ -2200,4 +2200,65 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(newEncodings.contains("br"));
         Assert.assertFalse(newEncodings.contains("gzip"));
     }
+
+
+    private static final class AltSvcClient extends SimpleHttpClient {
+
+        AltSvcClient(int port) {
+            setPort(port);
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
+
+
+    @Test
+    public void testAltServiceHeader() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = getProgrammaticRootContext();
+        Tomcat.addServlet(root, "AltSvc", new TesterServlet());
+        root.addServletMapping("/test", "AltSvc");
+
+        AbstractHttp11Protocol<?> protocol =
+                (AbstractHttp11Protocol<?>) tomcat.getConnector().getProtocolHandler();
+        protocol.setAltService("h2");
+
+        tomcat.start();
+        int port = tomcat.getConnector().getLocalPort();
+
+        AltSvcClient client = new AltSvcClient(port);
+        String request = "GET /test HTTP/1.1" + CRLF + "Host: localhost:" + port + CRLF + "Connection: close" +
+                CRLF + CRLF;
+        client.setRequest(new String[] { request });
+        client.connect();
+        client.processRequest();
+
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        String expected = "Alt-Svc: h2=\"" + ":" + port + "\"";
+        Assert.assertTrue(client.getResponseHeaders().toString(), client.getResponseHeaders().contains(expected));
+    }
+
+
+    @Test
+    public void testAltServiceInvalidValue() {
+        Http11NioProtocol protocol = new Http11NioProtocol();
+
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> protocol.setAltService("not a token"));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> protocol.setAltService("h2=\""));
+
+        // Any valid token identifier is accepted
+        protocol.setAltService("h2");
+        Assert.assertEquals("h2", protocol.getAltService());
+
+        protocol.setAltService("");
+        Assert.assertNull(protocol.getAltService());
+
+        protocol.setAltService(null);
+        Assert.assertNull(protocol.getAltService());
+    }
 }
