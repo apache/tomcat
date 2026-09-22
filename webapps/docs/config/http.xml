@@ -414,34 +414,6 @@
       comma-separated list of header names.</p>
     </attribute>
 
-    <attribute name="altService" required="false">
-      <p>The protocol identifier of an alternative service that is announced
-      to clients in the <code>Alt-Svc</code> response header as described by
-      <a href="https://tools.ietf.org/rfc/rfc9239.txt">RFC 9239</a>. This
-      allows clients to discover the alternative service from the first
-      response without any client-side configuration.
-      The value is used as the alternative service protocol identifier and
-      must therefore be a valid HTTP token as defined by
-      <a href="https://tools.ietf.org/rfc/rfc7230.txt">RFC 7230</a>, for
-      example <code>h2</code>. If the value is not valid,
-      the connector fails to start.</p>
-
-      <p>The alternative service is assumed to be reachable at the same host
-      and port as this connector. The header value is generated from the
-      protocol identifier and the port on which the request was received and
-      takes a form such as <code>Alt-Svc: h2=":8443"</code>.</p>
-
-      <p>If this attribute is not set, no <code>Alt-Svc</code> header is
-      added by Tomcat. If a web application sets its own
-      <code>Alt-Svc</code> header for a response, the application provided
-      value is used and this attribute is ignored for that response.</p>
-
-      <p>The header is added to HTTP/1.1 responses and to HTTP/2 responses
-      served via the HTTP/2
-      <a href="http2.html">UpgradeProtocol</a> associated with this
-      connector.</p>
-    </attribute>
-
     <attribute name="bindOnInit" required="false">
       <p>Controls when the socket used by the connector is bound. If set to
       <code>true</code> it is bound when the connector is initiated and unbound
