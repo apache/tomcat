@@ -18,20 +18,30 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.lang.ref.Cleaner;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -58,6 +68,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     private final InternalState state;
 
+    private ExecutorService sendSecureExecutor;
+
     /**
      * The timeout in milliseconds for the selector select operation.
      */
@@ -78,6 +90,10 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     @Override
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         long start = System.currentTimeMillis();
+        if ((msg.getOptions() & Channel.SEND_OPTIONS_SECURE) != 0) {
+            sendSecure(destination, msg);
+            return;
+        }
         this.setUdpBased((msg.getOptions() & Channel.SEND_OPTIONS_UDP) == Channel.SEND_OPTIONS_UDP);
         byte[] data = XByteBuffer.createDataPackage((ChannelData) msg);
         NioSender[] senders = setupForSend(destination);
@@ -153,6 +169,133 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             }
         }
 
+    }
+
+    private void sendSecure(Member[] destination, ChannelMessage msg) throws ChannelException {
+        if (getSslContext() == null) {
+            throw new ChannelException(sm.getString("parallelNioSender.tlsUnavailable"));
+        }
+        byte[] data = XByteBuffer.createDataPackage((ChannelData) msg);
+        boolean waitForAck = (msg.getOptions() & Channel.SEND_OPTIONS_USE_ACK) != 0;
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(getTimeout());
+        ChannelException failure = null;
+        if (destination.length == 0) {
+            return;
+        }
+        if (sendSecureExecutor == null) {
+            sendSecureExecutor = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors(), 60L,
+                    TimeUnit.SECONDS, new SynchronousQueue<>(), runnable -> {
+                        Thread thread = new Thread(runnable, "Tribes-TLS-Sender");
+                        return thread;
+                    });
+        }
+        List<Map.Entry<Member,Future<Void>>> sends = new ArrayList<>(destination.length);
+        for (Member member : destination) {
+            Future<Void> send = sendSecureExecutor.submit(() -> {
+                sendSecure(member, data, waitForAck, deadline);
+                return null;
+            });
+            sends.add(Map.entry(member, send));
+        }
+        for (Map.Entry<Member,Future<Void>> entry : sends) {
+            try {
+                long remaining = deadline - System.nanoTime();
+                entry.getValue().get(Math.max(0, remaining), TimeUnit.NANOSECONDS);
+            } catch (ExecutionException e) {
+                if (failure == null) {
+                    failure = new ChannelException(sm.getString("parallelNioSender.send.failed"));
+                }
+                Throwable cause = e.getCause();
+                failure.addFaultyMember(entry.getKey(),
+                        cause instanceof Exception ? (Exception) cause : new IOException(cause));
+            } catch (TimeoutException e) {
+                entry.getValue().cancel(true);
+                if (failure == null) {
+                    failure = new ChannelException(
+                            sm.getString("parallelNioSender.operation.timedout", Long.toString(getTimeout())));
+                }
+                failure.addFaultyMember(entry.getKey(), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new ChannelException(e);
+            }
+        }
+        if (failure != null) {
+            throw failure;
+        }
+    }
+
+    private void sendSecure(Member member, byte[] data, boolean waitForAck, long deadline) throws Exception {
+        if (member.getSecurePort() < 0) {
+            throw new IOException(sm.getString("parallelNioSender.securePortUnavailable"));
+        }
+        Exception failure = null;
+        int maxRetryAttempts = Math.max(0, getMaxRetryAttempts());
+        for (int attempt = 0; attempt <= maxRetryAttempts; attempt++) {
+            try {
+                int timeout = remainingTimeout(deadline);
+                try (SocketChannel socket = SocketChannel.open()) {
+                    socket.configureBlocking(true);
+                    socket.socket().connect(new java.net.InetSocketAddress(InetAddress.getByAddress(member.getHost()),
+                            member.getSecurePort()), timeout);
+                    socket.socket().setSoTimeout(remainingTimeout(deadline));
+                    try (TlsChannel tls = new TlsChannel(socket.socket(), getSslContext().createClientEngine())) {
+                        tls.write(java.nio.ByteBuffer.wrap(data));
+                        if (waitForAck) {
+                            socket.socket().setSoTimeout(remainingTimeout(deadline));
+                            readSecureAck(tls, deadline);
+                        }
+                    }
+                }
+                return;
+            } catch (Exception e) {
+                failure = e;
+                if (System.nanoTime() >= deadline) {
+                    break;
+                }
+            }
+        }
+        if (failure != null) {
+            throw failure;
+        }
+    }
+
+    private void readSecureAck(TlsChannel tls, long deadline) throws IOException {
+        XByteBuffer acknowledgements = new XByteBuffer(getRxBufSize(), true);
+        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.allocate(getRxBufSize());
+        while (!acknowledgements.doesPackageExist()) {
+            if (System.nanoTime() >= deadline) {
+                throw new IOException(
+                        sm.getString("parallelNioSender.operation.timedout", Long.toString(getTimeout())));
+            }
+            int read = tls.read(buffer);
+            if (read < 0) {
+                throw new IOException(sm.getString("nioSender.unable.receive.ack"));
+            }
+            buffer.flip();
+            acknowledgements.append(buffer, read);
+            buffer.clear();
+        }
+        byte[] ack = acknowledgements.extractDataPackage(true).getBytes();
+        if (java.util.Arrays.equals(ack, org.apache.catalina.tribes.transport.Constants.ACK_DATA)) {
+            return;
+        }
+        if (java.util.Arrays.equals(ack, org.apache.catalina.tribes.transport.Constants.FAIL_ACK_DATA)) {
+            if (getThrowOnFailedAck()) {
+                throw new RemoteProcessException(sm.getString("nioSender.receive.failedAck"));
+            }
+            return;
+        }
+        throw new IOException(sm.getString("parallelNioSender.invalidAck"));
+    }
+
+    private int remainingTimeout(long deadline) throws IOException {
+        long remaining = deadline - System.nanoTime();
+        if (remaining <= 0) {
+            throw new IOException(sm.getString("parallelNioSender.operation.timedout", Long.toString(getTimeout())));
+        }
+        long milliseconds = TimeUnit.NANOSECONDS.toMillis(remaining);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(1, milliseconds));
     }
 
     private SendResult doLoop(long selectTimeOut, int maxAttempts, boolean waitForAck, ChannelMessage msg)
@@ -382,6 +525,19 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             close();
         } catch (Exception ignore) {
             // Ignore
+        }
+        if (sendSecureExecutor != null) {
+            sendSecureExecutor.shutdown();
+            try {
+                // Should stop a lot faster than this as all the sockets have been closed.
+                if (!sendSecureExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.warn(sm.getString("parallelNioSender.disconnect.executor.timeout"));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("parallelNioSender.disconnect.executor.interrupted"));
+            } finally {
+                sendSecureExecutor = null;
+            }
         }
     }
 

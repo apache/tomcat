@@ -666,6 +666,9 @@
         configured address, while the unresolvable host was advertised to the
         other cluster members. (remm)
       </fix>
+      <add>
+        Add TLS pre-shared key support to Apache Tribes. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
