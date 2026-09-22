@@ -1235,8 +1235,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // No need to check cert->valid, because ssl_verify_OCSP() only
             // is called if OpenSSL already successfully verified the certificate
             // (parameter "ok" in SSL_callback_SSL_verify() must be true).
-            if (X509_check_issued(x509, x509) == X509_V_OK()) {
-                // don't do OCSP checking for valid self-issued certs
+            if (X509_check_issued(x509, x509) == X509_V_OK()
+                    || X509_STORE_CTX_get_error_depth(x509ctx) >= X509_STORE_CTX_get_num_untrusted(x509ctx)) {
+                // Don't do OCSP checking for valid self-issued certs, nor for a certificate that is itself
+                // a trust anchor (present directly in the configured trust store rather than supplied by the
+                // peer). A trust anchor is trusted unconditionally, so its own revocation status is not
+                // checked. This aligns with JSSE's PKIXRevocationChecker, which excludes the trust anchor
+                // of the certification path from revocation checking regardless of whether it is self-signed.
                 X509_STORE_CTX_set_error(x509ctx, X509_V_OK());
             } else {
                 try (var localArena = Arena.ofConfined()) {

@@ -3703,6 +3703,57 @@ public class openssl_h {
         }
     }
 
+    private static class X509_STORE_CTX_get_num_untrusted {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get_num_untrusted");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * int X509_STORE_CTX_get_num_untrusted(X509_STORE_CTX *ctx)
+     * }
+     */
+    public static FunctionDescriptor X509_STORE_CTX_get_num_untrusted$descriptor() {
+        return X509_STORE_CTX_get_num_untrusted.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c : * int X509_STORE_CTX_get_num_untrusted(X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MethodHandle X509_STORE_CTX_get_num_untrusted$handle() {
+        return X509_STORE_CTX_get_num_untrusted.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c : * int X509_STORE_CTX_get_num_untrusted(X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MemorySegment X509_STORE_CTX_get_num_untrusted$address() {
+        return X509_STORE_CTX_get_num_untrusted.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c : * int X509_STORE_CTX_get_num_untrusted(X509_STORE_CTX *ctx)
+     * }
+     */
+    public static int X509_STORE_CTX_get_num_untrusted(MemorySegment ctx) {
+        var mh$ = X509_STORE_CTX_get_num_untrusted.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get_num_untrusted", ctx);
+            }
+            return (int) mh$.invokeExact(ctx);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class X509_STORE_CTX_get_current_cert {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
