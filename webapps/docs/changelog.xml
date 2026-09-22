@@ -400,6 +400,10 @@
         Add support for configuring TLS pre-shared keys under an
         <code>SSLHostConfig</code>. (markt)
       </add>
+      <add>
+        Add TLS pre-shared key support to the OpenSSL FFM implementation.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
