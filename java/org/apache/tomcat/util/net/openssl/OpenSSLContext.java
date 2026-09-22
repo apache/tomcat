@@ -92,6 +92,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final List<String> negotiableProtocols;
+    private final boolean clientMode;
     private final long aprPool;
     private final long aprGeneration;
     private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
@@ -114,8 +115,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * @throws SSLException if initialization fails
      */
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols) throws SSLException {
+        this(certificate, negotiableProtocols, false);
+    }
+
+    public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols, boolean clientMode)
+            throws SSLException {
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
+        this.clientMode = clientMode;
         aprPool = Pool.create(0);
         aprGeneration = Library.getGeneration();
         boolean success = false;
@@ -177,7 +184,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Create SSL Context
             try {
-                ctx = SSLContext.make(aprPool, value, SSL.SSL_MODE_SERVER);
+                ctx = SSLContext.make(aprPool, value, clientMode ? SSL.SSL_MODE_CLIENT : SSL.SSL_MODE_SERVER);
             } catch (Exception e) {
                 // If the sslEngine is disabled on the AprLifecycleListener
                 // there will be an Exception here but there is no way to check
@@ -469,9 +476,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 PreSharedKeySelector selector = new OpenSSLPreSharedKeySelector(psks);
 
                 for (String protocol : sslHostConfig.getEnabledProtocols()) {
-                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
+                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && clientMode) {
+                        SSLContext.setPskClientCallback(ctx, selector);
+                    } else if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
                         SSLContext.setPskServerCallback(ctx, selector);
-                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && !clientMode) {
                         SSLContext.setPskFindSessionCallback(ctx, selector);
                     }
                 }
@@ -670,10 +679,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public SSLEngine createSSLEngine() {
-        return new OpenSSLEngine(ctx, defaultProtocol, false, sessionContext,
-                (negotiableProtocols != null && negotiableProtocols.size() > 0), initialized,
+        return new OpenSSLEngine(ctx, defaultProtocol, clientMode, sessionContext,
+                (negotiableProtocols != null && !negotiableProtocols.isEmpty()), initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA);
+    }
+
+    @Override
+    public SSLEngine createSSLEngine(boolean clientMode) {
+        if (clientMode != this.clientMode) {
+            throw new IllegalArgumentException();
+        }
+        return createSSLEngine();
     }
 
     @Override

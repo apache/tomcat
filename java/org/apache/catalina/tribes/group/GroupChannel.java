@@ -123,6 +123,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      */
     protected boolean optionCheck = false;
 
+    private boolean secure;
+    private String pskIdentity;
+    private String pskKey;
+    private volatile TribesSslContext sslContext;
+
     /**
      * the name of this channel.
      */
@@ -217,6 +222,16 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         }
         XByteBuffer buffer = null;
         try {
+            if (secure) {
+                options |= SEND_OPTIONS_SECURE;
+            }
+            if ((options & SEND_OPTIONS_SECURE) != 0 &&
+                    (options & (SEND_OPTIONS_UDP | SEND_OPTIONS_MULTICAST)) != 0) {
+                throw new ChannelException(sm.getString("groupChannel.tlsDatagramUnsupported"));
+            }
+            if ((options & SEND_OPTIONS_SECURE) != 0 && sslContext == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsUnavailable"));
+            }
             if (destination == null || destination.length == 0) {
                 throw new ChannelException(sm.getString("groupChannel.noDestination"));
             }
@@ -442,6 +457,25 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public synchronized void start(int svc) throws ChannelException {
         setupDefaultStack();
+        if (sslContext == null) {
+            if (pskKey != null && pskIdentity != null) {
+                try {
+                    sslContext = new TribesSslContext(pskIdentity, pskKey);
+                } catch (Exception e) {
+                    if (secure) {
+                        throw new ChannelException(sm.getString("groupChannel.tlsUnavailable"), e);
+                    }
+                    log.warn(sm.getString("groupChannel.tlsUnavailable"), e);
+                }
+            } else if (secure && pskKey == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsKeyMissing"));
+            } else if (secure && pskIdentity == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsIdentityMissing"));
+            }
+        }
+        if (secure && getChannelReceiver().getSecurePort() < 0) {
+            throw new ChannelException(sm.getString("groupChannel.tlsPortMissing"));
+        }
         if (optionCheck) {
             checkOptionFlags();
         }
@@ -495,6 +529,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             if (heartbeatFuture != null) {
                 heartbeatFuture.cancel(true);
                 heartbeatFuture = null;
+            }
+            if (sslContext != null) {
+                sslContext.close();
+                sslContext = null;
             }
             if (ownExecutor && utilityExecutor != null) {
                 utilityExecutor.shutdown();
@@ -631,6 +669,32 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public boolean getOptionCheck() {
         return optionCheck;
+    }
+
+    @Override
+    public boolean getSecure() {
+        return secure;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
+    @Override
+    public String getPskIdentity() {
+        return pskIdentity;
+    }
+
+    public void setPskIdentity(String pskIdentity) {
+        this.pskIdentity = pskIdentity;
+    }
+
+    public void setPskKey(String pskKey) {
+        this.pskKey = pskKey;
+    }
+
+    public TribesSslContext getSslContext() {
+        return sslContext;
     }
 
     @Override
