@@ -70,6 +70,11 @@
     The default implementation uses non-blocking TCP server sockets.<br/>
     You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
   </p>
+
+  <p>TLS pre-shared key support may be configured on the <strong>Channel</strong>. OpenSSL FFM is preferred when
+    available, followed by Tomcat Native. JSSE is not used for Tribes TLS. When TLS is enabled, cluster traffic will use
+    blocking socket I/O internally.</p>
+
   <p><b><a href="cluster-interceptor.html">Channel/Interceptor</a>:</b> <br/>
     The channel will send messages through an interceptor stack. Because of this, you have the ability to
     customize the way messages are sent and received, and even how membership is handled.<br/>
@@ -115,6 +120,23 @@
         If set to true, the GroupChannel will check the option flags that each
         interceptor is using. Reports an error if two interceptor share the same
         flag. The default is false.
+      </attribute>
+
+      <attribute name="secure" required="false">
+        If <code>true</code>, the <code>SEND_OPTIONS_SECURE</code> flag is
+        added to every message. Channel startup fails if TLS is unavailable.
+        The default is <code>false</code>.
+      </attribute>
+
+      <attribute name="pskIdentity" required="false">
+        The TLS pre-shared key identity. This must be configured together with
+        <code>pskKey</code> to enable TLS.
+      </attribute>
+
+      <attribute name="pskKey" required="false">
+        The TLS pre-shared key encoded as hexadecimal characters. This must be
+        configured together with <code>pskIdentity</code>. The key is not
+        exposed through JMX. It should be no longer than 512 bytes for TLS 1.2.
       </attribute>
 
       <attribute name="jmxEnabled" required="false">
