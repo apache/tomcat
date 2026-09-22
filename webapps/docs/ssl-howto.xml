@@ -477,7 +477,7 @@ configurations.</p>
       configuration.</li>
   <li>NIO or NIO2 HTTP connector with the
       <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>,
-      and using the OpenSSL style configuration. This uses FFM so Java 22 or
+      and using the OpenSSL style configuration. This uses FFM so Java 25 or
       later is also required.</li>
 </ul>
 
