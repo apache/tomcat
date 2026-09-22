@@ -34,7 +34,7 @@ public class TestGroupChannelTls {
 
     @Test
     public void testSecureMessage() throws Exception {
-        try (TribesSslContext ignored =
+        try (@SuppressWarnings("unused") TribesSslContext ignored =
                 new TribesSslContext("tribes-test", "000102030405060708090a0b0c0d0e0f")) {
             // Verify that a supported TLS provider is available before creating the channels.
         } catch (Exception e) {
