@@ -376,7 +376,7 @@
 
     <p>The <strong>OpenSSL Lifecycle Listener</strong> checks for the presence
     of the OpenSSL library and loads the library if it is present. This
-    uses the FFM API from Java 22 instead of additional native code. When
+    uses the FFM API from Java 25 instead of additional native code. When
     enabled and successfully loaded, NIO and NIO2 connector will then make use
     of OpenSSL for TLS functionality. This is a functional replacement to the
     <strong>APR Lifecycle Listener</strong> described above.</p>
