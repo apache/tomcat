@@ -38,6 +38,13 @@ public class SSLHostConfigPreSharedKey implements Serializable {
     private MessageDigest digest = MessageDigest.SHA256;
 
     /**
+     * Creates a new pre-shared key configuration with default settings.
+     */
+    public SSLHostConfigPreSharedKey() {
+        this(null);
+    }
+
+    /**
      * Creates a new pre-shared key configuration for the given host.
      *
      * @param sslHostConfig the parent SSL host configuration
