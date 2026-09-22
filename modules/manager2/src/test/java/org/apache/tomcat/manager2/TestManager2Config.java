@@ -959,12 +959,87 @@ public class TestManager2Config extends TomcatBaseTest {
             request(client, "DELETE", MANAGER2 + "/api/config/child", token, "{\"id\":\"" + certificateId + "\"}", 400);
             Assert.assertTrue(client.getResponseBody().contains("SSL_LAST_CERTIFICATE"));
 
-            // The TLS configuration is part of the stored server.xml.
+            // Pre-shared keys ------------------------------------------
+
+            // A pre-shared key can be added to the SSL host
+            // configuration (it is applied at once on the running, TLS
+            // enabled connector; inert for a JSSE based connector, which
+            // is what the test connector is).
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + sslHostConfigId + "\",\"type\":\"preSharedKey\"," +
+                            "\"identity\":\"client-a\",\"key\":\"000102030405060708090a0b0c0d0e0f\"}",
+                    200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            String preSharedKeyId = sslHostConfigId + "/preSharedKey/0";
+
+            // A missing identity or key, and a key that is not
+            // hexadecimal, are rejected.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + sslHostConfigId + "\",\"type\":\"preSharedKey\",\"key\":\"00ff\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("MISSING_FIELD"));
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + sslHostConfigId + "\",\"type\":\"preSharedKey\",\"identity\":\"x\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("MISSING_FIELD"));
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + sslHostConfigId + "\",\"type\":\"preSharedKey\"," +
+                            "\"identity\":\"x\",\"key\":\"not-hex\"}",
+                    400);
+            Assert.assertTrue(client.getResponseBody().contains("INVALID_VALUE"));
+
+            // A second key with the same identity is rejected (the keys
+            // are selected by identity).
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + sslHostConfigId + "\",\"type\":\"preSharedKey\"," +
+                            "\"identity\":\"client-a\",\"key\":\"00ff\"}",
+                    409);
+            Assert.assertTrue(client.getResponseBody().contains("DUPLICATE"));
+
+            // A pre-shared key is only a child of an SSL host configuration.
+            request(client, "POST", MANAGER2 + "/api/config/child", token,
+                    "{\"parent\":\"" + connectorId + "\",\"type\":\"preSharedKey\"," +
+                            "\"identity\":\"x\",\"key\":\"00ff\"}",
+                    400);
+            Assert.assertTrue(client.getResponseBody().contains("BAD_PARENT"));
+
+            // The key is visible in the tree under its identity...
+            tree = fetchTree(client);
+            Map<String, Object> pskNode = findChild(
+                    findChild(findChildById(tree, connectorId), "sslHostConfig", "_default_"),
+                    "preSharedKey", "client-a");
+            Assert.assertNotNull("Expected the pre-shared key in the tree", pskNode);
+            Assert.assertEquals(preSharedKeyId, pskNode.get("id"));
+
+            // ...and its node detail exposes the three attributes (the
+            // key in its hexadecimal form, the digest with its default).
+            request(client, "GET", MANAGER2 + "/api/config/node/" + preSharedKeyId, null, null, 200);
+            Map<String, Object> pskDetail = parseObject(client.getResponseBody());
+            Assert.assertEquals("preSharedKey", pskDetail.get("type"));
+            Assert.assertEquals("client-a", pskDetail.get("name"));
+            Assert.assertEquals("000102030405060708090a0b0c0d0e0f", findProperty(pskDetail, "key").get("value"));
+            Assert.assertEquals("SHA256", findProperty(pskDetail, "digest").get("value"));
+
+            // The digest can be changed and reads back...
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + preSharedKeyId + "\",\"name\":\"digest\",\"value\":\"SHA384\"}", 200);
+            request(client, "GET", MANAGER2 + "/api/config/node/" + preSharedKeyId, null, null, 200);
+            pskDetail = parseObject(client.getResponseBody());
+            Assert.assertEquals("SHA384", findProperty(pskDetail, "digest").get("value"));
+
+            // ...while a key that is not hexadecimal is refused.
+            request(client, "POST", MANAGER2 + "/api/config/attribute", token,
+                    "{\"id\":\"" + preSharedKeyId + "\",\"name\":\"key\",\"value\":\"not-hex\"}", 400);
+            Assert.assertTrue(client.getResponseBody().contains("SET_FAILED"));
+
+            // The TLS configuration (including the pre-shared key) is
+            // part of the stored server.xml.
             request(client, "GET", MANAGER2 + "/api/config/store/preview", null, null, 200);
             String xml = (String) parseObject(client.getResponseBody()).get("xml");
             Assert.assertTrue(xml.contains("<SSLHostConfig"));
             Assert.assertTrue(xml.contains("certificateKeystoreFile=\""));
             Assert.assertTrue(xml.contains(keystore.getPath()));
+            Assert.assertTrue(xml.contains("<PreSharedKey"));
+            Assert.assertTrue(xml.contains("identity=\"client-a\""));
+            Assert.assertTrue(xml.contains("000102030405060708090a0b0c0d0e0f"));
 
             // A duplicate host name is rejected.
             request(client, "POST", MANAGER2 + "/api/config/child", token,
@@ -974,6 +1049,17 @@ public class TestManager2Config extends TomcatBaseTest {
                             "\",\"certificateKeystorePassword\":\"changeit\"}}",
                     409);
             Assert.assertTrue(client.getResponseBody().contains("DUPLICATE"));
+
+            // The last pre-shared key can be removed (unlike the last
+            // certificate, a key is never required) and disappears from
+            // the tree.
+            request(client, "DELETE", MANAGER2 + "/api/config/child", token, "{\"id\":\"" + preSharedKeyId + "\"}",
+                    200);
+            Assert.assertTrue(client.getResponseBody().contains("\"ok\":true"));
+            tree = fetchTree(client);
+            Assert.assertNull("Expected the pre-shared key to be gone",
+                    findChild(findChild(findChildById(tree, connectorId), "sslHostConfig", "_default_"),
+                            "preSharedKey", "client-a"));
 
             // Remove ---------------------------------------------------
 

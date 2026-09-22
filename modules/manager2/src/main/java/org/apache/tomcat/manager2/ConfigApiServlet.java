@@ -135,6 +135,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 
 
 /**
@@ -201,6 +202,7 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate;
  *   server/service/{s}/connector/{index}
  *   server/service/{s}/connector/{i}/sslHostConfig/{hostName}
  *   server/service/{s}/connector/{i}/sslHostConfig/{h}/certificate/{index}
+ *   server/service/{s}/connector/{i}/sslHostConfig/{h}/preSharedKey/{index}
  *   server/service/{s}/connector/{i}/upgradeProtocol/{index}
  *   server/service/{s}/executor/{name}
  *   server/service/{s}/valve/{index}
@@ -212,8 +214,9 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate;
  * The tree endpoint generates these ids; clients only echo them back.
  * <p>
  * <b>Attributes.</b> The property list of a node is derived from the modeler MBean descriptor of the component's class
- * (the same contract that defines the {@code Catalina:*} MBeans). The TLS components ({@code SSLHostConfig} and
- * {@code SSLHostConfigCertificate}), the context sub components ({@code WebappLoader}, {@code CookieProcessorBase}
+ * (the same contract that defines the {@code Catalina:*} MBeans). The TLS components ({@code SSLHostConfig},
+ * {@code SSLHostConfigCertificate} and {@code SSLHostConfigPreSharedKey}), the context sub components
+ * ({@code WebappLoader}, {@code CookieProcessorBase}
  * subclasses and {@code SessionIdGeneratorBase} subclasses), the HTTP/2 upgrade protocol
  * ({@code org.apache.coyote.http2.Http2Protocol}) and the JNDI entry nodes have no (complete) modeler descriptor; their
  * editable attribute list is defined explicitly by this servlet. Only attributes that map to a simple UI type (boolean,
@@ -228,7 +231,8 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate;
  * <p>
  * <b>TLS.</b> Adding an {@code sslHostConfig} to a connector enables TLS on that connector. The TLS state of a running
  * connector only takes effect when the connector is restarted, so the operations that change it (add or remove an
- * {@code sslHostConfig}, add or remove a {@code certificate}) restart the affected connector and roll back the change
+ * {@code sslHostConfig}, add or remove a {@code certificate} or {@code preSharedKey}) restart the affected connector
+ * and roll back the change
  * if the restart fails (for example because the keystore does not exist or the password is wrong). The connector that
  * hosts this web application itself is never touched.
  * <p>
@@ -520,7 +524,11 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 children.addAll(sslHostConfigChildren(connector, id));
                 children.addAll(upgradeProtocolChildren(connector, id));
             }
-            case "sslHostConfig" -> children.addAll(certificateChildren((SSLHostConfig) component, id));
+            case "sslHostConfig" -> {
+                SSLHostConfig hostConfig = (SSLHostConfig) component;
+                children.addAll(certificateChildren(hostConfig, id));
+                children.addAll(preSharedKeyChildren(hostConfig, id));
+            }
             case "cluster" -> {
                 if (component instanceof CatalinaCluster cluster) {
                     children.addAll(clusterChildren(cluster, id));
@@ -554,7 +562,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * The tree entries of the TLS (SSL) host configurations of a connector, each with its certificate children.
+     * The tree entries of the TLS (SSL) host configurations of a connector, each with its certificate and pre-shared
+     * key children.
      */
     private List<Map<String, Object>> sslHostConfigChildren(Connector connector, String parentId) {
         List<Map<String, Object>> result = new ArrayList<>();
@@ -574,7 +583,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             entry.put("type", "sslHostConfig");
             entry.put("className", hostConfig.getClass().getName());
             entry.put("name", hostConfig.getHostName());
-            entry.put("children", certificateChildren(hostConfig, id));
+            List<Map<String, Object>> hostConfigChildren = certificateChildren(hostConfig, id);
+            hostConfigChildren.addAll(preSharedKeyChildren(hostConfig, id));
+            entry.put("children", hostConfigChildren);
             result.add(entry);
         }
         return result;
@@ -610,6 +621,40 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             return "default";
         }
         return certificate.getType().name();
+    }
+
+
+    /**
+     * The tree entries of the pre-shared keys of an SSL host configuration, addressed by a positional index in the
+     * order they were added.
+     */
+    private List<Map<String, Object>> preSharedKeyChildren(SSLHostConfig hostConfig, String parentId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        SSLHostConfigPreSharedKey[] preSharedKeys =
+                hostConfig.getPreSharedKeys().toArray(new SSLHostConfigPreSharedKey[0]);
+        for (int i = 0; i < preSharedKeys.length; i++) {
+            SSLHostConfigPreSharedKey preSharedKey = preSharedKeys[i];
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("id", parentId + "/preSharedKey/" + i);
+            entry.put("type", "preSharedKey");
+            entry.put("className", preSharedKey.getClass().getName());
+            entry.put("name", preSharedKeyLabel(preSharedKey));
+            entry.put("children", new ArrayList<Map<String, Object>>());
+            result.add(entry);
+        }
+        return result;
+    }
+
+
+    /**
+     * A human readable name for a pre-shared key configuration: its identity.
+     */
+    private static String preSharedKeyLabel(SSLHostConfigPreSharedKey preSharedKey) {
+        String label = preSharedKey.getIdentity();
+        if (label == null || label.isEmpty()) {
+            label = preSharedKey.getClass().getSimpleName();
+        }
+        return label;
     }
 
 
@@ -1078,6 +1123,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             case "connector" -> connectorLabel((Connector) component);
             case "sslHostConfig" -> ((SSLHostConfig) component).getHostName();
             case "certificate" -> certificateLabel((SSLHostConfigCertificate) component);
+            case "preSharedKey" -> preSharedKeyLabel((SSLHostConfigPreSharedKey) component);
             case "upgradeProtocol" -> upgradeProtocolLabel((UpgradeProtocol) component);
             case "member" -> memberLabel((Member) component);
             default -> isNamingEntry(type) ? ((ResourceBase) component).getName()
@@ -1360,6 +1406,15 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             new ExplicitAttribute("certificateFile", "java.lang.String", true),
             new ExplicitAttribute("certificateChainFile", "java.lang.String", true),
             new ExplicitAttribute("certificateKeyFile", "java.lang.String", true));
+
+    // The editable attributes of a pre-shared key configuration (the
+    // SSLHostConfigPreSharedKey class has no modeler descriptor). The key
+    // is the hexadecimal string form the setter and the store use.
+
+    private static final List<ExplicitAttribute> PRE_SHARED_KEY_ATTRIBUTES = List.of(
+            new ExplicitAttribute("identity", "java.lang.String", true),
+            new ExplicitAttribute("key", "java.lang.String", true),
+            new ExplicitAttribute("digest", "java.lang.String", true));
 
 
     private static final List<ExplicitAttribute> WEBAPP_LOADER_ATTRIBUTES = List.of(
@@ -1766,6 +1821,9 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if ("certificate".equals(type)) {
             return new ExplicitSpec("certificate", CERTIFICATE_ATTRIBUTES);
+        }
+        if ("preSharedKey".equals(type)) {
+            return new ExplicitSpec("preSharedKey", PRE_SHARED_KEY_ATTRIBUTES);
         }
         if (component instanceof WebappLoader) {
             return new ExplicitSpec("loader", WEBAPP_LOADER_ATTRIBUTES);
@@ -2208,6 +2266,19 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     parent = current;
                     current = certificates[index];
                 }
+                case "preSharedKey" -> {
+                    if (!(current instanceof SSLHostConfig hostConfig)) {
+                        throw notFound();
+                    }
+                    SSLHostConfigPreSharedKey[] preSharedKeys =
+                            hostConfig.getPreSharedKeys().toArray(new SSLHostConfigPreSharedKey[0]);
+                    int index = index(value);
+                    if (index < 0 || index >= preSharedKeys.length) {
+                        throw notFound();
+                    }
+                    parent = current;
+                    current = preSharedKeys[index];
+                }
                 case "manager" -> {
                     // A context holds exactly one manager, addressed as
                     // index 0.
@@ -2590,8 +2661,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * Update one attribute of a component without a modeler descriptor (the {@code sslHostConfig} and
-     * {@code certificate} node types, and the {@code loader}, {@code cookieProcessor} and {@code sessionIdGenerator}
+     * Update one attribute of a component without a modeler descriptor (the {@code sslHostConfig}, {@code certificate}
+     * and {@code preSharedKey} node types, and the {@code loader}, {@code cookieProcessor} and {@code sessionIdGenerator}
      * node types of the standard implementations).
      */
     private void updateExplicitAttribute(HttpServletResponse response, NodeRef ref, String name,
@@ -2692,7 +2763,8 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             if (ref.parent instanceof Connector parent) {
                 connector = parent;
             }
-        } else if ("certificate".equals(ref.type) && ref.parent instanceof SSLHostConfig parent) {
+        } else if (("certificate".equals(ref.type) || "preSharedKey".equals(ref.type)) &&
+                ref.parent instanceof SSLHostConfig parent) {
             sslHostConfig = parent;
             connector = connectorOfSsl(sslHostConfig);
         }
@@ -2947,11 +3019,18 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         NodeRef parent = resolve(parentId);
 
-        // The only child of an SSL host configuration is a certificate,
-        // and in its request body the "type" field carries the
-        // certificate type (RSA, DSA, ...), not a child component type.
+        // The children of an SSL host configuration are a certificate or a
+        // pre-shared key. For a certificate the request body carries the
+        // certificate type (RSA, DSA, ...) in the "type" field instead of a
+        // child component type (a pre-shared key has no such type), so the
+        // two are told apart by whether "type" names the pre-shared key
+        // component type.
         if (parent.component instanceof SSLHostConfig) {
-            addCertificate(response, parent, body);
+            if ("preSharedKey".equals(type)) {
+                addPreSharedKey(response, parent, body);
+            } else {
+                addCertificate(response, parent, body);
+            }
             return;
         }
 
@@ -2981,6 +3060,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             case "sslHostConfig" -> addSslHostConfig(response, parent, body);
             case "upgradeProtocol" -> addUpgradeProtocol(response, parent, body);
             case "certificate" -> addCertificate(response, parent, body);
+            case "preSharedKey" -> addPreSharedKey(response, parent, body);
             case "cluster" -> addCluster(response, parent, body);
             case "clusterValve" -> addClusterValve(response, parent, body);
             case "channel" -> addClusterChannel(response, parent, body);
@@ -4412,6 +4492,73 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
+     * Add a pre-shared key configuration to an SSL host configuration. On a running, TLS enabled connector the new key
+     * is applied at once (the SSL context of the virtual host is re-created, which with an OpenSSL based connector also
+     * validates the key set); when that fails the key is rolled back.
+     */
+    private void addPreSharedKey(HttpServletResponse response, NodeRef parent, Map<String, Object> body)
+            throws Exception {
+
+        if (!(parent.component instanceof SSLHostConfig sslHostConfig)) {
+            throw badParent("preSharedKey");
+        }
+        SSLHostConfigPreSharedKey preSharedKey = buildPreSharedKey(sslHostConfig, body);
+        String label = preSharedKeyLabel(preSharedKey);
+        // The pre-shared keys are selected by identity; a second key with
+        // the same identity would be silently shadowed (and, with an
+        // OpenSSL based connector, make the SSL context creation fail), so
+        // reject it here.
+        for (SSLHostConfigPreSharedKey existing : sslHostConfig.getPreSharedKeys()) {
+            if (label.equals(preSharedKeyLabel(existing))) {
+                throw duplicate(label);
+            }
+        }
+        sslHostConfig.addPreSharedKey(preSharedKey);
+
+        Connector connector = connectorOfSsl(sslHostConfig);
+        AbstractHttp11Protocol<?> http11 = (connector != null) ? sslProtocolHandler(connector) : null;
+        if (connector != null && connector.getState().isAvailable() && http11 != null && http11.isSSLEnabled()) {
+            try {
+                endpointOf(connector).reloadSslHostConfig(sslHostConfig.getHostName());
+            } catch (Exception e) {
+                sslHostConfig.getPreSharedKeys().remove(preSharedKey);
+                throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "ADD_FAILED",
+                        Strings.sm().getString("manager2.configAddFailed", label, rootMessage(e)));
+            }
+        }
+
+        log(Strings.sm().getString("manager2.configAuditAdd", "preSharedKey", label));
+        Api.ok(response, Strings.sm().getString("manager2.configAdded", label));
+    }
+
+
+    /**
+     * Build a (not yet registered) pre-shared key configuration from a JSON object. The identity (the name a client
+     * presents to select the key) and the hexadecimal key are required; the message digest is optional (SHA256, the
+     * default of the configuration class, or SHA384).
+     */
+    private static SSLHostConfigPreSharedKey buildPreSharedKey(SSLHostConfig sslHostConfig, Map<String, Object> body)
+            throws ConfigException {
+
+        String identity = string(body.get("identity"));
+        if (identity == null || identity.isEmpty()) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
+                    Strings.sm().getString("manager2.configPskIdentityRequired"));
+        }
+        String key = string(body.get("key"));
+        if (key == null || key.isEmpty()) {
+            throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "MISSING_FIELD",
+                    Strings.sm().getString("manager2.configPskKeyRequired"));
+        }
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);
+        preSharedKey.setIdentity(identity);
+        setIfPresent(preSharedKey, "key", body);
+        setIfPresent(preSharedKey, "digest", body);
+        return preSharedKey;
+    }
+
+
+    /**
      * Call one string setter on the target when the body carries a non-empty value for the property.
      */
     private static void setIfPresent(Object target, String name, Map<String, Object> body) throws ConfigException {
@@ -4610,6 +4757,10 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             removeCertificate(response, ref);
             return;
         }
+        if ("preSharedKey".equals(ref.type)) {
+            removePreSharedKey(response, ref);
+            return;
+        }
 
         try {
             switch (ref.type) {
@@ -4799,6 +4950,39 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
         String label = displayName(certificate, "certificate");
         log(Strings.sm().getString("manager2.configAuditRemove", "certificate", label));
+        Api.ok(response, Strings.sm().getString("manager2.configRemoved", label));
+    }
+
+
+    /**
+     * Remove a pre-shared key configuration from its SSL host configuration. Unlike a certificate a pre-shared key is
+     * never required (a key-less host configuration is a valid, if unusual, TLS configuration), so removing the last
+     * one is allowed. On a running, TLS enabled connector the change is applied at once (the SSL context of the virtual
+     * host is re-created) and rolled back when the remaining configuration does not validate.
+     */
+    private void removePreSharedKey(HttpServletResponse response, NodeRef ref) throws Exception {
+
+        if (!(ref.component instanceof SSLHostConfigPreSharedKey preSharedKey) ||
+                !(ref.parent instanceof SSLHostConfig sslHostConfig)) {
+            throw notFound();
+        }
+        Connector connector = connectorOfSsl(sslHostConfig);
+        boolean live = connector != null && connector.getState().isAvailable() && isSslEnabled(connector);
+
+        Set<SSLHostConfigPreSharedKey> preSharedKeys = sslHostConfig.getPreSharedKeys();
+        preSharedKeys.remove(preSharedKey);
+        if (live) {
+            try {
+                endpointOf(connector).reloadSslHostConfig(sslHostConfig.getHostName());
+            } catch (Exception e) {
+                preSharedKeys.add(preSharedKey);
+                throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "REMOVE_FAILED",
+                        Strings.sm().getString("manager2.configRemoveFailed", rootMessage(e)));
+            }
+        }
+
+        String label = displayName(preSharedKey, "preSharedKey");
+        log(Strings.sm().getString("manager2.configAuditRemove", "preSharedKey", label));
         Api.ok(response, Strings.sm().getString("manager2.configRemoved", label));
     }
 

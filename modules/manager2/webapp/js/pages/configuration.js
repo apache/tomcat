@@ -62,8 +62,9 @@ const CHILD_TYPES = {
   context: ['wrapper', 'realm', 'manager', 'resources', 'loader', 'cookieProcessor', 'valve', 'cluster'],
   wrapper: [],
   connector: ['sslHostConfig', 'upgradeProtocol'],
-  sslHostConfig: ['certificate'],
+  sslHostConfig: ['certificate', 'preSharedKey'],
   certificate: [],
+  preSharedKey: [],
   upgradeProtocol: [],
   realm: [],
   manager: ['sessionIdGenerator'],
@@ -832,6 +833,12 @@ export async function configuration(container) {
         ];
       case 'certificate':
         return certificateFields();
+      case 'preSharedKey':
+        return [
+          [t('manager2.ui.config.pskIdentity'), input('c-psk-identity', 'text', 'client-identity')],
+          [t('manager2.ui.config.pskKey'), input('c-psk-key', 'text', t('manager2.ui.config.pskKeyPlaceholder')), true],
+          [t('manager2.ui.config.pskDigest'), select('c-psk-digest', ['(default)', 'SHA256', 'SHA384'])],
+        ];
       case 'upgradeProtocol':
         return [[t('manager2.ui.config.className'), input('c-class', 'text', 'org.apache.coyote.http2.Http2Protocol'), true]];
       default:
@@ -897,6 +904,8 @@ export async function configuration(container) {
         return ids;
       }
       case 'certificate': return certificateFieldIds();
+      case 'preSharedKey':
+        return [['identity', 'c-psk-identity'], ['key', 'c-psk-key'], ['digest', 'c-psk-digest']];
       case 'upgradeProtocol': return [['className', 'c-class']];
       default: return [];
     }
