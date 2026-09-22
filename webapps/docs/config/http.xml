@@ -1253,8 +1253,9 @@
   <strong>Connector</strong>.</p>
 
   <p>Each <strong>SSLHostConfig</strong> must in turn define at least one
-  <strong>Certificate</strong>. The types of the <strong>Certificate</strong>s
-  must be unique.</p>
+  <strong>Certificate</strong> or <strong>PreSharedKey</strong>. A configuration
+  with no <strong>Certificate</strong> requires an OpenSSL-based implementation.
+  The types of the <strong>Certificate</strong>s must be unique.</p>
 
   <p>In addition to the standard TLS related request attributes defined in
   section 3.10 of the Servlet specification, Tomcat supports a number of
@@ -1580,6 +1581,32 @@
       identify a default, the default will be <code>JKS</code>. See the notes on
       <a href="#Key_store_types">key store types</a> below.</p>
      </attribute>
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="SSL Support - PreSharedKey">
+
+  <p>A <strong>PreSharedKey</strong> element represents a pre-shared key that
+  may be used by an OpenSSL-based connector. It must be nested in an
+  <strong>SSLHostConfig</strong> element.</p>
+
+  <attributes>
+
+    <attribute name="identity" required="true">
+      <p>The identity associated with this pre-shared key.</p>
+    </attribute>
+
+    <attribute name="key" required="true">
+      <p>The pre-shared key encoded as hexadecimal characters.</p>
+    </attribute>
+
+    <attribute name="digest" required="false">
+      <p>The message digest algorithm associated with this pre-shared key for
+      TLS 1.3, for example <code>SHA256</code> or <code>SHA384</code>. If not
+      specified, the default is <code>SHA256</code>.</p>
+    </attribute>
 
   </attributes>
 

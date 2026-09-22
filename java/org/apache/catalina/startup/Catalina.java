@@ -548,6 +548,11 @@ public class Catalina {
         digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate", "addCertificate",
                 "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
+        digester.addRule("Server/Service/Connector/SSLHostConfig/PreSharedKey", new PreSharedKeyCreateRule());
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/PreSharedKey");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/PreSharedKey", "addPreSharedKey",
+                "org.apache.tomcat.util.net.SSLHostConfigPreSharedKey");
+
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
                 "org.apache.tomcat.util.net.openssl.OpenSSLConf");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf");

@@ -117,6 +117,9 @@ public class OpenSSLUtil extends SSLUtilBase {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
+        if (sslHostConfig.isPreSharedKeyOnly()) {
+            return null;
+        }
         try {
             return super.getKeyManagers();
         } catch (IllegalArgumentException e) {

@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -60,9 +61,11 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
+import org.apache.tomcat.util.net.openssl.OpenSSLPreSharedKeySelector;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
@@ -70,6 +73,8 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.SSL_psk_find_session_cb_func;
+import org.apache.tomcat.util.openssl.SSL_psk_server_cb_func;
 import org.apache.tomcat.util.openssl.openssl_h;
 import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.openssl.pem_password_cb;
@@ -493,7 +498,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
         }
-        boolean success;
+        boolean success = true;
         Exception cause = null;
         try (var localArena = Arena.ofConfined()) {
             if (sslHostConfig.getInsecureRenegotiation()) {
@@ -557,12 +562,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
 
-            // If there is no certificate file must be using a KeyStore so a KeyManager is required.
-            // If there is a certificate file a KeyManager is helpful but not strictly necessary.
-            certificate.setCertificateKeyManager(
-                    OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
+            if (!sslHostConfig.isPreSharedKeyOnly()) {
+                // If there is no certificate file must be using a KeyStore so a KeyManager is required.
+                // If there is a certificate file a KeyManager is helpful but not strictly necessary.
+                certificate.setCertificateKeyManager(
+                        OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
 
-            success = addCertificate(certificate, localArena);
+                success = addCertificate(certificate, localArena);
+            }
 
             // Client certificate verification
             int value = switch (sslHostConfig.getCertificateVerification()) {
@@ -636,6 +643,23 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     if (MemorySegment.NULL.equals(caCerts)) {
                         log.warn(sm.getString("openssl.noCACerts"));
+                    }
+                }
+            }
+
+            Set<SSLHostConfigPreSharedKey> psks = sslHostConfig.getPreSharedKeys();
+            if (!psks.isEmpty()) {
+                OpenSSLPreSharedKeySelector selector = new OpenSSLPreSharedKeySelector(psks);
+                for (String protocol : sslHostConfig.getEnabledProtocols()) {
+                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
+                        SSL_CTX_set_psk_server_callback(state.sslCtx, SSL_psk_server_cb_func
+                                .allocate(new PskServerCallback(selector), contextArena));
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol)) {
+                        if (openssl_h_Compatibility.LIBRESSL) {
+                            throw new SSLException(sm.getString("openssl.pskTls13Unsupported"));
+                        }
+                        SSL_CTX_set_psk_find_session_callback(state.sslCtx, SSL_psk_find_session_cb_func
+                                .allocate(new PskFindSessionCallback(selector), contextArena));
                     }
                 }
             }
@@ -789,6 +813,95 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             return SSL_TLSEXT_ERR_NOACK();
+        }
+    }
+
+    private static class PskServerCallback implements SSL_psk_server_cb_func.Function {
+
+        private final OpenSSLPreSharedKeySelector selector;
+
+        PskServerCallback(OpenSSLPreSharedKeySelector selector) {
+            this.selector = selector;
+        }
+
+        @Override
+        public int apply(MemorySegment ssl, MemorySegment identity, MemorySegment psk, int maxPskLength) {
+            if (MemorySegment.NULL.equals(identity)) {
+                return 0;
+            }
+            byte[] key = selector.select(ssl.address(), identity.getString(0));
+            if (key == null || key.length == 0 || key.length > maxPskLength) {
+                return 0;
+            }
+            try (var localArena = Arena.ofConfined()) {
+                psk.reinterpret(key.length, localArena, null).copyFrom(MemorySegment.ofArray(key));
+            }
+            return key.length;
+        }
+    }
+
+    private static class PskFindSessionCallback implements SSL_psk_find_session_cb_func.Function {
+
+        private final OpenSSLPreSharedKeySelector selector;
+
+        PskFindSessionCallback(OpenSSLPreSharedKeySelector selector) {
+            this.selector = selector;
+        }
+
+        @Override
+        public int apply(MemorySegment ssl, MemorySegment identity, long identityLength, MemorySegment sessionPointer) {
+            try (var localArena = Arena.ofConfined()) {
+                MemorySegment sessionPointerSegment =
+                        sessionPointer.reinterpret(ValueLayout.ADDRESS.byteSize(), localArena, null);
+                sessionPointerSegment.set(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+                if (MemorySegment.NULL.equals(identity) || identityLength < 0 || identityLength > Integer.MAX_VALUE) {
+                    return 0;
+                }
+
+                byte[] identityBytes =
+                        identity.reinterpret(identityLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
+                int[] cipherSuite = new int[1];
+                byte[] key = selector.select(ssl.address(), identityBytes, cipherSuite);
+                if (key == null) {
+                    return 1;
+                }
+                if (key.length == 0 || cipherSuite[0] <= 0 || cipherSuite[0] > 0xFFFF) {
+                    return 0;
+                }
+
+                byte[] cipherId = new byte[] { (byte) (cipherSuite[0] >> 8), (byte) cipherSuite[0] };
+                MemorySegment cipher =
+                        SSL_CIPHER_find(ssl, localArena.allocateFrom(ValueLayout.JAVA_BYTE, cipherId));
+                if (MemorySegment.NULL.equals(cipher)
+                        || !Constants.SSL_PROTO_TLSv1_3.equals(SSL_CIPHER_get_version(cipher).getString(0))) {
+                    return 0;
+                }
+
+                MemorySegment session = SSL_SESSION_new();
+                if (MemorySegment.NULL.equals(session)) {
+                    return 0;
+                }
+                boolean success = false;
+                try {
+                    MemorySegment keySegment = localArena.allocateFrom(ValueLayout.JAVA_BYTE, key);
+                    try {
+                        if (SSL_SESSION_set1_master_key(session, keySegment, key.length) == 0 ||
+                                SSL_SESSION_set_cipher(session, cipher) == 0 ||
+                                SSL_SESSION_set_protocol_version(session, TLS1_3_VERSION()) == 0) {
+                            return 0;
+                        }
+                    } finally {
+                        keySegment.fill((byte) 0);
+                    }
+                    sessionPointerSegment.set(ValueLayout.ADDRESS, 0, session);
+                    success = true;
+                    return 1;
+                } finally {
+                    if (!success) {
+                        SSL_SESSION_free(session);
+                    }
+                }
+            }
         }
     }
 

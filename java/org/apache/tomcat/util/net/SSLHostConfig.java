@@ -153,6 +153,10 @@ public class SSLHostConfig implements Serializable {
      * The set of certificate configurations.
      */
     private final Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
+    /**
+     * The set of pre-shared key configurations.
+     */
+    private final Set<SSLHostConfigPreSharedKey> preSharedKeys = new LinkedHashSet<>();
     // Common
     /**
      * The path to the certificate revocation list file.
@@ -573,6 +577,40 @@ public class SSLHostConfig implements Serializable {
             registerDefaultCertificate();
         }
         return certificates;
+    }
+
+
+    /**
+     * Adds a pre-shared key to this SSL host configuration.
+     *
+     * @param preSharedKey the pre-shared key to add
+     */
+    public void addPreSharedKey(SSLHostConfigPreSharedKey preSharedKey) {
+        preSharedKeys.add(preSharedKey);
+    }
+
+
+    /**
+     * Returns the set of pre-shared keys.
+     *
+     * @return the pre-shared keys
+     */
+    public Set<SSLHostConfigPreSharedKey> getPreSharedKeys() {
+        return preSharedKeys;
+    }
+
+
+    /**
+     * Determines whether this configuration uses pre-shared keys without a certificate.
+     *
+     * @return {@code true} if pre-shared keys are configured and no certificate was explicitly configured
+     */
+    public boolean isPreSharedKeyOnly() {
+        if (preSharedKeys.isEmpty()) {
+            return false;
+        }
+        return certificates.isEmpty() ||
+                certificates.size() == 1 && certificates.contains(defaultCertificate);
     }
 
 
