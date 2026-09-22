@@ -280,7 +280,7 @@ loaded or not, use one of the following:</p>
            port="8443" .../>]]></source>
 
 <p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
-If the Tomcat Native library or Java 22 is installed, using the
+If the Tomcat Native library or Java 25 is installed, using the
 <code>sslImplementationName</code>
 attribute allows enabling it. When using the OpenSSL JSSE implementation, the
 configuration can use either the JSSE attributes or the OpenSSL attributes, but
@@ -471,7 +471,7 @@ configurations.</p>
       configuration.</li>
   <li>NIO or NIO2 HTTP connector with the
       <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>,
-      and using the OpenSSL style configuration. This uses FFM so Java 22 or
+      and using the OpenSSL style configuration. This uses FFM so Java 25 or
       later is also required.</li>
 </ul>
 
