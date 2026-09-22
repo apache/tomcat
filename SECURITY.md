@@ -27,7 +27,7 @@ These will be **rejected without response**:
 - "XSS/SQLi in my deployed application" - Your app's bug, not Tomcat's
 - "Manager app accessible with valid password" - Admin users are trusted
 - Scanner reports without actual testing - Must verify manually with working PoC
-- Theoretical vulnerabilities or AI-generated reports - Must include working test case
+- Theoretical vulnerabilities or AI-generated reports without a working test case - Must include working test case
 
 **Review the [security model](https://tomcat.apache.org/security-model.html) to understand what qualifies as a Tomcat vulnerability.**
 
