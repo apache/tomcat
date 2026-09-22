@@ -93,7 +93,9 @@ public class TestStoreConfig extends TomcatBaseTest {
         SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(tc_SSLHostConfig_22);
         preSharedKey.setIdentity("test");
         preSharedKey.setKey("000102030405060708090a0b0c0d0e0f");
-        preSharedKey.setDigest("SHA256");
+        // A non-default digest: storeconfig omits attributes that equal
+        // their default value, and SHA256 is the default digest.
+        preSharedKey.setDigest("SHA384");
         tc_SSLHostConfig_22.addPreSharedKey(preSharedKey);
         tomcat.getConnector().addSslHostConfig(tc_SSLHostConfig_22);
 
@@ -155,8 +157,13 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertTrue(serverXmlDump.contains("UserDatabaseRealm"));
         Assert.assertTrue(serverXmlDump.contains("SecretKeyCredentialHandler"));
         Assert.assertTrue(serverXmlDump.contains("certificateKeystorePassword="));
-        Assert.assertTrue(serverXmlDump.contains(
-                "<PreSharedKey digest=\"SHA256\" identity=\"test\" key=\"000102030405060708090a0b0c0d0e0f\""));
+        // The attributes of a stored element wrap at 60 columns, so check
+        // the element and its attributes individually rather than the
+        // whole tag.
+        Assert.assertTrue(serverXmlDump.contains("<PreSharedKey"));
+        Assert.assertTrue(serverXmlDump.contains("digest=\"SHA384\""));
+        Assert.assertTrue(serverXmlDump.contains("identity=\"test\""));
+        Assert.assertTrue(serverXmlDump.contains("key=\"000102030405060708090a0b0c0d0e0f\""));
         Assert.assertTrue(serverXmlDump.contains("+TLSv1.1"));
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(serverXmlDump)));
 
