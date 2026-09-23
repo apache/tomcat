@@ -18,6 +18,8 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.DatagramChannel;
@@ -29,11 +31,19 @@ import java.nio.channels.SocketChannel;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.group.TribesSslContext;
+import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.util.ExceptionUtils;
@@ -57,7 +67,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
+    private volatile ServerSocketChannel secureServerChannel = null;
     private DatagramChannel datagramChannel = null;
+    private final Set<SocketChannel> secureSockets = ConcurrentHashMap.newKeySet();
+    private volatile Semaphore secureConnectionSlots;
 
     /**
      * Queue of events to be processed by the selector thread.
@@ -70,10 +83,134 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     public NioReceiver() {
     }
 
+    private void startSecureListener() throws IOException {
+        if (getSecurePort() < 0) {
+            return;
+        }
+        if (!(getChannel() instanceof GroupChannel groupChannel)) {
+            return;
+        }
+        if (groupChannel.getSslContext() == null) {
+            if (groupChannel.getSecure()) {
+                throw new IOException(sm.getString("nioReceiver.tlsUnavailable"));
+            }
+            setSecurePort(-1);
+            return;
+        }
+        secureServerChannel = ServerSocketChannel.open();
+        bindSecure(secureServerChannel.socket(), getSecurePort(), getAutoBind());
+        secureConnectionSlots = new Semaphore(Math.max(1, getMaxTasks()));
+        Thread thread = new Thread(() -> runSecureListener(groupChannel.getSslContext()), "NioReceiver-TLS");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void runSecureListener(TribesSslContext sslContext) {
+        ServerSocketChannel server = secureServerChannel;
+        while (server != null && server.isOpen()) {
+            try {
+                SocketChannel socket = server.accept();
+                socket.configureBlocking(true);
+                socket.socket().setSoTimeout(getTimeout());
+                Semaphore connectionSlots = secureConnectionSlots;
+                if (connectionSlots == null || !connectionSlots.tryAcquire()) {
+                    socket.close();
+                    continue;
+                }
+                secureSockets.add(socket);
+                try {
+                    getExecutor().execute(() -> {
+                        try {
+                            processSecureConnection(socket, sslContext);
+                        } finally {
+                            secureSockets.remove(socket);
+                            connectionSlots.release();
+                        }
+                    });
+                } catch (RuntimeException re) {
+                    secureSockets.remove(socket);
+                    connectionSlots.release();
+                    socket.close();
+                    log.warn(sm.getString("nioReceiver.requestError"), re);
+                }
+            } catch (IOException ioe) {
+                if (isListening()) {
+                    log.warn(sm.getString("nioReceiver.requestError"), ioe);
+                }
+            }
+        }
+    }
+
+    private void processSecureConnection(SocketChannel socketChannel, TribesSslContext sslContext) {
+        try (Socket socket = socketChannel.socket()) {
+            try (TlsChannel channel = new TlsChannel(socket, sslContext.createServerEngine())) {
+                ObjectReader reader = new ObjectReader(getRxBufSize());
+                ByteBuffer buffer = ByteBuffer.allocate(getRxBufSize());
+                while (channel.isOpen()) {
+                    int read = channel.read(buffer);
+                    if (read < 0) {
+                        return;
+                    }
+                    buffer.flip();
+                    reader.append(buffer, read, false);
+                    buffer.clear();
+                    for (ChannelMessage message : reader.execute()) {
+                        if (ChannelData.sendAckAsync(message.getOptions())) {
+                            channel.write(ByteBuffer.wrap(Constants.ACK_COMMAND));
+                        }
+                        try {
+                            messageDataReceived(message);
+                            if (ChannelData.sendAckSync(message.getOptions())) {
+                                channel.write(ByteBuffer.wrap(Constants.ACK_COMMAND));
+                            }
+                        } catch (RuntimeException re) {
+                            if (ChannelData.sendAckSync(message.getOptions())) {
+                                channel.write(ByteBuffer.wrap(Constants.FAIL_ACK_COMMAND));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("nioReceiver.requestError"), ioe);
+            }
+        } catch (RuntimeException re) {
+            log.warn(sm.getString("nioReceiver.requestError"), re);
+        }
+    }
+
     @Override
     public void stop() {
         this.stopListening();
+        if (secureServerChannel != null) {
+            try {
+                secureServerChannel.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+            secureServerChannel = null;
+        }
+        for (SocketChannel socket : secureSockets) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+        }
+        secureSockets.clear();
+        secureConnectionSlots = null;
         super.stop();
+        if ((getChannel() instanceof GroupChannel groupChannel) && groupChannel.getSecure()) {
+            try {
+                // Should stop a lot faster than this as all the sockets have been closed.
+                if (!getExecutor().awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.warn(sm.getString("nioReceiver.stop.executor.timeout"));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("nioReceiver.stop.executor.interrupted"));
+            }
+        }
     }
 
     @Override
@@ -91,7 +228,15 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
         try {
             getBind();
-            bind();
+            boolean tlsOnly = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
+            if (!tlsOnly) {
+                bind();
+            }
+            startSecureListener();
+            if (tlsOnly) {
+                setListen(true);
+                return;
+            }
             String channelName = "";
             if (getChannel().getName() != null) {
                 channelName = "[" + getChannel().getName() + "]";

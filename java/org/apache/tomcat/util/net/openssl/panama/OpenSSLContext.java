@@ -73,6 +73,7 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.SSL_psk_client_cb_func;
 import org.apache.tomcat.util.openssl.SSL_psk_find_session_cb_func;
 import org.apache.tomcat.util.openssl.SSL_psk_server_cb_func;
 import org.apache.tomcat.util.openssl.openssl_h;
@@ -119,6 +120,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
+    private final boolean clientMode;
     private final boolean alpn;
     private final int minTlsVersion;
     private final int maxTlsVersion;
@@ -155,7 +157,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols) throws SSLException {
+        this(certificate, negotiableProtocols, false);
+    }
 
+    public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols, boolean clientMode)
+            throws SSLException {
         // Check that OpenSSL was initialized
         if (!OpenSSLStatus.isInitialized()) {
             try {
@@ -167,6 +173,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
+        this.clientMode = clientMode;
         contextArena = Arena.ofAuto();
 
         MemorySegment sslCtx = MemorySegment.NULL;
@@ -193,7 +200,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // SSL protocol
-            sslCtx = SSL_CTX_new(TLS_server_method());
+            sslCtx = SSL_CTX_new(clientMode ? TLS_client_method() : TLS_server_method());
 
             int protocol = SSL_PROTOCOL_NONE;
             for (String enabledProtocol : sslHostConfig.getEnabledProtocols()) {
@@ -651,10 +658,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (!psks.isEmpty()) {
                 OpenSSLPreSharedKeySelector selector = new OpenSSLPreSharedKeySelector(psks);
                 for (String protocol : sslHostConfig.getEnabledProtocols()) {
-                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
+                    if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && clientMode) {
+                        SSL_CTX_set_psk_client_callback(state.sslCtx,
+                                SSL_psk_client_cb_func.allocate(new PskClientCallback(selector), contextArena));
+                    } else if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
                         SSL_CTX_set_psk_server_callback(state.sslCtx, SSL_psk_server_cb_func
                                 .allocate(new PskServerCallback(selector), contextArena));
-                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && !clientMode) {
                         if (openssl_h_Compatibility.LIBRESSL) {
                             throw new SSLException(sm.getString("openssl.pskTls13Unsupported"));
                         }
@@ -837,6 +847,39 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 psk.reinterpret(key.length, localArena, null).copyFrom(MemorySegment.ofArray(key));
             }
             return key.length;
+        }
+    }
+
+    private static class PskClientCallback implements SSL_psk_client_cb_func.Function {
+
+        private final OpenSSLPreSharedKeySelector selector;
+
+        PskClientCallback(OpenSSLPreSharedKeySelector selector) {
+            this.selector = selector;
+        }
+
+        @Override
+        public int apply(MemorySegment ssl, MemorySegment hint, MemorySegment identity, int maxIdentityLength,
+                MemorySegment psk, int maxPskLength) {
+            try {
+                String[] selectedIdentity = new String[1];
+                byte[] key = selector.selectClient(ssl.address(), selectedIdentity);
+                if (key == null || selectedIdentity[0] == null) {
+                    return 0;
+                }
+                byte[] identityBytes = selectedIdentity[0].getBytes(StandardCharsets.UTF_8);
+                if (key.length == 0 || key.length > maxPskLength || identityBytes.length + 1 > maxIdentityLength) {
+                    return 0;
+                }
+                try (var localArena = Arena.ofConfined()) {
+                    MemorySegment identitySegment = identity.reinterpret(identityBytes.length + 1, localArena, null);
+                    identitySegment.copyFrom(localArena.allocateFrom(selectedIdentity[0]));
+                    psk.reinterpret(key.length, localArena, null).copyFrom(MemorySegment.ofArray(key));
+                }
+                return key.length;
+            } catch (RuntimeException e) {
+                return 0;
+            }
         }
     }
 
@@ -1499,10 +1542,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public SSLEngine createSSLEngine() {
-        return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, false, sessionContext, alpn, initialized,
+        return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, clientMode, sessionContext, alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA, noOcspCheck,
                 ocspSoftFail, ocspTimeout, ocspVerifyFlags);
+    }
+
+    @Override
+    public SSLEngine createSSLEngine(boolean clientMode) {
+        if (clientMode != this.clientMode) {
+            throw new IllegalArgumentException();
+        }
+        return createSSLEngine();
     }
 
     @Override

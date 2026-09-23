@@ -10414,4 +10414,33 @@ public class openssl_h {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+
+    private static class TLS_client_method {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("TLS_client_method");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static MemorySegment TLS_client_method() {
+        try {
+            return (MemorySegment) TLS_client_method.HANDLE.invokeExact();
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_CTX_set_psk_client_callback {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_psk_client_callback");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static void SSL_CTX_set_psk_client_callback(MemorySegment ctx, MemorySegment callback) {
+        try {
+            SSL_CTX_set_psk_client_callback.HANDLE.invokeExact(ctx, callback);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
 }

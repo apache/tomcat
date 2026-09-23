@@ -49,12 +49,23 @@ public class OpenSSLPreSharedKeySelector implements PreSharedKeySelector {
     }
 
     @Override
+    public byte[] selectClient(long ssl, String[] identity) {
+        if (identityToKeyMap.isEmpty()) {
+            return null;
+        }
+        SSLHostConfigPreSharedKey psk = identityToKeyMap.values().iterator().next();
+        identity[0] = psk.getIdentity();
+        // Need to limit keys to 512 bytes for TLS 1.2
+        return truncateToLength(psk.getIdentity(), psk.getKeyInternal(), 512);
+    }
+
+    @Override
     public byte[] select(long ssl, String identity) {
         SSLHostConfigPreSharedKey psk = identityToKeyMap.get(identity);
         if (psk == null) {
             return null;
         }
-        // Need to limit keys to 48 bytes for TLS 1.3
+        // Need to limit keys to 512 bytes for TLS 1.2
         return truncateToLength(identity, psk.getKeyInternal(), 512);
     }
 

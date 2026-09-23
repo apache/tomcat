@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.TribesSslContext;
 
 /** Abstract base implementation of a data sender. */
 public abstract class AbstractSender implements DataSender {
@@ -76,6 +77,7 @@ public abstract class AbstractSender implements DataSender {
     private boolean udpBased = false;
     /** The UDP port of the destination. */
     private int udpPort = -1;
+    private TribesSslContext sslContext;
 
     /**
      * transfers sender properties from one sender to another
@@ -104,6 +106,7 @@ public abstract class AbstractSender implements DataSender {
         to.throwOnFailedAck = from.throwOnFailedAck;
         to.udpBased = from.udpBased;
         to.udpPort = from.udpPort;
+        to.sslContext = from.sslContext;
     }
 
 
@@ -216,6 +219,14 @@ public abstract class AbstractSender implements DataSender {
      */
     public int getPort() {
         return port;
+    }
+
+    public TribesSslContext getSslContext() {
+        return sslContext;
+    }
+
+    public void setSslContext(TribesSslContext sslContext) {
+        this.sslContext = sslContext;
     }
 
     /**
