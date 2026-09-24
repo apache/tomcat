@@ -134,12 +134,24 @@
         <code>pskKey</code> to enable TLS.
       </attribute>
 
+      <attribute name="pskDigest" required="false">
+        The message digest algorithm associated with the pre-shared key for
+        TLS 1.3, either <code>SHA256</code> or <code>SHA384</code>. The default
+        is <code>SHA256</code>. This attribute is ignored for TLS 1.2.
+      </attribute>
+
       <attribute name="pskKey" required="false">
         The TLS pre-shared key encoded as hexadecimal characters. This must be
         configured together with <code>pskIdentity</code>. The key is not
         exposed through JMX. It should be no longer than 512 bytes for TLS 1.2.
-        If the value is truely random then 32 bytes are sufficient for a 256-bit
-        cipher suite.
+        For TLS 1.3, it must be no longer than 48 bytes. If the value is truely
+        random then 32 bytes are sufficient for a 256-bit cipher suite.
+      </attribute>
+
+      <attribute name="pskProtocol" required="false">
+        The TLS protocol to use with the pre-shared key. The permitted values
+        are <code>TLSv1.2</code> and <code>TLSv1.3</code>. The default is
+        <code>TLSv1.3</code>.
       </attribute>
 
       <attribute name="jmxEnabled" required="false">

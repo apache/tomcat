@@ -669,7 +669,7 @@
         other cluster members. (remm)
       </fix>
       <add>
-        Add TLS pre-shared key support to Apache Tribes. (markt)
+        Add TLS 1.2 and TLS 1.3 pre-shared key support to Apache Tribes. (markt)
       </add>
     </changelog>
   </subsection>
