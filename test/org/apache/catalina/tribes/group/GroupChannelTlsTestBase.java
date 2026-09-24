@@ -18,19 +18,44 @@ package org.apache.catalina.tribes.group;
 
 import java.io.Serializable;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
-public class TestGroupChannelTls {
+@RunWith(Parameterized.class)
+public class GroupChannelTlsTestBase {
+
+    @Parameterized.Parameters(name = "{index}: {0} {1} {2}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        for (Boolean explicit : TomcatBaseTest.booleans) {
+            parameterSets.add(new Object[] { explicit, "TLSv1.2", "SHA256" });
+            parameterSets.add(new Object[] { explicit, "TLSv1.3", "SHA256" });
+            parameterSets.add(new Object[] { explicit, "TLSv1.3", "SHA384" });
+        }
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public boolean explicit;
+    @Parameter(1)
+    public String protocol;
+    @Parameter(2)
+    public String digest;
 
     @Test
     public void testPskDefaults() {
@@ -39,17 +64,11 @@ public class TestGroupChannelTls {
         Assert.assertEquals("TLSv1.3", channel.getPskProtocol());
     }
 
+
     @Test
     public void testSecureMessage() throws Exception {
-        try (@SuppressWarnings("unused") TribesSslContext ignored =
-                new TribesSslContext("tribes-test", "000102030405060708090a0b0c0d0e0f", "TLSv1.3", "SHA256")) {
-            // Verify that a supported TLS provider is available before creating the channels.
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
-        }
-
-        GroupChannel sender = createChannel();
-        GroupChannel receiver = createChannel();
+        GroupChannel sender = createChannel(protocol, digest);
+        GroupChannel receiver = createChannel(protocol, digest);
         CountDownLatch received = new CountDownLatch(1);
         receiver.addChannelListener(new ChannelListener() {
             @Override
@@ -77,10 +96,13 @@ public class TestGroupChannelTls {
         }
     }
 
-    private static GroupChannel createChannel() throws Exception {
+
+    private static GroupChannel createChannel(String protocol, String digest) throws Exception {
         GroupChannel channel = new GroupChannel();
         channel.setPskIdentity("tribes-test");
         channel.setPskKey("000102030405060708090a0b0c0d0e0f");
+        channel.setPskProtocol(protocol);
+        channel.setPskDigest(digest);
         ReceiverBase receiver = (ReceiverBase) channel.getChannelReceiver();
         receiver.setHost("localhost");
         try (ServerSocket socket = new ServerSocket(0)) {
