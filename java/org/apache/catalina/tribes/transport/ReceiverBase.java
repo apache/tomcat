@@ -33,6 +33,7 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.util.ExecutorFactory;
@@ -228,8 +229,27 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param retries   Number of times to attempt to bind (port incremented between attempts)
      *
      * @throws IOException Socket bind error
+     *
+     * @deprecated Use {@link #bind(ServerSocket, int, int, boolean)}. This method will be removed in Tomcat 12.
      */
+    @Deprecated
     protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
+        bind(socket, portstart, retries, false);
+    }
+
+    /**
+     * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
+     * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
+     * to is obtained via a call to {@link #getBind()}.
+     *
+     * @param socket    The socket to bind
+     * @param portstart Starting port for bind attempts
+     * @param retries   Number of times to attempt to bind (port incremented between attempts)
+     * @param secure    Is this bind for a secure port or not
+     *
+     * @throws IOException Socket bind error
+     */
+    protected void bind(ServerSocket socket, int portstart, int retries, boolean secure) throws IOException {
         synchronized (bindLock) {
             InetSocketAddress addr = null;
             int port = portstart;
@@ -237,8 +257,19 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 try {
                     addr = new InetSocketAddress(getBind(), port);
                     socket.bind(addr);
-                    setPort(port);
-                    log.info(sm.getString("receiverBase.socket.bind", addr));
+                    String type;
+                    if (secure) {
+                        setSecurePort(port);
+                        if (getChannel() instanceof GroupChannel groupChannel) {
+                            type = groupChannel.getSslContext().getImplementationName();
+                        } else {
+                            type = "secure";
+                        }
+                    } else {
+                        type = "cleartext";
+                        setPort(port);
+                    }
+                    log.info(sm.getString("receiverBase.socket.bind", addr, type));
                     retries = 0;
                 } catch (IOException ioe) {
                     retries--;
@@ -250,28 +281,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     port++;
                 }
 
-            }
-        }
-    }
-
-    protected void bindSecure(ServerSocket socket, int portstart, int retries) throws IOException {
-        synchronized (bindLock) {
-            InetSocketAddress address = null;
-            int port = portstart;
-            while (retries > 0) {
-                try {
-                    address = new InetSocketAddress(getBind(), port);
-                    socket.bind(address);
-                    setSecurePort(port);
-                    log.info(sm.getString("receiverBase.socket.bind", address));
-                    return;
-                } catch (IOException ioe) {
-                    if (--retries <= 0) {
-                        log.info(sm.getString("receiverBase.unable.bind", address));
-                        throw ioe;
-                    }
-                    port++;
-                }
             }
         }
     }

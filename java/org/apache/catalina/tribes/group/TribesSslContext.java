@@ -150,4 +150,13 @@ public class TribesSslContext implements AutoCloseable {
             }
         }
     }
+
+
+    public String getImplementationName() {
+        if (ffm) {
+            return "TLS-OpenSSL-FFM";
+        } else {
+            return "TLS-OpenSSL";
+        }
+    }
 }

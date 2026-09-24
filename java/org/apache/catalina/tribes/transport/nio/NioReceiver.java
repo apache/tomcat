@@ -98,7 +98,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             return;
         }
         secureServerChannel = ServerSocketChannel.open();
-        bindSecure(secureServerChannel.socket(), getSecurePort(), getAutoBind());
+        bind(secureServerChannel.socket(), getSecurePort(), getAutoBind(), true);
         secureConnectionSlots = new Semaphore(Math.max(1, getMaxTasks()));
         Thread thread = new Thread(() -> runSecureListener(groupChannel.getSslContext()), "NioReceiver-TLS");
         thread.setDaemon(true);
@@ -278,7 +278,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         this.selector.set(Selector.open());
         // set the port the server channel will listen to
         // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-        bind(serverSocket, getPort(), getAutoBind());
+        bind(serverSocket, getPort(), getAutoBind(), false);
         // set non-blocking mode for the listening socket
         serverChannel.configureBlocking(false);
         // register the ServerSocketChannel with the Selector
