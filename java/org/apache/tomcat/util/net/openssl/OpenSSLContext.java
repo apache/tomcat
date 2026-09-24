@@ -459,7 +459,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 for (String protocol : sslHostConfig.getEnabledProtocols()) {
                     if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && clientMode) {
                         SSLContext.setPskClientCallback(state.ctx, selector);
-                    } else if (Constants.SSL_PROTO_TLSv1_2.equals(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && clientMode) {
+                        SSLContext.setPskUseSessionCallback(state.ctx, selector);
+                    } else if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && !clientMode) {
                         SSLContext.setPskServerCallback(state.ctx, selector);
                     } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && !clientMode) {
                         SSLContext.setPskFindSessionCallback(state.ctx, selector);

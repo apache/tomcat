@@ -54,7 +54,11 @@ public interface GroupChannelMBean {
 
     boolean getSecure();
 
+    String getPskDigest();
+
     String getPskIdentity();
+
+    String getPskProtocol();
 
     // Operations
     /**

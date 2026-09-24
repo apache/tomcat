@@ -10322,6 +10322,25 @@ public class openssl_h {
         }
     }
 
+    private static class SSL_CTX_set_psk_use_session_callback {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_psk_use_session_callback");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static void SSL_CTX_set_psk_use_session_callback(MemorySegment ctx, MemorySegment callback) {
+        var mh$ = SSL_CTX_set_psk_use_session_callback.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_psk_use_session_callback", ctx, callback);
+            }
+            mh$.invokeExact(ctx, callback);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class SSL_SESSION_new {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_new");
@@ -10372,6 +10391,25 @@ public class openssl_h {
                 traceDowncall("SSL_SESSION_set1_master_key", session, key, keyLength);
             }
             return (int) mh$.invokeExact(session, key, keyLength);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class SSL_SESSION_set1_id_context {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_INT);
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_set1_id_context");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    public static int SSL_SESSION_set1_id_context(MemorySegment session, MemorySegment sidCtx, int sidCtxLength) {
+        var mh$ = SSL_SESSION_set1_id_context.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_set1_id_context", session, sidCtx, sidCtxLength);
+            }
+            return (int) mh$.invokeExact(session, sidCtx, sidCtxLength);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

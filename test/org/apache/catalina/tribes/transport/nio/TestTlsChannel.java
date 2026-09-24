@@ -22,6 +22,9 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLEngine;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -33,12 +36,27 @@ public class TestTlsChannel {
 
     @Test
     public void testPskRoundTrip() throws Exception {
-        try (TribesSslContext context = createContext();
+        doTestPskRoundTrip(createContext("SHA256", "TLSv1.3"), "TLSv1.3");
+    }
+
+    @Test
+    public void testPskRoundTripTls13Sha384() throws Exception {
+        doTestPskRoundTrip(createContext("SHA384", "TLSv1.3"), "TLSv1.3");
+    }
+
+    @Test
+    public void testPskRoundTripTls12() throws Exception {
+        doTestPskRoundTrip(createContext("SHA256", "TLSv1.2"), "TLSv1.2");
+    }
+
+    private static void doTestPskRoundTrip(TribesSslContext context, String protocol) throws Exception {
+        try (context;
                 ServerSocketChannel server = ServerSocketChannel.open()) {
             server.bind(new InetSocketAddress("localhost", 0));
             FutureTask<Void> serverTask = new FutureTask<>(() -> {
-                try (SocketChannel socket = server.accept();
-                        TlsChannel tls = new TlsChannel(socket.socket(), context.createServerEngine())) {
+                SSLEngine engine = context.createServerEngine();
+                try (SocketChannel socket = server.accept(); TlsChannel tls = new TlsChannel(socket.socket(), engine)) {
+                    Assert.assertTrue(engine.getSession().getProtocol().startsWith(protocol));
                     Assert.assertEquals("request", read(tls));
                     tls.write(ByteBuffer.wrap("response".getBytes(StandardCharsets.UTF_8)));
                 }
@@ -46,12 +64,23 @@ public class TestTlsChannel {
             });
             Thread serverThread = new Thread(serverTask);
             serverThread.start();
-            try (SocketChannel socket = SocketChannel.open(server.getLocalAddress());
-                    TlsChannel tls = new TlsChannel(socket.socket(), context.createClientEngine())) {
-                tls.write(ByteBuffer.wrap("request".getBytes(StandardCharsets.UTF_8)));
-                Assert.assertEquals("response", read(tls));
+            SSLEngine engine = context.createClientEngine();
+            try {
+                try (SocketChannel socket = SocketChannel.open(server.getLocalAddress());
+                        TlsChannel tls = new TlsChannel(socket.socket(), engine)) {
+                    Assert.assertTrue(engine.getSession().getProtocol().startsWith(protocol));
+                    tls.write(ByteBuffer.wrap("request".getBytes(StandardCharsets.UTF_8)));
+                    Assert.assertEquals("response", read(tls));
+                }
+                serverTask.get();
+            } catch (Exception e) {
+                try {
+                    serverTask.get(5, TimeUnit.SECONDS);
+                } catch (Exception serverException) {
+                    e.addSuppressed(serverException);
+                }
+                throw e;
             }
-            serverTask.get();
         }
     }
 
@@ -87,8 +116,13 @@ public class TestTlsChannel {
     }
 
     private static TribesSslContext createContext() {
+        return createContext("SHA256", "TLSv1.3");
+    }
+
+    private static TribesSslContext createContext(String digest, String protocol) {
         try {
-            return new TribesSslContext("tribes-test", "000102030405060708090a0b0c0d0e0f");
+            return new TribesSslContext("tribes-test",
+                    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", digest, protocol);
         } catch (Exception e) {
             Assume.assumeNoException(e);
             return null;
@@ -97,7 +131,9 @@ public class TestTlsChannel {
 
     private static String read(TlsChannel channel) throws Exception {
         ByteBuffer buffer = ByteBuffer.allocate(32);
-        channel.read(buffer);
+        while (buffer.position() == 0) {
+            Assert.assertTrue(channel.read(buffer) >= 0);
+        }
         buffer.flip();
         return StandardCharsets.UTF_8.decode(buffer).toString();
     }
@@ -105,7 +141,7 @@ public class TestTlsChannel {
     private static byte[] read(TlsChannel channel, int length) throws Exception {
         ByteBuffer buffer = ByteBuffer.allocate(length);
         while (buffer.hasRemaining()) {
-            Assert.assertTrue(channel.read(buffer) > 0);
+            Assert.assertTrue(channel.read(buffer) >= 0);
         }
         return buffer.array();
     }
