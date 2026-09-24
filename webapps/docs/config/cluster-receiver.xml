@@ -73,9 +73,10 @@
       from the sockets.
     </attribute>
     <attribute name="port" required="false">
-      The listen port for incoming data. The default value is <code>4000</code>.
-      To avoid port conflicts the receiver will automatically bind to a free port within the range of
-      <code> port &lt;= bindPort &lt; port+autoBind</code>
+      The listen port for incoming data. The default value is <code>4000</code> unless the channel is
+      secure in which case this attribute will be forced to <code>-1</code> to disable the non-secure
+      port. If enabled, to avoid port conflicts the receiver will automatically bind to a free port
+      within the range of <code>port &lt;= bindPort &lt; port+autoBind</code>
       So for example, if port is 4000, and autoBind is set to 10, then the receiver will open up
       a server socket on the first available port in the range 4000-4009.
     </attribute>
@@ -85,12 +86,12 @@
       server socket on the <code>port</code> attribute port, and then work up <code>autoBind</code> number of times.
     </attribute>
     <attribute name="securePort" required="false">
-      The secure listen port. This port is SSL enabled. If this attribute is omitted no SSL port is opened up.
-      There default value is unset, meaning there is no SSL socket available.
+      The secure listen port. This port is TLS enabled. If this attribute is omitted no TLS port is opened up.
+      The default value is unset, meaning there is no TLS socket available.
     </attribute>
     <attribute name="udpPort" required="false">
       The UDP listen port. If this attribute is omitted no UDP port is opened up.
-      There default value is unset, meaning there is no UDP listener available.
+      The default value is unset, meaning there is no UDP listener available.
     </attribute>
     <attribute name="selectorTimeout" required="false">
       The value in milliseconds for the polling timeout in the <code>NioReceiver</code>. On older versions of the JDK
