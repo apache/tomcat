@@ -46,7 +46,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * for readability for the tests and their outputs.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
+public class TestEncryptInterceptor extends EncryptInterceptorBaseTest {
 
     @Test
     public void testBasic() throws Exception {
