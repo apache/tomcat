@@ -510,16 +510,15 @@
     </subsection>
 
     <subsection name="Cluster">
-      <p>The cluster implementation is written on the basis that a secure,
-      trusted network is used for all of the cluster related network traffic. It
-      is not safe to run a cluster on a insecure, untrusted network.</p>
-
-      <p>If you require confidentiality and/or integrity protection then you can
-      use the
-      <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
-      to encrypt traffic between nodes. This interceptor does not protect
-      against all the risks of running on an untrusted network, particularly
-      DoS attacks.</p>
+      <p>Tomcat clustering is typically used over a secure, trusted network. If a trusted network is not available then
+      a cluster may be configured to use TLS. The <code>EncryptInterceptor</code> is deprecated and should no longer be
+      used to secure cluster traffic. Other options for providing a secure, trusted network for use by a Tomcat cluster
+      include:</p>
+      <ul>
+        <li>private LAN</li>
+        <li>a Virtual Private Network (VPN)</li>
+        <li>IPSEC</li>
+      </ul>
     </subsection>
   </section>
 

@@ -31,7 +31,7 @@ import org.apache.catalina.tribes.Channel;
  * for readability for the tests and their outputs.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestEncryptInterceptorLargeHeap extends EncryptionInterceptorBaseTest {
+public class TestEncryptInterceptorLargeHeap extends EncryptInterceptorBaseTest {
 
     @Test
     public void testHugePayload() throws Exception {

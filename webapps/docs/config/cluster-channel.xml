@@ -123,9 +123,10 @@
       </attribute>
 
       <attribute name="secure" required="false">
-        If <code>true</code>, the <code>SEND_OPTIONS_SECURE</code> flag is
-        added to every message. Channel startup fails if TLS is unavailable.
-        The default is <code>false</code>.
+        If <code>true</code>, the <code>SEND_OPTIONS_SECURE</code> flag is added
+        to every message. Both <code>pskIdentity</code> and <code>pskKey</code>
+        must also be configued for TLS to be enabled. Channel startup fails if
+        TLS is unavailable. The default is <code>false</code>.
       </attribute>
 
       <attribute name="pskIdentity" required="false">
@@ -137,6 +138,8 @@
         The TLS pre-shared key encoded as hexadecimal characters. This must be
         configured together with <code>pskIdentity</code>. The key is not
         exposed through JMX. It should be no longer than 512 bytes for TLS 1.2.
+        If the value is truely random then 32 bytes are sufficient for a 256-bit
+        cipher suite.
       </attribute>
 
       <attribute name="jmxEnabled" required="false">

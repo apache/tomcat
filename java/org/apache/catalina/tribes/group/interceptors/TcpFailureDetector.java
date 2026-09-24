@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -419,9 +420,23 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             return false;
         }
 
+        boolean channelSecure = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
+        boolean useSecurePort = channelSecure || mbr.getSecurePort() >= 0 && mbr.getPort() < 0;
+        int port = useSecurePort ? mbr.getSecurePort() : mbr.getPort();
+        if (port < 0) {
+            // no usable port to connect to, so the member can't be checked
+            return false;
+        }
+        // the plaintext test message can't be spoken to a TLS-only listener, so a secure port check is
+        // limited to a plain TCP connect
+        if (useSecurePort) {
+            sendTest = false;
+            readTest = false;
+        }
+
         try (Socket socket = new Socket()) {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
-            InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
+            InetSocketAddress addr = new InetSocketAddress(ia, port);
             socket.setSoTimeout((int) readTimeout);
             socket.connect(addr, (int) conTimeout);
             if (sendTest) {
