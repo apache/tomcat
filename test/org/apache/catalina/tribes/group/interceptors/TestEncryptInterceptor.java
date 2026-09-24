@@ -45,6 +45,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * though the interceptor actually operates on byte arrays. This is done
  * for readability for the tests and their outputs.
  */
+@Deprecated
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEncryptInterceptor extends EncryptInterceptorBaseTest {
 
