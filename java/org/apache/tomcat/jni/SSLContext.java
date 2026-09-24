@@ -183,6 +183,7 @@ public final class SSLContext {
     public static native String[] getCiphers(long ctx);
 
     /**
+<<<<<<< HEAD
      * Sets the "quiet shutdown" flag for <b>ctx</b> to be <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1. <br>
      * Normally when an SSL connection is finished, the parties must send out "close notify" alert messages using
@@ -205,6 +206,9 @@ public final class SSLContext {
 
     /**
      * Set the TLSv1.2 and below ciphers available for negotiation in the TLS handshake.
+=======
+     * Set the TLSv1.2 and below ciphers available for negotiation the in TLS handshake.
+>>>>>>> 5a9393394b (Align with Tomcat Native 1.2.x)
      * <p>
      * This complex directive uses a colon-separated cipher-spec string consisting of OpenSSL cipher specifications to
      * configure the ciphers the client is permitted to negotiate in the TLS handshake phase.
@@ -219,7 +223,7 @@ public final class SSLContext {
     public static native boolean setCipherSuite(long ctx, String cipherList) throws Exception;
 
     /**
-     * Set the TLSv1.3 cipher suites available for negotiation in the TLS handshake.
+     * Set the TLSv1.3 cipher suites available for negotiation the in TLS handshake.
      * <p>
      * This uses a colon-separated list of TLSv1.3 cipher suite names in preference order.
      *
@@ -283,7 +287,7 @@ public final class SSLContext {
      * @param ctx      Server or Client context to use.
      * @param cert     Certificate file.
      * @param key      Private Key file to use if not in cert.
-     * @param password Certificate password. If null and certificate is encrypted, loading the certificate will fail.
+     * @param password Certificate password. If null and certificate is encrypted, password prompt will be displayed.
      * @param idx      Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
      *
      * @return <code>true</code> if the operation was successful
@@ -339,7 +343,7 @@ public final class SSLContext {
      * @param ctx  Server or Client context to use.
      * @param mode The mode to set
      *
-     * @return the previous mode
+     * @return the value set
      */
     public static native long setSessionCacheMode(long ctx, long mode);
 
@@ -348,7 +352,7 @@ public final class SSLContext {
      *
      * @param ctx Server or Client context to use.
      *
-     * @return the current mode
+     * @return the value set
      */
     public static native long getSessionCacheMode(long ctx);
 
@@ -679,12 +683,22 @@ public final class SSLContext {
     public static native void setPskFindSessionCallback(long ctx, PreSharedKeySelector selector);
 
     /**
-     * Sets the TLSv1.2 client-side pre-shared key callback.
+     * Sets the TLSv1.2 client-side pre-shared key callback to a {@link PreSharedKeySelector} instance. This will call
+     * {@code SSL_CTX_set_psk_client_callback}.
      *
      * @param ctx      Client context to use
      * @param selector pre-shared key selector
      */
     public static native void setPskClientCallback(long ctx, PreSharedKeySelector selector);
+
+    /**
+     * Sets the TLSv1.3 client-side pre-shared key callback to a {@link PreSharedKeySelector} instance. This will call
+     * {@code SSL_CTX_set_psk_use_session_callback}.
+     *
+     * @param ctx      Client context to use
+     * @param selector pre-shared key selector
+     */
+    public static native void setPskUseSessionCallback(long ctx, PreSharedKeySelector selector);
 
     /**
      * Set next protocol for next protocol negotiation extension
@@ -757,7 +771,7 @@ public final class SSLContext {
     public static native void setTmpECDHByCurveName(long ctx, String curveName) throws Exception;
 
     /**
-     * Set the context within which sessions can be reused (server side only)
+     * Set the context within which session be reused (server side only)
      * http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html
      *
      * @param ctx    Server context to use.
@@ -770,7 +784,7 @@ public final class SSLContext {
 
     /**
      * Set CertificateRaw <br>
-     * Use a keystore certificate and key to fill the BIO.
+     * Use keystore a certificate and key to fill the BIOP
      *
      * @param ctx        Server or Client context to use.
      * @param cert       Byte array with the certificate in DER encoding.
@@ -784,7 +798,7 @@ public final class SSLContext {
     /**
      * Add a certificate to the certificate chain. Certs should be added in order starting with the issuer of the host
      * certs and working up the certificate chain to the CA. <br>
-     * Use a keystore certificate chain to fill the BIO.
+     * Use keystore a certificate chain to fill the BIOP
      *
      * @param ctx  Server or Client context to use.
      * @param cert Byte array with the certificate in DER encoding.
