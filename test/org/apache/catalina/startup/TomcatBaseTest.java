@@ -93,7 +93,7 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
 public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     // Used by parameterized tests. Defined here to reduce duplication.
-    protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
+    public static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
 
     protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
