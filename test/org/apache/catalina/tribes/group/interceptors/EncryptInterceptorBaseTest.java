@@ -36,6 +36,7 @@ import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.tomcat.util.ExceptionUtils;
 
+@Deprecated
 public class EncryptInterceptorBaseTest {
 
     protected static final String MESSAGE_FILE = "message.bin";
