@@ -76,15 +76,37 @@ public class OpenSSLPreSharedKeySelector implements PreSharedKeySelector {
         if (psk == null) {
             return null;
         }
+        if (!setCipherSuite(psk, cipherSuite)) {
+            return null;
+        }
+        // Need to limit keys to 48 bytes for TLS 1.3
+        return truncateToLength(identityString, psk.getKeyInternal(), 48);
+    }
+
+    @Override
+    public byte[] selectClient(long ssl, String[] identity, int[] cipherSuite) {
+        if (identityToKeyMap.isEmpty()) {
+            return null;
+        }
+        SSLHostConfigPreSharedKey psk = identityToKeyMap.values().iterator().next();
+        if (!setCipherSuite(psk, cipherSuite)) {
+            return null;
+        }
+        identity[0] = psk.getIdentity();
+        // Need to limit keys to 48 bytes for TLS 1.3
+        return truncateToLength(psk.getIdentity(), psk.getKeyInternal(), 48);
+    }
+
+    private static boolean setCipherSuite(SSLHostConfigPreSharedKey psk, int[] cipherSuite) {
         switch (psk.getDigestInternal()) {
             case SHA256:
                 // Any TLS ciphersuite that OpenSSL recognises that uses SHA256 works here
                 cipherSuite[0] = 0x1301;
-                break;
+                return true;
             case SHA384:
                 // Any TLS ciphersuite that OpenSSL recognises that uses SHA384 works here
                 cipherSuite[0] = 0x1302;
-                break;
+                return true;
             case AEAD:
             case GOST89MAC:
             case GOST94:
@@ -92,10 +114,8 @@ public class OpenSSLPreSharedKeySelector implements PreSharedKeySelector {
             case SHA1:
             default:
                 // Unsupported digest
-                return null;
+                return false;
         }
-        // Need to limit keys to 48 bytes for TLS 1.3
-        return truncateToLength(identityString, psk.getKeyInternal(), 48);
     }
 
 
