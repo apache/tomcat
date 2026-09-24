@@ -277,11 +277,11 @@
         Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
       </attribute>
       <attribute name="port" required="true">
-        The port that this static member listens to for cluster messages
+        The port that this static member listens to for non-secure cluster messages.
       </attribute>
       <attribute name="securePort" required="false">
-        The secure port this static member listens to for encrypted cluster messages
-        default value is <code>-1</code>, this value means the member is not listening on a secure port
+        The port this static member listens to for TLS protected cluster messages. The default value is
+        <code>-1</code>, meaning the member is not listening on a secure port.
       </attribute>
       <attribute name="host" required="true">
         The host (or network interface) that this static member listens for cluster messages.

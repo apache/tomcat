@@ -53,7 +53,10 @@ import org.apache.juli.logging.LogFactory;
  * algorithm being used. For example, for AES, you must use a key of either 16 bytes (128 bits), 24 bytes (192 bits),
  * or 32 bytes (256 bits). You can supply the raw key bytes by calling {@link #setEncryptionKey(byte[])} or the
  * hex-encoded binary bytes by calling {@link #setEncryptionKey(String)}.
+ *
+ * @deprecated Configure the cluster to use TLS instead. This interceptor will be removed in Tomcat 12.
  */
+@Deprecated
 public class EncryptInterceptor extends ChannelInterceptorBase implements EncryptInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(EncryptInterceptor.class);

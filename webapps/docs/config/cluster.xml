@@ -42,27 +42,40 @@
   making the configuration seem like a lot, but don't lose faith, instead you have a tremendous control
   over what is going on.</p>
 </section>
+
 <section name="Security">
+  <p>
+  Tomcat clustering is typically used over a secure, trusted network. If a trusted network is not
+  available then a cluster may be configured to use TLS. To configure a cluster to use TLS the
+  following changes/additions to a working non-TLS cluster configuration are required:
+  </p>
+  <ul>
+    <li>OpenSSL-FFM support (Java 22+ and OpenSSL library) or Tomact Native 1.2.17+ must be available to provide the TLS
+        support.</li>
+    <li>The cluster must be configured to use static membership.</li>
+    <li>The <code>pskKey</code> and <code>pskIdentity</code> attributes of the <code>Channel</code> must be set to the
+        same values on each cluster node.</li>
+    <li>The <code>secure</code> attribute of the <code>Channel</code> must be set to <code>true</code> on each cluster
+        node.</li>
+    <li>The <code>securePort</code> attribute of the <code>Receiver</code> must be set.</li>
+    <li>The <code>securePort</code> attribute of each <code>Member</code> must be set to match the associated
+        <code>Receiver</code>.</li>
+  </ul>
 
-<p>The cluster implementation is written on the basis that a secure, trusted
-network is used for all of the cluster related network traffic. It is not safe
-to run a cluster on a insecure, untrusted network.</p>
+  <p>
+  The <code>EncryptInterceptor</code> is deprecated and should no longer be used to secure cluster traffic.
+  </p>
 
-<p>There are many options for providing a secure, trusted network for use by a
-Tomcat cluster. These include:</p>
-<ul>
-  <li>private LAN</li>
-  <li>a Virtual Private Network (VPN)</li>
-  <li>IPSEC</li>
-</ul>
-
-<p>When correctly configured, the <a
-href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
-provides confidentiality and integrity protection but it does not protect
-against all risks associated with running a Tomcat cluster on an untrusted
-network, particularly DoS attacks.</p>
-
+  <p>
+  Other options for providing a secure, trusted network for use by a Tomcat cluster include:
+  </p>
+  <ul>
+    <li>private LAN</li>
+    <li>a Virtual Private Network (VPN)</li>
+    <li>IPSEC</li>
+  </ul>
 </section>
+
 <section name="Engine vs Host placement">
   <p>
    You can place the <code>&lt;Cluster&gt;</code> element inside either the <code>&lt;Engine&gt;</code>
