@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.tribes.Channel;
 
+@Deprecated
 @RunWith(Parameterized.class)
 public class TestEncryptInterceptorAlgorithms extends EncryptInterceptorBaseTest {
 
