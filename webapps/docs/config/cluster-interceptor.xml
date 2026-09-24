@@ -59,7 +59,6 @@
    </p>
    <ul>
     <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.EncryptInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
@@ -176,7 +175,9 @@
        to the suspect node. Default is 1000.
      </attribute>
      <attribute name="performSendTest" required="false">
-       If true is set, send a test message to the suspect node. Default is true.
+       If true is set, send a test message to the suspect node. Default is true
+       unless the channel is secure in which case test messages will never be
+       sent.
      </attribute>
      <attribute name="performReadTest" required="false">
        If true is set, read the response of the test message that sent. Default is false.
@@ -220,6 +221,9 @@
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
+   <p>
+     The <code>EncryptInterceptor</code> is deprecated and should no longer be used to secure cluster traffic.
+   </p>
    <p>
      The EncryptInterceptor adds encryption to the channel messages carrying
      session data between nodes. For the EncryptInterceptor to be effective it
@@ -346,11 +350,11 @@
         Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
       </attribute>
       <attribute name="port" required="true">
-        The port that this static member listens to for cluster messages
+        The port that this static member listens to for non-secure cluster messages.
       </attribute>
       <attribute name="securePort" required="false">
-        The secure port this static member listens to for encrypted cluster messages
-        default value is <code>-1</code>, this value means the member is not listening on a secure port
+        The port this static member listens to for TLS protected cluster messages. The default value is
+        <code>-1</code>, meaning the member is not listening on a secure port.
       </attribute>
       <attribute name="host" required="true">
         The host (or network interface) that this static member listens for cluster messages.
