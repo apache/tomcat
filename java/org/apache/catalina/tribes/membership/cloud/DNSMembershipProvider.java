@@ -41,10 +41,8 @@ import org.apache.juli.logging.LogFactory;
  * cluster member in DNS and adds that node to the cluster. The DNS entry is, effectively, used by new nodes to identify
  * the other nodes in the cluster to which cluster messages should be sent.
  * <p>
- * If more control is required over cluster membership, users are strongly encouraged to use
- * {@link KubernetesMembershipProvider} instead. Alternatively, the
- * {@link org.apache.catalina.tribes.group.interceptors.EncryptInterceptor} may be used to ensure that only nodes with
- * knowledge of the shared key are able to participate in the cluster.
+ * If more control is required over cluster membership, users are strongly encouraged to configure a securePort and use
+ * TLS to ensure that only nodes with knowledge of the shared key are able to participate in the cluster.
  * <p>
  * TODO: Make the "accept messages from any node and add that node to the cluster" behaviour optional.
  * <p>
@@ -184,6 +182,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             MemberImpl member;
             try {
                 member = new MemberImpl(ip, port, aliveTime);
+                member.setSecurePort(securePort);
             } catch (IOException ioe) {
                 log.error(sm.getString("dnsMembershipProvider.memberError"), ioe);
                 continue;
@@ -212,6 +211,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             MemberImpl member = new MemberImpl();
             member.setHost(sender.getHost());
             member.setPort(sender.getPort());
+            member.setSecurePort(sender.getSecurePort());
             byte[] host = sender.getHost();
             int i = 0;
             StringBuilder buf = new StringBuilder();
