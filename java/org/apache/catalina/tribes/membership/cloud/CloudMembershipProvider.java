@@ -94,6 +94,11 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected int port;
 
     /**
+     * The local secure port number.
+     */
+    protected int securePort;
+
+    /**
      * Member expiration time in milliseconds.
      */
     protected long expirationTime = 5000;
@@ -180,6 +185,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
+        securePort = Integer.parseInt(properties.getProperty("tcpSecurePort"));
     }
 
     @Override
