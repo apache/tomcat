@@ -234,6 +234,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             }
             startSecureListener();
             if (tlsOnly) {
+                // Disable non-secure port
+                setPort(-1);
                 setListen(true);
                 return;
             }

@@ -56,7 +56,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * The tcp listen port for this member
      */
-    protected volatile int port;
+    protected volatile int port = -1;
     /**
      * The udp listen port for this member
      */
