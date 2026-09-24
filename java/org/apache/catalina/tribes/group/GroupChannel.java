@@ -125,8 +125,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     protected boolean optionCheck = false;
 
     private boolean secure;
+    private String pskDigest = "SHA256";
     private String pskIdentity;
     private String pskKey;
+    private String pskProtocol = "TLSv1.3";
     private volatile TribesSslContext sslContext;
 
     /**
@@ -461,7 +463,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         if (sslContext == null) {
             if (pskKey != null && pskIdentity != null) {
                 try {
-                    sslContext = new TribesSslContext(pskIdentity, pskKey);
+                    sslContext = new TribesSslContext(pskIdentity, pskKey, pskDigest, pskProtocol);
                 } catch (Exception e) {
                     if (secure) {
                         throw new ChannelException(sm.getString("groupChannel.tlsUnavailable"), e);
@@ -666,6 +668,15 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     @Override
+    public String getPskDigest() {
+        return pskDigest;
+    }
+
+    public void setPskDigest(String pskDigest) {
+        this.pskDigest = pskDigest;
+    }
+
+    @Override
     public String getPskIdentity() {
         return pskIdentity;
     }
@@ -676,6 +687,15 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     public void setPskKey(String pskKey) {
         this.pskKey = pskKey;
+    }
+
+    @Override
+    public String getPskProtocol() {
+        return pskProtocol;
+    }
+
+    public void setPskProtocol(String pskProtocol) {
+        this.pskProtocol = pskProtocol;
     }
 
     public TribesSslContext getSslContext() {

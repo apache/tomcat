@@ -18,7 +18,10 @@ package org.apache.catalina.tribes.group.interceptors;
 
 /**
  * MBean interface for managing the {@link EncryptInterceptor} configuration and status.
+ *
+ * @deprecated Configure the cluster to use TLS instead. This interceptor will be removed in Tomcat 12.
  */
+@Deprecated
 public interface EncryptInterceptorMBean {
 
     /**

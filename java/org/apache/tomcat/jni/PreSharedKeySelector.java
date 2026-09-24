@@ -18,8 +18,10 @@ package org.apache.tomcat.jni;
 
 /**
  * The interface for the Tomcat code that responds to the callback from the OpenSSL layer in Tomcat Native to allow
- * Tomcat to select a pre-shared key. It supports TLSv1.2 {@code SSL_CTX_set_psk_server_callback} and TLSv1.3
- * {@code SSL_CTX_set_psk_find_session_callback}.
+ * Tomcat to select a pre-shared key. It supports server-side TLSv1.2 {@code SSL_CTX_set_psk_server_callback},
+ * server-side TLSv1.3 {@code SSL_CTX_set_psk_find_session_callback}, client-side TLSv1.2
+ * {@code SSL_CTX_set_psk_client_callback} and client-side
+ * TLSv1.3 {@code SSL_CTX_set_psk_use_session_callback} call-backs.
  */
 public interface PreSharedKeySelector {
 
@@ -54,7 +56,7 @@ public interface PreSharedKeySelector {
 
 
     /**
-     * Selects the TLS1v2 identity and pre-shared key that the client will present to a server.
+     * Selects the TLSv1.2 identity and pre-shared key that the client will present to a server.
      *
      * @param ssl      the SSL instance
      * @param identity a single-element array that must be populated with the PSK identity
@@ -63,4 +65,14 @@ public interface PreSharedKeySelector {
      */
     byte[] selectClient(long ssl, String[] identity);
 
+    /**
+     * Selects the TLSv1.3 identity, pre-shared key and digest that the client will present to a server.
+     *
+     * @param ssl         the SSL instance
+     * @param identity    a single-element array that must be populated with the PSK identity
+     * @param cipherSuite a single-element array that must be populated with a IANA TLSv1.3 cipher suite identifier
+     *
+     * @return the pre-shared key (strictly the input to the KDF), or {@code null} if no key is available
+     */
+    byte[] selectClient(long ssl, String[] identity, int[] cipherSuite);
 }

@@ -68,9 +68,16 @@ final class TlsChannel implements ByteChannel {
                 case NEED_WRAP -> {
                     networkOutput.clear();
                     SSLEngineResult result = engine.wrap(EMPTY, networkOutput);
-                    status = result.getHandshakeStatus();
+                    if (result.getStatus() == Status.BUFFER_OVERFLOW) {
+                        networkOutput = expand(networkOutput, engine.getSession().getPacketBufferSize());
+                        continue;
+                    }
                     networkOutput.flip();
                     writeFully(networkOutput);
+                    if (result.getStatus() == Status.CLOSED) {
+                        throw new EOFException();
+                    }
+                    status = result.getHandshakeStatus();
                     continue;
                 }
                 case NEED_UNWRAP, NEED_UNWRAP_AGAIN -> {

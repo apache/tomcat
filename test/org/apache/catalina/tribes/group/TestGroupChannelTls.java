@@ -33,9 +33,16 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
 public class TestGroupChannelTls {
 
     @Test
+    public void testPskDefaults() {
+        GroupChannel channel = new GroupChannel();
+        Assert.assertEquals("SHA256", channel.getPskDigest());
+        Assert.assertEquals("TLSv1.3", channel.getPskProtocol());
+    }
+
+    @Test
     public void testSecureMessage() throws Exception {
         try (@SuppressWarnings("unused") TribesSslContext ignored =
-                new TribesSslContext("tribes-test", "000102030405060708090a0b0c0d0e0f")) {
+                new TribesSslContext("tribes-test", "000102030405060708090a0b0c0d0e0f", "TLSv1.3", "SHA256")) {
             // Verify that a supported TLS provider is available before creating the channels.
         } catch (Exception e) {
             Assume.assumeNoException(e);
