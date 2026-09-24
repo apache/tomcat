@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.apache.catalina.tribes.Channel;
 
 @RunWith(Parameterized.class)
-public class TestEncryptInterceptorAlgorithms extends EncryptionInterceptorBaseTest {
+public class TestEncryptInterceptorAlgorithms extends EncryptInterceptorBaseTest {
 
     @Parameters(name = "{index} {0}/{1}/{2}")
     public static Collection<Object[]> inputs() {
