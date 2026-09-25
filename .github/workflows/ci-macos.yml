@@ -12,6 +12,8 @@
 
 name: Smoke Test - MacOS
 
+# The purpose of this configuration is to test with MacOS's default LibreSSL implementation
+
 on:
   push:
     branches:
