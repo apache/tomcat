@@ -26,10 +26,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jakarta.servlet.jsp.tagext.FunctionInfo;
 import jakarta.servlet.jsp.tagext.PageData;
@@ -188,15 +186,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 tagFileInfos.add(createTagFileInfo(tagFileXml, jar));
             }
 
-            Set<String> names = new HashSet<>();
             List<FunctionInfo> functionInfos = taglibXml.getFunctions();
-            // TODO Move this validation to the parsing stage
-            for (FunctionInfo functionInfo : functionInfos) {
-                String name = functionInfo.getName();
-                if (!names.add(name)) {
-                    err.jspError("jsp.error.tld.fn.duplicate.name", name, uri);
-                }
-            }
 
             if (tlibversion == null) {
                 err.jspError("jsp.error.tld.mandatory.element.missing", "tlib-version", uri);

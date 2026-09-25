@@ -17,9 +17,13 @@
 package org.apache.tomcat.util.descriptor.tld;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.servlet.jsp.tagext.FunctionInfo;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Common representation of a Tag Library Descriptor (TLD) XML file.
@@ -29,6 +33,9 @@ import jakarta.servlet.jsp.tagext.FunctionInfo;
  * contain the uri and prefix values used by a JSP to reference this tag library.
  */
 public class TaglibXml {
+
+    private static final StringManager sm = StringManager.getManager(TaglibXml.class);
+
     /**
      * Constructs a new TaglibXml.
      */
@@ -84,6 +91,11 @@ public class TaglibXml {
      * The list of function definitions.
      */
     private final List<FunctionInfo> functions = new ArrayList<>();
+
+    /**
+     * The function names used to detect duplicate definitions.
+     */
+    private final Set<String> functionNames = new HashSet<>();
 
     /**
      * Returns the tag library version.
@@ -234,8 +246,12 @@ public class TaglibXml {
      * @param name the function name
      * @param klass the function class
      * @param signature the function signature
+     * @throws IllegalArgumentException if a function with the same name has already been added
      */
     public void addFunction(String name, String klass, String signature) {
+        if (!functionNames.add(name)) {
+            throw new IllegalArgumentException(sm.getString("taglibXml.duplicateFunction", name));
+        }
         functions.add(new FunctionInfo(name, klass, signature));
     }
 
