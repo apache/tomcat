@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary;
 
@@ -31,6 +32,7 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @Before
     public void setup() {
+        Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
         if (explicit) {
             // Models starting cluster when OpenSSLLifecycleListener has configured FFM support.
             OpenSSLLibrary.init();
