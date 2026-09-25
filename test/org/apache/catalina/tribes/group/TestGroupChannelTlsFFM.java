@@ -23,37 +23,54 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
-import org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary;
 
 @RunWith(Parameterized.class)
 public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
+        Assume.assumeTrue("TLS-PSK support requires OpenSSL", OpenSSLStatus.isOpenSSL3());
         if (explicit) {
             // Models starting cluster when OpenSSLLifecycleListener has configured FFM support.
-            OpenSSLLibrary.init();
+            openSSLLibraryInit();
             Assume.assumeTrue(OpenSSLStatus.isAvailable());
         } else {
             // Test FFM is available but leave it uninitialized so Tribes performs initialization
             try {
-                OpenSSLLibrary.init();
+                openSSLLibraryInit();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // Ignore
             }
             Assume.assumeTrue(OpenSSLStatus.isAvailable());
-            OpenSSLLibrary.destroy();
+            openSSLLibraryDestroy();
         }
     }
 
 
     @After
-    public void teardown() {
+    public void teardown() throws Exception {
         if (explicit) {
             // Models OpenSSLLifecycleListener. Stop FFM.
-            OpenSSLLibrary.destroy();
+            openSSLLibraryDestroy();
         }
+    }
+
+
+    // Use reflection to avoid loading the FFM code (which has static initializers) before the Java 22 check.
+    private static void openSSLLibraryInit() throws Exception {
+        Class<?> openSSLLibraryClass =
+                Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+        openSSLLibraryClass.getMethod("init").invoke(null);
+    }
+
+
+    private static void openSSLLibraryDestroy() throws Exception {
+        Class<?> openSSLLibraryClass =
+                Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+        openSSLLibraryClass.getMethod("destroy").invoke(null);
     }
 }

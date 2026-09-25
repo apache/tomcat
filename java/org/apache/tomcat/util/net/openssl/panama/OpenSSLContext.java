@@ -662,19 +662,25 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 OpenSSLPreSharedKeySelector selector = new OpenSSLPreSharedKeySelector(psks);
                 for (String protocol : sslHostConfig.getEnabledProtocols()) {
                     if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && clientMode) {
+                        if (openssl_h_Compatibility.LIBRESSL) {
+                            throw new SSLException(sm.getString("openssl.pskTls12Unsupported"));
+                        }
                         SSL_CTX_set_psk_client_callback(state.sslCtx,
                                 SSL_psk_client_cb_func.allocate(new PskClientCallback(selector), contextArena));
                     } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && clientMode) {
-                        if (openssl_h_Compatibility.LIBRESSL) {
+                        if (openssl_h_Compatibility.LIBRESSL || openssl_h_Compatibility.BORINGSSL) {
                             throw new SSLException(sm.getString("openssl.pskTls13Unsupported"));
                         }
                         SSL_CTX_set_psk_use_session_callback(state.sslCtx, SSL_psk_use_session_cb_func
                                 .allocate(new PskUseSessionCallback(selector, contextArena), contextArena));
                     } else if (Constants.SSL_PROTO_TLSv1_2.equals(protocol) && !clientMode) {
+                        if (openssl_h_Compatibility.LIBRESSL) {
+                            throw new SSLException(sm.getString("openssl.pskTls12Unsupported"));
+                        }
                         SSL_CTX_set_psk_server_callback(state.sslCtx, SSL_psk_server_cb_func
                                 .allocate(new PskServerCallback(selector), contextArena));
                     } else if (Constants.SSL_PROTO_TLSv1_3.equals(protocol) && !clientMode) {
-                        if (openssl_h_Compatibility.LIBRESSL) {
+                        if (openssl_h_Compatibility.LIBRESSL || openssl_h_Compatibility.BORINGSSL) {
                             throw new SSLException(sm.getString("openssl.pskTls13Unsupported"));
                         }
                         SSL_CTX_set_psk_find_session_callback(state.sslCtx, SSL_psk_find_session_cb_func

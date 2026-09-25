@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
+
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version;
@@ -472,4 +473,47 @@ public class openssl_h_Compatibility {
         return ENGINE_METHOD_ALL;
     }
 
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
+     * }
+     */
+    public static int SSL_in_init(MemorySegment e) {
+        if (OPENSSL3 || BORINGSSL) {
+            class Holder {
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+                static final MethodHandle MH = Linker.nativeLinker()
+                        .downcallHandle(openssl_h.findOrThrow("SSL_in_init"), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                return (int) mh$.invokeExact(e);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else if (LIBRESSL) {
+            // Here it is a macro:
+            // #define SSL_ST_CONNECT 0x1000
+            // #define SSL_ST_ACCEPT 0x2000
+            // #define SSL_ST_INIT (SSL_ST_CONNECT|SSL_ST_ACCEPT)
+            // #define SSL_in_init (SSL_state((a))&SSL_ST_INIT)
+            final int SSL_ST_CONNECT = 0x1000;
+            final int SSL_ST_ACCEPT = 0x2000;
+            class Holder {
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+                static final MethodHandle MH = Linker.nativeLinker()
+                        .downcallHandle(openssl_h.findOrThrow("SSL_state"), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                return ((int) mh$.invokeExact(e) & ((SSL_ST_CONNECT | SSL_ST_ACCEPT)));
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return 0;
+        }
+    }
 }
