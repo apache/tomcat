@@ -158,7 +158,7 @@
         key must be sufficiently random for the cipher used (the OpenSSL default
         for PSK on the system where Tomcat is running).  If the value is truely
         random then 32 bytes are sufficient for a 256-bit cipher suite. The key
-        must be configured together with <code>pskIdentity</code>. 
+        must be configured together with <code>pskIdentity</code>.
       </attribute>
 
       <attribute name="pskProtocol" required="false">
