@@ -148,8 +148,11 @@ public class SocketBufferHandler {
                 if ((readBuffer.position() + bytesReturned) > readBuffer.capacity()) {
                     throw new BufferOverflowException();
                 } else {
-                    // Move the bytes up to make space for the returned data
-                    for (int i = 0; i < readBuffer.position(); i++) {
+                    // Move the bytes up to make space for the returned data.
+                    // Copy backwards so that, when the source and destination
+                    // regions overlap, the source bytes are not overwritten
+                    // before they have been read.
+                    for (int i = readBuffer.position() - 1; i >= 0; i--) {
                         readBuffer.put(i + bytesReturned, readBuffer.get(i));
                     }
                     // Insert the bytes returned
@@ -166,10 +169,13 @@ public class SocketBufferHandler {
                     if ((readBuffer.capacity() - readBuffer.limit()) < shiftRequired) {
                         throw new BufferOverflowException();
                     }
-                    // Move the bytes up to make space for the returned data
+                    // Move the bytes up to make space for the returned data.
+                    // Copy backwards so that, when the source and destination
+                    // regions overlap, the source bytes are not overwritten
+                    // before they have been read.
                     int oldLimit = readBuffer.limit();
                     readBuffer.limit(oldLimit + shiftRequired);
-                    for (int i = readBuffer.position(); i < oldLimit; i++) {
+                    for (int i = oldLimit - 1; i >= readBuffer.position(); i--) {
                         readBuffer.put(i + shiftRequired, readBuffer.get(i));
                     }
                 } else {
