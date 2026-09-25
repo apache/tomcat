@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2"
+  metadata-complete="true">
+
+  <display-name>Tomcat Manager2 Application</display-name>
+  <description>
+    A modern, responsive management web application for the Tomcat Web
+    Server. Experimental module: web application and virtual host
+    management plus live runtime statistics.
+  </description>
+
+  <request-character-encoding>UTF-8</request-character-encoding>
+
+  <!-- ======================= Servlets ======================== -->
+
+  <servlet>
+    <servlet-name>AppsApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.AppsApiServlet</servlet-class>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <!-- Uncomment this to show proxy sessions from the Backup manager or a
+         StoreManager in the sessions list for an application
+    <init-param>
+      <param-name>showProxySessions</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    -->
+    <multipart-config>
+      <!-- 50 MiB max, same as the legacy manager -->
+      <max-file-size>52428800</max-file-size>
+      <max-request-size>52428800</max-request-size>
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
+  </servlet>
+  <servlet>
+    <servlet-name>HostsApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.HostsApiServlet</servlet-class>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>2</param-value>
+    </init-param>
+  </servlet>
+  <servlet>
+    <servlet-name>StatusApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.StatusApiServlet</servlet-class>
+    <!-- Load on startup so that the background collection of the status
+         history (served by /api/status/history) starts at deployment time.
+    <init-param>
+      <param-name>tickMs</param-name>
+      <param-value>2000</param-value>
+    </init-param>
+    <init-param>
+      <param-name>windowMs</param-name>
+      <param-value>600000</param-value>
+    </init-param>
+    -->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>LogsApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.LogsApiServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>UsersApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.UsersApiServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ConfigApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.ConfigApiServlet</servlet-class>
+  </servlet>
+  <!-- Serves the SPA entry point and the SPA deep-link routes. Unauthenticated
+       visitors see the login page; authenticated users get the SPA shell. -->
+  <servlet>
+    <servlet-name>Home</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.HomeServlet</servlet-class>
+  </servlet>
+  <!-- Renders the login page (form-login-page) and keeps the post-login
+       redirect pointing at the application root. -->
+  <servlet>
+    <servlet-name>Login</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.LoginServlet</servlet-class>
+  </servlet>
+  <!-- Invalidates the session and returns to the application root. -->
+  <servlet>
+    <servlet-name>Logout</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.LogoutServlet</servlet-class>
+  </servlet>
+  <!-- Renders the 403 and 404 error pages with a working base element. -->
+  <servlet>
+    <servlet-name>Error</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.ErrorServlet</servlet-class>
+  </servlet>
+
+  <!-- Serves the client-side messages of the LocalStrings bundle, localized
+       with the locales sent by the browser. Not under /api/* on purpose: the
+       login page (unauthenticated) needs it, and it only exposes message
+       templates, never server data. -->
+  <servlet>
+    <servlet-name>I18n</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.I18nServlet</servlet-class>
+  </servlet>
+
+  <!-- ===================== Servlet Mappings =================== -->
+
+  <servlet-mapping>
+    <servlet-name>AppsApi</servlet-name>
+    <url-pattern>/api/apps/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AppsApi</servlet-name>
+    <url-pattern>/api/ssl/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AppsApi</servlet-name>
+    <url-pattern>/api/leaks</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AppsApi</servlet-name>
+    <url-pattern>/api/resources</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AppsApi</servlet-name>
+    <url-pattern>/api/diagnostics/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HostsApi</servlet-name>
+    <url-pattern>/api/hosts/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StatusApi</servlet-name>
+    <url-pattern>/api/info</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StatusApi</servlet-name>
+    <url-pattern>/api/csrf</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StatusApi</servlet-name>
+    <url-pattern>/api/status</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StatusApi</servlet-name>
+    <url-pattern>/api/status/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/logs</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/logs/file</url-pattern>
+  </servlet-mapping>
+  <!-- The full raw file of a server log, for download -->
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/logs/download</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/access-log</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/access-log/file</url-pattern>
+  </servlet-mapping>
+  <!-- The full raw file of an access log, for download -->
+  <servlet-mapping>
+    <servlet-name>LogsApi</servlet-name>
+    <url-pattern>/api/access-log/download</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/users</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/users/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/groups</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/groups/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/roles</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UsersApi</servlet-name>
+    <url-pattern>/api/roles/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ConfigApi</servlet-name>
+    <url-pattern>/api/config/*</url-pattern>
+  </servlet-mapping>
+  <!-- The context root mapping is expressed with an empty URL pattern. Note
+       that a single slash must NOT be used here: in Tomcat a servlet (or
+       constraint) with the pattern "/" is the catch-all default mapping,
+       which would hide every other mapping of this web application. -->
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern></url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/apps</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/apps/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/hosts</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/configuration</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/monitoring</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/diagnostics</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/logs</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/access-log</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/users</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Login</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Logout</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Error</servlet-name>
+    <url-pattern>/error</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>I18n</servlet-name>
+    <url-pattern>/i18n</url-pattern>
+  </servlet-mapping>
+
+  <!-- ========================= Filters ======================== -->
+
+  <!-- Binds the locales sent by the browser to the request thread so that
+       responses are localized with them. Must stay the first filter. -->
+  <filter>
+    <filter-name>Locale</filter-name>
+    <filter-class>org.apache.tomcat.manager2.LocaleFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Locale</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- CSRF protection for the JSON API (synchronizer token pattern).
+       The token is delivered in the X-CSRF-Token response header of
+       every API response and must be echoed in the X-CSRF-Token request
+       header of every state-changing request. -->
+  <filter>
+    <filter-name>CSRF</filter-name>
+    <filter-class>org.apache.tomcat.manager2.CsrfFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CSRF</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Security headers: X-Frame-Options, X-Content-Type-Options, HSTS -->
+  <filter>
+    <filter-name>HTTP header security filter</filter-name>
+    <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+    <init-param>
+      <param-name>hstsEnabled</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>antiClickJackingOption</param-name>
+      <param-value>DENY</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>HTTP header security filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Content-Security-Policy and Referrer-Policy -->
+  <filter>
+    <filter-name>Headers</filter-name>
+    <filter-class>org.apache.tomcat.manager2.HeadersFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Headers</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- ===================== Security Constraints ================ -->
+
+  <!-- NOTE: None of these roles are present in the default users file -->
+
+  <!-- Read-only monitoring endpoints -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Status API (read-only)</web-resource-name>
+      <url-pattern>/api/status</url-pattern>
+      <url-pattern>/api/status/*</url-pattern>
+      <url-pattern>/api/info</url-pattern>
+      <url-pattern>/api/csrf</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>manager-gui</role-name>
+      <role-name>manager-status</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- Everything else in the API requires the GUI role -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Manager2 API</web-resource-name>
+      <url-pattern>/api/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>manager-gui</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- The SPA shell and the static resources (including the login page and
+       its CSS/JS) are deliberately NOT protected with a security constraint.
+       A constraint with the pattern "/" matches every request in the
+       context, which would send the login page's own CSS/JS requests through
+       FORM authentication (leaving the login page unstyled) and would poison
+       the saved request with asset URLs (sending the browser to a CSS file
+       after login). Instead, HomeServlet gates the SPA entry point and the
+       deep-link routes, and the JSON API - the only place where data lives -
+       is protected by the constraints above. -->
+
+  <!-- ======================= Login Config ====================== -->
+
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>Tomcat Manager2 Application</realm-name>
+    <form-login-config>
+      <!-- The login page is rendered by LoginServlet (not served as a static
+           resource) so that it can point the post-login redirect at the
+           application root and inject a base element. -->
+      <form-login-page>/login</form-login-page>
+      <form-error-page>/login?error=1</form-error-page>
+    </form-login-config>
+  </login-config>
+
+  <!-- ======================== Security Roles ==================== -->
+
+  <security-role>
+    <description>
+      The role required to access the Manager2 web application (full
+      management rights).
+    </description>
+    <role-name>manager-gui</role-name>
+  </security-role>
+  <security-role>
+    <description>
+      The role required to read the runtime statistics of the server.
+    </description>
+    <role-name>manager-status</role-name>
+  </security-role>
+
+  <!-- ========================= Error Pages ====================== -->
+
+  <error-page>
+    <error-code>403</error-code>
+    <location>/error</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error</location>
+  </error-page>
+
+</web-app>

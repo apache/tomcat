@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<!-- Standalone build for the Tomcat Manager2 module.                 -->
+<!--                                                                  -->
+<!-- Typical usage:                                                   -->
+<!--   ant                  build manager2.jar and manager2.war       -->
+<!--   ant deploy           also deploy the war into the main build   -->
+<!--   ant test             compile and run the integration tests     -->
+<!--                                                                  -->
+<!-- The main Tomcat tree must already have been built (ant) so that  -->
+<!-- ${tomcat.build}/lib contains catalina.jar, servlet-api.jar and   -->
+<!-- tomcat-util.jar.                                                 -->
+<project name="Tomcat Manager2" default="build" basedir=".">
+
+  <!-- ===================== Initialize Property Values =================== -->
+
+  <!-- Build output. tomcat.output must be defined before the property files
+       are loaded: build.properties.default references it (test.reports) and
+       Ant resolves references in property-file values at load time, so a
+       reference to a property that is not yet defined is left as a literal. -->
+  <property name="tomcat.output"     value="${basedir}/output"/>
+  <property name="tomcat.classes"    value="${tomcat.output}/classes"/>
+  <property name="tomcat.testclasses" value="${tomcat.output}/testclasses"/>
+  <property name="tomcat.webapp"     value="${tomcat.output}/webapp"/>
+
+  <!-- JAR / WAR artifacts -->
+  <property name="manager2.jar"      value="${tomcat.output}/manager2.jar"/>
+  <property name="manager2.war"      value="${tomcat.output}/manager2.war"/>
+
+  <property file="${user.home}/build.properties"/>
+  <property file="${basedir}/build.properties"/>
+  <property file="${basedir}/build.properties.default"/>
+  <property name="version"         value="${version.major}.${version.minor}.${version.build}.${version.patch}${version.suffix}"/>
+  <property name="version.major.minor" value="${version.major}.${version.minor}"/>
+
+  <tstamp>
+    <format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
+    <format property="TODAY" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
+    <format property="TSTAMP" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+  </tstamp>
+
+  <!-- Main Tomcat build jars used for compilation -->
+  <path id="compile.classpath">
+    <pathelement location="${tomcat.build}/lib/catalina.jar"/>
+    <pathelement location="${tomcat.build}/lib/catalina-ha.jar"/>
+    <pathelement location="${tomcat.build}/lib/catalina-tribes.jar"/>
+    <pathelement location="${tomcat.build}/lib/catalina-storeconfig.jar"/>
+    <pathelement location="${tomcat.build}/lib/servlet-api.jar"/>
+    <pathelement location="${tomcat.build}/lib/tomcat-util.jar"/>
+    <pathelement location="${tomcat.build}/lib/tomcat-util-scan.jar"/>
+    <pathelement location="${tomcat.build}/lib/tomcat-coyote.jar"/>
+    <pathelement location="${tomcat.build}/lib/tomcat-api.jar"/>
+    <pathelement location="${tomcat.build}/lib/jaspic-api.jar"/>
+    <pathelement location="${tomcat.build}/bin/tomcat-juli.jar"/>
+  </path>
+
+  <!-- Test classpath: module jar + main test classes + main jars -->
+  <path id="test.classpath">
+    <pathelement location="${tomcat.testclasses}"/>
+    <pathelement location="${manager2.jar}"/>
+    <pathelement location="${tomcat.home}/output/testclasses"/>
+    <pathelement location="${tomcat.home}/output/classes"/>
+    <fileset dir="${tomcat.build}/lib" includes="*.jar"/>
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${hamcrest.jar}"/>
+  </path>
+
+  <filterset id="version.filters">
+    <filter token="YEAR" value="${year}"/>
+    <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_MAJOR" value="${version.major}"/>
+    <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
+    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP} UTC"/>
+  </filterset>
+
+  <!-- ===================== Targets ==================================== -->
+
+  <target name="prepare">
+    <mkdir dir="${tomcat.output}"/>
+    <mkdir dir="${tomcat.classes}"/>
+    <mkdir dir="${tomcat.testclasses}"/>
+    <copy file="${basedir}/resources/MANIFEST.MF"
+          tofile="${tomcat.output}/MANIFEST.MF">
+      <filterset refid="version.filters"/>
+    </copy>
+  </target>
+
+  <target name="compile" depends="prepare"
+          description="Compile the servlet classes into ${tomcat.classes}">
+    <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${compile.release}"
+           encoding="${encoding}"
+           includeantruntime="false">
+      <classpath refid="compile.classpath"/>
+      <include name="org/apache/tomcat/manager2/**"/>
+    </javac>
+    <!-- StringManager resource bundles must sit next to the classes -->
+    <copy todir="${tomcat.classes}">
+      <fileset dir="${basedir}/src/main/java">
+        <include name="org/apache/tomcat/manager2/*.properties"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile"
+          description="Build manager2.jar">
+    <!-- Always rebuild the jar: with a fixed modificationtime the jar task's
+         up-to-date check cannot detect changed classes. -->
+    <delete file="${manager2.jar}"/>
+    <jar jarfile="${manager2.jar}"
+         manifest="${tomcat.output}/MANIFEST.MF"
+         modificationtime="${tstamp.file}">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/tomcat/manager2/**"/>
+      </fileset>
+      <fileset dir="${basedir}">
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="package" depends="jar"
+          description="Build the manager2.war web application">
+    <copy todir="${tomcat.webapp}">
+      <fileset dir="${basedir}/webapp" excludes="**/.gitignore"/>
+    </copy>
+    <mkdir dir="${tomcat.webapp}/WEB-INF/lib"/>
+    <copy file="${manager2.jar}" todir="${tomcat.webapp}/WEB-INF/lib"/>
+    <fixcrlf srcdir="${tomcat.webapp}" includes="**/*.html,**/*.js,**/*.css"
+             eol="lf" encoding="UTF-8" fixlast="false"/>
+    <!-- Always rebuild the WAR: with a fixed modificationtime the war task's
+         up-to-date check cannot detect changed web application files. -->
+    <delete file="${manager2.war}"/>
+    <war warfile="${manager2.war}"
+         basedir="${tomcat.webapp}"
+         modificationtime="${tstamp.file}">
+      <lib dir="${tomcat.webapp}/WEB-INF/lib"/>
+    </war>
+  </target>
+
+  <target name="build" depends="package"
+          description="Build manager2.jar and manager2.war"/>
+
+  <target name="deploy" depends="build"
+          description="Deploy manager2.war into the main Tomcat build">
+    <copy file="${manager2.war}" todir="${tomcat.build}/webapps"/>
+    <!-- Tomcat prefers an existing exploded directory over the WAR, so the
+         exploded webapp is kept in sync as well. Otherwise a previously
+         exploded (and now stale) copy would keep being served. -->
+    <delete dir="${tomcat.build}/webapps/manager2"/>
+    <copy todir="${tomcat.build}/webapps/manager2">
+      <fileset dir="${tomcat.webapp}"/>
+    </copy>
+  </target>
+
+  <target name="compile-test" depends="jar"
+          description="Compile the integration tests">
+    <javac srcdir="${basedir}/src/test/java" destdir="${tomcat.testclasses}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${compile.release}"
+           encoding="${encoding}"
+           includeantruntime="false">
+      <classpath refid="test.classpath"/>
+      <include name="org/apache/tomcat/manager2/**"/>
+    </javac>
+  </target>
+
+  <target name="test" depends="deploy,compile-test"
+          description="Run the integration tests against the main build">
+    <mkdir dir="${test.reports}"/>
+    <junit printsummary="withOutAndErr" fork="yes" showoutput="on"
+           errorproperty="test.result.error"
+           failureproperty="test.result.failure"
+           haltonfailure="true">
+      <jvmarg value="-Dfile.encoding=UTF-8"/>
+      <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
+      <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+      <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+      <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+      <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+      <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+      <classpath refid="test.classpath"/>
+      <sysproperty key="tomcat.test.temp" value="${tomcat.home}/output/test-tmp"/>
+      <sysproperty key="tomcat.test.basedir" value="${tomcat.build}"/>
+      <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}"/>
+      <sysproperty key="tomcat.test.reports" value="${test.reports}"/>
+      <formatter type="brief" usefile="true" extension=".M2"/>
+      <batchtest todir="${test.reports}">
+        <fileset dir="${basedir}/src/test/java">
+          <include name="**/Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <fail if="test.result.error" message="Some tests completed with an Error."/>
+    <fail if="test.result.failure" message="Some tests completed with a Failure."/>
+  </target>
+
+  <target name="clean" description="Remove all build output">
+    <delete dir="${tomcat.output}"/>
+  </target>
+
+</project>

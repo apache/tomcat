@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<html lang="{{lang}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>#{manager2.ui.brand.name}</title>
+  <!-- MANAGER2_BASE -->
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/manager2.css">
+</head>
+<body>
+  <div id="app" class="shell" hidden>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <img class="logo" src="images/tomcat.svg" alt="" aria-hidden="true">
+        <span class="brand-name">#{manager2.ui.brand.name}</span>
+        <span class="brand-version" id="server-version"></span>
+      </div>
+      <div class="topbar-status" id="server-status"></div>
+      <div class="topbar-actions">
+        <button type="button" class="icon-btn" id="theme-toggle" title="#{manager2.ui.shell.theme.toggle}" aria-label="#{manager2.ui.shell.theme.toggle}"></button>
+        <button type="button" class="btn btn-ghost" id="logout" data-logout>#{manager2.ui.shell.logout}</button>
+      </div>
+    </header>
+    <div class="shell-main">
+      <nav class="sidenav" aria-label="#{manager2.ui.shell.nav}">
+        <button type="button" class="nav-item" data-nav="/" data-route="/"></button>
+        <button type="button" class="nav-item" data-nav="/apps" data-route="/apps"></button>
+        <button type="button" class="nav-item" data-nav="/hosts" data-route="/hosts"></button>
+        <button type="button" class="nav-item" data-nav="/configuration" data-route="/configuration"></button>
+        <button type="button" class="nav-item" data-nav="/users" data-route="/users"></button>
+        <button type="button" class="nav-item" data-nav="/monitoring" data-route="/monitoring"></button>
+        <button type="button" class="nav-item" data-nav="/diagnostics" data-route="/diagnostics"></button>
+        <button type="button" class="nav-item" data-nav="/logs" data-route="/logs"></button>
+        <button type="button" class="nav-item" data-nav="/access-log" data-route="/access-log"></button>
+      </nav>
+      <main class="content" id="view" tabindex="-1"></main>
+    </div>
+  </div>
+  <div id="toast-region" class="toast-region" role="status" aria-live="polite"></div>
+  <div id="modal-root"></div>
+  <noscript>
+    <p>#{manager2.ui.shell.noscript}</p>
+  </noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

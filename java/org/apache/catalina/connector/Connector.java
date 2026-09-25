@@ -1031,6 +1031,13 @@ public class Connector extends LifecycleMBeanBase {
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         if (protocolHandler != null) {
             protocolHandler.addSslHostConfig(sslHostConfig);
+            // A connector with at least one SSL host configuration is an
+            // SSL connector, whatever the path used to configure it
+            // (server.xml, the Manager or the embedded API).
+            if (protocolHandler instanceof AbstractHttp11Protocol http11
+                    && !http11.isSSLEnabled()) {
+                http11.setSSLEnabled(true);
+            }
         }
     }
 

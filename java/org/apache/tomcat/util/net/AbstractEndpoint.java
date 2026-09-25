@@ -499,7 +499,12 @@ public abstract class AbstractEndpoint<S, U> {
         // internally because they are used as keys in a ConcurrentMap where
         // keys are compared in a case-sensitive manner.
         String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
-        if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
+        // The default host configuration is the fallback for handshakes
+        // without a matching SNI name, so it cannot be removed while the
+        // endpoint is still serving TLS. Once TLS is switched off (for
+        // example to remove the last remaining host configuration) the
+        // guard no longer applies.
+        if (isSSLEnabled() && hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
         SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
@@ -825,11 +830,15 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * Initialise the SSL configuration.
+     * Initialize the SSL implementation and (re-)create the SSL context
+     * of every SSL host configuration. Called from {@code bind()} but
+     * also made available to components that switch an already bound,
+     * running endpoint to TLS after the initial bind (which is when the
+     * SSL implementation and contexts are validated and created).
      *
      * @throws Exception If an error occurs while initializing SSL
      */
-    protected void initialiseSsl() throws Exception {
+    public void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
