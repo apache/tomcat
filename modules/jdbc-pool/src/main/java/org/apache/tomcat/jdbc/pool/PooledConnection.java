@@ -83,9 +83,13 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     protected volatile javax.sql.XAConnection xaConnection;
     /**
-     * When we track abandon traces, this string holds the thread dump
+     * When we track abandon traces, this string holds the formatted thread dump
      */
     private String abandonTrace = null;
+    /**
+     * When we track abandon traces, this array holds the thread dump until it needs to be formatted
+     */
+    private StackTraceElement[] abandonTraceElements = null;
     /**
      * Timestamp the connection was last 'touched' by the pool
      */
@@ -680,6 +684,16 @@ public class PooledConnection implements PooledConnectionMBean {
 
     public void setStackTrace(String trace) {
         abandonTrace = trace;
+        abandonTraceElements = null;
+    }
+
+    /**
+     * Sets the stack trace elements from when this connection was borrowed.
+     * @param trace the stack trace elements for this connection
+     */
+    void setStackTraceElements(StackTraceElement[] trace) {
+        abandonTrace = null;
+        abandonTraceElements = trace;
     }
 
     /**
@@ -687,6 +701,12 @@ public class PooledConnection implements PooledConnectionMBean {
      * @return the stack trace or null of no trace was set
      */
     public String getStackTrace() {
+        if (abandonTrace == null && abandonTraceElements != null) {
+            Exception x = new Exception();
+            x.setStackTrace(abandonTraceElements);
+            abandonTrace = ConnectionPool.getStackTrace(x);
+            abandonTraceElements = null;
+        }
         return abandonTrace;
     }
 
