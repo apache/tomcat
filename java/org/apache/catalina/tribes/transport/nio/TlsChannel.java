@@ -101,9 +101,6 @@ final class TlsChannel implements ByteChannel {
         }
         applicationInput.clear();
         while (true) {
-            if (networkInput.position() == 0 && readEncrypted() < 0) {
-                return -1;
-            }
             networkInput.flip();
             SSLEngineResult result = engine.unwrap(networkInput, applicationInput);
             networkInput.compact();
@@ -130,6 +127,16 @@ final class TlsChannel implements ByteChannel {
             }
             if (applicationInput.hasRemaining()) {
                 return transfer(applicationInput, destination);
+            }
+            /*
+             * The engine may already have buffered enough ciphertext internally to produce more
+             * plaintext without any new bytes from the socket (this happens routinely with the
+             * OpenSSL-backed engine, whose internal BIO can accept - and hold - more bytes than a
+             * single unwrap() call decodes). Only block for more network input once networkInput
+             * is empty; unwrap() is tried again unconditionally at the top of the loop first.
+             */
+            if (networkInput.position() == 0 && readEncrypted() < 0) {
+                return -1;
             }
         }
     }
@@ -222,6 +229,36 @@ final class TlsChannel implements ByteChannel {
     public void close() throws IOException {
         try {
             engine.closeOutbound();
+            /*
+             * closeOutbound() only marks the engine's intent to close; the resulting close_notify
+             * still has to be wrapped and sent, exactly like any other outbound TLS record.
+             */
+            while (!engine.isOutboundDone()) {
+                networkOutput.clear();
+                SSLEngineResult result = engine.wrap(EMPTY, networkOutput);
+                if (result.getStatus() == Status.BUFFER_OVERFLOW) {
+                    networkOutput = expand(networkOutput, engine.getSession().getPacketBufferSize());
+                    continue;
+                }
+                if (networkOutput.position() > 0) {
+                    networkOutput.flip();
+                    writeFully(networkOutput);
+                }
+                if (result.getStatus() == Status.CLOSED) {
+                    break;
+                }
+            }
+            try {
+                /*
+                 * Forces immediate release of any native resources held by the engine rather than
+                 * relying on garbage collection. closeInbound() throws if the peer's close_notify
+                 * has not been received, which is expected here since this is not a negotiated
+                 * shutdown; the exception can be ignored once the send above has completed.
+                 */
+                engine.closeInbound();
+            } catch (IOException expected) {
+                // Peer's close_notify was not received - see above.
+            }
         } finally {
             socket.close();
         }
