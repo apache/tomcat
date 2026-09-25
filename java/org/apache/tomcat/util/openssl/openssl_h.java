@@ -4860,57 +4860,6 @@ public class openssl_h {
         }
     }
 
-    private static class SSL_in_init {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
-
-        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_in_init");
-
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
-    }
-
-    /**
-     * Function descriptor for:
-     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
-     * }
-     */
-    public static FunctionDescriptor SSL_in_init$descriptor() {
-        return SSL_in_init.DESC;
-    }
-
-    /**
-     * Downcall method handle for:
-     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
-     * }
-     */
-    public static MethodHandle SSL_in_init$handle() {
-        return SSL_in_init.HANDLE;
-    }
-
-    /**
-     * Address for:
-     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
-     * }
-     */
-    public static MemorySegment SSL_in_init$address() {
-        return SSL_in_init.ADDR;
-    }
-
-    /**
-     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
-     * }
-     */
-    public static int SSL_in_init(MemorySegment s) {
-        var mh$ = SSL_in_init.HANDLE;
-        try {
-            if (TRACE_DOWNCALLS) {
-                traceDowncall("SSL_in_init", s);
-            }
-            return (int) mh$.invokeExact(s);
-        } catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
-        }
-    }
-
     private static class SSL_CTX_set0_tmp_dh_pkey {
         public static final FunctionDescriptor DESC =
                 FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
