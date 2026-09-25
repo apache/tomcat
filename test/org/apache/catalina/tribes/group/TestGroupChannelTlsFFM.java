@@ -32,6 +32,7 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
     @Before
     public void setup() throws Exception {
         Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
+        Assume.assumeTrue("TLS-PSK support requires OpenSSL", OpenSSLStatus.isOpenSSL3());
         if (explicit) {
             // Models starting cluster when OpenSSLLifecycleListener has configured FFM support.
             openSSLLibraryInit();
