@@ -492,6 +492,26 @@ public class openssl_h_Compatibility {
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
+        } else if (LIBRESSL) {
+            // Here it is a macro:
+            // #define SSL_ST_CONNECT 0x1000
+            // #define SSL_ST_ACCEPT 0x2000
+            // #define SSL_ST_INIT (SSL_ST_CONNECT|SSL_ST_ACCEPT)
+            // #define SSL_in_init (SSL_state((a))&SSL_ST_INIT)
+            final int SSL_ST_CONNECT = 0x1000;
+            final int SSL_ST_ACCEPT = 0x2000;
+            class Holder {
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+                static final MethodHandle MH = Linker.nativeLinker()
+                        .downcallHandle(openssl_h.findOrThrow("SSL_state"), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                return ((int) mh$.invokeExact(e) & ((SSL_ST_CONNECT | SSL_ST_ACCEPT)));
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
         } else {
             return 0;
         }
