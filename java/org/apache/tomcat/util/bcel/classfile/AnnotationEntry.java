@@ -57,7 +57,7 @@ public class AnnotationEntry {
     /**
      * Gets the annotation type name.
      *
-     * @return the annotation type name.
+     * @return The annotation type name.
      */
     public String getAnnotationType() {
         return constantPool.getConstantUtf8(typeIndex).getBytes();

@@ -320,11 +320,47 @@ public final class Const {
     public static final short MAJOR_26 = 70;
 
     /**
+     * Minor version number of class files for Java 27: {@value}.
+     *
+     * @see #MAJOR_27
+     *
+     * @since 6.13.0
+     */
+    public static final short MINOR_27 = 0;
+
+    /**
+     * Major version number of class files for Java 27: {@value}.
+     *
+     * @see #MINOR_27
+     *
+     * @since 6.13.0
+     */
+    public static final short MAJOR_27 = 71;
+
+    /**
+     * Minor version number of class files for Java 28: {@value}.
+     *
+     * @see #MAJOR_28
+     *
+     * @since 6.13.0
+     */
+    public static final short MINOR_28 = 0;
+
+    /**
+     * Major version number of class files for Java 28: {@value}.
+     *
+     * @see #MINOR_28
+     *
+     * @since 6.13.0
+     */
+    public static final short MAJOR_28 = 72;
+
+    /**
      * Get the CONSTANT_NAMES entry at the given index.
      *
      * @param index index into {@code CONSTANT_NAMES}.
      *
-     * @return the CONSTANT_NAMES entry at the given index
+     * @return the CONSTANT_NAMES entry at the given index.
      */
     public static String getConstantName(final int index) {
         return CONSTANT_NAMES[index];
