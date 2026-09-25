@@ -52,7 +52,6 @@
   <ul>
     <li>OpenSSL-FFM support (Java 22+ and OpenSSL library) or Tomact Native 1.2.17+ must be available to provide the TLS
         support.</li>
-    <li>The cluster must be configured to use static membership.</li>
     <li>The <code>pskKey</code> and <code>pskIdentity</code> attributes of the <code>Channel</code> must be set to the
         same values on each cluster node.</li>
     <li>The <code>secure</code> attribute of the <code>Channel</code> must be set to <code>true</code> on each cluster
@@ -60,6 +59,11 @@
     <li>The <code>securePort</code> attribute of the <code>Receiver</code> must be set.</li>
     <li>The <code>securePort</code> attribute of each <code>Member</code> must be set to match the associated
         <code>Receiver</code>.</li>
+    <li>It is recommended that the cluster is configured to use static membership. It is possible to use TLS in
+        combination with dynamic membership (multicast discovery) but the network communication that manages the dynamic
+        membership takes place in the clear. If any nodes (including potentially untrusted nodes) attempt to join a
+        cluster using TLS with dynamic membership without the correct TLS configuration, it will trigger a significant
+        amount of logging until those nodes stop attempting to join the cluster.</li>
   </ul>
 
   <p>
