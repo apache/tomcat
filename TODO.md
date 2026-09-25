@@ -997,16 +997,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 90. Example WebSocket Draw Message (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 90.1 | `DrawMessage.java:163` | Axis-aligned rectangles should be drawn as lines | Add a check: if `x1 == x2` or `y1 == y2`, draw a line instead of a rectangle. | 0.25 day | Low |
-
-**Total estimated effort: 0.25 day, Low difficulty**
-
----
-
 ### 91. Example WebSocket Client Blocking (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |

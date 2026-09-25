@@ -160,9 +160,12 @@ public final class DrawMessage {
                 y2 = this.y1;
             }
 
-            // TODO: If (x1 == x2 || y1 == y2) draw as line.
+            if (x1 == x2 || y1 == y2) {
+                // Draw axis-aligned shapes as lines to match the behavior in the HTML5 Canvas.
+                Line2D line = new Line2D.Double(x1, y1, x2, y2);
+                g.draw(line);
 
-            if (type == 3) {
+            } else if (type == 3) {
                 // Draw a rectangle.
                 Rectangle2D rect = new Rectangle2D.Double(x1, y1,
                         x2 - x1, y2 - y1);
