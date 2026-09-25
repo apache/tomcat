@@ -116,44 +116,6 @@
         The default is 5000 (5 seconds).
       </attribute>
 
-      <attribute name="optionCheck" required="false">
-        If set to true, the GroupChannel will check the option flags that each
-        interceptor is using. Reports an error if two interceptor share the same
-        flag. The default is false.
-      </attribute>
-
-      <attribute name="secure" required="false">
-        If <code>true</code>, the <code>SEND_OPTIONS_SECURE</code> flag is added
-        to every message. Both <code>pskIdentity</code> and <code>pskKey</code>
-        must also be configued for TLS to be enabled. Channel startup fails if
-        TLS is unavailable. The default is <code>false</code>.
-      </attribute>
-
-      <attribute name="pskIdentity" required="false">
-        The TLS pre-shared key identity. This must be configured together with
-        <code>pskKey</code> to enable TLS.
-      </attribute>
-
-      <attribute name="pskDigest" required="false">
-        The message digest algorithm associated with the pre-shared key for
-        TLS 1.3, either <code>SHA256</code> or <code>SHA384</code>. The default
-        is <code>SHA256</code>. This attribute is ignored for TLS 1.2.
-      </attribute>
-
-      <attribute name="pskKey" required="false">
-        The TLS pre-shared key encoded as hexadecimal characters. This must be
-        configured together with <code>pskIdentity</code>. The key is not
-        exposed through JMX. It should be no longer than 512 bytes for TLS 1.2.
-        For TLS 1.3, it must be no longer than 48 bytes. If the value is truely
-        random then 32 bytes are sufficient for a 256-bit cipher suite.
-      </attribute>
-
-      <attribute name="pskProtocol" required="false">
-        The TLS protocol to use with the pre-shared key. The permitted values
-        are <code>TLSv1.2</code> and <code>TLSv1.3</code>. The default is
-        <code>TLSv1.3</code>.
-      </attribute>
-
       <attribute name="jmxEnabled" required="false">
         Flag whether the channel components register with JMX or not.
         The default value is true.
@@ -168,6 +130,48 @@
       <attribute name="jmxPrefix" required="false">
         if <code>jmxEnabled</code> set to true, specifies the jmx prefix which
         will be used with channel ObjectName.
+      </attribute>
+
+      <attribute name="optionCheck" required="false">
+        If set to true, the GroupChannel will check the option flags that each
+        interceptor is using. Reports an error if two interceptor share the same
+        flag. The default is false.
+      </attribute>
+
+      <attribute name="pskDigest" required="false">
+        The message digest algorithm associated with the pre-shared key for
+        TLS 1.3, either <code>SHA256</code> or <code>SHA384</code>. The default
+        is <code>SHA256</code>. This attribute is ignored for TLS 1.2.
+      </attribute>
+
+      <attribute name="pskIdentity" required="false">
+        The TLS pre-shared key identity. This must be configured together with
+        <code>pskKey</code> to enable TLS.
+      </attribute>
+
+      <attribute name="pskKey" required="false">
+        The TLS pre-shared key encoded as hexadecimal characters. This key is
+        the secret that the security of the TLS cluster communication rests on.
+        If this key is compromised, the security of the cluster is compromised.
+        The key is not exposed through JMX. The key should be no longer than 512
+        bytes for TLS 1.2. For TLS 1.3, it must be no longer than 48 bytes. The
+        key must be sufficiently random for the cipher used (the OpenSSL default
+        for PSK on the system where Tomcat is running).  If the value is truely
+        random then 32 bytes are sufficient for a 256-bit cipher suite. The key
+        must be configured together with <code>pskIdentity</code>. 
+      </attribute>
+
+      <attribute name="pskProtocol" required="false">
+        The TLS protocol to use with the pre-shared key. The permitted values
+        are <code>TLSv1.2</code> and <code>TLSv1.3</code>. The default is
+        <code>TLSv1.3</code>.
+      </attribute>
+
+      <attribute name="secure" required="false">
+        If <code>true</code>, the <code>SEND_OPTIONS_SECURE</code> flag is added
+        to every message. Both <code>pskIdentity</code> and <code>pskKey</code>
+        must also be configued for TLS to be enabled. Channel startup fails if
+        TLS is unavailable. The default is <code>false</code>.
       </attribute>
 
     </attributes>
