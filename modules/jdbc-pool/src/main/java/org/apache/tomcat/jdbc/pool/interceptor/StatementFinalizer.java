@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +50,13 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     }
 
     private boolean logCreationStack = false;
+    private int createStatementCount=0;
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
             if (statement instanceof Statement) {
+                clearEntry();
                 statements.add(new StatementEntry((Statement)statement));
             }
         }catch (ClassCastException x) {
@@ -102,9 +105,22 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         super.reset(parent, con);
     }
 
-    /**
-     * Entry that tracks a statement and its allocation stack.
-     */
+
+    public void clearEntry() {
+        if(createStatementCount%10!=0) {
+            createStatementCount++;
+            return;
+        }else {
+            createStatementCount=0;
+            statements.removeIf(entry -> {
+            Statement stmt = entry.getStatement();
+            return stmt == null || stmt.isClosed();
+            });
+            
+        }
+    }
+
+
     protected class StatementEntry {
         private WeakReference<Statement> statement;
         private Throwable allocationStack;
