@@ -152,6 +152,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.13.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.26 (markt)" rtext="2026-09-15">
   <subsection name="Catalina">
