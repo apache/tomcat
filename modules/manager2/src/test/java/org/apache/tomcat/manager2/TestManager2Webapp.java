@@ -23,6 +23,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -947,6 +949,145 @@ public class TestManager2Webapp extends TomcatBaseTest {
         request(client, "GET", MANAGER2 + "/api/access-log", null, null, 403);
         request(client, "GET", MANAGER2 + "/api/logs/download?name=catalina.log", null, null, 403);
         request(client, "GET", MANAGER2 + "/api/access-log/download?name=localhost_access_log.txt", null, null, 403);
+
+        client.disconnect();
+    }
+
+
+    @Test
+    public void testLogConfigAccessAndValidation() throws Exception {
+        setup(true);
+
+        // The read-only status role cannot even read the configuration.
+        SimpleHttpClient statusClient = new TestClient();
+        statusClient.setPort(getPort());
+        statusClient.connect();
+        login(statusClient, "status1");
+        request(statusClient, "GET", MANAGER2 + "/api/logs/config", null, null, 403);
+        request(statusClient, "POST", MANAGER2 + "/api/logs/config/file", null, "{\"text\":\"\"}", 403);
+        statusClient.disconnect();
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+        login(client, "manager1");
+
+        // Mutations need the CSRF token like the rest of the API.
+        request(client, "POST", MANAGER2 + "/api/logs/config/file", null, "{\"text\":\"x\"}", 403);
+
+        String token = loginAndGetToken(client, "manager1");
+
+        // The GET payload: the file, the capability flag and at least the
+        // system class loader context.
+        request(client, "GET", MANAGER2 + "/api/logs/config", null, null, 200);
+        String body = client.getResponseBody();
+        Assert.assertTrue(body.contains("\"path\":\"conf/logging.properties\""));
+        Assert.assertTrue(body.contains("\"liveApply\":"));
+        Assert.assertTrue(body.contains("\"id\":\"system\""));
+
+        // Validation of the level endpoint inputs. The logger endpoint never
+        // creates loggers: an unknown name is a 404.
+        request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                "{\"context\":\"nonsense\",\"name\":\"x\",\"level\":\"FINE\"}", 400);
+        request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                "{\"context\":\"system\",\"name\":\"\",\"level\":\"FINE\"}", 400);
+        request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                "{\"context\":\"system\",\"name\":\"no.such.logger.xyz\",\"level\":\"NOTALEVEL\"}", 400);
+        request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                "{\"context\":\"system\",\"name\":\"no.such.logger.xyz\",\"level\":\"FINE\"}", 404);
+
+        client.disconnect();
+    }
+
+
+    @Test
+    public void testLogConfigSaveBackupAndApply() throws Exception {
+        setup(false);
+
+        // Redirect conf/logging.properties to a throw-away base (the same
+        // override the configuration store tests use).
+        File base = new File(TEMP_DIR, "manager2-logconfig");
+        deleteRecursive(base);
+        File conf = new File(base, "conf");
+        Assert.assertTrue(conf.mkdirs());
+        File file = new File(conf, "logging.properties");
+        writeLogFile(file, "# original\nhandlers = java.util.logging.ConsoleHandler\n");
+        System.setProperty("manager2.store.base", base.getAbsolutePath());
+        try {
+            SimpleHttpClient client = new TestClient();
+            client.setPort(getPort());
+            client.connect();
+            String token = loginAndGetToken(client, "manager1");
+
+            // The saved text is served back. The handler property is kept so
+            // that a (hypothetical) apply on a JULI that supports it does not
+            // strip the JVM's logging.
+            request(client, "POST", MANAGER2 + "/api/logs/config/file", token,
+                    "{\"text\":\"# edited\\nhandlers = java.util.logging.ConsoleHandler\\n\"}", 200);
+            String body = client.getResponseBody();
+            Assert.assertTrue(body.contains("\"backup\":\"logging.properties."));
+            Assert.assertEquals("# edited\nhandlers = java.util.logging.ConsoleHandler\n", readFile(file));
+
+            // A backup of the previous file was kept next to it.
+            File[] backups = conf.listFiles((dir, name) -> name.startsWith("logging.properties."));
+            Assert.assertNotNull(backups);
+            Assert.assertEquals(1, backups.length);
+            Assert.assertTrue(readFile(backups[0]).contains("# original"));
+
+            // Apply: supported only with a JULI that provides the reconfigure
+            // methods; the test JVM normally runs the default LogManager, in
+            // which case the API must report it cleanly instead of failing.
+            request(client, "GET", MANAGER2 + "/api/logs/config", null, null, 200);
+            body = client.getResponseBody();
+            Assert.assertTrue(body.contains("# edited"));
+            Assert.assertTrue(body.contains("\"exists\":true"));
+            if (body.contains("\"liveApply\":true")) {
+                request(client, "POST", MANAGER2 + "/api/logs/config/apply", token, "{}", 200);
+            } else {
+                request(client, "POST", MANAGER2 + "/api/logs/config/apply", token, "{}", 501);
+                Assert.assertTrue(client.getResponseBody().contains("LIVE_UNSUPPORTED"));
+            }
+
+            // A missing body field is rejected.
+            request(client, "POST", MANAGER2 + "/api/logs/config/file", token, "{}", 400);
+            request(client, "POST", MANAGER2 + "/api/logs/config/apply", null, "{}", 403);
+
+            client.disconnect();
+        } finally {
+            System.clearProperty("manager2.store.base");
+        }
+    }
+
+
+    @Test
+    public void testLogConfigLevelRoundTrip() throws Exception {
+        setup(false);
+
+        // A logger that certainly exists once the server has started. The
+        // test JVM uses the default LogManager, for which the class loader
+        // contexts coincide, so the system context addresses it.
+        String name = "org.apache.catalina.core.StandardContext";
+        Logger logger = Logger.getLogger(name);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+        String token = loginAndGetToken(client, "manager1");
+
+        try {
+            request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                    "{\"context\":\"system\",\"name\":\"" + name + "\",\"level\":\"FINE\"}", 200);
+            String body = client.getResponseBody();
+            Assert.assertTrue(body.contains("\"level\":\"FINE\""));
+            Assert.assertEquals(Level.FINE, logger.getLevel());
+
+            // INHERIT clears the level again.
+            request(client, "POST", MANAGER2 + "/api/logs/config/level", token,
+                    "{\"context\":\"system\",\"name\":\"" + name + "\",\"level\":\"INHERIT\"}", 200);
+            Assert.assertNull(logger.getLevel());
+        } finally {
+            logger.setLevel(null);
+        }
 
         client.disconnect();
     }

@@ -82,6 +82,12 @@
     <servlet-name>LogsApi</servlet-name>
     <servlet-class>org.apache.tomcat.manager2.LogsApiServlet</servlet-class>
   </servlet>
+  <!-- The JULI logging configuration: conf/logging.properties and the live
+       levels of the server class loader loggers. -->
+  <servlet>
+    <servlet-name>LogConfigApi</servlet-name>
+    <servlet-class>org.apache.tomcat.manager2.LogConfigApiServlet</servlet-class>
+  </servlet>
   <servlet>
     <servlet-name>UsersApi</servlet-name>
     <servlet-class>org.apache.tomcat.manager2.UsersApiServlet</servlet-class>
@@ -189,6 +195,23 @@
   <servlet-mapping>
     <servlet-name>LogsApi</servlet-name>
     <url-pattern>/api/access-log/download</url-pattern>
+  </servlet-mapping>
+  <!-- The JULI logging configuration (file, live state, apply, quick levels) -->
+  <servlet-mapping>
+    <servlet-name>LogConfigApi</servlet-name>
+    <url-pattern>/api/logs/config</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogConfigApi</servlet-name>
+    <url-pattern>/api/logs/config/file</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogConfigApi</servlet-name>
+    <url-pattern>/api/logs/config/apply</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogConfigApi</servlet-name>
+    <url-pattern>/api/logs/config/level</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UsersApi</servlet-name>
