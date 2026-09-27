@@ -1251,6 +1251,7 @@ public class TestManager2Config extends TomcatBaseTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRealm() throws Exception {
         setup();
@@ -1394,7 +1395,6 @@ public class TestManager2Config extends TomcatBaseTest {
             Map<String, Object> preview = parseObject(client.getResponseBody());
             String xml = (String) preview.get("xml");
             Assert.assertFalse(xml.contains("org.apache.catalina.realm.LockOutRealm"));
-            @SuppressWarnings("unchecked")
             List<Object> previewFiles = (List<Object>) preview.get("files");
             Assert.assertTrue("Expected a new context file for /realmapp: " + previewFiles,
                     previewFiles.stream().anyMatch(f -> String.valueOf(f).endsWith("realmapp.xml")));
@@ -2325,7 +2325,6 @@ public class TestManager2Config extends TomcatBaseTest {
     // ------------------------------------------------------- JSON navigation
 
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> parseObject(String json) throws Exception {
         JSONParser parser = new JSONParser(json);
         parser.setNativeNumbers(true);

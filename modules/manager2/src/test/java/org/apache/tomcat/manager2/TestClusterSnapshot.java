@@ -24,7 +24,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
@@ -465,6 +464,10 @@ public class TestClusterSnapshot {
         private boolean suspectFlag;
         private boolean failingFlag;
 
+        public TestMemberImpl() {
+            // Due to Externalizable
+        }
+
         TestMemberImpl(String host, int port, long aliveTime) throws IOException {
             super(host, port, aliveTime);
         }
@@ -502,6 +505,8 @@ public class TestClusterSnapshot {
      * A plain {@link Member} implementation that is not a {@link MemberImpl}.
      */
     private static class FakeMember implements Member {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public String getName() {
