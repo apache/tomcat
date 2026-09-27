@@ -326,6 +326,10 @@
         header using the <code>altService</code> attribute of the
         <code>Connector</code> element. (remm)
       </update>
+      <fix>
+        <pr>1073</pr>: Fix possible corruption when using HTTP/2 and async IO
+        on uploads. Submitted by Tim Burke. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
