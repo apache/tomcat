@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.ChannelException.FaultyMember;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.Response;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
@@ -147,7 +148,15 @@ public class StaticMembershipProvider extends MembershipProviderBase
         }
         startLevel = (startLevel | level);
         if (startLevel == (Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ)) {
-            startMembership(getAliveMembers(staticMembers.toArray(new Member[0])));
+            try {
+                startMembership(getAliveMembers(staticMembers.toArray(new Member[0])));
+            } catch (ChannelException ce) {
+                // A member that was reachable at the liveness check above may still fail the actual
+                // RPC (e.g. it has not finished its own startup yet). That is expected during cluster
+                // start-up and must not prevent this member from starting; the next ping will pick up
+                // any member that is not yet up.
+                log.warn(sm.getString("staticMembershipProvider.startMembership.failed"), ce);
+            }
             running = true;
             if (thread == null && useThread) {
                 thread = new PingThread();
@@ -418,11 +427,18 @@ public class StaticMembershipProvider extends MembershipProviderBase
     }
 
     private Member[] getAliveMembers(Member[] members) {
+        boolean channelSecure = channel instanceof GroupChannel groupChannel && groupChannel.getSecure();
         List<Member> aliveMembers = new ArrayList<>();
         for (Member member : members) {
+            boolean useSecurePort = channelSecure || member.getSecurePort() >= 0 && member.getPort() < 0;
+            int port = useSecurePort ? member.getSecurePort() : member.getPort();
+            if (port < 0) {
+                // no usable port to connect to, so the member can't be checked
+                continue;
+            }
             try (Socket socket = new Socket()) {
                 InetAddress ia = InetAddress.getByAddress(member.getHost());
-                InetSocketAddress addr = new InetSocketAddress(ia, member.getPort());
+                InetSocketAddress addr = new InetSocketAddress(ia, port);
                 socket.connect(addr, connectTimeout);
                 aliveMembers.add(member);
             } catch (Throwable t) {
