@@ -210,7 +210,7 @@ machine-readable `error` code and non-2xx status.
 | DELETE | `/api/apps/{path}/sessions/{id}/attributes/{name}` | manager-gui | remove one session attribute |
 | GET | `/api/status` | manager-gui, manager-status | compact live snapshot (see below) |
 | GET | `/api/status/workers` | manager-gui, manager-status | live per-socket (RequestProcessor) table |
-| GET | `/api/status/system` | manager-gui, manager-status | instant CPU and memory snapshot (cores, CPU loads, load average, thread counts; physical memory, swap, heap, non-heap, memory pools) |
+| GET | `/api/status/system` | manager-gui, manager-status | instant CPU and memory snapshot (cores, CPU loads, load average, thread counts; physical memory — total and free from the MXBean, plus the kernel's `MemAvailable` figure where exposed — swap, heap, non-heap, memory pools) |
 | GET | `/api/status/cluster` | manager-gui, manager-status | cluster view: `{"clustered", "clusters": [...]}` — per cluster the members, the membership summary and (when a clustered context exists) the replication aggregate |
 | GET | `/api/status/apps/{path}` | manager-gui, manager-status | detailed per-app: state, times, sessions, JSPs, servlets |
 | GET | `/api/ssl/ciphers` | manager-gui | SSL ciphers per connector |
@@ -609,7 +609,14 @@ server-side timestamp, so restarts and clock skew are handled.
   average and live/daemon/peak thread counts; the memory card shows
   physical memory and swap usage, the JVM heap (used / max bar, committed)
   and non-heap usage as bars and facts, and a per-memory-pool table
-  (used, committed, max). Values the platform does not expose (CPU loads
+  (used, committed, max). The physical memory bar counts
+  `total - MemAvailable` as used where the kernel exposes `MemAvailable`
+  in `/proc/meminfo` (Linux since 3.14), so reclaimable caches are not
+  painted as used; elsewhere it falls back to `total - free`, and the
+  available and free figures are shown as facts under the card. In a
+  container without `/proc` virtualisation the physical figures are the
+  host's, as they are for the underlying MBean values. Values the
+  platform does not expose (CPU loads
   before the first monitoring interval, the load average on Windows,
   physical/swap memory on a JVM without the HotSpot management MBean)
   render as "-".

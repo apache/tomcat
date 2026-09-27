@@ -160,12 +160,19 @@ export async function monitoring(container) {
     }
     const heap = mem.heap || {};
     const nonHeap = mem.nonHeap || {};
+    const physical = mem.physical || {};
+    // Prefer the kernel's MemAvailable figure: total minus free would count
+    // reclaimable caches as used. Fall back to free where there is no such
+    // figure (non-Linux platforms, kernels before 3.14).
+    const physicalUsed = physical.total > 0
+        ? physical.total - (physical.available != null ? physical.available : physical.free)
+        : 0;
     memoryBody.append(
-        mem.physical && mem.physical.total > 0
+        physical.total > 0
             ? metric(t('manager2.ui.monitoring.physicalMemory'),
                 t('manager2.ui.monitoring.usedOfTotal',
-                    formatBytes(mem.physical.total - mem.physical.free), formatBytes(mem.physical.total)),
-                (mem.physical.total - mem.physical.free) / mem.physical.total)
+                    formatBytes(physicalUsed), formatBytes(physical.total)),
+                physicalUsed / physical.total)
             : metric(t('manager2.ui.monitoring.physicalMemory'), '-', null),
         mem.swap && mem.swap.total > 0
             ? metric(t('manager2.ui.monitoring.swap'),
@@ -181,7 +188,11 @@ export async function monitoring(container) {
                 t('manager2.ui.monitoring.heapUnbounded', formatBytes(heap.used)), null));
     memoryBody.append(el('div', { class: 'sys-facts' },
         fact(t('manager2.ui.monitoring.heapCommitted'), formatBytes(heap.committed)),
-        fact(t('manager2.ui.monitoring.nonHeapUsed'), formatBytes(nonHeap.used))));
+        fact(t('manager2.ui.monitoring.nonHeapUsed'), formatBytes(nonHeap.used)),
+        fact(t('manager2.ui.monitoring.memAvailable'),
+            physical.available != null ? formatBytes(physical.available) : '-'),
+        fact(t('manager2.ui.monitoring.memFree'),
+            physical.total > 0 ? formatBytes(physical.free) : '-')));
 
     const pools = mem.pools || [];
     if (pools.length > 0) {

@@ -25,6 +25,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -571,6 +573,18 @@ public class TestManager2Webapp extends TomcatBaseTest {
         Assert.assertFalse(body.contains("\"availableProcessors\":0"));
         // The heap is always present and in use by the running webapp.
         Assert.assertFalse(body.contains("\"heap\":{\"used\":0,"));
+
+        // Physical memory: the total and free of the MXBean. The "available"
+        // figure read from /proc/meminfo is platform dependent; where it is
+        // present it must sit between zero and the total.
+        Matcher physical = Pattern.compile("\"physical\":\\{\"total\":(\\d+)").matcher(body);
+        Assert.assertTrue("physical memory block missing", physical.find());
+        Matcher available = Pattern.compile("\"physical\":\\{[^}]*\"available\":(\\d+)").matcher(body);
+        if (available.find()) {
+            long value = Long.parseLong(available.group(1));
+            Assert.assertTrue("available outside 0..total",
+                    value >= 0 && value <= Long.parseLong(physical.group(1)));
+        }
 
         client.disconnect();
     }

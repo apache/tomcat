@@ -16,10 +16,14 @@
  */
 package org.apache.tomcat.manager2;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -229,7 +233,9 @@ public final class StatusSnapshot {
         result.put("nonHeap", nonHeapMap);
 
         // The physical memory and swap of the machine are only exposed by the
-        // HotSpot specific MBean.
+        // HotSpot specific MBean; the total and free physical memory are
+        // completed with the MemAvailable figure of /proc/meminfo where that
+        // file exists (see memAvailable()).
         java.lang.management.OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
         Number physicalTotal = sunInvoke(SUN_PHYSICAL_TOTAL, os);
         Number physicalFree = sunInvoke(SUN_PHYSICAL_FREE, os);
@@ -237,6 +243,10 @@ public final class StatusSnapshot {
             Map<String, Object> physical = new LinkedHashMap<>();
             physical.put("total", Long.valueOf(physicalTotal.longValue()));
             physical.put("free", Long.valueOf(physicalFree.longValue()));
+            Long available = memAvailable();
+            if (available != null) {
+                physical.put("available", available);
+            }
             result.put("physical", physical);
         } else {
             result.put("physical", null);
@@ -255,6 +265,39 @@ public final class StatusSnapshot {
 
         result.put("pools", memoryPools());
         return result;
+    }
+
+
+    /*
+     * The free memory of the MXBean is the "free" figure of the operating
+     * system: on Linux it excludes the reclaimable page cache and the
+     * reclaimable slab, so total minus free overstates what the machine
+     * actually uses. The Linux kernel (since 3.14) exposes the better
+     * estimate as MemAvailable in /proc/meminfo: the memory that new
+     * applications can get without swapping, free plus the reclaimable part
+     * of the caches. Where that file exists (and has that line), its figure
+     * is reported as the "available" key of the physical memory; the
+     * consumers can then show total minus available as the used figure. In a
+     * container without /proc virtualisation the file shows the memory of the
+     * host, as the MXBean values do.
+     */
+    private static final Path MEMINFO_PATH = Path.of("/proc/meminfo");
+
+    private static final String MEM_AVAILABLE_PREFIX = "MemAvailable:";
+
+    private static Long memAvailable() {
+        try {
+            for (String line : Files.readAllLines(MEMINFO_PATH, StandardCharsets.UTF_8)) {
+                if (line.startsWith(MEM_AVAILABLE_PREFIX)) {
+                    // The kernel writes the value in kB: "MemAvailable:   <n> kB".
+                    return Long.valueOf(Long.parseLong(line.substring(MEM_AVAILABLE_PREFIX.length()).trim()
+                            .split("\\s+")[0]) * 1024L);
+                }
+            }
+        } catch (IOException | IndexOutOfBoundsException | NumberFormatException | SecurityException e) {
+            // No usable figure: report the metric as unavailable.
+        }
+        return null;
     }
 
 
