@@ -13,6 +13,10 @@ combines:
 - **Runtime monitoring** — JVM, memory and thread-pool gauges, per-connector
   worker statistics, per-application detail, plus diagnostics (memory leaks,
   global resources, VM info, thread dump, SSL ciphers/certificates).
+- **Cluster overview** — read-only live view of this node's clusters: the
+  members with their addresses and state, the membership configuration
+  summary and the session replication activity of the clustered
+  applications.
 
 The interface is a dependency-free JavaScript SPA (no JSPs, no build step)
 backed by a small JSON API. This module is experimental: it is not included
@@ -34,6 +38,8 @@ modules/manager2/
     StatusHistory.java      Rolling history of status samples, collected in
                             the background and served by /api/status/history
     StatusSnapshot.java     MBean collection for the status endpoints
+    ClusterSnapshot.java    Cluster membership + replication snapshot served
+                            by /api/status/cluster
     CsrfFilter.java         Per-session CSRF token (X-CSRF-Token header)
     HeadersFilter.java      Content-Security-Policy / Referrer-Policy
     HomeServlet.java        / + SPA deep links: login gate / SPA shell
@@ -120,4 +126,8 @@ built WAR into a throw-away Tomcat instance and drives it over HTTP:
   server-side WAR
 - Session list/detail/invalidate against a JSP-created session
 - Status, status history, workers and per-application detail endpoints
+- Cluster endpoint: unclustered shape and role access (in the webapp suite),
+  snapshot building against programmatic clusters (`TestClusterSnapshot`)
+  and against a live two-node static-membership cluster
+  (`TestManager2Cluster`, loopback only, CI safe)
 - Hosts endpoint

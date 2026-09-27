@@ -182,6 +182,7 @@ public class TestManager2Webapp extends TomcatBaseTest {
         Assert.assertTrue(body.contains("\"locale\":\"en\""));
         Assert.assertTrue(body.contains("\"manager2.ui.brand.name\":\"Tomcat Manager\""));
         Assert.assertTrue(body.contains("\"manager2.ui.nav.dashboard\":\"Dashboard\""));
+        Assert.assertTrue(body.contains("\"manager2.ui.nav.cluster\":\"Cluster\""));
         // The dynamic manager2.ui.type.* keys are served as well.
         Assert.assertTrue(body.contains("\"manager2.ui.type.connector\":\"connector\""));
         // Server-side-only keys are never exposed to the browser.
@@ -512,6 +513,38 @@ public class TestManager2Webapp extends TomcatBaseTest {
 
 
     @Test
+    public void testClusterEndpointUnclustered() throws Exception {
+        setup(false);
+
+        SimpleHttpClient client = new TestClient();
+        client.setPort(getPort());
+        client.connect();
+
+        // Unauthenticated: the endpoint is protected like the other status
+        // endpoints and forwards to the login page.
+        client.setRequest(
+                new String[] { "GET " + MANAGER2 + "/api/status/cluster HTTP/1.1" + CRLF,
+                        "Host: localhost:" + getPort() + CRLF, "Connection: Close" + CRLF, CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(200, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("j_security_check"));
+
+        // As manager-gui: the programmatic test server has no cluster, so the
+        // endpoint reports the empty shape.
+        login(client, "manager1");
+        request(client, "GET", MANAGER2 + "/api/status/cluster", null, null, 200);
+        Assert.assertEquals("{\"clustered\":false,\"clusters\":[]}", client.getResponseBody());
+
+        // The authenticated deep link serves the SPA shell (HomeServlet).
+        requestRaw(client, "GET", MANAGER2 + "/cluster", 200);
+        Assert.assertTrue(client.getResponseBody().contains("shell-main"));
+
+        client.disconnect();
+    }
+
+
+    @Test
     public void testStatusSystemEndpoint() throws Exception {
         setup(false);
 
@@ -636,6 +669,10 @@ public class TestManager2Webapp extends TomcatBaseTest {
         // Read access to the status endpoints is allowed.
         request(client, "GET", MANAGER2 + "/api/status", null, null, 200);
         Assert.assertTrue(client.getResponseBody().contains("\"jvm\""));
+
+        // The cluster view is read-only status data as well.
+        request(client, "GET", MANAGER2 + "/api/status/cluster", null, null, 200);
+        Assert.assertTrue(client.getResponseBody().contains("\"clustered\""));
 
         // Mutations are not (the CSRF filter and the security constraints
         // both reject the request).

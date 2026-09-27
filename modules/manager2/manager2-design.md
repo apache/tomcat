@@ -86,6 +86,7 @@ in manager2, mapped as follows:
 | Feature | manager2 page / API |
 |---|---|
   | Browse and edit the whole live server configuration (services, engines, hosts, contexts, wrappers, valves, connectors, executors, aliases, lifecycle listeners, realms with sub realms, the context sub components — manager with its session id generator, resources, loader, cookie processor — the cluster and its full channel (membership, sender + transport, receiver, interceptors, deployer, manager template, cluster valves and listeners) on any container, the JNDI naming resources of the server and of each context, TLS: SSL host configurations with their certificates, and the upgrade protocols of a connector): property editing, structural add/remove, start/stop/restart of any component with a lifecycle, persistence to `server.xml` | Configuration page / `GET /api/config/*` (the legacy manager required hand-editing `server.xml` and a restart for anything beyond the host manager's "persist" button; TLS, realms and JNDI entries apply live, without a restart) |
+  | Cluster membership and session replication overview: the members of every cluster of this node (local member first, name/address/ports, ready/suspect/failing flags, membership echo count), the membership service summary (multicast address and port when applicable) and the aggregate replication activity (replication valve request and timing counters, DeltaManager message counters, received queue, rejected sessions, replaced duplicate sessions) — read-only, polled every 10 s, empty state when the node is not clustered | Cluster page / `GET /api/status/cluster` |
 
 ## 3. Architecture
 
@@ -210,6 +211,7 @@ machine-readable `error` code and non-2xx status.
 | GET | `/api/status` | manager-gui, manager-status | compact live snapshot (see below) |
 | GET | `/api/status/workers` | manager-gui, manager-status | live per-socket (RequestProcessor) table |
 | GET | `/api/status/system` | manager-gui, manager-status | instant CPU and memory snapshot (cores, CPU loads, load average, thread counts; physical memory, swap, heap, non-heap, memory pools) |
+| GET | `/api/status/cluster` | manager-gui, manager-status | cluster view: `{"clustered", "clusters": [...]}` — per cluster the members, the membership summary and (when a clustered context exists) the replication aggregate |
 | GET | `/api/status/apps/{path}` | manager-gui, manager-status | detailed per-app: state, times, sessions, JSPs, servlets |
 | GET | `/api/ssl/ciphers` | manager-gui | SSL ciphers per connector |
 | GET | `/api/ssl/certs` | manager-gui | SSL certs per connector |
@@ -290,16 +292,19 @@ server-side timestamp, so restarts and clock skew are handled.
 - Left navigation (collapses to bottom tab bar under 900 px — slightly
   above the old 768 px breakpoint so iPad portrait and small tablets get
   the phone layout): Dashboard,
-  Applications, Hosts, Configuration, Users, Monitoring, Diagnostics,
+  Applications, Hosts, Configuration, Users, Monitoring, Cluster,
+  Diagnostics,
   Logs, Access log. Each item has a single-path 24×24 icon (holes — server
-  LEDs/slots, the gear bore, beetle seam/spots, file text lines — filled
+  LEDs/slots, the gear bore, beetle seam/spots, file text lines, the cluster
+  node links — filled
   with `fill-rule: evenodd`); the active item takes a per-tab accent hue
   (dashboard blue, apps violet, hosts teal, configuration slate, users
-  pink, monitoring green, diagnostics amber, logs cyan, access log indigo,
+  pink, monitoring green, cluster olive, diagnostics amber, logs cyan,
+  access log indigo,
   with lighter values in the dark theme) on icon, label and soft
   background. The navigation is always an icons-only 60 px rail (the
   labels are kept as `aria-label`): a 220 px rail of text is too costly at
-  every width, and nine labels are not legible at phone widths. In
+  every width, and ten labels are not legible at phone widths. In
   landscape viewports, hovering the rail — or landing keyboard focus in
   it — pops the sidenav out at full width (220 px) and label over the
   content as a `position: fixed` flyout; the content is pinned to the
@@ -618,6 +623,26 @@ server-side timestamp, so restarts and clock skew are handled.
 - Connector detail cards with the same data as the Dashboard, plus
   max-processing-time history chart.
 
+**Cluster**
+- Read-only cluster overview (10 s cadence, `GET /api/status/cluster`).
+  Always in the navigation; an unclustered node shows an empty state.
+- Per cluster: name, class, owning container, lifecycle state and channel
+  send mode; the member table lists the local member first (marked), then
+  the remote members with name, address, cleartext/secure/UDP ports and the
+  ready/suspect/failing status badge; the membership-echo ping count column
+  appears only when some member has a non-zero count (it is always 0 under
+  static membership).
+- Membership summary: the membership service class and, for a multicast
+  service, the multicast address and port.
+- Replication activity (shown when at least one clustered context exists):
+  the `ReplicationValve` aggregates over the owner's pipeline (requests,
+  send requests, filtered, cross-context sends, total/average send time,
+  last send) and the `DeltaManager` aggregates over the clustered contexts
+  (session messages sent/received, received queue size, rejected sessions,
+  replaced duplicate sessions); rejected sessions and duplicates are
+  highlighted when non-zero. Byte-level channel traffic is not instrumented
+  anywhere in Tribes, so these counters are the replication metric.
+
 **Diagnostics**
 - SSL: ciphers / certs / trusted certs tables per connector; "reload SSL
   host configs" (all, or single `tlsHostName`).
@@ -704,7 +729,8 @@ server-side timestamp, so restarts and clock skew are handled.
 ## 6. Live updating
 
 - **Default transport: HTTP polling.** Dashboard 2 s, Monitoring 5 s,
-  Applications list 10 s; all polling pauses when `document.hidden` and
+  Applications list 10 s, Cluster 10 s; all polling pauses when
+  `document.hidden` and
   resumes on focus. Intervals are servlet init-params
   (`pollIntervalStatus`, …) and client-configurable.
 - **Why not WebSockets/SSE first:** polling is proxy/LoadBalancer-safe,
@@ -811,7 +837,7 @@ saved request (sending the browser to a CSS file after login). Instead:
 
 - `HomeServlet` gates the SPA entry point (`/`) and the SPA deep-link routes
   (`/apps`, `/hosts`, `/configuration`, `/users`, `/monitoring`,
-  `/diagnostics`, `/logs`, `/access-log`, `/apps/*`): it forwards
+  `/cluster`, `/diagnostics`, `/logs`, `/access-log`, `/apps/*`): it forwards
   unauthenticated visitors to the login page and authenticated users get the
   shell rendered from `index.html` as a template, preserving the requested
   URL so deep links survive a reload. The template rendering (rather than a
@@ -956,6 +982,8 @@ modules/manager2/
     HostsApiServlet.java      extends HostManagerServlet
     StatusApiServlet.java     status endpoints
     StatusSnapshot.java       MBean collection → JSON model
+    ClusterSnapshot.java      cluster discovery, membership + replication
+                              counters → JSON model (/api/status/cluster)
     LogsApiServlet.java       /api/logs + /api/access-log (list, tail, filters, raw download)
     LogParser.java            JULI text/JSON log lines, access log pattern→regex
     AccessLogSupport.java     access log field names, normalization
@@ -977,6 +1005,8 @@ modules/manager2/
    src/test/java/org/apache/tomcat/manager2/
      TestManager2Webapp.java
      TestManager2Config.java
+     TestClusterSnapshot.java  ClusterSnapshot unit tests
+     TestManager2Cluster.java  live two-node static-membership cluster
   webapp/                   SPA shell, login, css, js, WEB-INF/web.xml,
                             META-INF/context.xml (privileged context)
 ```
@@ -1160,9 +1190,27 @@ modelled on the existing `TestManagerWebapp` but exercising the new flows:
        factory options editable as parameters, the pool size update re-binds
        it, duplicate → 409, removal unbinds it).
 
-    The browser E2E for this page (login, tree, property edit, add/remove
-    with confirm, save preview, no console errors) is driven over CDP and
-    is not part of `ant test`.
+     The browser E2E for this page (login, tree, property edit, add/remove
+     with confirm, save preview, no console errors) is driven over CDP and
+     is not part of `ant test`.
+12. **Cluster**: `GET /api/status/cluster` in the webapp suite —
+    unauthenticated redirect to the login page, the unclustered shape
+    (`{"clustered": false, "clusters": []}`) for `manager-gui` and the
+    read-only `manager-status`, and the deep-link route `/cluster` serving
+    the SPA shell. `TestClusterSnapshot` asserts the snapshot builder
+    directly (unclustered and empty-cluster shapes, the member field
+    mapping including the local member prepended to the Tribes list and
+    the `MemberImpl` extras, the membership summary, deduplication of a
+    cluster set on both engine and host, the replication block and its
+    omission when no clustered context exists). `TestManager2Cluster`
+    builds a live two-node cluster (loopback, static membership, no
+    multicast, so it is CI safe): a `SimpleTcpCluster` with a
+    `DeltaManager` template and a distributable context on the test
+    instance's host, and a bare `GroupChannel` peer — and asserts the
+    peer shows up in the members, the local member is flagged, the
+    membership summary has no multicast address for static membership
+    and the replication block of the clustered context is complete.
+
 
 Test-environment notes (discovered while implementing):
 
@@ -1221,7 +1269,21 @@ Test-environment notes (discovered while implementing):
    storing `findServices()` in `NamingResourcesSF.storeChildren`) closes
    the round-trip, so a `serviceRef` added through the Configuration page
    is written to `server.xml` like the other JNDI entries. The other six
-   entry types already round-tripped.
+    entry types already round-tripped.
+ - Cluster tests: `StaticMembershipService` needs its local member set
+   explicitly (`setLocalMember`), and a static member only joins the
+   membership once it answers the start RPC, so the live test runs a real
+   second channel as the peer. `SimpleTcpCluster` renames its channel to
+   `<clusterName>-Channel` on start and the channel name seeds the
+   membership id, so the peer must adopt the cluster channel's name after
+   the node has started. Tribes' member lists exclude the local member,
+   which `ClusterSnapshot` prepends; a member received over the wire has
+   no hostname string and reports its address in byte notation
+   (`{127, 0, 0, 1}`), which the member name/host reflect.
+   `TomcatBaseTest`'s `Tomcat` pre-creates a `StandardManager` for every
+   context at start, which prevents `StandardContext` from picking up the
+   cluster's manager template, so the test assigns the manager from
+   `cluster.createManager()` explicitly.
 
 Frontend: a manual smoke-test checklist in the docs (login, each page,
 deploy upload, live chart behaviour, mobile widths); the JS is small
@@ -1238,7 +1300,7 @@ disabled); high-volume tables (logs, access log, workers) scroll
 horizontally with the first column pinned (log pages: never pinned, the
 whole table scrolls) and single-line rows below 1150 px, not squeezed; tabs scroll when crowded; page-head, log and diagnostics
 controls go full width; modals show stacked full-width buttons; toasts
-appear above the bottom nav; the bottom nav keeps all nine items as icons
+appear above the bottom nav; the bottom nav keeps all ten items as icons
 only (labels as `aria-label`, active item in its per-tab hue); inputs are
 16 px at ≤480 px (no iOS
 focus zoom); the Configuration detail scrolls into view after a tree

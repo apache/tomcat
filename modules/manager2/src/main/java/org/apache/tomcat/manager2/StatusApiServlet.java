@@ -226,6 +226,8 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
                 }
             } else if (path.startsWith("/api/status/system")) {
                 Api.json(response, StatusSnapshot.system());
+            } else if (path.startsWith("/api/status/cluster")) {
+                Api.json(response, ClusterSnapshot.snapshot(host));
             } else if (path.startsWith("/api/status")) {
                 Api.json(response, StatusSnapshot.snapshot(mBeanServer, threadPools, host));
             } else {

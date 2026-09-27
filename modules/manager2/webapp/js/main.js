@@ -23,6 +23,7 @@ import { dashboard } from './pages/dashboard.js';
 import { apps, appDetail } from './pages/apps.js';
 import { hosts } from './pages/hosts.js';
 import { monitoring } from './pages/monitoring.js';
+import { cluster } from './pages/cluster.js';
 import { diagnostics } from './pages/diagnostics.js';
 import { logs } from './pages/logs.js';
 import { accessLog } from './pages/accesslog.js';
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
   { route: '/configuration', icon: 'config', labelKey: 'manager2.ui.nav.configuration' },
   { route: '/users', icon: 'users', labelKey: 'manager2.ui.nav.users' },
   { route: '/monitoring', icon: 'monitoring', labelKey: 'manager2.ui.nav.monitoring' },
+  { route: '/cluster', icon: 'cluster', labelKey: 'manager2.ui.nav.cluster' },
   { route: '/diagnostics', icon: 'diagnostics', labelKey: 'manager2.ui.nav.diagnostics' },
   { route: '/logs', icon: 'logs', labelKey: 'manager2.ui.nav.logs' },
   { route: '/access-log', icon: 'access-log', labelKey: 'manager2.ui.nav.accessLog' },
@@ -182,6 +184,7 @@ async function boot() {
   pageRoute('/hosts', hosts);
   pageRoute('/configuration', configuration);
   pageRoute('/monitoring', monitoring);
+  pageRoute('/cluster', cluster);
   pageRoute('/diagnostics', diagnostics);
   pageRoute('/logs', logs);
   pageRoute('/access-log', accessLog);

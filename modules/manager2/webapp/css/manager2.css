@@ -87,6 +87,8 @@
   --nav-users-soft: #fce8f1;
   --nav-monitoring: #16a34a;
   --nav-monitoring-soft: #e6f6ec;
+  --nav-cluster: #4d7c0f;
+  --nav-cluster-soft: #eef6dc;
   --nav-diagnostics: #d97706;
   --nav-diagnostics-soft: #fdf2e2;
   --nav-logs: #0891b2;
@@ -136,6 +138,8 @@
   --nav-users-soft: #442031;
   --nav-monitoring: #4cc98a;
   --nav-monitoring-soft: #16321f;
+  --nav-cluster: #a3e635;
+  --nav-cluster-soft: #232f13;
   --nav-diagnostics: #e5b93c;
   --nav-diagnostics-soft: #38300f;
   --nav-logs: #38bdf8;
@@ -283,6 +287,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .nav-item.active.nav-tab-config { color: var(--nav-config); background: var(--nav-config-soft); }
 .nav-item.active.nav-tab-users { color: var(--nav-users); background: var(--nav-users-soft); }
 .nav-item.active.nav-tab-monitoring { color: var(--nav-monitoring); background: var(--nav-monitoring-soft); }
+.nav-item.active.nav-tab-cluster { color: var(--nav-cluster); background: var(--nav-cluster-soft); }
 .nav-item.active.nav-tab-diagnostics { color: var(--nav-diagnostics); background: var(--nav-diagnostics-soft); }
 .nav-item.active.nav-tab-logs { color: var(--nav-logs); background: var(--nav-logs-soft); }
 .nav-item.active.nav-tab-access-log { color: var(--nav-access-log); background: var(--nav-access-log-soft); }
