@@ -150,6 +150,10 @@
         buffer used by the BIO pair. Patch submitted by Lukas Hellebrandt.
         (remm)
       </fix>
+      <fix>
+        <pr>1073</pr>: Fix possible corruption when using HTTP/2 and async IO
+        on uploads. Submitted by Tim Burke. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
