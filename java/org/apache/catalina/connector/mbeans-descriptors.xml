@@ -227,7 +227,7 @@
                  type="boolean"/>
 
     <attribute   name="useIPVHosts"
-          description="Should IP-based virtual hosting be used? "
+          description="Should IP-based virtual hosting be used?"
                  type="boolean"/>
 
     <attribute    name="xpoweredBy"
