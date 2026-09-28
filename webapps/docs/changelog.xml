@@ -292,6 +292,11 @@
         <code>AprLifecycleListener</code> and throw an Error when FIPS is
         requested but not available. (markt)
       </fix>
+      <fix>
+        Ensure that, as per the documentation, a simple bind is always used when
+        the JNDI realm binds using the user provided name and password to
+        authenticate the user. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
