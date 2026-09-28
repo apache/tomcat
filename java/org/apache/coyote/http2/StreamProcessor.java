@@ -98,8 +98,20 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
+                boolean reuseRequestAndResponse = false;
                 try {
                     state = process(socketWrapper, event);
+                    /*
+                     * The request and response may only be returned to the pool for re-use if the stream ended cleanly.
+                     * If the stream ended with either a timeout or an error that prevents further I/O (e.g. an
+                     * asynchronous timeout or error while an application thread was blocked in a write), a
+                     * non-container thread may still be using the request and/or response. Re-using them in that case
+                     * could result in the remaining data being written to a different stream, possibly on a different
+                     * connection.
+                     */
+                    if (SocketEvent.TIMEOUT != event) {
+                        reuseRequestAndResponse = getErrorState().isIoAllowed();
+                    }
 
                     if (state == SocketState.LONG) {
                         handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
@@ -148,6 +160,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                     ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR, e);
                     stream.close(ce);
                     state = SocketState.CLOSED;
+                    reuseRequestAndResponse = false;
                 } finally {
                     if (state == SocketState.CLOSED) {
                         /*
@@ -157,7 +170,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                          * response are added to the pool to avoid concurrency issues corrupting the statistics.
                          */
                         recycle();
-                        stream.recycle();
+                        stream.recycle(reuseRequestAndResponse);
                     }
                 }
             } finally {
