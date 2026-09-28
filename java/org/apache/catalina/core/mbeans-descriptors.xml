@@ -1104,7 +1104,7 @@
                type="boolean"/>
 
     <attribute name="createDirs"
-               description="Should we create directories upon startup for appBase and xmlBase? "
+               description="Should we create directories upon startup for appBase and xmlBase?"
                type="boolean"/>
 
     <attribute name="deployIgnore"
