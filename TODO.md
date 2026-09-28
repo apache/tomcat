@@ -400,16 +400,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 35. Jasper Ant Logging (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 35.1 | `JspC.java:1775` | Uses `System.out` instead of Ant Project log | Pass the Ant `Project` reference through to `initServletContext` and use `Project.log()` for output. | 0.5 day | Low |
-
-**Total estimated effort: 0.5 day, Low difficulty**
-
----
-
 ### 36. Jasper JspC ClassLoader / Filter Config (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
