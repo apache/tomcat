@@ -110,8 +110,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         while (server != null && server.isOpen()) {
             try {
                 SocketChannel socket = server.accept();
-                socket.configureBlocking(true);
-                socket.socket().setSoTimeout(getTimeout());
+                try {
+                    socket.configureBlocking(true);
+                    socket.socket().setSoTimeout(getTimeout());
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    try {
+                        socket.close();
+                    } catch (IOException ioe) {
+                        t.addSuppressed(ioe);
+                    }
+                    throw t;
+                }
                 Semaphore connectionSlots = secureConnectionSlots;
                 if (connectionSlots == null || !connectionSlots.tryAcquire()) {
                     socket.close();
@@ -493,16 +503,26 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     if (key.isAcceptable()) {
                         ServerSocketChannel server = (ServerSocketChannel) key.channel();
                         SocketChannel channel = server.accept();
-                        channel.socket().setReceiveBufferSize(getRxBufSize());
-                        channel.socket().setSendBufferSize(getTxBufSize());
-                        channel.socket().setTcpNoDelay(getTcpNoDelay());
-                        channel.socket().setKeepAlive(getSoKeepAlive());
-                        channel.socket().setOOBInline(getOoBInline());
-                        channel.socket().setReuseAddress(getSoReuseAddress());
-                        channel.socket().setSoLinger(getSoLingerOn(), getSoLingerTime());
-                        channel.socket().setSoTimeout(getTimeout());
-                        Object attach = new ObjectReader(channel);
-                        registerChannel(selector, channel, SelectionKey.OP_READ, attach);
+                        try {
+                            channel.socket().setReceiveBufferSize(getRxBufSize());
+                            channel.socket().setSendBufferSize(getTxBufSize());
+                            channel.socket().setTcpNoDelay(getTcpNoDelay());
+                            channel.socket().setKeepAlive(getSoKeepAlive());
+                            channel.socket().setOOBInline(getOoBInline());
+                            channel.socket().setReuseAddress(getSoReuseAddress());
+                            channel.socket().setSoLinger(getSoLingerOn(), getSoLingerTime());
+                            channel.socket().setSoTimeout(getTimeout());
+                            Object attach = new ObjectReader(channel);
+                            registerChannel(selector, channel, SelectionKey.OP_READ, attach);
+                        } catch (Throwable t) {
+                            ExceptionUtils.handleThrowable(t);
+                            try {
+                                channel.close();
+                            } catch (IOException ioe) {
+                                t.addSuppressed(ioe);
+                            }
+                            throw t;
+                        }
                     }
                     // is there data to read on this channel?
                     if (key.isReadable()) {
