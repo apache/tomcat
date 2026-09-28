@@ -217,7 +217,7 @@ class AsyncStateMachine {
     }
 
     boolean isAsyncError() {
-        return state == AsyncState.ERROR;
+        return state == AsyncState.ERROR || state == AsyncState.MUST_ERROR;
     }
 
     boolean isCompleting() {
