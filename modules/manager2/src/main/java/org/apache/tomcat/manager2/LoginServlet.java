@@ -220,7 +220,7 @@ public class LoginServlet extends HttpServlet {
      * Unwrap the servlet request wrappers to reach the container request.
      *
      * @param request the servlet request
-     * 
+     *
      * @return the container request, or {@code null} if the chain does not end in one (should not happen in a standard
      *             Tomcat deployment)
      */

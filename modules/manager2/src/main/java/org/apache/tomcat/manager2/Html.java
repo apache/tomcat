@@ -19,7 +19,6 @@ package org.apache.tomcat.manager2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,7 +71,7 @@ final class Html {
      *
      * @param context the servlet context
      * @param path    the context-relative template path, e.g. {@code /login.html}
-     * 
+     *
      * @return the template content, or {@code null} if it is missing
      */
     static String readTemplate(ServletContext context, String path) {

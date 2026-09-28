@@ -20,6 +20,7 @@
 <!-- Typical usage:                                                   -->
 <!--   ant                  build manager2.jar and manager2.war       -->
 <!--   ant deploy           also deploy the war into the main build   -->
+<!--   ant validate         run the Checkstyle style checks           -->
 <!--   ant test             compile and run the integration tests     -->
 <!--                                                                  -->
 <!-- The main Tomcat tree must already have been built (ant) so that  -->
@@ -81,6 +82,22 @@
     <pathelement location="${hamcrest.jar}"/>
   </path>
 
+  <!-- Text files checked by the validate target. The subset of the main
+       tree's "text.files" patternset that matches files in this module. -->
+  <patternset id="text.files">
+    <include name="**/LICENSE"/>
+    <include name="**/NOTICE"/>
+    <include name="**/*.MF"/>
+    <include name="**/*.css"/>
+    <include name="**/*.html"/>
+    <include name="**/*.java"/>
+    <include name="**/*.js"/>
+    <include name="**/*.md"/>
+    <include name="**/*.properties"/>
+    <include name="**/*.properties.default"/>
+    <include name="**/*.xml"/>
+  </patternset>
+
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
     <filter token="VERSION" value="${version}"/>
@@ -101,7 +118,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="prepare"
+  <target name="compile" depends="prepare,validate"
           description="Compile the servlet classes into ${tomcat.classes}">
     <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -170,6 +187,64 @@
     <copy todir="${tomcat.build}/webapps/manager2">
       <fileset dir="${tomcat.webapp}"/>
     </copy>
+  </target>
+
+  <target name="download-validate" if="${execute.validate}"
+          description="Download components necessary to validate source">
+    <available file="${checkstyle.jar}" property="checkstyle.jar.present"/>
+    <antcall target="download-checkstyle"/>
+  </target>
+
+  <target name="download-checkstyle" unless="checkstyle.jar.present"
+          description="Download Checkstyle if it is not already present">
+    <mkdir dir="${checkstyle.home}"/>
+    <get src="${checkstyle.loc}" dest="${checkstyle.jar}.download"/>
+    <property name="checkstyle.checksum.expected" value="${checkstyle.checksum.value}"/>
+    <checksum file="${checkstyle.jar}.download"
+              algorithm="${checkstyle.checksum.algorithm}"
+              property="checkstyle.checksum.expected"
+              verifyProperty="checkstyle.checksum.matches"/>
+    <fail unless="checkstyle.checksum.matches"
+          message="Checksum verification failed for ${checkstyle.loc}"/>
+    <move file="${checkstyle.jar}.download" tofile="${checkstyle.jar}"/>
+  </target>
+
+  <target name="validate" depends="download-validate" if="${execute.validate}"
+          description="Uses Checkstyle tool to perform style check for the source code">
+    <!-- Required so we can cache checkstyle results -->
+    <mkdir dir="${tomcat.output}/res/checkstyle"/>
+    <available property="checkstyletask.properties" resource="checkstyletask.properties"
+               classpath="${checkstyle.jar}" value="checkstyletask.properties"/>
+    <available property="checkstyletask.properties"
+               resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+               classpath="${checkstyle.jar}"
+               value="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"/>
+
+    <taskdef resource="${checkstyletask.properties}"
+             classpath="${checkstyle.jar}" />
+    <!-- The main tree's Checkstyle configuration files reference their
+         resources through ${basedir}. The nested properties override the
+         Ant project property of the same name, so the configuration can be
+         reused unchanged from this module's directory. -->
+    <property name="main.tree" location="${tomcat.home}"/>
+    <!-- Main checks -->
+    <checkstyle config="${tomcat.home}/res/checkstyle/checkstyle.xml">
+      <property key="basedir" value="${main.tree}"/>
+      <fileset dir=".">
+        <patternset refid="text.files"/>
+        <exclude name=".*/**"/>
+        <exclude name="output/**"/>
+        <!-- Exclude developer specific local files -->
+        <exclude name="build.properties"/>
+      </fileset>
+    </checkstyle>
+    <!-- Tests checks -->
+    <checkstyle config="${tomcat.home}/res/checkstyle/test-checkstyle.xml">
+      <property key="basedir" value="${main.tree}"/>
+      <fileset dir="src/test/java">
+        <include name="**/*.java"/>
+      </fileset>
+    </checkstyle>
   </target>
 
   <target name="compile-test" depends="jar"

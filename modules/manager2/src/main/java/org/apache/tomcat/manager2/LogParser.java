@@ -64,6 +64,8 @@ public final class LogParser {
 
         /**
          * The ordered list of field names a record of this format can have.
+         *
+         * @return the ordered list of field names
          */
         public List<String> getFields() {
             return fields;
@@ -74,7 +76,7 @@ public final class LogParser {
          * Parse one access log line.
          *
          * @param line the line to parse
-         * 
+         *
          * @return the parsed record (field names as keys) or {@code null} if the line does not match the pattern
          */
         public Map<String, Object> parse(String line) {
@@ -108,7 +110,7 @@ public final class LogParser {
      * Parse one line of a plain text JULI log file.
      *
      * @param line the line to parse
-     * 
+     *
      * @return a record with the fields {@code time}, {@code level}, {@code thread}, {@code source} and {@code message}
      *             or {@code null} if the line is not a record (for example a continuation line of a stack trace)
      */
@@ -131,7 +133,7 @@ public final class LogParser {
      * Parse one line of a JSON JULI log file ({@code org.apache.juli.JsonFormatter} output).
      *
      * @param line the line to parse
-     * 
+     *
      * @return a record with the fields {@code time}, {@code level}, {@code thread}, {@code source}, {@code message}
      *             and, when the record has an exception, {@code throwable} (a list of strings); or {@code null} if the
      *             line is not a JSON object
@@ -179,7 +181,7 @@ public final class LogParser {
      * Parse one line of a JSON access log ({@code org.apache.catalina.valves.JsonAccessLogValve} output).
      *
      * @param line the line to parse
-     * 
+     *
      * @return the parsed record (the attribute names of the JSON object as keys) or {@code null} if the line is not a
      *             JSON object
      */
@@ -219,9 +221,9 @@ public final class LogParser {
      * names.
      *
      * @param pattern the access log pattern (for example {@code %h %l %u %t "%r" %s %b})
-     * 
+     *
      * @return the compiled parser
-     * 
+     *
      * @throws IllegalArgumentException if the pattern uses an unsupported directive or produces a regular expression
      *                                      with more than the maximum number of capture groups
      */

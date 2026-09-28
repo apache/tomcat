@@ -464,7 +464,8 @@ public class TestClusterSnapshot {
         private boolean suspectFlag;
         private boolean failingFlag;
 
-        public TestMemberImpl() {
+        @SuppressWarnings("unused")
+        TestMemberImpl() {
             // Due to Externalizable
         }
 

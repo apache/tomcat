@@ -34,8 +34,8 @@ import java.util.TreeMap;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 
@@ -85,7 +85,7 @@ public final class StatusSnapshot {
      * @param mBeanServer the MBean server
      * @param threadPools ObjectNames of the connector thread pools
      * @param host        the Host the API is installed in (may be null, in which case the application summary is empty)
-     * 
+     *
      * @return the snapshot
      */
     public static Map<String, Object> snapshot(MBeanServer mBeanServer, List<ObjectName> threadPools, Host host)
@@ -104,7 +104,7 @@ public final class StatusSnapshot {
      *
      * @param mBeanServer       the MBean server
      * @param requestProcessors ObjectNames of the request processors
-     * 
+     *
      * @return the worker table
      */
     public static List<Map<String, Object>> workers(MBeanServer mBeanServer, List<ObjectName> requestProcessors)
@@ -307,7 +307,7 @@ public final class StatusSnapshot {
      * @param mBeanServer the MBean server
      * @param hostName    the name of the host the context is installed in
      * @param contextPath the context path (empty string for ROOT)
-     * 
+     *
      * @return the detailed state, or {@code null} if the context is not (any longer) deployed
      */
     public static Map<String, Object> application(MBeanServer mBeanServer, String hostName, String contextPath)

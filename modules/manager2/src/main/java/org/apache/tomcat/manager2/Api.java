@@ -35,7 +35,7 @@ public final class Api {
      *
      * @param response the servlet response
      * @param payload  the JSON payload
-     * 
+     *
      * @throws IOException if a write error occurs
      */
     public static void json(HttpServletResponse response, Object payload) throws IOException {
@@ -54,7 +54,7 @@ public final class Api {
      *
      * @param response the servlet response
      * @param message  the (localized) result message
-     * 
+     *
      * @throws IOException if a write error occurs
      */
     public static void ok(HttpServletResponse response, String message) throws IOException {
@@ -72,7 +72,7 @@ public final class Api {
      * @param status   the HTTP status code
      * @param code     the machine readable error code
      * @param message  the (localized) error message
-     * 
+     *
      * @throws IOException if a write error occurs
      */
     public static void error(HttpServletResponse response, int status, String code, String message) throws IOException {
@@ -92,7 +92,7 @@ public final class Api {
      * Write a 404 error envelope.
      *
      * @param response the servlet response
-     * 
+     *
      * @throws IOException if a write error occurs
      */
     public static void notFound(HttpServletResponse response) throws IOException {

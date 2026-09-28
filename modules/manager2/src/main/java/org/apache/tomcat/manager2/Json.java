@@ -31,7 +31,7 @@ public final class Json {
      * Serialize the given value to JSON.
      *
      * @param value the value to serialize
-     * 
+     *
      * @return the JSON representation
      */
     public static String write(Object value) {
@@ -46,7 +46,7 @@ public final class Json {
      * caller between double quotes).
      *
      * @param value the value to escape
-     * 
+     *
      * @return the escaped value
      */
     public static String escape(String value) {

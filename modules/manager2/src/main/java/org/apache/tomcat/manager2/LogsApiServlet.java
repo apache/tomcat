@@ -36,12 +36,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
-import org.apache.catalina.Wrapper;
-import org.apache.catalina.Container;
 import org.apache.catalina.Valve;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.valves.AbstractAccessLogValve;
 
 
@@ -655,7 +655,7 @@ public class LogsApiServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Detect the format of a log file from its first non-empty line: a line that starts with
-     * {@code {} is JSON, anything else is plain text.
+     * {@code &#123;} is JSON, anything else is plain text.
      */
     private static String detectFormat(File file) {
         try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {

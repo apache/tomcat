@@ -1,19 +1,18 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  See the License for the specific language governing
- *  permissions and limitations under the License.
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.manager2;
 
@@ -170,7 +169,7 @@ import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
  * <b>Node addressing.</b> Every node of the tree carries a path based {@code id} made of named segments (URL encoded,
  * where a {@code /} inside a value - e.g. in a context path - is written as {@code +}) and, for components that have no
  * name (valves, connectors, listeners), a positional index:
- * 
+ *
  * <pre>
  *   server
  *   server/service/{name}
@@ -210,7 +209,7 @@ import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
  *   server/valve/{index}
  *   server/listener/{index}
  * </pre>
- * 
+ *
  * The tree endpoint generates these ids; clients only echo them back.
  * <p>
  * <b>Attributes.</b> The property list of a node is derived from the modeler MBean descriptor of the component's class
@@ -1778,14 +1777,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             }
         } else {
             result = new ArrayList<>(switch (type) {
-                case "resourceLink" -> RESOURCE_LINK_ATTRIBUTES;
-                case "resourceEnvRef" -> RESOURCE_ENV_REF_ATTRIBUTES;
-                case "environment" -> ENVIRONMENT_ATTRIBUTES;
-                case "ejb" -> EJB_ATTRIBUTES;
-                case "localEjb" -> LOCAL_EJB_ATTRIBUTES;
-                case "serviceRef" -> SERVICE_ATTRIBUTES;
-                default -> List.of();
-            });
+                        case "resourceLink" -> RESOURCE_LINK_ATTRIBUTES;
+                        case "resourceEnvRef" -> RESOURCE_ENV_REF_ATTRIBUTES;
+                        case "environment" -> ENVIRONMENT_ATTRIBUTES;
+                        case "ejb" -> EJB_ATTRIBUTES;
+                        case "localEjb" -> LOCAL_EJB_ATTRIBUTES;
+                        case "serviceRef" -> SERVICE_ATTRIBUTES;
+                        default -> List.of();
+                    });
         }
         // The string parameters of the entry (the ResourceBase properties)
         // that are not covered by the explicit attribute tables above.
@@ -4772,7 +4771,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 case "executor" -> ((StandardService) ref.parent).removeExecutor((Executor) ref.component);
                 case "alias" -> ((Host) ref.component).removeAlias(ref.aliasValue);
                 case "listener" ->
-                    ((LifecycleBase) ref.parent).removeLifecycleListener((LifecycleListener) ref.component);
+                        ((LifecycleBase) ref.parent).removeLifecycleListener((LifecycleListener) ref.component);
                 case "upgradeProtocol" -> {
                     AbstractHttp11Protocol http11 = http11ProtocolHandler((Connector) ref.parent);
                     if (http11 == null) {
@@ -4806,7 +4805,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                 case "clusterManager" -> ((SimpleTcpCluster) ref.parent).setManagerTemplate(null);
                 case "transport" -> ((ReplicationTransmitter) ref.parent).setTransport(null);
                 case "clusterListener" ->
-                    ((CatalinaCluster) ref.parent).removeClusterListener((ClusterListener) ref.component);
+                        ((CatalinaCluster) ref.parent).removeClusterListener((ClusterListener) ref.component);
                 case "member" -> removeClusterMember(ref);
                 default -> throw notFound();
             }

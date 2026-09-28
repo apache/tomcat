@@ -300,7 +300,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
      * @param name         the init parameter name
      * @param defaultValue the value to use when the parameter is absent or invalid
      * @param minimum      the smallest acceptable value (inclusive)
-     * 
+     *
      * @return the effective value
      */
     private long getLongInitParameter(String name, long defaultValue, long minimum) {

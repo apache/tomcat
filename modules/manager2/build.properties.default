@@ -52,6 +52,18 @@ hamcrest.version=3.0
 hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
 hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 
+# ----- Validate settings (keep in sync with the main tree) -----
+# Set to true in build.properties to run Checkstyle as part of the build.
+execute.validate=false
+
+base-gh.loc=https://github.com
+checkstyle.version=14.1.0
+checkstyle.checksum.algorithm=SHA-512
+checkstyle.checksum.value=0193261e7b0369ace41c0b38cfabea821a1109d6ed6185d5cc72cdff130995c942b344087bb083c2aea303a15bd17f1e3e2024fd46125aa2ac7b09dfeb39f7fc
+checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
+checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
+
 # ----- Compile settings (keep in sync with the main tree) -----
 compile.release=21
 compile.debug=true
