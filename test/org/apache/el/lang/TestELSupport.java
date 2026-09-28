@@ -38,14 +38,12 @@ public class TestELSupport {
 
     @Test
     public void testBigDecimal() {
-        testIsSame(new BigDecimal(
-                "0.123456789012345678901234567890123456789012345678901234567890123456789"));
+        testIsSame(new BigDecimal("0.123456789012345678901234567890123456789012345678901234567890123456789"));
     }
 
     @Test
     public void testBigInteger() {
-        testIsSame(new BigInteger(
-                "1234567890123456789012345678901234567890123456789012345678901234567890"));
+        testIsSame(new BigInteger("1234567890123456789012345678901234567890123456789012345678901234567890"));
     }
 
     @Test
@@ -125,116 +123,100 @@ public class TestELSupport {
 
     @Test
     public void testCoerceToType01() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, Integer.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, Integer.class);
         Assert.assertNull("Result: " + result, result);
     }
 
     @Test
     public void testCoerceToType02() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, int.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, int.class);
         Assert.assertEquals(Integer.valueOf(0), result);
     }
 
     @Test
     public void testCoerceToType03() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, boolean.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, boolean.class);
         Assert.assertEquals(Boolean.valueOf(null), result);
     }
 
     @Test
     public void testCoerceToType04() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, String.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, String.class);
         Assert.assertEquals("", result);
     }
 
     @Test
     public void testCoerceToType05() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, Character.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, Character.class);
         Assert.assertNull("Result: " + result, result);
     }
 
     @Test
     public void testCoerceToType06() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", Character.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", Character.class);
         Assert.assertEquals(Character.valueOf((char) 0), result);
     }
 
     @Test
     public void testCoerceToType07() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, char.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, char.class);
         Assert.assertEquals(Character.valueOf((char) 0), result);
     }
 
     @Test
     public void testCoerceToType08() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", char.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", char.class);
         Assert.assertEquals(Character.valueOf((char) 0), result);
     }
 
     @Test
     public void testCoerceToType09() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, Boolean.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, Boolean.class);
         Assert.assertNull("Result: " + result, result);
     }
 
     @Test
     public void testCoerceToType10() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", Boolean.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", Boolean.class);
         Assert.assertEquals(Boolean.FALSE, result);
     }
 
     @Test
     public void testCoerceToType11() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                null, boolean.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(null, boolean.class);
         Assert.assertEquals(Boolean.FALSE, result);
     }
 
     @Test
     public void testCoerceToType12() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", boolean.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", boolean.class);
         Assert.assertEquals(Boolean.FALSE, result);
     }
 
     @Test
     public void testCoerceToType13() {
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", TesterType.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", TesterType.class);
         Assert.assertNull(result);
     }
 
     @Test
     public void testCoerceToType14() {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorNoError.class);
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "Foo", TesterType.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("Foo", TesterType.class);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 
-    @Test(expected=ELException.class)
+    @Test(expected = ELException.class)
     public void testCoerceToType15() {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "Foo", TesterType.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("Foo", TesterType.class);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 
     @Test
     public void testCoerceToType16() {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
-        Object result = ELManager.getExpressionFactory().coerceToType(
-                "", TesterType.class);
+        Object result = ELManager.getExpressionFactory().coerceToType("", TesterType.class);
         Assert.assertNull(result);
     }
 
@@ -270,10 +252,12 @@ public class TestELSupport {
         VALA1,
         VALA2
     }
+
     private enum TestEnumB {
         VALB1,
         VALB2
     }
+
     private enum TestEnumC {
         VALA1,
         VALA2,
@@ -336,9 +320,9 @@ public class TestELSupport {
 
 
     /*
-     * Note: The following tests use compareTo(). When the target object (Long or String) is examined by reflection
-     * both compareTo(Object) and compareTo(Long)/compareTo(String) methods will be found as potential matches. The
-     * method matching rules (see section 1.2.1.2 of the specification) require that overload resolution has a higher
+     * Note: The following tests use compareTo(). When the target object (Long or String) is examined by reflection both
+     * compareTo(Object) and compareTo(Long)/compareTo(String) methods will be found as potential matches. The method
+     * matching rules (see section 1.2.1.2 of the specification) require that overload resolution has a higher
      * precedence than coercion resolution so it is always the compareTo(Object) method that will be used for the
      * following tests resulting in a ClassCastException (which is wrapped in an ELException).
      */
@@ -488,8 +472,10 @@ public class TestELSupport {
     private interface FunctionalD<T> extends Predicate<T> {
         @Override
         String toString();
+
         @Override
         int hashCode();
+
         @Override
         boolean equals(Object o);
     }
