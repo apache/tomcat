@@ -50,7 +50,7 @@ jobs:
         distribution: zulu
     - name: Build
       run: |
-        ant -noinput echoproperties deploy test
+        ant -noinput deploy test
       working-directory: modules/manager2
 
     - name: Upload logs
