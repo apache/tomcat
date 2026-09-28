@@ -221,6 +221,10 @@
         unexpected <code>IllegalStateExceptions</code> for some error
         conditions. (markt)
       </fix>
+      <add>
+        Harden HTTP/2 against applications that do not correctly handle
+        asynchronous errors. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
