@@ -110,8 +110,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         while (server != null && server.isOpen()) {
             try {
                 SocketChannel socket = server.accept();
-                socket.configureBlocking(true);
-                socket.socket().setSoTimeout(getTimeout());
+                try {
+                    socket.configureBlocking(true);
+                    socket.socket().setSoTimeout(getTimeout());
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    try {
+                        socket.close();
+                    } catch (IOException ioe) {
+                        t.addSuppressed(ioe);
+                    }
+                    throw t;
+                }
                 Semaphore connectionSlots = secureConnectionSlots;
                 if (connectionSlots == null || !connectionSlots.tryAcquire()) {
                     socket.close();
