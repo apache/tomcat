@@ -399,10 +399,14 @@
         Allow for absolute host names in SNI checks. (markt)
       </fix>
       <fix>
-        Correct a gap in asynchronous error handling that could lead to 
+        Correct a gap in asynchronous error handling that could lead to
         unexpected <code>IllegalStateExceptions</code> for some error
-        conditions. (markt) 
+        conditions. (markt)
       </fix>
+      <add>
+        Harden HTTP/2 against applications that do not correctly handle
+        asynchronous errors. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
