@@ -216,6 +216,11 @@
       <fix>
         Allow for absolute host names in SNI checks. (markt)
       </fix>
+      <fix>
+        Correct a gap in asynchronous error handling that could lead to
+        unexpected <code>IllegalStateExceptions</code> for some error
+        conditions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
