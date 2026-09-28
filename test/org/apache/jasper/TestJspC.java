@@ -23,11 +23,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
 
 public class TestJspC {
 
@@ -119,6 +125,28 @@ public class TestJspC {
         verify(webappOut);
     }
 
+    @Test
+    public void servletContextUsesAntLog() throws Exception {
+        List<String> messages = new ArrayList<>();
+        Project project = new Project();
+        project.addBuildListener(new DefaultLogger() {
+            @Override
+            public void messageLogged(BuildEvent event) {
+                messages.add(event.getMessage());
+            }
+        });
+
+        TesterJspC testerJspC = new TesterJspC();
+        testerJspC.setProject(project);
+        testerJspC.setUriroot("test/webapp-2.2");
+        testerJspC.setValidateTld(false);
+        testerJspC.initServletContext();
+
+        String message = "JspCServletContext Ant log test";
+        testerJspC.logToServletContext(message);
+        Assert.assertTrue(messages.contains(message));
+    }
+
     private void verify(File webappOut) {
         // for now, just check some expected files exist
         Assert.assertTrue(new File(webappOut, "generated_web.xml").exists());
@@ -158,5 +186,16 @@ public class TestJspC {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    private static class TesterJspC extends JspC {
+
+        void initServletContext() throws IOException, JasperException {
+            initServletContext(getClass().getClassLoader());
+        }
+
+        void logToServletContext(String message) {
+            context.log(message);
+        }
     }
 }
