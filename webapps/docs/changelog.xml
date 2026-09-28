@@ -160,6 +160,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Route <code>JspC</code> servlet context logging through Ant when used as
+        an Ant task. (sainadh777)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
