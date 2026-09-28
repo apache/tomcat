@@ -266,7 +266,8 @@
     <junit printsummary="withOutAndErr" fork="yes" showoutput="on"
            errorproperty="test.result.error"
            failureproperty="test.result.failure"
-           haltonfailure="true">
+           haltonfailure="true"
+           threads="${test.threads}">
       <jvmarg value="-Dfile.encoding=UTF-8"/>
       <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
       <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
@@ -280,7 +281,7 @@
       <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}"/>
       <sysproperty key="tomcat.test.reports" value="${test.reports}"/>
       <formatter type="brief" usefile="true" extension=".M2"/>
-      <batchtest todir="${test.reports}">
+      <batchtest todir="${test.reports}" skipNonTests="true">
         <fileset dir="${basedir}/src/test/java">
           <include name="**/Test*.java"/>
         </fileset>

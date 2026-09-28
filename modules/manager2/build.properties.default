@@ -73,3 +73,9 @@ encoding=UTF-8
 # ----- Test settings -----
 test.entry=
 test.reports=${tomcat.output}/reports
+
+# Number of parallel threads to use for testing. The recommended value is one
+# thread per core. The Ant JUnit task parallelizes at the granularity of a
+# test class (the methods of a class always run sequentially), so a test that
+# mutates JVM-global state must live in a class of its own.
+test.threads=1
