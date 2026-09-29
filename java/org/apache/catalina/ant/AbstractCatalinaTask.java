@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.ant;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,7 +52,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     /**
      * The charset used during URL encoding.
      */
-    protected String charset = "ISO-8859-1";
+    protected String charset = "UTF-8";
 
     /**
      * Returns the charset used during URL encoding.
@@ -93,6 +94,32 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    /**
+     * The timeout, in seconds, used when establishing a connection to the server and when reading data from it. The
+     * default value of zero means no timeout, in which case an unresponsive server may cause the build to block
+     * indefinitely.
+     */
+    protected int timeout = 0;
+
+    /**
+     * Returns the connection and read timeout, in seconds.
+     *
+     * @return the timeout in seconds; zero means no timeout
+     */
+    public int getTimeout() {
+        return this.timeout;
+    }
+
+    /**
+     * Sets the connection and read timeout, in seconds.
+     *
+     * @param timeout the timeout in seconds; zero (the default) means no timeout
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
 
@@ -227,6 +254,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setAllowUserInteraction(false);
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
+            if (timeout > 0) {
+                hconn.setConnectTimeout(timeout * 1000);
+                hconn.setReadTimeout(timeout * 1000);
+            }
 
             // Set up authorization with our credentials
             Authenticator authenticator = new TaskAuthenticator(username, password);
@@ -244,6 +275,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     hconn.setRequestProperty("Content-Length", "" + contentLength);
 
                     hconn.setFixedLengthStreamingMode(contentLength);
+                } else {
+                    // The length is unknown. Use chunked streaming to avoid the
+                    // default HttpURLConnection behaviour of buffering the
+                    // entire request body in memory.
+                    hconn.setChunkedStreamingMode(0);
                 }
             } else {
                 hconn.setDoOutput(false);
@@ -259,6 +295,32 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 try (istream; OutputStream ostream = hconn.getOutputStream()) {
                     IOTools.flow(istream, ostream);
                 }
+            }
+
+            int responseCode = hconn.getResponseCode();
+            if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                // For error responses, getInputStream() below would throw and
+                // the response body - which typically explains the error -
+                // would be discarded. Include its first line in the message.
+                String errorBody = null;
+                try (InputStream errorStream = hconn.getErrorStream()) {
+                    if (errorStream != null) {
+                        BufferedReader errorReader = new BufferedReader(
+                                new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+                        errorBody = errorReader.readLine();
+                    }
+                }
+                StringBuilder message = new StringBuilder();
+                message.append("Server returned HTTP response code: ");
+                message.append(responseCode);
+                message.append(" for URL: ");
+                message.append(url);
+                message.append(command);
+                if (errorBody != null && !errorBody.isEmpty()) {
+                    message.append(" - ");
+                    message.append(errorBody);
+                }
+                throw new IOException(message.toString());
             }
 
             // Process the response message
@@ -346,6 +408,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setAllowUserInteraction(false);
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
+        if (timeout > 0) {
+            hconn.setConnectTimeout(timeout * 1000);
+            hconn.setReadTimeout(timeout * 1000);
+        }
         hconn.setDoOutput(false);
         hconn.setAuthenticator(authenticator);
         hconn.setRequestMethod(Method.OPTIONS);
