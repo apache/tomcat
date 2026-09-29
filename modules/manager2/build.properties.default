@@ -22,13 +22,6 @@
 # values here.
 # -----------------------------------------------------------------------------
 
-# ----- Version -----
-version.major=1
-version.minor=0
-version.build=0
-version.patch=0
-version.suffix=-SNAPSHOT
-
 # ----- Base path of the Tomcat source tree -----
 # The module is built against a Tomcat build (ant) from the main source
 # tree. By default the main tree is assumed to be two levels up.
@@ -43,39 +36,3 @@ tomcat.build=${tomcat.home}/output/build
 # Must match the main tree's build.properties "base.path" so that the
 # JUnit/Hamcrest jars used by the main build can be found for testing.
 base.path=${user.home}/tomcat-build-libs
-
-junit.version=4.13.2
-junit.home=${base.path}/junit-${junit.version}
-junit.jar=${junit.home}/junit-${junit.version}.jar
-
-hamcrest.version=3.0
-hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
-hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
-
-# ----- Validate settings (keep in sync with the main tree) -----
-# Set to true in build.properties to run Checkstyle as part of the build.
-execute.validate=false
-
-base-gh.loc=https://github.com
-checkstyle.version=14.1.0
-checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=0193261e7b0369ace41c0b38cfabea821a1109d6ed6185d5cc72cdff130995c942b344087bb083c2aea303a15bd17f1e3e2024fd46125aa2ac7b09dfeb39f7fc
-checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
-checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
-
-# ----- Compile settings (keep in sync with the main tree) -----
-compile.release=21
-compile.debug=true
-compile.deprecation=false
-encoding=UTF-8
-
-# ----- Test settings -----
-test.entry=
-test.reports=${tomcat.output}/reports
-
-# Number of parallel threads to use for testing. The recommended value is one
-# thread per core. The Ant JUnit task parallelizes at the granularity of a
-# test class (the methods of a class always run sequentially), so a test that
-# mutates JVM-global state must live in a class of its own.
-test.threads=1

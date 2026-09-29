@@ -39,15 +39,18 @@
   <property name="tomcat.testclasses" value="${tomcat.output}/testclasses"/>
   <property name="tomcat.webapp"     value="${tomcat.output}/webapp"/>
 
+  <property file="${user.home}/build.properties"/>
+  <property file="${basedir}/build.properties.default"/>
+  <property file="${tomcat.home}/build.properties"/>
+  <property file="${tomcat.home}/build.properties.default"/>
+  <property name="version"         value="${version.major}.${version.minor}.${version.build}.${version.patch}${version.suffix}"/>
+  <property name="version.major.minor" value="${version.major}.${version.minor}"/>
+
+  <property name="compile.release" value="21"/>
+
   <!-- JAR / WAR artifacts -->
   <property name="manager2.jar"      value="${tomcat.output}/manager2.jar"/>
   <property name="manager2.war"      value="${tomcat.output}/manager2.war"/>
-
-  <property file="${user.home}/build.properties"/>
-  <property file="${basedir}/build.properties"/>
-  <property file="${basedir}/build.properties.default"/>
-  <property name="version"         value="${version.major}.${version.minor}.${version.build}.${version.patch}${version.suffix}"/>
-  <property name="version.major.minor" value="${version.major}.${version.minor}"/>
 
   <tstamp>
     <format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
@@ -124,7 +127,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            release="${compile.release}"
-           encoding="${encoding}"
+           encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath refid="compile.classpath"/>
       <include name="org/apache/tomcat/manager2/**"/>
@@ -253,7 +256,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            release="${compile.release}"
-           encoding="${encoding}"
+           encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath refid="test.classpath"/>
       <include name="org/apache/tomcat/manager2/**"/>
