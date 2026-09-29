@@ -191,7 +191,7 @@ public class TestSecurity2026WebSocket extends WebSocketBaseTest {
     public static class BusyWaitEndpoint {
 
         // 8k message
-        private static final String MSG = "a".repeat(1024 * 8);
+        private static final String MSG = new String(new char[1024 * 8]).replace("\0", "a");
 
         @OnOpen
         public void onOpen(Session session) {
