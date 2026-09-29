@@ -403,10 +403,14 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
                 MBeanServerConnection jmxServerConnection = getJMXConnection();
                 error = jmxExecute(jmxServerConnection);
-                if (error != null && isFailOnError()) {
-                    // exception should be thrown only if failOnError == true
-                    // or error line will be logged twice
-                    throw new BuildException(error);
+                if (error != null) {
+                    if (isFailOnError()) {
+                        // exception should be thrown only if failOnError == true
+                        // or error line will be logged twice
+                        throw new BuildException(error);
+                    }
+                    // Ant semantics for failOnError="false" are to report the error and continue
+                    handleErrorOutput(error);
                 }
             } catch (Exception e) {
                 if (isFailOnError()) {
