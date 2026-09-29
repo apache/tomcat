@@ -4294,6 +4294,11 @@
         meant that the first header in the response was also dropped. Fix based
         on pull request <pr>710</pr> by foremans. (markt)
       </fix>
+      <fix>
+        Avoid very rare race between async write notification and completion.
+        Skip the write notification in these cases since it would be useless.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
