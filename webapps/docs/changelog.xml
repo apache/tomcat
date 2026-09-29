@@ -158,6 +158,10 @@
         Fix a timing issue that could cause large non-blocking writes to stall
         for AJP connections. (markt)
       </fix>
+      <fix>
+        Ensure that the non-blocking write buffer is empty before sending an AJP
+        end response message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
