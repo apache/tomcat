@@ -335,6 +335,10 @@
         Skip the write notification in these cases since it would be useless.
         (remm)
       </fix>
+      <fix>
+        Fix a timing issue that could cause large non-blocking writes to stall
+        for AJP connections. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
