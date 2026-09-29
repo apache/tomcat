@@ -265,6 +265,37 @@ class AsyncStateMachine {
     }
 
     /*
+     * Entry point for transport generated OPEN_WRITE write-listener
+     * notifications. Unlike asyncOperation(), which the container calls when
+     * it is about to perform an application initiated non-blocking write, a
+     * notification may legitimately race with the completion of the async
+     * cycle: the transport may queue the event while the write listener is
+     * still active and only deliver the dispatch after the application has
+     * completed the response on another thread. Once the cycle is completing
+     * there is nothing left to notify (the listener will not be called again)
+     * and the completion path in asyncPostProcess() takes care of flushing
+     * buffered data and firing onComplete().
+     *
+     * Returns true if the caller should notify the write listener, false if
+     * the notification raced with completion and should be treated as
+     * handled without notifying the listener.
+     */
+    synchronized boolean asyncOperationForWriteNotification() {
+        // States in which the cycle is completing (or an application
+        // initiated write operation is already in progress): asyncPostProcess
+        // () has a completion branch for each of these, so ignoring the
+        // notification lets the completion proceed normally.
+        if (state == AsyncState.READ_WRITE_OP || state == AsyncState.STARTING ||
+                state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETE_PENDING ||
+                state == AsyncState.COMPLETING || state == AsyncState.MUST_DISPATCH ||
+                state == AsyncState.DISPATCH_PENDING || state == AsyncState.DISPATCHING) {
+            return false;
+        }
+        asyncOperation();
+        return true;
+    }
+
+    /*
      * Async has been processed. Whether or not to enter a long poll depends on current state. For example, as per
      * SRV.2.3.3.3 can now process calls to complete() or dispatch().
      */

@@ -229,7 +229,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     public final SocketState dispatch(SocketEvent status) throws IOException {
 
         if (status == SocketEvent.OPEN_WRITE && response.getWriteListener() != null) {
-            asyncStateMachine.asyncOperation();
+            if (!asyncStateMachine.asyncOperationForWriteNotification()) {
+                // The notification raced with async completion on another
+                // thread. Nothing to notify; returning LONG lets
+                // asyncPostProcess() complete the cycle as usual.
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace(sm.getString("abstractProcessor.lateWriteNotification",
+                            request.requestURI()));
+                }
+                return SocketState.LONG;
+            }
             try {
                 if (flushBufferedWrite()) {
                     return SocketState.LONG;
