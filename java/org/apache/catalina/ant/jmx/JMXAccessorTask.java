@@ -95,6 +95,12 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public static final String JMX_SERVICE_SUFFIX = "/jmxrmi";
 
+    /*
+     * Suffix of the project reference under which the JMX service URL of a connection stored under reference
+     * <em>refId</em> is recorded, to be able to detect later requests that explicitly specify a different target.
+     */
+    private static final String JMX_SERVICE_URL_REF_SUFFIX = "-jmx-service-url";
+
     // ----------------------------------------------------- Instance Variables
 
     private String name = null;
@@ -103,9 +109,14 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     private String url = null;
 
-    private String host = "localhost";
+    /*
+     * A null host or port means the attribute was not specified. The defaults (localhost and 8050) are applied when
+     * the JMX service URL is built, so an explicitly specified value can be detected and compared against an existing
+     * connection reference.
+     */
+    private String host = null;
 
-    private String port = "8050";
+    private String port = null;
 
     private String password = null;
 
@@ -436,8 +447,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      *
      * @param url      URL to be used for the JMX connection (if specified, it is a complete URL so host and port will
      *                     not be used)
-     * @param host     Host name of the JMX server
-     * @param port     Port number for the JMX server
+     * @param host     Host name of the JMX server ({@code null} selects the default host)
+     * @param port     Port number for the JMX server ({@code null} selects the default port)
      * @param username User name for the connection
      * @param password Credentials corresponding to the specified user
      *
@@ -450,12 +461,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public static JMXConnector createJMXConnector(String url, String host, String port, String username,
             String password) throws MalformedURLException, IOException {
-        String urlForJMX;
-        if (url != null) {
-            urlForJMX = url;
-        } else {
-            urlForJMX = JMX_SERVICE_PREFIX + host + ":" + port + JMX_SERVICE_SUFFIX;
-        }
+        String urlForJMX = resolveJMXServiceURL(url, host, port);
         Map<String,String[]> environment = null;
         if (username != null && password != null) {
             String[] credentials = new String[2];
@@ -465,6 +471,30 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
         return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment);
+    }
+
+    /*
+     * Build the JMX service URL from the connection parameters, applying the default host and port when they are not
+     * specified.
+     */
+    private static String resolveJMXServiceURL(String url, String host, String port) {
+        if (url != null) {
+            return url;
+        }
+        String effectiveHost = host != null ? host : "localhost";
+        String effectivePort = port != null ? port : "8050";
+        return JMX_SERVICE_PREFIX + effectiveHost + ":" + effectivePort + JMX_SERVICE_SUFFIX;
+    }
+
+    /*
+     * The JMX service URL targeted by the given connection parameters, or null when no target was specified at all
+     * (in which case the parameters say nothing about which server the caller wants to reach).
+     */
+    private static String specifiedJMXServiceURL(String url, String host, String port) {
+        if (url == null && host == null && port == null) {
+            return null;
+        }
+        return resolveJMXServiceURL(url, host, port);
     }
 
     /**
@@ -515,18 +545,32 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         boolean isRef = project != null && refId != null && !refId.isEmpty();
         if (isRef) {
             Object pref = project.getReference(refId);
-            try {
-                jmxServerConnection = (MBeanServerConnection) pref;
-            } catch (ClassCastException cce) {
-                project.log("wrong object reference " + refId + " - " + pref.getClass());
-                return null;
+            if (pref != null) {
+                try {
+                    jmxServerConnection = (MBeanServerConnection) pref;
+                } catch (ClassCastException cce) {
+                    project.log("wrong object reference " + refId + " - " + pref.getClass());
+                    return null;
+                }
+            }
+            if (jmxServerConnection != null) {
+                // The reference already holds an open connection and is reused. If this call explicitly specifies a
+                // different target, the explicit parameters would be silently ignored, so fail instead.
+                String specified = specifiedJMXServiceURL(url, host, port);
+                Object openedTo = project.getReference(refId + JMX_SERVICE_URL_REF_SUFFIX);
+                if (specified != null && openedTo != null && !specified.equals(openedTo)) {
+                    throw new BuildException("The JMX connection reference '" + refId + "' already refers to a "
+                            + "connection to '" + openedTo + "'. This task specifies a connection to '" + specified
+                            + "'. Open the second server under a different ref or omit the connection parameters "
+                            + "to reuse the existing connection.");
+                }
+                return jmxServerConnection;
             }
         }
-        if (jmxServerConnection == null) {
-            jmxServerConnection = createJMXConnection(url, host, port, username, password);
-        }
+        jmxServerConnection = createJMXConnection(url, host, port, username, password);
         if (isRef && jmxServerConnection != null) {
             project.addReference(refId, jmxServerConnection);
+            project.addReference(refId + JMX_SERVICE_URL_REF_SUFFIX, resolveJMXServiceURL(url, host, port));
         }
         return jmxServerConnection;
     }

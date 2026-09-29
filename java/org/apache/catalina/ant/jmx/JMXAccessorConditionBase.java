@@ -38,8 +38,13 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
     }
 
     private String url = null;
-    private String host = "localhost";
-    private String port = "8050";
+    /*
+     * A null host or port means the attribute was not specified. The defaults (localhost and 8050) are applied when
+     * the JMX service URL is built, so an explicitly specified value can be detected and compared against an existing
+     * connection reference.
+     */
+    private String host = null;
+    private String port = null;
     private String password = null;
     private String username = null;
     private String name = null;
