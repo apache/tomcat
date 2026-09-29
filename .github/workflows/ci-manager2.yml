@@ -50,7 +50,7 @@ jobs:
         distribution: zulu
     - name: Compile Tomcat
       run: |
-        ant -noinput
+        ant -noinput deploy test-compile
     - name: Build
       run: |
         ant -noinput deploy test
