@@ -97,7 +97,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         ClassLoader oldCL = currentThread.getContextClassLoader();
         currentThread.setContextClassLoader(ValidatorTask.class.getClassLoader());
 
-        Digester digester = DigesterFactory.newDigester(true, true, null, false);
+        Digester digester = DigesterFactory.newDigester(true, true, null, true);
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()))) {
             InputSource is = new InputSource(file.toURI().toURL().toExternalForm());
             is.setByteStream(stream);
