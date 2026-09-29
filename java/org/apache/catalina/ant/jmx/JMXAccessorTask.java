@@ -125,6 +125,12 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     private final Properties properties = new Properties();
 
+    /*
+     * Connector owned by this task for the duration of a single execution. Only set when the connection was created
+     * by this task and is not shared via a project reference, so it can be closed when the task completes.
+     */
+    private JMXConnector jmxConnector;
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -398,6 +404,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     handleErrorOutput(e.getMessage());
                 }
             } finally {
+                closeJMXConnector();
                 closeRedirector();
             }
         }
@@ -420,6 +427,29 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public static MBeanServerConnection createJMXConnection(String url, String host, String port, String username,
             String password) throws MalformedURLException, IOException {
+        return createJMXConnector(url, host, port, username, password).getMBeanServerConnection();
+    }
+
+    /**
+     * Create a new JMX Connection with auth when username and password is set. The caller is responsible for closing
+     * the returned connector.
+     *
+     * @param url      URL to be used for the JMX connection (if specified, it is a complete URL so host and port will
+     *                     not be used)
+     * @param host     Host name of the JMX server
+     * @param port     Port number for the JMX server
+     * @param username User name for the connection
+     * @param password Credentials corresponding to the specified user
+     *
+     * @throws MalformedURLException Invalid URL specified
+     * @throws IOException           Other connection error
+     *
+     * @return the JMX connector
+     *
+     * @since 12.0.x
+     */
+    public static JMXConnector createJMXConnector(String url, String host, String port, String username,
+            String password) throws MalformedURLException, IOException {
         String urlForJMX;
         if (url != null) {
             urlForJMX = url;
@@ -434,9 +464,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             environment = new HashMap<>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
-        // FIXME: Referencing JMXConnector instead of MBeanServerConnection is needed to close the connection
-        return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment).getMBeanServerConnection();
-
+        return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment);
     }
 
     /**
@@ -515,28 +543,46 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     protected MBeanServerConnection getJMXConnection() throws MalformedURLException, IOException {
         MBeanServerConnection jmxServerConnection = null;
-        if (isUseRef()) {
-            Object pref;
-            if (getProject() != null) {
-                pref = getProject().getReference(getRef());
-                if (pref != null) {
-                    try {
-                        jmxServerConnection = (MBeanServerConnection) pref;
-                    } catch (ClassCastException cce) {
-                        getProject().log("Wrong object reference " + getRef() + " - " + pref.getClass());
-                        return null;
-                    }
+        boolean refAvailable = isUseRef() && getProject() != null;
+        if (refAvailable) {
+            Object pref = getProject().getReference(getRef());
+            if (pref != null) {
+                try {
+                    jmxServerConnection = (MBeanServerConnection) pref;
+                } catch (ClassCastException cce) {
+                    getProject().log("Wrong object reference " + getRef() + " - " + pref.getClass());
+                    return null;
                 }
             }
-            if (jmxServerConnection == null) {
+        }
+        if (jmxServerConnection == null) {
+            if (refAvailable) {
+                // A reference is available: the connection is stored in the project for reuse by later tasks in
+                // the same build and is intentionally left open, so this task does not own it.
                 jmxServerConnection = accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
                         getPassword(), getRef());
+            } else {
+                // No reference to store it in: this task owns the connection and closes it when it completes.
+                jmxConnector = createJMXConnector(getUrl(), getHost(), getPort(), getUsername(), getPassword());
+                jmxServerConnection = jmxConnector.getMBeanServerConnection();
             }
-        } else {
-            jmxServerConnection = accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
-                    getPassword(), null);
         }
         return jmxServerConnection;
+    }
+
+    /**
+     * Close the JMX connection owned by this task, if any. Connections shared through a project reference are not
+     * owned by this task and are left open for reuse.
+     */
+    private void closeJMXConnector() {
+        if (jmxConnector != null) {
+            try {
+                jmxConnector.close();
+            } catch (IOException e) {
+                // Ignore errors while closing
+            }
+            jmxConnector = null;
+        }
     }
 
     /**
