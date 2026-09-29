@@ -27,6 +27,8 @@ import javax.management.openmbean.TabularType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tools.ant.BuildException;
+
 public class TestJMXAccessorTask {
 
     @Test
@@ -41,6 +43,49 @@ public class TestJMXAccessorTask {
         Assert.assertEquals("1", task.getProperty("tabular.1.id"));
         Assert.assertEquals("beta", task.getProperty("tabular.1.details.name"));
         Assert.assertEquals("11", task.getProperty("tabular.1.count"));
+    }
+
+
+    @Test
+    public void testConvertStringToType() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        Assert.assertEquals("x", task.convertStringToType("x", "java.lang.String"));
+        Assert.assertEquals(Integer.valueOf(7), task.convertStringToType("7", "int"));
+        Assert.assertEquals(Long.valueOf(7), task.convertStringToType("7", "java.lang.Long"));
+        Assert.assertEquals(Boolean.TRUE, task.convertStringToType("true", "boolean"));
+        Assert.assertEquals(Double.valueOf(1.5), task.convertStringToType("1.5", "double"));
+    }
+
+
+    @Test
+    public void testConvertStringToTypeInvalid() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        assertConvertFails(task, "x", "int");
+        assertConvertFails(task, "x", "java.lang.Long");
+        assertConvertFails(task, "1.5", "java.lang.Integer");
+        assertConvertFails(task, "x", "javax.management.ObjectName");
+    }
+
+
+    @Test
+    public void testConvertStringToTypeUnsupportedType() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        assertConvertFails(task, "x", "java.lang.Int");
+        assertConvertFails(task, "x", "java.util.List");
+        assertConvertFails(task, "x", null);
+    }
+
+
+    private static void assertConvertFails(JMXAccessorTask task, String value, String type) {
+        try {
+            task.convertStringToType(value, type);
+            Assert.fail("Expected a BuildException for value '" + value + "' and type '" + type + "'");
+        } catch (BuildException expected) {
+            // Expected
+        }
     }
 
 
