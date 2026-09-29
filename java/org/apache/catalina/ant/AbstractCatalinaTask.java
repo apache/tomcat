@@ -97,6 +97,32 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
 
     /**
+     * The timeout, in seconds, used when establishing a connection to the server and when reading data from it. The
+     * default value of zero means no timeout, in which case an unresponsive server may cause the build to block
+     * indefinitely.
+     */
+    protected int timeout = 0;
+
+    /**
+     * Returns the connection and read timeout, in seconds.
+     *
+     * @return the timeout in seconds; zero means no timeout
+     */
+    public int getTimeout() {
+        return this.timeout;
+    }
+
+    /**
+     * Sets the connection and read timeout, in seconds.
+     *
+     * @param timeout the timeout in seconds; zero (the default) means no timeout
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+
+    /**
      * The URL of the <code>Manager</code> application to be used.
      */
     protected String url = "http://localhost:8080/manager/text";
@@ -227,6 +253,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setAllowUserInteraction(false);
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
+            if (timeout > 0) {
+                hconn.setConnectTimeout(timeout * 1000);
+                hconn.setReadTimeout(timeout * 1000);
+            }
 
             // Set up authorization with our credentials
             Authenticator authenticator = new TaskAuthenticator(username, password);
@@ -346,6 +376,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setAllowUserInteraction(false);
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
+        if (timeout > 0) {
+            hconn.setConnectTimeout(timeout * 1000);
+            hconn.setReadTimeout(timeout * 1000);
+        }
         hconn.setDoOutput(false);
         hconn.setAuthenticator(authenticator);
         hconn.setRequestMethod(Method.OPTIONS);
