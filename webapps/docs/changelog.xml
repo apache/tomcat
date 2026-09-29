@@ -4489,6 +4489,11 @@
         Ensure that the non-blocking write buffer is empty before sending an AJP
         end response message. (markt)
       </fix>
+      <fix>
+        Avoid very rare race between async write notification and completion.
+        Skip the write notification in these cases since it would be useless.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
