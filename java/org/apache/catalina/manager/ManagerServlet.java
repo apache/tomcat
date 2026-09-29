@@ -1307,7 +1307,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int expired = 0;
             for (Session session : sessions) {
                 int time = (int) (session.getIdleTimeInternal() / 1000L);
-                if (idle >= 0 && time >= idle * 60) {
+                if (idle >= 0 && time >= (long) idle * 60) {
                     session.expire();
                     expired++;
                 }
