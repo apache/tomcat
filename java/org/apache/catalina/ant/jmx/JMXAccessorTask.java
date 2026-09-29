@@ -610,65 +610,57 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @param valueType The type
      *
      * @return The converted object
+     *
+     * @throws BuildException The value cannot be converted to the requested type, or the type is not supported
      */
     protected Object convertStringToType(String value, String valueType) {
         if ("java.lang.String".equals(valueType)) {
             return value;
         }
+        if (valueType == null) {
+            throw new BuildException("Unable to convert value '" + value + "': no target type available");
+        }
 
-        Object convertValue = value;
         if ("java.lang.Integer".equals(valueType) || "int".equals(valueType)) {
             try {
-                convertValue = Integer.valueOf(value);
+                return Integer.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to integer:" + value);
-                }
+                throw new BuildException("Unable to convert to integer:" + value, ex);
             }
         } else if ("java.lang.Long".equals(valueType) || "long".equals(valueType)) {
             try {
-                convertValue = Long.valueOf(value);
+                return Long.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to long:" + value);
-                }
+                throw new BuildException("Unable to convert to long:" + value, ex);
             }
         } else if ("java.lang.Boolean".equals(valueType) || "boolean".equals(valueType)) {
-            convertValue = Boolean.valueOf(value);
+            return Boolean.valueOf(value);
         } else if ("java.lang.Float".equals(valueType) || "float".equals(valueType)) {
             try {
-                convertValue = Float.valueOf(value);
+                return Float.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to float:" + value);
-                }
+                throw new BuildException("Unable to convert to float:" + value, ex);
             }
         } else if ("java.lang.Double".equals(valueType) || "double".equals(valueType)) {
             try {
-                convertValue = Double.valueOf(value);
+                return Double.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to double:" + value);
-                }
+                throw new BuildException("Unable to convert to double:" + value, ex);
             }
         } else if ("javax.management.ObjectName".equals(valueType) || "name".equals(valueType)) {
             try {
-                convertValue = new ObjectName(value);
+                return new ObjectName(value);
             } catch (MalformedObjectNameException e) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to ObjectName:" + value);
-                }
+                throw new BuildException("Unable to convert to ObjectName:" + value, e);
             }
         } else if ("java.net.InetAddress".equals(valueType)) {
             try {
-                convertValue = InetAddress.getByName(value);
+                return InetAddress.getByName(value);
             } catch (UnknownHostException exc) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to resolve host name:" + value);
-                }
+                throw new BuildException("Unable to resolve host name:" + value, exc);
             }
         }
-        return convertValue;
+        throw new BuildException("Unsupported conversion type '" + valueType + "' for value '" + value + "'");
     }
 
     /**
