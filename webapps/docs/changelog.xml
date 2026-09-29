@@ -154,6 +154,10 @@
         <pr>1073</pr>: Fix possible corruption when using HTTP/2 and async IO
         on uploads. Submitted by Tim Burke. (remm)
       </fix>
+      <fix>
+        Fix a timing issue that could cause large non-blocking writes to stall
+        for AJP connections. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
