@@ -179,6 +179,10 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         } else {
             if (isConvert()) {
                 String mType = getMBeanAttributeType(jmxServerConnection, name, attribute);
+                if (mType == null) {
+                    throw new BuildException(
+                            "Attribute '" + attribute + "' not found on MBean '" + name + "' for set");
+                }
                 realValue = convertStringToType(value, mType);
             } else {
                 realValue = value;
