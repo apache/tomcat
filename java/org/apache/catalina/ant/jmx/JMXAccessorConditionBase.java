@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
 
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
@@ -45,6 +46,12 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
     private String attribute;
     private String value;
     private String ref = "jmx.server";
+
+    /*
+     * Connector created for the current evaluation when the connection is not shared through a project reference. It
+     * is closed once the value has been read so repeated waitfor evaluations do not accumulate connections.
+     */
+    private JMXConnector jmxConnector;
 
     /**
      * Get the attribute name.
@@ -217,8 +224,29 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
      * @throws IOException           Connection error
      */
     protected MBeanServerConnection getJMXConnection() throws MalformedURLException, IOException {
-        return JMXAccessorTask.accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
-                getPassword(), ref);
+        if (ref != null && !ref.isEmpty() && getProject() != null) {
+            // Reuse or establish a shared connection stored in the project reference; this condition does not own it.
+            return JMXAccessorTask.accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
+                    getPassword(), ref);
+        }
+        // No reference to store it in: this condition owns the connection and closes it after the evaluation.
+        jmxConnector = JMXAccessorTask.createJMXConnector(getUrl(), getHost(), getPort(), getUsername(), getPassword());
+        return jmxConnector.getMBeanServerConnection();
+    }
+
+    /**
+     * Close the JMX connection owned by this condition, if any. Connections shared through a project reference are
+     * left open for reuse.
+     */
+    private void closeJMXConnector() {
+        if (jmxConnector != null) {
+            try {
+                jmxConnector.close();
+            } catch (IOException e) {
+                // Ignore errors while closing
+            }
+            jmxConnector = null;
+        }
     }
 
     /**
@@ -228,7 +256,8 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
      */
     protected String accessJMXValue() {
         try {
-            Object result = getJMXConnection().getAttribute(new ObjectName(name), attribute);
+            MBeanServerConnection jmxServerConnection = getJMXConnection();
+            Object result = jmxServerConnection.getAttribute(new ObjectName(name), attribute);
             if (result != null) {
                 return result.toString();
             }
@@ -237,6 +266,8 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
              * Exceptions are ignored for compatibility with the waitFor task when waiting for the server to start. If
              * the exception was thrown the build task would fail rather than wait.
              */
+        } finally {
+            closeJMXConnector();
         }
         return null;
     }
