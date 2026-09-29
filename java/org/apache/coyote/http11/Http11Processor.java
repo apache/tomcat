@@ -161,7 +161,7 @@ public class Http11Processor extends AbstractProcessor {
      * Creates a new HTTP/1.1 processor.
      *
      * @param protocol the protocol handler
-     * @param adapter the adapter to pass requests to
+     * @param adapter  the adapter to pass requests to
      */
     @SuppressWarnings("deprecation")
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
@@ -351,7 +351,10 @@ public class Http11Processor extends AbstractProcessor {
                         Request upgradeRequest = null;
                         try {
                             upgradeRequest = cloneRequest(request);
-                            // Make sure any remaining body is swallowed before we start processing the upgraded protocol
+                            /*
+                             * Make sure any remaining body is swallowed before we start processing the upgraded
+                             * protocol.
+                             */
                             inputBuffer.endRequest();
                         } catch (ByteChunk.BufferOverflowException ioe) {
                             response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
@@ -1163,13 +1166,12 @@ public class Http11Processor extends AbstractProcessor {
     protected boolean flushBufferedWrite() throws IOException {
         if (outputBuffer.hasDataToWrite()) {
             if (outputBuffer.flushBuffer(false)) {
-                // The buffer wasn't fully flushed so re-register the
-                // socket for write. Note this does not go via the
-                // Response since the write registration state at
-                // that level should remain unchanged. Once the buffer
-                // has been emptied then the code below will call
-                // Adaptor.asyncDispatch() which will enable the
-                // Response to respond to this event.
+                /*
+                 * The buffer wasn't fully flushed so re-register the socket for write. Note this does not go via the
+                 * Response since the write registration state at that level should remain unchanged. Once the buffer
+                 * has been emptied then the code below will call Adaptor.asyncDispatch() which will enable the Response
+                 * to respond to this event.
+                 */
                 outputBuffer.registerWriteInterest();
                 return true;
             }
