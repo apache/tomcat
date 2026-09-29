@@ -274,6 +274,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     hconn.setRequestProperty("Content-Length", "" + contentLength);
 
                     hconn.setFixedLengthStreamingMode(contentLength);
+                } else {
+                    // The length is unknown. Use chunked streaming to avoid the
+                    // default HttpURLConnection behaviour of buffering the
+                    // entire request body in memory.
+                    hconn.setChunkedStreamingMode(0);
                 }
             } else {
                 hconn.setDoOutput(false);
