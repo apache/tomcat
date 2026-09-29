@@ -335,6 +335,20 @@
         Skip the write notification in these cases since it would be useless.
         (remm)
       </fix>
+      <fix>
+        Fix a timing issue that could cause large non-blocking writes to stall
+        for AJP connections. (markt)
+      </fix>
+      <fix>
+        Improve the handling of the requirements for response closure in section
+        5.7 of the Servlet specification. If a non-blocking write writes exactly
+        content-length bytes to the response, allow that write to complete in a
+        non-blocking manner before the response is closed. (markt)
+      </fix>
+      <fix>
+        Ensure that the non-blocking write buffer is empty before sending an AJP
+        end response message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
