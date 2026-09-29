@@ -46,7 +46,23 @@
   <property name="version"         value="${version.major}.${version.minor}.${version.build}.${version.patch}${version.suffix}"/>
   <property name="version.major.minor" value="${version.major}.${version.minor}"/>
 
+  <property name="test.basedir"          value="${tomcat.output}"/>
+  <property name="test.reports"          value="${test.basedir}/logs"/>
+
   <property name="compile.release" value="21"/>
+
+  <!-- Default JUnit log output formatter -->
+  <property name="junit.formatter.type" value="plain" />
+  <property name="junit.formatter.usefile" value="true" />
+  <property name="junit.formatter.extension" value=".txt" />
+
+  <!-- Configure JUnit output based on test.silent property -->
+  <condition property="junit.printsummary" value="off" else="yes">
+    <istrue value="${test.silent}"/>
+  </condition>
+  <condition property="junit.showoutput" value="false" else="${test.verbose}">
+    <istrue value="${test.silent}"/>
+  </condition>
 
   <!-- JAR / WAR artifacts -->
   <property name="manager2.jar"      value="${tomcat.output}/manager2.jar"/>
@@ -266,10 +282,10 @@
   <target name="test" depends="deploy,compile-test"
           description="Run the integration tests against the main build">
     <mkdir dir="${test.reports}"/>
-    <junit printsummary="withOutAndErr" fork="yes" showoutput="on"
+    <junit printsummary="${junit.printsummary}" fork="yes" showoutput="${junit.showoutput}"
            errorproperty="test.result.error"
            failureproperty="test.result.failure"
-           haltonfailure="true"
+           haltonfailure="${test.haltonfailure}"
            threads="${test.threads}">
       <jvmarg value="-Dfile.encoding=UTF-8"/>
       <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
@@ -283,8 +299,14 @@
       <sysproperty key="tomcat.test.basedir" value="${tomcat.build}"/>
       <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}"/>
       <sysproperty key="tomcat.test.reports" value="${test.reports}"/>
-      <formatter type="brief" usefile="true" extension=".M2"/>
-      <batchtest todir="${test.reports}" skipNonTests="true">
+      <formatter type="${junit.formatter.type}"
+                 usefile="${junit.formatter.usefile}"
+                 extension="${junit.formatter.extension}" />
+
+      <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
+      <test todir="${test.reports}" name="${test.entry}" if="test.entry" unless="test.entry.methods" />
+      <test todir="${test.reports}" name="${test.entry}" methods="${test.entry.methods}" if="test.entry.methods" />
+      <batchtest todir="${test.reports}" skipNonTests="true" unless="test.entry">
         <fileset dir="${basedir}/src/test/java">
           <include name="**/Test*.java"/>
         </fileset>

@@ -51,9 +51,13 @@ jobs:
     - name: Compile Tomcat
       run: |
         ant -noinput deploy test-compile
-    - name: Build
+    - name: Build manager2 Webapp
       run: |
-        ant -noinput deploy test
+        ant -noinput deploy
+      working-directory: modules/manager2
+    - name: manager2 Webapp Tests
+      run: |
+        ant -noinput test
       working-directory: modules/manager2
 
     - name: Upload logs
@@ -63,6 +67,6 @@ jobs:
         name: JDK${{ matrix.java }}-${{ matrix.os }}-logs
         path: |
           hs_err_*.log
-          modules/manager2/output/reports/TEST*.txt
+          modules/manager2/output/logs/TEST*.txt
         retention-days: 7
 
