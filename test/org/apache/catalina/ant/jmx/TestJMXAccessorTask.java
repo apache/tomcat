@@ -16,6 +16,14 @@
  */
 package org.apache.catalina.ant.jmx;
 
+import java.lang.management.ManagementFactory;
+import java.net.ServerSocket;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerConnection;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
@@ -23,11 +31,15 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 public class TestJMXAccessorTask {
 
@@ -85,6 +97,57 @@ public class TestJMXAccessorTask {
             Assert.fail("Expected a BuildException for value '" + value + "' and type '" + type + "'");
         } catch (BuildException expected) {
             // Expected
+        }
+    }
+
+
+    /*
+     * A cached connection reference is reused. If the caller explicitly specifies a different target than the one the
+     * reference was opened to, a BuildException is raised instead of the explicit parameters being silently ignored.
+     */
+    @Test
+    public void testAccessJMXConnectionReuseAndMismatch() throws Exception {
+        int port = getAvailablePort();
+        Registry registry = LocateRegistry.createRegistry(port);
+        MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+        JMXServiceURL serviceUrl = new JMXServiceURL(
+                JMXAccessorTask.JMX_SERVICE_PREFIX + "localhost:" + port + JMXAccessorTask.JMX_SERVICE_SUFFIX);
+        JMXConnectorServer connectorServer =
+                JMXConnectorServerFactory.newJMXConnectorServer(serviceUrl, null, mbeanServer);
+        connectorServer.start();
+        try {
+            Project project = new Project();
+            String ref = "jmx.server.test";
+            String host = "localhost";
+            String openPort = Integer.toString(port);
+
+            // First call opens the connection and stores it under the reference.
+            MBeanServerConnection first =
+                    JMXAccessorTask.accessJMXConnection(project, null, host, openPort, null, null, ref);
+            Assert.assertNotNull(first);
+
+            // Reuse with no explicit target: the cached connection is returned.
+            MBeanServerConnection reused =
+                    JMXAccessorTask.accessJMXConnection(project, null, null, null, null, null, ref);
+            Assert.assertSame(first, reused);
+
+            // Explicitly specifying a different port than the open connection must fail rather than be ignored.
+            try {
+                JMXAccessorTask.accessJMXConnection(project, null, host, "1", null, null, ref);
+                Assert.fail("Expected a BuildException for an explicit conflicting target");
+            } catch (BuildException expected) {
+                // Expected
+            }
+        } finally {
+            connectorServer.stop();
+            UnicastRemoteObject.unexportObject(registry, true);
+        }
+    }
+
+
+    private static int getAvailablePort() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
         }
     }
 
