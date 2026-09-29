@@ -345,6 +345,10 @@
         content-length bytes to the response, allow that write to complete in a
         non-blocking manner before the response is closed. (markt)
       </fix>
+      <fix>
+        Ensure that the non-blocking write buffer is empty before sending an AJP
+        end response message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
