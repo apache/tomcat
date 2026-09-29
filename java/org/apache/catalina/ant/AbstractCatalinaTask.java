@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.ant;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -297,6 +298,32 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     } catch (Exception e) {
                     }
                 }
+            }
+
+            int responseCode = hconn.getResponseCode();
+            if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                // For error responses, getInputStream() below would throw and
+                // the response body - which typically explains the error -
+                // would be discarded. Include its first line in the message.
+                String errorBody = null;
+                try (InputStream errorStream = hconn.getErrorStream()) {
+                    if (errorStream != null) {
+                        BufferedReader errorReader = new BufferedReader(
+                                new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+                        errorBody = errorReader.readLine();
+                    }
+                }
+                StringBuilder message = new StringBuilder();
+                message.append("Server returned HTTP response code: ");
+                message.append(responseCode);
+                message.append(" for URL: ");
+                message.append(url);
+                message.append(command);
+                if (errorBody != null && !errorBody.isEmpty()) {
+                    message.append(" - ");
+                    message.append(errorBody);
+                }
+                throw new IOException(message.toString());
             }
 
             // Process the response message
