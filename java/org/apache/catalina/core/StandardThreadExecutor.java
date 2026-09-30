@@ -415,12 +415,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
 
 
     @Override
-    public void close() {
-        // Controlled by Lifecycle instead
-    }
-
-
-    @Override
     public void shutdown() {
         // Controlled by Lifecycle instead
     }

@@ -119,12 +119,6 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
 
 
     @Override
-    public void close() {
-        // Controlled by Lifecycle instead
-    }
-
-
-    @Override
     public void shutdown() {
         // Controlled by Lifecycle instead
     }
