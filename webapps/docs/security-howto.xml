@@ -398,6 +398,16 @@
       increased privileges to the web application. Note that if the security
       manager is enabled that the <strong>deployXML</strong> attribute will
       default to <code>false</code>.</p>
+
+      <p>Using name-based virtual hosts on a secured connection requires careful
+      configuration of the names specified in a single certificate or the use of
+      SNI. SNI allows multiple certificates with different names to be
+      associated with a single TLS connector. Administrators should be aware
+      that virtual host matching using the HTTP host name header and TLS
+      configuration (including certificate) matching using SNI are completely
+      separate processes and that it is likely that they will want to keep the
+      two configurations synchronized.</p>
+
     </subsection>
 
     <subsection name="Context">
