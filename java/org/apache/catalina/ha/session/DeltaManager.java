@@ -949,7 +949,11 @@ public class DeltaManager extends ClusterManagerBase {
             if (enableStatistics) {
                 counterSend_EVT_GET_ALL_SESSIONS.incrementAndGet();
             }
+            // Reset both flags that terminate the wait for the state transfer,
+            // so that a repeated transfer (context restart or JMX resync) does
+            // not exit immediately on a response from a previous transfer
             stateTransferred = false;
+            noContextManagerReceived = false;
             // FIXME This send call block the deploy thread, when sender waitForAck is enabled
             try {
                 synchronized (receivedMessageQueue) {
