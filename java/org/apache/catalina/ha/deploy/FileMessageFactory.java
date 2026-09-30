@@ -146,7 +146,9 @@ public class FileMessageFactory {
             out = new FileOutputStream(f);
         } else {
             size = file.length();
-            totalNrOfMessages = (size / READ_SIZE) + 1;
+            // The number of messages the file is split into. One full message
+            // per READ_SIZE bytes plus one for a non-empty remainder
+            totalNrOfMessages = (size + READ_SIZE - 1) / READ_SIZE;
             in = new FileInputStream(f);
         } // end if
         lastModified = System.currentTimeMillis();
