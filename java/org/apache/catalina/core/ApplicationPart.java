@@ -161,7 +161,12 @@ public class ApplicationPart implements Part {
                         // RFC 6266. This is either a token or a quoted-string
                         if (fileName.indexOf('\\') > -1) {
                             // This is a quoted-string
-                            fileName = HttpParser.unquote(fileName.trim());
+                            String unquoted = HttpParser.unquote(fileName.trim());
+                            // If the quoted-string was invalid (e.g. ended
+                            // with a backslash) fall back to the raw value to
+                            // remain consistent with the classifier used by
+                            // the multipart parser (FileUploadBase.getFileName)
+                            fileName = unquoted != null ? unquoted : fileName.trim();
                         } else {
                             // This is a token
                             fileName = fileName.trim();
