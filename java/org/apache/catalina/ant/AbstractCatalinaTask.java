@@ -298,31 +298,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 }
             }
 
-            int responseCode = hconn.getResponseCode();
-            if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                // For error responses, getInputStream() below would throw and
-                // the response body - which typically explains the error -
-                // would be discarded. Include its first line in the message.
-                String errorBody = null;
-                try (InputStream errorStream = hconn.getErrorStream()) {
-                    if (errorStream != null) {
-                        BufferedReader errorReader = new BufferedReader(
-                                new InputStreamReader(errorStream, StandardCharsets.UTF_8));
-                        errorBody = errorReader.readLine();
-                    }
-                }
-                StringBuilder message = new StringBuilder();
-                message.append("Server returned HTTP response code: ");
-                message.append(responseCode);
-                message.append(" for URL: ");
-                message.append(url);
-                message.append(command);
-                if (errorBody != null && !errorBody.isEmpty()) {
-                    message.append(" - ");
-                    message.append(errorBody);
-                }
-                throw new IOException(message.toString());
-            }
+            // For error responses, getInputStream() below would throw and
+            // the response body - which typically explains the error -
+            // would be discarded. Include its first line in the message.
+            reportErrorResponse(hconn, command);
 
             // Process the response message
             reader = new InputStreamReader(hconn.getInputStream(), StandardCharsets.UTF_8);
@@ -408,6 +387,40 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     }
 
 
+    /**
+     * Checks the response status code and throws an IOException with the response body in the message if the status
+     * code is 400 or above.
+     *
+     * @param hconn   The HTTP connection to be checked
+     * @param command The command associated with the request
+     *
+     * @throws IOException if the response has a status code of 400 or above
+     */
+    protected void reportErrorResponse(HttpURLConnection hconn, String command) throws IOException {
+        int responseCode = hconn.getResponseCode();
+        if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+            String errorBody = null;
+            try (InputStream errorStream = hconn.getErrorStream()) {
+                if (errorStream != null) {
+                    BufferedReader errorReader = new BufferedReader(
+                            new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+                    errorBody = errorReader.readLine();
+                }
+            }
+            StringBuilder message = new StringBuilder();
+            message.append("Server returned HTTP response code: ");
+            message.append(responseCode);
+            message.append(" for URL: ");
+            message.append(url);
+            message.append(command);
+            if (errorBody != null && !errorBody.isEmpty()) {
+                message.append(" - ");
+                message.append(errorBody);
+            }
+            throw new IOException(message.toString());
+        }
+    }
+
     /*
      * This is a hack. We need to use streaming to avoid OOME on large uploads. We'd like to use
      * Authenticator.setDefault() for authentication as the JRE then provides the DIGEST client implementation. However,
@@ -437,6 +450,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
         // Establish the connection with the server
         hconn.connect();
+
+        // For error responses, getInputStream() below would throw and
+        // the response body - which typically explains the error -
+        // would be discarded. Include its first line in the message.
+        reportErrorResponse(hconn, " pre-authentication");
 
         // Swallow response message
         try (InputStream is = hconn.getInputStream()) {
