@@ -306,10 +306,11 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected void dispatchNonBlockingRead() {
+    protected boolean dispatchNonBlockingRead() {
         if (available(true) > 0) {
-            super.dispatchNonBlockingRead();
+            return super.dispatchNonBlockingRead();
         }
+        return true;
     }
 
 
