@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -278,6 +279,8 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @Override
         public Enumeration<String> getAttributeNames() {
             Set<String> names = new HashSet<>(tomcatAttributes.keySet());
+            // Names that are present in both stores are only reported once
+            names.removeAll(attributes.keySet());
 
             return new MultiEnumeration<String>(
                     new Enumeration[] { super.getAttributeNames(), Collections.enumeration(names) });
@@ -321,8 +324,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                     return enumeration.nextElement();
                 }
             }
-            return null;
-
+            throw new NoSuchElementException();
         }
     }
 
