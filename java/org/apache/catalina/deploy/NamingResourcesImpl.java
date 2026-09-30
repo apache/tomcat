@@ -269,13 +269,22 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
                 }
             } else if (rl != null) {
                 // Link. Need to look at the global resources
-                NamingResourcesImpl global = getServer().getGlobalNamingResources();
-                if (global.findEnvironment(rl.getGlobal()) != null) {
-                    if (global.findEnvironment(rl.getGlobal()).getOverride()) {
-                        removeResourceLink(environment.getName());
-                    } else {
-                        return;
-                    }
+                Server server = getServer();
+                if (server == null) {
+                    return;
+                }
+                NamingResourcesImpl global = server.getGlobalNamingResources();
+                ContextEnvironment globalEnv = global.findEnvironment(rl.getGlobal());
+                if (globalEnv != null && globalEnv.getOverride()) {
+                    removeResourceLink(environment.getName());
+                } else {
+                    // The link targets a global entry that may not be
+                    // overridden, or something that is not a global
+                    // environment at all (or is missing). In those cases the
+                    // existing link is retained. Adding the environment entry
+                    // as well would result in two entries sharing one JNDI
+                    // name.
+                    return;
                 }
             } else {
                 // It exists but it isn't an env or a res link...
