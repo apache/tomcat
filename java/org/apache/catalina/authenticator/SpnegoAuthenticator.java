@@ -324,7 +324,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                     log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
                 }
             } else {
-                log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
+                log.error(sm.getString("spnegoAuthenticator.clientLoginFail"), e);
             }
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
