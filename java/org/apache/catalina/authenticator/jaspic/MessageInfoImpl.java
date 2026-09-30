@@ -59,7 +59,9 @@ public class MessageInfoImpl implements MessageInfo {
     public MessageInfoImpl(HttpServletRequest request, HttpServletResponse response, boolean authMandatory) {
         this.request = request;
         this.response = response;
-        map.put(IS_MANDATORY, Boolean.valueOf(authMandatory));
+        if (authMandatory) {
+            map.put(IS_MANDATORY, Boolean.toString(authMandatory));
+        }
     }
 
     @Override
