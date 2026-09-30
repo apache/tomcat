@@ -450,7 +450,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        return false;
+        if (executor != null) {
+            return executor.awaitTermination(timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
     }
 
 
