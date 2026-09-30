@@ -185,6 +185,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.41. (markt)
       </update>
+      <update>
+        Update to NSIS 3.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -6778,9 +6781,6 @@
       <update>
         Update the internal fork of Apache Commons FileUpload to aa8eff6
         (2022-11-29, 2.0-SNAPSHOT). (markt)
-      </update>
-      <update>
-        Update to NSIS 3.13. (markt)
       </update>
     </changelog>
   </subsection>
