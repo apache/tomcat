@@ -995,10 +995,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Process response header packet and checks the status. Any other data is ignored.
      */
-    private Map<String, List<String>> validateResponseHeaders(TesterAjpMessage message, int expectedStatus,
+    static Map<String, List<String>> validateResponseHeaders(TesterAjpMessage message, int expectedStatus,
             String expectedMessage) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
@@ -1088,7 +1088,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertEquals(Boolean.valueOf(expectedReuse), Boolean.valueOf(reuse));
     }
 
-    private void validateCpong(TesterAjpMessage message) throws Exception {
+    static void validateCpong(TesterAjpMessage message) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
