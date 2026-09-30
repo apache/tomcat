@@ -21,10 +21,11 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestExecutorAwaitTermination {
+public class TestStandardThreadExecutor {
 
     @Test
-    public void testThreadExecutorAwaitTerminationNotStarted() throws Exception {
+    public void testAwaitTerminationNotStarted() throws Exception {
+        @SuppressWarnings("resource") // never started
         StandardThreadExecutor executor = new StandardThreadExecutor();
         try {
             executor.awaitTermination(0, TimeUnit.MILLISECONDS);
@@ -36,37 +37,12 @@ public class TestExecutorAwaitTermination {
 
 
     @Test
-    public void testThreadExecutorAwaitTerminationDelegates() throws Exception {
+    public void testAwaitTerminationDelegates() throws Exception {
+        @SuppressWarnings("resource") // stop() is called
         StandardThreadExecutor executor = new StandardThreadExecutor();
         executor.start();
         try {
             // The pool is running so termination has not been reached
-            Assert.assertFalse(executor.awaitTermination(0, TimeUnit.MILLISECONDS));
-        } finally {
-            executor.stop();
-        }
-    }
-
-
-    @Test
-    public void testVirtualThreadExecutorAwaitTerminationNotStarted() throws Exception {
-        StandardVirtualThreadExecutor executor = new StandardVirtualThreadExecutor();
-        try {
-            executor.awaitTermination(0, TimeUnit.MILLISECONDS);
-            Assert.fail("Expected an IllegalStateException before the executor is started");
-        } catch (IllegalStateException e) {
-            // Expected
-        }
-    }
-
-
-    @Test
-    public void testVirtualThreadExecutorAwaitTerminationDelegates() throws Exception {
-        StandardVirtualThreadExecutor executor = new StandardVirtualThreadExecutor();
-        executor.start();
-        try {
-            // The executor has not been shut down so termination has not been
-            // reached; the call must delegate rather than block indefinitely
             Assert.assertFalse(executor.awaitTermination(0, TimeUnit.MILLISECONDS));
         } finally {
             executor.stop();

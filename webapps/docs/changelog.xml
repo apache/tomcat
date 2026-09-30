@@ -349,6 +349,11 @@
         Ensure that the non-blocking write buffer is empty before sending an AJP
         end response message. (markt)
       </fix>
+      <fix>
+        Fix <code>CharChunk.indexOf(char)</code> so that it searches from the
+        start of the chunk rather than from twice the chunk's start offset
+        when the chunk does not begin at the start of its buffer. (breken-ai)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -386,6 +391,10 @@
         Add support for <code>java.util.Optional</code> to the empty operator.
         (markt)
       </add>
+      <fix>
+        Route <code>JspC</code> servlet context logging through Ant when used as
+        an Ant task. (sainadh777)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
@@ -471,6 +480,21 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         Update the internal fork of Apache Commons BCEL to 6.13.0. (markt)
+      </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.41. (markt)
+      </update>
+      <update>
+        Update to NSIS 3.13. (markt)
+      </update>
+      <update>
+        Update to Byte Buddy 1.18.14. (markt)
+      </update>
+      <update>
+        Update to Checkstyle 14.3.0. (markt)
+      </update>
+      <update>
+        Update to Bouncy Castle 1.8.6. (markt)
       </update>
     </changelog>
   </subsection>

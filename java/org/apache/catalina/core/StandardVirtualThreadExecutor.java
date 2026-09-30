@@ -117,6 +117,13 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
         return "type=Executor,name=" + getName();
     }
 
+
+    @Override
+    public void close() {
+        // Controlled by Lifecycle instead
+    }
+
+
     @Override
     public void shutdown() {
         // Controlled by Lifecycle instead
