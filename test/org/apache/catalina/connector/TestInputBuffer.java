@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.MalformedInputException;
@@ -135,6 +136,26 @@ public class TestInputBuffer extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testZeroLengthReadAtEof() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "ZeroRead", new ZeroReadServlet());
+        root.addServletMapping("/test", "ZeroRead");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        int rc = postUrl("abc".getBytes(StandardCharsets.US_ASCII),
+                "http://localhost:" + getPort() + "/test", bc, responseHeaders);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        // Per the InputStream contract, a zero-length read returns 0, even at EOF
+        Assert.assertEquals("0", responseHeaders.get("X-Zero").get(0));
+    }
+
+
     private void doUtf8BodyTest(String description, int[] input, String expected) throws Exception {
 
         byte[] bytes = new byte[input.length];
@@ -188,6 +209,24 @@ public class TestInputBuffer extends TomcatBaseTest {
                 resp.resetBuffer();
                 w.write("FAILED");
             }
+        }
+    }
+
+
+    private static class ZeroReadServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            InputStream is = req.getInputStream();
+            while (is.read() >= 0) {
+                // Drain the body
+            }
+            int zero = is.read(new byte[1], 0, 0);
+
+            resp.setHeader("X-Zero", Integer.toString(zero));
+            resp.getWriter().write("ok");
         }
     }
 
