@@ -402,6 +402,14 @@
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
+        Fix a possible deadlock in <code>DeltaSession.expire()</code>: the
+        final session delta is now captured and sent to the cluster before the
+        session monitor is acquired, because obtaining the delta takes the
+        delta lock and code that runs while the delta lock is held, such as
+        session attribute listener notifications, may in turn wait for the
+        session monitor. (remm)
+      </fix>
+      <fix>
         Move context attributes that were set while the web application was
         still starting into the replicated attribute map when it is installed
         in <code>ReplicatedContext</code>, so that they are replicated to the
