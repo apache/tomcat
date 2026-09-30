@@ -18,11 +18,15 @@ package org.apache.catalina.connector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -102,6 +106,56 @@ public class TestInputBuffer extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testSkip() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "Skip", new SkipServlet());
+        root.addServletMapping("/test", "Skip");
+
+        // Limit socket reads to 10 bytes so skip() has to refill repeatedly
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "10"));
+
+        tomcat.start();
+
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < 210; i++) {
+            body.append((char) ('a' + i % 26));
+        }
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        int rc = postUrl(body.toString().getBytes(StandardCharsets.US_ASCII),
+                "http://localhost:" + getPort() + "/test", bc, responseHeaders);
+        bc.setCharset(StandardCharsets.US_ASCII);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        // One character read, then 20 skipped before the remainder was echoed
+        Assert.assertEquals("20", responseHeaders.get("X-Skip").get(0));
+        Assert.assertEquals(body.substring(21), bc.toString());
+    }
+
+
+    @Test
+    public void testZeroLengthReadAtEof() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "ZeroRead", new ZeroReadServlet());
+        root.addServletMapping("/test", "ZeroRead");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        int rc = postUrl("abc".getBytes(StandardCharsets.US_ASCII),
+                "http://localhost:" + getPort() + "/test", bc, responseHeaders);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        // Per the InputStream contract, a zero-length read returns 0, even at EOF
+        Assert.assertEquals("0", responseHeaders.get("X-Zero").get(0));
+    }
+
+
     private void doUtf8BodyTest(String description, int[] input, String expected) throws Exception {
 
         byte[] bytes = new byte[input.length];
@@ -155,6 +209,52 @@ public class TestInputBuffer extends TomcatBaseTest {
                 resp.resetBuffer();
                 w.write("FAILED");
             }
+        }
+    }
+
+
+    private static class ZeroReadServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            InputStream is = req.getInputStream();
+            while (is.read() >= 0) {
+                // Drain the body
+            }
+            int zero = is.read(new byte[1], 0, 0);
+
+            resp.setHeader("X-Zero", Integer.toString(zero));
+            resp.getWriter().write("ok");
+        }
+    }
+
+
+    private static class SkipServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            Reader r = req.getReader();
+            StringBuilder result = new StringBuilder();
+
+            // Consume one character so the skip below starts with 9 buffered chars
+            r.read();
+            long skipped = r.skip(20);
+
+            char[] cbuf = new char[80];
+            int n = r.read(cbuf);
+            while (n > 0) {
+                result.append(cbuf, 0, n);
+                n = r.read(cbuf);
+            }
+
+            resp.setHeader("X-Skip", Long.toString(skipped));
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("US-ASCII");
+            resp.getWriter().write(result.toString());
         }
     }
 

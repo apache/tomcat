@@ -395,6 +395,10 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     public int read(byte[] b, int off, int len) throws IOException {
         throwIfClosed();
 
+        if (len == 0) {
+            return 0;
+        }
+
         if (checkByteBufferEof()) {
             return -1;
         }
@@ -501,6 +505,10 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     public int read(char[] cbuf, int off, int len) throws IOException {
         throwIfClosed();
 
+        if (len == 0) {
+            return 0;
+        }
+
         if (checkCharBufferEof()) {
             return -1;
         }
@@ -520,8 +528,8 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
         long nRead = 0;
         while (nRead < n) {
-            if (cb.remaining() >= n) {
-                cb.position(cb.position() + (int) n);
+            if (cb.remaining() >= (n - nRead)) {
+                cb.position(cb.position() + (int) (n - nRead));
                 nRead = n;
             } else {
                 nRead += cb.remaining();

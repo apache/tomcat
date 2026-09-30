@@ -93,6 +93,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             throw new IllegalArgumentException(
                     sm.getString("applicationServletRegistration.nullInitParam", name, value));
         }
+        checkState();
         if (getInitParameter(name) != null) {
             return false;
         }
@@ -117,6 +118,8 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
             }
         }
 
+        checkState();
+
         // Have to add in a separate loop since spec requires no updates at all
         // if there is an issue
         if (conflicts.isEmpty()) {
@@ -130,6 +133,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
 
     @Override
     public void setAsyncSupported(boolean asyncSupported) {
+        checkState();
         wrapper.setAsyncSupported(asyncSupported);
     }
 
@@ -167,17 +171,23 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
 
     @Override
     public Set<String> addMapping(String... urlPatterns) {
-        if (urlPatterns == null) {
-            return Collections.emptySet();
+        if (urlPatterns == null || urlPatterns.length == 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("applicationServletRegistration.nullUrlPatterns", getName(), context.getName()));
         }
+
+        for (String urlPattern : urlPatterns) {
+            if (urlPattern == null) {
+                throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
+            }
+        }
+
+        checkState();
 
         Set<String> conflicts = new HashSet<>();
         Set<String> overrides = new HashSet<>();
 
         for (int i = 0; i < urlPatterns.length; i++) {
-            if (urlPatterns[i] == null) {
-                throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
-            }
             String wrapperName = context.findServletMapping(urlPatterns[i]);
             if (wrapperName != null) {
                 Wrapper wrapper = (Wrapper) context.findChild(wrapperName);
@@ -231,6 +241,20 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     @Override
     public String getRunAsRole() {
         return wrapper.getRunAs();
+    }
+
+
+    private void checkState() {
+        // The specification requires an IllegalStateException if the
+        // ServletContext has already been initialised. A stricter check
+        // (only allowing calls during STARTING_PREP, as used by
+        // setServletSecurity()) risks breaking existing applications that
+        // configure registrations before the context starts, so the looser
+        // test below only rejects calls made once the context is available.
+        if (context.getState().isAvailable()) {
+            throw new IllegalStateException(sm.getString("applicationServletRegistration.ise", getName(),
+                    context.getName()));
+        }
     }
 
 }
