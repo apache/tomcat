@@ -181,6 +181,13 @@
         the last associated session expires, even when the sessions expire on
         different cluster nodes. (remm)
       </fix>
+      <fix>
+        Move context attributes that were set while the web application was
+        still starting into the replicated attribute map when it is installed
+        in <code>ReplicatedContext</code>, so that they are replicated to the
+        other nodes like attributes set later on rather than remaining local to
+        the node that started the application. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
