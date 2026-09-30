@@ -484,6 +484,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.41. (markt)
       </update>
+      <update>
+        Update to NSIS 3.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
