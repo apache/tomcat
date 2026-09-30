@@ -216,10 +216,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             throw new IllegalArgumentException(sm.getString("namingResources.ejbLookupLink", ejb.getName()));
         }
 
-        if (entries.contains(ejb.getName())) {
+        if (!entries.add(ejb.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(ejb.getName());
         }
 
         synchronized (ejbs) {
@@ -292,7 +291,10 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             }
         }
 
-        entries.add(environment.getName());
+        if (!entries.add(environment.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
+        }
 
         synchronized (envs) {
             environment.setNamingResources(this);
@@ -332,10 +334,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void addLocalEjb(ContextLocalEjb ejb) {
 
-        if (entries.contains(ejb.getName())) {
+        if (!entries.add(ejb.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(ejb.getName());
         }
 
         synchronized (localEjbs) {
@@ -356,12 +357,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(mdr.getName())) {
             return;
-        } else {
-            if (!checkResourceType(mdr)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", mdr.getName(), mdr.getType()));
-            }
-            entries.add(mdr.getName());
+        }
+
+        if (!checkResourceType(mdr)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", mdr.getName(), mdr.getType()));
+        }
+
+        if (!entries.add(mdr.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (mdrs) {
@@ -390,12 +395,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(resource.getName())) {
             return;
-        } else {
-            if (!checkResourceType(resource)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
-            }
-            entries.add(resource.getName());
+        }
+
+        if (!checkResourceType(resource)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
+        }
+
+        if (!entries.add(resource.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (resources) {
@@ -424,12 +433,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(resource.getName())) {
             return;
-        } else {
-            if (!checkResourceType(resource)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
-            }
-            entries.add(resource.getName());
+        }
+
+        if (!checkResourceType(resource)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
+        }
+
+        if (!entries.add(resource.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (resourceEnvRefs) {
@@ -444,10 +457,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void addResourceLink(ContextResourceLink resourceLink) {
 
-        if (entries.contains(resourceLink.getName())) {
+        if (!entries.add(resourceLink.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(resourceLink.getName());
         }
 
         synchronized (resourceLinks) {
@@ -474,10 +486,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void addService(ContextService service) {
 
-        if (entries.contains(service.getName())) {
+        if (!entries.add(service.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(service.getName());
         }
 
         synchronized (services) {
