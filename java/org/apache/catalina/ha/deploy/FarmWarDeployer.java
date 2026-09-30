@@ -167,6 +167,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             log.error(sm.getString("farmWarDeployer.mbeanNameFail", engine.getName(), hostname), e);
             return;
         }
+        if (watchEnabled && getWatchDir() == null) {
+            log.error(sm.getString("farmWarDeployer.noWatchDir"));
+            watchEnabled = false;
+        }
         if (watchEnabled) {
             watcher = new WarWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
