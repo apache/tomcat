@@ -80,9 +80,23 @@ public class TcpSender implements Sender {
      */
     protected BufferedWriter[] connectionWriters = null;
 
+    /**
+     * The proxy list that the current connections were established for.
+     */
+    protected String proxyList = null;
+
 
     @Override
     public void init(HeartbeatListener config) throws Exception {
+        String newProxyList = config.getProxyList();
+        if (connections != null && newProxyList != null && newProxyList.equals(proxyList)) {
+            // The proxy list has not changed since the previous init, so the
+            // existing connections can be kept. The init is called for every
+            // heartbeat and closing the connections here would defeat the
+            // keep-alive design.
+            this.config = config;
+            return;
+        }
         // Close any existing connections from a previous init
         if (connections != null) {
             for (int i = 0; i < connections.length; i++) {
@@ -111,6 +125,7 @@ public class TcpSender implements Sender {
         connections = new Socket[proxies.length];
         connectionReaders = new BufferedReader[proxies.length];
         connectionWriters = new BufferedWriter[proxies.length];
+        proxyList = newProxyList;
 
     }
 
