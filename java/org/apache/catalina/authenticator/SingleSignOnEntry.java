@@ -105,6 +105,20 @@ public class SingleSignOnEntry implements Serializable {
         }
     }
 
+
+    /**
+     * Re-associates a <code>Session</code> with this SSO after its ID has changed, without registering an additional
+     * session listener. The listener is associated with the <code>Session</code> object rather than with the session
+     * ID, so the listener registered when the session was first associated with this SSO continues to receive events
+     * for the session. Registering another listener on each ID change would cause unbounded listener accumulation.
+     *
+     * @param session The <code>Session</code> being re-associated with this SSO.
+     */
+    public void reassociateSession(Session session) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
+        sessionKeys.putIfAbsent(key, key);
+    }
+
     /**
      * Removes the given <code>Session</code> from the list of those associated with this SSO.
      *
