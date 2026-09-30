@@ -143,11 +143,11 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-jdt.version=4.40
-jdt.release=R-4.40-202606010713
+jdt.version=4.41
+jdt.release=R-4.41-202608281142
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=0b2c799e20dbdd074272faf2aed454186f0ad25759c09963350bceea8e9bec0ad9a04693115401cab6a1c9122b94aba6d79d741eef2e003a4149b2fe00f6f158
+jdt.checksum.value=080bb403adb3b88b5b5f382388922425de5274f7729f0a94702f0e2a516c7d13c6740faab1cb20786b1dda0c5da933aa9b842f7c64867414ff75fa668ea06b09
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
