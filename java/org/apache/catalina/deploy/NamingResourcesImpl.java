@@ -1184,18 +1184,25 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
     private Class<?> getSetterType(Class<?> clazz, String name) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
-                return method.getParameterTypes()[0];
+        // The runtime injection engine (DefaultInstanceManager) matches
+        // injection targets across the whole class hierarchy, so the checks
+        // here must do the same
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            for (Method method : c.getDeclaredMethods()) {
+                if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
+                    return method.getParameterTypes()[0];
+                }
             }
         }
         return null;
     }
 
     private Class<?> getFieldType(Class<?> clazz, String name) {
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.getName().equals(name)) {
-                return field.getType();
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.getName().equals(name)) {
+                    return field.getType();
+                }
             }
         }
         return null;
