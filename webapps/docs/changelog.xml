@@ -196,6 +196,13 @@
         session attribute listener notifications, may in turn wait for the
         session monitor. (remm)
       </fix>
+      <fix>
+        Fire the documented <code>send_message_failure</code> lifecycle event
+        with the message, destination and exception when a
+        <code>SimpleTcpCluster</code> message send fails and
+        <code>notifyLifecycleListenerOnFailure</code> is enabled. The event
+        was previously declared but never fired. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -4602,6 +4609,7 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
+<<<<<<< HEAD
         Avoid updating request count stats on async. (remm)
       </fix>
     </changelog>
