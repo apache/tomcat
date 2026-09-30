@@ -16,12 +16,19 @@
  */
 package org.apache.catalina.core;
 
+import jakarta.servlet.ServletRegistration;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.TesterServlet;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestApplicationServletRegistration {
+public class TestApplicationServletRegistration extends TomcatBaseTest {
 
     @Test
     public void testUrlPatternsAreTreatedAsUrlDecoded() {
@@ -35,5 +42,103 @@ public class TestApplicationServletRegistration {
         Assert.assertTrue(registration.addMapping("/servlet%25").isEmpty());
         // Ensure pattern has not been decoded
         Assert.assertEquals("servlet", context.findServletMapping("/servlet%25"));
+    }
+
+
+    @Test
+    public void testAddMappingNullAndEmptyPatterns() {
+        StandardContext context = new StandardContext();
+
+        Wrapper wrapper = context.createWrapper();
+        wrapper.setName("servlet");
+        context.addChild(wrapper);
+
+        ApplicationServletRegistration registration = new ApplicationServletRegistration(wrapper, context);
+
+        try {
+            registration.addMapping((String[]) null);
+            Assert.fail("Expected an IllegalArgumentException for null patterns");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
+        try {
+            registration.addMapping();
+            Assert.fail("Expected an IllegalArgumentException for an empty pattern array");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
+        try {
+            registration.addMapping("");
+            Assert.fail("Expected an IllegalArgumentException for an empty pattern");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+    }
+
+
+    @Test
+    public void testAddMappingWhileContextAvailable() {
+        CustomContext context = new CustomContext();
+        context.setState(LifecycleState.NEW);
+
+        Wrapper wrapper = context.createWrapper();
+        wrapper.setName("servlet");
+        context.addChild(wrapper);
+
+        context.setState(LifecycleState.STARTED);
+
+        ApplicationServletRegistration registration = new ApplicationServletRegistration(wrapper, context);
+
+        try {
+            registration.addMapping("/servlet");
+            Assert.fail("Expected an IllegalStateException once the context is available");
+        } catch (IllegalStateException e) {
+            // Expected
+        }
+    }
+
+
+    @Test
+    public void testModificationAfterContextInitialised() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = getProgrammaticRootContext();
+        Tomcat.addServlet(root, "servlet", new TesterServlet());
+        root.addServletMapping("/test", "servlet");
+
+        tomcat.start();
+
+        ServletRegistration registration =
+                root.getServletContext().getServletRegistration("servlet");
+
+        try {
+            registration.setInitParameter("param", "value");
+            Assert.fail("Expected an IllegalStateException after initialisation");
+        } catch (IllegalStateException e) {
+            // Expected
+        }
+
+        try {
+            ((ServletRegistration.Dynamic) registration).addMapping("/other");
+            Assert.fail("Expected an IllegalStateException after initialisation");
+        } catch (IllegalStateException e) {
+            // Expected
+        }
+    }
+
+
+    private static class CustomContext extends StandardContext {
+        private volatile LifecycleState state;
+
+        @Override
+        public LifecycleState getState() {
+            return state;
+        }
+
+        @Override
+        public synchronized void setState(LifecycleState state) {
+            this.state = state;
+        }
     }
 }
