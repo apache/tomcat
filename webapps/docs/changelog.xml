@@ -186,6 +186,9 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.13.0. (markt)
       </update>
+      <update>
+        Update to NSIS 3.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
