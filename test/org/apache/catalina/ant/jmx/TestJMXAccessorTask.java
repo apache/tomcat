@@ -111,14 +111,14 @@ public class TestJMXAccessorTask {
         Registry registry = LocateRegistry.createRegistry(port);
         MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
         JMXServiceURL serviceUrl = new JMXServiceURL(
-                JMXAccessorTask.JMX_SERVICE_PREFIX + "localhost:" + port + JMXAccessorTask.JMX_SERVICE_SUFFIX);
+                JMXAccessorTask.JMX_SERVICE_PREFIX + "127.0.0.1:" + port + JMXAccessorTask.JMX_SERVICE_SUFFIX);
         JMXConnectorServer connectorServer =
                 JMXConnectorServerFactory.newJMXConnectorServer(serviceUrl, null, mbeanServer);
         connectorServer.start();
         try {
             Project project = new Project();
             String ref = "jmx.server.test";
-            String host = "localhost";
+            String host = "127.0.0.1";
             String openPort = Integer.toString(port);
 
             // First call opens the connection and stores it under the reference.
