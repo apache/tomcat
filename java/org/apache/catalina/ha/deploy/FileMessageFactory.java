@@ -372,7 +372,7 @@ public class FileMessageFactory {
      *
      * @return True if the factory is still valid, false if it has expired
      */
-    public boolean isValid() {
+    public synchronized boolean isValid() {
         if (maxValidTime > 0) {
             long timeNow = System.currentTimeMillis();
             long timeIdle = (timeNow - lastModified) / 1000L;

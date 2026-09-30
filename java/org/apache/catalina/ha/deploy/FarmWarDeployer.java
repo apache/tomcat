@@ -838,8 +838,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         String[] fileNames = fileFactories.keySet().toArray(new String[0]);
         for (String fileName : fileNames) {
             FileMessageFactory factory = fileFactories.get(fileName);
-            if (!factory.isValid()) {
-                fileFactories.remove(fileName);
+            if (factory != null && !factory.isValid()) {
+                // Remove with the factory instance to avoid evicting a newer
+                // factory created for a new transfer of the same file
+                fileFactories.remove(fileName, factory);
             }
         }
     }
