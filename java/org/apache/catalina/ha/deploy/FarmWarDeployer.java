@@ -254,7 +254,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     } catch (Exception e) {
                         log.error(sm.getString("farmWarDeployer.fileMessageError"), e);
                     } finally {
-                        removeFactory(fmsg);
+                        removeFactory(fmsg, factory);
                     }
                 }
             } else if (msg instanceof UndeployMessage) {
@@ -309,10 +309,13 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Remove file (war) from messages
      *
-     * @param msg The file
+     * @param msg     The file
+     * @param factory The factory for which the transfer completed
      */
-    public void removeFactory(FileMessage msg) {
-        fileFactories.remove(msg.getFileName());
+    public void removeFactory(FileMessage msg, FileMessageFactory factory) {
+        // Remove with the factory instance to avoid evicting a newer factory
+        // created for a new transfer of the same file
+        fileFactories.remove(msg.getFileName(), factory);
     }
 
     /**
