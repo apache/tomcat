@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.security.Principal;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -279,10 +280,16 @@ public class DeltaRequest implements Externalizable {
         // if we have already done something to this attribute, make sure
         // we don't send multiple actions across the wire
         if (!recordAllActions) {
-            try {
-                actions.remove(info);
-            } catch (java.util.NoSuchElementException x) {
-                // do nothing, we wanted to remove it anyway
+            Iterator<AttributeInfo> iterator = actions.iterator();
+            while (iterator.hasNext()) {
+                AttributeInfo existing = iterator.next();
+                if (existing.equals(info)) {
+                    iterator.remove();
+                    // Return the evicted action to the pool
+                    existing.recycle();
+                    actionPool.addLast(existing);
+                    break;
+                }
             }
         }
         // add the action
@@ -522,7 +529,9 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public int hashCode() {
-            return name.hashCode();
+            // Must be consistent with equals() which compares name, type and
+            // action
+            return (name.hashCode() * 31 + type) * 31 + action;
         }
 
         public String getName() {
@@ -541,8 +550,11 @@ public class DeltaRequest implements Externalizable {
             if (!(o instanceof AttributeInfo)) {
                 return false;
             }
-            AttributeInfo other = (AttributeInfo) o;
-            return other.getName().equals(this.getName());
+            // Attributes and notes are different stores and setting and
+            // removing are different changes, so a name match alone is not
+            // enough to consider two actions as the same change
+            return other.getType() == this.getType() && other.getAction() == this.getAction() &&
+                    other.getName().equals(this.getName());
         }
 
         @Override
