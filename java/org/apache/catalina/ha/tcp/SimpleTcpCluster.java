@@ -690,7 +690,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
         setState(LifecycleState.STOPPING);
 
-        unregisterMember(channel.getLocalMember(false));
         if (clusterDeployer != null) {
             clusterDeployer.stop();
         }
@@ -699,13 +698,34 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             if (clusterDeployer != null) {
                 clusterDeployer.setCluster(null);
             }
-            channel.stop(channelStartOptions);
-            channel.removeChannelListener(this);
-            channel.removeMembershipListener(this);
-            this.unregisterClusterValve();
         } catch (Exception e) {
             log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
         }
+        try {
+            channel.stop(channelStartOptions);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
+        }
+        // These steps must also run when stopping the channel failed,
+        // otherwise the cluster valves remain in the container pipeline and
+        // would be linked a second time on the next start
+        try {
+            channel.removeChannelListener(this);
+            channel.removeMembershipListener(this);
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
+        }
+        try {
+            unregisterClusterValve();
+        } catch (Exception e) {
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
+        }
+        // Unregister the MBeans of the local member and of any remote members
+        // for which memberDisappeared() did not fire during the stop
+        for (ObjectName oname : memberOnameMap.values()) {
+            unregister(oname);
+        }
+        memberOnameMap.clear();
 
         channel.setUtilityExecutor(null);
     }
