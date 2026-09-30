@@ -388,6 +388,13 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
                 }
                 Providers providers = PersistentProviderRegistrations.loadProviders(CONFIG_FILE);
                 for (Provider provider : providers.getProviders()) {
+                    /*
+                     * If a configured provider cannot be created, the resulting exception is allowed to propagate to
+                     * the caller. This is deliberate: JASPIC is an authentication mechanism so, for security, a
+                     * registration that cannot be honoured must be fatal rather than silently skipped, since silently
+                     * skipping it could allow requests to be processed without the expected authentication provider.
+                     * The admin must fix or remove the offending entry in jaspic-providers.xml.
+                     */
                     doRegisterConfigProvider(provider.getClassName(), provider.getProperties(), provider.getLayer(),
                             provider.getAppContext(), provider.getDescription(), wrappersToNotify);
                 }
