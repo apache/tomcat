@@ -263,8 +263,11 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
         super.stopInternal();
 
-        if (getCluster() != null) {
-            ((ReplicatedMap<?,?>) cache).breakdown();
+        // The cache is only a ReplicatedMap if start completed successfully.
+        // If the ReplicatedMap creation failed, the base class ConcurrentHashMap
+        // is still in place.
+        if (cache instanceof ReplicatedMap<?,?> map) {
+            map.breakdown();
         }
     }
 }
