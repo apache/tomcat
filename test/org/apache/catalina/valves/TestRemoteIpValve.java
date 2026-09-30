@@ -909,6 +909,72 @@ public class TestRemoteIpValve {
     }
 
     @Test
+    public void testInvokeXforwardedPortOutOfRange() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setPortHeader("x-forwarded-port");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        // port
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-port").setString("99999");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("https");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        Assert.assertEquals("tracked serverPort", 443, actualServerPort);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+    }
+
+    @Test
+    public void testInvokeXforwardedPortNegative() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setPortHeader("x-forwarded-port");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        // port
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-port").setString("-5");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("https");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        Assert.assertEquals("tracked serverPort", 443, actualServerPort);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+    }
+
+    @Test
     public void testInvokeXforwardedHostAndPort() throws Exception {
 
         // PREPARE

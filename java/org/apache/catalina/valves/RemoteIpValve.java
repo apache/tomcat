@@ -838,6 +838,12 @@ public class RemoteIpValve extends ValveBase {
                         log.debug(sm.getString("remoteIpValve.invalidPortHeader", portHeaderValue, portHeader), nfe);
                     }
                 }
+                if (port < 1 || port > 65535) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpValve.invalidPortHeader", portHeaderValue, portHeader));
+                    }
+                    port = defaultPort;
+                }
             }
         }
         request.setServerPort(port);
