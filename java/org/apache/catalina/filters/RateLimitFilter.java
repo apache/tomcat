@@ -254,7 +254,12 @@ public class RateLimitFilter extends FilterBase {
         super.init(filterConfig);
 
         try {
-            rateLimiter = (RateLimiter) Class.forName(rateLimitClassName).getConstructor().newInstance();
+            Object instance = Class.forName(rateLimitClassName).getConstructor().newInstance();
+            if (instance instanceof RateLimiter limiter) {
+                rateLimiter = limiter;
+            } else {
+                throw new ServletException(sm.getString("rateLimitFilter.classNotFound", rateLimitClassName));
+            }
         } catch (ReflectiveOperationException e) {
             throw new ServletException(sm.getString("rateLimitFilter.classNotFound", rateLimitClassName), e);
         }
