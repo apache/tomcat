@@ -464,6 +464,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         } catch (Exception e) {
             log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), e);
             manager = new DeltaManager();
+            // The name is required for replication message routing, a null
+            // name would make the receiving nodes apply the messages to all
+            // contexts
+            manager.setName(name);
         } finally {
             if (manager != null) {
                 manager.setCluster(this);
