@@ -377,7 +377,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * has members
      */
-    protected boolean hasMembers = false;
+    protected volatile boolean hasMembers = false;
 
     /**
      * {@inheritDoc}
