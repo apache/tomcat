@@ -59,7 +59,7 @@ public class MessageInfoImpl implements MessageInfo {
     public MessageInfoImpl(HttpServletRequest request, HttpServletResponse response, boolean authMandatory) {
         this.request = request;
         this.response = response;
-        map.put(IS_MANDATORY, Boolean.toString(authMandatory));
+        map.put(IS_MANDATORY, Boolean.valueOf(authMandatory));
     }
 
     @Override
@@ -82,8 +82,8 @@ public class MessageInfoImpl implements MessageInfo {
     @Override
     public void setRequestMessage(Object request) {
         if (!(request instanceof HttpServletRequest)) {
-            throw new IllegalArgumentException(
-                    sm.getString("authenticator.jaspic.badRequestType", request.getClass().getName()));
+            String typeName = request == null ? "null" : request.getClass().getName();
+            throw new IllegalArgumentException(sm.getString("authenticator.jaspic.badRequestType", typeName));
         }
         this.request = (HttpServletRequest) request;
     }
@@ -91,8 +91,8 @@ public class MessageInfoImpl implements MessageInfo {
     @Override
     public void setResponseMessage(Object response) {
         if (!(response instanceof HttpServletResponse)) {
-            throw new IllegalArgumentException(
-                    sm.getString("authenticator.jaspic.badResponseType", response.getClass().getName()));
+            String typeName = response == null ? "null" : response.getClass().getName();
+            throw new IllegalArgumentException(sm.getString("authenticator.jaspic.badResponseType", typeName));
         }
         this.response = (HttpServletResponse) response;
     }
