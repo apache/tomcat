@@ -148,7 +148,9 @@ public class AddDefaultCharsetFilter extends FilterBase {
         @Override
         public void setCharacterEncoding(String charset) {
             super.setCharacterEncoding(charset);
-            encoding = charset;
+            if (charset != null) {
+                encoding = charset;
+            }
         }
     }
 }
