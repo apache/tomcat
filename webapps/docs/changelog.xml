@@ -4308,6 +4308,11 @@
         Skip the write notification in these cases since it would be useless.
         (remm)
       </fix>
+      <fix>
+        Fix <code>CharChunk.indexOf(char)</code> so that it searches from the
+        start of the chunk rather than from twice the chunk's start offset
+        when the chunk does not begin at the start of its buffer. (breken-ai)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
