@@ -402,6 +402,13 @@
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
+        Fire the documented <code>send_message_failure</code> lifecycle event
+        with the message, destination and exception when a
+        <code>SimpleTcpCluster</code> message send fails and
+        <code>notifyLifecycleListenerOnFailure</code> is enabled. The event
+        was previously declared but never fired. (remm)
+      </fix>
+      <fix>
         Fix a possible deadlock in <code>DeltaSession.expire()</code>: the
         final session delta is now captured and sent to the cluster before the
         session monitor is acquired, because obtaining the delta takes the

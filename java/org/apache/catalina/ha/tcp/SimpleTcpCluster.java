@@ -771,6 +771,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             }
         } catch (Exception e) {
             log.error(sm.getString("simpleTcpCluster.sendFailed"), e);
+            if (notifyLifecycleListenerOnFailure) {
+                // Notify our interested LifecycleListeners
+                fireLifecycleEvent(SEND_MESSAGE_FAILURE_EVENT, new SendMessageData(msg, dest, e));
+            }
         }
     }
 
