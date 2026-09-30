@@ -152,7 +152,11 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        return false;
+        if (executor != null) {
+            return executor.awaitTermination(timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
+        }
     }
 
 
