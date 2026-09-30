@@ -1184,11 +1184,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
     private Class<?> getSetterType(Class<?> clazz, String name) {
-        Method[] methods = Introspection.getDeclaredMethods(clazz);
-        if (methods != null && methods.length > 0) {
-            for (Method method : methods) {
-                if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
-                    return method.getParameterTypes()[0];
+        // The runtime injection engine (DefaultInstanceManager) matches
+        // injection targets across the whole class hierarchy, so the checks
+        // here must do the same
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            Method[] methods = Introspection.getDeclaredMethods(c);
+            if (methods != null && methods.length > 0) {
+                for (Method method : methods) {
+                    if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
+                        return method.getParameterTypes()[0];
+                    }
                 }
             }
         }
@@ -1196,14 +1201,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
     private Class<?> getFieldType(Class<?> clazz, String name) {
-        Field[] fields = Introspection.getDeclaredFields(clazz);
-        if (fields != null && fields.length > 0) {
-            for (Field field : fields) {
-                if (field.getName().equals(name)) {
-                    return field.getType();
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            Field[] fields = Introspection.getDeclaredFields(c);
+            if (fields != null && fields.length > 0) {
+                for (Field field : fields) {
+                    if (field.getName().equals(name)) {
+                        return field.getType();
+                    }
                 }
             }
+            return null;
         }
-        return null;
     }
 }
