@@ -189,6 +189,9 @@
       <update>
         Update to NSIS 3.13. (markt)
       </update>
+      <update>
+        Update to Byte Buddy 1.18.14. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
