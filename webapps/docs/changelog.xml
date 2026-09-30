@@ -481,6 +481,21 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.13.0. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.41. (markt)
+      </update>
+      <update>
+        Update to NSIS 3.13. (markt)
+      </update>
+      <update>
+        Update to Byte Buddy 1.18.14. (markt)
+      </update>
+      <update>
+        Update to Checkstyle 14.3.0. (markt)
+      </update>
+      <update>
+        Update to Bouncy Castle 1.8.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

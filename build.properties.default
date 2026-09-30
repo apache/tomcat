@@ -143,11 +143,11 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-jdt.version=4.40
-jdt.release=R-4.40-202606010713
+jdt.version=4.41
+jdt.release=R-4.41-202608281142
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=0b2c799e20dbdd074272faf2aed454186f0ad25759c09963350bceea8e9bec0ad9a04693115401cab6a1c9122b94aba6d79d741eef2e003a4149b2fe00f6f158
+jdt.checksum.value=080bb403adb3b88b5b5f382388922425de5274f7729f0a94702f0e2a516c7d13c6740faab1cb20786b1dda0c5da933aa9b842f7c64867414ff75fa668ea06b09
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
@@ -171,15 +171,15 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-${tomcat-native-openssl.version}-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.12
+nsis.version=3.13
 nsis.checksum.enabled=true
 nsis.bin.checksum.algorithm=MD5|SHA-1
-nsis.bin.checksum.value=757c22153dd8b90f5e297310d9966997|364fd795b0cafc1fbff3e966f103a8f8fc8fb7f1
+nsis.bin.checksum.value=530e3623c077cba879ed2ae6e13be362|db14f8af2ea346b786c6ae19343f61aaf5e09b8e
 nsis.bin.home=${base.path}/nsis-${nsis.version}
 nsis.executable.windows=${nsis.bin.home}/makensis.exe
 nsis.bin.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 nsis.src.checksum.algorithm=MD5|SHA-1
-nsis.src.checksum.value=8ec7c3e1228ac4eb96e5e421610b4aae|432e99150881c061c7e313eb1aac45763d951572
+nsis.src.checksum.value=3f992d176c50fb653cf0230eed38cfea|e0bd42648bea7bd933b32b9f1459cdb29ed41709
 nsis.src.home=${base.path}/nsis-${nsis.version}-src
 nsis.src.loc=${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
@@ -249,10 +249,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.18.9
+bytebuddy.version=1.18.14
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=SHA-512
-bytebuddy.checksum.value=d0cf2517b0b78287747485da86468e59fbe67a313453e005a5ed376b47607c99d6d83176a9986970963b6ce458ab2eab37db4089331d2ed17b45b7337c5ca7af
+bytebuddy.checksum.value=252f57ee0a99f81a6795484e4712966de9f0b7229a3bf8e818cf20a8ff3de6b3745f91ad6a85421696a14e6d528f6d25fa2b0550e37500c5907be3781c6504e2
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
@@ -267,10 +267,10 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=14.1.0
+checkstyle.version=14.3.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=0193261e7b0369ace41c0b38cfabea821a1109d6ed6185d5cc72cdff130995c942b344087bb083c2aea303a15bd17f1e3e2024fd46125aa2ac7b09dfeb39f7fc
+checkstyle.checksum.value=8ced49f3a009def84d3f6089c4d9987461abf6024f81940398335db910c0bc75b9e69989f4a559eb1dc1f78cf2af12d6f7d362416bb43306911e9d310b99777a
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
@@ -346,20 +346,20 @@ derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
 
 # ----- Bouncy Castle, used by unit tests ----
-bouncycastle.version=1.85
+bouncycastle.version=1.86
 bouncycastle-provider.checksum.enabled=true
 bouncycastle-provider.checksum.algorithm=SHA-512
-bouncycastle-provider.checksum.value=c20a531b6cd5d513eba8ff5b304cb83d0c7f6f9c5264b81caca43986b745b37907bac3aacaab585284012adb8a9371a52b43c1c0498b49cf57cf9e42ac446264
+bouncycastle-provider.checksum.value=4502851281929ef645316ae96ad7d6db6a54d11ce024a66bec654c2eef62b80f174b67a2a15de86b2698f33b696459e21ecfec4a846350f4297394e9a331c43b
 bouncycastle-pkix.checksum.enabled=true
 bouncycastle-pkix.checksum.algorithm=SHA-512
-bouncycastle-pkix.checksum.value=142ce817145f7348dc97f62872eac931280c578bc61ff4cfcff927d4247ab2bf15e858edf74f2549074c4685ebe8de1d815c42637eacdb65b344b741c2bf1415
+bouncycastle-pkix.checksum.value=2923c0da3848b47d1953bdba3ae50441f3a3416f3646a26244c080414f31fbde875e4e50619a0ef34670c877367a45438a346260fc8b047e753b553debd40b37
 bouncycastle-util.checksum.enabled=true
 bouncycastle-util.checksum.algorithm=SHA-512
-bouncycastle-util.checksum.value=1cf5011448dfaed7daea587807b9513961bdfd7b41ee5ce42444254dfa3677fdba78fe5191bca4ecf2a51eb3883be59f0374affc1efae3fd1728a64fa094027d
+bouncycastle-util.checksum.value=aeb9138f96d5c48491974974534bb3b07931a18d36ccbed828940ae0361f5ef8f5b0ad6c776a1aebb4d2c0416edf8b7d143d821bfe7136d7948c4e5807b1c426
 
 bouncycastle.home=${base.path}/bouncycastle-${bouncycastle.version}
-bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.2.jar
-bouncycastle-provider.loc=${base-maven.loc}/org/bouncycastle/bcprov-jdk18on/${bouncycastle.version}.2/bcprov-jdk18on-${bouncycastle.version}.2.jar
+bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.jar
+bouncycastle-provider.loc=${base-maven.loc}/org/bouncycastle/bcprov-jdk18on/${bouncycastle.version}/bcprov-jdk18on-${bouncycastle.version}.jar
 bouncycastle-pkix.jar=${bouncycastle.home}/bouncycastle-pkix-${bouncycastle.version}.jar
 bouncycastle-pkix.loc=${base-maven.loc}/org/bouncycastle/bcpkix-jdk18on/${bouncycastle.version}/bcpkix-jdk18on-${bouncycastle.version}.jar
 bouncycastle-util.jar=${bouncycastle.home}/bouncycastle-util-${bouncycastle.version}.jar
