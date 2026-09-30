@@ -373,20 +373,20 @@ derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
 
 # ----- Bouncy Castle, used by unit tests ----
-bouncycastle.version=1.85
+bouncycastle.version=1.86
 bouncycastle-provider.checksum.enabled=true
 bouncycastle-provider.checksum.algorithm=SHA-512
-bouncycastle-provider.checksum.value=c20a531b6cd5d513eba8ff5b304cb83d0c7f6f9c5264b81caca43986b745b37907bac3aacaab585284012adb8a9371a52b43c1c0498b49cf57cf9e42ac446264
+bouncycastle-provider.checksum.value=4502851281929ef645316ae96ad7d6db6a54d11ce024a66bec654c2eef62b80f174b67a2a15de86b2698f33b696459e21ecfec4a846350f4297394e9a331c43b
 bouncycastle-pkix.checksum.enabled=true
 bouncycastle-pkix.checksum.algorithm=SHA-512
-bouncycastle-pkix.checksum.value=142ce817145f7348dc97f62872eac931280c578bc61ff4cfcff927d4247ab2bf15e858edf74f2549074c4685ebe8de1d815c42637eacdb65b344b741c2bf1415
+bouncycastle-pkix.checksum.value=2923c0da3848b47d1953bdba3ae50441f3a3416f3646a26244c080414f31fbde875e4e50619a0ef34670c877367a45438a346260fc8b047e753b553debd40b37
 bouncycastle-util.checksum.enabled=true
 bouncycastle-util.checksum.algorithm=SHA-512
-bouncycastle-util.checksum.value=1cf5011448dfaed7daea587807b9513961bdfd7b41ee5ce42444254dfa3677fdba78fe5191bca4ecf2a51eb3883be59f0374affc1efae3fd1728a64fa094027d
+bouncycastle-util.checksum.value=aeb9138f96d5c48491974974534bb3b07931a18d36ccbed828940ae0361f5ef8f5b0ad6c776a1aebb4d2c0416edf8b7d143d821bfe7136d7948c4e5807b1c426
 
 bouncycastle.home=${base.path}/bouncycastle-${bouncycastle.version}
-bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.2.jar
-bouncycastle-provider.loc=${base-maven.loc}/org/bouncycastle/bcprov-jdk18on/${bouncycastle.version}.2/bcprov-jdk18on-${bouncycastle.version}.2.jar
+bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.jar
+bouncycastle-provider.loc=${base-maven.loc}/org/bouncycastle/bcprov-jdk18on/${bouncycastle.version}/bcprov-jdk18on-${bouncycastle.version}.jar
 bouncycastle-pkix.jar=${bouncycastle.home}/bouncycastle-pkix-${bouncycastle.version}.jar
 bouncycastle-pkix.loc=${base-maven.loc}/org/bouncycastle/bcpkix-jdk18on/${bouncycastle.version}/bcpkix-jdk18on-${bouncycastle.version}.jar
 bouncycastle-util.jar=${bouncycastle.home}/bouncycastle-util-${bouncycastle.version}.jar
