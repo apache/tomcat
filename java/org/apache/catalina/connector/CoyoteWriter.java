@@ -111,12 +111,16 @@ public class CoyoteWriter extends PrintWriter {
     @Override
     public void close() {
 
+        if (error) {
+            return;
+        }
+
         // We don't close the PrintWriter - super() is not called,
         // so the stream can be reused. We close ob.
         try {
             ob.close();
-        } catch (IOException ignore) {
-            // Ignore
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
