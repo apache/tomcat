@@ -160,6 +160,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation: Explicitly state that virtual host matching via the HTTP
+        host header and TLS configuration matching via SNI are completely
+        separate processes. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

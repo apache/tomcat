@@ -1176,6 +1176,14 @@
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
 
+  <p>Using name-based virtual hosts on a secured connection requires careful
+  configuration of the names specified in a single certificate or the use of
+  SNI. SNI allows multiple certificates with different names to be associated
+  with a single TLS connector. Administrators should be aware that virtual host
+  matching using the HTTP host name header and TLS configuration (including
+  certificate) matching using SNI are completely separate processes and that it
+  is likely that they will want to keep the two configurations synchronized.</p>
+
   <p>When OpenSSL is providing the TLS implementation, one or more
   <strong>OpenSSLConfCmd</strong> elements may be nested inside a
   <strong>OpenSSLConf</strong> element to configure OpenSSL via OpenSSL's
