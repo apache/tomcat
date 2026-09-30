@@ -401,6 +401,13 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Replicate SSO session key set changes made by <code>removeSession()</code>
+        and <code>sessionChangedId()</code> in <code>ClusterSingleSignOn</code> so
+        that SSO entries are correctly deregistered and removed from all nodes when
+        the last associated session expires, even when the sessions expire on
+        different cluster nodes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
