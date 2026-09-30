@@ -420,7 +420,14 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     @Override
     public String[] getServletMethods() throws ServletException {
 
-        instance = loadServlet();
+        // Synchronise the check and the assignment of the instance to avoid a
+        // race with other threads loading the servlet which could otherwise
+        // result in a second, uninitialised instance being retained
+        synchronized (this) {
+            if (instance == null) {
+                instance = loadServlet();
+            }
+        }
 
         Class<? extends Servlet> servletClazz = instance.getClass();
         if (!jakarta.servlet.http.HttpServlet.class.isAssignableFrom(servletClazz)) {
