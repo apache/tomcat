@@ -349,6 +349,11 @@
         Ensure that the non-blocking write buffer is empty before sending an AJP
         end response message. (markt)
       </fix>
+      <fix>
+        Fix <code>CharChunk.indexOf(char)</code> so that it searches from the
+        start of the chunk rather than from twice the chunk's start offset
+        when the chunk does not begin at the start of its buffer. (breken-ai)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
