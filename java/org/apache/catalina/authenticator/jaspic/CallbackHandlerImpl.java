@@ -83,6 +83,7 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                     GroupPrincipalCallback gpc = (GroupPrincipalCallback) callback;
                     groups = gpc.getGroups();
                 } else if (callback instanceof PasswordValidationCallback) {
+                    PasswordValidationCallback pvc = (PasswordValidationCallback) callback;
                     if (container == null) {
                         log.warn(sm.getString("callbackHandlerImpl.containerMissing", callback.getClass().getName()));
                         passwordValidationFailed = true;
@@ -91,15 +92,14 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                                 container.getName()));
                         passwordValidationFailed = true;
                     } else {
-                        PasswordValidationCallback pvc = (PasswordValidationCallback) callback;
                         principal =
                                 container.getRealm().authenticate(pvc.getUsername(), String.valueOf(pvc.getPassword()));
-                        pvc.setResult(principal != null);
                         if (principal == null) {
                             passwordValidationFailed = true;
                         }
                         subject = pvc.getSubject();
                     }
+                    pvc.setResult(!passwordValidationFailed);
                 } else {
                     log.error(sm.getString("callbackHandlerImpl.jaspicCallbackMissing", callback.getClass().getName()));
                 }
