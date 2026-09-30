@@ -176,6 +176,26 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
 
     @Override
+    protected void removeSession(String ssoId, Session session) {
+        super.removeSession(ssoId, session);
+        // If the entry still exists, replicate the updated session key set so
+        // the other nodes can also detect when the set becomes empty
+        if (cache.containsKey(ssoId)) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+    }
+
+    @Override
+    protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
+        super.sessionChangedId(ssoId, session, oldSessionId);
+        // Replicate the updated session key set so stale session IDs do not
+        // remain on the other nodes
+        if (cache.containsKey(ssoId)) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+    }
+
+    @Override
     protected SessionListener getSessionListener(String ssoId) {
         return new ClusterSingleSignOnListener(ssoId);
     }
