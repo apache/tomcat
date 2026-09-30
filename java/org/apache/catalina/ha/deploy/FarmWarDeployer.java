@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -237,7 +238,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                             try {
                                 remove(contextName);
 
-                                Files.move(factory.getFile().toPath(), deployable.toPath());
+                                // Replace an existing file since the delete of
+                                // an old WAR may have failed earlier
+                                Files.move(factory.getFile().toPath(), deployable.toPath(),
+                                        StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException ioe) {
                                 log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable),
                                         ioe);
