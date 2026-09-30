@@ -170,6 +170,12 @@ public class StandardHost extends ContainerBase implements Host {
      */
     private final Map<ClassLoader,String> childClassLoaders = new WeakHashMap<>();
 
+    /**
+     * Lock used to synchronise access to {@link #childClassLoaders} which is written when child contexts start and
+     * read when memory leaks are checked.
+     */
+    private final Object childClassLoadersLock = new Object();
+
 
     /**
      * Any file or directory in {@link #appBase} that this pattern matches will be ignored by the automatic deployment
@@ -691,8 +697,10 @@ public class StandardHost extends ContainerBase implements Host {
             if (event.getType().equals(AFTER_START_EVENT)) {
                 if (event.getSource() instanceof Context) {
                     Context context = ((Context) event.getSource());
-                    childClassLoaders.put(context.getLoader().getClassLoader(),
-                            context.getServletContext().getContextPath());
+                    synchronized (childClassLoadersLock) {
+                        childClassLoaders.put(context.getLoader().getClassLoader(),
+                                context.getServletContext().getContextPath());
+                    }
                 }
             }
         }
@@ -712,7 +720,12 @@ public class StandardHost extends ContainerBase implements Host {
 
         List<String> result = new ArrayList<>();
 
-        for (Map.Entry<ClassLoader,String> entry : childClassLoaders.entrySet()) {
+        List<Map.Entry<ClassLoader,String>> entries;
+        synchronized (childClassLoadersLock) {
+            entries = new ArrayList<>(childClassLoaders.entrySet());
+        }
+
+        for (Map.Entry<ClassLoader,String> entry : entries) {
             ClassLoader cl = entry.getKey();
             if (cl instanceof WebappClassLoaderBase) {
                 if (!((WebappClassLoaderBase) cl).getState().isAvailable()) {
