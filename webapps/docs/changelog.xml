@@ -191,6 +191,9 @@
       <update>
         Update to Byte Buddy 1.18.14. (markt)
       </update>
+      <update>
+        Update to Bouncy Castle 1.8.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -6784,9 +6787,6 @@
       <update>
         Update the internal fork of Apache Commons FileUpload to aa8eff6
         (2022-11-29, 2.0-SNAPSHOT). (markt)
-      </update>
-      <update>
-        Update to Bouncy Castle 1.8.6. (markt)
       </update>
     </changelog>
   </subsection>
