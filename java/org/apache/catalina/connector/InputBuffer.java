@@ -520,8 +520,8 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
         long nRead = 0;
         while (nRead < n) {
-            if (cb.remaining() >= n) {
-                cb.position(cb.position() + (int) n);
+            if (cb.remaining() >= (n - nRead)) {
+                cb.position(cb.position() + (int) (n - nRead));
                 nRead = n;
             } else {
                 nRead += cb.remaining();
