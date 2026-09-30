@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.Method;
@@ -119,6 +120,9 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * @param timeout the timeout in seconds; zero (the default) means no timeout
      */
     public void setTimeout(int timeout) {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout may not be negative");
+        }
         this.timeout = timeout;
     }
 
@@ -257,10 +261,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setAllowUserInteraction(false);
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
-            if (timeout > 0) {
-                hconn.setConnectTimeout(timeout * 1000);
-                hconn.setReadTimeout(timeout * 1000);
-            }
+            configureTimeout(hconn, timeout);
+
             if (istream != null) {
                 preAuthenticate();
 
@@ -395,6 +397,26 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     }
 
 
+    /**
+     * Configures the given connection with the given timeout.
+     *
+     * @param urlConn The connection for which the timeout should be configured
+     * @param seconds Timeout to configure in seconds
+     */
+    protected void configureTimeout(URLConnection urlConn, int seconds) {
+        if (seconds > 0) {
+            // timeout is in seconds.
+            long millis = TimeUnit.SECONDS.toMillis(seconds);
+            // This is about 24 days so is unlikely to happen but limit it to avoid an IAE in setConnectTimeout()
+            if (millis > Integer.MAX_VALUE) {
+                millis = Integer.MAX_VALUE;
+            }
+            urlConn.setConnectTimeout((int) millis);
+            urlConn.setReadTimeout((int) millis);
+        }
+    }
+
+
     /*
      * This is a hack. We need to use streaming to avoid OOME on large uploads. We'd like to use
      * Authenticator.setDefault() for authentication as the JRE then provides the DIGEST client implementation. However,
@@ -416,10 +438,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setAllowUserInteraction(false);
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
-        if (timeout > 0) {
-            hconn.setConnectTimeout(timeout * 1000);
-            hconn.setReadTimeout(timeout * 1000);
-        }
+        configureTimeout(hconn, timeout);
         hconn.setDoOutput(false);
         hconn.setRequestMethod(Method.OPTIONS);
         hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
