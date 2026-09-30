@@ -1138,7 +1138,9 @@ public class Request implements HttpServletRequest {
         }
 
         if (!locales.isEmpty()) {
-            return Collections.enumeration(locales);
+            // Take a copy to prevent ConcurrentModificationExceptions if the
+            // list is modified while the enumeration is being iterated
+            return Collections.enumeration(new ArrayList<>(locales));
         }
         ArrayList<Locale> results = new ArrayList<>();
         results.add(defaultLocale);
