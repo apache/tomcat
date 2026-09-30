@@ -478,25 +478,29 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         // TODO Handle remove also work dir content !
         // Stop the context first to be nicer
         Context context = (Context) host.findChild(contextName);
-        if (context != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        if (context == null) {
+            if (log.isWarnEnabled()) {
+                log.warn(sm.getString("farmWarDeployer.contextNotFound", contextName));
             }
-            context.stop();
-            String baseName = context.getBaseName();
-            File war = new File(host.getAppBaseFile(), baseName + ".war");
-            File dir = new File(host.getAppBaseFile(), baseName);
-            File xml = new File(configBase, baseName + ".xml");
-            if (war.exists()) {
-                if (!war.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", war));
-                }
-            } else if (dir.exists()) {
-                undeployDir(dir);
-            } else {
-                if (!xml.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", xml));
-                }
+            return;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        }
+        context.stop();
+        String baseName = context.getBaseName();
+        File war = new File(host.getAppBaseFile(), baseName + ".war");
+        File dir = new File(host.getAppBaseFile(), baseName);
+        File xml = new File(configBase, baseName + ".xml");
+        if (war.exists()) {
+            if (!war.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", war));
+            }
+        } else if (dir.exists()) {
+            undeployDir(dir);
+        } else {
+            if (xml.exists() && !xml.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", xml));
             }
         }
     }
