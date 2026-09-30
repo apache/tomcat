@@ -63,6 +63,7 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
         Principal principal = null;
         Subject subject = null;
         String[] groups = null;
+        boolean passwordValidationFailed = false;
 
         if (callbacks != null) {
             /*
@@ -84,14 +85,19 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                 } else if (callback instanceof PasswordValidationCallback) {
                     if (container == null) {
                         log.warn(sm.getString("callbackHandlerImpl.containerMissing", callback.getClass().getName()));
+                        passwordValidationFailed = true;
                     } else if (container.getRealm() == null) {
                         log.warn(sm.getString("callbackHandlerImpl.realmMissing", callback.getClass().getName(),
                                 container.getName()));
+                        passwordValidationFailed = true;
                     } else {
                         PasswordValidationCallback pvc = (PasswordValidationCallback) callback;
                         principal =
                                 container.getRealm().authenticate(pvc.getUsername(), String.valueOf(pvc.getPassword()));
                         pvc.setResult(principal != null);
+                        if (principal == null) {
+                            passwordValidationFailed = true;
+                        }
                         subject = pvc.getSubject();
                     }
                 } else {
@@ -99,8 +105,12 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                 }
             }
 
-            // If subject is null, there is nothing to do
-            if (subject != null) {
+            /*
+             * If subject is null, there is nothing to do. If password validation was requested and failed, do not
+             * update the subject. The Jakarta Authentication specification requires the runtime to update the subject
+             * only if authentication succeeds and, for security, the handler must fail closed.
+             */
+            if (subject != null && !passwordValidationFailed) {
 
                 // Need a name to create a Principal
                 if (name == null && principal != null) {
