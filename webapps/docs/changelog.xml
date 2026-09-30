@@ -402,6 +402,13 @@
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
+        Move context attributes that were set while the web application was
+        still starting into the replicated attribute map when it is installed
+        in <code>ReplicatedContext</code>, so that they are replicated to the
+        other nodes like attributes set later on rather than remaining local to
+        the node that started the application. (remm)
+      </fix>
+      <fix>
         Replicate SSO session key set changes made by <code>removeSession()</code>
         and <code>sessionChangedId()</code> in <code>ClusterSingleSignOn</code> so
         that SSO entries are correctly deregistered and removed from all nodes when
