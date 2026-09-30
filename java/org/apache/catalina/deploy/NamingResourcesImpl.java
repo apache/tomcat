@@ -1229,7 +1229,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
                     }
                 }
             }
-            return null;
         }
+        return null;
     }
 }
