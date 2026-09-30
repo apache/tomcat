@@ -456,6 +456,25 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
             return;
         }
 
+        /*
+         * Obtaining and sending the final delta below takes the delta lock. That must not happen while the session
+         * monitor is held: code that runs while the delta lock is held, in particular the listener notifications
+         * triggered by StandardSession's attribute methods, may enter methods that take the session monitor, and the
+         * two orders would deadlock the two threads. The delta is therefore captured and sent before synchronizing.
+         * Concurrent expirations of the same session may then duplicate this message, which receivers handle
+         * harmlessly (a delta for an unknown session is ignored). The expired notification below remains under the
+         * monitor so it is sent only once.
+         */
+        String expiredId = getIdInternal();
+
+        if (notifyCluster && expiredId != null && manager instanceof DeltaManager dmanager) {
+            CatalinaCluster cluster = dmanager.getCluster();
+            ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
+            if (msg != null) {
+                cluster.send(msg);
+            }
+        }
+
         synchronized (this) {
             // Check again, now we are inside the sync so this code only runs once
             // Double check locking - isValid needs to be volatile
@@ -465,16 +484,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
             if (manager == null) {
                 return;
-            }
-
-            String expiredId = getIdInternal();
-
-            if (notifyCluster && expiredId != null && manager instanceof DeltaManager dmanager) {
-                CatalinaCluster cluster = dmanager.getCluster();
-                ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
-                if (msg != null) {
-                    cluster.send(msg);
-                }
             }
 
             super.expire(notify);
