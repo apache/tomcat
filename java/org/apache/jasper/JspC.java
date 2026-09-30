@@ -60,7 +60,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.LogOutputStream;
 import org.apache.tools.ant.util.FileUtils;
 import org.xml.sax.SAXException;
 
@@ -1772,8 +1774,12 @@ public class JspC extends Task implements Options {
      * @throws JasperException If a JSP error occurs
      */
     protected void initServletContext(ClassLoader classLoader) throws IOException, JasperException {
-        // TODO: should we use the Ant Project's log?
-        PrintWriter log = new PrintWriter(System.out);
+        PrintWriter log;
+        if (getProject() == null) {
+            log = new PrintWriter(System.out);
+        } else {
+            log = new PrintWriter(new LogOutputStream(this, Project.MSG_INFO), true);
+        }
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase, classLoader, isValidateXml(), isBlockExternal());
