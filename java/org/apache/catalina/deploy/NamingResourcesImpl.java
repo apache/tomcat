@@ -234,6 +234,30 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void addEnvironment(ContextEnvironment environment) {
 
+        List<InjectionTarget> injectionTargets = environment.getInjectionTargets();
+        String value = environment.getValue();
+        String lookupName = environment.getLookupName();
+
+        // Validate the new entry before any existing entry is removed below.
+        // Otherwise, an invalid new entry would silently destroy a valid
+        // existing one.
+
+        // Entries with injection targets but no value are effectively ignored
+        if (injectionTargets != null && !injectionTargets.isEmpty() && (value == null || value.isEmpty())) {
+            return;
+        }
+
+        // Entries with lookup-name and value are an error (EE.5.4.1.3)
+        if (value != null && !value.isEmpty() && lookupName != null && !lookupName.isEmpty()) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.envEntryLookupValue", environment.getName()));
+        }
+
+        if (!checkResourceType(environment)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", environment.getName(), environment.getType()));
+        }
+
         if (entries.contains(environment.getName())) {
             ContextEnvironment ce = findEnvironment(environment.getName());
             ContextResourceLink rl = findResourceLink(environment.getName());
@@ -261,26 +285,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
                 // It exists but it isn't an env or a res link...
                 return;
             }
-        }
-
-        List<InjectionTarget> injectionTargets = environment.getInjectionTargets();
-        String value = environment.getValue();
-        String lookupName = environment.getLookupName();
-
-        // Entries with injection targets but no value are effectively ignored
-        if (injectionTargets != null && !injectionTargets.isEmpty() && (value == null || value.isEmpty())) {
-            return;
-        }
-
-        // Entries with lookup-name and value are an error (EE.5.4.1.3)
-        if (value != null && !value.isEmpty() && lookupName != null && !lookupName.isEmpty()) {
-            throw new IllegalArgumentException(
-                    sm.getString("namingResources.envEntryLookupValue", environment.getName()));
-        }
-
-        if (!checkResourceType(environment)) {
-            throw new IllegalArgumentException(
-                    sm.getString("namingResources.resourceTypeFail", environment.getName(), environment.getType()));
         }
 
         entries.add(environment.getName());
