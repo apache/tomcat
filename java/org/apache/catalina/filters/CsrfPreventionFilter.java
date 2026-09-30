@@ -447,7 +447,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                         session = req.getSession(true);
                     }
 
-                    nonceCache = createNonceCache(req, session);
+                    synchronized (session) {
+                        nonceCache = getNonceCache(req, session);
+                        if (nonceCache == null) {
+                            nonceCache = createNonceCache(req, session);
+                        }
+                    }
                 }
 
                 String newNonce = generateNonce(req);
