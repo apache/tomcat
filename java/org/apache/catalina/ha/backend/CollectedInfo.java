@@ -98,6 +98,14 @@ public class CollectedInfo {
                 objName = null;
                 continue;
             }
+            // A connector configured with an auto-assigned port is registered
+            // before its port is bound, with a name ending with
+            // "auto-<name index>" in which the last element is the name index,
+            // not a port, so it cannot be matched
+            if (elenames.length >= 3 && "auto".equals(elenames[elenames.length - 2])) {
+                objName = null;
+                continue;
+            }
             if (elenames.length == 4) {
                 shost = elenames[2];
             }
