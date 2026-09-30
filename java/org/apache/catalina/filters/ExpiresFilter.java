@@ -1602,7 +1602,12 @@ public class ExpiresFilter extends FilterBase {
                         Integer.valueOf(response.getStatus()), response.getContentType(), expirationDate));
             }
 
-            String maxAgeDirective = "max-age=" + ((expirationDate.getTime() - System.currentTimeMillis()) / 1000);
+            long maxAgeSeconds = (expirationDate.getTime() - System.currentTimeMillis()) / 1000;
+            if (maxAgeSeconds < 0) {
+                maxAgeSeconds = 0;
+            }
+
+            String maxAgeDirective = "max-age=" + maxAgeSeconds;
 
             String cacheControlHeader = response.getCacheControlHeader();
             String newCacheControlHeader =
