@@ -94,12 +94,12 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                         } else {
                             principal = container.getRealm().authenticate(pvc.getUsername(),
                                     String.valueOf(pvc.getPassword()));
-                            pvc.setResult(principal != null);
                             if (principal == null) {
                                 passwordValidationFailed = true;
                             }
                             subject = pvc.getSubject();
                         }
+                        pvc.setResult(!passwordValidationFailed);
                     }
                     default -> log.error(
                             sm.getString("callbackHandlerImpl.jaspicCallbackMissing", callback.getClass().getName()));
