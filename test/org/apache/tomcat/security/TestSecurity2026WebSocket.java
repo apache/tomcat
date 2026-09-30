@@ -34,6 +34,7 @@ import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -91,6 +92,17 @@ public class TestSecurity2026WebSocket extends WebSocketBaseTest {
      */
     @Test
     public void testCVE_2026_77791() throws Exception {
+        /*
+         * Skipped on macOS. The test relies on a stalled (zero TCP receive window) connection keeping the server's
+         * pending write stuck for the whole blocking send timeout. The macOS TCP stack does not honor that premise:
+         * it tends to tear such connections down early (e.g. RST on segments overlapping the zero window) so the
+         * pending write fails after a few polling iterations. The server then closes long before the blocking send
+         * timeout expires (observed: ~126ms vs the expected ~2s), which trips the sanity check below without the
+         * wait under test ever having been exercised. This is an OS TCP behavior difference, not a Tomcat issue.
+         */
+        Assume.assumeFalse("macOS TCP stack does not keep the stalled write stuck. See comment in code.",
+                System.getProperty("os.name").contains("OS X"));
+
         serverSendLatch = new CountDownLatch(1);
         // Never released. The server's pending data message write must never complete, forcing
         // acquireMessagePartInProgressSemaphore() to wait for the full blocking send timeout.
