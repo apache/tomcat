@@ -181,7 +181,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
 
         String[] decodedUrlPatterns = new String[urlPatterns.length];
         for (int i = 0; i < urlPatterns.length; i++) {
-            if (urlPatterns[i] == null) {
+            if (urlPatterns[i] == null || urlPatterns[i].isEmpty()) {
                 throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
             }
             if (context.getUrlPatternsProvidedInDecodedForm()) {
