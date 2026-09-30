@@ -192,6 +192,9 @@
       <update>
         Update to Byte Buddy 1.18.14. (markt)
       </update>
+      <update>
+        Update to Bouncy Castle 1.8.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
