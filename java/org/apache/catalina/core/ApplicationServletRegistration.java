@@ -177,7 +177,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
         }
 
         for (String urlPattern : urlPatterns) {
-            if (urlPattern == null || urlPattern.isEmpty()) {
+            if (urlPattern == null) {
                 throw new IllegalArgumentException(sm.getString("applicationServletRegistration.nullUrlPattern"));
             }
         }

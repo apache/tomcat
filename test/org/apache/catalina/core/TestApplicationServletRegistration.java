@@ -46,7 +46,7 @@ public class TestApplicationServletRegistration extends TomcatBaseTest {
 
 
     @Test
-    public void testAddMappingNullAndEmptyPatterns() {
+    public void testAddMappingNullPatterns() {
         StandardContext context = new StandardContext();
 
         Wrapper wrapper = context.createWrapper();
@@ -65,13 +65,6 @@ public class TestApplicationServletRegistration extends TomcatBaseTest {
         try {
             registration.addMapping();
             Assert.fail("Expected an IllegalArgumentException for an empty pattern array");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-
-        try {
-            registration.addMapping("");
-            Assert.fail("Expected an IllegalArgumentException for an empty pattern");
         } catch (IllegalArgumentException e) {
             // Expected
         }
