@@ -1107,6 +1107,10 @@ public class RemoteIpFilter extends GenericFilter {
                 } catch (NumberFormatException nfe) {
                     log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()), nfe);
                 }
+                if (port < 1 || port > 65535) {
+                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()));
+                    port = defaultPort;
+                }
             }
         }
         xrequest.setServerPort(port);
