@@ -730,11 +730,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeEjb(String name) {
 
-        entries.remove(name);
-
         ContextEjb ejb;
         synchronized (ejbs) {
             ejb = ejbs.remove(name);
+            if (ejb != null) {
+                entries.remove(name);
+            }
         }
         if (ejb != null) {
             support.firePropertyChange("ejb", ejb, null);
@@ -747,11 +748,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeEnvironment(String name) {
 
-        entries.remove(name);
-
         ContextEnvironment environment;
         synchronized (envs) {
             environment = envs.remove(name);
+            if (environment != null) {
+                entries.remove(name);
+            }
         }
         if (environment != null) {
             support.firePropertyChange("environment", environment, null);
@@ -775,11 +777,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeLocalEjb(String name) {
 
-        entries.remove(name);
-
         ContextLocalEjb localEjb;
         synchronized (localEjbs) {
             localEjb = localEjbs.remove(name);
+            if (localEjb != null) {
+                entries.remove(name);
+            }
         }
         if (localEjb != null) {
             support.firePropertyChange("localEjb", localEjb, null);
@@ -796,11 +799,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeMessageDestinationRef(String name) {
 
-        entries.remove(name);
-
         MessageDestinationRef mdr;
         synchronized (mdrs) {
             mdr = mdrs.remove(name);
+            if (mdr != null) {
+                entries.remove(name);
+            }
         }
         if (mdr != null) {
             support.firePropertyChange("messageDestinationRef", mdr, null);
@@ -825,11 +829,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeResource(String name) {
 
-        entries.remove(name);
-
         ContextResource resource;
         synchronized (resources) {
             resource = resources.remove(name);
+            if (resource != null) {
+                entries.remove(name);
+            }
         }
         if (resource != null) {
             support.firePropertyChange("resource", resource, null);
@@ -853,11 +858,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeResourceEnvRef(String name) {
 
-        entries.remove(name);
-
         ContextResourceEnvRef resourceEnvRef;
         synchronized (resourceEnvRefs) {
             resourceEnvRef = resourceEnvRefs.remove(name);
+            if (resourceEnvRef != null) {
+                entries.remove(name);
+            }
         }
         if (resourceEnvRef != null) {
             support.firePropertyChange("resourceEnvRef", resourceEnvRef, null);
@@ -870,11 +876,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeResourceLink(String name) {
 
-        entries.remove(name);
-
         ContextResourceLink resourceLink;
         synchronized (resourceLinks) {
             resourceLink = resourceLinks.remove(name);
+            if (resourceLink != null) {
+                entries.remove(name);
+            }
         }
         if (resourceLink != null) {
             support.firePropertyChange("resourceLink", resourceLink, null);
@@ -898,11 +905,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeService(String name) {
 
-        entries.remove(name);
-
         ContextService service;
         synchronized (services) {
             service = services.remove(name);
+            if (service != null) {
+                entries.remove(name);
+            }
         }
         if (service != null) {
             support.firePropertyChange("service", service, null);
