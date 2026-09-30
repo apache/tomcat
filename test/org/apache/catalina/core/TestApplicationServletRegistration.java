@@ -120,7 +120,7 @@ public class TestApplicationServletRegistration extends TomcatBaseTest {
         }
 
         try {
-            ((ServletRegistration.Dynamic) registration).addMapping("/other");
+            registration.addMapping("/other");
             Assert.fail("Expected an IllegalStateException after initialisation");
         } catch (IllegalStateException e) {
             // Expected
