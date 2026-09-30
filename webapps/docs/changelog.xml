@@ -188,6 +188,14 @@
         other nodes like attributes set later on rather than remaining local to
         the node that started the application. (remm)
       </fix>
+      <fix>
+        Fix a possible deadlock in <code>DeltaSession.expire()</code>: the
+        final session delta is now captured and sent to the cluster before the
+        session monitor is acquired, because obtaining the delta takes the
+        delta lock and code that runs while the delta lock is held, such as
+        session attribute listener notifications, may in turn wait for the
+        session monitor. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
