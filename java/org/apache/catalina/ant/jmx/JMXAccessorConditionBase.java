@@ -23,6 +23,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 
@@ -266,6 +267,9 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
             if (result != null) {
                 return result.toString();
             }
+        } catch (BuildException e) {
+            // Re-throw configuration errors.
+            throw e;
         } catch (Exception e) {
             /*
              * Exceptions are ignored for compatibility with the waitFor task when waiting for the server to start. If
