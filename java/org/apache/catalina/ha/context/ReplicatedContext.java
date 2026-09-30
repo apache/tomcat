@@ -235,8 +235,14 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         @Override
         public void removeAttribute(String name) {
-            tomcatAttributes.remove(name);
+            Object localValue = tomcatAttributes.remove(name);
+            boolean inAttributeMap = attributes.containsKey(name);
             super.removeAttribute(name);
+            if (localValue != null && !inAttributeMap) {
+                // The attribute was only stored locally, so the removal event
+                // was not fired by the attribute map
+                fireContextAttributeRemoved(name, localValue);
+            }
         }
 
         @Override
@@ -249,7 +255,10 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 return;
             }
             if ((!getParent().getState().isAvailable()) || JSP_APP_CONTEXT_NAME.equals(name)) {
-                tomcatAttributes.put(name, value);
+                Object oldValue = tomcatAttributes.put(name, value);
+                // The attribute is stored locally, so the event has to be fired
+                // here rather than by the attribute map
+                fireContextAttributeAddedOrReplaced(oldValue != null, name, oldValue != null ? oldValue : value);
             } else {
                 super.setAttribute(name, value);
             }
