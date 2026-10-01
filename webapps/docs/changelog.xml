@@ -162,6 +162,11 @@
         Ensure that the non-blocking write buffer is empty before sending an AJP
         end response message. (markt)
       </fix>
+      <fix>
+        <bug>70247</bug>: Fix a leak in the HTTP/2 connection flow control
+        window when part of the HTTP request body is received but not read.
+        Based on a patch provided by Guillaume Darmont. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

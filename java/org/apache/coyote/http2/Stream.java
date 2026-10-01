@@ -887,21 +887,26 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void close(Http2Exception http2Exception) {
-        if (http2Exception instanceof StreamException) {
+        if (http2Exception instanceof ConnectionException) {
+            handler.closeConnection(http2Exception);
+        } else {
             try {
                 StreamException se = (StreamException) http2Exception;
-                if (log.isTraceEnabled()) {
-                    log.trace(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
-                }
+                // se may be null when the clean-up is required without sending the reset
+                if (se != null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
+                    }
 
-                // Need to update state atomically with the sending of the RST
-                // frame else other threads currently working with this stream
-                // may see the state change and send a RST frame before the RST
-                // frame triggered by this thread. If that happens the client
-                // may see out of order RST frames which may hard to follow if
-                // the client is unaware the RST frames may be received out of
-                // order.
-                handler.sendStreamReset(state, se);
+                    // Need to update state atomically with the sending of the RST
+                    // frame else other threads currently working with this stream
+                    // may see the state change and send a RST frame before the RST
+                    // frame triggered by this thread. If that happens the client
+                    // may see out of order RST frames which may hard to follow if
+                    // the client is unaware the RST frames may be received out of
+                    // order.
+                    handler.sendStreamReset(state, se);
+                }
 
                 cancelAllocationRequests();
                 inputBuffer.swallowUnread();
@@ -911,8 +916,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                                 Http2Error.PROTOCOL_ERROR, ioe);
                 handler.closeConnection(ce);
             }
-        } else {
-            handler.closeConnection(http2Exception);
         }
         replace();
     }
