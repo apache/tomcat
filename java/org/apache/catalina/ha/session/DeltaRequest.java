@@ -553,6 +553,7 @@ public class DeltaRequest implements Externalizable {
             // Attributes and notes are different stores and setting and
             // removing are different changes, so a name match alone is not
             // enough to consider two actions as the same change
+            AttributeInfo other = (AttributeInfo) o;
             return other.getType() == this.getType() && other.getAction() == this.getAction() &&
                     other.getName().equals(this.getName());
         }

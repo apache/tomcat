@@ -266,7 +266,8 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
         // The cache is only a ReplicatedMap if start completed successfully.
         // If the ReplicatedMap creation failed, the base class ConcurrentHashMap
         // is still in place.
-        if (cache instanceof ReplicatedMap<?,?> map) {
+        if (cache instanceof ReplicatedMap<?,?>) {
+            ReplicatedMap<?,?> map = (ReplicatedMap<?,?>) cache;
             map.breakdown();
         }
     }
