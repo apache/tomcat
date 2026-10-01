@@ -354,6 +354,11 @@
         start of the chunk rather than from twice the chunk's start offset
         when the chunk does not begin at the start of its buffer. (breken-ai)
       </fix>
+      <fix>
+        <bug>70247</bug>: Fix a leak in the HTTP/2 connection flow control
+        window when part of the HTTP request body is received but not read.
+        Based on a patch provided by Guillaume Darmont. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

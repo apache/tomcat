@@ -131,8 +131,11 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {
-                                // Close calls replace() so need the same call here
-                                stream.replace();
+                                /*
+                                 * Still need to call close to perform the necessary clean-up but no need to send reset
+                                 * since the stream is not active so pass null.
+                                 */
+                                stream.close(null);
                             }
                         }
                     }
