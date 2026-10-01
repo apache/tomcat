@@ -107,6 +107,8 @@ public class TestJMXAccessorTask {
      */
     @Test
     public void testAccessJMXConnectionReuseAndMismatch() throws Exception {
+        // Force the use of localhost to resolve CI failures
+        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
         int port = getAvailablePort();
         Registry registry = LocateRegistry.createRegistry(port);
         MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
