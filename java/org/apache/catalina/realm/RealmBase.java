@@ -1475,7 +1475,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 Class<?> clazz = Class.forName(handlerClassName);
                 handler = (DigestCredentialHandlerBase) clazz.getConstructor().newInstance();
                 IntrospectionUtils.setProperty(handler, "algorithm", algorithm);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | ClassCastException e) {
                 throw new RuntimeException(e);
             }
         }

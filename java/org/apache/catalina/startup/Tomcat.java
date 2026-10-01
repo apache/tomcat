@@ -692,7 +692,7 @@ public class Tomcat {
         try {
             Class<?> clazz = Class.forName((host != null ? host : getHost()).getConfigClass());
             listener = (LifecycleListener) clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | ClassCastException e) {
             // Wrap in IAE since we can't easily change the method signature
             // to throw the specific checked exceptions
             throw new IllegalArgumentException(e);
@@ -977,7 +977,8 @@ public class Tomcat {
                 return (Context) Class.forName(contextClass).getConstructor().newInstance();
             }
 
-        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                ClassCastException e) {
             throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }
     }

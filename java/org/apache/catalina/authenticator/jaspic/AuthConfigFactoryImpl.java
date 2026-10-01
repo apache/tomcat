@@ -191,7 +191,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             }
             Constructor<?> constructor = clazz.getConstructor(Map.class, AuthConfigFactory.class);
             provider = (AuthConfigProvider) constructor.newInstance(properties, null);
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException | ClassCastException e) {
             throw new SecurityException(e);
         }
         return provider;

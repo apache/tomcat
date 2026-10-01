@@ -277,7 +277,7 @@ public class JspCompilationContext {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.error.compiler"), e);
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | ClassCastException e) {
             log.warn(Localizer.getMessage("jsp.error.compiler"), e);
         }
         return compiler;
