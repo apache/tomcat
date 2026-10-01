@@ -87,14 +87,8 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         super.init(filterConfig);
 
         try {
-            Class<?> clazz = Class.forName(randomClass);
-            Object instance = clazz.getConstructor().newInstance();
-            if (instance instanceof Random random) {
-                randomSource = random;
-            } else {
-                throw new ServletException(sm.getString("csrfPrevention.invalidRandomClass", randomClass));
-            }
-        } catch (ReflectiveOperationException e) {
+            randomSource = (Random) Class.forName(randomClass).getConstructor().newInstance();
+        } catch (ReflectiveOperationException | ClassCastException e) {
             throw new ServletException(sm.getString("csrfPrevention.invalidRandomClass", randomClass), e);
         }
     }

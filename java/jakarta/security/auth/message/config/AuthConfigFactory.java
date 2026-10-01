@@ -71,7 +71,7 @@ public abstract class AuthConfigFactory {
                         Class<?> clazz = Class.forName(className);
                         factory = (AuthConfigFactory) clazz.getConstructor().newInstance();
                     }
-                } catch (ReflectiveOperationException e) {
+                } catch (ReflectiveOperationException | ClassCastException e) {
                     Throwable cause = e.getCause() == null ? e : e.getCause();
                     throw new RuntimeException("AuthConfigFactory error:" + cause.getMessage(), cause);
                 }
