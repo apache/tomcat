@@ -69,7 +69,7 @@ public class TestFileMessageFactory {
             Assert.assertEquals("Number of messages", expectedCount, messageCount);
             // The transfer must be signalled complete by the last message,
             // otherwise the receiving node never deploys the WAR
-            Assert.assertEquals(messageCount > 0, complete);
+            Assert.assertEquals(Boolean.valueOf(messageCount > 0), Boolean.valueOf(complete));
             Assert.assertArrayEquals("Target file content", content, Files.readAllBytes(target.toPath()));
         } finally {
             if (!source.delete()) {
