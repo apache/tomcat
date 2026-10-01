@@ -116,7 +116,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
         public void setContentType(String contentType) {
 
             if (contentType != null) {
-                String lowerCaseContentType = contentType.toLowerCase(Locale.ENGLISH);
+                String lowerCaseContentType = contentType.toLowerCase(Locale.ENGLISH).trim();
                 if (lowerCaseContentType.startsWith("text/")) {
                     if (!lowerCaseContentType.contains("charset=")) {
                         super.setContentType(contentType + ";charset=" + encoding);
