@@ -154,7 +154,8 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                             ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                                ClassCastException e) {
                             throw new AuthException(e);
                         }
 
