@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
@@ -44,6 +46,10 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Method;
 
 public class TestStreamProcessor extends Http2TestBase {
+
+    private static final int INCOMPLETE_READ_BODY_SIZE = 8192;
+
+    private static CountDownLatch incompleteReadLatch = null;
 
     @Test
     public void testAsyncComplete() throws Exception {
@@ -794,6 +800,171 @@ public class TestStreamProcessor extends Http2TestBase {
             resp.setContentType("text/plain");
 
             resp.getWriter().write("OK");
+        }
+    }
+
+
+    /*
+     * Connection window leak.
+     * <p>
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70247
+     * <p>
+     * The client sends the complete request body. The application does not read it.
+     */
+    @Test
+    public void testWindowLeakWithUnreadRequestBody() throws Exception {
+        incompleteReadLatch = null;
+
+        enableHttp2(200, false, 10000, 10000, 2000, 5000, 5000);
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "reject", new RejectServlet());
+        ctxt.addServletMapping("/reject", "reject");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(INCOMPLETE_READ_BODY_SIZE);
+
+        buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/reject", dataFrameHeader,
+                dataPayload, null, false, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+        writeFrame(dataFrameHeader, dataPayload);
+
+        // Response headers
+        parser.readFrame();
+        // Empty response body with end of stream
+        parser.readFrame();
+        // connection window update
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[403]\n" + "3-Header-[content-length]-[0]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-0\n" + "3-EndOfStream\n" +
+                "0-WindowSize-[" + INCOMPLETE_READ_BODY_SIZE + "]\n", output.getTrace());
+    }
+
+
+    /*
+     * Connection window leak.
+     * <p>
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70247
+     * <p>
+     * The client resets the stream after the response has been written but before the container completes the request.
+     * The request body that the application did not read must still be returned to the connection window.
+     */
+    @Test
+    public void testResetAfterResponseCommitted() throws Exception {
+        incompleteReadLatch = new CountDownLatch(1);
+
+        enableHttp2(200, false, 10000, 10000, 2000, 5000, 5000);
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "reject", new RejectServlet());
+        ctxt.addServletMapping("/reject", "reject");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // No end of stream. The client keeps the stream open and then cancels it.
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(INCOMPLETE_READ_BODY_SIZE);
+
+        buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/reject", dataFrameHeader,
+                dataPayload, null, false, 3);
+        // Clear the end of stream flag set by buildPostRequest()
+        dataFrameHeader[4] = 0x00;
+
+        writeFrame(headersFrameHeader, headersPayload);
+        writeFrame(dataFrameHeader, dataPayload);
+
+        // The servlet commits the response and then waits
+        // Response headers
+        parser.readFrame();
+        Assert.assertTrue(output.getTrace(), output.getTrace().contains("3-Header-[:status]-[403]\n"));
+        output.clearTrace();
+
+        // Cancel the stream. The ping confirms the connection thread processed the reset before the request
+        // processing thread continues.
+        sendRst(3, Http2Error.CANCEL.getCode());
+        sendPing();
+        parser.readFrame();
+        Assert.assertEquals("0-Ping-Ack-[0,0,0,0,0,0,0,0]\n", output.getTrace());
+        output.clearTrace();
+
+        // Let the request processing thread complete the request
+        incompleteReadLatch.countDown();
+
+        // The stream is reset, thus only the connection window update remains
+        parser.readFrame();
+        Assert.assertEquals("0-WindowSize-[" + INCOMPLETE_READ_BODY_SIZE + "]\n", output.getTrace());
+    }
+
+
+    private static class RejectServlet extends SimpleServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            // The request body has to be buffered by the container before the request completes
+            waitForRequestBody(req);
+
+            // Reject the request without reading the request body
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+            CountDownLatch latch = incompleteReadLatch;
+            if (latch != null) {
+                // Commit the response and then wait for the client to reset the stream
+                resp.flushBuffer();
+                try {
+                    Assert.assertTrue(latch.await(10, TimeUnit.SECONDS));
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+            }
+        }
+
+
+        /*
+         * available() returns a positive value once the complete DATA frame has been buffered. The parser processes
+         * the end of stream flag of that frame before it makes the payload available.
+         */
+        private void waitForRequestBody(HttpServletRequest req) throws IOException {
+            long count = 0;
+            while (req.getInputStream().available() == 0) {
+                // Allow 10s (far more than necessary)
+                if (count > 200) {
+                    throw new IOException("Request body did not arrive");
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+                count++;
+            }
         }
     }
 }
