@@ -146,7 +146,8 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
             }
-        } else if (connection instanceof JarURLConnection jarConn) {
+        } else if (connection instanceof JarURLConnection) {
+            JarURLConnection jarConn = (JarURLConnection) connection;
             // Most JarFile cannot be closed
             if (isPrivateJdkJarFile(jarConn)) {
                 try (@SuppressWarnings("unused")
