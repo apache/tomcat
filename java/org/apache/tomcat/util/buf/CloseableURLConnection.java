@@ -37,9 +37,11 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <ul>
  * <li>{@link HttpURLConnection} (including {@code HttpsURLConnection}) requires {@code disconnect()} to release the
  * underlying socket.</li>
- * <li>{@link JarURLConnection} requires the input stream to be closed to release the underlying
- * {@code java.util.jar.JarFile}. When {@code setUseCaches(false)} is set, closing the input stream closes the
- * {@code JarFile}, and calling {@code getInputStream()} again will throw {@link IllegalStateException}.</li>
+ * <li>{@link JarURLConnection} requires its resources to be released. When the stock JDK handler is used with
+ * {@code setUseCaches(false)}, {@code getJarFile()} returns a JarFile private to this connection, which is closed
+ * directly. Otherwise the {@code JarFile} may be shared - the JDK caches one instance while caches are enabled, and
+ * a custom jar handler (such as nested JAR support) may share one regardless of the use of caches - so only the
+ * input stream is closed, leaving any shared {@code JarFile} open for its other users.</li>
  * <li>Other URLConnection types only require any obtained streams to be closed.</li>
  * </ul>
  * <p>
@@ -49,6 +51,12 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public final class CloseableURLConnection extends URLConnection implements AutoCloseable {
 
+    /*
+     * The class name of the stock JDK handler for jar URLs. A connection of exactly this type opened with caches
+     * disabled hands out, via getJarFile(), a JarFile that is private to the connection and therefore safe to close.
+     * The name is matched rather than the class referenced directly because the handler is in a non-exported package.
+     */
+    private static final String JDK_JAR_URL_CONNECTION = "sun.net.www.protocol.jar.JarURLConnection";
 
     private final URLConnection connection;
     private InputStream trackedStream;
@@ -138,13 +146,21 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
             }
-        } else if (connection instanceof JarURLConnection) {
-            try (@SuppressWarnings("unused")
-                java.util.jar.JarFile jarFile = ((JarURLConnection) connection).getJarFile()) {
-                // Explicitly close the JarFile to release its native resources.
-                // As setUseCaches(false) is set, this should not cause side effects on other streams.
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
+        } else if (connection instanceof JarURLConnection jarConn) {
+            // Most JarFile cannot be closed
+            if (isPrivateJdkJarFile(jarConn)) {
+                try (@SuppressWarnings("unused")
+                    java.util.jar.JarFile jarFile = jarConn.getJarFile()) {
+                    // Explicitly close the private JarFile to release its native resources.
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
+            } else {
+                try (@SuppressWarnings("unused") InputStream is = connection.getInputStream()) {
+                    // Explicitly close the InputStream to release native resources.
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
             }
         } else if (!(connection instanceof HttpURLConnection)) {
             /*
@@ -162,6 +178,22 @@ public final class CloseableURLConnection extends URLConnection implements AutoC
         if (connection instanceof HttpURLConnection) {
             ((HttpURLConnection) connection).disconnect();
         }
+    }
+
+
+    /**
+     * Determines whether the JarFile returned by the given connection is a private instance owned by this
+     * connection and therefore safe to close directly. This is only the case for the stock JDK jar handler opened
+     * with caches disabled. For any other connection - a custom handler, which may share the JarFile regardless of
+     * the use of caches, or a stock connection with caches enabled, which shares a cached JarFile - the JarFile must
+     * be left open and the connection released through its input stream instead.
+     *
+     * @param connection the jar connection to test
+     *
+     * @return {@code true} if {@link JarURLConnection#getJarFile()} may be closed directly
+     */
+    private static boolean isPrivateJdkJarFile(JarURLConnection connection) {
+        return !connection.getUseCaches() && JDK_JAR_URL_CONNECTION.equals(connection.getClass().getName());
     }
 
 

@@ -167,6 +167,11 @@
         window when part of the HTTP request body is received but not read.
         Based on a patch provided by Guillaume Darmont. (markt)
       </fix>
+      <fix>
+        <bug>70251</bug>: Avoid closing a <code>JarFile</code> in
+        <code>CloseableURLConnection</code> unless it is certain the JAR is not
+        shared. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
