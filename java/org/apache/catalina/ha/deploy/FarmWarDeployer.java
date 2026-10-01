@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -167,6 +168,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             log.error(sm.getString("farmWarDeployer.mbeanNameFail", engine.getName(), hostname), e);
             return;
         }
+        if (watchEnabled && getWatchDir() == null) {
+            log.error(sm.getString("farmWarDeployer.noWatchDir"));
+            watchEnabled = false;
+        }
         if (watchEnabled) {
             watcher = new WarWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
@@ -237,7 +242,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                             try {
                                 remove(contextName);
 
-                                Files.move(factory.getFile().toPath(), deployable.toPath());
+                                // Replace an existing file since the delete of
+                                // an old WAR may have failed earlier
+                                Files.move(factory.getFile().toPath(), deployable.toPath(),
+                                        StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException ioe) {
                                 log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable),
                                         ioe);
@@ -254,7 +262,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     } catch (Exception e) {
                         log.error(sm.getString("farmWarDeployer.fileMessageError"), e);
                     } finally {
-                        removeFactory(fmsg);
+                        removeFactory(fmsg, factory);
                     }
                 }
             } else if (msg instanceof UndeployMessage) {
@@ -309,10 +317,13 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Remove file (war) from messages
      *
-     * @param msg The file
+     * @param msg     The file
+     * @param factory The factory for which the transfer completed
      */
-    public void removeFactory(FileMessage msg) {
-        fileFactories.remove(msg.getFileName());
+    public void removeFactory(FileMessage msg, FileMessageFactory factory) {
+        // Remove with the factory instance to avoid evicting a newer factory
+        // created for a new transfer of the same file
+        fileFactories.remove(msg.getFileName(), factory);
     }
 
     /**
@@ -471,25 +482,29 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         // TODO Handle remove also work dir content !
         // Stop the context first to be nicer
         Context context = (Context) host.findChild(contextName);
-        if (context != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        if (context == null) {
+            if (log.isWarnEnabled()) {
+                log.warn(sm.getString("farmWarDeployer.contextNotFound", contextName));
             }
-            context.stop();
-            String baseName = context.getBaseName();
-            File war = new File(host.getAppBaseFile(), baseName + ".war");
-            File dir = new File(host.getAppBaseFile(), baseName);
-            File xml = new File(configBase, baseName + ".xml");
-            if (war.exists()) {
-                if (!war.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", war));
-                }
-            } else if (dir.exists()) {
-                undeployDir(dir);
-            } else {
-                if (!xml.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", xml));
-                }
+            return;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        }
+        context.stop();
+        String baseName = context.getBaseName();
+        File war = new File(host.getAppBaseFile(), baseName + ".war");
+        File dir = new File(host.getAppBaseFile(), baseName);
+        File xml = new File(configBase, baseName + ".xml");
+        if (war.exists()) {
+            if (!war.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", war));
+            }
+        } else if (dir.exists()) {
+            undeployDir(dir);
+        } else {
+            if (xml.exists() && !xml.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", xml));
             }
         }
     }
@@ -803,8 +818,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         String[] fileNames = fileFactories.keySet().toArray(new String[0]);
         for (String fileName : fileNames) {
             FileMessageFactory factory = fileFactories.get(fileName);
-            if (!factory.isValid()) {
-                fileFactories.remove(fileName);
+            if (factory != null && !factory.isValid()) {
+                // Remove with the factory instance to avoid evicting a newer
+                // factory created for a new transfer of the same file
+                fileFactories.remove(fileName, factory);
             }
         }
     }

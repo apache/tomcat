@@ -45,6 +45,16 @@ public class TcpSender implements Sender {
     private static final StringManager sm = StringManager.getManager(TcpSender.class);
 
     /**
+     * Timeout, in milliseconds, when connecting to a proxy.
+     */
+    private static final int CONNECT_TIMEOUT = 5000;
+
+    /**
+     * Timeout, in milliseconds, when reading a response from a proxy.
+     */
+    private static final int READ_TIMEOUT = 5000;
+
+    /**
      * The heartbeat listener configuration.
      */
     HeartbeatListener config = null;
@@ -70,9 +80,23 @@ public class TcpSender implements Sender {
      */
     protected BufferedWriter[] connectionWriters = null;
 
+    /**
+     * The proxy list that the current connections were established for.
+     */
+    protected String proxyList = null;
+
 
     @Override
     public void init(HeartbeatListener config) throws Exception {
+        String newProxyList = config.getProxyList();
+        if (connections != null && newProxyList != null && newProxyList.equals(proxyList)) {
+            // The proxy list has not changed since the previous init, so the
+            // existing connections can be kept. The init is called for every
+            // heartbeat and closing the connections here would defeat the
+            // keep-alive design.
+            this.config = config;
+            return;
+        }
         // Close any existing connections from a previous init
         if (connections != null) {
             for (int i = 0; i < connections.length; i++) {
@@ -101,6 +125,7 @@ public class TcpSender implements Sender {
         connections = new Socket[proxies.length];
         connectionReaders = new BufferedReader[proxies.length];
         connectionWriters = new BufferedWriter[proxies.length];
+        proxyList = newProxyList;
 
     }
 
@@ -115,16 +140,19 @@ public class TcpSender implements Sender {
         for (int i = 0; i < connections.length; i++) {
             if (connections[i] == null) {
                 try {
+                    connections[i] = new Socket();
+                    // Never block the periodic event thread indefinitely
+                    connections[i].setSoTimeout(READ_TIMEOUT);
                     if (config.getHost() != null) {
-                        connections[i] = new Socket();
                         InetAddress addr = InetAddress.getByName(config.getHost());
                         InetSocketAddress addrs = new InetSocketAddress(addr, 0);
                         connections[i].setReuseAddress(true);
                         connections[i].bind(addrs);
                         addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
-                        connections[i].connect(addrs);
+                        connections[i].connect(addrs, CONNECT_TIMEOUT);
                     } else {
-                        connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                        connections[i].connect(new InetSocketAddress(proxies[i].address, proxies[i].port),
+                                CONNECT_TIMEOUT);
                     }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
@@ -156,12 +184,14 @@ public class TcpSender implements Sender {
             }
 
             /* Read httpd answer */
-            String responseStatus = connectionReaders[i].readLine();
-            if (responseStatus == null) {
-                log.error(sm.getString("tcpSender.responseError"));
-                close(i);
-                continue;
-            } else {
+            try {
+                String responseStatus = connectionReaders[i].readLine();
+                if (responseStatus == null) {
+                    log.error(sm.getString("tcpSender.responseError"));
+                    close(i);
+                    continue;
+                }
+
                 int firstSpace = responseStatus.indexOf(' ');
                 int secondSpace = responseStatus.indexOf(' ', firstSpace + 1);
                 if (firstSpace < 0 || secondSpace < 0 || secondSpace <= firstSpace + 1) {
@@ -234,8 +264,12 @@ public class TcpSender implements Sender {
                         }
                     }
                 }
+            } catch (IOException e) {
+                // Includes read timeouts. Close the connection so it is not
+                // reused in a desynchronised state
+                log.error(sm.getString("tcpSender.responseError"), e);
+                close(i);
             }
-
         }
 
         return 0;

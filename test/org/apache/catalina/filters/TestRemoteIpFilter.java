@@ -599,6 +599,60 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvokeXforwardedPortOutOfRange() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // port
+        request.setHeader("x-forwarded-port", "99999");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
+    }
+
+    @Test
+    public void testInvokeXforwardedPortNegative() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // port
+        request.setHeader("x-forwarded-port", "-5");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
+    }
+
+    @Test
     public void testInvokeXforwardedHostAndPort() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();

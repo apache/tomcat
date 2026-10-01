@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -170,6 +171,12 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      */
     protected static class ReplApplContext extends ApplicationContext {
         /**
+         * Attribute name used by Jasper for its application context. It holds
+         * node specific state and must therefore never be replicated.
+         */
+        private static final String JSP_APP_CONTEXT_NAME = "org.apache.jasper.runtime.JspApplicationContextImpl";
+
+        /**
          * Map for Tomcat-specific attributes that should not be replicated.
          */
         protected final Map<String,Object> tomcatAttributes = new ConcurrentHashMap<>();
@@ -213,12 +220,30 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
          */
         public void setAttributeMap(Map<String,Object> map) {
             this.attributes = map;
+            // Attributes set while the context was starting were stored in the
+            // local map. Move them to the new map so that they are handled the
+            // same way as attributes set later on, in particular replicated to
+            // the other nodes. Values that cannot be serialized are stored
+            // locally by the replicated map.
+            for (Map.Entry<String,Object> entry : tomcatAttributes.entrySet()) {
+                if (JSP_APP_CONTEXT_NAME.equals(entry.getKey())) {
+                    continue;
+                }
+                map.put(entry.getKey(), entry.getValue());
+                tomcatAttributes.remove(entry.getKey());
+            }
         }
 
         @Override
         public void removeAttribute(String name) {
-            tomcatAttributes.remove(name);
+            Object localValue = tomcatAttributes.remove(name);
+            boolean inAttributeMap = attributes.containsKey(name);
             super.removeAttribute(name);
+            if (localValue != null && !inAttributeMap) {
+                // The attribute was only stored locally, so the removal event
+                // was not fired by the attribute map
+                fireContextAttributeRemoved(name, localValue);
+            }
         }
 
         @Override
@@ -230,9 +255,11 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 removeAttribute(name);
                 return;
             }
-            if ((!getParent().getState().isAvailable()) ||
-                    "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name)) {
-                tomcatAttributes.put(name, value);
+            if ((!getParent().getState().isAvailable()) || JSP_APP_CONTEXT_NAME.equals(name)) {
+                Object oldValue = tomcatAttributes.put(name, value);
+                // The attribute is stored locally, so the event has to be fired
+                // here rather than by the attribute map
+                fireContextAttributeAddedOrReplaced(oldValue != null, name, oldValue != null ? oldValue : value);
             } else {
                 super.setAttribute(name, value);
             }
@@ -252,6 +279,8 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @Override
         public Enumeration<String> getAttributeNames() {
             Set<String> names = new HashSet<>(tomcatAttributes.keySet());
+            // Names that are present in both stores are only reported once
+            names.removeAll(attributes.keySet());
 
             return new MultiEnumeration<String>(
                     new Enumeration[] { super.getAttributeNames(), Collections.enumeration(names) });
@@ -295,8 +324,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                     return enumeration.nextElement();
                 }
             }
-            return null;
-
+            throw new NoSuchElementException();
         }
     }
 
