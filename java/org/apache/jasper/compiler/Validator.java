@@ -1551,7 +1551,7 @@ class Validator {
         PageInfo pageInfo = compiler.getPageInfo();
         String contentType = pageInfo.getContentType();
 
-        if (contentType == null || !contentType.contains("charset=")) {
+        if (contentType == null || !contentType.toLowerCase(Locale.ENGLISH).contains("charset=")) {
             boolean isXml = page.getRoot().isXmlSyntax();
             String defaultType;
             defaultType = Objects.requireNonNullElse(contentType, isXml ? "text/xml" : "text/html");
