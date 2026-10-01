@@ -213,7 +213,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             try {
                 Class<?> clazz = Class.forName((String) option);
                 credentialHandler = (CredentialHandler) clazz.getConstructor().newInstance();
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | ClassCastException e) {
                 throw new IllegalArgumentException(e);
             }
         }

@@ -161,7 +161,7 @@ public abstract class ExpressionFactory {
             Throwable cause = e.getCause();
             Util.handleThrowable(cause);
             throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException | ClassCastException e) {
             throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
         }
 
