@@ -4609,7 +4609,6 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
-<<<<<<< HEAD
         Avoid updating request count stats on async. (remm)
       </fix>
     </changelog>
