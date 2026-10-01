@@ -158,15 +158,5 @@ public class AddDefaultCharsetFilter extends FilterBase {
                 encoding = charset;
             }
         }
-
-        @Override
-        public void setCharacterEncoding(Charset encoding) {
-            super.setCharacterEncoding(encoding);
-            if (encoding == null) {
-                this.encoding = DEFAULT_ENCODING;
-            } else {
-                this.encoding = encoding.name();
-            }
-        }
     }
 }
