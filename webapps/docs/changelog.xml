@@ -155,12 +155,22 @@
         on uploads. Submitted by Tim Burke. (remm)
       </fix>
       <fix>
+        Avoid very rare race between async write notification and completion.
+        Skip the write notification in these cases since it would be useless.
+        (remm)
+      </fix>
+      <fix>
         Fix a timing issue that could cause large non-blocking writes to stall
         for AJP connections. (markt)
       </fix>
       <fix>
         Ensure that the non-blocking write buffer is empty before sending an AJP
         end response message. (markt)
+      </fix>
+      <fix>
+        Fix <code>CharChunk.indexOf(char)</code> so that it searches from the
+        start of the chunk rather than from twice the chunk's start offset
+        when the chunk does not begin at the start of its buffer. (breken-ai)
       </fix>
       <fix>
         <bug>70247</bug>: Fix a leak in the HTTP/2 connection flow control
@@ -2152,6 +2162,10 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
+      <fix>
+        <bug>69844</bug>: Close the connection with a protocol error if the
+        server sends masked frames. (markt)
+      </fix>
       <fix>
         <bug>69845</bug>: When using <code>permessage-deflate</code> with Java
         25 onwards, handle the underlying <code>Inflater</code> and/or
@@ -4363,16 +4377,6 @@
         meant that the first header in the response was also dropped. Fix based
         on pull request <pr>710</pr> by foremans. (markt)
       </fix>
-      <fix>
-        Avoid very rare race between async write notification and completion.
-        Skip the write notification in these cases since it would be useless.
-        (remm)
-      </fix>
-      <fix>
-        Fix <code>CharChunk.indexOf(char)</code> so that it searches from the
-        start of the chunk rather than from twice the chunk's start offset
-        when the chunk does not begin at the start of its buffer. (breken-ai)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -4388,10 +4392,6 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
-      <fix>
-        <bug>69844</bug>: Close the connection with a protocol error if the
-        server sends masked frames. (markt)
-      </fix>
       <fix>
         <bug>68884</bug>: Reduce the write timeout when writing WebSocket close
         messages for abnormal closes. The timeout defaults to 50 milliseconds
