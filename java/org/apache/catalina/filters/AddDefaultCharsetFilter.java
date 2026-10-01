@@ -116,7 +116,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
         public void setContentType(String contentType) {
 
             if (contentType != null) {
-                String lowerCaseContentType = contentType.toLowerCase(Locale.ENGLISH);
+                String lowerCaseContentType = contentType.toLowerCase(Locale.ENGLISH).trim();
                 if (lowerCaseContentType.startsWith("text/")) {
                     if (!lowerCaseContentType.contains("charset=")) {
                         super.setContentType(contentType + ";charset=" + encoding);
@@ -152,8 +152,20 @@ public class AddDefaultCharsetFilter extends FilterBase {
         @Override
         public void setCharacterEncoding(String charset) {
             super.setCharacterEncoding(charset);
-            if (charset != null) {
+            if (charset == null) {
+                encoding = DEFAULT_ENCODING;
+            } else {
                 encoding = charset;
+            }
+        }
+
+        @Override
+        public void setCharacterEncoding(Charset encoding) {
+            super.setCharacterEncoding(encoding);
+            if (encoding == null) {
+                this.encoding = DEFAULT_ENCODING;
+            } else {
+                this.encoding = encoding.name();
             }
         }
     }
