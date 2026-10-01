@@ -116,7 +116,8 @@ public class TcpSender implements Sender {
             proxies[i] = new Proxy();
             try {
                 proxies[i].port = Integer.parseInt(token.substring(pos + 1));
-                proxies[i].address = InetAddress.getByName(token.substring(0, pos));
+                proxies[i].host = token.substring(0, pos);
+                proxies[i].address = InetAddress.getByName(proxies[i].host);
             } catch (Exception e) {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));
             }
@@ -140,6 +141,8 @@ public class TcpSender implements Sender {
         for (int i = 0; i < connections.length; i++) {
             if (connections[i] == null) {
                 try {
+                    // Pick up any DNS change since this proxy was last resolved
+                    refreshProxyAddress(i);
                     connections[i] = new Socket();
                     // Never block the periodic event thread indefinitely
                     connections[i].setSoTimeout(READ_TIMEOUT);
@@ -305,5 +308,22 @@ public class TcpSender implements Sender {
             // Ignore
         }
         connections[i] = null;
+    }
+
+
+    /**
+     * Re-resolve the address of the given proxy. If resolution fails the previously resolved address is kept so a
+     * transient DNS failure does not stop heartbeats to a proxy that is still reachable.
+     *
+     * @param i The index of the proxy
+     */
+    private void refreshProxyAddress(int i) {
+        try {
+            proxies[i].address = InetAddress.getByName(proxies[i].host);
+        } catch (IOException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("tcpSender.resolveFailed", proxies[i].host), e);
+            }
+        }
     }
 }
