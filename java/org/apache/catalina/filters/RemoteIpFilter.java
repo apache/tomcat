@@ -459,8 +459,8 @@ public class RemoteIpFilter extends GenericFilter {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Wrapper for {@link HttpServletRequest} that allows modification of headers, remote address,
-     * scheme, and other properties used by the RemoteIpFilter.
+     * Wrapper for {@link HttpServletRequest} that allows modification of headers, remote address, scheme, and other
+     * properties used by the RemoteIpFilter.
      */
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
@@ -552,6 +552,7 @@ public class RemoteIpFilter extends GenericFilter {
          * Find the header entry for the given name (case-insensitive).
          *
          * @param name the header name to look up
+         *
          * @return the header entry, or {@code null} if not found
          */
         protected Map.Entry<String,List<String>> getHeaderEntry(String name) {
@@ -636,7 +637,7 @@ public class RemoteIpFilter extends GenericFilter {
         /**
          * Set a header value.
          *
-         * @param name the header name
+         * @param name  the header name
          * @param value the header value
          */
         public void setHeader(String name, String value) {
@@ -848,8 +849,8 @@ public class RemoteIpFilter extends GenericFilter {
 
 
     /**
-     * Process the incoming request, updating the remote address, scheme, and headers based on
-     * the configured forwarded headers when the request comes from a trusted proxy.
+     * Process the incoming request, updating the remote address, scheme, and headers based on the configured forwarded
+     * headers when the request comes from a trusted proxy.
      *
      * @param request  The servlet request to be processed
      * @param response The servlet response to be created
@@ -916,7 +917,9 @@ public class RemoteIpFilter extends GenericFilter {
                         // We know we need a DNS look up so use getCanonicalHostName()
                         xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
                     } catch (UnknownHostException e) {
-                        log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                        }
                         xRequest.setRemoteHost(remoteIp);
                     }
                 } else {
@@ -959,7 +962,10 @@ public class RemoteIpFilter extends GenericFilter {
                     try {
                         int portIndex = Host.parse(hostHeaderValue);
                         if (portIndex > -1) {
-                            log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue, hostHeader));
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue,
+                                        hostHeader));
+                            }
                             hostHeaderValue = hostHeaderValue.substring(0, portIndex);
                         }
 
@@ -969,7 +975,10 @@ public class RemoteIpFilter extends GenericFilter {
                         }
 
                     } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader), iae);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader),
+                                    iae);
+                        }
                     }
                 }
             }
@@ -1033,7 +1042,9 @@ public class RemoteIpFilter extends GenericFilter {
         try {
             return netMaskSet.contains(remoteIp);
         } catch (UnknownHostException uhe) {
-            log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), uhe);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), uhe);
+            }
         }
         return false;
     }
@@ -1065,10 +1076,14 @@ public class RemoteIpFilter extends GenericFilter {
                 try {
                     port = Integer.parseInt(portHeaderValue);
                 } catch (NumberFormatException nfe) {
-                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()), nfe);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()), nfe);
+                    }
                 }
                 if (port < 1 || port > 65535) {
-                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()));
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()));
+                    }
                     port = defaultPort;
                 }
             }
@@ -1495,9 +1510,11 @@ public class RemoteIpFilter extends GenericFilter {
      */
     /**
      * Restores the log after deserialization.
+     *
      * @param ois the object input stream
+     *
      * @throws ClassNotFoundException if the class is not found
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      */
     @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
