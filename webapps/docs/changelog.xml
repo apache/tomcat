@@ -188,6 +188,10 @@
         <code>CloseableURLConnection</code> unless it is certain the JAR is not
         shared. (remm)
       </fix>
+      <fix>
+        Fix possible corruption of HTTP/1.1 chunked response bodies if a
+        previous write to a chunked body fails. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
