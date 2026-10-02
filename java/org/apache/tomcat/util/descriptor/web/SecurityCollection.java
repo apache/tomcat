@@ -18,7 +18,9 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -66,9 +68,10 @@ public class SecurityCollection implements Serializable {
 
 
     /**
-     * Description of this web resource collection.
+     * The descriptions of this web resource collection. Multiple descriptions, each with an optional language, are
+     * supported as per the deployment descriptor specification.
      */
-    private String description = null;
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
 
     /**
@@ -103,22 +106,52 @@ public class SecurityCollection implements Serializable {
 
 
     /**
-     * Get the description of this web resource collection.
+     * Get the descriptions of this web resource collection.
      *
-     * @return the description of this web resource collection
+     * @return the descriptions of this web resource collection
      */
-    public String getDescription() {
-        return this.description;
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
     }
 
 
     /**
-     * Set the description of this web resource collection.
+     * Add a description to this web resource collection.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+
+    /**
+     * Get the description of this web resource collection. The default description (the one without a language) is
+     * returned if present, otherwise the first description is returned.
+     *
+     * @return the description of this web resource collection
+     */
+    public String getDescription() {
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
+    }
+
+
+    /**
+     * Set the description of this web resource collection. Any existing descriptions, including language specific
+     * ones, are replaced by a single default description.
      *
      * @param description The new description
      */
     public void setDescription(String description) {
-        this.description = description;
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
     }
 
 
@@ -389,9 +422,9 @@ public class SecurityCollection implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("SecurityCollection[");
         sb.append(name);
-        if (description != null) {
+        if (getDescription() != null) {
             sb.append(", ");
-            sb.append(description);
+            sb.append(getDescription());
         }
         sb.append(']');
         return sb.toString();

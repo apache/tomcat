@@ -414,28 +414,105 @@ public class WebXml {
 
     // web-app elements
     // TODO: Ignored elements:
-    // - description
     // - icon
-
-    // display-name - TODO should support multiple with language
-    private String displayName = null;
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
     /**
-     * Returns the display name of the web application.
+     * Returns the descriptions of the web application.
+     *
+     * @return the descriptions
+     */
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
+    }
+
+    /**
+     * Adds a description of the web application.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+    /**
+     * Returns the description of the web application. The default description (the one without a language) is
+     * returned if present, otherwise the first description is returned.
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
+    }
+
+    /**
+     * Sets the description. Any existing descriptions, including language specific ones, are replaced by a single
+     * default description.
+     *
+     * @param description The description
+     */
+    public void setDescription(String description) {
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
+    }
+
+    /**
+     * The display names of the web application. Multiple display names, each with an optional language, are supported
+     * as per the deployment descriptor specification.
+     */
+    private final List<LocaleElement> displayNames = new ArrayList<>();
+
+    /**
+     * Returns the display names of the web application.
+     *
+     * @return the display names
+     */
+    public List<LocaleElement> getDisplayNames() {
+        return displayNames;
+    }
+
+    /**
+     * Adds a display name of the web application.
+     *
+     * @param displayName The display name to add
+     */
+    public void addDisplayName(LocaleElement displayName) {
+        displayNames.add(displayName);
+    }
+
+    /**
+     * Returns the display name of the web application. The default display name (the one without a language) is
+     * returned if present, otherwise the first display name is returned.
      *
      * @return the display name
      */
     public String getDisplayName() {
-        return displayName;
+        for (LocaleElement element : displayNames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displayNames.isEmpty() ? null : displayNames.get(0).getContent();
     }
 
     /**
-     * Sets the display name.
+     * Sets the display name. Any existing display names, including language specific ones, are replaced by a single
+     * default display name.
      *
      * @param displayName The display name
      */
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+        displayNames.clear();
+        if (displayName != null) {
+            displayNames.add(new LocaleElement(displayName, null));
+        }
     }
 
     // distributable
@@ -504,8 +581,6 @@ public class WebXml {
     }
 
     // filter
-    // TODO: Should support multiple description elements with language
-    // TODO: Should support multiple display-name elements with language
     // TODO: Should support multiple icon elements
     // TODO: Description for init-param is ignored
     private final Map<String,FilterDef> filters = new LinkedHashMap<>();
@@ -582,11 +657,8 @@ public class WebXml {
     }
 
     // servlet
-    // TODO: description (multiple with language) is ignored
-    // TODO: display-name (multiple with language) is ignored
     // TODO: icon (multiple) is ignored
     // TODO: init-param/description (multiple with language) is ignored
-    // TODO: security-role-ref/description (multiple with language) is ignored
     private final Map<String,ServletDef> servlets = new HashMap<>();
 
     /**
@@ -807,8 +879,6 @@ public class WebXml {
     }
 
     // security-constraint
-    // TODO: Should support multiple display-name elements with language
-    // TODO: Should support multiple description elements with language
     private final Set<SecurityConstraint> securityConstraints = new HashSet<>();
 
     /**
@@ -874,7 +944,6 @@ public class WebXml {
     }
 
     // env-entry
-    // TODO: Should support multiple description elements with language
     private final Map<String,ContextEnvironment> envEntries = new HashMap<>();
 
     /**
@@ -902,7 +971,6 @@ public class WebXml {
     }
 
     // ejb-ref
-    // TODO: Should support multiple description elements with language
     private final Map<String,ContextEjb> ejbRefs = new HashMap<>();
 
     /**
@@ -924,7 +992,6 @@ public class WebXml {
     }
 
     // ejb-local-ref
-    // TODO: Should support multiple description elements with language
     private final Map<String,ContextLocalEjb> ejbLocalRefs = new HashMap<>();
 
     /**
@@ -946,8 +1013,6 @@ public class WebXml {
     }
 
     // service-ref
-    // TODO: Should support multiple description elements with language
-    // TODO: Should support multiple display-names elements with language
     // TODO: Should support multiple icon elements ???
     private final Map<String,ContextService> serviceRefs = new HashMap<>();
 
@@ -970,7 +1035,6 @@ public class WebXml {
     }
 
     // resource-ref
-    // TODO: Should support multiple description elements with language
     private final Map<String,ContextResource> resourceRefs = new HashMap<>();
 
     /**
@@ -998,7 +1062,6 @@ public class WebXml {
     }
 
     // resource-env-ref
-    // TODO: Should support multiple description elements with language
     private final Map<String,ContextResourceEnvRef> resourceEnvRefs = new HashMap<>();
 
     /**
@@ -1027,7 +1090,6 @@ public class WebXml {
     }
 
     // message-destination-ref
-    // TODO: Should support multiple description elements with language
     private final Map<String,MessageDestinationRef> messageDestinationRefs = new HashMap<>();
 
     /**
@@ -1057,8 +1119,6 @@ public class WebXml {
     }
 
     // message-destination
-    // TODO: Should support multiple description elements with language
-    // TODO: Should support multiple display-names elements with language
     // TODO: Should support multiple icon elements ???
     private final Map<String,MessageDestination> messageDestinations = new HashMap<>();
 
@@ -1346,8 +1406,8 @@ public class WebXml {
      */
     public String toXml() {
         StringBuilder sb = new StringBuilder(2048);
-        // TODO - Various, icon, description etc elements are skipped - mainly
-        // because they are ignored when web.xml is parsed - see above
+        // TODO - icon elements are skipped - mainly because they are ignored
+        // when web.xml is parsed - see above
 
         // NOTE - Elements need to be written in the order defined in the
         // schema for the version in use else validation of the merged web.xml
@@ -1426,7 +1486,8 @@ public class WebXml {
             }
         }
 
-        appendElement(sb, INDENT2, "display-name", displayName);
+        appendLocaleElements(sb, INDENT2, "description", descriptions);
+        appendLocaleElements(sb, INDENT2, "display-name", displayNames);
 
         if (isDistributable()) {
             sb.append("  <distributable/>\n\n");
@@ -1447,8 +1508,8 @@ public class WebXml {
             for (Map.Entry<String,FilterDef> entry : filters.entrySet()) {
                 FilterDef filterDef = entry.getValue();
                 sb.append("  <filter>\n");
-                appendElement(sb, INDENT4, "description", filterDef.getDescription());
-                appendElement(sb, INDENT4, "display-name", filterDef.getDisplayName());
+                appendLocaleElements(sb, INDENT4, "description", filterDef.getDescriptions());
+                appendLocaleElements(sb, INDENT4, "display-name", filterDef.getDisplayNames());
                 appendElement(sb, INDENT4, "filter-name", filterDef.getFilterName());
                 appendElement(sb, INDENT4, "filter-class", filterDef.getFilterClass());
                 // Async support was introduced for Servlet 3.0 onwards
@@ -1515,8 +1576,8 @@ public class WebXml {
         for (Map.Entry<String,ServletDef> entry : servlets.entrySet()) {
             ServletDef servletDef = entry.getValue();
             sb.append("  <servlet>\n");
-            appendElement(sb, INDENT4, "description", servletDef.getDescription());
-            appendElement(sb, INDENT4, "display-name", servletDef.getDisplayName());
+            appendLocaleElements(sb, INDENT4, "description", servletDef.getDescriptions());
+            appendLocaleElements(sb, INDENT4, "display-name", servletDef.getDisplayNames());
             appendElement(sb, INDENT4, "servlet-name", entry.getKey());
             appendElement(sb, INDENT4, "servlet-class", servletDef.getServletClass());
             appendElement(sb, INDENT4, "jsp-file", servletDef.getJspFile());
@@ -1542,6 +1603,7 @@ public class WebXml {
             }
             for (SecurityRoleRef roleRef : servletDef.getSecurityRoleRefs()) {
                 sb.append("    <security-role-ref>\n");
+                appendLocaleElements(sb, INDENT6, "description", roleRef.getDescriptions());
                 appendElement(sb, INDENT6, "role-name", roleRef.getName());
                 appendElement(sb, INDENT6, "role-link", roleRef.getLink());
                 sb.append("    </security-role-ref>\n");
@@ -1697,7 +1759,7 @@ public class WebXml {
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextResourceEnvRef resourceEnvRef : resourceEnvRefs.values()) {
                 sb.append("  <resource-env-ref>\n");
-                appendElement(sb, INDENT4, "description", resourceEnvRef.getDescription());
+                appendLocaleElements(sb, INDENT4, "description", resourceEnvRef.getDescriptions());
                 appendElement(sb, INDENT4, "resource-env-ref-name", resourceEnvRef.getName());
                 appendElement(sb, INDENT4, "resource-env-ref-type", resourceEnvRef.getType());
                 appendElement(sb, INDENT4, "mapped-name", resourceEnvRef.getProperty("mappedName"));
@@ -1717,7 +1779,7 @@ public class WebXml {
 
         for (ContextResource resourceRef : resourceRefs.values()) {
             sb.append("  <resource-ref>\n");
-            appendElement(sb, INDENT4, "description", resourceRef.getDescription());
+            appendLocaleElements(sb, INDENT4, "description", resourceRef.getDescriptions());
             appendElement(sb, INDENT4, "res-ref-name", resourceRef.getName());
             appendElement(sb, INDENT4, "res-type", resourceRef.getType());
             appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
@@ -1743,12 +1805,13 @@ public class WebXml {
             sb.append("  <security-constraint>\n");
             // security-constraint/display-name was introduced in Servlet 2.3
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
-                appendElement(sb, INDENT4, "display-name", constraint.getDisplayName());
+                appendLocaleElements(sb, INDENT4, "display-name", constraint.getDisplayNames());
+                appendLocaleElements(sb, INDENT4, "description", constraint.getDescriptions());
             }
             for (SecurityCollection collection : constraint.findCollections()) {
                 sb.append("    <web-resource-collection>\n");
                 appendElement(sb, INDENT6, "web-resource-name", collection.getName());
-                appendElement(sb, INDENT6, "description", collection.getDescription());
+                appendLocaleElements(sb, INDENT6, "description", collection.getDescriptions());
                 for (String urlPattern : collection.findPatterns()) {
                     appendElement(sb, INDENT6, "url-pattern", urlPattern);
                 }
@@ -1808,7 +1871,7 @@ public class WebXml {
 
         for (ContextEnvironment envEntry : envEntries.values()) {
             sb.append("  <env-entry>\n");
-            appendElement(sb, INDENT4, "description", envEntry.getDescription());
+            appendLocaleElements(sb, INDENT4, "description", envEntry.getDescriptions());
             appendElement(sb, INDENT4, "env-entry-name", envEntry.getName());
             appendElement(sb, INDENT4, "env-entry-type", envEntry.getType());
             appendElement(sb, INDENT4, "env-entry-value", envEntry.getValue());
@@ -1828,7 +1891,7 @@ public class WebXml {
 
         for (ContextEjb ejbRef : ejbRefs.values()) {
             sb.append("  <ejb-ref>\n");
-            appendElement(sb, INDENT4, "description", ejbRef.getDescription());
+            appendLocaleElements(sb, INDENT4, "description", ejbRef.getDescriptions());
             appendElement(sb, INDENT4, "ejb-ref-name", ejbRef.getName());
             appendElement(sb, INDENT4, "ejb-ref-type", ejbRef.getType());
             appendElement(sb, INDENT4, "home", ejbRef.getHome());
@@ -1852,7 +1915,7 @@ public class WebXml {
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
                 sb.append("  <ejb-local-ref>\n");
-                appendElement(sb, INDENT4, "description", ejbLocalRef.getDescription());
+                appendLocaleElements(sb, INDENT4, "description", ejbLocalRef.getDescriptions());
                 appendElement(sb, INDENT4, "ejb-ref-name", ejbLocalRef.getName());
                 appendElement(sb, INDENT4, "ejb-ref-type", ejbLocalRef.getType());
                 appendElement(sb, INDENT4, "local-home", ejbLocalRef.getHome());
@@ -1877,8 +1940,8 @@ public class WebXml {
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             for (ContextService serviceRef : serviceRefs.values()) {
                 sb.append("  <service-ref>\n");
-                appendElement(sb, INDENT4, "description", serviceRef.getDescription());
-                appendElement(sb, INDENT4, "display-name", serviceRef.getDisplayname());
+                appendLocaleElements(sb, INDENT4, "description", serviceRef.getDescriptions());
+                appendLocaleElements(sb, INDENT4, "display-name", serviceRef.getDisplaynames());
                 appendElement(sb, INDENT4, "service-ref-name", serviceRef.getName());
                 appendElement(sb, INDENT4, "service-interface", serviceRef.getInterface());
                 appendElement(sb, INDENT4, "service-ref-type", serviceRef.getType());
@@ -1948,7 +2011,7 @@ public class WebXml {
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             for (MessageDestinationRef mdr : messageDestinationRefs.values()) {
                 sb.append("  <message-destination-ref>\n");
-                appendElement(sb, INDENT4, "description", mdr.getDescription());
+                appendLocaleElements(sb, INDENT4, "description", mdr.getDescriptions());
                 appendElement(sb, INDENT4, "message-destination-ref-name", mdr.getName());
                 appendElement(sb, INDENT4, "message-destination-type", mdr.getType());
                 appendElement(sb, INDENT4, "message-destination-usage", mdr.getUsage());
@@ -1969,8 +2032,8 @@ public class WebXml {
 
             for (MessageDestination md : messageDestinations.values()) {
                 sb.append("  <message-destination>\n");
-                appendElement(sb, INDENT4, "description", md.getDescription());
-                appendElement(sb, INDENT4, "display-name", md.getDisplayName());
+                appendLocaleElements(sb, INDENT4, "description", md.getDescriptions());
+                appendLocaleElements(sb, INDENT4, "display-name", md.getDisplayNames());
                 appendElement(sb, INDENT4, "message-destination-name", md.getName());
                 appendElement(sb, INDENT4, "mapped-name", md.getProperty("mappedName"));
                 appendElement(sb, INDENT4, "lookup-name", md.getLookupName());
@@ -2042,6 +2105,35 @@ public class WebXml {
         appendElement(sb, indent, elementName, value.toString());
     }
 
+    /**
+     * Appends a list of locale-aware elements (e.g. description, display-name) to the output. Elements with a language
+     * are written with the {@code xml:lang} attribute, elements without a language are written as plain elements.
+     *
+     * @param sb          The output buffer
+     * @param indent      The indentation to use
+     * @param elementName The element name
+     * @param elements    The elements to append
+     */
+    private void appendLocaleElements(StringBuilder sb, String indent, String elementName,
+            List<LocaleElement> elements) {
+        for (LocaleElement element : elements) {
+            if (element.getLang() == null || element.getLang().isEmpty()) {
+                appendElement(sb, indent, elementName, element.getContent());
+            } else {
+                sb.append(indent);
+                sb.append('<');
+                sb.append(elementName);
+                sb.append(" xml:lang=\"");
+                sb.append(Escape.xml(element.getLang()));
+                sb.append("\">");
+                sb.append(Escape.xml(element.getContent()));
+                sb.append("</");
+                sb.append(elementName);
+                sb.append(">\n");
+            }
+        }
+    }
+
 
     /**
      * Merge the supplied web fragments into this main web.xml.
@@ -2066,20 +2158,36 @@ public class WebXml {
         }
         contextParams.putAll(temp.getContextParams());
 
-        if (displayName == null) {
+        if (descriptions.isEmpty()) {
             for (WebXml fragment : fragments) {
-                String value = fragment.getDisplayName();
-                if (value != null) {
-                    if (temp.getDisplayName() == null) {
-                        temp.setDisplayName(value);
-                    } else {
+                for (LocaleElement element : fragment.getDescriptions()) {
+                    LocaleElement conflict = findLocaleElement(temp.getDescriptions(), element.getLang());
+                    if (conflict == null) {
+                        temp.addDescription(element);
+                    } else if (!conflict.equals(element)) {
+                        log.error(
+                                sm.getString("webXml.mergeConflictDescription", fragment.getName(), fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+            descriptions.addAll(temp.getDescriptions());
+        }
+
+        if (displayNames.isEmpty()) {
+            for (WebXml fragment : fragments) {
+                for (LocaleElement element : fragment.getDisplayNames()) {
+                    LocaleElement conflict = findLocaleElement(temp.getDisplayNames(), element.getLang());
+                    if (conflict == null) {
+                        temp.addDisplayName(element);
+                    } else if (!conflict.equals(element)) {
                         log.error(
                                 sm.getString("webXml.mergeConflictDisplayName", fragment.getName(), fragment.getURL()));
                         return false;
                     }
                 }
             }
-            displayName = temp.getDisplayName();
+            displayNames.addAll(temp.getDisplayNames());
         }
 
         // Note: Not permitted in fragments, but we also use fragments for
@@ -2436,9 +2544,25 @@ public class WebXml {
         return true;
     }
 
+    /**
+     * Finds a locale-aware element in the supplied list that has the same language as the requested language.
+     *
+     * @param elements The elements to search
+     * @param lang     The language to look for, or {@code null} for the default element
+     *
+     * @return The matching element, or {@code null} if no match is found
+     */
+    private static LocaleElement findLocaleElement(List<LocaleElement> elements, String lang) {
+        for (LocaleElement element : elements) {
+            if (element.getLang() == null ? lang == null : element.getLang().equals(lang)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
     private <T extends ResourceBase> boolean mergeResourceMap(Map<String,T> fragmentResources,
-            Map<String,T> mainResources, Map<String,T> tempResources, WebXml fragment) {
-        for (T resource : fragmentResources.values()) {
+            Map<String,T> mainResources, Map<String,T> tempResources, WebXml fragment) {        for (T resource : fragmentResources.values()) {
             String resourceName = resource.getName();
             if (mainResources.containsKey(resourceName)) {
                 mainResources.get(resourceName).getInjectionTargets().addAll(resource.getInjectionTargets());

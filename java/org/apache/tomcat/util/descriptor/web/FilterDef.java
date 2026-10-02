@@ -18,7 +18,9 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.Filter;
@@ -48,50 +50,108 @@ public class FilterDef implements Serializable {
 
 
     /**
-     * The description of this filter.
+     * The descriptions of this filter. Multiple descriptions, each with an optional language, are supported as per the
+     * deployment descriptor specification.
      */
-    private String description = null;
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
     /**
-     * Returns the description of this filter.
+     * Returns the descriptions of this filter.
+     *
+     * @return The descriptions
+     */
+    public List<LocaleElement> getDescriptions() {
+        return descriptions;
+    }
+
+    /**
+     * Adds a description to this filter.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+        descriptions.add(description);
+    }
+
+    /**
+     * Returns the description of this filter. The default description (the one without a language) is returned if
+     * present, otherwise the first description is returned.
      *
      * @return The description
      */
     public String getDescription() {
-        return this.description;
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
     }
 
     /**
-     * Sets the description of this filter.
+     * Sets the description of this filter. Any existing descriptions, including language specific ones, are replaced
+     * by a single default description.
      *
      * @param description The new description
      */
     public void setDescription(String description) {
-        this.description = description;
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
     }
 
 
     /**
-     * The display name of this filter.
+     * The display names of this filter. Multiple display names, each with an optional language, are supported as per
+     * the deployment descriptor specification.
      */
-    private String displayName = null;
+    private final List<LocaleElement> displayNames = new ArrayList<>();
 
     /**
-     * Returns the display name of this filter.
+     * Returns the display names of this filter.
+     *
+     * @return The display names
+     */
+    public List<LocaleElement> getDisplayNames() {
+        return displayNames;
+    }
+
+    /**
+     * Adds a display name to this filter.
+     *
+     * @param displayName The display name to add
+     */
+    public void addDisplayName(LocaleElement displayName) {
+        displayNames.add(displayName);
+    }
+
+    /**
+     * Returns the display name of this filter. The default display name (the one without a language) is returned if
+     * present, otherwise the first display name is returned.
      *
      * @return The display name
      */
     public String getDisplayName() {
-        return this.displayName;
+        for (LocaleElement element : displayNames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displayNames.isEmpty() ? null : displayNames.get(0).getContent();
     }
 
     /**
-     * Sets the display name of this filter.
+     * Sets the display name of this filter. Any existing display names, including language specific ones, are replaced
+     * by a single default display name.
      *
      * @param displayName The new display name
      */
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+        displayNames.clear();
+        if (displayName != null) {
+            displayNames.add(new LocaleElement(displayName, null));
+        }
     }
 
 
