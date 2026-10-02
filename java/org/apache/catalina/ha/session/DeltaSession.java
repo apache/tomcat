@@ -787,7 +787,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
                  * Record the current value, not the value passed in, so concurrent updates of the same attribute
                  * cannot leave the replica with an older value than the primary.
                  */
-                Object current = getAttribute(name);
+                Object current = attributes.get(name);
                 if (current != null && !exclude(name, current)) {
                     deltaRequest.setAttribute(name, current);
                 }
