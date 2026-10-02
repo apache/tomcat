@@ -17,10 +17,6 @@
 package org.apache.catalina.ant.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.net.ServerSocket;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
@@ -109,23 +105,20 @@ public class TestJMXAccessorTask {
     public void testAccessJMXConnectionReuseAndMismatch() throws Exception {
         // Force the use of localhost to resolve CI failures
         System.setProperty("java.rmi.server.hostname", "127.0.0.1");
-        int port = getAvailablePort();
-        Registry registry = LocateRegistry.createRegistry(port);
         MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-        JMXServiceURL serviceUrl = new JMXServiceURL(
-                JMXAccessorTask.JMX_SERVICE_PREFIX + "127.0.0.1:" + port + JMXAccessorTask.JMX_SERVICE_SUFFIX);
-        JMXConnectorServer connectorServer =
-                JMXConnectorServerFactory.newJMXConnectorServer(serviceUrl, null, mbeanServer);
+        // No registry and no fixed port: RMI chooses the port for the connector's own remote object and the
+        // resulting address is self-contained, so there is no window in which another process can take the port
+        JMXConnectorServer connectorServer = JMXConnectorServerFactory
+                .newJMXConnectorServer(new JMXServiceURL("service:jmx:rmi://127.0.0.1"), null, mbeanServer);
         connectorServer.start();
         try {
             Project project = new Project();
             String ref = "jmx.server.test";
-            String host = "127.0.0.1";
-            String openPort = Integer.toString(port);
+            String url = connectorServer.getAddress().toString();
 
             // First call opens the connection and stores it under the reference.
             MBeanServerConnection first =
-                    JMXAccessorTask.accessJMXConnection(project, null, host, openPort, null, null, ref);
+                    JMXAccessorTask.accessJMXConnection(project, url, null, null, null, null, ref);
             Assert.assertNotNull(first);
 
             // Reuse with no explicit target: the cached connection is returned.
@@ -135,21 +128,13 @@ public class TestJMXAccessorTask {
 
             // Explicitly specifying a different port than the open connection must fail rather than be ignored.
             try {
-                JMXAccessorTask.accessJMXConnection(project, null, host, "1", null, null, ref);
+                JMXAccessorTask.accessJMXConnection(project, null, "127.0.0.1", "1", null, null, ref);
                 Assert.fail("Expected a BuildException for an explicit conflicting target");
             } catch (BuildException expected) {
                 // Expected
             }
         } finally {
             connectorServer.stop();
-            UnicastRemoteObject.unexportObject(registry, true);
-        }
-    }
-
-
-    private static int getAvailablePort() throws Exception {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
         }
     }
 
