@@ -765,8 +765,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     private LifecycleException handleExceptionDuringStop(LifecycleException stopException, Throwable t) {
         if (stopException == null) {
-            if (t instanceof LifecycleException le) {
-                return le;
+            if (t instanceof LifecycleException) {
+                return (LifecycleException) t;
             } else {
                 return new LifecycleException(sm.getString("simpleTcpCluster.stopUnable"), t);
             }
