@@ -440,7 +440,42 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO: Add tests for the individual operators
+    @Test
+    public void testOperatorExclude() throws Exception {
+        testSpecification("AES128:!SHA256:SHA256");
+    }
+
+
+    @Test
+    public void testOperatorDelete() throws Exception {
+        testSpecification("AES128:-SHA256:SHA256");
+    }
+
+
+    @Test
+    public void testOperatorMoveToEnd() throws Exception {
+        testSpecification("AES128:AES256:+AES128");
+    }
+
+
+    @Test
+    public void testOperatorIntersection() throws Exception {
+        testSpecification("AES128+SHA256");
+    }
+
+
+    @Test
+    public void testOperatorStrengthSort() throws Exception {
+        testSpecification("AES128:AES256:@STRENGTH");
+    }
+
+
+    @Test
+    public void testSeparators() throws Exception {
+        testSpecification("AES128:AES256");
+        testSpecification("AES128,AES256");
+        testSpecification("AES128 AES256");
+    }
 
     @Test
     public void testSpecification01() throws Exception {

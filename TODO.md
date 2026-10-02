@@ -891,16 +891,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 81. OpenSSL Cipher Test Coverage (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 81.1 | `TestOpenSSLCipherConfigurationParser.java:497` | Individual operator tests missing | Add unit tests for each cipher string operator: `+`, `-`, `!`, `@`, colon separator, etc. | 1-2 days | Medium |
-
-**Total estimated effort: 1-2 days, Medium difficulty**
-
----
-
 ### 83. EL in JSP Escape Test (1 item)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
