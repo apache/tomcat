@@ -277,9 +277,12 @@ public class DeltaRequest implements Externalizable {
         } else {
             info = new AttributeInfo(type, action, name, value);
         }
-        // if we have already done something to this attribute, make sure
-        // we don't send multiple actions across the wire
-        if (!recordAllActions) {
+        /*
+         * If we have already done something to this attribute, make sure we don't send multiple actions across the
+         * wire. Listeners are a special case as they are stored (in StandardSession) as a List not a Map so two calls
+         * to addSessionListener(l) should add the same listener twice. Therefore always send all listener events.
+         */
+        if (!recordAllActions && type != TYPE_LISTENER) {
             Iterator<AttributeInfo> iterator = actions.iterator();
             while (iterator.hasNext()) {
                 AttributeInfo existing = iterator.next();
