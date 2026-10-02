@@ -257,6 +257,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <docs>
+        Document Tribes channel, membership, transport and replication
+        status available through JMX. Based on pull request <pr>1071</pr> by
+        sainadh777. (markt)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
