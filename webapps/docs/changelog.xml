@@ -552,6 +552,12 @@
       <update>
         Update to Bouncy Castle 1.8.6. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
