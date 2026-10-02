@@ -372,7 +372,7 @@
       </fix>
       <fix>
         Fix possible corruption of HTTP/1.1 chunked response bodies if a
-        previous write to a chunked body fails. (markt) 
+        previous write to a chunked body fails. (markt)
       </fix>
     </changelog>
   </subsection>
