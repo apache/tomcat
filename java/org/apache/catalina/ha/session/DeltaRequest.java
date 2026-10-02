@@ -532,9 +532,8 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public int hashCode() {
-            // Must be consistent with equals() which compares name, type and
-            // action
-            return (name.hashCode() * 31 + type) * 31 + action;
+            // Must be consistent with equals() which compares name and type (while action overrides)
+            return name.hashCode() * 31 + type;
         }
 
         public String getName() {
@@ -555,10 +554,9 @@ public class DeltaRequest implements Externalizable {
             }
             // Attributes and notes are different stores and setting and
             // removing are different changes, so a name match alone is not
-            // enough to consider two actions as the same change
+            // enough, but two actions on the same item would override
             AttributeInfo other = (AttributeInfo) o;
-            return other.getType() == this.getType() && other.getAction() == this.getAction() &&
-                    other.getName().equals(this.getName());
+            return other.getType() == this.getType() && other.getName().equals(this.getName());
         }
 
         @Override
