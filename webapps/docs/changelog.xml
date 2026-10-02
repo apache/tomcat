@@ -427,6 +427,18 @@
         session monitor. (remm)
       </fix>
       <fix>
+        Fix a possible deadlock in <code>DeltaSession</code>: session attribute
+        listeners are no longer called while the delta lock is held when
+        attributes are set or removed. The delta lock is only held while the
+        change is recorded. (markt)
+      </fix>
+      <fix>
+        Fix a possible deadlock in <code>DeltaSession</code>: received session
+        deltas are now read into a separate <code>DeltaRequest</code> from the
+        one the session uses to record local changes. This avoids having to
+        hold the delta lock while processing received changes. (markt)
+      </fix>
+      <fix>
         Move context attributes that were set while the web application was
         still starting into the replicated attribute map when it is installed
         in <code>ReplicatedContext</code>, so that they are replicated to the
