@@ -242,6 +242,11 @@
         other nodes like attributes set later on rather than remaining local to
         the node that started the application. (remm)
       </fix>
+      <fix>
+        Fix an issue replicating <code>SessionListener</code> additions and
+        removals that meant some modification were not replicated leading to
+        inconsistent listener configurations across the cluster. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
