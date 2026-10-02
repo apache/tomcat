@@ -375,16 +375,11 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     /**
-     * has members
-     */
-    protected volatile boolean hasMembers = false;
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public boolean hasMembers() {
-        return hasMembers;
+        return channel.hasMembers();
     }
 
     /**
@@ -808,7 +803,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void memberAdded(Member member) {
         try {
-            hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("simpleTcpCluster.member.added", member));
             }
@@ -831,7 +825,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void memberDisappeared(Member member) {
         try {
-            hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("simpleTcpCluster.member.disappeared", member));
             }
