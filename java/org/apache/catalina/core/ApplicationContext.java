@@ -553,7 +553,7 @@ public class ApplicationContext implements ServletContext {
 
         // Remove the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name)) {
+        if (isReadOnlyAttribute(name)) {
             return;
         }
         Object value = attributes.remove(name);
@@ -611,7 +611,7 @@ public class ApplicationContext implements ServletContext {
 
         // Add or replace the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name)) {
+        if (isReadOnlyAttribute(name)) {
             return;
         }
 
@@ -1233,14 +1233,43 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
-     * Set an attribute as read only.
+     * Set an attribute as read only. The attribute is only marked read only if it is currently stored, possibly in
+     * a store maintained by a subclass.
+     *
+     * @param name The attribute name
      */
     void setAttributeReadOnly(String name) {
 
-        if (attributes.containsKey(name)) {
+        if (isAttributeStored(name)) {
             readOnlyAttributes.put(name, name);
         }
 
+    }
+
+
+    /**
+     * Check if an attribute with the given name is currently stored in this context, possibly in a store
+     * maintained by a subclass. Subclasses that keep some attributes outside the main attribute map should
+     * override this method to allow those attributes to be made read only.
+     *
+     * @param name The attribute name
+     *
+     * @return {@code true} if an attribute with the given name is present
+     */
+    protected boolean isAttributeStored(String name) {
+        return attributes.containsKey(name);
+    }
+
+
+    /**
+     * Check if the attribute with the given name has been made read only.
+     *
+     * @param name The attribute name
+     *
+     * @return {@code true} if the attribute has been made read only
+     */
+    protected boolean isReadOnlyAttribute(String name) {
+        return readOnlyAttributes.containsKey(name);
     }
 
 
@@ -1252,6 +1281,7 @@ public class ApplicationContext implements ServletContext {
     protected void setNewServletContextListenerAllowed(boolean allowed) {
         this.newServletContextListenerAllowed = allowed;
     }
+
 
     /**
      * Internal class used as thread-local storage when doing path mapping during dispatch.

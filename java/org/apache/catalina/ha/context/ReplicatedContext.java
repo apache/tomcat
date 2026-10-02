@@ -171,10 +171,28 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      */
     protected static class ReplApplContext extends ApplicationContext {
         /**
-         * Attribute name used by Jasper for its application context. It holds
-         * node specific state and must therefore never be replicated.
+         * Attribute name prefixes reserved for internal use: the namespaces reserved by the Servlet
+         * specification and Tomcat's own namespace. Attributes using these names likely contain node
+         * specific state and must therefore never be replicated.
          */
-        private static final String JSP_APP_CONTEXT_NAME = "org.apache.jasper.runtime.JspApplicationContextImpl";
+        private static final String[] NON_REPLICATED_ATTRIBUTE_PREFIXES = { "java.", "javax.", "jakarta.",
+                "org.apache." };
+
+        /**
+         * Check if an attribute with the given name is an internal attribute that must not be replicated.
+         *
+         * @param attributeName The attribute name
+         *
+         * @return {@code true} if the attribute name starts with one of the internal prefixes
+         */
+        private static boolean isNonReplicatedAttribute(String attributeName) {
+            for (String prefix : NON_REPLICATED_ATTRIBUTE_PREFIXES) {
+                if (attributeName.startsWith(prefix)) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /**
          * Map for Tomcat-specific attributes that should not be replicated.
@@ -226,16 +244,23 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             // the other nodes. Values that cannot be serialized are stored
             // locally by the replicated map.
             for (Map.Entry<String,Object> entry : tomcatAttributes.entrySet()) {
-                if (JSP_APP_CONTEXT_NAME.equals(entry.getKey())) {
-                    continue;
+                if (!isNonReplicatedAttribute(entry.getKey())) {
+                    map.put(entry.getKey(), entry.getValue());
+                    tomcatAttributes.remove(entry.getKey());
                 }
-                map.put(entry.getKey(), entry.getValue());
-                tomcatAttributes.remove(entry.getKey());
             }
         }
 
         @Override
+        protected boolean isAttributeStored(String name) {
+            return super.isAttributeStored(name) || tomcatAttributes.containsKey(name);
+        }
+
+        @Override
         public void removeAttribute(String name) {
+            if (isReadOnlyAttribute(name)) {
+                return;
+            }
             Object localValue = tomcatAttributes.remove(name);
             boolean inAttributeMap = attributes.containsKey(name);
             super.removeAttribute(name);
@@ -255,7 +280,10 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 removeAttribute(name);
                 return;
             }
-            if ((!getParent().getState().isAvailable()) || JSP_APP_CONTEXT_NAME.equals(name)) {
+            if ((!getParent().getState().isAvailable()) || isNonReplicatedAttribute(name)) {
+                if (isReadOnlyAttribute(name)) {
+                    return;
+                }
                 Object oldValue = tomcatAttributes.put(name, value);
                 // The attribute is stored locally, so the event has to be fired
                 // here rather than by the attribute map
