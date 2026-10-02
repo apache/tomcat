@@ -20,10 +20,11 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.easymock.Capture;
+import org.easymock.EasyMock;
 
 import websocket.drawboard.DrawMessage;
 
