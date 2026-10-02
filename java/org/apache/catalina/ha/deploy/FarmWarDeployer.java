@@ -240,7 +240,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         String contextName = fmsg.getContextName();
                         if (tryAddServiced(contextName)) {
                             try {
-                                remove(contextName);
+                                Context context = (Context) host.findChild(contextName);
+                                if (context != null) {
+                                    remove(contextName);
+                                }
                                 if (!factory.getFile().renameTo(deployable)) {
                                     log.error(
                                             sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable));
@@ -482,7 +485,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void remove(String contextName) throws Exception {
         // TODO Handle remove also work dir content !
-        // Stop the context first to be nicer
         Context context = (Context) host.findChild(contextName);
         if (context == null) {
             if (log.isWarnEnabled()) {
@@ -493,6 +495,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
         }
+        // Stop the context first to be nicer
         context.stop();
         String baseName = context.getBaseName();
         File war = new File(host.getAppBaseFile(), baseName + ".war");
