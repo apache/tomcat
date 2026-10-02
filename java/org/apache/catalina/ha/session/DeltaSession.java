@@ -712,7 +712,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
      */
     private DeltaRequest obtainRequest() {
         DeltaRequest request = null;
-        if (manager instanceof ClusterManagerBase cmb) {
+        if (manager instanceof ClusterManagerBase) {
+            ClusterManagerBase cmb = (ClusterManagerBase) manager;
             request = cmb.getDeltaRequestPool().pop();
             if (request == null) {
                 request = createRequest(null, cmb.isRecordAllActions());
@@ -725,7 +726,8 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
 
     private void releaseRequest(DeltaRequest request) {
-        if (manager instanceof ClusterManagerBase cmb) {
+        if (manager instanceof ClusterManagerBase) {
+            ClusterManagerBase cmb = (ClusterManagerBase) manager;
             request.reset();
             cmb.getDeltaRequestPool().push(request);
         }
