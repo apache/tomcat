@@ -92,9 +92,8 @@ public class TesterWsClient {
     }
 
     public void closeSocket() throws IOException {
-        // Enable SO_LINGER to ensure close() only returns when TCP closing
-        // handshake completes
-        socket.setSoLinger(true, 65535);
+        // Enable SO_LINGER to ensure close() only returns when TCP closing handshake completes (1 hour)
+        socket.setSoLinger(true, 3600);
         socket.close();
     }
 
