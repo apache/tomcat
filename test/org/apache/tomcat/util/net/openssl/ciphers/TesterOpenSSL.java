@@ -53,7 +53,9 @@ public class TesterOpenSSL {
         }
         VERSION_STRING = versionString;
 
-        if (versionString.startsWith("OpenSSL 4.1.")) {
+        if (versionString.startsWith("OpenSSL 4.2.")) {
+            VERSION = 40200;
+        } else if (versionString.startsWith("OpenSSL 4.1.")) {
             VERSION = 40100;
         } else if (versionString.startsWith("OpenSSL 4.0.")) {
             VERSION = 40000;
