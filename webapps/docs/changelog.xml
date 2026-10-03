@@ -531,6 +531,17 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>59569</bug>: Delegate <code>isWrapperFor()</code> and
+        <code>unwrap()</code> on a pooled connection to the underlying
+        connection when it does not directly implement the requested interface,
+        so that connections returned by drivers that wrap another driver's
+        connection can be unwrapped. Implement <code>isWrapperFor()</code> and
+        <code>unwrap()</code> for the pool's <code>DataSource</code> so that it
+        recognises itself and the configured <code>dataSource</code>, and throw
+        an <code>SQLException</code> rather than returning <code>null</code>
+        when it cannot be unwrapped to the requested interface. (shayand)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
