@@ -374,6 +374,10 @@
         Fix possible corruption of HTTP/1.1 chunked response bodies if a
         previous write to a chunked body fails. (markt)
       </fix>
+      <fix>
+        Align cipher order with the results produced by OpenSSL if the cipher
+        specification adds, removes and then re-adds ciphers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
