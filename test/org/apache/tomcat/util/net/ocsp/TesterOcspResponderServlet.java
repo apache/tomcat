@@ -203,7 +203,7 @@ public class TesterOcspResponderServlet extends HttpServlet {
                 throw new IOException("Invalid certificate serial at line " + lineNumber, e);
             }
         }
-        return Map.copyOf(result);
+        return new HashMap<>(result);
     }
 
 
