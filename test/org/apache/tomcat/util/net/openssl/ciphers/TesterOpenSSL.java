@@ -53,8 +53,10 @@ public class TesterOpenSSL {
         }
         VERSION_STRING = versionString;
 
-        // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.1.x
-        if (versionString.startsWith("OpenSSL 4.1.")) {
+        // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.2.x
+        if (versionString.startsWith("OpenSSL 4.2.")) {
+            VERSION = 40200;
+        } else if (versionString.startsWith("OpenSSL 4.1.")) {
             VERSION = 40100;
         } else if (versionString.startsWith("OpenSSL 4.0.")) {
             VERSION = 40000;
