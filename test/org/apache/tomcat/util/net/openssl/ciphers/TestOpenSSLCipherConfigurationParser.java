@@ -544,6 +544,42 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testReAddAfterRemove() throws Exception {
+        testSpecification("AES256:AES128:-AES256:AES");
+    }
+
+
+    @Test
+    public void testReAddMultipleRemovalsOrder() throws Exception {
+        testSpecification("AES128:AES256:-AES256:-AES128:AES");
+    }
+
+
+    @Test
+    public void testExcludeBeatsReAdd() throws Exception {
+        testSpecification("AES:-AES256:!AES256:AES");
+    }
+
+
+    @Test
+    public void testReAddViaIntersection() throws Exception {
+        testSpecification("AES256:AES128:-AES256:AES+AESGCM");
+    }
+
+
+    @Test
+    public void testReAddAfterMoveToEnd01() throws Exception {
+        testSpecification("AES128-SHA:AES256-SHA:+AES128-SHA:-AES:AES");
+    }
+
+
+    @Test
+    public void testReAddAfterMoveToEnd02() throws Exception {
+        testSpecification("AES128-SHA:AES256-SHA:-AES128-SHA:+AES128-SHA:AES");
+    }
+
+
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
