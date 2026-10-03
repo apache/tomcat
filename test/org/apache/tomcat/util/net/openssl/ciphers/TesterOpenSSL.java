@@ -32,6 +32,8 @@ import org.apache.catalina.util.IOTools;
 
 public class TesterOpenSSL {
 
+    public static final String VERSION_STRING;
+
     public static final int VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS;
@@ -49,6 +51,8 @@ public class TesterOpenSSL {
         } catch (IOException ioe) {
             versionString = "";
         }
+        VERSION_STRING = versionString;
+
         if (versionString.startsWith("OpenSSL 4.1.")) {
             VERSION = 40100;
         } else if (versionString.startsWith("OpenSSL 4.0.")) {

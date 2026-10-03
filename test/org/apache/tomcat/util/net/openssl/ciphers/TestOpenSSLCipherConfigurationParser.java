@@ -539,8 +539,8 @@ public class TestOpenSSLCipherConfigurationParser {
 
     private void testSpecificationIsEmpty(String specification) throws Exception {
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
-        Assert.assertEquals("Specification [" + specification + "] returned [" + openSSLCipherList +
-                "] rather than the expected empty list", "", openSSLCipherList);
+        Assert.assertEquals(TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "] returned [" +
+                openSSLCipherList + "] rather than the expected empty list", "", openSSLCipherList);
     }
 
 
@@ -557,9 +557,8 @@ public class TestOpenSSLCipherConfigurationParser {
         // First check the lists have the same entries
         // Order is NOT important at this point. It is checked below.
         Assert.assertEquals(
-                "Expected " + jsseCipherListFromOpenSSL.size() + " ciphers but got "
-                        + jsseCipherListFromParser.size() + " for the specification '"
-                        + specification + "'",
+                TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "] expected " +
+                        jsseCipherListFromOpenSSL.size() + " ciphers but got " + jsseCipherListFromParser.size(),
                 new TreeSet<>(jsseCipherListFromOpenSSL), new TreeSet<>(jsseCipherListFromParser));
 
         /*
@@ -574,8 +573,8 @@ public class TestOpenSSLCipherConfigurationParser {
          * be caught by CI and the test can be adjusted.
          */
         if (TesterOpenSSL.VERSION > 30299) {
-            Assert.assertEquals(specification, listToString(jsseCipherListFromOpenSSL, ','),
-                    listToString(jsseCipherListFromParser, ','));
+            Assert.assertEquals(TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "]",
+                    listToString(jsseCipherListFromOpenSSL, ','), listToString(jsseCipherListFromParser, ','));
         }
     }
 
