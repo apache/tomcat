@@ -683,6 +683,21 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
     }
 
 
+    @Override
+    public void setSSLEnabled(boolean SSLEnabled) {
+        if (SSLEnabled != isSSLEnabled() && nioChannels != null) {
+            // The channel cache may contain channels of the previous
+            // type (secure or plain) which must not be re-used once the
+            // SSL state of the endpoint has changed.
+            NioChannel channel;
+            while ((channel = nioChannels.pop()) != null) {
+                channel.free();
+            }
+        }
+        super.setSSLEnabled(SSLEnabled);
+    }
+
+
     /**
      * Returns the poller instance.
      *
