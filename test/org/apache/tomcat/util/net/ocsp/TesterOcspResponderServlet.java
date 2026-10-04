@@ -16,8 +16,11 @@
  */
 package org.apache.tomcat.util.net.ocsp;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -28,6 +31,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -82,6 +87,12 @@ public class TesterOcspResponderServlet extends HttpServlet {
     private X509CertificateHolder[] responderCertificateChain;
     private RespID responderID;
     private ContentSigner contentSigner;
+    private Map<BigInteger,CertificateState> certificateStatuses;
+
+    enum CertificateState {
+        GOOD,
+        REVOKED
+    }
 
 
     @Override
@@ -89,6 +100,12 @@ public class TesterOcspResponderServlet extends HttpServlet {
         String value = config.getInitParameter(INIT_FIXED_RESPONSE);
         if (value != null) {
             fixedResponse = TesterOcspResponder.OcspResponse.valueOf(value);
+        }
+
+        try (FileReader reader = new FileReader(TesterSupport.DB_INDEX)) {
+            certificateStatuses = loadCertificateStatuses(reader);
+        } catch (IOException e) {
+            throw new ServletException(e);
         }
 
         // Enable the Bouncy Castle Provider
@@ -159,6 +176,37 @@ public class TesterOcspResponderServlet extends HttpServlet {
     }
 
 
+    static Map<BigInteger,CertificateState> loadCertificateStatuses(Reader input) throws IOException {
+        Map<BigInteger,CertificateState> result = new HashMap<>();
+        BufferedReader reader = new BufferedReader(input);
+        String line;
+        int lineNumber = 0;
+        while ((line = reader.readLine()) != null) {
+            lineNumber++;
+            String[] fields = line.split("\\t", -1);
+            if (fields.length < 4) {
+                throw new IOException("Invalid certificate database entry at line " + lineNumber);
+            }
+
+            CertificateState state;
+            if ("V".equals(fields[0])) {
+                state = CertificateState.GOOD;
+            } else if ("R".equals(fields[0])) {
+                state = CertificateState.REVOKED;
+            } else {
+                continue;
+            }
+
+            try {
+                result.put(new BigInteger(fields[3], 16), state);
+            } catch (NumberFormatException e) {
+                throw new IOException("Invalid certificate serial at line " + lineNumber, e);
+            }
+        }
+        return Map.copyOf(result);
+    }
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -217,21 +265,18 @@ public class TesterOcspResponderServlet extends HttpServlet {
         for (Req request : requests) {
             CertificateID certificateID = request.getCertID();
             if (fixedResponse == null) {
-                switch (certificateID.getSerialNumber().intValue()) {
-                    // TODO read index.db rather than hard-code certificate serial numbers
-                    case 4096:
-                    case 4098:
-                    case 4100:
-                    case 4101:
-                        responseBuilder.addResponse(certificateID, CertificateStatus.GOOD);
-                        break;
-                    case 4097:
-                    case 4099:
-                    case 4102:
-                        responseBuilder.addResponse(certificateID, new RevokedStatus(new Date(0)));
-                        break;
-                    default:
-                        responseBuilder.addResponse(certificateID, new UnknownStatus());
+                CertificateState state = certificateStatuses.get(certificateID.getSerialNumber());
+                if (state == null) {
+                    responseBuilder.addResponse(certificateID, new UnknownStatus());
+                } else {
+                    switch (state) {
+                        case GOOD:
+                            responseBuilder.addResponse(certificateID, CertificateStatus.GOOD);
+                            break;
+                        case REVOKED:
+                            responseBuilder.addResponse(certificateID, new RevokedStatus(new Date(0)));
+                            break;
+                    }
                 }
             } else {
                 switch (fixedResponse) {

@@ -64,7 +64,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Whether the deployer has been started.
      */
-    protected boolean started = false;
+    protected volatile boolean started = false;
 
     /**
      * Map of file name to factory for in-progress file transfers.
@@ -97,12 +97,12 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * The watcher for monitoring the watch directory.
      */
-    protected WarWatcher watcher = null;
+    protected volatile WarWatcher watcher = null;
 
     /**
      * Iteration count for background processing.
      */
-    private int count = 0;
+    private volatile int count = 0;
 
     /**
      * Frequency of the Farm watchDir check. Cluster wide deployment will be done once for the specified amount of
@@ -240,7 +240,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         String contextName = fmsg.getContextName();
                         if (tryAddServiced(contextName)) {
                             try {
-                                remove(contextName);
+                                Context context = (Context) host.findChild(contextName);
+                                if (context != null) {
+                                    remove(contextName);
+                                }
 
                                 // Replace an existing file since the delete of
                                 // an old WAR may have failed earlier
@@ -428,6 +431,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     @Override
     public void fileModified(File newWar) {
+        if (!started) {
+            return;
+        }
         try {
             ContextName cn = new ContextName(newWar.getName(), true);
             // Ensure deployed war uses lower case ".war" extension
@@ -460,6 +466,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     @Override
     public void fileRemoved(File removeWar) {
+        if (!started) {
+            return;
+        }
         try {
             ContextName cn = new ContextName(removeWar.getName(), true);
             if (log.isInfoEnabled()) {
@@ -480,7 +489,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void remove(String contextName) throws Exception {
         // TODO Handle remove also work dir content !
-        // Stop the context first to be nicer
         Context context = (Context) host.findChild(contextName);
         if (context == null) {
             if (log.isWarnEnabled()) {
@@ -491,6 +499,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
         }
+        // Stop the context first to be nicer
         context.stop();
         String baseName = context.getBaseName();
         File war = new File(host.getAppBaseFile(), baseName + ".war");
@@ -542,6 +551,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     @Override
     public void backgroundProcess() {
+        // Need to handle a concurrent call to stop() which nulls this.watcher
+        WarWatcher watcher = this.watcher;
         if (started) {
             if (watchEnabled) {
                 count = (count + 1) % processDeployFrequency;
