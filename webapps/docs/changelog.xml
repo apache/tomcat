@@ -287,6 +287,16 @@
         premature end of stream as an I/O error. Based on pull request
         <pr>1067</pr> by aoto-tech. (markt)
       </fix>
+      <fix>
+        Align <code>OpenSSLLifecycleListener</code> with
+        <code>AprLifecycleListener</code> and throw an Error when FIPS is
+        requested but not available. (markt)
+      </fix>
+      <fix>
+        Ensure that, as per the documentation, a simple bind is always used when
+        the JNDI realm binds using the user provided name and password to
+        authenticate the user. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -378,6 +388,25 @@
         Align cipher order with the results produced by OpenSSL if the cipher
         specification adds, removes and then re-adds ciphers. (markt)
       </fix>
+      <fix>
+        Correct a narrow race condition when processing HTTP/2 headers. (markt)
+      </fix>
+      <fix>
+        Fix possible TLS connections failures caused by one of the flags Tomcat
+        uses to track TLS handshake progress not being correctly reset. (markt)
+      </fix>
+      <fix>
+        Allow for absolute host names in SNI checks. (markt)
+      </fix>
+      <fix>
+        Correct a gap in asynchronous error handling that could lead to
+        unexpected <code>IllegalStateExceptions</code> for some error
+        conditions. (markt)
+      </fix>
+      <add>
+        Harden HTTP/2 against applications that do not correctly handle
+        asynchronous errors. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -420,6 +449,10 @@
         an Ant task. (sainadh777)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix the tag plugin for the JSTL &lt;c:redirtect&gt; tag so that page
+        processing ends with the redirect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -591,6 +624,9 @@
       <add>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </add>
+      <update>
+        Update to Migration tool for Jakarta EE 1.0.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

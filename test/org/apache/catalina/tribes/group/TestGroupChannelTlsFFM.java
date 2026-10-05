@@ -37,6 +37,7 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
             // Models starting cluster when OpenSSLLifecycleListener has configured FFM support.
             openSSLLibraryInit();
             Assume.assumeTrue(OpenSSLStatus.isAvailable());
+
         } else {
             // Test FFM is available but leave it uninitialized so Tribes performs initialization
             try {
@@ -53,8 +54,8 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @After
     public void teardown() throws Exception {
-        if (explicit) {
-            // Models OpenSSLLifecycleListener. Stop FFM.
+        if (explicit && OpenSSLStatus.isAvailable()) {
+            // Models OpenSSLLifecycleListener. Stop FFM if it was started.
             openSSLLibraryDestroy();
         }
     }
