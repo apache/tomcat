@@ -99,8 +99,15 @@ public class ProxyConnection extends JdbcInterceptor {
     public boolean isWrapperFor(Class<?> iface) {
         if (iface == XAConnection.class && connection.getXAConnection()!=null) {
             return true;
+        } else if (iface.isInstance(connection.getConnection())) {
+            return true;
         } else {
-            return iface.isInstance(connection.getConnection());
+            // The underlying connection may itself be a wrapper
+            try {
+                return connection.getConnection().isWrapperFor(iface);
+            } catch (SQLException e) {
+                return false;
+            }
         }
     }
 
@@ -116,8 +123,10 @@ public class ProxyConnection extends JdbcInterceptor {
             return connection;
         }else if (iface == XAConnection.class) {
             return connection.getXAConnection();
-        } else if (isWrapperFor(iface)) {
+        } else if (iface.isInstance(connection.getConnection())) {
             return connection.getConnection();
+        } else if (isWrapperFor(iface)) {
+            return connection.getConnection().unwrap(iface);
         } else {
             throw new SQLException("Not a wrapper of "+iface.getName());
         }
