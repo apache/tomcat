@@ -305,6 +305,9 @@
       <add>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </add>
+      <update>
+        Update to Migration tool for Jakarta EE 1.0.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
