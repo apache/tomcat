@@ -80,8 +80,7 @@ public class TesterHttp2Parser extends Http2Parser {
             headerSize--;
         }
 
-        HpackDecoder hpackDecoder = output.getHpackDecoder();
-        hpackDecoder.setHeaderEmitter(output.headersStart(pushedStreamId, headersEndStream));
+        output.headersStart(pushedStreamId, headersEndStream);
 
         readHeaderPayload(pushedStreamId, headerSize, buffer);
 
