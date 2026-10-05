@@ -111,10 +111,16 @@ public class SecurityConstraint implements Serializable {
 
 
     /**
-     * The display name of this security constraint.
+     * The display names of this security constraint. Multiple display names, each with an optional language, are
+     * supported as per the deployment descriptor specification.
      */
-    private String displayName = null;
+    private final List<LocaleElement> displayNames = new ArrayList<>();
 
+    /**
+     * The descriptions of this security constraint. Multiple descriptions, each with an optional language, are
+     * supported as per the deployment descriptor specification.
+     */
+    private final List<LocaleElement> descriptions = new ArrayList<>();
 
     /**
      * The user data constraint for this security constraint. Must be NONE, INTEGRAL, or CONFIDENTIAL.
@@ -172,25 +178,117 @@ public class SecurityConstraint implements Serializable {
 
 
     /**
-     * Get the display name of this security constraint.
+     * Get the display names of this security constraint.
      *
-     * @return the display name of this security constraint
+     * @return the display names of this security constraint
      */
-    public String getDisplayName() {
+    public List<LocaleElement> getDisplayNames() {
 
-        return this.displayName;
+        return displayNames;
 
     }
 
 
     /**
-     * Set the display name of this security constraint.
+     * Add a display name to this security constraint.
+     *
+     * @param displayName The display name to add
+     */
+    public void addDisplayName(LocaleElement displayName) {
+
+        displayNames.add(displayName);
+
+    }
+
+
+    /**
+     * Get the display name of this security constraint. The default display name (the one without a language) is
+     * returned if present, otherwise the first display name is returned.
+     *
+     * @return the display name of this security constraint
+     */
+    public String getDisplayName() {
+
+        for (LocaleElement element : displayNames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displayNames.isEmpty() ? null : displayNames.get(0).getContent();
+
+    }
+
+
+    /**
+     * Set the display name of this security constraint. Any existing display names, including language specific ones,
+     * are replaced by a single default display name.
      *
      * @param displayName The new value
      */
     public void setDisplayName(String displayName) {
 
-        this.displayName = displayName;
+        displayNames.clear();
+        if (displayName != null) {
+            displayNames.add(new LocaleElement(displayName, null));
+        }
+
+    }
+
+
+    /**
+     * Get the descriptions of this security constraint.
+     *
+     * @return the descriptions of this security constraint
+     */
+    public List<LocaleElement> getDescriptions() {
+
+        return descriptions;
+
+    }
+
+
+    /**
+     * Add a description to this security constraint.
+     *
+     * @param description The description to add
+     */
+    public void addDescription(LocaleElement description) {
+
+        descriptions.add(description);
+
+    }
+
+
+    /**
+     * Get the description of this security constraint. The default description (the one without a language) is
+     * returned if present, otherwise the first description is returned.
+     *
+     * @return the description of this security constraint
+     */
+    public String getDescription() {
+
+        for (LocaleElement element : descriptions) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return descriptions.isEmpty() ? null : descriptions.get(0).getContent();
+
+    }
+
+
+    /**
+     * Set the description of this security constraint. Any existing descriptions, including language specific ones,
+     * are replaced by a single default description.
+     *
+     * @param description The new description
+     */
+    public void setDescription(String description) {
+
+        descriptions.clear();
+        if (description != null) {
+            descriptions.add(new LocaleElement(description, null));
+        }
 
     }
 
