@@ -500,6 +500,10 @@
         the pool generated a name that repeated across pools, which caused
         pools to share the same name. (remm)
       </fix>
+      <fix>
+        Use RequestDispatcher target rather than source when looking up
+        <code>security-role-ref</code>s for the current Servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
