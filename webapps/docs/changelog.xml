@@ -155,6 +155,10 @@
         the JNDI realm binds using the user provided name and password to
         authenticate the user. (markt)
       </fix>
+      <update>
+        Optimize <code>Accept-Language</code> header processing and use of
+        resource budles for localization. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
