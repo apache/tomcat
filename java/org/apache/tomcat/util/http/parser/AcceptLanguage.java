@@ -68,10 +68,39 @@ public class AcceptLanguage {
      * @throws IOException If an I/O error occurs while reading the input
      */
     public static List<AcceptLanguage> parse(StringReader input) throws IOException {
+        return parse(input, -1);
+    }
+
+
+    /**
+     * Parses an Accept-Language header value, reading at most the specified
+     * number of entries. Parsing stops as soon as the maximum number of
+     * entries has been read. This limits the number of Locale objects created
+     * when the caller has no use for entries beyond the limit (e.g. when a
+     * container level limit means the request is going to be rejected).
+     *
+     * @param input       The StringReader containing the header value
+     * @param maxElements The maximum number of entries to parse or
+     *                    <code>-1</code> for no limit
+     *
+     * @return A list of AcceptLanguage entries sorted by quality. If the limit
+     *         was reached, the returned list has exactly
+     *         <code>maxElements</code> entries and any remaining entries were
+     *         not parsed.
+     *
+     * @throws IOException If an I/O error occurs while reading the input
+     */
+    public static List<AcceptLanguage> parse(StringReader input, int maxElements) throws IOException {
 
         List<AcceptLanguage> result = new ArrayList<>();
 
         do {
+            if (maxElements >= 0 && result.size() >= maxElements) {
+                // Enough entries have been read. Do not parse any further
+                // entries to avoid unnecessary object creation.
+                break;
+            }
+
             // Token is broader than what is permitted in a language tag
             // (alphanumeric + '-') but any invalid values that slip through
             // will be caught later

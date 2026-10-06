@@ -355,4 +355,65 @@ public class TestAcceptLanguage {
         Assert.assertEquals(l2, actual.get(1).getLocale());
         Assert.assertEquals(Q0_050, actual.get(1).getQuality(), 0.0001);
     }
+
+
+    /*
+     * The parse(Reader, int) overload stops as soon as the
+     * requested number of entries has been read.
+     */
+    @Test
+    public void testLimited01() throws Exception {
+        List<AcceptLanguage> actual =
+                AcceptLanguage.parse(new StringReader("en,fr,de"), 2);
+
+        Assert.assertEquals(2, actual.size());
+        Assert.assertEquals(L_EN, actual.get(0).getLocale());
+        Assert.assertEquals(L_FR, actual.get(1).getLocale());
+    }
+
+
+    /*
+     * A limit of zero means no entries are parsed.
+     */
+    @Test
+    public void testLimited02() throws Exception {
+        List<AcceptLanguage> actual =
+                AcceptLanguage.parse(new StringReader("en,fr,de"), 0);
+
+        Assert.assertEquals(0, actual.size());
+    }
+
+
+    /*
+     * A limit of -1 means no limit.
+     */
+    @Test
+    public void testLimited03() throws Exception {
+        StringBuilder header = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            if (i > 0) {
+                header.append(',');
+            }
+            header.append("aa-").append(String.format("%03d", i));
+        }
+
+        Assert.assertEquals(100, AcceptLanguage.parse(new StringReader(header.toString()), -1).size());
+    }
+
+
+    /*
+     * Entries beyond the limit are not parsed at all. The list
+     * below the limit is valid. An entry with a quality of zero
+     * is not added, so it does not consume part of the limit.
+     */
+    @Test
+    public void testLimited04() throws Exception {
+        List<AcceptLanguage> actual =
+                AcceptLanguage.parse(new StringReader("en,fr,de;q=0,de,de"), 3);
+
+        Assert.assertEquals(3, actual.size());
+        Assert.assertEquals(L_EN, actual.get(0).getLocale());
+        Assert.assertEquals(L_FR, actual.get(1).getLocale());
+        Assert.assertEquals(Locale.forLanguageTag("de"), actual.get(2).getLocale());
+    }
 }
