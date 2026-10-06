@@ -394,7 +394,7 @@ public class TestAcceptLanguage {
             if (i > 0) {
                 header.append(',');
             }
-            header.append("aa-").append(String.format("%03d", i));
+            header.append("aa-").append(String.format("%03d", Integer.valueOf(i)));
         }
 
         Assert.assertEquals(100, AcceptLanguage.parse(new StringReader(header.toString()), -1).size());
