@@ -52,12 +52,32 @@ public interface GroupChannelMBean {
      */
     long getHeartbeatSleeptime();
 
+    /**
+     * Returns whether the channel uses TLS to secure communication.
+     *
+     * @return {@code true} if the channel is secure
+     */
     boolean getSecure();
 
+    /**
+     * Returns the name of the message digest algorithm used to derive the pre-shared key.
+     *
+     * @return the pre-shared key digest algorithm name
+     */
     String getPskDigest();
 
+    /**
+     * Returns the identity associated with the pre-shared key.
+     *
+     * @return the pre-shared key identity
+     */
     String getPskIdentity();
 
+    /**
+     * Returns the TLS protocol name used for secure communication.
+     *
+     * @return the TLS protocol name
+     */
     String getPskProtocol();
 
     // Operations
