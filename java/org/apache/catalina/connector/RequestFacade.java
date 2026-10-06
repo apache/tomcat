@@ -43,6 +43,7 @@ import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -850,6 +851,18 @@ public class RequestFacade implements HttpServletRequest {
     public Map<String,String> getTrailerFields() {
         checkFacade();
         return request.getTrailerFields();
+    }
+
+
+    public Wrapper getRequestDispatcherWrapper() {
+        checkFacade();
+        return request.getMappingData().requestDispatcherWrapper;
+    }
+
+
+    public void setRequestDispatcherWrapper(Wrapper wrapper) {
+        checkFacade();
+        request.getMappingData().requestDispatcherWrapper = wrapper;
     }
 
 
