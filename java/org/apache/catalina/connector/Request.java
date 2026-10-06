@@ -117,6 +117,7 @@ import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
+import org.apache.tomcat.util.http.parser.AcceptLanguage2;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.http.parser.Upgrade;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -130,6 +131,18 @@ import org.ietf.jgss.GSSException;
 public class Request implements HttpServletRequest {
 
     private static final String HTTP_UPGRADE_HEADER_NAME = "upgrade";
+
+    /**
+     * The default value of the maximum number of locales to parse from the Accept-Language header(s). Must match the
+     * default of the maxLocaleCount attribute of the Connector with which a Request is associated.
+     */
+    private static final int DEFAULT_MAX_LOCALE_COUNT = 10;
+
+    /*
+     * Use AcceptLanguage2 parser rather than the StandardAcceptLanguageParser.
+     */
+    private static final boolean USE_STANDARD_ACCEPT_LANGUAGE_PARSER = Boolean.parseBoolean(
+            System.getProperty("org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser", "false"));
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -149,6 +162,7 @@ public class Request implements HttpServletRequest {
             maxParameterCount = connector.getMaxParameterCount();
             maxPartCount = connector.getMaxPartCount();
             maxPartHeaderSize = connector.getMaxPartHeaderSize();
+            maxLocaleCount = connector.getMaxLocaleCount();
         }
         this.coyoteRequest = coyoteRequest;
         inputBuffer = new InputBuffer(coyoteRequest);
@@ -431,6 +445,15 @@ public class Request implements HttpServletRequest {
 
     private int maxPartHeaderSize = -1;
 
+    /**
+     * The maximum number of locales permitted for a request. The Accept-Language header value is untrusted input
+     * bounded only by the maximum header size so the number of locales is bounded by default to limit the
+     * per-request processing and the number of distinct locales exposed to web applications and internal components.
+     * Requests that exceed this limit are rejected when the locales are parsed. A value of less than zero means no
+     * limit.
+     */
+    private int maxLocaleCount = DEFAULT_MAX_LOCALE_COUNT;
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -481,10 +504,12 @@ public class Request implements HttpServletRequest {
             maxParameterCount = connector.getMaxParameterCount();
             maxPartCount = connector.getMaxPartCount();
             maxPartHeaderSize = connector.getMaxPartHeaderSize();
+            maxLocaleCount = connector.getMaxLocaleCount();
         } else {
             maxParameterCount = -1;
             maxPartCount = -1;
             maxPartHeaderSize = -1;
+            maxLocaleCount = DEFAULT_MAX_LOCALE_COUNT;
         }
         if (parts != null) {
             for (Part part : parts) {
@@ -3208,6 +3233,10 @@ public class Request implements HttpServletRequest {
         // negating the Double value when creating the key)
         for (ArrayList<Locale> list : locales.values()) {
             for (Locale locale : list) {
+                if (maxLocaleCount > -1 && this.locales.size() >= maxLocaleCount) {
+                    throw new IllegalArgumentException(
+                            sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
+                }
                 addLocale(locale);
             }
         }
@@ -3222,9 +3251,30 @@ public class Request implements HttpServletRequest {
      */
     protected void parseLocalesHeader(String value, TreeMap<Double,ArrayList<Locale>> locales) {
 
+        // Determine how many more entries are of interest. One more than the
+        // maximum is parsed so that a header that exceeds the limit is
+        // rejected rather than silently truncated. Parsing no further entries
+        // once the limit is reached avoids creating Locale objects for entries
+        // that can never be used.
+        int maxElements = -1;
+        if (maxLocaleCount > -1) {
+            int current = 0;
+            for (ArrayList<Locale> list : locales.values()) {
+                current += list.size();
+            }
+            maxElements = maxLocaleCount + 1 - current;
+            if (maxElements < 1) {
+                return;
+            }
+        }
+
         List<AcceptLanguage> acceptLanguages;
         try {
-            acceptLanguages = AcceptLanguage.parse(new StringReader(value));
+            if (USE_STANDARD_ACCEPT_LANGUAGE_PARSER) {
+                acceptLanguages = AcceptLanguage.parse(new StringReader(value), maxElements);
+            } else {
+                acceptLanguages = AcceptLanguage2.parse(new StringReader(value), maxElements);
+            }
         } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
             // of an IOException.
