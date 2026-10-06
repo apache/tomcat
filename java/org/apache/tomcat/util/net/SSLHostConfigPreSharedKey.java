@@ -31,10 +31,22 @@ public class SSLHostConfigPreSharedKey implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The SSL host configuration that owns this pre-shared key configuration.
+     */
     private final SSLHostConfig sslHostConfig;
 
+    /**
+     * The identity associated with the pre-shared key.
+     */
     private String identity;
+    /**
+     * The pre-shared key.
+     */
     private byte[] key;
+    /**
+     * The message digest algorithm used to derive the pre-shared key.
+     */
     private MessageDigest digest = MessageDigest.SHA256;
 
     /**
