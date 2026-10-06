@@ -54,23 +54,56 @@ public class SocketBufferHandler {
     private volatile boolean writeBufferConfiguredForWrite = true;
     private volatile ByteBuffer writeBuffer;
 
+    private final int readBufferSize;
+    private final int writeBufferSize;
     private final boolean direct;
 
     /**
      * Creates a new SocketBufferHandler with the specified buffer sizes.
+     * The buffers are allocated lazily, on first use: a handler whose
+     * buffers are never touched allocates nothing, and a fresh (never
+     * allocated) buffer is by definition empty and write-configured, the
+     * same state a freshly allocated one would be in.
      * @param readBufferSize the size of the read buffer in bytes
      * @param writeBufferSize the size of the write buffer in bytes
      * @param direct whether to allocate direct (off-heap) buffers
      */
     public SocketBufferHandler(int readBufferSize, int writeBufferSize, boolean direct) {
+        this.readBufferSize = readBufferSize;
+        this.writeBufferSize = writeBufferSize;
         this.direct = direct;
-        if (direct) {
-            readBuffer = ByteBuffer.allocateDirect(readBufferSize);
-            writeBuffer = ByteBuffer.allocateDirect(writeBufferSize);
-        } else {
-            readBuffer = ByteBuffer.allocate(readBufferSize);
-            writeBuffer = ByteBuffer.allocate(writeBufferSize);
+    }
+
+    private ByteBuffer allocate(int size) {
+        return direct ? ByteBuffer.allocateDirect(size) : ByteBuffer.allocate(size);
+    }
+
+    private ByteBuffer readBuffer() {
+        ByteBuffer buf = readBuffer;
+        if (buf == null) {
+            synchronized (this) {
+                buf = readBuffer;
+                if (buf == null) {
+                    buf = allocate(readBufferSize);
+                    readBuffer = buf;
+                }
+            }
         }
+        return buf;
+    }
+
+    private ByteBuffer writeBuffer() {
+        ByteBuffer buf = writeBuffer;
+        if (buf == null) {
+            synchronized (this) {
+                buf = writeBuffer;
+                if (buf == null) {
+                    buf = allocate(writeBufferSize);
+                    writeBuffer = buf;
+                }
+            }
+        }
+        return buf;
     }
 
 
@@ -93,17 +126,18 @@ public class SocketBufferHandler {
     private void setReadBufferConfiguredForWrite(boolean readBufferConFiguredForWrite) {
         // NO-OP if buffer is already in correct state
         if (this.readBufferConfiguredForWrite != readBufferConFiguredForWrite) {
+            ByteBuffer rb = readBuffer();
             if (readBufferConFiguredForWrite) {
                 // Switching to write
-                int remaining = readBuffer.remaining();
+                int remaining = rb.remaining();
                 if (remaining == 0) {
-                    readBuffer.clear();
+                    rb.clear();
                 } else {
-                    readBuffer.compact();
+                    rb.compact();
                 }
             } else {
                 // Switching to read
-                readBuffer.flip();
+                rb.flip();
             }
             this.readBufferConfiguredForWrite = readBufferConFiguredForWrite;
         }
@@ -115,7 +149,7 @@ public class SocketBufferHandler {
      * @return the read buffer
      */
     public ByteBuffer getReadBuffer() {
-        return readBuffer;
+        return readBuffer();
     }
 
 
@@ -124,10 +158,16 @@ public class SocketBufferHandler {
      * @return {@code true} if the read buffer is empty
      */
     public boolean isReadBufferEmpty() {
+        // An unallocated buffer is empty; no point allocating one to find
+        // that out.
+        ByteBuffer rb = readBuffer;
+        if (rb == null) {
+            return true;
+        }
         if (readBufferConfiguredForWrite) {
-            return readBuffer.position() == 0;
+            return rb.position() == 0;
         } else {
-            return readBuffer.remaining() == 0;
+            return rb.remaining() == 0;
         }
     }
 
@@ -140,53 +180,54 @@ public class SocketBufferHandler {
     public void unReadReadBuffer(ByteBuffer returnedData) {
         if (isReadBufferEmpty()) {
             configureReadBufferForWrite();
-            readBuffer.put(returnedData);
+            readBuffer().put(returnedData);
         } else {
+            ByteBuffer rb = readBuffer;
             int bytesReturned = returnedData.remaining();
             if (readBufferConfiguredForWrite) {
                 // Writes always start at position zero
-                if ((readBuffer.position() + bytesReturned) > readBuffer.capacity()) {
+                if ((rb.position() + bytesReturned) > rb.capacity()) {
                     throw new BufferOverflowException();
                 } else {
                     // Move the bytes up to make space for the returned data.
                     // Copy backwards so that, when the source and destination
                     // regions overlap, the source bytes are not overwritten
                     // before they have been read.
-                    for (int i = readBuffer.position() - 1; i >= 0; i--) {
-                        readBuffer.put(i + bytesReturned, readBuffer.get(i));
+                    for (int i = rb.position() - 1; i >= 0; i--) {
+                        rb.put(i + bytesReturned, rb.get(i));
                     }
                     // Insert the bytes returned
                     for (int i = 0; i < bytesReturned; i++) {
-                        readBuffer.put(i, returnedData.get());
+                        rb.put(i, returnedData.get());
                     }
                     // Update the position
-                    readBuffer.position(readBuffer.position() + bytesReturned);
+                    rb.position(rb.position() + bytesReturned);
                 }
             } else {
                 // Reads will start at zero but may have progressed
-                int shiftRequired = bytesReturned - readBuffer.position();
+                int shiftRequired = bytesReturned - rb.position();
                 if (shiftRequired > 0) {
-                    if ((readBuffer.capacity() - readBuffer.limit()) < shiftRequired) {
+                    if ((rb.capacity() - rb.limit()) < shiftRequired) {
                         throw new BufferOverflowException();
                     }
                     // Move the bytes up to make space for the returned data.
                     // Copy backwards so that, when the source and destination
                     // regions overlap, the source bytes are not overwritten
                     // before they have been read.
-                    int oldLimit = readBuffer.limit();
-                    readBuffer.limit(oldLimit + shiftRequired);
-                    for (int i = oldLimit - 1; i >= readBuffer.position(); i--) {
-                        readBuffer.put(i + shiftRequired, readBuffer.get(i));
+                    int oldLimit = rb.limit();
+                    rb.limit(oldLimit + shiftRequired);
+                    for (int i = oldLimit - 1; i >= rb.position(); i--) {
+                        rb.put(i + shiftRequired, rb.get(i));
                     }
                 } else {
                     shiftRequired = 0;
                 }
                 // Insert the returned bytes
-                int insertOffset = readBuffer.position() + shiftRequired - bytesReturned;
+                int insertOffset = rb.position() + shiftRequired - bytesReturned;
                 for (int i = insertOffset; i < bytesReturned + insertOffset; i++) {
-                    readBuffer.put(i, returnedData.get());
+                    rb.put(i, returnedData.get());
                 }
-                readBuffer.position(insertOffset);
+                rb.position(insertOffset);
             }
         }
     }
@@ -211,19 +252,20 @@ public class SocketBufferHandler {
     private void setWriteBufferConfiguredForWrite(boolean writeBufferConfiguredForWrite) {
         // NO-OP if buffer is already in correct state
         if (this.writeBufferConfiguredForWrite != writeBufferConfiguredForWrite) {
+            ByteBuffer wb = writeBuffer();
             if (writeBufferConfiguredForWrite) {
                 // Switching to write
-                int remaining = writeBuffer.remaining();
+                int remaining = wb.remaining();
                 if (remaining == 0) {
-                    writeBuffer.clear();
+                    wb.clear();
                 } else {
-                    writeBuffer.compact();
-                    writeBuffer.position(remaining);
-                    writeBuffer.limit(writeBuffer.capacity());
+                    wb.compact();
+                    wb.position(remaining);
+                    wb.limit(wb.capacity());
                 }
             } else {
                 // Switching to read
-                writeBuffer.flip();
+                wb.flip();
             }
             this.writeBufferConfiguredForWrite = writeBufferConfiguredForWrite;
         }
@@ -235,10 +277,16 @@ public class SocketBufferHandler {
      * @return {@code true} if the write buffer can accept more data
      */
     public boolean isWriteBufferWritable() {
+        // An unallocated buffer is empty and, if it has any size at all,
+        // writable; no point allocating one to find that out.
+        ByteBuffer wb = writeBuffer;
+        if (wb == null) {
+            return writeBufferSize > 0;
+        }
         if (writeBufferConfiguredForWrite) {
-            return writeBuffer.hasRemaining();
+            return wb.hasRemaining();
         } else {
-            return writeBuffer.remaining() == 0;
+            return wb.remaining() == 0;
         }
     }
 
@@ -248,7 +296,7 @@ public class SocketBufferHandler {
      * @return the write buffer
      */
     public ByteBuffer getWriteBuffer() {
-        return writeBuffer;
+        return writeBuffer();
     }
 
 
@@ -257,10 +305,16 @@ public class SocketBufferHandler {
      * @return {@code true} if the write buffer is empty
      */
     public boolean isWriteBufferEmpty() {
+        // An unallocated buffer is empty; no point allocating one to find
+        // that out.
+        ByteBuffer wb = writeBuffer;
+        if (wb == null) {
+            return true;
+        }
         if (writeBufferConfiguredForWrite) {
-            return writeBuffer.position() == 0;
+            return wb.position() == 0;
         } else {
-            return writeBuffer.remaining() == 0;
+            return wb.remaining() == 0;
         }
     }
 
@@ -269,9 +323,15 @@ public class SocketBufferHandler {
      * Resets both read and write buffers to their initial empty state.
      */
     public void reset() {
-        readBuffer.clear();
+        ByteBuffer rb = readBuffer;
+        if (rb != null) {
+            rb.clear();
+        }
         readBufferConfiguredForWrite = true;
-        writeBuffer.clear();
+        ByteBuffer wb = writeBuffer;
+        if (wb != null) {
+            wb.clear();
+        }
         writeBufferConfiguredForWrite = true;
     }
 
@@ -282,9 +342,9 @@ public class SocketBufferHandler {
      */
     public void expand(int newSize) {
         configureReadBufferForWrite();
-        readBuffer = ByteBufferUtils.expand(readBuffer, newSize);
+        readBuffer = ByteBufferUtils.expand(readBuffer(), newSize);
         configureWriteBufferForWrite();
-        writeBuffer = ByteBufferUtils.expand(writeBuffer, newSize);
+        writeBuffer = ByteBufferUtils.expand(writeBuffer(), newSize);
     }
 
     /**
@@ -292,8 +352,14 @@ public class SocketBufferHandler {
      */
     public void free() {
         if (direct) {
-            ByteBufferUtils.cleanDirectBuffer(readBuffer);
-            ByteBufferUtils.cleanDirectBuffer(writeBuffer);
+            ByteBuffer rb = readBuffer;
+            if (rb != null) {
+                ByteBufferUtils.cleanDirectBuffer(rb);
+            }
+            ByteBuffer wb = writeBuffer;
+            if (wb != null) {
+                ByteBufferUtils.cleanDirectBuffer(wb);
+            }
         }
     }
 
