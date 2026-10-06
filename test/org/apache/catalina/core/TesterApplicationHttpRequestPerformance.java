@@ -33,7 +33,7 @@ public class TesterApplicationHttpRequestPerformance {
         org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
         Request request = new Request(null);
         request.setCoyoteRequest(coyoteRequest);
-        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null, false);
+        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null, false, null);
 
         // Warm-up
         doTestGetAttribute(applicationHttpRequest);
@@ -59,7 +59,7 @@ public class TesterApplicationHttpRequestPerformance {
             request.setCoyoteRequest(coyoteRequest);
             return request;
         }
-        return new ApplicationHttpRequest(getRequest(depth - 1), null, false);
+        return new ApplicationHttpRequest(getRequest(depth - 1), null, false, null);
     }
 
 
