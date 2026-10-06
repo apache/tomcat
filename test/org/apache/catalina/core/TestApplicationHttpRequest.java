@@ -219,7 +219,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
             request.setAttribute("key", "value");
             return request;
         }
-        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false);
+        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false, null);
     }
 
 

@@ -2254,8 +2254,29 @@ public class Request implements HttpServletRequest {
             return false;
         }
 
-        // Identify the Realm we will use for checking role assignments
-        Context context = getContext();
+        /*
+         * There might be a RequestDispatcher in use. That changes the wrapper that needs to be used to look up any
+         * security-role-ref. If the dispatch is a cross-context dispatch, the context changes as well.
+         */
+        Wrapper wrapper;
+        Context context;
+        if (mappingData.requestDispatcherWrapper != null) {
+            wrapper = mappingData.requestDispatcherWrapper;
+            Container container = wrapper.getParent();
+            if (container instanceof Context c) {
+                context = c;
+            } else {
+                context = null;
+            }
+        } else {
+            wrapper = getWrapper();
+            context = getContext();
+        }
+
+        /*
+         * This shouldn't happen. No context means no realm. No realm means no user can be authenticated. That in turn
+         * means userPrincipal should have been null.
+         */
         if (context == null) {
             return false;
         }
@@ -2272,13 +2293,13 @@ public class Request implements HttpServletRequest {
             return true;
         }
 
+        // Identify the Realm we will use for checking role assignments
         Realm realm = context.getRealm();
         if (realm == null) {
             return false;
         }
 
         // Check for a role alias defined in a <security-role-ref> element
-        Wrapper wrapper = getWrapper();
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
             if (realRole != null) {

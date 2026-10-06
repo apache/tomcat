@@ -702,7 +702,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 }
                 crossContext = !context.getEncodedPath().equals(contextPath);
             }
-            wrapper = new ApplicationHttpRequest(hcurrent, context, crossContext);
+            wrapper = new ApplicationHttpRequest(hcurrent, context, crossContext, this.wrapper);
         } else {
             wrapper = new ApplicationRequest(current);
         }
