@@ -885,7 +885,7 @@ public class TestRequest extends TomcatBaseTest {
             if (i > 0) {
                 acceptLanguage.append(',');
             }
-            acceptLanguage.append(String.format("aa-%03d", i));
+            acceptLanguage.append(String.format("aa-%03d", Integer.valueOf(i)));
         }
         return acceptLanguage.toString();
     }

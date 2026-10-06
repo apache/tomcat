@@ -42,6 +42,7 @@ import java.util.Locale;
  *   {@link Locale#ROOT}.</li>
  * </ul>
  */
+@SuppressWarnings("javadoc")
 public final class AcceptLanguage2 {
 
     private AcceptLanguage2() {
