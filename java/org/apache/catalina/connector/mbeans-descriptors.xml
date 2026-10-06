@@ -106,6 +106,10 @@
           description="Maximum number of Keep-Alive requests to honor per connection"
                  type="int"/>
 
+    <attribute   name="maxLocaleCount"
+          description="The maximum number of locales that are permitted for a request. Requests that exceed this limit will be rejected when the locales are parsed. 10 by default. A value of less than 0 means no limit."
+                 type="int"/>
+
     <attribute   name="maxParameterCount"
           description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by default. The default Tomcat server.xml configures a lower default of 1000. A value of less than 0 means no limit."
                  type="int"/>
