@@ -221,10 +221,18 @@ public abstract class AbstractSender implements DataSender {
         return port;
     }
 
+    /**
+     * Returns the SSL context used to secure the connection with TLS.
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
     public TribesSslContext getSslContext() {
         return sslContext;
     }
 
+    /**
+     * Sets the SSL context used to secure the connection with TLS.
+     * @param sslContext the SSL context to use
+     */
     public void setSslContext(TribesSslContext sslContext) {
         this.sslContext = sslContext;
     }

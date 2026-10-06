@@ -35,6 +35,18 @@ public class TribesSslContext implements AutoCloseable {
     private final Object serverContext;
     private final boolean ffm;
 
+    /**
+     * Creates the pair of client and server TLS contexts to be used by a Tribes channel. The OpenSSL FFM
+     * implementation is used where available, otherwise the Tomcat Native implementation is used.
+     *
+     * @param identity    The pre-shared key identity
+     * @param key         The pre-shared key as a hex encoded string
+     * @param digest      The name of the message digest algorithm used to derive the pre-shared key, for example
+     *                        <code>SHA256</code>
+     * @param protocol    The TLS protocol name, for example <code>TLSv1.3</code>
+     *
+     * @throws Exception if the TLS contexts could not be created
+     */
     public TribesSslContext(String identity, String key, String digest, String protocol) throws Exception {
         Object[] contexts = createFfmContexts(identity, key, digest, protocol);
         if (contexts != null) {
@@ -50,10 +62,20 @@ public class TribesSslContext implements AutoCloseable {
         serverContext = contexts[1];
     }
 
+    /**
+     * Creates a new SSL engine for client-side use.
+     *
+     * @return the new client SSL engine
+     */
     public SSLEngine createClientEngine() {
         return createEngine(clientContext, true);
     }
 
+    /**
+     * Creates a new SSL engine for server-side use.
+     *
+     * @return the new server SSL engine
+     */
     public SSLEngine createServerEngine() {
         return createEngine(serverContext, false);
     }
@@ -180,6 +202,12 @@ public class TribesSslContext implements AutoCloseable {
     }
 
 
+    /**
+     * Returns the name of the TLS implementation in use.
+     *
+     * @return <code>TLS-OpenSSL-FFM</code> if the OpenSSL FFM implementation is used, otherwise
+     *             <code>TLS-OpenSSL</code>
+     */
     public String getImplementationName() {
         if (ffm) {
             return "TLS-OpenSSL-FFM";
