@@ -893,7 +893,8 @@ public class TestRequest extends TomcatBaseTest {
     private static int localeCount(Connector connector, String acceptLanguage) {
         org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
         coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
-        Request request = new Request(connector, coyoteRequest);
+        Request request = new Request(connector);
+        request.setCoyoteRequest(coyoteRequest);
 
         Enumeration<Locale> locales = request.getLocales();
         int count = 0;
@@ -952,7 +953,8 @@ public class TestRequest extends TomcatBaseTest {
         for (String acceptLanguage : acceptLanguages) {
             coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
         }
-        Request request = new Request(connector, coyoteRequest);
+        Request request = new Request(connector);
+        request.setCoyoteRequest(coyoteRequest);
 
         Enumeration<Locale> locales = request.getLocales();
         int count = 0;
