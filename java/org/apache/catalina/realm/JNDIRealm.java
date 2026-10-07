@@ -343,8 +343,6 @@ public class JNDIRealm extends RealmBase {
      */
     private boolean useStartTls = false;
 
-    private StartTlsResponse tls = null;
-
     /**
      * The list of enabled cipher suites used for establishing tls connections. <code>null</code> means to use the
      * default cipher suites.
@@ -2386,11 +2384,13 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Close tls startResponse if used
-        if (tls != null) {
+        if (connection.tls != null) {
             try {
-                tls.close();
+                connection.tls.close();
             } catch (IOException ioe) {
                 containerLog.error(sm.getString("jndiRealm.tlsClose"), ioe);
+            } finally {
+                connection.tls = null;
             }
         }
         // Close our opened connection
@@ -2711,7 +2711,7 @@ public class JNDIRealm extends RealmBase {
     protected void open(JNDIConnection connection) throws NamingException {
         try {
             // Ensure that we have a directory context available
-            connection.context = createDirContext(getDirectoryContextEnvironment());
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment());
         } catch (Exception e) {
             if (alternateURL == null || alternateURL.isEmpty()) {
                 // No alternate URL. Re-throw the exception.
@@ -2721,7 +2721,7 @@ public class JNDIRealm extends RealmBase {
             // log the first exception.
             containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
             // Try connecting to the alternate url.
-            connection.context = createDirContext(getDirectoryContextEnvironment());
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment());
         } finally {
             // reset it in case the connection times out.
             // the primary may come back.
@@ -2737,9 +2737,10 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    private DirContext createDirContext(Hashtable<String,String> env) throws NamingException {
+    private DirContext createDirContext(JNDIConnection connection, Hashtable<String,String> env)
+            throws NamingException {
         if (useStartTls) {
-            return createTlsDirContext(env);
+            return createTlsDirContext(connection, env);
         } else {
             return new InitialDirContext(env);
         }
@@ -2794,15 +2795,17 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Create a tls enabled LdapContext and set the StartTlsResponse tls instance variable.
+     * Create a tls enabled LdapContext and set the StartTlsResponse tls instance field of the connection.
      *
-     * @param env Environment to use for context creation
+     * @param connection The directory server connection wrapper
+     * @param env        Environment to use for context creation
      *
      * @return configured {@link LdapContext}
      *
      * @throws NamingException when something goes wrong while negotiating the connection
      */
-    private DirContext createTlsDirContext(Hashtable<String,String> env) throws NamingException {
+    private DirContext createTlsDirContext(JNDIConnection connection, Hashtable<String,String> env)
+            throws NamingException {
         Map<String,Object> savedEnv = new HashMap<>();
         for (String key : Arrays.asList(Context.SECURITY_AUTHENTICATION, Context.SECURITY_CREDENTIALS,
                 Context.SECURITY_PRINCIPAL, Context.SECURITY_PROTOCOL)) {
@@ -2814,16 +2817,17 @@ public class JNDIRealm extends RealmBase {
         LdapContext result = null;
         try {
             result = new InitialLdapContext(env, null);
-            tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
-            if (getHostnameVerifier() != null) {
-                tls.setHostnameVerifier(getHostnameVerifier());
-            }
-            if (getCipherSuitesArray() != null) {
-                tls.setEnabledCipherSuites(getCipherSuitesArray());
-            }
+            StartTlsResponse tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
             try {
+                if (getHostnameVerifier() != null) {
+                    tls.setHostnameVerifier(getHostnameVerifier());
+                }
+                if (getCipherSuitesArray() != null) {
+                    tls.setEnabledCipherSuites(getCipherSuitesArray());
+                }
                 SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
                 containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
+                connection.tls = tls;
             } catch (IOException ioe) {
                 NamingException ne = new NamingException(ioe.getMessage());
                 ne.initCause(ioe);
@@ -3386,6 +3390,12 @@ public class JNDIRealm extends RealmBase {
         /**
          * The directory context linking us to our directory server.
          */
-        public DirContext context = null;
+        public volatile DirContext context = null;
+
+        /**
+         * The {@link StartTlsResponse} negotiated for this connection, if any.
+         */
+        public volatile StartTlsResponse tls = null;
+
     }
 }
