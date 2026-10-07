@@ -28,6 +28,7 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
@@ -114,7 +115,8 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      *
      * @param valveType ClassName of the valve to be added
      *
-     * @return the MBean name of the new valve
+     * @return the MBean name of the new valve, or null if the valve was not
+     *         added or has no registered MBean
      *
      * @throws MBeanException if adding the valve failed
      */
@@ -122,10 +124,27 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
         Valve valve = (Valve) newInstance(valveType);
 
         Container container = doGetManagedResource();
-        container.getPipeline().addValve(valve);
+        Pipeline pipeline = container.getPipeline();
+        pipeline.addValve(valve);
+
+        // If the pipeline is running and starting the valve fails, the valve
+        // is cleaned up and not added. The pipeline logs the failure.
+        boolean added = false;
+        for (Valve pipelineValve : pipeline.getValves()) {
+            if (pipelineValve == valve) {
+                added = true;
+                break;
+            }
+        }
+        if (!added) {
+            return null;
+        }
 
         if (valve instanceof JmxEnabled) {
-            return ((JmxEnabled) valve).getObjectName().toString();
+            // A container that is not running does not initialize the valve,
+            // so no MBean name is available
+            ObjectName oname = ((JmxEnabled) valve).getObjectName();
+            return oname == null ? null : oname.toString();
         } else {
             return null;
         }
@@ -154,7 +173,8 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             for (Valve valve : valves) {
                 if (valve instanceof JmxEnabled) {
                     ObjectName voname = ((JmxEnabled) valve).getObjectName();
-                    if (voname.equals(oname)) {
+                    // A valve that has not been initialized has no name
+                    if (oname.equals(voname)) {
                         container.getPipeline().removeValve(valve);
                     }
                 }

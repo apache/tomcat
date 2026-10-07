@@ -27,6 +27,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.JmxEnabled;
+import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
@@ -616,8 +617,8 @@ public class MBeanFactory {
      * @param className The fully qualified class name of the {@link Valve} to create
      * @param parent    The MBean name of the associated parent {@link Container}.
      *
-     * @return The MBean name of the {@link Valve} that was created or <code>null</code> if the {@link Valve} does not
-     *             implement {@link JmxEnabled}.
+     * @return The MBean name of the {@link Valve} that was created or <code>null</code> if the {@link Valve} was not
+     *             added, does not implement {@link JmxEnabled} or has no registered MBean.
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -633,10 +634,27 @@ public class MBeanFactory {
 
         Valve valve = (Valve) Class.forName(className).getConstructor().newInstance();
 
-        container.getPipeline().addValve(valve);
+        Pipeline pipeline = container.getPipeline();
+        pipeline.addValve(valve);
+
+        // If the pipeline is running and starting the valve fails, the valve
+        // is cleaned up and not added. The pipeline logs the failure.
+        boolean added = false;
+        for (Valve pipelineValve : pipeline.getValves()) {
+            if (pipelineValve == valve) {
+                added = true;
+                break;
+            }
+        }
+        if (!added) {
+            return null;
+        }
 
         if (valve instanceof JmxEnabled) {
-            return ((JmxEnabled) valve).getObjectName().toString();
+            // A container that is not running does not initialize the valve,
+            // so no MBean name is available
+            ObjectName oname = ((JmxEnabled) valve).getObjectName();
+            return oname == null ? null : oname.toString();
         } else {
             return null;
         }
@@ -886,7 +904,8 @@ public class MBeanFactory {
         for (Valve valve : valves) {
             if (valve instanceof JmxEnabled) {
                 ObjectName voname = ((JmxEnabled) valve).getObjectName();
-                if (voname.equals(oname)) {
+                // A valve that has not been initialized has no name
+                if (oname.equals(voname)) {
                     container.getPipeline().removeValve(valve);
                 }
             }
