@@ -1099,8 +1099,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             }
         }
         if (counter > 0) {
-            if (oldest < now) {
-                result = (1000 * 60 * counter) / (int) (now - oldest);
+            long span = now - oldest;
+            if (span > 0) {
+                result = (int) ((1000L * 60 * counter) / span);
             } else {
                 // Better than reporting zero
                 result = Integer.MAX_VALUE;
