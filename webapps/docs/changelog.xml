@@ -108,6 +108,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.124 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Use the resolved <code>roleBase</code> value when computing the
+        distinguished name of a group found during a nested role search in
+        <code>JNDIRealm</code>, so that groups nested more than one level deep
+        are found when <code>roleBase</code> uses pattern replacements. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.123 (remm)" rtext="release in progress">
   <subsection name="Catalina">
