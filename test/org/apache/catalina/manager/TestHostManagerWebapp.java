@@ -297,4 +297,99 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
 
         tomcat.stop();
     }
+
+
+    /*
+     * Removing a host leaves the configuration directory in place. Re-adding
+     * a host with the same name using manager=true must then replace the
+     * leftover manager.xml rather than failing to install it.
+     */
+    @Test
+    public void testAddRemoveReAddWithManager() throws Exception {
+        System.setProperty("catalina.home", getBuildDirectory().getAbsolutePath());
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
+
+        File configFile = new File(getTemporaryDirectory(), "tomcat-users-host-manager-readd.xml");
+        try (PrintWriter writer = new PrintWriter(configFile)) {
+            writer.write(TestManagerWebapp.CONFIG);
+        }
+        addDeleteOnTearDown(configFile);
+
+        MemoryRealm memoryRealm = new MemoryRealm();
+        memoryRealm.setCredentialHandler(new MessageDigestCredentialHandler());
+        memoryRealm.setPathname(configFile.getAbsolutePath());
+        tomcat.getEngine().setRealm(memoryRealm);
+
+        File confFolder = new File(getTemporaryDirectory(), "conf");
+        confFolder.mkdirs();
+        File webappDir = new File(getBuildDirectory(), "webapps");
+
+        File appDir = new File(webappDir, "host-manager");
+        tomcat.addWebapp(null, "/host-manager", appDir.getAbsolutePath());
+
+        getProgrammaticRootContext();
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/text/add?name=rehost&manager=true HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("OK - Host [rehost] added"));
+        File managerXml = new File(confFolder, tomcat.getEngine().getName() + "/rehost/manager.xml");
+        Assert.assertTrue(managerXml.getAbsolutePath(), managerXml.isFile());
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/text/remove?name=rehost HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("OK - Removed host [rehost]"));
+        // The configuration directory is intentionally left in place
+        Assert.assertTrue(managerXml.getAbsolutePath(), managerXml.isFile());
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/text/add?name=rehost&manager=true HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("OK - Host [rehost] added"));
+
+        tomcat.stop();
+    }
 }
