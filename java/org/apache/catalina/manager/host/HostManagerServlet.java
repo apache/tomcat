@@ -24,6 +24,7 @@ import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.management.InstanceNotFoundException;
@@ -306,7 +307,13 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
     }
 
 
-    // -------------------------------------------------------- Private Methods
+    private static String normalizeHostName(String hostName) {
+        if (hostName == null) {
+            return null;
+        } else {
+            return hostName.toLowerCase(Locale.ENGLISH);
+        }
+    }
 
 
     /**
@@ -336,6 +343,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
+
+        // Normalize host name before it is used
+        name = normalizeHostName(name);
 
         // Check if host already exists
         if (engine.findChild(name) != null) {
@@ -453,6 +463,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             return;
         }
 
+        // Normalize host name before it is used
+        name = normalizeHostName(name);
+
         // Check if host exists
         if (engine.findChild(name) == null) {
             writer.println(smClient.getString("hostManagerServlet.noHost", name));
@@ -531,6 +544,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             return;
         }
 
+        // Normalize host name before it is used
+        name = normalizeHostName(name);
+
         Container host = engine.findChild(name);
 
         // Check if host exists
@@ -581,6 +597,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
+
+        // Normalize host name before it is used
+        name = normalizeHostName(name);
 
         Container host = engine.findChild(name);
 
@@ -673,6 +692,9 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
      * @return the config base for the host
      */
     protected File getConfigBase(String hostName, PrintWriter writer, StringManager smClient) {
+        // Normalize host name before it is used
+        hostName = normalizeHostName(hostName);
+
         File configBase = new File(context.getCatalinaBase(), "conf");
         if (!configBase.exists()) {
             return null;
