@@ -894,11 +894,13 @@ public class JNDIRealm extends RealmBase {
      * @param userPattern The new user pattern
      */
     public void setUserPattern(String userPattern) {
-        this.userPattern = userPattern;
         if (userPattern == null) {
+            this.userPattern = null;
             userPatternArray = null;
         } else {
-            userPatternArray = parseUserPatternString(userPattern);
+            String[] parsed = parseUserPatternString(userPattern);
+            this.userPattern = userPattern;
+            userPatternArray = parsed;
             singleConnection = create();
         }
     }
@@ -2951,6 +2953,8 @@ public class JNDIRealm extends RealmBase {
      * @param userPatternString - a string LDAP search paths surrounded by parentheses
      *
      * @return a parsed string array
+     *
+     * @throws IllegalArgumentException if the pattern contains unbalanced parentheses
      */
     protected String[] parseUserPatternString(String userPatternString) {
 
@@ -2965,18 +2969,37 @@ public class JNDIRealm extends RealmBase {
                 // weed out escaped open parens and parens enclosing the
                 // whole statement (in the case of valid LDAP search
                 // strings: (|(something)(somethingelse))
-                while ((userPatternString.charAt(startParenLoc + 1) == '|') ||
-                        (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\')) {
+                while (startParenLoc > -1 && startParenLoc < userPatternString.length() - 1 &&
+                        ((userPatternString.charAt(startParenLoc + 1) == '|') ||
+                                (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\'))) {
                     startParenLoc = userPatternString.indexOf('(', startParenLoc + 1);
+                }
+                if (startParenLoc == -1) {
+                    break;
+                }
+                if (startParenLoc == userPatternString.length() - 1) {
+                    // an open paren at the end cannot start a pattern
+                    throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern",
+                            userPatternString));
                 }
                 int endParenLoc = userPatternString.indexOf(')', startParenLoc + 1);
                 // weed out escaped end-parens
-                while (userPatternString.charAt(endParenLoc - 1) == '\\') {
+                while (endParenLoc > 0 && userPatternString.charAt(endParenLoc - 1) == '\\') {
                     endParenLoc = userPatternString.indexOf(')', endParenLoc + 1);
+                }
+                if (endParenLoc == -1) {
+                    // no matching close paren for this pattern
+                    throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern",
+                            userPatternString));
                 }
                 String nextPathPart = userPatternString.substring(startParenLoc + 1, endParenLoc);
                 pathList.add(nextPathPart);
                 startParenLoc = userPatternString.indexOf('(', endParenLoc + 1);
+            }
+            if (pathList.isEmpty()) {
+                // every paren was escaped, nothing to separate: treat the
+                // whole string as the pattern
+                return new String[] { userPatternString };
             }
             return pathList.toArray(new String[0]);
         }
