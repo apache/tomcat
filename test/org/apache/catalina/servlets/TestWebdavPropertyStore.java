@@ -33,6 +33,8 @@ import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -70,6 +72,10 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
             "<V:someprop xmlns:V=\"http://tomcat.apache.org/other\">\n" +
             "  <V:othervalue>foooooooo</V:othervalue>\n" +
             "</V:someprop>";
+
+    private static final String PROPERTY4 =
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+            "<displayname>test value</displayname>";
 
     public static final String SIMPLE_SCHEMA =
             "CREATE TABLE webdavproperties (\n" +
@@ -249,6 +255,33 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
         XMLWriter xmlWriter9 = new XMLWriter();
         Assert.assertFalse(propertyStore.propfind("/other/path2", node1, false, xmlWriter9));
         Assert.assertTrue(xmlWriter9.toString().isEmpty());
+
+        // Set a property without a namespace
+        Document document4 = documentBuilder.parse(new InputSource(new ByteArrayInputStream(PROPERTY4.getBytes(StandardCharsets.UTF_8))));
+        Node node4 = document4.getDocumentElement();
+
+        operations = new ArrayList<>();
+        operations.add(new ProppatchOperation(PropertyUpdateType.SET, node4));
+        propertyStore.proppatch("/some/path1", operations);
+        Assert.assertEquals(HttpServletResponse.SC_OK, operations.get(0).getStatusCode());
+
+        XMLWriter xmlWriter10 = new XMLWriter();
+        Assert.assertTrue(propertyStore.propfind("/some/path1", node4, false, xmlWriter10));
+        Assert.assertTrue(xmlWriter10.toString().contains(">test value<"));
+
+        XMLWriter xmlWriter11 = new XMLWriter();
+        Assert.assertFalse(propertyStore.propfind("/some/path1", null, true, xmlWriter11));
+        Assert.assertTrue(xmlWriter11.toString().contains("<displayname"));
+
+        // Remove the property without a namespace
+        operations = new ArrayList<>();
+        operations.add(new ProppatchOperation(PropertyUpdateType.REMOVE, node4));
+        propertyStore.proppatch("/some/path1", operations);
+        Assert.assertEquals(HttpServletResponse.SC_OK, operations.get(0).getStatusCode());
+
+        XMLWriter xmlWriter12 = new XMLWriter();
+        Assert.assertFalse(propertyStore.propfind("/some/path1", null, true, xmlWriter12));
+        Assert.assertFalse(xmlWriter12.toString().contains("<displayname"));
 
         propertyStore.destroy();
 
