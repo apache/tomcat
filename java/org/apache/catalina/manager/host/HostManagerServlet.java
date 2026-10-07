@@ -24,6 +24,7 @@ import java.io.Serial;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.StringTokenizer;
 
 import javax.management.InstanceNotFoundException;
@@ -388,7 +389,10 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
                     return;
                 }
                 Path dest = new File(configBaseFile, "manager.xml").toPath();
-                Files.copy(is, dest);
+                // Replace any manager.xml left behind by a previous host
+                // with the same name. Removing a host does not delete the
+                // configuration directory.
+                Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ioe) {
                 writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
