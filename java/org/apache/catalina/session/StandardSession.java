@@ -167,7 +167,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     /**
      * The maximum time interval, in seconds, between client requests before the servlet container may invalidate this
-     * session. A negative time indicates that the session should never time out.
+     * session. A zero or negative time indicates that the session should never time out.
      */
     protected volatile int maxInactiveInterval = -1;
 
