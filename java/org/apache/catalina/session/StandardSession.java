@@ -17,6 +17,7 @@
 package org.apache.catalina.session;
 
 import java.beans.PropertyChangeSupport;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -1301,11 +1302,24 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Write authentication information (may be null values)
         stream.writeObject(sessionAuthType);
-        try {
-            stream.writeObject(sessionPrincipal);
-        } catch (NotSerializableException e) {
-            manager.getContext().getLogger().warn(sm.getString("standardSession.principalNotSerializable", id), e);
+        if (sessionPrincipal != null) {
+            /*
+             * The instanceof check above only covers the principal itself.
+             * Verify that the complete object graph is serializable before
+             * writing to the session stream, since a NotSerializableException
+             * thrown for a nested element mid-write would leave the session
+             * record corrupted and unreadable. Discard the principal in the
+             * same way as above if the graph is not serializable.
+             */
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ObjectOutputStream principalStream = new ObjectOutputStream(baos)) {
+                principalStream.writeObject(sessionPrincipal);
+            } catch (NotSerializableException e) {
+                sessionPrincipal = null;
+                manager.getContext().getLogger().warn(sm.getString("standardSession.principalNotSerializable", id), e);
+            }
         }
+        stream.writeObject(sessionPrincipal);
         stream.writeObject(expectedSessionId);
         stream.writeObject(savedRequest);
 
