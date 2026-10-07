@@ -154,14 +154,18 @@ public class StandardManager extends ManagerBase {
                         StandardSession session = getNewSession();
                         session.readObjectData(ois);
                         session.setManager(this);
+                        if (!session.isValidInternal()) {
+                            // The session was already invalid when it was
+                            // persisted, typically because it expired while
+                            // the sessions were being written. It has already
+                            // left the map of the writing JVM and the
+                            // associated events have already been fired.
+                            // Discard it without activating or expiring it
+                            // again.
+                            continue;
+                        }
                         sessions.put(session.getIdInternal(), session);
                         session.activate();
-                        if (!session.isValidInternal()) {
-                            // If session is already invalid,
-                            // expire session to prevent memory leak.
-                            session.setValid(true);
-                            session.expire();
-                        }
                     }
                 } finally {
                     // Delete the persistent storage file in all cases, since retrying after an exception
