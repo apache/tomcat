@@ -315,8 +315,8 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             // by handleNotification() when connectors are registered or
             // unregistered and StatusTransformer iterates them without
             // holding the lists' monitor.
-            StatusTransformer.writeConnectorsState(writer, mBeanServer, copyOf(threadPools),
-                    copyOf(globalRequestProcessors), copyOf(requestProcessors), mode, args);
+            StatusTransformer.writeConnectorsState(writer, mBeanServer, threadPools, globalRequestProcessors,
+                    requestProcessors, mode, args);
 
             if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
                 // Note: Retrieving the full status is much slower
@@ -330,16 +330,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         // use StatusTransformer to output status
         StatusTransformer.writeFooter(writer, mode);
-    }
-
-
-    // Takes a snapshot of a list created with Collections.synchronizedList().
-    // The wrapper instance is its own lock, which is also acquired by the
-    // add() and remove() calls in handleNotification().
-    private static <T> List<T> copyOf(List<T> list) {
-        synchronized (list) {
-            return new ArrayList<>(list);
-        }
     }
 
 
