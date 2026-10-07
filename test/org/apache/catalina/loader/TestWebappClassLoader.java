@@ -244,4 +244,32 @@ public class TestWebappClassLoader extends TomcatBaseTest {
 
         Assert.assertFalse(urls.hasMoreElements());
     }
+
+
+    @Test
+    public void testFindResourcesLeadingSlash() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.findResources("/org/apache/tomcat/Bug58096.java");
+        Assert.assertNotNull(urls);
+
+        Assert.assertFalse(urls.hasMoreElements());
+    }
+
+
+    @Test
+    public void testGetResourcesLeadingSlash() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        Enumeration<URL> urls = cl.getResources("/org/apache/tomcat/Bug58096.java");
+        Assert.assertNotNull(urls);
+
+        Assert.assertFalse(urls.hasMoreElements());
+    }
 }

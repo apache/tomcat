@@ -1021,6 +1021,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForResourceLoading(name);
 
+        if (name == null || name.startsWith("/")) {
+            return Collections.emptyEnumeration();
+        }
+
         String path = nameToPath(name);
 
         WebResource[] webResources;
