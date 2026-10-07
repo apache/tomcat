@@ -2003,9 +2003,15 @@ public class JNDIRealm extends RealmBase {
      * @param dn          Distinguished name of user
      * @param credentials Credentials of user
      *
-     * @exception NamingException if a directory server error occurs
+     * @exception NamingException if a directory server error occurs or no credentials are available for the user
      */
     private void userCredentialsAdd(DirContext context, String dn, String credentials) throws NamingException {
+        if (credentials == null) {
+            // The JNDI environment is a Hashtable that does not accept null
+            // values. Without credentials, searching or binding as the user is
+            // not possible.
+            throw new AuthenticationException(sm.getString("jndiRealm.noUserCredentials", dn));
+        }
         // Set up security environment to bind as the user
         context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
         context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
