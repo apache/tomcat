@@ -35,10 +35,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
 import org.apache.catalina.filters.Constants;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -616,6 +618,91 @@ public class TestManagerWebapp extends TomcatBaseTest {
             tomcat.stop();
         }
     }
+
+    /*
+     * A session with an unlimited timeout (maxInactiveInterval == -1) must
+     * be counted in the "Unlimited time" bucket of the text interface
+     * session histogram rather than in an idle-time bucket.
+     */
+    @Test
+    public void testSessionsUnlimitedTimeout() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-script");
+
+        File webappDir = new File(getBuildDirectory(), "webapps");
+        File appDir = new File(webappDir, "manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        Context ctx = tomcat.addContext("/testsession", null);
+        // A session timeout of zero means sessions never time out. It is
+        // stored as -1 minutes which becomes -60 seconds on the session.
+        Context zeroCtx = tomcat.addContext("/testsession0", null);
+        zeroCtx.setSessionTimeout(0);
+
+        tomcat.start();
+
+        ManagerBase manager = (ManagerBase) ctx.getManager();
+        Session unlimited = manager.createSession(null);
+        unlimited.setMaxInactiveInterval(-1);
+        manager.add(unlimited);
+
+        Session limited = manager.createSession(null);
+        manager.add(limited);
+
+        ManagerBase zeroManager = (ManagerBase) zeroCtx.getManager();
+        Session zeroTimeout = zeroManager.createSession(null);
+        Assert.assertEquals(-60, zeroTimeout.getMaxInactiveInterval());
+        zeroManager.add(zeroTimeout);
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader =
+                (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/text/sessions?path=/testsession HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Unlimited time: [1] sessions"));
+        // The unlimited session must not also appear in an idle bucket
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Inactive for [<1] minutes: [1] sessions"));
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/text/sessions?path=/testsession0 HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Unlimited time: [1] sessions"));
+
+        tomcat.stop();
+    }
+
 
     /*
      * Verify that manager JSPs compile and render correctly.
