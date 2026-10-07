@@ -19,12 +19,16 @@ package org.apache.catalina.core;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestStandardVirtualThreadExecutor {
 
     @Test
     public void testVirtualThreadExecutorAwaitTerminationNotStarted() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre21Available());
         @SuppressWarnings("resource") // never started
         StandardVirtualThreadExecutor executor = new StandardVirtualThreadExecutor();
         try {
@@ -38,6 +42,7 @@ public class TestStandardVirtualThreadExecutor {
 
     @Test
     public void testVirtualThreadExecutorAwaitTerminationDelegates() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre21Available());
         @SuppressWarnings("resource") // stop() is called
         StandardVirtualThreadExecutor executor = new StandardVirtualThreadExecutor();
         executor.start();
