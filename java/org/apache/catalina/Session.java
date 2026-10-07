@@ -212,7 +212,7 @@ public interface Session {
 
     /**
      * Returns the maximum time interval, in seconds, between client requests before the servlet container will
-     * invalidate the session. A negative time indicates that the session should never time out.
+     * invalidate the session. A zero or negative time indicates that the session should never time out.
      *
      * @return the maximum inactive interval in seconds
      */
@@ -221,7 +221,7 @@ public interface Session {
 
     /**
      * Set the maximum time interval, in seconds, between client requests before the servlet container will invalidate
-     * the session. A negative time indicates that the session should never time out.
+     * the session. A zero or negative time indicates that the session should never time out.
      *
      * @param interval The new maximum interval
      */

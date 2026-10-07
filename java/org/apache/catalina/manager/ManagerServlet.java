@@ -1311,10 +1311,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     session.expire();
                     expired++;
                 }
-                // Negative interval: session never times out (a context
+                // Non-positive interval: session never times out (a context
                 // session timeout of zero is stored as -1 minutes which
                 // becomes -60 seconds on the session)
-                if (session.getMaxInactiveInterval() < 0) {
+                if (session.getMaxInactiveInterval() <= 0) {
                     notimeout++;
                 } else {
                     // Clamp negative idle time (system clock went backwards)
