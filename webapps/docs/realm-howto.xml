@@ -1023,9 +1023,11 @@ and restarting the server, without any code changes to your application.</li>
               security information for an already authenticated user will <strong>not</strong>
               be reflected until the next time that user logs on again.</li>
           <li>As with other <code>Realm</code> implementations, digested passwords
-              are supported if the <code>&lt;Realm&gt;</code> element in <code>server.xml</code>
-              contains a <code>digest</code> attribute; JAASRealm's <code>CallbackHandler</code>
-              will digest the password prior to passing it back to the <code>LoginModule</code></li>
+              are supported via the configured <code>CredentialHandler</code>.
+              JAASRealm's <code>CallbackHandler</code> passes the password or
+              client digest to the <code>LoginModule</code> unchanged; any digest
+              comparison is expected to be performed by the <code>LoginModule</code>
+              when it calls back into the <code>Realm</code></li>
         </ul>
 
 </subsection>
