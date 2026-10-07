@@ -102,7 +102,7 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
     /**
      * Return the error page entry for the specified Java exception type, if any; otherwise return <code>null</code>.
      *
-     * @param exceptionType Fully qualified class name of the exception type to look up
+     * @param exceptionType Exception type to look up
      *
      * @return a string representation of the error page
      *
@@ -126,17 +126,14 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
      *
      * @throws MBeanException propagated from the managed resource access
      */
-    public String findErrorPage(String exceptionType) throws MBeanException {
-        if (exceptionType == null) {
+    public String findErrorPage(Throwable exceptionType) throws MBeanException {
+        Context context = doGetManagedResource();
+        ErrorPage errorPage = context.findErrorPage(exceptionType);
+        if (errorPage != null) {
+            return errorPage.toString();
+        } else {
             return null;
         }
-        Context context = doGetManagedResource();
-        for (ErrorPage errorPage : context.findErrorPages()) {
-            if (exceptionType.equals(errorPage.getExceptionType())) {
-                return errorPage.toString();
-            }
-        }
-        return null;
     }
 
 
