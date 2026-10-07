@@ -1914,6 +1914,16 @@
         and changes the signature of the protected
         <code>getDirectoryContextEnvironment()</code> method. (remm)
       </fix>
+      <fix>
+        Stop pre-digesting the HTTP DIGEST client digest in
+        <code>JAASCallbackHandler</code>. The pre-digest, a leftover from the
+        pre-<code>CredentialHandler</code> design, could never match the
+        deterministic server digest and so made DIGEST authentication via
+        <code>JAASRealm</code> always fail whenever the realm's credential
+        handler algorithm matched the digest algorithm. The client digest is
+        now passed to the <code>LoginModule</code> unchanged, consistent with
+        the non-JAAS realms. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
