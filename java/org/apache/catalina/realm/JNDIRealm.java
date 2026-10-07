@@ -2206,8 +2206,7 @@ public class JNDIRealm extends RealmBase {
                             doFilterEscaping(doAttributeValueEscaping(group.getValue())) });
 
                     if (containerLog.isTraceEnabled()) {
-                        containerLog
-                                .trace("Perform a nested group search with base " + roleBase + " and filter " + filter);
+                        containerLog.trace("Perform a nested group search with base " + base + " and filter " + filter);
                     }
 
                     results = searchAsUser(connection.context, user, base, filter, controls, isRoleSearchAsUser());
@@ -2219,7 +2218,7 @@ public class JNDIRealm extends RealmBase {
                             if (attrs == null) {
                                 continue;
                             }
-                            String dname = getDistinguishedName(connection.context, roleBase, result);
+                            String dname = getDistinguishedName(connection.context, base, result);
                             String name = getAttributeValue(roleName, attrs);
                             if (name != null && dname != null && !groupMap.containsKey(dname)) {
                                 groupMap.put(dname, name);

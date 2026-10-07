@@ -252,6 +252,12 @@
         interface must implement this method. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Use the resolved <code>roleBase</code> value when computing the
+        distinguished name of a group found during a nested role search in
+        <code>JNDIRealm</code>, so that groups nested more than one level deep
+        are found when <code>roleBase</code> uses pattern replacements. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
