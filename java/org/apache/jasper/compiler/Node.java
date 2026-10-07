@@ -2204,6 +2204,12 @@ public abstract class Node implements TagConstants {
      */
     public static class PageTerminationGenerator extends Node {
 
+        /**
+         * Zero-arg Constructor.
+         */
+        PageTerminationGenerator() {
+        }
+
         @Override
         void accept(Visitor v) throws JasperException {
             v.visit(this);

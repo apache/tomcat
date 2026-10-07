@@ -663,6 +663,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return secure;
     }
 
+    /**
+     * Enables or disables the use of TLS to secure channel communication using a pre-shared key.
+     *
+     * @param secure boolean
+     */
     public void setSecure(boolean secure) {
         this.secure = secure;
     }
@@ -672,6 +677,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskDigest;
     }
 
+    /**
+     * Sets the name of the message digest algorithm used to derive the pre-shared key.
+     *
+     * @param pskDigest the digest algorithm name, for example <code>SHA256</code>
+     */
     public void setPskDigest(String pskDigest) {
         this.pskDigest = pskDigest;
     }
@@ -681,10 +691,22 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskIdentity;
     }
 
+    /**
+     * Sets the identity associated with the pre-shared key. Both the identity and the key must be set for the channel
+     * to use a pre-shared key.
+     *
+     * @param pskIdentity the pre-shared key identity
+     */
     public void setPskIdentity(String pskIdentity) {
         this.pskIdentity = pskIdentity;
     }
 
+    /**
+     * Sets the pre-shared key as a hex encoded string. Both the identity and the key must be set for the channel to
+     * use a pre-shared key.
+     *
+     * @param pskKey the hex encoded pre-shared key
+     */
     public void setPskKey(String pskKey) {
         this.pskKey = pskKey;
     }
@@ -694,10 +716,20 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskProtocol;
     }
 
+    /**
+     * Sets the TLS protocol name used for secure channel communication.
+     *
+     * @param pskProtocol the TLS protocol name, for example <code>TLSv1.3</code>
+     */
     public void setPskProtocol(String pskProtocol) {
         this.pskProtocol = pskProtocol;
     }
 
+    /**
+     * Returns the SSL context used to secure the channel with TLS.
+     *
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
     public TribesSslContext getSslContext() {
         return sslContext;
     }
