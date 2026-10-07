@@ -96,6 +96,8 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
         ContextResource cr = doGetManagedResource();
 
+        String oldType = cr.getType();
+
         switch (name) {
             case "auth" -> cr.setAuth((String) value);
             case "description" -> cr.setDescription((String) value);
@@ -110,8 +112,17 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
         // there is a modification in a resource.
         NamingResources nr = cr.getNamingResources();
         if (nr != null) {
-            nr.removeResource(cr.getName());
-            nr.addResource(cr);
+            try {
+                nr.removeResource(cr.getName());
+                nr.addResource(cr);
+            } catch (IllegalArgumentException iae) {
+                // The change is not acceptable. Restore the previous type
+                // before passing the failure to the caller, so the entry is
+                // not lost.
+                cr.setType(oldType);
+                nr.addResource(cr);
+                throw iae;
+            }
         }
     }
 }
