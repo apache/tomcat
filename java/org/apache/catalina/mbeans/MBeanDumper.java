@@ -76,7 +76,7 @@ public class MBeanDumper {
                 MBeanInfo minfo = mbeanServer.getMBeanInfo(oname);
                 // can't be null - I think
                 String code = minfo.getClassName();
-                if ("org.apache.commons.modeler.BaseModelMBean".equals(code)) {
+                if ("org.apache.tomcat.util.modeler.BaseModelMBean".equals(code)) {
                     code = (String) mbeanServer.getAttribute(oname, "modelerType");
                 }
                 buf.append("modelerType: ");
