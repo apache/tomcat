@@ -125,7 +125,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             this.defaultHost = host.toLowerCase(Locale.ENGLISH);
         }
         if (getState().isAvailable()) {
-            service.getMapper().setDefaultHostName(host);
+            service.getMapper().setDefaultHostName(this.defaultHost);
         }
         support.firePropertyChange("defaultHost", oldDefaultHost, this.defaultHost);
 
