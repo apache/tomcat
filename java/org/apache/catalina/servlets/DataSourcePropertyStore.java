@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -266,7 +265,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
             try (Connection connection = dataSource.getConnection();
                     PreparedStatement statement = connection.prepareStatement(getPropertyStatement)) {
                 statement.setString(1, resource);
-                statement.setString(2, Objects.requireNonNullElse(property.getNamespaceURI(), ""));
+                statement.setString(2, getNamespaceURI(property));
                 statement.setString(3, property.getLocalName());
                 if (statement.execute()) {
                     ResultSet rs = statement.getResultSet();
@@ -341,7 +340,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                         try {
                             try (PreparedStatement statement = connection.prepareStatement(getPropertyStatement)) {
                                 statement.setString(1, resource);
-                                statement.setString(2, Objects.requireNonNullElse(node.getNamespaceURI(), ""));
+                                statement.setString(2, getNamespaceURI(node));
                                 statement.setString(3, node.getLocalName());
                                 if (statement.execute()) {
                                     ResultSet rs = statement.getResultSet();
@@ -354,14 +353,14 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                                 try (PreparedStatement statement = connection.prepareStatement(setPropertyStatement)) {
                                     statement.setString(1, serializedNode);
                                     statement.setString(2, resource);
-                                    statement.setString(3, Objects.requireNonNullElse(node.getNamespaceURI(), ""));
+                                    statement.setString(3, getNamespaceURI(node));
                                     statement.setString(4, node.getLocalName());
                                     statement.execute();
                                 }
                             } else {
                                 try (PreparedStatement statement = connection.prepareStatement(addPropertyStatement)) {
                                     statement.setString(1, resource);
-                                    statement.setString(2, Objects.requireNonNullElse(node.getNamespaceURI(), ""));
+                                    statement.setString(2, getNamespaceURI(node));
                                     statement.setString(3, node.getLocalName());
                                     statement.setString(4, serializedNode);
                                     statement.execute();
@@ -377,7 +376,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                         Node node = operation.getPropertyNode();
                         try (PreparedStatement statement = connection.prepareStatement(removePropertyStatement)) {
                             statement.setString(1, resource);
-                            statement.setString(2, Objects.requireNonNullElse(node.getNamespaceURI(), ""));
+                            statement.setString(2, getNamespaceURI(node));
                             statement.setString(3, node.getLocalName());
                             statement.execute();
                         } catch (SQLException e) {
@@ -408,4 +407,8 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
         }
     }
 
+    private static String getNamespaceURI(Node node) {
+        String namespaceURI = node.getNamespaceURI();
+        return (namespaceURI != null) ? namespaceURI : "";
+    }
 }

@@ -23,9 +23,9 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.servlet.http.HttpSessionActivationListener;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
+import javax.servlet.http.HttpSessionActivationListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
 import org.junit.Test;
