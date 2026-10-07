@@ -1905,6 +1905,15 @@
         no longer terminates the TLS session of another, still active pooled
         connection. (remm)
       </fix>
+      <fix>
+        Select the primary or alternate directory server URL for each
+        <code>JNDIRealm</code> connection attempt individually rather than via
+        a realm-wide mutable flag that concurrent pooled connections raced on,
+        which could transiently cause a connection to use the wrong URL. Note
+        that this removes the <code>connectionAttempt</code> protected field
+        and changes the signature of the protected
+        <code>getDirectoryContextEnvironment()</code> method. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
