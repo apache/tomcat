@@ -87,7 +87,7 @@ public class TLSCertificateReloadListener implements LifecycleListener {
         if (checkPeriod <= 0) {
             // A non-positive period would leave the next check time in the
             // past, causing the reload check to run on every periodic event.
-            log.warn(sm.getString("tlsCertRenewalListener.invalidCheckPeriod", checkPeriod));
+            log.warn(sm.getString("tlsCertRenewalListener.invalidCheckPeriod", Integer.valueOf(checkPeriod)));
             return;
         }
         this.checkPeriod = checkPeriod;
