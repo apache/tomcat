@@ -136,6 +136,44 @@ public class TestJNDIRealm {
         Assert.assertTrue(latch.await(30, TimeUnit.SECONDS));
     }
 
+    @Test
+    public void testParseUserPatternStringValid() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+
+        Assert.assertArrayEquals(new String[] { "cn={0}" },
+                realm.parseUserPatternString("cn={0}"));
+        Assert.assertArrayEquals(new String[] { "cn={0}", "cn={0},o=myorg" },
+                realm.parseUserPatternString("(cn={0})(cn={0},o=myorg)"));
+        Assert.assertArrayEquals(new String[] { "cn={0}", "cn={0},o=myorg" },
+                realm.parseUserPatternString("(|(cn={0})(cn={0},o=myorg))"));
+        Assert.assertArrayEquals(new String[] { "cn=\\(x" },
+                realm.parseUserPatternString("cn=\\(x"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringTrailingOpenParen() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        realm.setUserPattern("cn={0}(");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringMissingCloseParen() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        realm.setUserPattern("(cn={0}");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringOnlyOpenParen() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        realm.setUserPattern("(");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringEscapedOpenParenOnly() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        realm.setUserPattern("cn=\\(");
+    }
+
 
     private JNDIRealm buildRealm(String password) throws NamingException,
             NoSuchFieldException, IllegalAccessException, LifecycleException {
