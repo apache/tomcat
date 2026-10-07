@@ -18,10 +18,11 @@ package org.apache.catalina.core;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.tomcat.util.compat.JreCompat;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestStandardVirtualThreadExecutor {
 
