@@ -136,7 +136,7 @@ public class JspHelper {
      * Returns the formatted time-to-live for the given session.
      *
      * @param in_session the session
-     * @return the formatted TTL string
+     * @return the formatted TTL string, or "Unlimited" for sessions that never time out
      */
     public static String getDisplayTTLForSession(Session in_session) {
         try {
@@ -147,7 +147,11 @@ public class JspHelper {
             // ignore: invalidated session
             return "";
         }
-        return secondsToTimeString(SessionUtils.getTTLForSession(in_session) / 1000);
+        long ttl = SessionUtils.getTTLForSession(in_session);
+        if (ttl == Long.MAX_VALUE) {
+            return "Unlimited";
+        }
+        return secondsToTimeString(ttl / 1000);
     }
 
     /**
