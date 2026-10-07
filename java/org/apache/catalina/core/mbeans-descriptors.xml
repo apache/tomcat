@@ -573,7 +573,7 @@
                returnType="java.lang.String">
       <parameter name="exceptionType"
                  description="Exception type to look up"
-                 type="java.lang.String"/>
+                 type="java.lang.Throwable"/>
     </operation>
 
     <operation name="findErrorPages"
