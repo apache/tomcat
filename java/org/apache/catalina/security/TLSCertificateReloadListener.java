@@ -78,11 +78,18 @@ public class TLSCertificateReloadListener implements LifecycleListener {
 
 
     /**
-     * Set the time, in seconds, between reloading checks.
+     * Set the time, in seconds, between reloading checks. Values less than or equal to zero are rejected and the
+     * current value is retained.
      *
      * @param checkPeriod The new time, in seconds, between reloading checks
      */
     public void setCheckPeriod(int checkPeriod) {
+        if (checkPeriod <= 0) {
+            // A non-positive period would leave the next check time in the
+            // past, causing the reload check to run on every periodic event.
+            log.warn(sm.getString("tlsCertRenewalListener.invalidCheckPeriod", checkPeriod));
+            return;
+        }
         this.checkPeriod = checkPeriod;
     }
 
