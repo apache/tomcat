@@ -1421,7 +1421,12 @@ public class DefaultServlet extends HttpServlet {
                     if (equalsIdx == -1) {
                         continue;
                     }
-                    quality = Double.parseDouble(preference.substring(equalsIdx + 1).trim());
+                    try {
+                        quality = Double.parseDouble(preference.substring(equalsIdx + 1).trim());
+                    } catch (NumberFormatException nfe) {
+                        // Invalid q-value: ignore this preference
+                        continue;
+                    }
                 }
                 if (quality >= bestResourceQuality) {
                     String encoding = preference;
