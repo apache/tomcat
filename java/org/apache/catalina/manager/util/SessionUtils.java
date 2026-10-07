@@ -219,11 +219,17 @@ public class SessionUtils {
      * Returns the remaining time-to-live for the session in milliseconds.
      *
      * @param in_session The session
-     * @return the remaining TTL in milliseconds, or -1 if the session is invalidated
+     * @return the remaining TTL in milliseconds, {@link Long#MAX_VALUE} if the session never times out, or -1 if the
+     *         session is invalidated
      */
     public static long getTTLForSession(Session in_session) {
         try {
-            return 1000L * in_session.getMaxInactiveInterval() -
+            int maxInactiveInterval = in_session.getMaxInactiveInterval();
+            if (maxInactiveInterval <= 0) {
+                // A non-positive interval means the session never times out
+                return Long.MAX_VALUE;
+            }
+            return 1000L * maxInactiveInterval -
                     (System.currentTimeMillis() - in_session.getThisAccessedTime());
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
