@@ -454,7 +454,7 @@ public class MBeanUtils {
     static ObjectName createObjectName(String domain, Group group) throws MalformedObjectNameException {
 
         return new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
-                ",database=" + group.getUserDatabase().getId());
+                ",database=" + ObjectName.quote(group.getUserDatabase().getId()));
 
     }
 
@@ -472,7 +472,7 @@ public class MBeanUtils {
     static ObjectName createObjectName(String domain, Role role) throws MalformedObjectNameException {
 
         return new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) + ",database=" +
-                role.getUserDatabase().getId());
+                ObjectName.quote(role.getUserDatabase().getId()));
 
     }
 
@@ -489,8 +489,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, User user) throws MalformedObjectNameException {
 
-        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) + ",database=" +
-                user.getUserDatabase().getId());
+        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
+                ",database=" + ObjectName.quote(user.getUserDatabase().getId()));
     }
 
 
@@ -506,7 +506,7 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, UserDatabase userDatabase) throws MalformedObjectNameException {
 
-        return new ObjectName(domain + ":type=UserDatabase,database=" + userDatabase.getId());
+        return new ObjectName(domain + ":type=UserDatabase,database=" + ObjectName.quote(userDatabase.getId()));
 
     }
 
@@ -726,36 +726,38 @@ public class MBeanUtils {
 
         // FIXME: UserDatabase MBean management could be improved
 
+        String quotedDatabase = ObjectName.quote(userDatabase);
+
         ObjectName query;
         Set<ObjectName> results;
 
         // Groups
-        query = new ObjectName("Users:type=Group,database=" + userDatabase + ",*");
+        query = new ObjectName("Users:type=Group,database=" + quotedDatabase + ",*");
         results = mserver.queryNames(query, null);
         for (ObjectName result : results) {
             mserver.unregisterMBean(result);
         }
 
         // Roles
-        query = new ObjectName("Users:type=Role,database=" + userDatabase + ",*");
+        query = new ObjectName("Users:type=Role,database=" + quotedDatabase + ",*");
         results = mserver.queryNames(query, null);
         for (ObjectName result : results) {
             mserver.unregisterMBean(result);
         }
 
         // Users
-        query = new ObjectName("Users:type=User,database=" + userDatabase + ",*");
+        query = new ObjectName("Users:type=User,database=" + quotedDatabase + ",*");
         results = mserver.queryNames(query, null);
         for (ObjectName result : results) {
             mserver.unregisterMBean(result);
         }
 
         // The database itself
-        ObjectName db = new ObjectName("Users:type=UserDatabase,database=" + userDatabase);
+        ObjectName db = new ObjectName("Users:type=UserDatabase,database=" + quotedDatabase);
         if (mserver.isRegistered(db)) {
             mserver.unregisterMBean(db);
         }
-        db = new ObjectName("Catalina:type=UserDatabase,database=" + userDatabase);
+        db = new ObjectName("Catalina:type=UserDatabase,database=" + quotedDatabase);
         if (mserver.isRegistered(db)) {
             mserver.unregisterMBean(db);
         }
