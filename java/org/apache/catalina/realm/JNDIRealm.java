@@ -297,11 +297,6 @@ public class JNDIRealm extends RealmBase {
     protected String alternateURL;
 
     /**
-     * The number of connection attempts. If greater than zero we use the alternate url.
-     */
-    protected int connectionAttempt = 0;
-
-    /**
      * Add this role to every authenticated user
      */
     protected String commonRole = null;
@@ -2694,21 +2689,16 @@ public class JNDIRealm extends RealmBase {
     protected void open(JNDIConnection connection) throws NamingException {
         try {
             // Ensure that we have a directory context available
-            connection.context = createDirContext(connection, getDirectoryContextEnvironment());
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment(false));
         } catch (Exception e) {
             if (alternateURL == null || alternateURL.isEmpty()) {
                 // No alternate URL. Re-throw the exception.
                 throw e;
             }
-            connectionAttempt = 1;
             // log the first exception.
             containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
             // Try connecting to the alternate url.
-            connection.context = createDirContext(connection, getDirectoryContextEnvironment());
-        } finally {
-            // reset it in case the connection times out.
-            // the primary may come back.
-            connectionAttempt = 0;
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment(true));
         }
     }
 
@@ -2830,16 +2820,18 @@ public class JNDIRealm extends RealmBase {
     /**
      * Create our directory context configuration.
      *
+     * @param useAlternateURL Whether the alternate URL should be used in place of the connection URL
+     *
      * @return java.util.Hashtable the configuration for the directory context.
      */
-    protected Hashtable<String,String> getDirectoryContextEnvironment() {
+    protected Hashtable<String,String> getDirectoryContextEnvironment(boolean useAlternateURL) {
 
         Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
-        if (containerLog.isTraceEnabled() && connectionAttempt == 0) {
+        if (containerLog.isTraceEnabled() && !useAlternateURL) {
             containerLog.trace("Connecting to URL " + connectionURL);
-        } else if (containerLog.isTraceEnabled() && connectionAttempt > 0) {
+        } else if (containerLog.isTraceEnabled() && useAlternateURL) {
             containerLog.trace("Connecting to URL " + alternateURL);
         }
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
@@ -2849,9 +2841,9 @@ public class JNDIRealm extends RealmBase {
         if (connectionPassword != null) {
             env.put(Context.SECURITY_CREDENTIALS, connectionPassword);
         }
-        if (connectionURL != null && connectionAttempt == 0) {
+        if (connectionURL != null && !useAlternateURL) {
             env.put(Context.PROVIDER_URL, connectionURL);
-        } else if (alternateURL != null && connectionAttempt > 0) {
+        } else if (alternateURL != null && useAlternateURL) {
             env.put(Context.PROVIDER_URL, alternateURL);
         }
         if (authentication != null) {
