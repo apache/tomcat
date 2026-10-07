@@ -68,6 +68,9 @@ public class SessionUtils {
      * @return the locale, or {@code null} if it cannot be determined
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
+        if (null == in_session) {
+            return null;
+        }
         return guessLocaleFromSession(in_session.getSession());
     }
 
