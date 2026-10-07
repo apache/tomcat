@@ -543,6 +543,11 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <add>
+        Add Manager 2.0 webapp with a modern reactive design. Provided as a
+        module in the <code>modules/manager2</code> folder in the source
+        package. (remm)
+      </add>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
