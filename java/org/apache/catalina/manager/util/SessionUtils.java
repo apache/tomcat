@@ -238,10 +238,14 @@ public class SessionUtils {
      *
      * @param in_session The session
      * @return the time in milliseconds between session creation and the last access, or -1 if the session is
-     *         invalidated
+     *         invalidated or its times are unknown (proxy sessions of a cluster member)
      */
     public static long getUsedTimeForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
             return in_session.getThisAccessedTime() - in_session.getCreationTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
@@ -254,10 +258,14 @@ public class SessionUtils {
      *
      * @param in_session The session
      * @return the remaining TTL in milliseconds, {@link Long#MAX_VALUE} if the session never times out, or -1 if the
-     *         session is invalidated
+     *         session is invalidated or its times are unknown (proxy sessions of a cluster member)
      */
     public static long getTTLForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
             int maxInactiveInterval = in_session.getMaxInactiveInterval();
             if (maxInactiveInterval <= 0) {
                 // A non-positive interval means the session never times out
@@ -275,10 +283,15 @@ public class SessionUtils {
      * Returns the time in milliseconds since the session was last accessed.
      *
      * @param in_session The session
-     * @return the inactive time in milliseconds, or -1 if the session is invalidated
+     * @return the inactive time in milliseconds, or -1 if the session is invalidated or its times are unknown (proxy
+     *         sessions of a cluster member)
      */
     public static long getInactiveTimeForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
             return System.currentTimeMillis() - in_session.getThisAccessedTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
