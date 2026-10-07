@@ -258,6 +258,13 @@
         <code>JNDIRealm</code>, so that groups nested more than one level deep
         are found when <code>roleBase</code> uses pattern replacements. (remm)
       </fix>
+      <fix>
+        Track the <code>StartTlsResponse</code> used by <code>JNDIRealm</code>
+        per connection rather than in a single realm-wide field, so that
+        closing one pooled connection when <code>useStartTls</code> is enabled
+        no longer terminates the TLS session of another, still active pooled
+        connection. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
