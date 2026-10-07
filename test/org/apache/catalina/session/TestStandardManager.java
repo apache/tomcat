@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.http.HttpSessionActivationListener;
@@ -29,6 +30,7 @@ import jakarta.servlet.http.HttpSessionListener;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Session;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterHost;
@@ -59,6 +61,26 @@ public class TestStandardManager {
             return activated;
         }
     }
+
+    public static class TesterNonSerializableGraphPrincipal implements Principal, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String name;
+
+        @SuppressWarnings("unused")
+        private final Object notSerializable = new Object();
+
+        public TesterNonSerializableGraphPrincipal(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
+
 
     /*
      * A session that was persisted as invalid (which can happen when a
@@ -137,6 +159,51 @@ public class TestStandardManager {
             TesterActivationAttribute loadedActivation = (TesterActivationAttribute) ((StandardSession) manager
                     .findSession(VALID_ID)).getAttribute("activation");
             Assert.assertTrue(loadedActivation.wasActivated());
+        } finally {
+            ExpandWar.delete(dir);
+        }
+    }
+
+    /*
+     * A principal whose own class is Serializable but whose object graph
+     * contains a non-serializable element must not corrupt the persisted
+     * session record. The principal is dropped instead, keeping the rest of
+     * the session loadable.
+     */
+    @Test
+    public void testUnloadDropsPrincipalWithNonSerializableGraph() throws Exception {
+        File dir = new File("SESS_TEMP_STANDARD_PRINCIPAL");
+        ExpandWar.delete(dir);
+        Assert.assertTrue(dir.mkdirs());
+        File file = new File(dir, "TEST_SESSIONS.ser");
+        try {
+            StandardManager manager = new StandardManager();
+
+            TesterContext context = new TesterContext();
+            context.setServletContext(new TesterServletContext());
+            context.setParent(new TesterHost());
+            manager.setContext(context);
+
+            manager.setPathname(file.getAbsolutePath());
+            manager.setPersistAuthentication(true);
+            manager.start();
+
+            Session session = manager.createSession(VALID_ID);
+            session.setPrincipal(new TesterNonSerializableGraphPrincipal("testUser"));
+
+            manager.unload();
+
+            try {
+                manager.load();
+            } catch (Throwable t) {
+                // Before the fix, the NotSerializableException was swallowed
+                // mid-write, corrupting the stream, so loading the file failed
+                Assert.fail("Loading the persisted session failed: " + t);
+            }
+
+            Session loaded = manager.findSession(VALID_ID);
+            Assert.assertNotNull(loaded);
+            Assert.assertNull(loaded.getPrincipal());
         } finally {
             ExpandWar.delete(dir);
         }
