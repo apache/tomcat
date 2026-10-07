@@ -20,9 +20,13 @@ import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
+import javax.management.RuntimeOperationsException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A <strong>ModelMBean</strong> implementation for the
@@ -36,20 +40,51 @@ public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironmen
     public ContextEnvironmentMBean() {
     }
 
+    private static final Log log = LogFactory.getLog(ContextEnvironmentMBean.class);
+    private static final StringManager sm = StringManager.getManager(ContextEnvironmentMBean.class);
+
     @Override
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {
 
-        super.setAttribute(attribute);
+        if (attribute == null) {
+            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullAttribute")),
+                    sm.getString("mBean.nullAttribute"));
+        }
 
         ContextEnvironment ce = doGetManagedResource();
+
+        if ("name".equals(attribute.getName())) {
+            // Updating the name actually needs removing and adding back the
+            // component under the new name. Ignore the change, as the other
+            // naming resource MBeans do.
+            log.info(sm.getString("mBean.nameChange"));
+            return;
+        }
+
+        String oldType = ce.getType();
+        String oldValue = ce.getValue();
+        String oldLookup = ce.getLookupName();
+
+        super.setAttribute(attribute);
 
         // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = ce.getNamingResources();
         if (nr != null) {
-            nr.removeEnvironment(ce.getName());
-            nr.addEnvironment(ce);
+            try {
+                nr.removeEnvironment(ce.getName());
+                nr.addEnvironment(ce);
+            } catch (IllegalArgumentException iae) {
+                // The change is not acceptable. Restore the previous state
+                // before passing the failure to the caller, so the entry is
+                // not lost.
+                ce.setType(oldType);
+                ce.setValue(oldValue);
+                ce.setLookupName(oldLookup);
+                nr.addEnvironment(ce);
+                throw iae;
+            }
         }
     }
 }
