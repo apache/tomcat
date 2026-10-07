@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.JMRuntimeException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -111,6 +112,14 @@ public class MBeanDumper {
                             }
                         } else {
                             log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
+                        }
+                        continue;
+                    } catch (AttributeNotFoundException e) {
+                        // Attributes that are advertised in the descriptor for
+                        // every protocol but handled by a single protocol do
+                        // not exist on the other protocols
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), e);
                         }
                         continue;
                     } catch (Throwable t) {
