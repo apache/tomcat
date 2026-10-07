@@ -649,6 +649,11 @@ public class TestManagerWebapp extends TomcatBaseTest {
         unlimited.setMaxInactiveInterval(-1);
         manager.add(unlimited);
 
+        // An interval of zero also means the session never times out
+        Session zeroInterval = manager.createSession(null);
+        zeroInterval.setMaxInactiveInterval(0);
+        manager.add(zeroInterval);
+
         Session limited = manager.createSession(null);
         manager.add(limited);
 
@@ -680,7 +685,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody(),
-                client.getResponseBody().contains("Unlimited time: [1] sessions"));
+                client.getResponseBody().contains("Unlimited time: [2] sessions"));
         // The unlimited session must not also appear in an idle bucket
         Assert.assertTrue(client.getResponseBody(),
                 client.getResponseBody().contains("Inactive for [<1] minutes: [1] sessions"));
