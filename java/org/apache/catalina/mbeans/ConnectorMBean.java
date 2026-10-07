@@ -51,7 +51,26 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         }
 
         Connector connector = doGetManagedResource();
-        return IntrospectionUtils.getProperty(connector, name);
+        Object value = IntrospectionUtils.getProperty(connector, name);
+        if (value == null) {
+            // An unset property has a null value, an unknown attribute has no
+            // getter. Only report an error for the latter. Protocol handler
+            // properties are read through the connector's getProperty.
+            String capitalized = IntrospectionUtils.capitalize(name);
+            if (!hasGetter(connector.getClass(), capitalized)) {
+                Object handler = connector.getProtocolHandler();
+                if (handler == null || !hasGetter(handler.getClass(), capitalized)) {
+                    throw new AttributeNotFoundException(sm.getString("mBean.attributeNotFound", name));
+                }
+            }
+        }
+        return value;
+    }
+
+
+    private static boolean hasGetter(Class<?> clazz, String capitalizedProperty) {
+        return IntrospectionUtils.findMethod(clazz, "get" + capitalizedProperty, null) != null ||
+                IntrospectionUtils.findMethod(clazz, "is" + capitalizedProperty, null) != null;
     }
 
 
@@ -72,10 +91,14 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         }
 
         Connector connector = doGetManagedResource();
+        boolean set;
         if (value == null) {
-            IntrospectionUtils.setProperty(connector, name, null);
+            set = IntrospectionUtils.setProperty(connector, name, null);
         } else {
-            IntrospectionUtils.setProperty(connector, name, String.valueOf(value));
+            set = IntrospectionUtils.setProperty(connector, name, String.valueOf(value));
+        }
+        if (!set) {
+            throw new MBeanException(new IllegalArgumentException(sm.getString("mBean.setAttributeFail", name)));
         }
     }
 }
