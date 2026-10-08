@@ -32,7 +32,11 @@ import org.apache.tomcat.util.res.StringManager;
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextResourceLink</code> component.
  */
-public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceLink> {
+public class ContextResourceLinkMBean extends BaseNamingResourceMBean<ContextResourceLink> {
+
+    private static final Log log = LogFactory.getLog(ContextResourceLinkMBean.class);
+    private static final StringManager sm = StringManager.getManager(ContextResourceLinkMBean.class);
+
 
     /**
      * Default constructor for ContextResourceLinkMBean.
@@ -40,8 +44,6 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
     public ContextResourceLinkMBean() {
     }
 
-    private static final Log log = LogFactory.getLog(ContextResourceLinkMBean.class);
-    private static final StringManager sm = StringManager.getManager(ContextResourceLinkMBean.class);
 
     @Override
     public Object getAttribute(String name) throws AttributeNotFoundException, MBeanException, ReflectionException {
@@ -78,18 +80,12 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {
 
-        // Validate the input parameters
-        if (attribute == null) {
-            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullAttribute")),
-                    sm.getString("mBean.nullAttribute"));
+        if (!validateAttribute(attribute)) {
+            return;
         }
 
         String name = attribute.getName();
         Object value = attribute.getValue();
-        if (name == null) {
-            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullName")),
-                    sm.getString("mBean.nullName"));
-        }
 
         ContextResourceLink crl = doGetManagedResource();
 
@@ -97,9 +93,6 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
             crl.setGlobal((String) value);
         } else if ("description".equals(name)) {
             crl.setDescription((String) value);
-        } else if ("name".equals(name)) {
-            // Updating the name actually needs removing and adding back the component under the new name
-            log.info(sm.getString("mBean.nameChange"));
         } else if ("type".equals(name)) {
             crl.setType((String) value);
         } else {
@@ -113,5 +106,11 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
             nr.removeResourceLink(crl.getName());
             nr.addResourceLink(crl);
         }
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 }

@@ -491,8 +491,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, User user) throws MalformedObjectNameException {
 
-        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
-                ",database=" + ObjectName.quote(user.getUserDatabase().getId()));
+        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) + ",database=" +
+                ObjectName.quote(user.getUserDatabase().getId()));
     }
 
 
