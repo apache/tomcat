@@ -1856,7 +1856,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         for (ServletContainerInitializer sci : detectedScis) {
-            initializerClassMap.put(sci, new HashSet<>());
+            // The per-SCI sets are updated concurrently when parallel annotation
+            // scanning is enabled
+            initializerClassMap.put(sci, ConcurrentHashMap.newKeySet());
 
             HandlesTypes ht;
             try {
@@ -2452,9 +2454,12 @@ public class ContextConfig implements LifecycleListener {
                     return;
                 }
 
+                // All SCIs are registered in processServletContainerInitializers()
+                // before scanning starts, so the map is only read here. The value
+                // sets are updated concurrently when parallel annotation scanning
+                // is enabled.
                 for (ServletContainerInitializer sci : entry.getSciSet()) {
-                    Set<Class<?>> classes = initializerClassMap.computeIfAbsent(sci, k -> new HashSet<>());
-                    classes.add(clazz);
+                    initializerClassMap.get(sci).add(clazz);
                 }
             }
         }
@@ -2557,7 +2562,15 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        // May be null of the class is not present or could not be loaded.
+        // May be null if the class is not present or could not be loaded.
+        if (superClassCacheEntry == null) {
+            // With parallel annotation scanning the entry may also be absent because
+            // another thread has not finished adding the hierarchy to the cache.
+            // Ensure the entry is present, loading the class if necessary, so the
+            // set computed here cannot miss an SCI that matches a super class.
+            populateJavaClassCache(superClassName, javaClassCache);
+            superClassCacheEntry = javaClassCache.get(superClassName);
+        }
         if (superClassCacheEntry != null) {
             if (superClassCacheEntry.getSciSet() == null) {
                 populateSCIsForCacheEntry(superClassCacheEntry, javaClassCache);
@@ -2569,6 +2582,13 @@ public class ContextConfig implements LifecycleListener {
         // Interfaces
         for (String interfaceName : cacheEntry.getInterfaceNames()) {
             JavaClassCacheEntry interfaceEntry = javaClassCache.get(interfaceName);
+            // As for the super class, a null may mean the parallel scanner has
+            // not finished populating the cache, so attempt the load before
+            // deciding there is nothing of interest.
+            if (interfaceEntry == null) {
+                populateJavaClassCache(interfaceName, javaClassCache);
+                interfaceEntry = javaClassCache.get(interfaceName);
+            }
             // A null could mean that the class not present in application or
             // that there is nothing of interest. Either way, nothing to do here
             // so move along
@@ -2977,8 +2997,10 @@ public class ContextConfig implements LifecycleListener {
 
         /**
          * The set of ServletContainerInitializers interested in this class, or {@link #EMPTY_SCI_SET} if none.
+         * Volatile for safe publication: the set is computed once and the reference may be handed between
+         * threads when annotation scanning runs in parallel.
          */
-        private Set<ServletContainerInitializer> sciSet = null;
+        private volatile Set<ServletContainerInitializer> sciSet = null;
 
         /**
          * Constructs a new cache entry from a parsed Java class.
