@@ -779,22 +779,21 @@ public class ContextConfig implements LifecycleListener {
             log.debug(sm.getString("contextConfig.processContext", context.getName(), contextXml));
         }
 
-        InputSource source = null;
+        InputSource source;
 
-        try {
-            source = new InputSource(contextXml.toString());
-            if (stream == null) {
+        if (stream == null) {
+            try {
                 URLConnection xmlConn = contextXml.openConnection();
                 xmlConn.setUseCaches(false);
                 stream = xmlConn.getInputStream();
+            } catch (Exception e) {
+                log.error(sm.getString("contextConfig.contextMissing", contextXml), e);
+                ok = false;
+                return;
             }
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.contextMissing", contextXml), e);
         }
 
-        if (source == null) {
-            return;
-        }
+        source = new InputSource(contextXml.toString());
 
         try {
             source.setByteStream(stream);
