@@ -27,8 +27,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.connector.Connector</code>
- * component.
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.connector.Connector</code> component.
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
 

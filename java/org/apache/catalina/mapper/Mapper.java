@@ -245,13 +245,12 @@ public final class Mapper {
         }
         MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, alias)) {
-            hosts = newHosts;
             hostMapping.getRealHost().removeAlias(hostMapping);
             if (defaultHost == hostMapping) {
                 defaultHost = null;
             }
+            hosts = newHosts;
         }
-
     }
 
     /**
