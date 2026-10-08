@@ -117,4 +117,41 @@ public class TestSsiServlet extends TomcatBaseTest {
         }
         Assert.assertNotNull(lastModified);
     }
+
+
+    @Test
+    public void testBadConditionalExpressionReportsError() throws Exception {
+        // A conditional directive with an expression that cannot be parsed
+        // stops processing of the document, but it must report the default
+        // error message rather than truncating the response silently.
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getTemporaryDirectory(), "ssi-badif");
+        Assert.assertTrue(appDir.mkdirs() || appDir.isDirectory());
+        addDeleteOnTearDown(appDir);
+        File doc = new File(appDir, "badif.shtml");
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(doc), StandardCharsets.ISO_8859_1)) {
+            writer.write("BEFORE-CONTENT\n");
+            writer.write("<!--#if expr=\"this is not valid (\"-->\n");
+            writer.write("AFTER-CONTENT\n");
+        }
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Tomcat.addServlet(ctxt, "ssi", new SSIServlet());
+        ctxt.addServletMapping("*.shtml", "ssi");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        String path = "http://localhost:" + getPort() + "/badif.shtml";
+        ByteChunk out = new ByteChunk();
+
+        int rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String body = new String(out.getBuffer(), 0, out.getLength(), StandardCharsets.ISO_8859_1);
+        Assert.assertTrue(body.contains("BEFORE-CONTENT"));
+        Assert.assertTrue(body.contains("[an error occurred"));
+        // Processing of the remainder of the document stops at the failing directive
+        Assert.assertFalse(body.contains("AFTER-CONTENT"));
+    }
 }
