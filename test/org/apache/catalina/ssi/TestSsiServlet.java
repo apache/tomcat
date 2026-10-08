@@ -67,6 +67,9 @@ public class TestSsiServlet extends TomcatBaseTest {
         Assert.assertTrue(body.contains("path is relative"));
         Assert.assertTrue(body.contains("1k"));
         Assert.assertTrue(body.contains("SERVER_PROTOCOL"));
+        // Any undefined variable renders as "(none)". The page only echoes
+        // variables that must be defined, including the built-in date variables.
+        Assert.assertFalse(body.contains("(none)"));
 
     }
 }

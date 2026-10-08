@@ -1936,6 +1936,18 @@
         evaluation of existing documents using unparenthesized mixed
         <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
       </fix>
+      <fix>
+        Fix the built-in SSI variables <code>DATE_GMT</code>,
+        <code>DATE_LOCAL</code> and <code>LAST_MODIFIED</code> always
+        resolving to <code>null</code> and rendering as
+        <code>(none)</code>. The mediator stored and looked them up as
+        external variables using names starting with its own fully qualified
+        class name, which the servlet resolver rejects since those names fall
+        under the reserved <code>org.apache.catalina.</code> prefix. Hold the
+        built-in variables in the mediator itself and resolve them there, as
+        they are per-document values that do not need to be stored in the
+        external resolver. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
