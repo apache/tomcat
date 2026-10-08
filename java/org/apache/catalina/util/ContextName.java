@@ -101,15 +101,21 @@ public final class ContextName {
      *
      * @param path    Context path to use, which must not contain a version marker. May be <code>null</code>,
      *                 <code>""</code>, <code>"/"</code> or <code>"/ROOT"</code> to represent the root context. Any
-     *                 other value must start with <code>"/"</code>
+     *                 other value must start with <code>"/"</code>; if it does not, a leading <code>"/"</code> is
+     *                 prepended, matching the normalisation performed by
+     *                 {@link org.apache.catalina.Context#setPath(String)}.
      * @param version Context version to use
      */
     public ContextName(String path, String version) {
         // Path should never be null, '/' or '/ROOT'
         if (path == null || "/".equals(path) || "/ROOT".equals(path)) {
             this.path = "";
-        } else {
+        } else if (path.startsWith("/") || path.isEmpty()) {
             this.path = path;
+        } else {
+            // Normalise a malformed path the same way Context.setPath() does by adding the missing
+            // leading slash, so that the conversions below derive the expected name and base name
+            this.path = '/' + path;
         }
 
         // Version should never be null
