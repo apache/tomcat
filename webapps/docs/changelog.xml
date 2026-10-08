@@ -401,6 +401,13 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix the entries returned by
+        <code>CaseInsensitiveKeyMap.entrySet()</code> so they implement the
+        <code>Map.Entry</code> <code>equals()</code> and <code>hashCode()</code>
+        contracts. This map backs the WebSocket handshake request and response
+        header maps. (breken-ai)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
