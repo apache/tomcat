@@ -138,6 +138,25 @@ public class TestExpressionParseTree {
 
 
     @Test
+    public void testAndHasHigherPrecedenceThanOr() throws Exception {
+        SSIExternalResolver r = new TesterSSIExternalResolver();
+        r.setVariableValue("a", "x");
+        r.setVariableValue("b", "");
+        r.setVariableValue("c", "");
+        SSIMediator mediator = new SSIMediator(r, LAST_MODIFIED);
+        // With conventional precedence, this is true: $a || ($b && $c)
+        ExpressionParseTree ept = new ExpressionParseTree("$a || $b && $c", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        // Explicit parentheses give the same result
+        ept = new ExpressionParseTree("$a || ($b && $c)", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        // The left-to-right grouping evaluates to false: ($a || $b) && $c
+        ept = new ExpressionParseTree("($a || $b) && $c", mediator);
+        Assert.assertFalse(ept.evaluateTree());
+    }
+
+
+    @Test
     public void testMissingOperand() throws Exception {
         // Operators missing an operand must produce a parse error rather than
         // an unchecked exception
