@@ -66,7 +66,7 @@ public class ContextEnvironmentMBean extends BaseNamingResourceMBean<ContextEnvi
 
         // Entries with injection targets but no value are effectively ignored
         if (ce.getInjectionTargets() != null && !ce.getInjectionTargets().isEmpty() && "value".equals(name) &&
-                (value == null || (value instanceof String s && s.isEmpty()))) {
+                (value == null || (value instanceof String && ((String) value).isEmpty()))) {
             throw new IllegalArgumentException(sm.getString("contextEnvironment.ignore.injectionNoValue"));
         }
 
