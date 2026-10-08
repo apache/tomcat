@@ -278,6 +278,16 @@ public class Tomcat {
 
         try (InputStream is = uConn.getInputStream(); OutputStream os = new FileOutputStream(targetWar)) {
             IOTools.flow(is, os);
+        } catch (IOException e) {
+            // An incomplete WAR left in the appBase would block any subsequent attempt to deploy
+            // to this context path via the conflict checks above, so remove it before rethrowing.
+            if (targetWar.exists() && !targetWar.delete()) {
+                Logger.getLogger(getLoggerName(getHost(), contextPath)).log(Level.WARNING,
+                        sm.getString("tomcat.addWebapp.copyCleanupFailed", source, contextPath,
+                                targetWar.getAbsolutePath()),
+                        e);
+            }
+            throw e;
         }
 
         return addWebapp(contextPath, targetWar.getAbsolutePath());
