@@ -1927,6 +1927,20 @@
         they are per-document values that do not need to be stored in the
         external resolver. (remm)
       </fix>
+      <fix>
+        Fix multiple data races in annotation scanning when the
+        <code>parallelAnnotationScanning</code> attribute of the
+        <code>StandardContext</code> is enabled. Classes matched for a
+        <code>ServletContainerInitializer</code> were collected into
+        non-thread-safe sets, which could silently lose matches. A scanner
+        thread could also cache an incomplete set of initializers for a class
+        when another thread had not finished adding that class' super class or
+        interfaces to the shared class cache, and the lazily computed set was
+        not safely published between threads. Matched classes could therefore
+        be missing from the set passed to
+        <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
+        the application at runtime. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
