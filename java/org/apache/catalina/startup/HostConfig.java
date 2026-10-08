@@ -1195,7 +1195,13 @@ public class HostConfig implements LifecycleListener {
      */
     protected void migrateLegacyApp(File source, File destination) {
         File tempNew = null;
-        File tempOld;
+        File tempOld = null;
+        // Track which moves completed so cleanup can decide whether the previous web application
+        // needs to be restored rather than discarded. These are set only when the corresponding
+        // move returns, so a move that fails part way through (for example a cross-file-system
+        // copy that cannot delete its source) leaves the flag false.
+        boolean previousMovedAside = false;
+        boolean migratedPlaced = false;
         try {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
@@ -1216,8 +1222,10 @@ public class HostConfig implements LifecycleListener {
             // Use rename
             if (destination.exists()) {
                 Files.move(destination.toPath(), tempOld.toPath());
+                previousMovedAside = true;
             }
             Files.move(tempNew.toPath(), destination.toPath());
+            migratedPlaced = true;
             // Only delete the previous webapp if everything went fine
             ExpandWar.delete(tempOld);
 
@@ -1228,6 +1236,51 @@ public class HostConfig implements LifecycleListener {
             if (tempNew != null && tempNew.exists()) {
                 ExpandWar.delete(tempNew);
             }
+            if (tempOld != null) {
+                if (migratedPlaced) {
+                    // The migrated application is in place. The previous application, if one was
+                    // moved aside, is no longer needed.
+                    ExpandWar.delete(tempOld);
+                } else if (previousMovedAside && tempOld.exists()) {
+                    // The previous application was moved aside but the migrated application could
+                    // not be placed. Restore the previous application so it is not lost. tempOld is
+                    // known to hold the complete previous application because previousMovedAside is
+                    // only set once the move out of the way returned successfully.
+                    restorePreviousApplication(tempOld, destination);
+                }
+                // If the move out of the way never completed (previousMovedAside is false) tempOld
+                // is either a placeholder, an incomplete copy or, in the rare case of a
+                // cross-file-system move whose source deletion failed, possibly the only remaining
+                // copy of the previous application while the destination is incomplete. In that
+                // situation deleting tempOld could destroy data, so it is retained for manual
+                // recovery instead of being promoted over the destination.
+            }
+        }
+    }
+
+
+    /**
+     * Restore a previously migrated-out web application that is held in {@code tempOld} back to
+     * {@code destination}. Any incomplete content left at the destination by a failed move is
+     * removed first. If the restore cannot be completed, the copy in {@code tempOld} is retained so
+     * that an administrator can recover the original web application manually.
+     *
+     * @param tempOld     the temporary location holding the complete previous web application
+     * @param destination the location the previous web application should be restored to
+     */
+    private void restorePreviousApplication(File tempOld, File destination) {
+        try {
+            if (destination.exists()) {
+                // Remove the partial content left by the failed move of the migrated application.
+                // The previous application is safely held in tempOld (previousMovedAside is set) so
+                // this does not risk the original data.
+                ExpandWar.delete(destination);
+            }
+            Files.move(tempOld.toPath(), destination.toPath());
+            log.warn(sm.getString("hostConfig.migrateRestore", destination));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("hostConfig.migrateRestoreError", tempOld, destination), t);
         }
     }
 
