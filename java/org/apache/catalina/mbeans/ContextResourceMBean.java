@@ -24,6 +24,7 @@ import javax.management.RuntimeOperationsException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
@@ -32,7 +33,11 @@ import org.apache.tomcat.util.res.StringManager;
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextResource</code> component.
  */
-public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
+public class ContextResourceMBean extends BaseNamingResourceMBean<ContextResource> {
+
+    private static final Log log = LogFactory.getLog(ContextResourceMBean.class);
+    private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
+
 
     /**
      * Default constructor for ContextResourceMBean.
@@ -40,8 +45,6 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
     public ContextResourceMBean() {
     }
 
-    private static final Log log = LogFactory.getLog(ContextResourceMBean.class);
-    private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
 
     @Override
     public Object getAttribute(String name) throws AttributeNotFoundException, MBeanException, ReflectionException {
@@ -82,27 +85,19 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {
 
-        // Validate the input parameters
-        if (attribute == null) {
-            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullAttribute")),
-                    sm.getString("mBean.nullAttribute"));
+        if (!validateAttribute(attribute)) {
+            return;
         }
+
         String name = attribute.getName();
         Object value = attribute.getValue();
-        if (name == null) {
-            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullName")),
-                    sm.getString("mBean.nullName"));
-        }
 
         ContextResource cr = doGetManagedResource();
-
         String oldType = cr.getType();
 
         switch (name) {
             case "auth" -> cr.setAuth((String) value);
             case "description" -> cr.setDescription((String) value);
-            // Updating the name actually needs removing and adding back the component under the new name
-            case "name" -> log.info(sm.getString("mBean.nameChange"));
             case "scope" -> cr.setScope((String) value);
             case "type" -> cr.setType((String) value);
             default -> cr.setProperty(name, value == null ? null : value.toString());
@@ -115,14 +110,26 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
             try {
                 nr.removeResource(cr.getName());
                 nr.addResource(cr);
-            } catch (IllegalArgumentException iae) {
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // The change is not acceptable. Restore the previous type
                 // before passing the failure to the caller, so the entry is
                 // not lost.
                 cr.setType(oldType);
-                nr.addResource(cr);
-                throw iae;
+                try {
+                    nr.addResource(cr);
+                } catch (Throwable t1) {
+                    ExceptionUtils.handleThrowable(t1);
+                    t.addSuppressed(t1);
+                }
+                throw t;
             }
         }
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 }

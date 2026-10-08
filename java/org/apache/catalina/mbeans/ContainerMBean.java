@@ -37,8 +37,8 @@ import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
 
 /**
- * MBean wrapper for ContainerBase instances, providing JMX management operations for child containers,
- * valves, and lifecycle listeners.
+ * MBean wrapper for ContainerBase instances, providing JMX management operations for child containers, valves, and
+ * lifecycle listeners.
  */
 public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
     /**
@@ -115,8 +115,7 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      *
      * @param valveType ClassName of the valve to be added
      *
-     * @return the MBean name of the new valve, or null if the valve was not
-     *         added or has no registered MBean
+     * @return the MBean name of the new valve, or null if the valve was not added or has no registered MBean
      *
      * @throws MBeanException if adding the valve failed
      */
