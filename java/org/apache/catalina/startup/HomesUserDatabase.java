@@ -90,7 +90,7 @@ public final class HomesUserDatabase implements UserDatabase {
             if (!homeDir.isDirectory() || !homeDir.canRead()) {
                 continue;
             }
-            homes.put(homeBaseFile, homeDir.toString());
+            homes.put(homeBaseFile, homeDir.getAbsolutePath());
         }
     }
 }
