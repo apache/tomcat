@@ -172,6 +172,26 @@ public class TestWebappServiceLoader {
     }
 
     @Test
+    public void testServiceInitializationFailsWithLinkageError() throws Exception {
+        Class<?> sci = TesterServiceWithFailingInitializer.class;
+        loader = new WebappServiceLoader<>(context);
+        cl.loadClass(sci.getName());
+        EasyMock.expectLastCall()
+                .andReturn(sci);
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        names.add(sci.getName());
+        control.replay();
+        try {
+            loader.loadServices(ServletContainerInitializer.class, names);
+            Assert.fail("Expected IOException");
+        } catch (IOException ioe) {
+            assertThat(ioe.getCause(), instanceOf(LinkageError.class));
+        } finally {
+            control.verify();
+        }
+    }
+
+    @Test
     public void testServiceCannotBeConstructed() throws Exception {
         Class<?> sci = Integer.class;
         loader = new WebappServiceLoader<>(context);
