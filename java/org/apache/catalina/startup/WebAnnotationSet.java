@@ -300,11 +300,11 @@ public class WebAnnotationSet {
 
             context.getNamingResources().addService(service);
 
-        } else if (type.equals("javax.sql.DataSource") || type.equals("javax.jms.ConnectionFactory") ||
-                type.equals("javax.jms.QueueConnectionFactory") || type.equals("javax.jms.TopicConnectionFactory") ||
-                type.equals("jakarta.mail.Session") || type.equals("java.net.URL") ||
-                type.equals("javax.resource.cci.ConnectionFactory") || type.equals("org.omg.CORBA_2_3.ORB") ||
-                type.endsWith("ConnectionFactory")) {
+        } else if (type.equals("javax.sql.DataSource") || type.equals("jakarta.jms.ConnectionFactory") ||
+                type.equals("jakarta.jms.QueueConnectionFactory") ||
+                type.equals("jakarta.jms.TopicConnectionFactory") || type.equals("jakarta.mail.Session") ||
+                type.equals("java.net.URL") || type.equals("jakarta.resource.cci.ConnectionFactory") ||
+                type.equals("org.omg.CORBA_2_3.ORB") || type.endsWith("ConnectionFactory")) {
 
             // resource-ref element
             ContextResource resource = new ContextResource();
@@ -325,7 +325,7 @@ public class WebAnnotationSet {
 
             context.getNamingResources().addResource(resource);
 
-        } else if (type.equals("javax.jms.Queue") || type.equals("javax.jms.Topic")) {
+        } else if (type.equals("jakarta.jms.Queue") || type.equals("jakarta.jms.Topic")) {
 
             // message-destination-ref
             MessageDestinationRef resource = new MessageDestinationRef();
