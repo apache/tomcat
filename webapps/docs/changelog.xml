@@ -322,6 +322,17 @@
         <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
         the application at runtime. (remm)
       </fix>
+      <fix>
+        When automatic migration of a legacy Java EE web application from
+        the <code>legacyAppBase</code> to the <code>appBase</code> failed
+        after the previous version of the application had been moved aside,
+        the previous application was left in a temporary location from which
+        it was neither restored nor cleaned up, making it effectively lost.
+        The previous application is now restored to the deployment location
+        when the migrated application cannot be placed, and is retained with
+        a warning in the temporary location only in the rare cases where
+        restoring it is not possible. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
