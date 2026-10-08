@@ -408,8 +408,11 @@ public class Tomcat {
 
     /**
      * Initialize the server given the specified configuration source. The server will be loaded according to the Tomcat
-     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). If no
-     * configuration source is specified, it will use the default locations for these files.
+     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). The
+     * configuration source is global to the JVM. Once a source has been configured, by this instance or by any earlier
+     * use in the same JVM, it will be used for all subsequent configuration and cannot be replaced: neither a later
+     * call specifying a different source nor a call specifying no source has any effect. If no source is specified and
+     * none has been configured previously, the default locations for these files are used.
      *
      * @param source The configuration source
      */
@@ -419,8 +422,11 @@ public class Tomcat {
 
     /**
      * Initialize the server given the specified configuration source. The server will be loaded according to the Tomcat
-     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). If no
-     * configuration source is specified, it will use the default locations for these files.
+     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). The
+     * configuration source is global to the JVM. Once a source has been configured, by this instance or by any earlier
+     * use in the same JVM, it will be used for all subsequent configuration and cannot be replaced: neither a later
+     * call specifying a different source nor a call specifying no source has any effect. If no source is specified and
+     * none has been configured previously, the default locations for these files are used.
      *
      * @param source            The configuration source
      * @param catalinaArguments The arguments that should be passed to Catalina
