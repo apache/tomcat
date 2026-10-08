@@ -109,7 +109,7 @@ public class ExpressionTokenizer {
         }
         // Clear the current token val
         tokenVal = null;
-        if (index == length) {
+        if (index >= length) {
             return TOKEN_END; // End of string
         }
         int start = index;
@@ -191,7 +191,9 @@ public class ExpressionTokenizer {
                 }
                 escaped = false;
             }
-            end = ++index;
+            // If the regular expression was not terminated, the token is the
+            // remainder of the expression, otherwise it includes the closing slash
+            end = Math.min(++index, length);
         } else {
             // End is the next whitespace character
             for (; index < length; index++) {
