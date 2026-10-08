@@ -241,6 +241,9 @@ public class ExpressionParseTree {
                     break;
                 case ExpressionTokenizer.TOKEN_END:
                     break;
+                case ExpressionTokenizer.TOKEN_ERROR:
+                    throw new ParseException(sm.getString("expressionParseTree.unterminatedLiteral"),
+                            et.getIndex());
             }
         }
         // Finish off the rest of the opps
