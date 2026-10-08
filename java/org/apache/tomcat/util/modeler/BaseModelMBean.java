@@ -517,10 +517,10 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             throw new IllegalArgumentException(sm.getString("baseModelMBean.nullListener"));
         }
 
-        // FIXME - currently this removes *all* notifications for this listener
-        if (attributeBroadcaster != null) {
-            attributeBroadcaster.removeNotificationListener(listener);
+        if (attributeBroadcaster == null) {
+            throw new ListenerNotFoundException();
         }
+        attributeBroadcaster.removeAttributeNotificationListener(listener, name);
 
     }
 

@@ -117,6 +117,11 @@
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <fix>
+        Ensure that removing an attribute change notification listener from a
+        <code>BaseModelMBean</code> only removes the registration for the
+        requested attribute. (sainadh777)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Catalina">

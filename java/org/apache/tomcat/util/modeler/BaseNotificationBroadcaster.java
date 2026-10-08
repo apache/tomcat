@@ -18,6 +18,7 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -76,14 +77,11 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                     if ((item.listener == listener) && (item.filter instanceof BaseAttributeFilter oldFilter) &&
                             (item.handback == handback)) {
                         String[] newNames = newFilter.getNames();
-                        String[] oldNames = oldFilter.getNames();
                         if (newNames.length == 0) {
                             oldFilter.clear();
                         } else {
-                            if (oldNames.length != 0) {
-                                for (String newName : newNames) {
-                                    oldFilter.addAttribute(newName);
-                                }
+                            for (String newName : newNames) {
+                                oldFilter.addAttribute(newName);
                             }
                         }
                         return;
@@ -121,6 +119,42 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             entries.removeIf(item -> item.listener == listener);
         }
 
+    }
+
+
+    /**
+     * Remove an attribute change notification listener for the given attribute.
+     *
+     * @param listener Listener to remove
+     * @param name     Attribute name, or {@code null} to remove all attribute change registrations for the listener
+     *
+     * @throws ListenerNotFoundException if there is no matching registration
+     */
+    void removeAttributeNotificationListener(NotificationListener listener, String name)
+            throws ListenerNotFoundException {
+
+        boolean found = false;
+        synchronized (entries) {
+            Iterator<BaseNotificationBroadcasterEntry> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                BaseNotificationBroadcasterEntry item = iterator.next();
+                if (item.listener == listener && item.filter instanceof BaseAttributeFilter filter &&
+                        (name == null || filter.isAttributeEnabled(name))) {
+                    found = true;
+                    if (name == null) {
+                        iterator.remove();
+                    } else {
+                        filter.removeAttribute(name);
+                        if (filter.isEmpty()) {
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+        }
+        if (!found) {
+            throw new ListenerNotFoundException();
+        }
     }
 
 
