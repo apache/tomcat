@@ -53,26 +53,32 @@ public class SSISet implements SSICommand {
         long lastModified = 0;
         String errorMessage = ssiMediator.getConfigErrMsg();
         String variableName = null;
+        String variableValue = null;
+        // Collect the attributes first so that they can be given in any order, as
+        // Apache does
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
             if (paramName.equalsIgnoreCase("var")) {
                 variableName = paramValue;
             } else if (paramName.equalsIgnoreCase("value")) {
-                if (variableName != null) {
-                    String substitutedValue = ssiMediator.substituteVariables(paramValue);
-                    ssiMediator.setVariableValue(variableName, substitutedValue);
-                    lastModified = System.currentTimeMillis();
-                } else {
-                    ssiMediator.log(sm.getString("ssiSet.noVariable"));
-                    writer.write(errorMessage);
-                    throw new SSIStopProcessingException();
-                }
+                variableValue = paramValue;
             } else {
                 ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                 writer.write(errorMessage);
                 throw new SSIStopProcessingException();
             }
+        }
+        if (variableName == null) {
+            if (variableValue != null) {
+                ssiMediator.log(sm.getString("ssiSet.noVariable"));
+                writer.write(errorMessage);
+                throw new SSIStopProcessingException();
+            }
+        } else if (variableValue != null) {
+            String substitutedValue = ssiMediator.substituteVariables(variableValue);
+            ssiMediator.setVariableValue(variableName, substitutedValue);
+            lastModified = System.currentTimeMillis();
         }
         return lastModified;
     }
