@@ -69,17 +69,21 @@ public class SSISet implements SSICommand {
                 throw new SSIStopProcessingException();
             }
         }
+        // Both attributes are required, as Apache requires, but they may be
+        // given in any order
         if (variableName == null) {
-            if (variableValue != null) {
-                ssiMediator.log(sm.getString("ssiSet.noVariable"));
-                writer.write(errorMessage);
-                throw new SSIStopProcessingException();
-            }
-        } else if (variableValue != null) {
-            String substitutedValue = ssiMediator.substituteVariables(variableValue);
-            ssiMediator.setVariableValue(variableName, substitutedValue);
-            lastModified = System.currentTimeMillis();
+            ssiMediator.log(sm.getString("ssiSet.noVariable"));
+            writer.write(errorMessage);
+            throw new SSIStopProcessingException();
         }
+        if (variableValue == null) {
+            ssiMediator.log(sm.getString("ssiSet.noValue"));
+            writer.write(errorMessage);
+            throw new SSIStopProcessingException();
+        }
+        String substitutedValue = ssiMediator.substituteVariables(variableValue);
+        ssiMediator.setVariableValue(variableName, substitutedValue);
+        lastModified = System.currentTimeMillis();
         return lastModified;
     }
 }

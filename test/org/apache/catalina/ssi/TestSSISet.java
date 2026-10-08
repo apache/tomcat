@@ -49,10 +49,10 @@ public class TestSSISet {
 
     @Test
     public void testVarOnly() throws Exception {
-        // Setting only the variable name does nothing and is not an error
+        // The value attribute is required, as it is for Apache
         SSIMediator mediator = newMediator();
         String output = process(mediator, new String[] { "var" }, new String[] { "foo" });
-        Assert.assertEquals("", output);
+        Assert.assertEquals(mediator.getConfigErrMsg(), output);
         Assert.assertNull(mediator.getVariableValue("foo"));
     }
 
