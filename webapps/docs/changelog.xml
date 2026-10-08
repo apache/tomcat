@@ -117,6 +117,10 @@
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <fix>
+        Fix name-scoped removal of attribute change notification listeners from
+        <code>BaseModelMBean</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Catalina">
