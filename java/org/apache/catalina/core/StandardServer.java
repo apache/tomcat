@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,7 +30,6 @@ import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.security.AccessControlException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -620,7 +620,13 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
                 // Decode the received bytes as UTF-8, matching the encoding
                 // used by the stop command
-                String command = commandBytes.toString(StandardCharsets.UTF_8);
+                String command;
+                try {
+                    command = commandBytes.toString("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    log.error(sm.getString("standardServer.invalidShutdownCommand", commandBytes.toString()));
+                    return;
+                }
 
                 // Match against our command string
                 boolean match = command.equals(shutdown);

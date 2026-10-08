@@ -89,7 +89,11 @@ public class TestSsiServlet extends TomcatBaseTest {
         addDeleteOnTearDown(appDir);
         File doc = new File(appDir, "large.shtml");
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(doc), StandardCharsets.ISO_8859_1)) {
-            writer.write("X".repeat(20000));
+            StringBuilder outStr = new StringBuilder();
+            for (int i = 0; i < 20000; i++) {
+                outStr.append("X");
+            }
+            writer.write(outStr.toString());
             writer.write("<!--#flastmod file=\"large.shtml\" -->TAIL");
         }
 
