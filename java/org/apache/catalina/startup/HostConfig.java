@@ -1164,7 +1164,7 @@ public class HostConfig implements LifecycleListener {
                     continue;
                 }
 
-                if (tryAddServiced(cn.getBaseName())) {
+                if (tryAddServiced(cn.getName())) {
                     try {
                         // MigrateApp will call removeServiced
                         results.add(es.submit(new MigrateApp(this, cn, source, destination)));
