@@ -20,10 +20,10 @@ import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
@@ -32,7 +32,11 @@ import org.apache.tomcat.util.res.StringManager;
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextEnvironment</code> component.
  */
-public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironment> {
+public class ContextEnvironmentMBean extends BaseNamingResourceMBean<ContextEnvironment> {
+
+    private static final StringManager sm = StringManager.getManager(ContextEnvironmentMBean.class);
+    private static final Log log = LogFactory.getLog(ContextEnvironmentMBean.class);
+
 
     /**
      * Default constructor for ContextEnvironmentMBean.
@@ -40,31 +44,31 @@ public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironmen
     public ContextEnvironmentMBean() {
     }
 
-    private static final Log log = LogFactory.getLog(ContextEnvironmentMBean.class);
-    private static final StringManager sm = StringManager.getManager(ContextEnvironmentMBean.class);
 
     @Override
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {
 
-        if (attribute == null) {
-            throw new RuntimeOperationsException(new IllegalArgumentException(sm.getString("mBean.nullAttribute")),
-                    sm.getString("mBean.nullAttribute"));
-        }
-
-        ContextEnvironment ce = doGetManagedResource();
-
-        if ("name".equals(attribute.getName())) {
-            // Updating the name actually needs removing and adding back the
-            // component under the new name. Ignore the change, as the other
-            // naming resource MBeans do.
-            log.info(sm.getString("mBean.nameChange"));
+        if (!validateAttribute(attribute)) {
             return;
         }
+
+        String name = attribute.getName();
+        Object value = attribute.getValue();
+
+        ContextEnvironment ce = doGetManagedResource();
 
         String oldType = ce.getType();
         String oldValue = ce.getValue();
         String oldLookup = ce.getLookupName();
+        String oldDescription = ce.getDescription();
+        boolean oldOverride = ce.getOverride();
+
+        // Entries with injection targets but no value are effectively ignored
+        if (ce.getInjectionTargets() != null && !ce.getInjectionTargets().isEmpty() && "value".equals(name) &&
+                (value == null || (value instanceof String s && s.isEmpty()))) {
+            throw new IllegalArgumentException(sm.getString("contextEnvironment.ignore.injectionNoValue"));
+        }
 
         super.setAttribute(attribute);
 
@@ -75,16 +79,30 @@ public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironmen
             try {
                 nr.removeEnvironment(ce.getName());
                 nr.addEnvironment(ce);
-            } catch (IllegalArgumentException iae) {
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // The change is not acceptable. Restore the previous state
                 // before passing the failure to the caller, so the entry is
                 // not lost.
                 ce.setType(oldType);
                 ce.setValue(oldValue);
                 ce.setLookupName(oldLookup);
-                nr.addEnvironment(ce);
-                throw iae;
+                ce.setDescription(oldDescription);
+                ce.setOverride(oldOverride);
+                try {
+                    nr.addEnvironment(ce);
+                } catch (Throwable t1) {
+                    ExceptionUtils.handleThrowable(t1);
+                    t.addSuppressed(t1);
+                }
+                throw t;
             }
         }
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 }
