@@ -20,6 +20,8 @@ package org.apache.catalina.ssi;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -109,10 +111,11 @@ public final class SSIFsize implements SSICommand {
     // We try to mimic httpd here, as we do everywhere.
     // All the 'magic' numbers are from the util_script.c httpd source file.
     // Should use KiB and MiB in output but use k and M for consistency with httpd.
+    // The formatting is locale independent since it is server generated output.
     private String formatSize(long size, String format) {
         String retString;
         if (format.equalsIgnoreCase("bytes")) {
-            DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+            DecimalFormat decimalFormat = new DecimalFormat("#,##0", DecimalFormatSymbols.getInstance(Locale.ROOT));
             retString = decimalFormat.format(size);
         } else {
             if (size < 0) {
@@ -125,7 +128,7 @@ public final class SSIFsize implements SSICommand {
                 retString = Long.toString((size + 512) / ONE_KIBIBYTE);
                 retString += "k";
             } else if (size < 99 * ONE_MEBIBYTE) {
-                DecimalFormat decimalFormat = new DecimalFormat("0.0M");
+                DecimalFormat decimalFormat = new DecimalFormat("0.0M", DecimalFormatSymbols.getInstance(Locale.ROOT));
                 retString = decimalFormat.format(size / (double) ONE_MEBIBYTE);
             } else {
                 retString = Long.toString((size + (529 * ONE_KIBIBYTE)) / ONE_MEBIBYTE);
