@@ -219,6 +219,12 @@ is used to assign a value to a user-defined variable.
 <!--#else -->
 <p>Yoga class at noon.</p>
 <!--#endif -->]]></source>
+Operators in conditional expressions are evaluated from highest to lowest
+precedence: parentheses, the <code>!</code> operator, the comparison operators
+(<code>=</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>,
+<code>&lt;=</code>, <code>&gt;=</code>), <code>&amp;&amp;</code> and finally
+<code>||</code>. For example, <code>$a || $b &amp;&amp; $c</code> is evaluated as
+<code>$a || ($b &amp;&amp; $c)</code>.
 </li>
 </ul>
 <p>

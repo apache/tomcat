@@ -310,7 +310,8 @@ public class ExpressionParseTree {
 
     private static final int PRECEDENCE_NOT = 5;
     private static final int PRECEDENCE_COMPARE = 4;
-    private static final int PRECEDENCE_LOGICAL = 1;
+    private static final int PRECEDENCE_AND = 2;
+    private static final int PRECEDENCE_OR = 1;
 
     /**
      * A node implementation that represents an operation.
@@ -397,7 +398,7 @@ public class ExpressionParseTree {
 
         @Override
         public int getPrecedence() {
-            return PRECEDENCE_LOGICAL;
+            return PRECEDENCE_AND;
         }
 
 
@@ -419,7 +420,7 @@ public class ExpressionParseTree {
 
         @Override
         public int getPrecedence() {
-            return PRECEDENCE_LOGICAL;
+            return PRECEDENCE_OR;
         }
 
 

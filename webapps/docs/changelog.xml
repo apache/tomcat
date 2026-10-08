@@ -1903,6 +1903,18 @@
         now passed to the <code>LoginModule</code> unchanged, consistent with
         the non-JAAS realms. (remm)
       </fix>
+      <fix>
+        Give the SSI conditional expression operators <code>&amp;&amp;</code>
+        and <code>||</code> distinct precedences, <code>&amp;&amp;</code>
+        binding more tightly than <code>||</code>, consistent with the
+        convention used by the C-like languages and by Apache HTTP Server
+        expressions. Previously, mixed chains were evaluated strictly left to
+        right, so <code>$a || $b &amp;&amp; $c</code> was evaluated as
+        <code>($a || $b) &amp;&amp; $c</code> rather than the expected
+        <code>$a || ($b &amp;&amp; $c)</code>. Note that this changes the
+        evaluation of existing documents using unparenthesized mixed
+        <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
