@@ -17,6 +17,7 @@
 package org.apache.catalina.ssi;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -133,6 +134,39 @@ public class TestExpressionParseTree {
         ExpressionParseTree ept =
                 new ExpressionParseTree("$QUERY_STRING = /a=/", mediator);
         Assert.assertFalse(ept.evaluateTree());
+    }
+
+
+    @Test
+    public void testMissingOperand() throws Exception {
+        // Operators missing an operand must produce a parse error rather than
+        // an unchecked exception
+        String[] expressions = { "= a", "a =", "a ! =", "!", "a = = b", "!= a" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+                Assert.fail("Expected a parse error for [" + expression + "]");
+            } catch (ParseException pe) {
+                // Expected
+            }
+        }
+    }
+
+
+    @Test
+    public void testExtraClosingParen() throws Exception {
+        // Unbalanced closing parentheses consumed the artificial group marker
+        // and used to result in a NoSuchElementException from the parser
+        String[] expressions = { ")", "a)", "a))", "(a))", "a ) b" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+            } catch (ParseException pe) {
+                // Also a valid outcome
+            }
+        }
     }
 
 
