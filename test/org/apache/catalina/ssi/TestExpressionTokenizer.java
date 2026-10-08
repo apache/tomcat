@@ -101,11 +101,19 @@ public class TestExpressionTokenizer {
         // Escaped slash inside a regular expression
         parameterSets.add(new Object[] { "/a\\/b/",
                 new int[] { ExpressionTokenizer.TOKEN_STRING }, new String[] { "/a\\/b/" } });
-        // Unterminated regular expression: the token is the remainder
+        // Unterminated regular expression yields an error token
         parameterSets.add(new Object[] { "a = /x",
                 new int[] { ExpressionTokenizer.TOKEN_STRING, ExpressionTokenizer.TOKEN_EQ,
-                        ExpressionTokenizer.TOKEN_STRING },
-                new String[] { "a", null, "/x" } });
+                        ExpressionTokenizer.TOKEN_ERROR },
+                new String[] { "a", null, null } });
+
+        // Unterminated quoted strings yield an error token
+        parameterSets.add(new Object[] { "a = \"x",
+                new int[] { ExpressionTokenizer.TOKEN_STRING, ExpressionTokenizer.TOKEN_EQ,
+                        ExpressionTokenizer.TOKEN_ERROR },
+                new String[] { "a", null, null } });
+        parameterSets.add(new Object[] { "'x",
+                new int[] { ExpressionTokenizer.TOKEN_ERROR }, new String[] { null } });
 
         // Operators mixed with strings
         parameterSets.add(new Object[] { "a && b",
