@@ -157,6 +157,23 @@ public class TestExpressionParseTree {
 
 
     @Test
+    public void testUnterminatedLiteral() throws Exception {
+        // Unterminated quoted strings and regular expressions must produce a
+        // parse error rather than silently changing the expression semantics
+        String[] expressions = { "a = \"x", "a = 'x", "a = /x", "\"", "/", "'x = y" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+                Assert.fail("Expected a parse error for [" + expression + "]");
+            } catch (ParseException pe) {
+                // Expected
+            }
+        }
+    }
+
+
+    @Test
     public void testMissingOperand() throws Exception {
         // Operators missing an operand must produce a parse error rather than
         // an unchecked exception
