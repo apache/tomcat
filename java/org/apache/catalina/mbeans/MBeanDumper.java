@@ -180,6 +180,7 @@ public class MBeanDumper {
      * Escape a string value for display.
      *
      * @param value the value to escape
+     *
      * @return the escaped value
      */
     public static String escape(String value) {
