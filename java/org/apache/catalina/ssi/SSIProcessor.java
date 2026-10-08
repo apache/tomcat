@@ -181,7 +181,12 @@ public class SSIProcessor {
                 }
             }
         } catch (SSIStopProcessingException e) {
-            // If we are here, then we have already stopped processing, so all is good
+            // If we are here, then processing has already been stopped by a command that
+            // reported its own error. Log any wrapped cause so nothing can fail silently,
+            // and log everything when debugging is enabled.
+            if (debug > 0 || e.getCause() != null) {
+                ssiExternalResolver.log("SSI processing stopped", e);
+            }
         }
         return lastModifiedDate;
     }
