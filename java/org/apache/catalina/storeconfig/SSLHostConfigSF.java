@@ -25,6 +25,7 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
+import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 
 /**
  * Store SSLHostConfig
@@ -99,8 +100,37 @@ public class SSLHostConfigSF extends StoreFactoryBase {
             storeElementArray(aWriter, indent, hostConfigsCertificates);
             // Store nested <OpenSSLConf> element
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
+            openSslConf = removeRuntimeCommands(openSslConf, sslHostConfig);
             storeElement(aWriter, indent, openSslConf);
         }
+    }
+
+    /*
+     * When the SSL context is created, the OpenSSL implementation adds a runtime "groups" command derived from the
+     * SSLHostConfig "groups" attribute. Store a copy of the configuration without such a command, since it duplicates
+     * the attribute and a stored command would shadow later changes of the attribute. A command whose value differs
+     * from the derived one was written by the user and is kept.
+     */
+    private OpenSSLConf removeRuntimeCommands(OpenSSLConf openSslConf, SSLHostConfig sslHostConfig) {
+        if (openSslConf == null || sslHostConfig.getGroups() == null) {
+            return openSslConf;
+        }
+        String derivedValue = sslHostConfig.getGroups().replace(',', ':');
+        ArrayList<OpenSSLConfCmd> retainedCommands = new ArrayList<>();
+        for (OpenSSLConfCmd command : openSslConf.getCommands()) {
+            if (OpenSSLConfCmd.GROUPS.equals(command.getName()) && derivedValue.equals(command.getValue())) {
+                continue;
+            }
+            retainedCommands.add(command);
+        }
+        if (retainedCommands.size() == openSslConf.getCommands().size()) {
+            return openSslConf;
+        }
+        OpenSSLConf filteredCommands = new OpenSSLConf();
+        for (OpenSSLConfCmd command : retainedCommands) {
+            filteredCommands.addCmd(command);
+        }
+        return filteredCommands;
     }
 
 }
