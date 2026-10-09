@@ -141,11 +141,21 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         ChannelMessage complete = null;
         try {
             FragCollection coll = getFragCollection(key, msg);
-            coll.addMessage((ChannelMessage) msg.deepclone());
-
-            if (coll.complete()) {
-                removeFragCollection(key);
-                complete = coll.assemble();
+            // The deep clone does not touch shared state, so it happens before the
+            // monitor is entered. The fragment storage of a collection is shared
+            // state. Synchronise on the collection so that adding a fragment and
+            // checking for completion form a single atomic sequence even when
+            // fragments arrive on multiple threads.
+            ChannelMessage stored = (ChannelMessage) msg.deepclone();
+            synchronized (coll) {
+                coll.addMessage(stored);
+                complete = coll.assembleIfComplete();
+                if (complete != null) {
+                    // Remove only this collection. A heartbeat expiry may already
+                    // have removed it and a late fragment may have installed a new
+                    // collection under the same key, which must not be evicted.
+                    fragpieces.remove(key, coll);
+                }
             }
         } catch (IllegalArgumentException | IllegalStateException e) {
             // Fragment metadata received as part of the message data failed validation
@@ -256,6 +266,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         private final long received = System.currentTimeMillis();
         private final ChannelMessage msg;
         private final XByteBuffer[] frags;
+        private boolean assembled = false;
 
         /**
          * Creates a new fragment collection for the given message.
@@ -283,7 +294,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          *
          * @param msg The fragment message to add
          */
-        public void addMessage(ChannelMessage msg) {
+        public synchronized void addMessage(ChannelMessage msg) {
             // At least the fragment number and the fragment count must be present.
             // Check before trimming, trimming more bytes than are available throws
             // an ArrayIndexOutOfBoundsException.
@@ -311,7 +322,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          *
          * @return {@code true} if all fragments are present
          */
-        public boolean complete() {
+        public synchronized boolean complete() {
             boolean result = true;
             for (int i = 0; (i < frags.length) && (result); i++) {
                 result = (frags[i] != null);
@@ -326,7 +337,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          *
          * @throws IllegalStateException if not all fragments have been received
          */
-        public ChannelMessage assemble() {
+        public synchronized ChannelMessage assemble() {
             if (!complete()) {
                 throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
             }
@@ -344,6 +355,23 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
                 msg.getMessage().append(frag.getBytesDirect(), 0, frag.getLength());
             }
             return msg;
+        }
+
+        /**
+         * Assembles the complete message if all fragments have been received and this
+         * collection has not been assembled before. The one-shot guarantee makes the
+         * completion of a message delivered exactly once, even when the last fragments
+         * are processed concurrently on multiple threads.
+         *
+         * @return The assembled channel message, or <code>null</code> if the message is
+         *         incomplete or was assembled by an earlier call
+         */
+        public synchronized ChannelMessage assembleIfComplete() {
+            if (!assembled && complete()) {
+                assembled = true;
+                return assemble();
+            }
+            return null;
         }
 
         /**
