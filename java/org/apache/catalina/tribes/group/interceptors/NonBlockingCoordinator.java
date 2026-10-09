@@ -606,7 +606,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
         AbsoluteOrder.absoluteOrder(complete);
         AbsoluteOrder.absoluteOrder(local);
-        return (AbsoluteOrder.comp.compare(complete[0], local[0]) > 0);
+        return (AbsoluteOrder.comp.compare(complete[0], local[0]) < 0);
 
     }
 
