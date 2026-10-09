@@ -62,6 +62,9 @@ public class TestThroughputInterceptor {
         }
     }
 
+    private static class PassThrough extends ChannelInterceptorBase {
+    }
+
     private static ChannelData createMessage(Member source) {
         ChannelData data = new ChannelData(false);
         data.setUniqueId(UUIDGenerator.randomUUID(false));
@@ -143,5 +146,47 @@ public class TestThroughputInterceptor {
         Assert.assertNull("The send should not have failed", sendFailure.get());
         Assert.assertEquals("A successful send must release the in-flight counter slot",
                 0, interceptor.access.get());
+    }
+
+    @Test
+    public void testConcurrentSendReceiveAndReport() throws Exception {
+        ThroughputInterceptor interceptor = new ThroughputInterceptor();
+        interceptor.setChannel(new GroupChannel());
+        interceptor.setNext(new PassThrough());
+        // Small interval so the periodic report paths inside sendMessage and
+        // messageReceived are exercised in addition to the direct calls below
+        interceptor.setInterval(10);
+
+        MemberImpl member = new MemberImpl("localhost", 4000, -1);
+        int threadCount = 4;
+        int iterations = 250;
+        CountDownLatch done = new CountDownLatch(threadCount);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        for (int i = 0; i < threadCount; i++) {
+            Thread thread = new Thread(() -> {
+                try {
+                    for (int j = 0; j < iterations; j++) {
+                        interceptor.sendMessage(new Member[] { member }, createMessage(member), null);
+                        interceptor.messageReceived(createMessage(member));
+                        interceptor.report(interceptor.getTimeTx());
+                    }
+                } catch (Throwable x) {
+                    failure.compareAndSet(null, x);
+                } finally {
+                    done.countDown();
+                }
+            });
+            thread.start();
+        }
+
+        Assert.assertTrue("Traffic threads did not finish", done.await(30, TimeUnit.SECONDS));
+        Assert.assertNull("Concurrent traffic and reporting must not throw: " + failure.get(), failure.get());
+        Assert.assertEquals("Every completed send must release the in-flight counter slot",
+                0, interceptor.access.get());
+        Assert.assertEquals("All successful sends must be counted",
+                threadCount * iterations, interceptor.getMsgTxCnt().get() - 1);
+        Assert.assertEquals("All receives must be counted",
+                (long) threadCount * iterations, interceptor.getMsgRxCnt().get());
     }
 }
