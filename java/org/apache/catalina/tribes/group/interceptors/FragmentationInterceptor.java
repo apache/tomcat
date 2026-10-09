@@ -56,6 +56,14 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
     protected static final StringManager sm = StringManager.getManager(FragmentationInterceptor.class);
 
     /**
+     * The maximum number of fragments that will be accepted for a single message. The fragment count is received as
+     * part of the message data, so it is validated against this limit before it is used to allocate the fragment
+     * storage. The limit is far above any realistic message: with the default maxSize it allows messages of close to
+     * ten GB.
+     */
+    public static final int MAX_FRAGMENTS = 100000;
+
+    /**
      * Map of fragment keys to their fragment collections for reassembly.
      */
     protected final Map<FragKey,FragCollection> fragpieces = new ConcurrentHashMap<>();
@@ -130,14 +138,23 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
      */
     public void defrag(ChannelMessage msg) {
         FragKey key = new FragKey(msg.getUniqueId());
-        FragCollection coll = getFragCollection(key, msg);
-        coll.addMessage((ChannelMessage) msg.deepclone());
+        ChannelMessage complete = null;
+        try {
+            FragCollection coll = getFragCollection(key, msg);
+            coll.addMessage((ChannelMessage) msg.deepclone());
 
-        if (coll.complete()) {
-            removeFragCollection(key);
-            ChannelMessage complete = coll.assemble();
+            if (coll.complete()) {
+                removeFragCollection(key);
+                complete = coll.assemble();
+            }
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            // Fragment metadata received as part of the message data failed validation
+            log.warn(sm.getString("fragmentationInterceptor.fragment.discarded"), e);
+            return;
+        }
+
+        if (complete != null) {
             super.messageReceived(complete);
-
         }
     }
 
@@ -235,7 +252,16 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          */
         public FragCollection(ChannelMessage msg) {
             // get the total messages
-            int count = XByteBuffer.toInt(msg.getMessage().getBytesDirect(), msg.getMessage().getLength() - 4);
+            int length = msg.getMessage().getLength();
+            if (length < 4) {
+                throw new IllegalArgumentException(
+                        sm.getString("fragmentationInterceptor.fragment.too-short", Integer.toString(length)));
+            }
+            int count = XByteBuffer.toInt(msg.getMessage().getBytesDirect(), length - 4);
+            if (count < 1 || count > MAX_FRAGMENTS) {
+                throw new IllegalArgumentException(
+                        sm.getString("fragmentationInterceptor.invalid.frag.count", Integer.toString(count)));
+            }
             frags = new XByteBuffer[count];
             this.msg = msg;
         }
@@ -246,12 +272,24 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          * @param msg The fragment message to add
          */
         public void addMessage(ChannelMessage msg) {
+            // At least the fragment number and the fragment count must be present.
+            // Check before trimming, trimming more bytes than are available throws
+            // an ArrayIndexOutOfBoundsException.
+            int length = msg.getMessage().getLength();
+            if (length < 8) {
+                throw new IllegalArgumentException(
+                        sm.getString("fragmentationInterceptor.fragment.too-short", Integer.toString(length)));
+            }
             // remove the total messages
             msg.getMessage().trim(4);
             // get the msg nr
             int nr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(), msg.getMessage().getLength() - 4);
             // remove the msg nr
             msg.getMessage().trim(4);
+            if (nr < 0 || nr >= frags.length) {
+                throw new IllegalArgumentException(sm.getString("fragmentationInterceptor.invalid.frag.nr",
+                        Integer.toString(nr), Integer.toString(frags.length)));
+            }
             frags[nr] = msg.getMessage();
 
         }
@@ -280,11 +318,15 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             if (!complete()) {
                 throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
             }
-            int buffersize = 0;
+            long buffersize = 0;
             for (XByteBuffer frag : frags) {
                 buffersize += frag.getLength();
             }
-            XByteBuffer buf = new XByteBuffer(buffersize, false);
+            if (buffersize > Integer.MAX_VALUE) {
+                throw new IllegalStateException(
+                        sm.getString("fragmentationInterceptor.fragments.too-large", Long.toString(buffersize)));
+            }
+            XByteBuffer buf = new XByteBuffer((int) buffersize, false);
             msg.setMessage(buf);
             for (XByteBuffer frag : frags) {
                 msg.getMessage().append(frag.getBytesDirect(), 0, frag.getLength());

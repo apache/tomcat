@@ -1,0 +1,261 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.catalina.tribes.group.interceptors;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.util.UUIDGenerator;
+
+public class TestFragmentationInterceptor {
+
+    private static class CapturingSender extends ChannelInterceptorBase {
+
+        private final List<ChannelMessage> captured = new ArrayList<>();
+
+        @Override
+        public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+                throws ChannelException {
+            int len = msg.getMessage().getLength();
+            byte[] copy = Arrays.copyOfRange(msg.getMessage().getBytesDirect(), 0, len);
+            ChannelData clone = new ChannelData(false);
+            clone.setUniqueId(Arrays.copyOf(msg.getUniqueId(), msg.getUniqueId().length));
+            clone.setAddress(msg.getAddress());
+            clone.setOptions(msg.getOptions());
+            clone.setMessage(new XByteBuffer(copy, false));
+            captured.add(clone);
+        }
+    }
+
+    private static class DeliveringCollector extends ChannelInterceptorBase {
+
+        private volatile ChannelMessage delivered;
+
+        @Override
+        public void messageReceived(ChannelMessage msg) {
+            delivered = msg;
+        }
+    }
+
+    private static ChannelData createMessage(byte[] payload, Member source) {
+        return createMessage(payload, source, UUIDGenerator.randomUUID(false));
+    }
+
+    private static ChannelData createMessage(byte[] payload, Member source, byte[] uniqueId) {
+        ChannelData data = new ChannelData(false);
+        data.setUniqueId(uniqueId);
+        data.setAddress(source);
+        data.setMessage(new XByteBuffer(payload, false));
+        return data;
+    }
+
+    private static byte[] bytesOf(ChannelMessage msg) {
+        int len = msg.getMessage().getLength();
+        return Arrays.copyOfRange(msg.getMessage().getBytesDirect(), 0, len);
+    }
+
+    @Test
+    public void testFragmentRoundTrip() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        byte[] payload = "The quick brown fox jumps over the lazy dog.".getBytes(StandardCharsets.UTF_8);
+
+        FragmentationInterceptor sender = new FragmentationInterceptor();
+        sender.setMaxSize(8);
+        CapturingSender capture = new CapturingSender();
+        sender.setChannel(new GroupChannel());
+        sender.setNext(capture);
+        sender.sendMessage(new Member[] { destination }, createMessage(payload, destination), null);
+        Assert.assertEquals(6, capture.captured.size());
+
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+        for (ChannelMessage frag : capture.captured) {
+            receiver.messageReceived(frag);
+        }
+
+        Assert.assertNotNull("Assembled message was not delivered", delivery.delivered);
+        Assert.assertArrayEquals("Assembled message does not match the original payload",
+                payload, bytesOf(delivery.delivered));
+    }
+
+    @Test
+    public void testHugeFragmentCountIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        XByteBuffer buffer = new XByteBuffer(16, false);
+        buffer.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
+        buffer.append(Integer.MAX_VALUE);
+        buffer.append(true);
+        ChannelData frag = createMessage(new byte[0], destination);
+        frag.setMessage(buffer);
+
+        receiver.messageReceived(frag);
+
+        Assert.assertNull("Message with a huge fragment count must not be delivered", delivery.delivered);
+    }
+
+    @Test
+    public void testNegativeFragmentCountIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        XByteBuffer buffer = new XByteBuffer(16, false);
+        buffer.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
+        buffer.append(-5);
+        buffer.append(true);
+        ChannelData frag = createMessage(new byte[0], destination);
+        frag.setMessage(buffer);
+
+        receiver.messageReceived(frag);
+
+        Assert.assertNull("Message with a negative fragment count must not be delivered", delivery.delivered);
+    }
+
+    @Test
+    public void testOutOfRangeFragmentNumberIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        XByteBuffer buffer = new XByteBuffer(16, false);
+        buffer.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
+        buffer.append(5);
+        buffer.append(1);
+        buffer.append(true);
+        ChannelData frag = createMessage(new byte[0], destination);
+        frag.setMessage(buffer);
+
+        receiver.messageReceived(frag);
+
+        Assert.assertNull("Fragment with an out of range number must not be delivered", delivery.delivered);
+    }
+
+    @Test
+    public void testTooShortFragmentIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        XByteBuffer buffer = new XByteBuffer(16, false);
+        buffer.append("d".getBytes(StandardCharsets.UTF_8), 0, 1);
+        buffer.append(true);
+        ChannelData frag = createMessage(new byte[0], destination);
+        frag.setMessage(buffer);
+
+        receiver.messageReceived(frag);
+
+        Assert.assertNull("Fragment that is too short must not be delivered", delivery.delivered);
+    }
+
+    @Test
+    public void testShortNonFirstFragmentIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        byte[] uniqueId = UUIDGenerator.randomUUID(false);
+
+        XByteBuffer first = new XByteBuffer(16, false);
+        first.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
+        first.append(0);
+        first.append(2);
+        first.append(true);
+        ChannelData firstFrag = createMessage(new byte[0], destination, uniqueId);
+        firstFrag.setMessage(first);
+        receiver.messageReceived(firstFrag);
+
+        XByteBuffer shortFrag = new XByteBuffer(16, false);
+        shortFrag.append("x".getBytes(StandardCharsets.UTF_8), 0, 1);
+        shortFrag.append(true);
+        ChannelData shortData = createMessage(new byte[0], destination, uniqueId);
+        shortData.setMessage(shortFrag);
+        receiver.messageReceived(shortData);
+
+        Assert.assertNull("Incomplete message must not be delivered", delivery.delivered);
+    }
+
+    @Test
+    public void testReassemblyAfterMalformedFirstFragment() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        byte[] uniqueId = UUIDGenerator.randomUUID(false);
+
+        XByteBuffer malformed = new XByteBuffer(16, false);
+        malformed.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
+        malformed.append(Integer.MAX_VALUE);
+        malformed.append(true);
+        ChannelData malformedFrag = createMessage(new byte[0], destination, uniqueId);
+        malformedFrag.setMessage(malformed);
+        receiver.messageReceived(malformedFrag);
+
+        XByteBuffer first = new XByteBuffer(16, false);
+        first.append("ab".getBytes(StandardCharsets.UTF_8), 0, 2);
+        first.append(0);
+        first.append(2);
+        first.append(true);
+        ChannelData firstFrag = createMessage(new byte[0], destination, uniqueId);
+        firstFrag.setMessage(first);
+        receiver.messageReceived(firstFrag);
+
+        XByteBuffer second = new XByteBuffer(16, false);
+        second.append("cd".getBytes(StandardCharsets.UTF_8), 0, 2);
+        second.append(1);
+        second.append(2);
+        second.append(true);
+        ChannelData secondFrag = createMessage(new byte[0], destination, uniqueId);
+        secondFrag.setMessage(second);
+        receiver.messageReceived(secondFrag);
+
+        Assert.assertNotNull("Message must still be reassembled after a malformed fragment",
+                delivery.delivered);
+        Assert.assertArrayEquals("Assembled message does not match the expected content",
+                "abcd".getBytes(StandardCharsets.UTF_8), bytesOf(delivery.delivered));
+    }
+}
