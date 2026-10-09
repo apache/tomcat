@@ -508,6 +508,15 @@
         <code>maxQueueSize</code> limit eventually stopped being
         enforced. (remm)
       </fix>
+      <fix>
+        The <code>NonBlockingCoordinator</code> now uses a separate,
+        configurable <code>mergeAliveTimeout</code> with a default of
+        one second for the TCP liveness checks that run while merging
+        an arriving coordination message, instead of the 15 second
+        coordination message wait timeout. Members that do not respond
+        within this timeout are excluded from the merged view and the
+        exclusion is now logged. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
