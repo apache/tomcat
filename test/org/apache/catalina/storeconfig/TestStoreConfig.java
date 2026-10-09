@@ -43,6 +43,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
@@ -618,6 +619,44 @@ public class TestStoreConfig extends TomcatBaseTest {
         dump = storeToString(desc, noAttribute);
         Assert.assertTrue(dump, dump.contains("OpenSSLConfCmd"));
         Assert.assertTrue(dump, dump.contains("name=\"groups\""));
+    }
+
+    /**
+     * Verify that the placeholder certificate of type UNDEFINED that is created at runtime when no certificate is
+     * configured is not stored. The placeholder would fail the start of a server when a typed certificate is added to
+     * the stored configuration later. An explicitly configured certificate of type UNDEFINED must be kept since the
+     * filter matches the runtime registered instance.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testDefaultCertificatePlaceholderNotStored() throws Exception {
+        StoreLoader loader = new StoreLoader();
+        loader.load(null);
+        StoreRegistry registry = loader.getRegistry();
+        StoreDescription desc = registry.findDescription(SSLHostConfig.class);
+        Assert.assertNotNull(desc);
+
+        // The placeholder registered at runtime when the endpoint creates the SSL context
+        SSLHostConfig placeholder = new SSLHostConfig();
+        placeholder.getCertificates(true);
+        String dump = storeToString(desc, placeholder);
+        Assert.assertTrue(dump, dump.contains("<SSLHostConfig"));
+        Assert.assertFalse(dump, dump.contains("<Certificate"));
+
+        // An explicitly configured, type-less certificate must be kept
+        SSLHostConfig explicit = new SSLHostConfig();
+        explicit.addCertificate(new SSLHostConfigCertificate(explicit, SSLHostConfigCertificate.Type.UNDEFINED));
+        dump = storeToString(desc, explicit);
+        Assert.assertTrue(dump, dump.contains("<Certificate"));
+        Assert.assertTrue(dump, dump.contains("type=\"UNDEFINED\""));
+
+        // Typed certificates are unaffected
+        SSLHostConfig typed = new SSLHostConfig();
+        typed.addCertificate(new SSLHostConfigCertificate(typed, SSLHostConfigCertificate.Type.EC));
+        dump = storeToString(desc, typed);
+        Assert.assertTrue(dump, dump.contains("<Certificate"));
+        Assert.assertTrue(dump, dump.contains("type=\"EC\""));
     }
 
     private static String storeToString(StoreDescription desc, Object element) throws Exception {
