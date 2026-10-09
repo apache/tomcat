@@ -131,7 +131,8 @@ public class ManagerSF extends StoreFactoryBase {
                 !StandardSessionIdGenerator.class.equals(sessionIdGenerator.getClass())) {
             return false;
         }
-        if (sessionIdGenerator instanceof SessionIdGeneratorBase sigBase) {
+        if (sessionIdGenerator instanceof SessionIdGeneratorBase) {
+            SessionIdGeneratorBase sigBase = (SessionIdGeneratorBase) sessionIdGenerator;
             // The manager propagates its jvmRoute to the generator when it starts,
             // so a value matching the manager's is runtime state, not configuration
             String sigJvmRoute = sigBase.getJvmRoute();
