@@ -52,8 +52,9 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <p>
  * This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on. Note
- * that {@link #startElection(boolean)} itself blocks its caller for up to 15 seconds while waiting for an election
- * request from a higher priority member.
+ * that {@link #startElection(boolean)} itself blocks its caller for up to
+ * {@link #getWaitForCoordMsgTimeout()} milliseconds while waiting for an election request from a higher priority
+ * member.
  * </p>
  * <p>
  * This implementation is based on a home brewed algorithm that uses the AbsoluteOrder of a membership to pass a token
@@ -151,9 +152,15 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             50, 111, 103, 65, 3, -77, 51, -35, 0, 119, 117, 9, -26, 119, 50, -75, -105, -102, 36, 79, 37, -68, -84,
             -123, 15, -22, -109, 106, -55 };
     /**
-     * Time to wait for coordination timeout
+     * Time to wait for coordination timeout. A node that is not the leader in its view
+     * waits up to this duration for a coordination message when an election is started.
+     * The wait blocks the calling thread, which for membership events is the channel
+     * utility executor thread that also runs the channel heartbeat. Lowering this value
+     * reduces the time that a single membership event can delay heartbeats and other
+     * membership processing. The same value is also used as the TCP connect timeout
+     * when verifying the liveness of members during a merge.
      */
-    protected final long waitForCoordMsgTimeout = 15000;
+    protected long waitForCoordMsgTimeout = 15000;
     /**
      * Our current view
      */
@@ -201,6 +208,42 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      */
     public NonBlockingCoordinator() {
         super();
+    }
+
+    /**
+     * Returns the time in milliseconds that a non-leader node waits for a coordination
+     * message when an election is started. The same value is also used as the TCP
+     * connect timeout when verifying the liveness of members during a merge.
+     *
+     * @return the coordination message wait timeout in milliseconds
+     */
+    public long getWaitForCoordMsgTimeout() {
+        return waitForCoordMsgTimeout;
+    }
+
+    /**
+     * Sets the time in milliseconds that a non-leader node waits for a coordination
+     * message when an election is started. The same value is also used as the TCP
+     * connect timeout when verifying the liveness of members during a merge. Since the
+     * wait blocks the calling thread, which for membership events is the single
+     * threaded channel utility executor that also runs the channel heartbeat, a lower
+     * value limits the delay that a single membership event can impose on other channel
+     * maintenance work.
+     *
+     * @param waitForCoordMsgTimeout the coordination message wait timeout in
+     *                                   milliseconds, at least one and no more than
+     *                                   {@link Integer#MAX_VALUE}
+     */
+    public void setWaitForCoordMsgTimeout(long waitForCoordMsgTimeout) {
+        if (waitForCoordMsgTimeout < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("nonBlockingCoordinator.waitForCoordMsgTimeout.tooSmall"));
+        }
+        if (waitForCoordMsgTimeout > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(sm.getString("nonBlockingCoordinator.waitForCoordMsgTimeout.tooLarge",
+                    Integer.toString(Integer.MAX_VALUE)));
+        }
+        this.waitForCoordMsgTimeout = waitForCoordMsgTimeout;
     }
 
     // ============================================================================================================
@@ -356,7 +399,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Checks if a member is alive using the default timeout.
+     * Checks if a member is alive using the coordination message wait timeout
+     * ({@link #getWaitForCoordMsgTimeout()}) as the connection timeout.
      *
      * @param mbr The member to check
      * @return true if the member is alive
