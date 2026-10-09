@@ -37,7 +37,13 @@ import org.apache.juli.logging.LogFactory;
  * each message and only passes it on when the matching confirmation message is received. A confirmation that arrives
  * before its original message is remembered for the expiration time, so the original is still released when it
  * arrives late. There is no retransmission, so a message whose confirmation is lost is dropped after the expiration
- * time.
+ * time. <br>
+ * <b>Configuration Options</b><br>
+ * When combined with the <code>FragmentationInterceptor</code>, this interceptor must be declared before it in the
+ * channel configuration, so that it confirms complete messages and never individual fragments. All fragments of a
+ * message share its unique id; if this interceptor is declared below the fragmentation interceptor, it sees the
+ * fragments as separate messages with equal ids, keeps only one of them in its pending map, and the large message is
+ * never delivered.
  */
 public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
 

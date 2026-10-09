@@ -40,6 +40,10 @@ import org.apache.juli.logging.LogFactory;
  * rest to arrive <b>default=60,000ms -&gt; 60seconds</b> This setting is useful to avoid OutOfMemoryErrors<br>
  * FragmentationInterceptor.maxSize=&lt;max message size&gt; - message size in bytes <b>default=1024*100 (around a tenth
  * of a MB)</b><br>
+ * When combined with the <code>TwoPhaseCommitInterceptor</code>, this interceptor must be declared after it in the
+ * channel configuration, so that the two-phase commit interceptor confirms complete messages and never individual
+ * fragments. All fragments of a message share its unique id, which the two-phase commit interceptor uses as its only
+ * correlation key.
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase implements FragmentationInterceptorMBean {
     /**
