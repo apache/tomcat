@@ -96,17 +96,16 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 7. ManagedBean / BaseModelMBean Issues (3 items)
+### 7. ManagedBean Issues (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
-| 7.1 | `BaseModelMBean.java:520` | `removeAttributeChangeNotificationListener` removes ALL notifications for a listener | Track per-attribute listener registrations. Only remove the listener for the specified attribute name. | 1 day | Medium |
 | 7.2 | `ManagedBean.java:606` | Method signature from `opInfo` not used for reflection lookup | Use the signature from `opInfo` to locate the method, falling back to the MBean descriptor signature. | 0.5-1 day | Low |
 | 7.3 | `ManagedBean.java:614` | Methods declared in superinterfaces not found by reflection | Walk the class hierarchy and all implemented interfaces when searching for the method. | 0.5-1 day | Low |
 
-**Summary:** JMX MBean infrastructure issues. 7.1 is a behavioral bug; 7.2 and 7.3 are limitations.
+**Summary:** JMX MBean infrastructure limitations.
 
-**Total estimated effort: 2-3 days, Low-Medium difficulty**
+**Total estimated effort: 1-2 days, Low difficulty**
 
 ---
 

@@ -49,7 +49,9 @@ public class BaseAttributeFilter implements NotificationFilter {
     public BaseAttributeFilter(String name) {
 
         super();
-        if (name != null) {
+        if (name == null) {
+            acceptAll = true;
+        } else {
             addAttribute(name);
         }
 
@@ -60,10 +62,14 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * The set of attribute names that are accepted by this filter. If this list is empty, all attribute names are
-     * accepted.
+     * The set of attribute names that are accepted or excluded by this filter, depending on {@link #acceptAll}.
      */
     private final Set<String> names = new HashSet<>();
+
+    /**
+     * {@code true} if all attribute names except those in {@link #names} are accepted.
+     */
+    private boolean acceptAll = false;
 
 
     // --------------------------------------------------------- Public Methods
@@ -77,7 +83,11 @@ public class BaseAttributeFilter implements NotificationFilter {
     public void addAttribute(String name) {
 
         synchronized (names) {
-            names.add(name);
+            if (acceptAll) {
+                names.remove(name);
+            } else {
+                names.add(name);
+            }
         }
 
     }
@@ -89,6 +99,7 @@ public class BaseAttributeFilter implements NotificationFilter {
     public void clear() {
 
         synchronized (names) {
+            acceptAll = true;
             names.clear();
         }
 
@@ -96,14 +107,17 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * Return the set of names that are accepted by this filter. If this filter accepts all attribute names, a zero
-     * length array will be returned.
+     * Return the set of names that are explicitly accepted by this filter. If this filter is in accept-all mode,
+     * including when individual names have been excluded, a zero length array will be returned.
      *
      * @return the array of names
      */
     public String[] getNames() {
 
         synchronized (names) {
+            if (acceptAll) {
+                return new String[0];
+            }
             return names.toArray(new String[0]);
         }
 
@@ -133,11 +147,7 @@ public class BaseAttributeFilter implements NotificationFilter {
             return false;
         }
         synchronized (names) {
-            if (names.isEmpty()) {
-                return true;
-            } else {
-                return names.contains(acn.getAttributeName());
-            }
+            return acceptAll != names.contains(acn.getAttributeName());
         }
 
     }
@@ -151,9 +161,27 @@ public class BaseAttributeFilter implements NotificationFilter {
     public void removeAttribute(String name) {
 
         synchronized (names) {
-            names.remove(name);
+            if (acceptAll) {
+                names.add(name);
+            } else {
+                names.remove(name);
+            }
         }
 
+    }
+
+
+    boolean isAttributeEnabled(String name) {
+        synchronized (names) {
+            return acceptAll != names.contains(name);
+        }
+    }
+
+
+    boolean isEmpty() {
+        synchronized (names) {
+            return !acceptAll && names.isEmpty();
+        }
     }
 
 
