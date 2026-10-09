@@ -1952,6 +1952,20 @@
         a warning in the temporary location only in the rare cases where
         restoring it is not possible. (remm)
       </fix>
+      <fix>
+        Fix the <code>ManagerSF</code> store configuration factory always
+        treating a started <code>StandardManager</code> as non-default, since
+        the manager propagates its (possibly <code>null</code>) node identifier
+        to its session ID generator when it starts, which the default check
+        compared against an empty string. This caused a redundant
+        <code>Manager</code> element with a nested
+        <code>SessionIdGenerator</code> to be written for every context using
+        the default manager configuration when the running configuration was
+        stored. The default check was strengthened to require the exact
+        manager and session ID generator classes and to test
+        <code>throwOnFailure</code>, so the now reachable skip path cannot
+        silently drop a customised configuration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
