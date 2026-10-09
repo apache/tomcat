@@ -2516,6 +2516,20 @@
         within this timeout are excluded from the merged view and the
         exclusion is now logged. (remm)
       </fix>
+      <fix>
+        The <code>TcpFailureDetector</code> now performs its TCP
+        liveness checks outside the membership monitor, and only
+        applies the result after re-acquiring the monitor and
+        re-checking that the membership state has not changed in the
+        meantime. Previously, the network I/O, up to the configured
+        connection timeout for each member, was performed while
+        holding the monitor, which blocked every other membership
+        operation and update for seconds during a network outage.
+        Member events forwarded by the interceptor are also no longer
+        sent while holding the monitor, removing a potential deadlock
+        with membership listeners that call back into the
+        interceptor. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
