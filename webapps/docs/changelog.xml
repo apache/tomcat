@@ -2496,6 +2496,18 @@
         with membership listeners that call back into the
         interceptor. (remm)
       </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now forwards the
+        interceptor payload, and with it the <code>ErrorHandler</code>
+        supplied by the application, with the original message instead
+        of with its internal confirmation message. When the
+        <code>MessageDispatchInterceptor</code> performed the actual
+        send, completion and error callbacks were previously reported
+        under the confirmation message's random id, which the
+        application cannot correlate with the id returned by the send,
+        and failures of the original message were never reported at
+        all. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
