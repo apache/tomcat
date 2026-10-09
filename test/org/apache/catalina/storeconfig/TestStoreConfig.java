@@ -644,6 +644,26 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertTrue(dump, dump.contains("type=\"EC\""));
     }
 
+    /**
+     * Verify that storing a Context whose class has no store description is reported as a failure rather than as a
+     * success, since nothing is persisted for it.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testStoreContextWithoutDescriptionFails() throws Exception {
+        StoreLoader loader = new StoreLoader();
+        loader.load(null);
+        StoreConfig storeConfig = new StoreConfig();
+        storeConfig.setRegistry(loader.getRegistry());
+
+        Context context = new StandardContext() {
+            // Sub-class that the store registry does not know
+        };
+        Assert.assertNull(loader.getRegistry().findDescription(context.getClass()));
+        Assert.assertFalse(storeConfig.store(context));
+    }
+
     private static String storeToString(StoreDescription desc, Object element) throws Exception {
         StringWriter buffer = new StringWriter();
         desc.getStoreFactory().store(new PrintWriter(buffer), -2, element);
