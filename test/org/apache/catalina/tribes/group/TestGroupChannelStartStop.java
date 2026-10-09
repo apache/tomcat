@@ -127,6 +127,27 @@ public class TestGroupChannelStartStop {
     }
 
     @Test
+    public void testOverlappingPartialStart() throws Exception {
+        // start one service, then start everything: the already
+        // started service must not be started a second time
+        ReceiverBase rb = (ReceiverBase) channel.getChannelReceiver();
+        rb.setPort(45588);
+        // one bind attempt only, so a second start on the same port fails
+        rb.setAutoBind(0);
+        int count = 0;
+        try {
+            channel.start(Channel.SND_RX_SEQ);
+            count++;
+        } catch ( Exception x){x.printStackTrace();}
+        try {
+            channel.start(Channel.DEFAULT);
+            count++;
+        } catch ( Exception x){x.printStackTrace();}
+        Assert.assertEquals(2,count);
+        channel.stop(Channel.DEFAULT);
+    }
+
+    @Test
     public void testFalseOption() throws Exception {
         int flag = 0xFFF0;//should get ignored by the underlying components
         int count = 0;

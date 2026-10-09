@@ -152,13 +152,17 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 return;// nothing to start
             }
 
-            if (svc == (svc & startLevel)) {
+            // only start the services that are not started yet, so that a request
+            // that partially overlaps with the started services does not start the
+            // already started ones a second time
+            int toStart = svc & ~startLevel;
+            if (toStart == 0) {
                 throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted", Integer.toString(svc)));
             }
 
             // must start the receiver first so that we can coordinate the port it
             // listens to with the local membership settings
-            if (Channel.SND_RX_SEQ == (svc & Channel.SND_RX_SEQ)) {
+            if (Channel.SND_RX_SEQ == (toStart & Channel.SND_RX_SEQ)) {
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
@@ -178,13 +182,13 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 }
                 valid = true;
             }
-            if (Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
+            if (Channel.SND_TX_SEQ == (toStart & Channel.SND_TX_SEQ)) {
                 clusterSender.setChannel(getChannel());
                 clusterSender.start();
                 valid = true;
             }
 
-            if (Channel.MBR_RX_SEQ == (svc & Channel.MBR_RX_SEQ)) {
+            if (Channel.MBR_RX_SEQ == (toStart & Channel.MBR_RX_SEQ)) {
                 membershipService.setMembershipListener(this);
                 membershipService.setChannel(getChannel());
                 if (membershipService instanceof McastService) {
@@ -193,7 +197,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 membershipService.start(MembershipService.MBR_RX);
                 valid = true;
             }
-            if (Channel.MBR_TX_SEQ == (svc & Channel.MBR_TX_SEQ)) {
+            if (Channel.MBR_TX_SEQ == (toStart & Channel.MBR_TX_SEQ)) {
                 membershipService.setChannel(getChannel());
                 membershipService.start(MembershipService.MBR_TX);
                 valid = true;
