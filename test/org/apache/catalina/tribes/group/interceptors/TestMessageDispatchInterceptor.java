@@ -34,6 +34,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.util.UUIDGenerator;
 
 public class TestMessageDispatchInterceptor {
 
@@ -126,6 +127,57 @@ public class TestMessageDispatchInterceptor {
         interceptor.sendMessage(destination, data, null);
 
         Assert.assertSame("Synchronous sends must pass the original message through", data, collector.message);
+    }
+
+    @Test
+    public void testQueueSizeReturnsToZeroWhenDownstreamMutatesPayload() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        MessageDispatchInterceptor interceptor = new MessageDispatchInterceptor();
+        MutatingCollector collector = new MutatingCollector();
+        interceptor.setChannel(channel);
+        interceptor.setNext(collector);
+        interceptor.startQueue();
+        try {
+            byte[] payloadBytes = "PAYLOAD".getBytes(StandardCharsets.UTF_8);
+            Member destination = new MemberImpl("localhost", 4000, -1);
+            Member[] dest = new Member[] { destination };
+            int count = 20;
+            for (int i = 0; i < count; i++) {
+                ChannelData data = new ChannelData(false);
+                data.setUniqueId(UUIDGenerator.randomUUID(false));
+                data.setAddress(destination);
+                data.setOptions(Channel.SEND_OPTIONS_ASYNCHRONOUS);
+                XByteBuffer buffer = new XByteBuffer(64, false);
+                buffer.append(payloadBytes, 0, payloadBytes.length);
+                data.setMessage(buffer);
+                interceptor.sendMessage(dest, data, null);
+            }
+
+            long deadline = System.currentTimeMillis() + 10000;
+            long size = interceptor.getCurrentSize();
+            while (size != 0 && System.currentTimeMillis() < deadline) {
+                Thread.sleep(50);
+                size = interceptor.getCurrentSize();
+            }
+            Assert.assertEquals(
+                    "Queue size accounting drifted when a downstream interceptor changed the message length",
+                    0, size);
+        } finally {
+            interceptor.stopQueue();
+        }
+    }
+
+    /*
+     * Simulates interceptors such as EncryptInterceptor or FragmentationInterceptor that replace or extend the
+     * message payload while the message is being sent downstream.
+     */
+    private static class MutatingCollector extends ChannelInterceptorBase {
+
+        @Override
+        public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+                throws ChannelException {
+            msg.getMessage().append(true);
+        }
     }
 
     private static class RecordingCollector extends ChannelInterceptorBase {
