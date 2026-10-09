@@ -42,6 +42,9 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.valves.AccessLogValve;
+import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.openssl.OpenSSLConf;
+import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.xml.sax.InputSource;
 
 public class TestStoreConfig extends TomcatBaseTest {
@@ -556,6 +559,56 @@ public class TestStoreConfig extends TomcatBaseTest {
 
         Assert.assertTrue(serverXmlDump, serverXmlDump.contains("<Manager"));
         Assert.assertTrue(serverXmlDump, serverXmlDump.contains("throwOnFailure=\"false\""));
+    }
+
+    /**
+     * Verify that the "groups" OpenSSLConfCmd that the OpenSSL implementation derives at runtime from the
+     * SSLHostConfig "groups" attribute is not stored, since a stored command would shadow later changes of the
+     * attribute. A user-written groups command must be kept.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testOpenSSLConfGroupsCommandHandling() throws Exception {
+        StoreLoader loader = new StoreLoader();
+        loader.load(null);
+        StoreRegistry registry = loader.getRegistry();
+        StoreDescription desc = registry.findDescription(SSLHostConfig.class);
+        Assert.assertNotNull(desc);
+
+        // The runtime command that the OpenSSL implementation adds from the attribute must not be stored
+        SSLHostConfig derived = new SSLHostConfig();
+        derived.setGroups("secp256r1,secp384r1");
+        derived.setOpenSslConf(new OpenSSLConf());
+        derived.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS, "secp256r1:secp384r1"));
+        String dump = storeToString(desc, derived);
+        Assert.assertTrue(dump, dump.contains("groups=\"secp256r1,secp384r1\""));
+        Assert.assertFalse(dump, dump.contains("OpenSSLConfCmd"));
+
+        // A user-written command with a value different from the derived one must be kept
+        SSLHostConfig userCommand = new SSLHostConfig();
+        userCommand.setGroups("secp256r1,secp384r1");
+        userCommand.setOpenSslConf(new OpenSSLConf());
+        userCommand.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS, "X25519"));
+        dump = storeToString(desc, userCommand);
+        Assert.assertTrue(dump, dump.contains("OpenSSLConfCmd"));
+        Assert.assertTrue(dump, dump.contains("name=\"groups\""));
+        Assert.assertTrue(dump, dump.contains("value=\"X25519\""));
+
+        // Without the attribute, a groups command can only be user-written and must be kept
+        SSLHostConfig noAttribute = new SSLHostConfig();
+        noAttribute.setGroups(null);
+        noAttribute.setOpenSslConf(new OpenSSLConf());
+        noAttribute.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS, "secp256r1"));
+        dump = storeToString(desc, noAttribute);
+        Assert.assertTrue(dump, dump.contains("OpenSSLConfCmd"));
+        Assert.assertTrue(dump, dump.contains("name=\"groups\""));
+    }
+
+    private static String storeToString(StoreDescription desc, Object element) throws Exception {
+        StringWriter buffer = new StringWriter();
+        desc.getStoreFactory().store(new PrintWriter(buffer), -2, element);
+        return buffer.toString();
     }
 
     public static class CustomTestManager extends StandardManager {
