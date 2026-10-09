@@ -83,6 +83,67 @@ public class TestFragmentationInterceptor {
     }
 
     @Test
+    public void testSetMaxSizeRejectsInvalidValues() {
+        FragmentationInterceptor interceptor = new FragmentationInterceptor();
+
+        try {
+            interceptor.setMaxSize(0);
+            Assert.fail("A max size of zero would make fragmentation divide by zero");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        try {
+            interceptor.setMaxSize(-1);
+            Assert.fail("A negative max size would make fragmentation allocate a negative sized array");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        interceptor.setMaxSize(1024);
+        Assert.assertEquals(1024, interceptor.getMaxSize());
+    }
+
+    @Test
+    public void testSetExpireRejectsInvalidValues() {
+        FragmentationInterceptor interceptor = new FragmentationInterceptor();
+
+        try {
+            interceptor.setExpire(0);
+            Assert.fail("A non-positive expire would discard fragment collections before reassembly can complete");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        try {
+            interceptor.setExpire(-1);
+            Assert.fail("A negative expire would discard fragment collections before reassembly can complete");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        interceptor.setExpire(60000);
+        Assert.assertEquals(60000, interceptor.getExpire());
+    }
+
+    @Test
+    public void testFragExceedingMaxFragmentsFails() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor sender = new FragmentationInterceptor();
+        sender.setMaxSize(1);
+        sender.setChannel(new GroupChannel());
+        sender.setNext(new CapturingSender());
+
+        byte[] payload = new byte[FragmentationInterceptor.MAX_FRAGMENTS + 1];
+        try {
+            sender.sendMessage(new Member[] { destination }, createMessage(payload, destination), null);
+            Assert.fail("Fragmenting into more than MAX_FRAGMENTS fragments should fail");
+        } catch (ChannelException expected) {
+            // Expected
+        }
+    }
+
+    @Test
     public void testFragmentRoundTrip() throws Exception {
         Member destination = new MemberImpl("localhost", 4000, -1);
         byte[] payload = "The quick brown fox jumps over the lazy dog.".getBytes(StandardCharsets.UTF_8);

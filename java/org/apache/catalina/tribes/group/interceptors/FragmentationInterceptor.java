@@ -171,6 +171,12 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         int size = msg.getMessage().getLength();
 
         int count = ((size / maxSize) + (size % maxSize == 0 ? 0 : 1));
+        if (count > MAX_FRAGMENTS) {
+            // The receiver rejects fragment counts above MAX_FRAGMENTS, so fail here
+            // rather than sending fragments that are guaranteed to be discarded.
+            throw new ChannelException(sm.getString("fragmentationInterceptor.fragments.exceed-max",
+                    Integer.toString(size), Integer.toString(count), Integer.toString(MAX_FRAGMENTS)));
+        }
         ChannelMessage[] messages = new ChannelMessage[count];
         int remaining = size;
         for (int i = 0; i < count; i++) {
@@ -229,11 +235,17 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
     @Override
     public void setMaxSize(int maxSize) {
+        if (maxSize < 1) {
+            throw new IllegalArgumentException(sm.getString("fragmentationInterceptor.maxSize.tooSmall"));
+        }
         this.maxSize = maxSize;
     }
 
     @Override
     public void setExpire(long expire) {
+        if (expire < 1) {
+            throw new IllegalArgumentException(sm.getString("fragmentationInterceptor.expire.tooSmall"));
+        }
         this.expire = expire;
     }
 
