@@ -125,6 +125,15 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         this.internalStop(svc);
     }
 
+    /**
+     * Returns the bit mask of the services that are currently started.
+     *
+     * @return the started service flags
+     */
+    synchronized int getStartLevel() {
+        return startLevel;
+    }
+
 
     /**
      * Starts up the channel. This can be called multiple times for individual services to start The svc parameter can
