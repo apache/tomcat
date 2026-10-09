@@ -39,12 +39,13 @@ public final class UniqueId implements Serializable {
     }
 
     /**
-     * Constructs a new UniqueId from the given byte array.
+     * Constructs a new UniqueId from the given byte array. A defensive copy of the array is made, so later changes to
+     * the caller's array do not affect this object.
      *
-     * @param id the byte array containing the identifier. The array is retained by reference and must not be modified.
+     * @param id the byte array containing the identifier
      */
     public UniqueId(byte[] id) {
-        this.id = id;
+        this.id = id != null ? id.clone() : null;
     }
 
     /**
@@ -86,7 +87,7 @@ public final class UniqueId implements Serializable {
     }
 
     /**
-     * Returns the raw bytes of this unique identifier.
+     * Returns the raw bytes of this unique identifier. Do not modify the returned array.
      *
      * @return the byte array
      */
