@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -159,19 +160,28 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             setupMembership();
         }
         boolean notify = false;
+        boolean verify = false;
         synchronized (membership) {
             if (removeSuspects.containsKey(member)) {
                 // previously marked suspect, system below picked up the member again
                 removeSuspects.remove(member);
             } else if (membership.getMember(member) == null) {
-                // if we add it here, then add it upwards too
-                // check to see if it is alive
-                if (memberAlive(member)) {
-                    membership.memberAlive(member);
-                    addSuspects.remove(member);
-                    notify = true;
-                } else {
-                    if (member instanceof StaticMember) {
+                verify = true;
+            }
+        }
+        if (verify) {
+            // if we add it here, then add it upwards too
+            // check to see if it is alive, outside the membership monitor so
+            // that slow TCP connects do not block other membership operations
+            boolean alive = memberAlive(member);
+            synchronized (membership) {
+                // the state may have changed while the member was being checked
+                if (!removeSuspects.containsKey(member) && membership.getMember(member) == null) {
+                    if (alive) {
+                        membership.memberAlive(member);
+                        addSuspects.remove(member);
+                        notify = true;
+                    } else if (member instanceof StaticMember) {
                         addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
                     }
                 }
@@ -201,29 +211,41 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             }
             super.memberDisappeared(member);
         } else {
+            boolean verify;
+            synchronized (membership) {
+                verify = membership.contains(member);
+            }
+            if (!verify) {
+                if (log.isInfoEnabled()) {
+                    log.info(sm.getString("tcpFailureDetector.already.disappeared", member));
+                }
+                return;
+            }
             boolean notify = false;
+            boolean applied = false;
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("tcpFailureDetector.memberDisappeared.verify", member));
             }
+            // check to see if the member really is gone, outside the membership
+            // monitor so that slow TCP connects do not block other membership
+            // operations
+            boolean alive = memberAlive(member);
             synchronized (membership) {
-                if (!membership.contains(member)) {
-                    if (log.isInfoEnabled()) {
-                        log.info(sm.getString("tcpFailureDetector.already.disappeared", member));
+                // the state may have changed while the member was being checked
+                if (membership.contains(member)) {
+                    applied = true;
+                    if (alive) {
+                        // add the member as suspect
+                        removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    } else {
+                        // not correct, we need to maintain the map
+                        membership.removeMember(member);
+                        removeSuspects.remove(member);
+                        if (member instanceof StaticMember) {
+                            addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                        }
+                        notify = true;
                     }
-                    return;
-                }
-                // check to see if the member really is gone
-                if (!memberAlive(member)) {
-                    // not correct, we need to maintain the map
-                    membership.removeMember(member);
-                    removeSuspects.remove(member);
-                    if (member instanceof StaticMember) {
-                        addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
-                    }
-                    notify = true;
-                } else {
-                    // add the member as suspect
-                    removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
                 }
             }
             if (notify) {
@@ -231,7 +253,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                     log.info(sm.getString("tcpFailureDetector.member.disappeared", member));
                 }
                 super.memberDisappeared(member);
-            } else {
+            } else if (applied) {
                 if (log.isInfoEnabled()) {
                     log.info(sm.getString("tcpFailureDetector.still.alive", member));
                 }
@@ -280,12 +302,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             if (membership == null) {
                 setupMembership();
             }
-            synchronized (membership) {
-                if (!checkAll) {
-                    performBasicCheck();
-                } else {
-                    performForcedCheck();
-                }
+            if (!checkAll) {
+                performBasicCheck();
+            } else {
+                performForcedCheck();
             }
         } catch (Exception e) {
             log.warn(sm.getString("tcpFailureDetector.heartbeat.failed"), e);
@@ -293,90 +313,182 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
     }
 
     /**
-     * Performs a forced check of all cluster members.
+     * Performs a forced check of all cluster members. The TCP liveness checks run outside the
+     * membership monitor and the results are only applied after re-acquiring the monitor and
+     * re-checking that the current state still matches the decision.
      */
     protected void performForcedCheck() {
         // update all alive times
         Member[] members = super.getMembers();
         for (int i = 0; members != null && i < members.length; i++) {
-            if (memberAlive(members[i])) {
-                if (membership.memberAlive(members[i])) {
-                    super.memberAdded(members[i]);
-                }
-                addSuspects.remove(members[i]);
-            } else {
-                if (membership.getMember(members[i]) != null) {
-                    membership.removeMember(members[i]);
-                    removeSuspects.remove(members[i]);
-                    if (members[i] instanceof StaticMember) {
-                        addSuspects.put(members[i], Long.valueOf(System.currentTimeMillis()));
+            Member member = members[i];
+            boolean alive = memberAlive(member);
+            boolean added = false;
+            boolean disappeared = false;
+            synchronized (membership) {
+                if (alive) {
+                    if (membership.memberAlive(member)) {
+                        added = true;
                     }
-                    super.memberDisappeared(members[i]);
-                }
-            } // end if
+                    addSuspects.remove(member);
+                } else {
+                    if (membership.getMember(member) != null) {
+                        membership.removeMember(member);
+                        removeSuspects.remove(member);
+                        if (member instanceof StaticMember) {
+                            addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                        }
+                        disappeared = true;
+                    }
+                } // end if
+            }
+            if (added) {
+                super.memberAdded(member);
+            } else if (disappeared) {
+                super.memberDisappeared(member);
+            }
         } // for
 
     }
 
     /**
-     * Performs a basic check of suspected members.
+     * Performs a basic check of suspected members. The TCP liveness checks run outside the
+     * membership monitor and the results are only applied after re-acquiring the monitor and
+     * re-checking that the current state still matches the decision.
      */
     protected void performBasicCheck() {
         // update all alive times
         Member[] members = super.getMembers();
+        ArrayList<Member> toCheck = new ArrayList<>();
         for (int i = 0; members != null && i < members.length; i++) {
-            if (addSuspects.containsKey(members[i]) && membership.getMember(members[i]) == null) {
-                // avoid temporary adding member.
-                continue;
-            }
-            if (membership.memberAlive(members[i])) {
-                // we don't have this one in our membership, check to see if the member is alive
-                if (memberAlive(members[i])) {
-                    log.warn(sm.getString("tcpFailureDetector.performBasicCheck.memberAdded", members[i]));
-                    super.memberAdded(members[i]);
-                } else {
-                    membership.removeMember(members[i]);
+            synchronized (membership) {
+                if (addSuspects.containsKey(members[i]) && membership.getMember(members[i]) == null) {
+                    // avoid temporary adding member.
+                    continue;
+                }
+                if (membership.memberAlive(members[i])) {
+                    // we don't have this one in our membership, check to see if the member is alive
+                    toCheck.add(members[i]);
                 } // end if
-            } // end if
+            }
         } // for
+
+        // The liveness checks run outside the monitor, so a concurrent memberDisappeared can
+        // remove a member from the tracker between the two passes. The apply below then skips
+        // that member and the concurrent disappearance is the one that is reported.
+        for (Member member : toCheck) {
+            boolean alive = memberAlive(member);
+            boolean notify = false;
+            synchronized (membership) {
+                if (membership.getMember(member) != null) {
+                    if (alive) {
+                        notify = true;
+                    } else {
+                        membership.removeMember(member);
+                    } // end if
+                }
+            }
+            if (notify) {
+                log.warn(sm.getString("tcpFailureDetector.performBasicCheck.memberAdded", member));
+                super.memberAdded(member);
+            }
+        }
 
         // check suspect members if they are still alive,
         // if not, simply issue the memberDisappeared message
-        Member[] keys = removeSuspects.keySet().toArray(new Member[0]);
+        Member[] keys;
+        synchronized (membership) {
+            keys = removeSuspects.keySet().toArray(new Member[0]);
+        }
         for (Member m : keys) {
-            if (membership.getMember(m) != null && (!memberAlive(m))) {
-                membership.removeMember(m);
-                if (m instanceof StaticMember) {
-                    addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
-                }
-                super.memberDisappeared(m);
-                removeSuspects.remove(m);
-                if (log.isInfoEnabled()) {
-                    log.info(sm.getString("tcpFailureDetector.suspectMember.dead", m));
+            boolean verify;
+            synchronized (membership) {
+                verify = membership.getMember(m) != null;
+            }
+            boolean disappeared = false;
+            if (verify) {
+                boolean alive = memberAlive(m);
+                if (!alive) {
+                    synchronized (membership) {
+                        // the state may have changed while the member was being checked
+                        if (membership.getMember(m) != null) {
+                            membership.removeMember(m);
+                            if (m instanceof StaticMember) {
+                                addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
+                            }
+                            removeSuspects.remove(m);
+                            disappeared = true;
+                        }
+                    }
+                } else {
+                    synchronized (membership) {
+                        expireRemoveSuspect(m);
+                    }
                 }
             } else {
-                if (removeSuspectsTimeout > 0) {
-                    long timeNow = System.currentTimeMillis();
-                    int timeIdle = (int) ((timeNow - removeSuspects.get(m).longValue()) / 1000L);
-                    if (timeIdle > removeSuspectsTimeout) {
-                        removeSuspects.remove(m); // remove suspect member
-                    }
+                synchronized (membership) {
+                    expireRemoveSuspect(m);
+                }
+            }
+            if (disappeared) {
+                super.memberDisappeared(m);
+                if (log.isInfoEnabled()) {
+                    log.info(sm.getString("tcpFailureDetector.suspectMember.dead", m));
                 }
             }
         }
 
         // check add suspects members if they are alive now,
         // if they are, simply issue the memberAdded message
-        keys = addSuspects.keySet().toArray(new Member[0]);
+        synchronized (membership) {
+            keys = addSuspects.keySet().toArray(new Member[0]);
+        }
         for (Member m : keys) {
-            if (membership.getMember(m) == null && (memberAlive(m))) {
-                membership.memberAlive(m);
+            boolean verify;
+            synchronized (membership) {
+                verify = membership.getMember(m) == null;
+            }
+            if (!verify) {
+                continue;
+            }
+            boolean alive = memberAlive(m);
+            boolean notify = false;
+            if (alive) {
+                synchronized (membership) {
+                    // the state may have changed while the member was being checked
+                    if (membership.getMember(m) == null) {
+                        membership.memberAlive(m);
+                        addSuspects.remove(m);
+                        notify = true;
+                    }
+                }
+            }
+            if (notify) {
                 super.memberAdded(m);
-                addSuspects.remove(m);
                 if (log.isInfoEnabled()) {
                     log.info(sm.getString("tcpFailureDetector.suspectMember.alive", m));
                 }
             } // end if
+        }
+    }
+
+    /**
+     * Removes the member from the remove suspects map if it has been suspect for longer than the
+     * configured timeout. Must be called while holding the membership monitor.
+     *
+     * @param m the member to expire
+     */
+    protected void expireRemoveSuspect(Member m) {
+        if (removeSuspectsTimeout > 0) {
+            Long suspectTime = removeSuspects.get(m);
+            // the member may have been removed from the map while it was being checked
+            if (suspectTime != null) {
+                long timeNow = System.currentTimeMillis();
+                int timeIdle = (int) ((timeNow - suspectTime.longValue()) / 1000L);
+                if (timeIdle > removeSuspectsTimeout) {
+                    removeSuspects.remove(m); // remove suspect member
+                }
+            }
         }
     }
 
