@@ -18,6 +18,7 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.catalina.tribes.Channel;
@@ -141,15 +142,46 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         } else {
             synchronized (members) {
                 Member[] others = super.getMembers();
-                Member[] result = new Member[members.size() + others.length];
-                System.arraycopy(others, 0, result, 0, others.length);
-                for (int i = 0; i < members.size(); i++) {
-                    result[i + others.length] = members.get(i);
+                ArrayList<Member> result = new ArrayList<>(members.size() + others.length);
+                result.addAll(Arrays.asList(others));
+                for (Member member : members) {
+                    // A statically configured node that is also discovered
+                    // dynamically would otherwise be returned twice and
+                    // receive every message sent to the full member list.
+                    // The two copies are only equal by Member.equals when the
+                    // static configuration pins the same unique id the node
+                    // announces, so the destination TCP endpoint is used to
+                    // detect the duplicate instead
+                    if (!containsDestination(result, member)) {
+                        result.add(member);
+                    }
                 }
-                AbsoluteOrder.absoluteOrder(result);
-                return result;
+                Member[] sorted = result.toArray(new Member[0]);
+                AbsoluteOrder.absoluteOrder(sorted);
+                return sorted;
             } // sync
         } // end if
+    }
+
+    /**
+     * Checks whether the list of members already includes a member pointing at the same TCP
+     * destination as the given member. Two nodes cannot listen on the same TCP port on the same
+     * host, so host plus effective TCP port identifies the node, independently of the unique id
+     * that each copy happens to carry.
+     *
+     * @param list   the members already collected for the result
+     * @param member the member to look for
+     * @return true if the list already contains the same TCP destination
+     */
+    private static boolean containsDestination(List<Member> list, Member member) {
+        int port = member.getPort() >= 0 ? member.getPort() : member.getSecurePort();
+        for (Member other : list) {
+            int otherPort = other.getPort() >= 0 ? other.getPort() : other.getSecurePort();
+            if (otherPort == port && Arrays.equals(other.getHost(), member.getHost())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
