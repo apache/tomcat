@@ -20,6 +20,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -141,6 +147,64 @@ public class TestFragmentationInterceptor {
         } catch (ChannelException expected) {
             // Expected
         }
+    }
+
+    @Test
+    public void testAssembleIfCompleteIsOneShotUnderConcurrency() throws Exception {
+        Member source = new MemberImpl("localhost", 4000, -1);
+        byte[] uniqueId = UUIDGenerator.randomUUID(false);
+
+        XByteBuffer init = new XByteBuffer(16, false);
+        init.append("xx".getBytes(StandardCharsets.UTF_8), 0, 2);
+        init.append(2);
+        ChannelData initMessage = createMessage(new byte[0], source, uniqueId);
+        initMessage.setMessage(init);
+        FragmentationInterceptor.FragCollection coll =
+                new FragmentationInterceptor.FragCollection(initMessage);
+
+        XByteBuffer fragData0 = new XByteBuffer(16, false);
+        fragData0.append("a".getBytes(StandardCharsets.UTF_8), 0, 1);
+        fragData0.append(0);
+        fragData0.append(2);
+        ChannelData frag0 = createMessage(new byte[0], source, uniqueId);
+        frag0.setMessage(fragData0);
+
+        XByteBuffer fragData1 = new XByteBuffer(16, false);
+        fragData1.append("b".getBytes(StandardCharsets.UTF_8), 0, 1);
+        fragData1.append(1);
+        fragData1.append(2);
+        ChannelData frag1 = createMessage(new byte[0], source, uniqueId);
+        frag1.setMessage(fragData1);
+
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        AtomicInteger assembled = new AtomicInteger();
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            List<Future<?>> futures = new ArrayList<>();
+            for (ChannelMessage frag : Arrays.asList(frag0, frag1)) {
+                futures.add(executor.submit(() -> {
+                    coll.addMessage(frag);
+                    try {
+                        // Both threads have added their fragment once the barrier trips,
+                        // so both observe the collection as complete
+                        barrier.await(10, TimeUnit.SECONDS);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (coll.assembleIfComplete() != null) {
+                        assembled.incrementAndGet();
+                    }
+                }));
+            }
+            for (Future<?> future : futures) {
+                future.get(10, TimeUnit.SECONDS);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+
+        Assert.assertEquals("A concurrently completed message must be assembled exactly once",
+                1, assembled.get());
     }
 
     @Test
