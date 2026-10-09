@@ -486,6 +486,14 @@
   </subsection>
   <subsection name="Tribes">
     <changelog>
+      <fix>
+        When the <code>MessageDispatchInterceptor</code> is configured with
+        <code>useDeepClone="false"</code>, asynchronously sent messages are now
+        detached from the caller's buffer with a shallow clone before being
+        queued. Previously, the buffer could be returned to the send buffer pool
+        and reused by a concurrent send while the queued message still
+        referenced it, corrupting the transmitted data. (remm)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
