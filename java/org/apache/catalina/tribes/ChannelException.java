@@ -91,7 +91,11 @@ public class ChannelException extends Exception {
      */
     @Override
     public String getMessage() {
-        StringBuilder buf = new StringBuilder(super.getMessage());
+        // The detail message is null when the exception is created without a
+        // message and without a cause. Use the class name as the base, in line
+        // with Throwable.toString(), to keep getMessage() null-safe
+        String base = super.getMessage();
+        StringBuilder buf = new StringBuilder(base != null ? base : getClass().getName());
         if (faultyMembers == null || faultyMembers.isEmpty()) {
             buf.append("; No faulty members identified.");
         } else {
