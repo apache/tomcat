@@ -310,7 +310,9 @@ public class ChannelData implements ChannelMessage {
     }
 
     /**
-     * Create a shallow clone, only the data gets recreated
+     * Create a shallow clone, the message data and the unique id are recreated so that the
+     * clone, for example a confirmation message derived from the original, can be given a new
+     * id without modifying the original message in place.
      *
      * @return ChannelData clone
      */
@@ -322,6 +324,9 @@ public class ChannelData implements ChannelMessage {
         } catch (CloneNotSupportedException e) {
             // Cannot happen
             throw new AssertionError();
+        }
+        if (this.uniqueId != null) {
+            clone.uniqueId = this.uniqueId.clone();
         }
         if (this.message != null) {
             clone.message = new XByteBuffer(this.message.getBytesDirect(), false);
