@@ -122,6 +122,31 @@ public class TestTwoPhaseCommitInterceptor {
     }
 
     @Test
+    public void testShallowCloneKeepsOriginalUniqueIdIntact() throws Exception {
+        TwoPhaseCommitInterceptor interceptor = new TwoPhaseCommitInterceptor();
+        interceptor.setDeepclone(false);
+        RecordingSendChain chain = new RecordingSendChain();
+        GroupChannel channel = new GroupChannel();
+        interceptor.setChannel(channel);
+        interceptor.setNext(chain);
+
+        MemberImpl member = new MemberImpl("localhost", 4000, -1);
+        ChannelData msg = createMessage(member);
+        byte[] originalId = msg.getUniqueId();
+        byte[] savedId = originalId.clone();
+
+        interceptor.sendMessage(new Member[] { member }, msg, null);
+
+        Assert.assertEquals(2, chain.messages.size());
+        Assert.assertArrayEquals("Building the confirmation must not modify the original id in place",
+                savedId, msg.getUniqueId());
+        Assert.assertNotSame("The clone must not share the id array with the original",
+                originalId, chain.messages.get(1).getUniqueId());
+        Assert.assertFalse("The confirmation must carry a different id",
+                Arrays.equals(savedId, chain.messages.get(1).getUniqueId()));
+    }
+
+    @Test
     public void testOriginalSendFailureSkipsConfirmation() throws Exception {
         TwoPhaseCommitInterceptor interceptor = new TwoPhaseCommitInterceptor();
         RecordingSendChain chain = new RecordingSendChain() {
