@@ -126,6 +126,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        When the <code>MessageDispatchInterceptor</code> is configured with
+        <code>useDeepClone="false"</code>, asynchronously sent messages are now
+        detached from the caller's buffer with a shallow clone before being
+        queued. Previously, the buffer could be returned to the send buffer pool
+        and reused by a concurrent send while the queued message still
+        referenced it, corrupting the transmitted data. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.61 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
