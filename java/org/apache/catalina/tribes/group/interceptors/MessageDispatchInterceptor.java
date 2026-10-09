@@ -30,6 +30,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.TcclThreadFactory;
@@ -58,7 +59,8 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
      */
     protected volatile boolean run = false;
     /**
-     * Whether to use deep clone.
+     * Whether to use deep clone. When false, the message is still detached from the caller's buffer by a shallow
+     * clone before it is queued, but the unique id and address are shared rather than re-serialized.
      */
     protected boolean useDeepClone = true;
     /**
@@ -113,6 +115,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             // add to queue
             if (useDeepClone) {
                 msg = (ChannelMessage) msg.deepclone();
+            } else if (msg instanceof ChannelData channelData) {
+                // The caller of sendMessage() may reuse the buffer that backs the
+                // message as soon as this method returns, e.g. GroupChannel.send()
+                // returns it to the BufferPool. Clone, which copies the message
+                // data, so the queued message is independent of that buffer.
+                msg = channelData.clone();
             }
             if (!addToQueue(msg, destination, payload)) {
                 throw new ChannelException(sm.getString("messageDispatchInterceptor.unableAdd.queue"));
@@ -187,7 +195,8 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
 
 
     /**
-     * Set whether to use deep clone.
+     * Set whether to use deep clone. When false, the queued message is a shallow clone of the original with the
+     * message bytes copied to a new buffer rather than a fully re-serialized deep clone.
      * @param useDeepClone whether to use deep clone
      */
     public void setUseDeepClone(boolean useDeepClone) {
