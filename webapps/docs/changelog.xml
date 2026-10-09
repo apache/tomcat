@@ -2584,6 +2584,15 @@
         and failures of the original message were never reported at
         all. (remm)
       </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now remembers a
+        confirmation message that arrives before the original message
+        it confirms, and releases the original as soon as it arrives.
+        Previously, the confirmation was consumed as an error and the
+        original message was silently dropped when it arrived and no
+        further confirmation ever followed, so a single moment of
+        network reordering cost one lost cluster message. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
