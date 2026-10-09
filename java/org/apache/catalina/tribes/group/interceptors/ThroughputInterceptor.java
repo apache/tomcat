@@ -75,9 +75,11 @@ public class ThroughputInterceptor extends ChannelInterceptorBase implements Thr
             super.sendMessage(destination, msg, payload);
         } catch (ChannelException x) {
             msgTxErr.addAndGet(1);
-            if (access.get() == 1) {
-                access.addAndGet(-1);
-            }
+            // Release the in-flight slot exactly once. The previous check-then-act on
+            // access could skip the decrement when another send was still in flight,
+            // permanently keeping the counter above zero and stopping the reports, or
+            // let two failing sends decrement the same slot.
+            access.addAndGet(-1);
             throw x;
         }
         mbTx += (bytes * destination.length) / (1024d * 1024d);
