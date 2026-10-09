@@ -68,6 +68,31 @@ public class TestTwoPhaseCommitInterceptor {
         return payload;
     }
 
+    // Upstream stand-in: records the messages the interceptor releases
+    private static class RecordingReceiveChain extends ChannelInterceptorBase {
+
+        private final List<ChannelMessage> messages = Collections.synchronizedList(new ArrayList<>());
+
+        @Override
+        public void messageReceived(ChannelMessage msg) {
+            messages.add(msg);
+        }
+    }
+
+    /*
+     * Runs a message through a sender-side interceptor and returns the confirmation message
+     * the interceptor generated for it.
+     */
+    private static ChannelMessage buildConfirmation(Member sender, ChannelData original) throws Exception {
+        TwoPhaseCommitInterceptor senderInterceptor = new TwoPhaseCommitInterceptor();
+        RecordingSendChain chain = new RecordingSendChain();
+        GroupChannel channel = new GroupChannel();
+        senderInterceptor.setChannel(channel);
+        senderInterceptor.setNext(chain);
+        senderInterceptor.sendMessage(new Member[] { sender }, original, null);
+        return chain.messages.get(1);
+    }
+
     private static ChannelData createMessage(Member source) {
         ChannelData data = new ChannelData(false);
         data.setUniqueId(UUIDGenerator.randomUUID(false));
@@ -144,6 +169,79 @@ public class TestTwoPhaseCommitInterceptor {
                 originalId, chain.messages.get(1).getUniqueId());
         Assert.assertFalse("The confirmation must carry a different id",
                 Arrays.equals(savedId, chain.messages.get(1).getUniqueId()));
+    }
+
+    @Test
+    public void testConfirmationArrivingBeforeOriginalReleasesLateOriginal() throws Exception {
+        MemberImpl member = new MemberImpl("localhost", 4000, -1);
+        ChannelData original = createMessage(member);
+        ChannelMessage confirmation = buildConfirmation(member, original);
+
+        TwoPhaseCommitInterceptor receiver = new TwoPhaseCommitInterceptor();
+        RecordingReceiveChain released = new RecordingReceiveChain();
+        receiver.setPrevious(released);
+
+        receiver.messageReceived(confirmation);
+        Assert.assertFalse("The confirmation must be held for the original",
+                receiver.earlyConfirmations.isEmpty());
+        Assert.assertTrue("Nothing may be released before the original arrives",
+                released.messages.isEmpty());
+
+        receiver.messageReceived(original);
+        Assert.assertEquals("The late original must be released immediately",
+                1, released.messages.size());
+        Assert.assertTrue("No bookkeeping may remain",
+                receiver.messages.isEmpty() && receiver.earlyConfirmations.isEmpty());
+    }
+
+    @Test
+    public void testOriginalThenConfirmationDeliveredOnce() throws Exception {
+        MemberImpl member = new MemberImpl("localhost", 4000, -1);
+        ChannelData original = createMessage(member);
+        ChannelMessage confirmation = buildConfirmation(member, original);
+
+        TwoPhaseCommitInterceptor receiver = new TwoPhaseCommitInterceptor();
+        RecordingReceiveChain released = new RecordingReceiveChain();
+        receiver.setPrevious(released);
+
+        receiver.messageReceived(original);
+        Assert.assertTrue("The original must be held for the confirmation",
+                released.messages.isEmpty());
+
+        receiver.messageReceived(confirmation);
+        Assert.assertEquals("The confirmed original must be released",
+                1, released.messages.size());
+        Assert.assertTrue("No bookkeeping may remain",
+                receiver.messages.isEmpty() && receiver.earlyConfirmations.isEmpty());
+
+        // A duplicate confirmation for the same id must not deliver again
+        receiver.messageReceived(confirmation);
+        Assert.assertEquals(1, released.messages.size());
+    }
+
+    @Test
+    public void testEarlyConfirmationExpiresWithoutOriginal() throws Exception {
+        MemberImpl member = new MemberImpl("localhost", 4000, -1);
+        ChannelData original = createMessage(member);
+        ChannelMessage confirmation = buildConfirmation(member, original);
+
+        TwoPhaseCommitInterceptor receiver = new TwoPhaseCommitInterceptor();
+        receiver.setExpire(50);
+        RecordingReceiveChain released = new RecordingReceiveChain();
+        receiver.setPrevious(released);
+
+        receiver.messageReceived(confirmation);
+        Assert.assertEquals(1, receiver.earlyConfirmations.size());
+
+        Thread.sleep(200);
+        receiver.heartbeat();
+        Assert.assertTrue("The stale confirmation must be dropped",
+                receiver.earlyConfirmations.isEmpty());
+
+        // The original is no longer matched against the expired confirmation
+        receiver.messageReceived(original);
+        Assert.assertTrue("A message after the expired confirmation must not be released",
+                released.messages.isEmpty());
     }
 
     @Test
