@@ -78,7 +78,11 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         // msg.setOptions(msg.getOptions() & (~getOptionFlag())
         // and just send one message
         if (okToProcess(msg.getOptions())) {
-            super.sendMessage(destination, msg, null);
+            // The payload carries the application error handler. It applies to the real
+            // message, so forward it with the original. The confirmation is an internal
+            // message with a random id the application cannot correlate, so it goes without
+            // a payload, which also keeps the handler from being notified twice per send
+            super.sendMessage(destination, msg, payload);
             ChannelMessage confirmation;
             if (deepclone) {
                 confirmation = (ChannelMessage) msg.deepclone();
@@ -90,7 +94,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             confirmation.getMessage().append(START_DATA, 0, START_DATA.length);
             confirmation.getMessage().append(msg.getUniqueId(), 0, msg.getUniqueId().length);
             confirmation.getMessage().append(END_DATA, 0, END_DATA.length);
-            super.sendMessage(destination, confirmation, payload);
+            super.sendMessage(destination, confirmation, null);
         } else {
             // turn off two phase commit
             // this won't work if the interceptor has 0 as a flag
