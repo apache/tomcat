@@ -157,10 +157,17 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * The wait blocks the calling thread, which for membership events is the channel
      * utility executor thread that also runs the channel heartbeat. Lowering this value
      * reduces the time that a single membership event can delay heartbeats and other
-     * membership processing. The same value is also used as the TCP connect timeout
-     * when verifying the liveness of members during a merge.
+     * membership processing. The liveness checks performed while merging an arriving
+     * coordination message use {@link #mergeAliveTimeout} instead.
      */
     protected long waitForCoordMsgTimeout = 15000;
+    /**
+     * Time to wait for the TCP connect of the member liveness checks performed while
+     * merging an arriving coordination message. These checks run on the channel receiver
+     * worker threads, so this timeout is kept separate from and much shorter than
+     * {@link #waitForCoordMsgTimeout}.
+     */
+    protected long mergeAliveTimeout = 1000;
     /**
      * Our current view
      */
@@ -212,8 +219,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     /**
      * Returns the time in milliseconds that a non-leader node waits for a coordination
-     * message when an election is started. The same value is also used as the TCP
-     * connect timeout when verifying the liveness of members during a merge.
+     * message when an election is started.
      *
      * @return the coordination message wait timeout in milliseconds
      */
@@ -222,13 +228,45 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
+     * Returns the time in milliseconds that the TCP connect of the member liveness
+     * checks waits during the merge of an arriving coordination message.
+     *
+     * @return the merge liveness check timeout in milliseconds
+     */
+    public long getMergeAliveTimeout() {
+        return mergeAliveTimeout;
+    }
+
+    /**
+     * Sets the time in milliseconds that the TCP connect of the member liveness checks
+     * waits during the merge of an arriving coordination message. Since these checks run
+     * sequentially on the channel receiver worker threads, the value should stay short to
+     * avoid pinning receiver workers when a coordination message carries stale or dead
+     * members.
+     *
+     * @param mergeAliveTimeout the merge liveness check timeout in milliseconds, at
+     *                              least one and no more than
+     *                              {@link Integer#MAX_VALUE}
+     */
+    public void setMergeAliveTimeout(long mergeAliveTimeout) {
+        if (mergeAliveTimeout < 1) {
+            throw new IllegalArgumentException(sm.getString("nonBlockingCoordinator.mergeAliveTimeout.tooSmall"));
+        }
+        if (mergeAliveTimeout > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(sm.getString("nonBlockingCoordinator.mergeAliveTimeout.tooLarge",
+                    Integer.toString(Integer.MAX_VALUE)));
+        }
+        this.mergeAliveTimeout = mergeAliveTimeout;
+    }
+
+    /**
      * Sets the time in milliseconds that a non-leader node waits for a coordination
-     * message when an election is started. The same value is also used as the TCP
-     * connect timeout when verifying the liveness of members during a merge. Since the
-     * wait blocks the calling thread, which for membership events is the single
-     * threaded channel utility executor that also runs the channel heartbeat, a lower
-     * value limits the delay that a single membership event can impose on other channel
-     * maintenance work.
+     * message when an election is started. Since the wait blocks the calling thread,
+     * which for membership events is the single threaded channel utility executor that
+     * also runs the channel heartbeat, a lower value limits the delay that a single
+     * membership event can impose on other channel maintenance work. The merge-time
+     * liveness checks are not affected by this value, they use
+     * {@link #getMergeAliveTimeout()}.
      *
      * @param waitForCoordMsgTimeout the coordination message wait timeout in
      *                                   milliseconds, at least one and no more than
@@ -399,14 +437,14 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Checks if a member is alive using the coordination message wait timeout
-     * ({@link #getWaitForCoordMsgTimeout()}) as the connection timeout.
+     * Checks if a member is alive using the merge liveness timeout
+     * ({@link #getMergeAliveTimeout()}) as the connection timeout.
      *
      * @param mbr The member to check
      * @return true if the member is alive
      */
     protected boolean alive(Member mbr) {
-        return memberAlive(mbr, waitForCoordMsgTimeout);
+        return memberAlive(mbr, mergeAliveTimeout);
     }
 
     /**
@@ -450,6 +488,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Member[] diff = Arrays.diff(merged, membership, local);
         for (Member member : diff) {
             if (!alive(member)) {
+                if (log.isWarnEnabled()) {
+                    log.warn(sm.getString("nonBlockingCoordinator.mergeMemberNotAlive", member));
+                }
                 merged.removeMember(member);
             } else {
                 memberAdded(member, false);
