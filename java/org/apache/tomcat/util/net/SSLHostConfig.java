@@ -575,6 +575,16 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * Returns the placeholder certificate that was created at runtime because no certificate was configured, if any.
+     *
+     * @return the runtime placeholder certificate or {@code null} if none was created
+     */
+    public SSLHostConfigCertificate getDefaultCertificate() {
+        return defaultCertificate;
+    }
+
+
     // ----------------------------------------- Common configuration properties
 
     /**

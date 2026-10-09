@@ -23,7 +23,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 
@@ -88,11 +87,13 @@ public class SSLHostConfigSF extends StoreFactoryBase {
             // Store nested <SSLHostConfigCertificate> elements
             SSLHostConfigCertificate[] hostConfigsCertificates =
                     sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
-            // Remove a possible default UNDEFINED certificate
-            if (hostConfigsCertificates.length > 1) {
+            // Remove the runtime placeholder certificate that was created when
+            // no certificate was configured
+            SSLHostConfigCertificate defaultCertificate = sslHostConfig.getDefaultCertificate();
+            if (defaultCertificate != null) {
                 ArrayList<SSLHostConfigCertificate> certificates = new ArrayList<>();
                 for (SSLHostConfigCertificate certificate : hostConfigsCertificates) {
-                    if (Type.UNDEFINED != certificate.getType()) {
+                    if (certificate != defaultCertificate) {
                         certificates.add(certificate);
                     }
                 }
