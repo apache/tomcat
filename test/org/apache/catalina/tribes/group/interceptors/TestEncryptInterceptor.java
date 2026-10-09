@@ -385,7 +385,7 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
     }
 
     @Test
-    public void testTcpFailureDetectorDetection() {
+    public void testTcpFailureDetectorDetection() throws Exception {
         src.setPrevious(new TcpFailureDetector());
 
         try {
@@ -399,6 +399,25 @@ public class TestEncryptInterceptor extends EncryptionInterceptorBaseTest {
         } catch (Throwable t) {
             Assert.fail("EncryptionInterceptor should throw ChannelConfigException, not " + t.getClass().getName());
         }
+
+        // The failed start left the encryption manager uncreated, stop() must cope
+        src.stop(Channel.SND_TX_SEQ);
+    }
+
+    @Test
+    public void testStopAfterFailedStart() throws Exception {
+        EncryptInterceptor interceptor = new EncryptInterceptor();
+
+        // No key is set, so start() fails before the encryption manager is created
+        try {
+            interceptor.start(Channel.SND_TX_SEQ);
+            Assert.fail("start() without a key should fail");
+        } catch (IllegalStateException ise) {
+            // Expected
+        }
+
+        // stop() must tolerate the missing encryption manager rather than fail with an NPE
+        interceptor.stop(Channel.SND_TX_SEQ);
     }
 
     private byte[] encrypt(String message, long timestamp) throws Exception {
