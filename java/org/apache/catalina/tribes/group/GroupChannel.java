@@ -493,7 +493,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             ownExecutor = true;
         }
         super.start(svc);
-        monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        if (monitorFuture == null || monitorFuture.isDone()) {
+            monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -516,27 +518,34 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     @Override
     public synchronized void stop(int svc) throws ChannelException {
-        if (monitorFuture != null) {
-            monitorFuture.cancel(true);
-            monitorFuture = null;
-        }
-        if (heartbeatFuture != null) {
-            heartbeatFuture.cancel(true);
-            heartbeatFuture = null;
-        }
         super.stop(svc);
-        if ((svc & DEFAULT) == DEFAULT && sslContext != null) {
-            sslContext.close();
-            sslContext = null;
-        }
-        if (ownExecutor) {
-            utilityExecutor.shutdown();
-            utilityExecutor = null;
-            ownExecutor = false;
-        }
-        if (oname != null) {
-            JmxRegistry.getRegistry(this).unregisterJmx(oname);
-            oname = null;
+        if (coordinator.getStartLevel() == 0) {
+            // The monitor and the heartbeat only make sense while services
+            // are running. Cancel them, and release an executor that this
+            // channel owns, only once all services have been stopped. A
+            // partial stop must not tear down what the started services
+            // still rely on.
+            if (monitorFuture != null) {
+                monitorFuture.cancel(true);
+                monitorFuture = null;
+            }
+            if (heartbeatFuture != null) {
+                heartbeatFuture.cancel(true);
+                heartbeatFuture = null;
+            }
+            if ((svc & DEFAULT) == DEFAULT && sslContext != null) {
+                sslContext.close();
+                sslContext = null;
+            }
+            if (ownExecutor && utilityExecutor != null) {
+                utilityExecutor.shutdown();
+                utilityExecutor = null;
+                ownExecutor = false;
+            }
+            if (oname != null) {
+                JmxRegistry.getRegistry(this).unregisterJmx(oname);
+                oname = null;
+            }
         }
     }
 

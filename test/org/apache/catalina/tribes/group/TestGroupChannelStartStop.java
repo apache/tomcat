@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.util.concurrent.ScheduledFuture;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -124,6 +126,42 @@ public class TestGroupChannelStartStop {
         }
         Assert.assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
+    }
+
+    @Test
+    public void testNoMonitorLeakOnRepeatedStart() throws Exception {
+        channel.start(Channel.DEFAULT);
+        ScheduledFuture<?> firstMonitor = channel.monitorFuture;
+        Assert.assertNotNull(firstMonitor);
+        // a second start must not schedule a second monitor task
+        channel.start(Channel.DEFAULT);
+        Assert.assertSame(firstMonitor, channel.monitorFuture);
+        channel.stop(Channel.DEFAULT);
+    }
+
+    @Test
+    public void testPartialStopKeepsHeartbeatAlive() throws Exception {
+        channel.start(Channel.DEFAULT);
+        // the monitor task runs immediately and schedules the heartbeat
+        long deadline = System.currentTimeMillis() + 10000;
+        while (channel.heartbeatFuture == null && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50);
+        }
+        ScheduledFuture<?> monitor = channel.monitorFuture;
+        ScheduledFuture<?> heartbeat = channel.heartbeatFuture;
+        Assert.assertNotNull(heartbeat);
+        // a partial stop must not cancel the monitor or the heartbeat
+        channel.stop(Channel.SND_RX_SEQ);
+        Assert.assertSame(monitor, channel.monitorFuture);
+        Assert.assertFalse(monitor.isCancelled());
+        Assert.assertFalse(heartbeat.isCancelled());
+        Assert.assertNotNull(channel.utilityExecutor);
+        // a full stop cancels them
+        channel.stop(Channel.DEFAULT);
+        Assert.assertNull(channel.monitorFuture);
+        Assert.assertNull(channel.heartbeatFuture);
+        Assert.assertTrue(monitor.isCancelled());
+        Assert.assertTrue(heartbeat.isCancelled());
     }
 
     @Test
