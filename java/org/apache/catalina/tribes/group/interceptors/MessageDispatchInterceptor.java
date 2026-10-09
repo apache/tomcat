@@ -115,12 +115,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             // add to queue
             if (useDeepClone) {
                 msg = (ChannelMessage) msg.deepclone();
-            } else if (msg instanceof ChannelData channelData) {
+            } else if (msg instanceof ChannelData) {
                 // The caller of sendMessage() may reuse the buffer that backs the
                 // message as soon as this method returns, e.g. GroupChannel.send()
                 // returns it to the BufferPool. Clone, which copies the message
                 // data, so the queued message is independent of that buffer.
-                msg = channelData.clone();
+                msg = ((ChannelData) msg).clone();
             }
             if (!addToQueue(msg, destination, payload)) {
                 throw new ChannelException(sm.getString("messageDispatchInterceptor.unableAdd.queue"));
