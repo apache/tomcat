@@ -495,6 +495,19 @@
         and reused by a concurrent send while the queued message still
         referenced it, corrupting the transmitted data. (remm)
       </fix>
+      <fix>
+        Fix the queue size accounting of the
+        <code>MessageDispatchInterceptor</code>. The message length
+        recorded when a message is queued is now also the length used
+        to release the accounting when the send completes. Previously,
+        when a downstream interceptor like
+        <code>EncryptInterceptor</code> or
+        <code>FragmentationInterceptor</code> replaced or extended the
+        message payload while the message was sent, the recorded queue
+        size drifted towards negative values and the
+        <code>maxQueueSize</code> limit eventually stopped being
+        enforced. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
