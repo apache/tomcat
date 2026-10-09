@@ -34,11 +34,13 @@ import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.LockOutRealm;
+import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.startup.CatalinaBaseConfigurationSource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.xml.sax.InputSource;
@@ -328,6 +330,253 @@ public class TestStoreConfig extends TomcatBaseTest {
         // The stored configuration must remain well-formed
         SAXParserFactory.newInstance().newSAXParser().getXMLReader()
                 .parse(new InputSource(new StringReader(contextXmlDump)));
+    }
+
+    /**
+     * Verify that the &lt;Manager&gt; element is not stored for a running context using the default StandardManager
+     * configuration. The jvmRoute of the session ID generator is runtime state that the manager propagates from the
+     * Engine when it starts and must not defeat the default detection.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testDefaultManagerNotStored() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        File appDir = new File(getTemporaryDirectory(), "webapps/defmgr");
+        if (!appDir.mkdirs()) {
+            Assert.fail("Unable to create the webapp directory");
+        }
+        Context context = tomcat.addContext("/defmgr", appDir.getAbsolutePath());
+        ((StandardContext) context).setDeployedFromServerXml(true);
+
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.isDirectory() && !conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        addDeleteOnTearDown(conf);
+
+        tomcat.start();
+
+        // Undo the FastNonSecureRandom configuration the test base applies to every manager, so the started manager
+        // is in the same (default) state as it would be on a regular server
+        StandardManager manager = (StandardManager) ((StandardContext) context).getManager();
+        manager.setSecureRandomClass(null);
+        ((SessionIdGeneratorBase) manager.getSessionIdGenerator()).setSecureRandomClass(null);
+
+        IStoreConfig storeConfig = storeConfigListener.getStoreConfig();
+        StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
+        Assert.assertNotNull(desc);
+        boolean oldSeparate = desc.isStoreSeparate();
+        boolean oldExternalAllowed = desc.isExternalAllowed();
+        boolean oldExternalOnly = desc.isExternalOnly();
+        String serverXmlDump;
+        try {
+            desc.setStoreSeparate(true);
+            desc.setExternalAllowed(true);
+            desc.setExternalOnly(false);
+            StringWriter buffer = new StringWriter();
+            storeConfig.store(new PrintWriter(buffer), -2, tomcat.getServer());
+            serverXmlDump = buffer.toString();
+        } finally {
+            desc.setStoreSeparate(oldSeparate);
+            desc.setExternalAllowed(oldExternalAllowed);
+            desc.setExternalOnly(oldExternalOnly);
+        }
+
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("path=\"/defmgr\""));
+        // The manager of the started context is at its default configuration, so no <Manager> element may be stored
+        Assert.assertFalse(serverXmlDump, serverXmlDump.contains("<Manager"));
+        Assert.assertFalse(serverXmlDump, serverXmlDump.contains("StandardManager"));
+        Assert.assertFalse(serverXmlDump, serverXmlDump.contains("SessionIdGenerator"));
+    }
+
+    /**
+     * Verify that a &lt;Manager&gt; element is still stored for a context whose StandardManager deviates from the
+     * default configuration.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testNonDefaultManagerStored() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        File appDir = new File(getTemporaryDirectory(), "webapps/nondflmgr");
+        if (!appDir.mkdirs()) {
+            Assert.fail("Unable to create the webapp directory");
+        }
+        Context context = tomcat.addContext("/nondflmgr", appDir.getAbsolutePath());
+        ((StandardContext) context).setDeployedFromServerXml(true);
+        StandardManager manager = new StandardManager();
+        manager.setMaxActiveSessions(100);
+        ((StandardContext) context).setManager(manager);
+
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.isDirectory() && !conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        addDeleteOnTearDown(conf);
+
+        tomcat.start();
+
+        IStoreConfig storeConfig = storeConfigListener.getStoreConfig();
+        StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
+        Assert.assertNotNull(desc);
+        boolean oldSeparate = desc.isStoreSeparate();
+        boolean oldExternalAllowed = desc.isExternalAllowed();
+        boolean oldExternalOnly = desc.isExternalOnly();
+        String serverXmlDump;
+        try {
+            desc.setStoreSeparate(true);
+            desc.setExternalAllowed(true);
+            desc.setExternalOnly(false);
+            StringWriter buffer = new StringWriter();
+            storeConfig.store(new PrintWriter(buffer), -2, tomcat.getServer());
+            serverXmlDump = buffer.toString();
+        } finally {
+            desc.setStoreSeparate(oldSeparate);
+            desc.setExternalAllowed(oldExternalAllowed);
+            desc.setExternalOnly(oldExternalOnly);
+        }
+
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("<Manager"));
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("maxActiveSessions=\"100\""));
+    }
+
+    /**
+     * Verify that a &lt;Manager&gt; element with a StandardManager sub-class is still stored, since the sub-class is
+     * configured through its class name even when all inherited properties are at their defaults.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testSubClassManagerStored() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        File appDir = new File(getTemporaryDirectory(), "webapps/subcmgr");
+        if (!appDir.mkdirs()) {
+            Assert.fail("Unable to create the webapp directory");
+        }
+        Context context = tomcat.addContext("/subcmgr", appDir.getAbsolutePath());
+        ((StandardContext) context).setDeployedFromServerXml(true);
+        ((StandardContext) context).setManager(new CustomTestManager());
+
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.isDirectory() && !conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        addDeleteOnTearDown(conf);
+
+        tomcat.start();
+
+        IStoreConfig storeConfig = storeConfigListener.getStoreConfig();
+        StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
+        Assert.assertNotNull(desc);
+        boolean oldSeparate = desc.isStoreSeparate();
+        boolean oldExternalAllowed = desc.isExternalAllowed();
+        boolean oldExternalOnly = desc.isExternalOnly();
+        String serverXmlDump;
+        try {
+            desc.setStoreSeparate(true);
+            desc.setExternalAllowed(true);
+            desc.setExternalOnly(false);
+            StringWriter buffer = new StringWriter();
+            storeConfig.store(new PrintWriter(buffer), -2, tomcat.getServer());
+            serverXmlDump = buffer.toString();
+        } finally {
+            desc.setStoreSeparate(oldSeparate);
+            desc.setExternalAllowed(oldExternalAllowed);
+            desc.setExternalOnly(oldExternalOnly);
+        }
+
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("<Manager"));
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains(CustomTestManager.class.getName()));
+    }
+
+    /**
+     * Verify that a &lt;Manager&gt; element is stored when the only deviation from the default configuration is a
+     * non-default <code>throwOnFailure</code> value, which is a persistable property that must not be lost.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testManagerThrowOnFailureStored() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StoreConfigLifecycleListener storeConfigListener = new StoreConfigLifecycleListener();
+        tomcat.getServer().addLifecycleListener(storeConfigListener);
+
+        // Use a storable realm. The default embedded realm (Tomcat.SimpleRealm) is an inner class that the store
+        // path cannot instantiate a default instance of.
+        tomcat.getEngine().setRealm(new LockOutRealm());
+
+        File appDir = new File(getTemporaryDirectory(), "webapps/tofmgr");
+        if (!appDir.mkdirs()) {
+            Assert.fail("Unable to create the webapp directory");
+        }
+        Context context = tomcat.addContext("/tofmgr", appDir.getAbsolutePath());
+        ((StandardContext) context).setDeployedFromServerXml(true);
+
+        File conf = new File(getTemporaryDirectory(), "conf");
+        if (!conf.isDirectory() && !conf.mkdirs()) {
+            Assert.fail("Unable to create conf directory");
+        }
+        addDeleteOnTearDown(conf);
+
+        tomcat.start();
+
+        // Undo the FastNonSecureRandom configuration the test base applies to every manager, so throwOnFailure is the
+        // only deviation from the default manager configuration
+        StandardManager manager = (StandardManager) ((StandardContext) context).getManager();
+        manager.setSecureRandomClass(null);
+        ((SessionIdGeneratorBase) manager.getSessionIdGenerator()).setSecureRandomClass(null);
+        manager.setThrowOnFailure(false);
+
+        IStoreConfig storeConfig = storeConfigListener.getStoreConfig();
+        StoreDescription desc = storeConfig.getRegistry().findDescription(StandardContext.class);
+        Assert.assertNotNull(desc);
+        boolean oldSeparate = desc.isStoreSeparate();
+        boolean oldExternalAllowed = desc.isExternalAllowed();
+        boolean oldExternalOnly = desc.isExternalOnly();
+        String serverXmlDump;
+        try {
+            desc.setStoreSeparate(true);
+            desc.setExternalAllowed(true);
+            desc.setExternalOnly(false);
+            StringWriter buffer = new StringWriter();
+            storeConfig.store(new PrintWriter(buffer), -2, tomcat.getServer());
+            serverXmlDump = buffer.toString();
+        } finally {
+            desc.setStoreSeparate(oldSeparate);
+            desc.setExternalAllowed(oldExternalAllowed);
+            desc.setExternalOnly(oldExternalOnly);
+        }
+
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("<Manager"));
+        Assert.assertTrue(serverXmlDump, serverXmlDump.contains("throwOnFailure=\"false\""));
+    }
+
+    public static class CustomTestManager extends StandardManager {
+
+        public CustomTestManager() {
+        }
     }
 
     /**
