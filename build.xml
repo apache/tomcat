@@ -2075,40 +2075,53 @@
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
           depends="-test-name-default,test-only-nio,test-status" />
 
-  <target name="test-status"
-          description="Analyses logs directory and reports on skipped tests, test failures and test errors">
-    <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
-      <not>
-        <contains text="Skipped: 0" />
-      </not>
-    </fileset>
-    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
-      <not>
-        <contains text="Failures: 0, Errors: 0" />
-      </not>
-    </fileset>
-    <concat>
-      <header>Testsuites with skipped tests:${line.separator}</header>
-      <string>${toString:test.result.skippedtests}</string>
-      <filterchain>
-        <tokenfilter delimOutput="${line.separator}">
-          <stringtokenizer delims=";"/>
-        </tokenfilter>
-      </filterchain>
-    </concat>
-    <concat>
-      <header>Testsuites with failed tests:${line.separator}</header>
-      <string>${toString:test.result.failedtests}</string>
-      <filterchain>
-        <tokenfilter delimOutput="${line.separator}">
-          <stringtokenizer delims=";"/>
-        </tokenfilter>
-      </filterchain>
-    </concat>
+<target name="test-status"
+        description="Analyses logs directory and reports on skipped tests, test failures and test errors">
+  <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
+    <not>
+      <contains text="Skipped: 0" />
+    </not>
+  </fileset>
 
-    <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
-    <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
-  </target>
+  <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
+    <not>
+      <contains text="Failures: 0, Errors: 0" />
+    </not>
+  </fileset>
+
+  <condition property="test.result.skippedtests.empty">
+    <resourcecount refid="test.result.skippedtests" when="eq" count="0"/>
+  </condition>
+
+  <condition property="test.result.failedtests.empty">
+    <resourcecount refid="test.result.failedtests" when="eq" count="0"/>
+  </condition>
+
+  <concat>
+    <header>Testsuites with skipped tests:</header>
+    <string value=" None" if:set="test.result.skippedtests.empty"/>
+    <string value="${toString:test.result.skippedtests}" unless:set="test.result.skippedtests.empty"/>
+    <filterchain>
+      <tokenfilter delimOutput="${line.separator}">
+        <stringtokenizer delims=";"/>
+      </tokenfilter>
+    </filterchain>
+  </concat>
+
+  <concat>
+    <header>Testsuites with failed tests:</header>
+    <string value=" None" if:set="test.result.failedtests.empty"/>
+    <string value="${toString:test.result.failedtests}" unless:set="test.result.failedtests.empty"/>
+    <filterchain>
+      <tokenfilter delimOutput="${line.separator}">
+        <stringtokenizer delims=";"/>
+      </tokenfilter>
+    </filterchain>
+  </concat>
+
+  <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
+  <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
+</target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
           depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
